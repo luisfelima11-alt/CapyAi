@@ -1,0 +1,3406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lessons — Capy Yara Adventures</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { navy: '#001f3f', 'pink-brand': '#ec4899', 'green-brand': '#10b981' },
+          fontFamily: { sans: ['Plus Jakarta Sans','sans-serif'], headline: ['Plus Jakarta Sans','sans-serif'] }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .flip-card { perspective: 900px; }
+    .flip-inner { transition: transform .55s cubic-bezier(.4,2,.6,1); transform-style: preserve-3d; position: relative; }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-front, .flip-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .flip-back { transform: rotateY(180deg); position: absolute; inset: 0; }
+    .tool-tab { cursor: pointer; transition: all .18s; }
+    .tool-tab.active { background: #001f3f; color: #fff; }
+    .tool-panel { display: none; }
+    .tool-panel.active { display: block; animation: fadeUp .25s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .choice-btn { transition: all .15s; }
+    .choice-btn.correct { background:#dcfce7!important; border-color:#16a34a!important; color:#15803d!important; }
+    .choice-btn.wrong   { background:#fee2e2!important; border-color:#dc2626!important; color:#b91c1c!important; }
+    .word-tile { cursor:pointer; transition:all .15s; user-select:none; }
+    .word-tile.used { opacity:.3; pointer-events:none; }
+    .lesson-item { transition: all .15s; cursor: pointer; }
+    .lesson-item.active { background: #001f3f; color: #fff; }
+    .lesson-item.done .lesson-num { background: #10b981; color: #fff; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    .match-item { cursor: pointer; transition: all .18s; }
+    .match-item.selected { border-color: #ec4899; background: #fdf2f8; }
+    .match-item.matched { border-color: #10b981; background: #f0fdf4; pointer-events: none; }
+    .match-item.wrong-flash { border-color: #ef4444; background: #fef2f2; animation: shake .3s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+    /* Typing Practice */
+    .type-char { display:inline-block; min-width:1.5rem; height:2rem; text-align:center; line-height:2rem; font-weight:900; border-radius:6px; font-size:1rem; margin:0 1px; padding:0 2px; }
+    .type-char.hit  { background:#dcfce7; color:#15803d; }
+    .type-char.miss { background:#fee2e2; color:#b91c1c; }
+    /* Speed Round */
+    @keyframes countdown-shrink { from{stroke-dashoffset:0} to{stroke-dashoffset:188} }
+    .speed-ring-fill { fill:none; stroke:#ec4899; stroke-width:6; stroke-linecap:round; stroke-dasharray:188; transform-origin:center; transform:rotate(-90deg); }
+    /* Progress Dashboard */
+    .prog-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:99px; font-size:.7rem; font-weight:700; border:1.5px solid; cursor:pointer; transition:all .15s; }
+    .prog-pill.done { background:#dcfce7; color:#16a34a; border-color:#86efac; }
+    .prog-pill.active-pill { background:#fdf2f8; color:#db2777; border-color:#f9a8d4; }
+    .prog-pill.todo { background:#f8fafc; color:#94a3b8; border-color:#e2e8f0; }
+    /* Scramble */
+    .scramble-tile { display:inline-flex; align-items:center; justify-content:center; min-width:2.4rem; height:2.6rem; border-radius:10px; font-weight:900; font-size:1.1rem; cursor:pointer; transition:all .15s; border:2px solid; }
+    .scramble-tile:not(.used) { background:#fff; border-color:#e2e8f0; color:#001f3f; }
+    .scramble-tile:not(.used):hover { border-color:#ec4899; background:#fdf2f8; }
+    .scramble-tile.used { background:#f1f5f9; border-color:#e2e8f0; color:#cbd5e1; pointer-events:none; }
+    .scramble-box { display:inline-flex; align-items:center; justify-content:center; min-width:2.4rem; height:2.6rem; border-radius:10px; font-weight:900; font-size:1.1rem; border-bottom:3px solid #ec4899; margin:0 2px; min-width:2rem; color:#001f3f; }
+    .scramble-box.filled { background:#fdf2f8; border:2px solid #ec4899; border-radius:10px; }
+    @keyframes xpPop { 0%{opacity:1;transform:translateX(-50%) translateY(0)} 100%{opacity:0;transform:translateX(-50%) translateY(-40px)} }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+
+<div class="flex min-h-screen pt-20">
+
+  <!-- ── Sidebar ───────────────────────────────────────── -->
+  <aside id="lesson-sidebar" class="hidden md:flex flex-col w-72 bg-white border-r border-slate-100 fixed top-20 bottom-0 overflow-y-auto z-30 shadow-sm">
+    <div class="p-5 border-b border-slate-100">
+      <div class="flex items-center gap-3 mb-3">
+        <img src="capy%20Yara%20teacher%20generated%20pic.png" alt="Yara Teacher"
+             class="w-16 h-16 rounded-2xl object-cover shadow-md border-2 border-pink-100 flex-shrink-0"/>
+        <div>
+          <h1 class="font-headline text-lg font-extrabold text-navy">📖 Jadson's Course</h1>
+          <p class="text-xs text-slate-400 mt-0.5">with Yara 🎓</p>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400">22 aulas · English for Brazilians</p>
+      <!-- XP bar -->
+      <div class="mt-3 bg-slate-100 rounded-full h-2 overflow-hidden">
+        <div id="sidebar-xp-bar" class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full transition-all" style="width:0%"></div>
+      </div>
+      <p id="sidebar-xp-label" class="text-[10px] text-slate-400 mt-1">0 XP total</p>
+    </div>
+    <nav class="flex-1 p-3 space-y-1" id="lesson-list">
+      <!-- Populated by JS -->
+    </nav>
+  </aside>
+
+  <!-- ── Main content ───────────────────────────────────── -->
+  <main class="flex-1 md:ml-72 px-4 md:px-8 py-8 max-w-4xl">
+
+    <!-- ── GUIDED MODE HEADER (hidden in free mode) ── -->
+    <div id="guided-header" class="hidden mb-6">
+      <div class="flex items-center gap-3 mb-4">
+        <button onclick="window.location.href='learn.html'" class="flex items-center gap-1 text-slate-400 hover:text-navy text-sm font-bold transition-colors">
+          <span class="material-symbols-outlined text-base">arrow_back</span> Learning Path
+        </button>
+        <span class="text-slate-300">·</span>
+        <span id="guided-lesson-label" class="text-slate-600 text-sm font-bold"></span>
+      </div>
+      <!-- Step progress bar -->
+      <div class="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Progress</span>
+          <span id="guided-step-label" class="text-xs font-black text-pink-500"></span>
+        </div>
+        <div class="flex gap-2">
+          <div data-step="0" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+          <div data-step="1" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+          <div data-step="2" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+          <div data-step="3" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+          <div data-step="4" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+          <div data-step="5" class="guided-step-dot flex-1 h-2 rounded-full bg-slate-100 transition-all"></div>
+        </div>
+        <div class="flex gap-2 mt-1.5">
+          <span data-step="0" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">🔊</span>
+          <span data-step="1" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">❓</span>
+          <span data-step="2" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">🎮</span>
+          <span data-step="3" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">🏗️</span>
+          <span data-step="4" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">🎤</span>
+          <span data-step="5" class="guided-icon-label flex-1 text-center text-[9px] text-slate-400 font-bold">💬</span>
+        </div>
+        <!-- Continue banner — shown when a step is done in guided mode -->
+        <div id="guided-continue-banner" style="display:none" class="mt-4 text-center">
+          <button onclick="guidedNextStep()"
+                  class="bg-pink-500 text-white font-black px-7 py-2.5 rounded-full text-sm shadow-lg hover:bg-pink-400 active:scale-95 transition-all">
+            ✅ Continue to Next Step →
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ── GAME STEP PANEL (shown during game step in guided mode) ── -->
+    <div id="panel-game" class="tool-panel" style="display:none">
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 text-center">
+        <div id="game-step-emoji" class="text-6xl mb-4"></div>
+        <h3 id="game-step-title" class="text-2xl font-black text-navy mb-2"></h3>
+        <p class="text-slate-500 mb-6 text-sm">Play this game to reinforce what you just learned!</p>
+        <a id="game-step-link" href="#"
+           class="inline-flex items-center gap-2 bg-navy text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all mb-4">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">sports_esports</span>
+          Play Game
+        </a>
+        <p class="text-slate-400 text-xs mb-5">Jogue e use o botão voltar para retornar à trilha</p>
+        <button onclick="guidedGameDone()"
+                class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95">
+          ✅ I Finished the Game — Continue
+        </button>
+      </div>
+    </div>
+
+    <!-- ── LESSON COMPLETE OVERLAY (guided mode) ── -->
+    <div id="guided-complete-overlay" style="display:none"
+         class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center text-center px-6 py-10 overflow-y-auto">
+      <div class="text-8xl mb-4">🎉</div>
+      <h2 class="text-3xl font-black text-navy mb-2">Lesson Complete!</h2>
+      <p id="gco-lesson-label" class="text-slate-500 mb-3"></p>
+      <div class="flex gap-1 justify-center mb-6">⭐⭐⭐</div>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl px-8 py-4 mb-8 w-full max-w-xs">
+        <p id="gco-xp" class="font-black text-yellow-700 text-xl">+50 XP</p>
+        <p class="text-yellow-600 text-sm">earned this lesson</p>
+      </div>
+      <button id="gco-next-btn"
+              class="bg-navy text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all mb-3 w-full max-w-xs">
+        Next Lesson →
+      </button>
+      <button onclick="window.location.href='learn.html'"
+              class="bg-pink-500 text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all w-full max-w-xs">
+        🗺️ Back to Learning Path
+      </button>
+    </div>
+
+    <!-- ── AI CHAT PANEL (7th guided step) ── -->
+    <div id="panel-aichat" class="tool-panel" style="display:none">
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-pink-500 to-violet-500 p-5 flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">🦫</div>
+          <div class="flex-1">
+            <p class="text-white font-black text-lg leading-tight">Chat with Yara</p>
+            <p id="aichat-topic" class="text-white/70 text-xs mt-0.5"></p>
+          </div>
+          <div id="ai-remaining-badge" class="text-white/70 text-xs font-bold bg-white/15 px-2.5 py-1 rounded-full"></div>
+        </div>
+        <!-- Messages -->
+        <div id="aichat-messages" class="p-4 space-y-3 min-h-[200px] max-h-80 overflow-y-auto bg-slate-50/50"></div>
+        <!-- Input -->
+        <div class="border-t border-slate-100 p-4 flex gap-2 bg-white">
+          <input id="aichat-input" type="text" placeholder="Type your answer in English…"
+                 class="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-pink-400 transition-colors"
+                 onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button onclick="sendChat()"
+                  class="bg-pink-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-pink-400 active:scale-95 transition-all flex-shrink-0">
+            Send →
+          </button>
+        </div>
+        <!-- Done button (appears after 3+ exchanges) -->
+        <div id="aichat-done-row" style="display:none" class="px-4 pb-5 bg-white">
+          <button onclick="markToolDone(currentLesson.id,'aichat',3)"
+                  class="w-full bg-emerald-500 text-white font-black py-3 rounded-xl text-sm hover:bg-emerald-400 active:scale-95 transition-all">
+            ✅ Great chat! Finish Conversation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile lesson picker -->
+    <div class="md:hidden mb-5">
+      <select id="mobile-lesson-select" onchange="loadLesson(parseInt(this.value))"
+              class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 font-bold text-navy shadow-sm">
+      </select>
+    </div>
+
+    <!-- Lesson header -->
+    <div id="lesson-header" class="mb-6"></div>
+
+    <!-- Progress Dashboard -->
+    <div id="progress-dashboard" class="mb-5"></div>
+
+    <!-- Tool tabs -->
+    <div class="flex gap-2 flex-wrap mb-5" id="tool-tabs">
+      <button class="tool-tab active px-4 py-2 rounded-2xl font-bold text-sm bg-navy text-white border-2 border-transparent" data-tool="vocab" onclick="switchTool('vocab')">🃏 Flashcards</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="quiz"  onclick="switchTool('quiz')">❓ Quiz</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="build" onclick="switchTool('build')">🏗️ Build</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="expr"  onclick="switchTool('expr')">💬 Expressions</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="gram"  onclick="switchTool('gram')">📐 Grammar</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="speak" onclick="switchTool('speak')">🎤 Speak</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="listen" onclick="switchTool('listen')">🔊 Listen</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="typing" onclick="switchTool('typing')">⌨️ Typing</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="speed" onclick="switchTool('speed')">⏱️ Speed</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="scramble" onclick="switchTool('scramble')">🧩 Scramble</button>
+    </div>
+
+    <!-- Tool panels -->
+    <div id="panel-vocab"   class="tool-panel active"></div>
+    <div id="panel-quiz"    class="tool-panel"></div>
+    <div id="panel-build"   class="tool-panel"></div>
+    <div id="panel-expr"    class="tool-panel"></div>
+    <div id="panel-gram"    class="tool-panel"></div>
+    <div id="panel-speak"   class="tool-panel"></div>
+    <div id="panel-listen"  class="tool-panel"></div>
+    <div id="panel-typing"  class="tool-panel"></div>
+    <div id="panel-speed"   class="tool-panel"></div>
+    <div id="panel-scramble" class="tool-panel"></div>
+
+  </main>
+</div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// LESSON DATA — All 24 Jadson lessons + custom lessons merged at boot
+// ══════════════════════════════════════════════════════════════════════════════
+let ALL_LESSONS = []; // populated at DOMContentLoaded
+const JADSON_LESSONS = [
+  {
+    id: 1, title: 'To Have, Want, Need, Like', emoji: '💬',
+    verbs: ['To Have','To Want','To Need','To Like'],
+    vocab: [
+      {en:'Water',pt:'Água'},{en:'Food',pt:'Comida'},{en:'Coffee',pt:'Café'},
+      {en:'Money',pt:'Dinheiro'},{en:'A car',pt:'Um carro'},{en:'A house',pt:'Uma casa'},
+      {en:'Time',pt:'Tempo'},{en:'Help',pt:'Ajuda'},{en:'A job',pt:'Um emprego'},
+      {en:'A break',pt:'Uma pausa'},{en:'My family',pt:'Minha família'},{en:'My friends',pt:'Meus amigos'},
+      {en:'Work',pt:'Trabalho'},{en:'Home',pt:'Casa/Lar'},{en:'Today',pt:'Hoje'},
+      {en:'Now',pt:'Agora'},{en:'People',pt:'Pessoas'},{en:'A problem',pt:'Um problema'},
+      {en:'Information',pt:'Informação'},{en:'Something',pt:'Algo'},{en:'Good',pt:'Bom'},
+      {en:'New',pt:'Novo'},{en:'More',pt:'Mais'},{en:'Some',pt:'Algum/uns'},
+      {en:'Very',pt:'Muito'},{en:'With',pt:'Com'},{en:'And',pt:'E'},
+      {en:'But',pt:'Mas'},{en:'Big',pt:'Grande'},{en:'Small',pt:'Pequeno'},
+    ],
+    expressions: [
+      {expr:'Excuse me',meaning:'Com licença / Me desculpe',example:'Excuse me, I have a question.'},
+      {expr:"I'm sorry",meaning:'Sinto muito / Me desculpe',example:"I'm sorry, I have a problem now."},
+      {expr:'How much is it?',meaning:'Quanto custa?',example:'How much is it for the new car?'},
+      {expr:"That's fine",meaning:'Está bem / Tudo certo',example:"You want a break? That's fine."},
+    ],
+    sentences: [
+      'I have a car.','You have a big house.','He has a new job.',
+      'She wants a break now.','We need more money.','They like good food.',
+      'I need help now.','You have my coffee.',
+    ],
+    grammar: {
+      title: 'A Regra dos 3 Mosqueteiros (He, She, It)',
+      rules: [
+        'Para a maioria dos verbos, adicione <b>-s</b> no final para He, She, It: I want → He <b>wants</b>',
+        'O verbo "To Have" é irregular: I have → He <b>has</b>',
+        'Para todos os outros pronomes (I, You, We, They), o verbo <b>não muda</b>.',
+      ],
+      table: {
+        headers: ['Pronome','To Have','To Want','To Need','To Like'],
+        rows: [
+          ['I','have','want','need','like'],
+          ['You','have','want','need','like'],
+          ['He/She/It','<b>has</b>','<b>wants</b>','<b>needs</b>','<b>likes</b>'],
+          ['We','have','want','need','like'],
+          ['They','have','want','need','like'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ a new job now.',a:'wants',opts:['want','wants','need','like']},
+      {q:'I ___ help now.',a:'need',opts:['needs','have','need','wants']},
+      {q:'They ___ good food.',a:'like',opts:['likes','have','want','like']},
+      {q:'He ___ my coffee.',a:'has',opts:['have','has','want','needs']},
+      {q:'We ___ more time.',a:'have',opts:['has','want','have','need']},
+    ],
+    speak: ['I have a car.','She needs help.','They like good food.','We want more time.','He has a new job.'],
+  },
+
+  {
+    id: 2, title: 'To Go, Do, Say, See', emoji: '🚶',
+    verbs: ['To Go','To Do','To Say','To See'],
+    vocab: [
+      {en:'Year',pt:'Ano'},{en:'Day',pt:'Dia'},{en:'Man',pt:'Homem'},
+      {en:'Woman',pt:'Mulher'},{en:'Life',pt:'Vida'},{en:'Child',pt:'Criança'},
+      {en:'World',pt:'Mundo'},{en:'School',pt:'Escola'},{en:'State',pt:'Estado'},
+      {en:'Student',pt:'Estudante'},{en:'Group',pt:'Grupo'},{en:'Country',pt:'País'},
+      {en:'Hand',pt:'Mão'},{en:'Part',pt:'Parte'},{en:'Place',pt:'Lugar'},
+      {en:'Case',pt:'Caso'},{en:'Week',pt:'Semana'},{en:'Company',pt:'Empresa'},
+      {en:'System',pt:'Sistema'},{en:'Program',pt:'Programa'},{en:'Question',pt:'Pergunta'},
+      {en:'Night',pt:'Noite'},{en:'Point',pt:'Ponto'},{en:'Room',pt:'Quarto/Sala'},
+      {en:'Story',pt:'História'},{en:'Fact',pt:'Fato'},{en:'Month',pt:'Mês'},
+      {en:'Lot',pt:'Muito/Bastante'},{en:'Right',pt:'Certo/Direito'},{en:'Study',pt:'Estudo'},
+    ],
+    expressions: [
+      {expr:'So far, so good.',meaning:'Até agora, tudo bem.',example:'So far, so good, I see the point.'},
+      {expr:'My bad.',meaning:'Minha culpa / Foi mal.',example:'My bad, I do the wrong thing.'},
+      {expr:'Hang in there.',meaning:'Aguenta firme / Não desista.',example:'Hang in there, you do a good job.'},
+      {expr:'A piece of cake.',meaning:'Moleza / Muito fácil.',example:'This study is a piece of cake.'},
+    ],
+    sentences: [
+      'I go to school.','You go to work.','He goes to the room.',
+      'She says the story.','We do a lot of things.','They see the school.',
+      'Do you go to school?','Does he see the man?',
+    ],
+    grammar: {
+      title: 'Do / Does — Negativas e Perguntas',
+      rules: [
+        'Para negar: <b>don\'t</b> (I/You/We/They) e <b>doesn\'t</b> (He/She/It)',
+        'Com doesn\'t, o verbo principal <b>perde o -s</b>: He goes → He doesn\'t <b>go</b>',
+        'Para perguntas, coloque Do/Does <b>no início</b>: Do you go? / Does she see?',
+      ],
+      table: {
+        headers: ['Pronome','Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I','I go','I don\'t go','Do I go?'],
+          ['You','You go','You don\'t go','Do you go?'],
+          ['He/She','He goes','He doesn\'t go','Does he go?'],
+          ['We','We go','We don\'t go','Do we go?'],
+          ['They','They go','They don\'t go','Do they go?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'He ___ to the room.',a:'goes',opts:['go','goes','do','see']},
+      {q:'She ___ the story.',a:'says',opts:['say','see','says','goes']},
+      {q:'___ you go to school?',a:'Do',opts:['Does','Do','Is','Are']},
+      {q:'He ___ go to work. (negative)',a:"doesn't",opts:["don't","doesn't","isn't","aren't"]},
+      {q:'They ___ the school.',a:'see',opts:['sees','go','see','do']},
+    ],
+    speak: ['I go to school.','Does she go to work?','They don\'t see the problem.','He does his homework.','We say the truth.'],
+  },
+
+  {
+    id: 3, title: 'To Get, Make, Know, Take', emoji: '🧠',
+    verbs: ['To Get','To Make','To Know','To Take'],
+    vocab: [
+      {en:'Way',pt:'Caminho/Jeito'},{en:'Thing',pt:'Coisa'},{en:'Person',pt:'Pessoa'},
+      {en:'Eye',pt:'Olho'},{en:'Mother',pt:'Mãe'},{en:'Father',pt:'Pai'},
+      {en:'Brother',pt:'Irmão'},{en:'Sister',pt:'Irmã'},{en:'Friend',pt:'Amigo'},
+      {en:'Book',pt:'Livro'},{en:'Door',pt:'Porta'},{en:'Window',pt:'Janela'},
+      {en:'City',pt:'Cidade'},{en:'Street',pt:'Rua'},{en:'Bus',pt:'Ônibus'},
+      {en:'Plane',pt:'Avião'},{en:'Idea',pt:'Ideia'},{en:'Solution',pt:'Solução'},
+      {en:'Name',pt:'Nome'},{en:'Number',pt:'Número'},{en:'Side',pt:'Lado'},
+      {en:'Kind',pt:'Tipo/Gentil'},{en:'Head',pt:'Cabeça'},{en:'Office',pt:'Escritório'},
+      {en:'Service',pt:'Serviço'},{en:'Body',pt:'Corpo'},{en:'Face',pt:'Rosto'},
+      {en:'End',pt:'Fim'},{en:'Morning',pt:'Manhã'},{en:'Afternoon',pt:'Tarde'},
+    ],
+    expressions: [
+      {expr:'Break the ice.',meaning:'Quebrar o gelo (iniciar conversa).',example:'He knows how to break the ice.'},
+      {expr:'Cut corners.',meaning:'Fazer o mínimo/pular etapas.',example:"Don't cut corners with your study."},
+      {expr:'Better late than never.',meaning:'Melhor tarde do que nunca.',example:'Better late than never, I get the solution.'},
+      {expr:"Call it a day.",meaning:'Encerrar por hoje.',example:"Let's call it a day, we take the bus now."},
+    ],
+    sentences: [
+      'I get the book.','She gets the money.','You make the food.',
+      'We make the plan.','I know the way.','He knows the name.',
+      'They take the bus.','She takes the time.',
+    ],
+    grammar: {
+      title: 'WH-Questions (Question Words)',
+      rules: [
+        '<b>What</b> = O que/Qual | <b>Where</b> = Onde | <b>Who</b> = Quem',
+        '<b>Why</b> = Por que | <b>When</b> = Quando | <b>How</b> = Como',
+        'Estrutura: [Question Word] + [Do/Does] + [Sujeito] + [Verbo]?',
+      ],
+      table: {
+        headers: ['Question Word','Significado','Exemplo'],
+        rows: [
+          ['What','O que / Qual','What do you know?'],
+          ['Where','Onde','Where does she go?'],
+          ['Who','Quem','Who takes the bus?'],
+          ['Why','Por que','Why do they take the bus?'],
+          ['When','Quando','When do you make the food?'],
+          ['How','Como','How do you get there?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ the book from the shelf.',a:'get',opts:['make','get','know','take']},
+      {q:'She ___ a good point.',a:'makes',opts:['gets','makes','knows','takes']},
+      {q:'___ do you know? (O que...)',a:'What',opts:['Where','What','Who','When']},
+      {q:'___ does she go? (Onde...)',a:'Where',opts:['What','Why','Where','How']},
+      {q:'He ___ the bus every morning.',a:'takes',opts:['makes','gets','takes','knows']},
+    ],
+    speak: ['I know the way.','What do you make?','She takes the bus.','We get the solution.','How do they know?'],
+  },
+
+  {
+    id: 4, title: 'To Come, Think, Look, Give', emoji: '👀',
+    verbs: ['To Come','To Think','To Look','To Give'],
+    vocab: [
+      {en:'Time',pt:'Hora/Vez'},{en:'Season',pt:'Estação'},{en:'Team',pt:'Time/Equipe'},
+      {en:'Road',pt:'Estrada'},{en:'Hour',pt:'Hora'},{en:'Boy',pt:'Menino'},
+      {en:'Girl',pt:'Menina'},{en:'Object',pt:'Objeto'},{en:'Baby',pt:'Bebê'},
+      {en:'Earth',pt:'Terra'},{en:'University',pt:'Universidade'},{en:'Town',pt:'Cidade pequena'},
+      {en:'Parents',pt:'Pais'},{en:'Teacher',pt:'Professor(a)'},{en:'Class',pt:'Turma/Aula'},
+      {en:'Nation',pt:'Nação'},{en:'Issue',pt:'Problema/Edição'},{en:'Arm',pt:'Braço'},
+      {en:'Piece',pt:'Pedaço'},{en:'Area',pt:'Área'},{en:'Example',pt:'Exemplo'},
+      {en:'Weekend',pt:'Fim de semana'},{en:'Business',pt:'Negócio'},{en:'Method',pt:'Método'},
+      {en:'Project',pt:'Projeto'},{en:'Answer',pt:'Resposta'},{en:'Task',pt:'Tarefa'},
+      {en:'Amount',pt:'Quantia'},{en:'Evening',pt:'Noite (início)'},{en:'Detail',pt:'Detalhe'},
+    ],
+    expressions: [
+      {expr:'Break a leg.',meaning:'Boa sorte! (antes de apresentação)',example:'Break a leg with your new project!'},
+      {expr:'Under the weather.',meaning:'Sentindo-se mal/doente.',example:"I'm feeling under the weather today."},
+      {expr:'Once in a blue moon.',meaning:'Muito raramente.',example:'Once in a blue moon, I come to the town.'},
+      {expr:'The best of both worlds.',meaning:'O melhor dos dois mundos.',example:"It's the best of both worlds for the team."},
+    ],
+    sentences: [
+      'I come to the university.','She comes to the evening class.',
+      'I think about the project.','He thinks about the method.',
+      'I look at the object.','She looks at the baby.',
+      'I give the answer.','He gives the task to the team.',
+    ],
+    grammar: {
+      title: 'Present Continuous (Verbo + ING)',
+      rules: [
+        'Usado para ações que estão acontecendo <b>agora</b> ou ao redor do presente.',
+        'Estrutura: [Sujeito] + [am/is/are] + [verbo-ING]',
+        'Regras do -ING: verbos com -e final → tire o -e e adicione -ING (come → com<b>ing</b>). Consoante-vogal-consoante → dobre a última (run → runn<b>ing</b>)',
+      ],
+      table: {
+        headers: ['Pronome','Auxiliar','Exemplo'],
+        rows: [
+          ['I','am','I am looking at the road.'],
+          ['You','are','You are thinking about the project.'],
+          ['He/She/It','is','She is coming to the class.'],
+          ['We','are','We are giving the answer.'],
+          ['They','are','They are looking at the team.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ to the class every Monday.',a:'comes',opts:['come','comes','think','give']},
+      {q:'I am ___ about the project. (present continuous)',a:'thinking',opts:['think','thinks','thinking','thought']},
+      {q:'He ___ the task to the team.',a:'gives',opts:['give','gives','look','come']},
+      {q:'They are ___ at the road.',a:'looking',opts:['look','looks','looking','looked']},
+      {q:"___ a leg! (Boa sorte!)",a:'Break',opts:['Give','Take','Break','Make']},
+    ],
+    speak: ['She is thinking about the answer.','I give the example.','They look at the team.','We are coming to the class.','He thinks about the detail.'],
+  },
+
+  {
+    id: 5, title: 'To Tell, Work, Feel, Leave', emoji: '✉️',
+    verbs: ['To Tell','To Work','To Feel','To Leave'],
+    vocab: [
+      {en:'Experience',pt:'Experiência'},{en:'Decision',pt:'Decisão'},{en:'Reason',pt:'Razão'},
+      {en:'Knowledge',pt:'Conhecimento'},{en:'Change',pt:'Mudança'},{en:'Result',pt:'Resultado'},
+      {en:'Value',pt:'Valor'},{en:'Goal',pt:'Objetivo'},{en:'Effort',pt:'Esforço'},
+      {en:'Energy',pt:'Energia'},{en:'Manager',pt:'Gerente'},{en:'Boss',pt:'Chefe'},
+      {en:'Apartment',pt:'Apartamento'},{en:'College',pt:'Faculdade'},{en:'Magazine',pt:'Revista'},
+      {en:'Challenge',pt:'Desafio'},{en:'Opportunity',pt:'Oportunidade'},{en:'Situation',pt:'Situação'},
+      {en:'Meeting',pt:'Reunião'},{en:'Process',pt:'Processo'},{en:'Step',pt:'Passo'},
+      {en:'Level',pt:'Nível'},{en:'Topic',pt:'Tópico'},{en:'Subject',pt:'Assunto/Matéria'},
+      {en:'Point of view',pt:'Ponto de vista'},{en:'Behavior',pt:'Comportamento'},
+      {en:'Attention',pt:'Atenção'},{en:'Progress',pt:'Progresso'},{en:'Ability',pt:'Habilidade'},
+      {en:'Feature',pt:'Característica'},
+    ],
+    expressions: [
+      {expr:'Hit the hay.',meaning:'Ir dormir.',example:"I'm tired. Time to hit the hay."},
+      {expr:'Spill the beans.',meaning:'Revelar um segredo.',example:'Who spilled the beans about the surprise?'},
+      {expr:'Feel like a million bucks.',meaning:'Sentir-se ótimo.',example:"I feel like a million bucks today!"},
+      {expr:'Get the ball rolling.',meaning:'Começar algo/dar o pontapé inicial.',example:"Let's get the ball rolling on this project."},
+    ],
+    sentences: [
+      'I tell the truth.','She tells the story.','We work every day.',
+      'He works at the office.','I feel good today.','She feels tired.',
+      'They leave the meeting.','He leaves the room.',
+    ],
+    grammar: {
+      title: 'Present Perfect (Have/Has + Past Participle)',
+      rules: [
+        'Usado para ações que aconteceram em algum momento no passado, sem especificar quando, ou que têm relevância no presente.',
+        'Estrutura: [I/You/We/They] + <b>have</b> + particípio passado',
+        'Estrutura: [He/She/It] + <b>has</b> + particípio passado',
+        'Palavras-chave: <b>already, yet, ever, never, just, since, for</b>',
+      ],
+      table: {
+        headers: ['Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I have worked.','I haven\'t worked.','Have you worked?'],
+          ['She has left.','She hasn\'t left.','Has she left?'],
+          ['They have told.','They haven\'t told.','Have they told?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ the story to the class.',a:'tells',opts:['tell','tells','work','leave']},
+      {q:'I have ___ here for 5 years.',a:'worked',opts:['work','works','worked','working']},
+      {q:'He has already ___ the meeting.',a:'left',opts:['leave','leaves','left','leaving']},
+      {q:'Have you ever ___ like a million bucks?',a:'felt',opts:['feel','feels','felt','feeling']},
+      {q:'We ___ on the new project now.',a:'work',opts:['works','tell','work','leave']},
+    ],
+    speak: ['I feel good today.','She has told the story.','We work every day.','Have you ever left early?','He tells the truth.'],
+  },
+
+  {
+    id: 6, title: 'Modal Verbs: Can, Could, Should', emoji: '⚡',
+    verbs: ['Can','Could','Should','Would'],
+    vocab: [
+      {en:'Skill',pt:'Habilidade'},{en:'Ability',pt:'Capacidade'},{en:'Permission',pt:'Permissão'},
+      {en:'Request',pt:'Pedido'},{en:'Advice',pt:'Conselho'},{en:'Suggestion',pt:'Sugestão'},
+      {en:'Possibility',pt:'Possibilidade'},{en:'Wish',pt:'Desejo'},{en:'Preference',pt:'Preferência'},
+      {en:'Choice',pt:'Escolha'},{en:'Option',pt:'Opção'},{en:'Condition',pt:'Condição'},
+      {en:'Consequence',pt:'Consequência'},{en:'Situation',pt:'Situação'},{en:'Rule',pt:'Regra'},
+      {en:'Law',pt:'Lei'},{en:'Right',pt:'Direito'},{en:'Duty',pt:'Dever'},
+      {en:'Responsibility',pt:'Responsabilidade'},{en:'Plan',pt:'Plano'},{en:'Schedule',pt:'Agenda'},
+      {en:'Language',pt:'Idioma'},{en:'Drive',pt:'Dirigir'},{en:'Swim',pt:'Nadar'},
+      {en:'Cook',pt:'Cozinhar'},{en:'Speak',pt:'Falar'},{en:'Understand',pt:'Entender'},
+      {en:'Explain',pt:'Explicar'},{en:'Describe',pt:'Descrever'},{en:'Compare',pt:'Comparar'},
+    ],
+    expressions: [
+      {expr:'Can I ask you something?',meaning:'Posso te perguntar algo?',example:'Can I ask you something about the schedule?'},
+      {expr:'Could you repeat that?',meaning:'Você poderia repetir isso?',example:'Could you repeat that, please? I didn\'t understand.'},
+      {expr:'You should try it.',meaning:'Você deveria tentar.',example:'You should try the new method. It works!'},
+      {expr:'I would love to.',meaning:'Eu adoraria.',example:'Would you like to join us? I would love to!'},
+    ],
+    sentences: [
+      'I can speak English.','She can swim very well.','Can you help me?',
+      'Could you repeat that?','You should study every day.','We should leave now.',
+      'I would love to come.','Would you like some coffee?',
+    ],
+    grammar: {
+      title: 'Modal Verbs — Regra de Ouro',
+      rules: [
+        'Verbos modais <b>NUNCA mudam</b> — sem -s para He/She/It: He <b>can</b> (nunca "cans")',
+        'Sempre seguidos de verbo no infinitivo <b>sem "to"</b>: I can <b>swim</b> ✓',
+        '<b>Can</b> = habilidade/permissão | <b>Could</b> = forma mais educada/passado | <b>Should</b> = conselho | <b>Would</b> = condicional/pedido educado',
+      ],
+      table: {
+        headers: ['Modal','Uso','Exemplo'],
+        rows: [
+          ['Can','Habilidade / Permissão','I can drive.'],
+          ['Could','Pedido educado / Possibilidade','Could you help me?'],
+          ['Should','Conselho / Obrigação moral','You should sleep more.'],
+          ['Would','Pedido formal / Condicional','Would you like tea?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ speak three languages.',a:'can',opts:['cans','can','could to','should to']},
+      {q:'___ you repeat that, please?',a:'Could',opts:['Can you','Could','Would to','Should']},
+      {q:'You ___ study every day.',a:'should',opts:['shoulds','should to','should','can to']},
+      {q:'I ___ love to come to the party.',a:'would',opts:['will to','would','could to','should']},
+      {q:'Modal verbs are followed by verb + ___',a:'nothing (bare infinitive)',opts:['to','ing','nothing (bare infinitive)','ed']},
+    ],
+    speak: ['Can you help me?','She should study more.','I would love to go.','Could you explain that?','We can do it!'],
+  },
+
+  {
+    id: 7, title: 'Past Simple — Regular Verbs', emoji: '⏪',
+    verbs: ['Worked','Played','Studied','Watched'],
+    vocab: [
+      {en:'Yesterday',pt:'Ontem'},{en:'Last week',pt:'Semana passada'},{en:'Last year',pt:'Ano passado'},
+      {en:'Ago',pt:'Atrás'},{en:'Then',pt:'Então/Depois'},{en:'Before',pt:'Antes'},
+      {en:'After',pt:'Depois'},{en:'While',pt:'Enquanto'},{en:'When',pt:'Quando'},
+      {en:'During',pt:'Durante'},{en:'Travel',pt:'Viagem/Viajar'},{en:'Visit',pt:'Visitar'},
+      {en:'Talk',pt:'Conversar'},{en:'Call',pt:'Ligar'},{en:'Walk',pt:'Caminhar'},
+      {en:'Open',pt:'Abrir'},{en:'Close',pt:'Fechar'},{en:'Start',pt:'Começar'},
+      {en:'Finish',pt:'Terminar'},{en:'Use',pt:'Usar'},{en:'Help',pt:'Ajudar'},
+      {en:'Try',pt:'Tentar'},{en:'Stop',pt:'Parar'},{en:'Wait',pt:'Esperar'},
+      {en:'Return',pt:'Retornar'},{en:'Clean',pt:'Limpar'},{en:'Cook',pt:'Cozinhar'},
+      {en:'Learn',pt:'Aprender'},{en:'Listen',pt:'Ouvir'},{en:'Watch',pt:'Assistir'},
+    ],
+    expressions: [
+      {expr:'Back in the day.',meaning:'Antigamente / Na época.',example:'Back in the day, we walked to school.'},
+      {expr:'Once upon a time.',meaning:'Era uma vez.',example:'Once upon a time, I lived in another city.'},
+      {expr:'It\'s history now.',meaning:'Isso é passado.',example:"We had a fight but it's history now."},
+      {expr:'Long story short.',meaning:'Resumindo.',example:'Long story short, I missed the bus yesterday.'},
+    ],
+    sentences: [
+      'I worked all day yesterday.','She studied English last year.',
+      'We watched a movie last night.','He called his mother yesterday.',
+      'They traveled to another city.','I finished the project last week.',
+      'She opened the door and walked in.','We talked for two hours.',
+    ],
+    grammar: {
+      title: 'Simple Past — Verbos Regulares',
+      rules: [
+        'Adicione <b>-ed</b> ao infinitivo: work → work<b>ed</b>, call → call<b>ed</b>',
+        'Verbos terminados em -e: adicione apenas <b>-d</b>: use → use<b>d</b>, close → close<b>d</b>',
+        'Verbos terminados em consoante+y: troque y por <b>-ied</b>: study → stud<b>ied</b>',
+        'Para negar: <b>didn\'t</b> + verbo no infinitivo: I didn\'t work.',
+        'Para perguntar: <b>Did</b> + sujeito + infinitivo: Did you work?',
+      ],
+      table: {
+        headers: ['Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I worked.','I didn\'t work.','Did you work?'],
+          ['She studied.','She didn\'t study.','Did she study?'],
+          ['They watched.','They didn\'t watch.','Did they watch?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ English last year. (study)',a:'studied',opts:['studyed','studied','study','studying']},
+      {q:'She ___ her friend yesterday. (call)',a:'called',opts:['call','calls','called','calling']},
+      {q:'They ___ work last week. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
+      {q:'___ you watch the movie? (question)',a:'Did',opts:['Do','Does','Did','Have']},
+      {q:'He ___ the door and walked in. (open)',a:'opened',opts:['open','opens','opened','opening']},
+    ],
+    speak: ['I worked yesterday.','Did you study last night?','She called her mother.','We didn\'t watch TV.','They traveled last year.'],
+  },
+
+  {
+    id: 8, title: 'Past Simple — Irregular Verbs', emoji: '🔄',
+    verbs: ['Go→Went','See→Saw','Make→Made','Take→Took'],
+    vocab: [
+      {en:'Airport',pt:'Aeroporto'},{en:'Hotel',pt:'Hotel'},{en:'Ticket',pt:'Passagem/Bilhete'},
+      {en:'Luggage',pt:'Bagagem'},{en:'Flight',pt:'Voo'},{en:'Reservation',pt:'Reserva'},
+      {en:'Client',pt:'Cliente'},{en:'Report',pt:'Relatório'},{en:'Email',pt:'E-mail'},
+      {en:'Schedule',pt:'Agenda/Cronograma'},{en:'Manager',pt:'Gerente'},{en:'Early',pt:'Cedo'},
+      {en:'Late',pt:'Tarde'},{en:'Ready',pt:'Pronto'},{en:'Check-in',pt:'Check-in'},
+      {en:'Meeting',pt:'Reunião'},{en:'Office',pt:'Escritório'},{en:'Project',pt:'Projeto'},
+      {en:'Call',pt:'Ligação'},{en:'Tomorrow',pt:'Amanhã'},{en:'Yesterday',pt:'Ontem'},
+      {en:'Trip',pt:'Viagem'},{en:'Conference',pt:'Conferência'},{en:'Deadline',pt:'Prazo'},
+      {en:'Presentation',pt:'Apresentação'},{en:'Budget',pt:'Orçamento'},{en:'Contract',pt:'Contrato'},
+      {en:'Deal',pt:'Negócio/Acordo'},{en:'Partner',pt:'Parceiro'},{en:'Colleague',pt:'Colega'},
+    ],
+    expressions: [
+      {expr:'Nice to meet you.',meaning:'Prazer em conhecê-lo(a).',example:'Nice to meet you! I went to your office last week.'},
+      {expr:'Can you help me?',meaning:'Você pode me ajudar?',example:'Can you help me? I need to go to the hotel.'},
+      {expr:"Let's get started.",meaning:'Vamos começar.',example:"Let's get started. I made a plan for today."},
+      {expr:'Have a good trip.',meaning:'Faça uma boa viagem.',example:'Have a good trip! See you when you get back.'},
+    ],
+    sentences: [
+      'I went to the office yesterday.','She saw the manager this morning.',
+      'We made a reservation at the hotel.','He took the luggage to the room.',
+      'They went to the airport early.','I saw the email last night.',
+      'Did she make a report?','I didn\'t take the bus.',
+    ],
+    grammar: {
+      title: 'Simple Past — Verbos Irregulares',
+      rules: [
+        'Verbos irregulares <b>mudam completamente</b> de forma — é preciso memorizar!',
+        'Com <b>did/didn\'t</b>, o verbo volta ao infinitivo: She didn\'t <b>make</b> (não "made")',
+      ],
+      table: {
+        headers: ['Infinitivo','Passado','Negativo','Pergunta'],
+        rows: [
+          ['go','went','didn\'t go','Did you go?'],
+          ['see','saw','didn\'t see','Did she see?'],
+          ['make','made','didn\'t make','Did he make?'],
+          ['take','took','didn\'t take','Did they take?'],
+          ['have','had','didn\'t have','Did we have?'],
+          ['come','came','didn\'t come','Did it come?'],
+          ['get','got','didn\'t get','Did you get?'],
+          ['give','gave','didn\'t give','Did she give?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ to the airport yesterday. (go)',a:'went',opts:['goed','gone','went','go']},
+      {q:'She ___ the manager this morning. (see)',a:'saw',opts:['seen','saw','seed','see']},
+      {q:'We ___ a reservation. (make)',a:'made',opts:['maked','make','made','making']},
+      {q:'He ___ the luggage. (take)',a:'took',opts:['taked','take','taken','took']},
+      {q:'I ___ make the report. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
+    ],
+    speak: ['I went to the airport.','She made a reservation.','Did you see the email?','We took the bus.','He didn\'t go to the meeting.'],
+  },
+
+  {
+    id: 9, title: 'Prepositions of Place', emoji: '📍',
+    verbs: ['In','On','At','Under / Between / Behind'],
+    vocab: [
+      {en:'In',pt:'Em (dentro de)'},{en:'On',pt:'Em cima de (superfície)'},{en:'At',pt:'Em (ponto específico)'},
+      {en:'Under',pt:'Embaixo de'},{en:'Between',pt:'Entre (dois)'},{en:'Behind',pt:'Atrás de'},
+      {en:'In front of',pt:'Na frente de'},{en:'Next to',pt:'Ao lado de'},{en:'Beside',pt:'Ao lado de'},
+      {en:'Above',pt:'Acima de'},{en:'Below',pt:'Abaixo de'},{en:'Inside',pt:'Dentro de'},
+      {en:'Outside',pt:'Fora de'},{en:'Near',pt:'Perto de'},{en:'Far from',pt:'Longe de'},
+      {en:'Corner',pt:'Esquina/Canto'},{en:'Wall',pt:'Parede'},{en:'Floor',pt:'Chão'},
+      {en:'Ceiling',pt:'Teto'},{en:'Shelf',pt:'Prateleira'},{en:'Drawer',pt:'Gaveta'},
+      {en:'Pocket',pt:'Bolso'},{en:'Bag',pt:'Bolsa'},{en:'Box',pt:'Caixa'},
+      {en:'Fridge',pt:'Geladeira'},{en:'Sofa',pt:'Sofá'},{en:'Table',pt:'Mesa'},
+      {en:'Chair',pt:'Cadeira'},{en:'Bed',pt:'Cama'},{en:'Roof',pt:'Telhado'},
+    ],
+    expressions: [
+      {expr:"It's right there.",meaning:'Está bem ali.',example:"Your keys? They're right there on the table."},
+      {expr:"I can't find it.",meaning:'Não consigo encontrar.',example:"I can't find my phone. Is it under the sofa?"},
+      {expr:'Around the corner.',meaning:'Logo ali / Na esquina.',example:'The pharmacy is around the corner.'},
+      {expr:'In the middle of.',meaning:'No meio de.',example:'The park is in the middle of the city.'},
+    ],
+    sentences: [
+      'The keys are in my pocket.','The book is on the table.',
+      'I am at the bus stop.','The dog is under the bed.',
+      'The bank is between the pharmacy and the supermarket.',
+      'My car is in front of the house.',
+      'Sit next to me, please.','The clock is on the wall.',
+    ],
+    grammar: {
+      title: 'Preposições de Lugar — The Target Method',
+      rules: [
+        '<b>AT</b> = ponto específico, endereço preciso: at the bus stop, at school, at home',
+        '<b>ON</b> = superfície (tocando em cima): on the table, on the wall, on the floor',
+        '<b>IN</b> = dentro de (limites fechados): in the box, in Brazil, in the room',
+        '<b>UNDER</b> = embaixo | <b>BETWEEN</b> = entre dois | <b>NEXT TO</b> = ao lado',
+      ],
+      table: {
+        headers: ['Preposição','Uso','Exemplo'],
+        rows: [
+          ['IN','Espaços fechados / países / cidades','I live in Brazil.'],
+          ['ON','Superfícies / ruas','The book is on the table.'],
+          ['AT','Pontos específicos / endereços','I am at the office.'],
+          ['UNDER','Diretamente abaixo','The cat is under the bed.'],
+          ['BETWEEN','No meio de dois','She is between her friends.'],
+          ['NEXT TO','Ao lado','Sit next to me.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'The milk is ___ the fridge.',a:'in',opts:['on','in','at','under']},
+      {q:'The book is ___ the table.',a:'on',opts:['in','at','on','next to']},
+      {q:'I am waiting ___ the station.',a:'at',opts:['in','on','at','between']},
+      {q:'The cat is hiding ___ the chair.',a:'under',opts:['on','in','under','behind']},
+      {q:'The bank is ___ the pharmacy and the school.',a:'between',opts:['next to','behind','between','in front of']},
+    ],
+    speak: ['The keys are in my pocket.','She is at the office.','Put it on the table.','He is behind the door.','We are next to the park.'],
+  },
+
+  {
+    id: 10, title: 'Quantifiers: Many, Much, More', emoji: '🔢',
+    verbs: ['Many','Much','More','A lot of'],
+    vocab: [
+      {en:'Many',pt:'Muitos/Muitas (contável)'},{en:'Much',pt:'Muito/Muita (incontável)'},
+      {en:'More',pt:'Mais (comparação/adicional)'},{en:'A lot of',pt:'Muito/Muitos (ambos)'},
+      {en:'A few',pt:'Alguns/uns poucos (contável)'},{en:'A little',pt:'Um pouco (incontável)'},
+      {en:'Some',pt:'Alguns/um pouco (afirmativo)'},{en:'Any',pt:'Algum/nenhum (neg/interr)'},
+      {en:'Enough',pt:'Suficiente'},{en:'Too much',pt:'Muito demais'},{en:'Too many',pt:'Muitos demais'},
+      {en:'Sugar',pt:'Açúcar'},{en:'Water',pt:'Água'},{en:'Milk',pt:'Leite'},
+      {en:'Rice',pt:'Arroz'},{en:'Bread',pt:'Pão'},{en:'Time',pt:'Tempo'},
+      {en:'Money',pt:'Dinheiro'},{en:'Space',pt:'Espaço'},{en:'Traffic',pt:'Trânsito'},
+      {en:'Experience',pt:'Experiência'},{en:'Information',pt:'Informação'},{en:'Homework',pt:'Tarefa'},
+      {en:'Questions',pt:'Perguntas'},{en:'Friends',pt:'Amigos'},{en:'Books',pt:'Livros'},
+      {en:'Pages',pt:'Páginas'},{en:'Times',pt:'Vezes'},{en:'Places',pt:'Lugares'},
+      {en:'People',pt:'Pessoas'},
+    ],
+    expressions: [
+      {expr:'That\'s too much.',meaning:'Isso é demais.',example:"That's too much work for one day!"},
+      {expr:'A little bit.',meaning:'Um pouquinho.',example:'Can I have a little bit more water?'},
+      {expr:'How many/much...?',meaning:'Quantos/Quanta...?',example:'How many books do you have? How much sugar?'},
+      {expr:'Not enough.',meaning:'Não suficiente.',example:"I don't have enough time to finish."},
+    ],
+    sentences: [
+      'How much money do you have?','There are many people at the party.',
+      "I don't have much time.",'Do you want more coffee?',
+      'She has a lot of friends.','I have a lot of work today.',
+      "There isn't much milk.",'How many pages does this book have?',
+    ],
+    grammar: {
+      title: 'Countable vs. Uncountable Nouns',
+      rules: [
+        '<b>MANY</b> → usa com substantivos <b>contáveis</b> (que têm plural): many books, many friends',
+        '<b>MUCH</b> → usa com substantivos <b>incontáveis</b> (sem plural): much water, much time',
+        '<b>A LOT OF</b> → funciona com <b>ambos</b>: a lot of books / a lot of water',
+        '<b>MORE</b> → comparação ou quantidade adicional (ambos): more books / more water',
+      ],
+      table: {
+        headers: ['','Contável (books)','Incontável (water)'],
+        rows: [
+          ['✓ Afirmativo','many books / a lot of books','much water / a lot of water'],
+          ['? Pergunta','How many books?','How much water?'],
+          ['✗ Negativo','not many books','not much water'],
+          ['+ Mais','more books','more water'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'How ___ money do you have?',a:'much',opts:['many','much','more','lot']},
+      {q:'There are ___ people at the party.',a:'many',opts:['much','many','more','lot of']},
+      {q:'I have ___ of work today.',a:'a lot',opts:['many','much','a lot','more']},
+      {q:'Do you want ___ coffee? (adicional)',a:'more',opts:['many','much','more','some']},
+      {q:"There isn't ___ milk in the fridge.",a:'much',opts:['many','much','more','a lot']},
+    ],
+    speak: ['How much water do you drink?','I have many friends.','She needs more time.','There isn\'t much sugar.','How many books do you have?'],
+  },
+
+  {
+    id: 11, title: 'Adjectives & Comparatives', emoji: '📊',
+    verbs: ['Big→Bigger','Good→Better','Fast→Faster','Beautiful→More beautiful'],
+    vocab: [
+      {en:'Big / Bigger / Biggest',pt:'Grande / Maior / O maior'},{en:'Small / Smaller',pt:'Pequeno / Menor'},
+      {en:'Fast / Faster',pt:'Rápido / Mais rápido'},{en:'Slow / Slower',pt:'Lento / Mais lento'},
+      {en:'Good / Better / Best',pt:'Bom / Melhor / O melhor'},{en:'Bad / Worse / Worst',pt:'Ruim / Pior / O pior'},
+      {en:'Old / Older',pt:'Velho / Mais velho'},{en:'Young / Younger',pt:'Jovem / Mais jovem'},
+      {en:'Tall / Taller',pt:'Alto / Mais alto'},{en:'Short / Shorter',pt:'Baixo / Mais baixo'},
+      {en:'Hot / Hotter',pt:'Quente / Mais quente'},{en:'Cold / Colder',pt:'Frio / Mais frio'},
+      {en:'Expensive',pt:'Caro'},{en:'Cheap',pt:'Barato'},{en:'Easy',pt:'Fácil'},
+      {en:'Difficult / Hard',pt:'Difícil'},{en:'Happy',pt:'Feliz'},{en:'Sad',pt:'Triste'},
+      {en:'Beautiful',pt:'Bonito/Linda'},{en:'Ugly',pt:'Feio'},{en:'Clean',pt:'Limpo'},
+      {en:'Dirty',pt:'Sujo'},{en:'Strong',pt:'Forte'},{en:'Weak',pt:'Fraco'},
+      {en:'Smart',pt:'Inteligente'},{en:'Funny',pt:'Engraçado'},{en:'Boring',pt:'Chato'},
+      {en:'Interesting',pt:'Interessante'},{en:'Important',pt:'Importante'},{en:'Popular',pt:'Popular'},
+    ],
+    expressions: [
+      {expr:'The more, the merrier.',meaning:'Quanto mais, melhor.',example:'Invite everyone! The more, the merrier.'},
+      {expr:'Better safe than sorry.',meaning:'Melhor prevenir do que remediar.',example:'Take an umbrella. Better safe than sorry.'},
+      {expr:'The best of the best.',meaning:'O melhor dos melhores.',example:'She is the best of the best in her class.'},
+      {expr:'As good as it gets.',meaning:'Não fica melhor que isso.',example:"This coffee is as good as it gets."},
+    ],
+    sentences: [
+      'My house is bigger than yours.','She is taller than her sister.',
+      'This is the best coffee I have ever had.','English is easier than I thought.',
+      'He is faster than me.','That movie was more interesting than this one.',
+      'Today is hotter than yesterday.','She is more beautiful than ever.',
+    ],
+    grammar: {
+      title: 'Comparativos e Superlativos',
+      rules: [
+        '<b>Adjetivos curtos</b> (1 sílaba): adicione <b>-er</b> / <b>-est</b>: big → bigger → biggest',
+        '<b>Adjetivos longos</b> (2+ sílabas): use <b>more / most</b>: beautiful → more beautiful',
+        'Para comparar: [A] + is + <b>adjective-er / more adj</b> + than + [B]',
+        '<b>Irregulares</b>: good → better → best | bad → worse → worst',
+      ],
+      table: {
+        headers: ['Adjetivo','Comparativo','Superlativo'],
+        rows: [
+          ['big','bigger','the biggest'],
+          ['small','smaller','the smallest'],
+          ['good','better','the best'],
+          ['bad','worse','the worst'],
+          ['beautiful','more beautiful','the most beautiful'],
+          ['interesting','more interesting','the most interesting'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'My car is ___ than yours. (big)',a:'bigger',opts:['more big','bigger','bigest','most big']},
+      {q:'She is the ___ student in the class. (good)',a:'best',opts:['better','more good','goodest','best']},
+      {q:'This test is ___ than the last one. (difficult)',a:'more difficult',opts:['difficulter','more difficult','most difficult','difficultier']},
+      {q:'Today is ___ than yesterday. (hot)',a:'hotter',opts:['more hot','hoter','hotter','hottest']},
+      {q:'He runs ___ than me. (fast)',a:'faster',opts:['more fast','fastest','faster','fastly']},
+    ],
+    speak: ['She is taller than me.','This is the best day ever!','English is more interesting than I thought.','He is faster than his brother.','That is the most beautiful place.'],
+  },
+
+  {
+    id: 12, title: 'Future: Will & Going to', emoji: '🔮',
+    verbs: ['Will + verb','Am/Is/Are going to + verb','Shall','Won\'t (will not)'],
+    vocab: [
+      {en:'Tomorrow',pt:'Amanhã'},{en:'Next week',pt:'Próxima semana'},{en:'Next year',pt:'Próximo ano'},
+      {en:'Soon',pt:'Em breve'},{en:'Later',pt:'Mais tarde'},{en:'In the future',pt:'No futuro'},
+      {en:'Plan',pt:'Plano'},{en:'Intention',pt:'Intenção'},{en:'Promise',pt:'Promessa'},
+      {en:'Prediction',pt:'Previsão'},{en:'Decision',pt:'Decisão'},{en:'Dream',pt:'Sonho'},
+      {en:'Goal',pt:'Meta'},{en:'Hope',pt:'Esperança'},{en:'Expect',pt:'Esperar/Prever'},
+      {en:'Probably',pt:'Provavelmente'},{en:'Maybe',pt:'Talvez'},{en:'Definitely',pt:'Definitivamente'},
+      {en:'Graduate',pt:'Formarse'},{en:'Marry',pt:'Casar'},{en:'Move',pt:'Mudar-se'},
+      {en:'Buy',pt:'Comprar'},{en:'Sell',pt:'Vender'},{en:'Build',pt:'Construir'},
+      {en:'Travel',pt:'Viajar'},{en:'Learn',pt:'Aprender'},{en:'Earn',pt:'Ganhar'},
+      {en:'Save',pt:'Economizar'},{en:'Start',pt:'Começar'},{en:'Retire',pt:'Aposentar-se'},
+    ],
+    expressions: [
+      {expr:'I\'ll think about it.',meaning:'Vou pensar a respeito.',example:"Should I take the job? I'll think about it."},
+      {expr:'It\'s going to be great.',meaning:'Vai ser ótimo.',example:"Don't worry, it's going to be great!"},
+      {expr:'One day...',meaning:'Um dia...',example:'One day, I will speak English perfectly.'},
+      {expr:'Before you know it.',meaning:'Antes que você perceba.',example:'Study every day and before you know it, you\'ll be fluent.'},
+    ],
+    sentences: [
+      "I'll call you tomorrow.",'She is going to study tonight.',
+      'They will travel to London next year.','We are going to buy a new car.',
+      "It's going to rain today.",'I will never give up.',
+      'Will you help me?','Is she going to be there?',
+    ],
+    grammar: {
+      title: 'Will vs. Going to',
+      rules: [
+        '<b>WILL</b>: decisão espontânea, promessa, previsão sem evidência: "I\'ll help you!" (agora decidi)',
+        '<b>GOING TO</b>: plano já decidido, intenção, previsão com evidência: "I\'m going to study" (já planejei)',
+        'Estrutura WILL: [Sujeito] + will + [infinitivo sem to]',
+        'Estrutura GOING TO: [Sujeito] + am/is/are + going to + [infinitivo sem to]',
+      ],
+      table: {
+        headers: ['','Will','Going to'],
+        rows: [
+          ['Afirmativo','I will go.','I am going to go.'],
+          ['Negativo','I won\'t go.','I\'m not going to go.'],
+          ['Pergunta','Will you go?','Are you going to go?'],
+          ['Uso','Decisão espontânea / promessa','Plano já feito / intenção'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'Look at those clouds. It ___ rain. (evidência)',a:'is going to',opts:['will','is going to','going to','shall']},
+      {q:'Hold on, ___ help you. (decisão espontânea)',a:"I'll",opts:["I'm going to","I'll","I shall to","I am will"]},
+      {q:'She ___ travel to London next month. (plano)',a:'is going to',opts:['will','is going to','goes to','shall']},
+      {q:'___ you help me? (pedido com will)',a:'Will',opts:['Shall','Going to','Will','Are']},
+      {q:'They ___ (will + neg) give up.',a:"won't",opts:["don't will","won't","not will","willn't"]},
+    ],
+    speak: ['I\'ll call you later.','She is going to study tonight.','Will you come to the party?','We won\'t give up.','It\'s going to be a great day!'],
+  },
+
+  // ── LESSONS 13–24: From Aulas 14–28 ─────────────────────────────────────────
+
+  {
+    id: 13, title: 'Work & Career', emoji: '💼',
+    verbs: ['To Work / Worked','To Hire / Hired','To Quit / Quit','To Apply / Applied'],
+    vocab: [
+      {en:'Job',pt:'Emprego'},{en:'Career',pt:'Carreira'},{en:'Company',pt:'Empresa'},
+      {en:'Office',pt:'Escritório'},{en:'Boss',pt:'Chefe'},{en:'Manager',pt:'Gerente'},
+      {en:'Employee',pt:'Funcionário'},{en:'Colleague',pt:'Colega'},{en:'Salary',pt:'Salário'},
+      {en:'Bonus',pt:'Bônus'},{en:'Interview',pt:'Entrevista'},{en:'Resume',pt:'Currículo'},
+      {en:'Application',pt:'Candidatura'},{en:'Skills',pt:'Habilidades'},{en:'Experience',pt:'Experiência'},
+      {en:'Promotion',pt:'Promoção'},{en:'Meeting',pt:'Reunião'},{en:'Deadline',pt:'Prazo'},
+      {en:'Project',pt:'Projeto'},{en:'Task',pt:'Tarefa'},{en:'Success',pt:'Sucesso'},
+      {en:'Business',pt:'Negócio'},{en:'Client',pt:'Cliente'},{en:'Contract',pt:'Contrato'},
+      {en:'Full-time',pt:'Tempo integral'},{en:'Part-time',pt:'Meio período'},{en:'Remote work',pt:'Trabalho remoto'},
+      {en:'Retirement',pt:'Aposentadoria'},{en:'Unemployed',pt:'Desempregado'},{en:'Promotion',pt:'Promoção'},
+    ],
+    expressions: [
+      {expr:'I applied for the job.',meaning:'Me candidatei para o emprego.',example:'I applied for the job and got an interview.'},
+      {expr:'She got a promotion.',meaning:'Ela foi promovida.',example:'She worked hard and got a promotion last year.'},
+      {expr:'I quit my job.',meaning:'Eu saí do meu emprego.',example:'He quit his job and started his own business.'},
+      {expr:'We hit the deadline.',meaning:'Cumprimos o prazo.',example:'The team worked all night and hit the deadline.'},
+    ],
+    sentences: [
+      'She worked at the company for five years.','He applied for the job online.',
+      'They hired a new manager last month.','I quit my old job and found a better one.',
+      'She earned a big bonus this year.','We met the client at the office.',
+      'Did you apply for the promotion?','He didn\'t work on weekends.',
+    ],
+    grammar: {
+      title: 'Simple Past — Verbos Regulares de Trabalho',
+      rules: [
+        'Verbos regulares: adicione <b>-ed</b> → work → work<b>ed</b>, hire → hire<b>d</b>',
+        'Apply → appli<b>ed</b> (y → ied quando precedido de consoante)',
+        'Negativo: <b>didn\'t</b> + infinitivo → "She didn\'t work."',
+        'Pergunta: <b>Did</b> + sujeito + infinitivo → "Did he apply?"',
+        'Quit é irregular: quit → <b>quit</b> (não muda no passado!)',
+      ],
+      table: {
+        headers: ['Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I worked.','I didn\'t work.','Did I work?'],
+          ['She applied.','She didn\'t apply.','Did she apply?'],
+          ['He quit.','He didn\'t quit.','Did he quit?'],
+          ['They hired.','They didn\'t hire.','Did they hire?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ for the job last week. (apply)',a:'applied',opts:['apply','applyed','applied','applies']},
+      {q:'He ___ his job after 5 years. (quit)',a:'quit',opts:['quited','quit','quits','quitting']},
+      {q:'They ___ a new manager. (hire)',a:'hired',opts:['hire','hires','hirable','hired']},
+      {q:'I ___ work on Saturday. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
+      {q:'___ she earn a bonus? (question)',a:'Did',opts:['Was','Did','Does','Has']},
+    ],
+    speak: ['I applied for a new job.','She quit her job last year.','Did you get a promotion?','He worked very hard.','They didn\'t hire anyone.'],
+  },
+
+  {
+    id: 14, title: 'Technology & Digital Life', emoji: '💻',
+    verbs: ['To Send / Sent','To Download / Downloaded','To Upload / Uploaded','To Connect / Connected'],
+    vocab: [
+      {en:'Computer',pt:'Computador'},{en:'Laptop',pt:'Notebook'},{en:'Smartphone',pt:'Celular'},
+      {en:'Screen',pt:'Tela'},{en:'Keyboard',pt:'Teclado'},{en:'Internet',pt:'Internet'},
+      {en:'Website',pt:'Site'},{en:'Social Media',pt:'Redes sociais'},{en:'Email',pt:'E-mail'},
+      {en:'Password',pt:'Senha'},{en:'Account',pt:'Conta'},{en:'Profile',pt:'Perfil'},
+      {en:'Message',pt:'Mensagem'},{en:'Notification',pt:'Notificação'},{en:'App',pt:'Aplicativo'},
+      {en:'Software',pt:'Software'},{en:'Wi-Fi',pt:'Wi-Fi'},{en:'Data',pt:'Dados'},
+      {en:'File',pt:'Arquivo'},{en:'Folder',pt:'Pasta'},{en:'Link',pt:'Link'},
+      {en:'Browser',pt:'Navegador'},{en:'Search Engine',pt:'Mecanismo de busca'},{en:'Cloud',pt:'Nuvem'},
+      {en:'Online',pt:'Online'},{en:'Offline',pt:'Offline'},{en:'Update',pt:'Atualização'},
+      {en:'Virus',pt:'Vírus'},{en:'Backup',pt:'Backup'},{en:'Video call',pt:'Videochamada'},
+    ],
+    expressions: [
+      {expr:'My phone died.',meaning:'Meu celular descarregou.',example:'I missed your call — my phone died.'},
+      {expr:'The Wi-Fi is down.',meaning:'O Wi-Fi está fora.',example:'I can\'t connect. The Wi-Fi is down again.'},
+      {expr:'I\'ll send it over.',meaning:'Vou enviar / mandar.',example:'I finished the file. I\'ll send it over right now.'},
+      {expr:'Let me Google that.',meaning:'Deixa eu pesquisar isso.',example:'I don\'t know the answer — let me Google that.'},
+    ],
+    sentences: [
+      'I sent the email this morning.','She downloaded the app yesterday.',
+      'We uploaded the photos to the cloud.','He connected to the Wi-Fi at the café.',
+      'Did you receive my message?','They updated the software last night.',
+      'I searched for information online.','She didn\'t remember her password.',
+    ],
+    grammar: {
+      title: 'Simple Past — Verbos de Tecnologia',
+      rules: [
+        'Download → download<b>ed</b> | Upload → upload<b>ed</b> | Connect → connect<b>ed</b>',
+        'Send é irregular: send → <b>sent</b> | Receive → receive<b>d</b>',
+        'Negativo: <b>didn\'t</b> + infinitivo → "I didn\'t send."',
+        'Pergunta: <b>Did</b> + sujeito + infinitivo → "Did she connect?"',
+      ],
+      table: {
+        headers: ['Infinitivo','Passado','Negativo'],
+        rows: [
+          ['send','sent','didn\'t send'],
+          ['download','downloaded','didn\'t download'],
+          ['upload','uploaded','didn\'t upload'],
+          ['connect','connected','didn\'t connect'],
+          ['receive','received','didn\'t receive'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ the file to the cloud. (upload)',a:'uploaded',opts:['upload','uploads','uploading','uploaded']},
+      {q:'I ___ you an email this morning. (send)',a:'sent',opts:['sended','send','sent','sending']},
+      {q:'He ___ to the Wi-Fi at the hotel. (connect)',a:'connected',opts:['connect','connects','connected','connecting']},
+      {q:'They ___ download the app. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
+      {q:'___ you receive my message?',a:'Did',opts:['Have','Did','Does','Was']},
+    ],
+    speak: ['I sent you a message.','Did you download the app?','She connected to the internet.','We uploaded the video.','I didn\'t receive the email.'],
+  },
+
+  {
+    id: 15, title: 'Travel & Tourism', emoji: '✈️',
+    verbs: ['To Travel / Traveled','To Arrive / Arrived','To Stay / Stayed','To Visit / Visited'],
+    vocab: [
+      {en:'Airport',pt:'Aeroporto'},{en:'Airplane',pt:'Avião'},{en:'Flight',pt:'Voo'},
+      {en:'Ticket',pt:'Passagem'},{en:'Passport',pt:'Passaporte'},{en:'Suitcase',pt:'Mala'},
+      {en:'Luggage',pt:'Bagagem'},{en:'Boarding pass',pt:'Cartão de embarque'},{en:'Gate',pt:'Portão'},
+      {en:'Security',pt:'Segurança'},{en:'Customs',pt:'Alfândega'},{en:'Hotel',pt:'Hotel'},
+      {en:'Reservation',pt:'Reserva'},{en:'Room service',pt:'Serviço de quarto'},{en:'Tourist',pt:'Turista'},
+      {en:'Sightseeing',pt:'Passeio turístico'},{en:'Landmark',pt:'Ponto turístico'},{en:'Museum',pt:'Museu'},
+      {en:'Map',pt:'Mapa'},{en:'Guidebook',pt:'Guia de viagem'},{en:'Souvenir',pt:'Lembrança'},
+      {en:'Beach',pt:'Praia'},{en:'Mountain',pt:'Montanha'},{en:'City center',pt:'Centro da cidade'},
+      {en:'Train station',pt:'Estação de trem'},{en:'Bus stop',pt:'Ponto de ônibus'},{en:'Taxi',pt:'Táxi'},
+      {en:'Vacation',pt:'Férias'},{en:'Trip',pt:'Viagem'},{en:'Destination',pt:'Destino'},
+    ],
+    expressions: [
+      {expr:'I\'m all packed.',meaning:'Estou com tudo arrumado.',example:'The taxi comes at 6am — I\'m all packed!'},
+      {expr:'Safe travels!',meaning:'Boa viagem! / Viaje com segurança!',example:'Safe travels! Send me photos when you arrive.'},
+      {expr:'We got lost.',meaning:'Nós nos perdemos.',example:'We didn\'t have a map and got lost in the city.'},
+      {expr:'It was worth it.',meaning:'Valeu a pena.',example:'The line was long but it was worth it — the view was amazing.'},
+    ],
+    sentences: [
+      'I traveled to Paris last summer.','She arrived at the airport early.',
+      'We stayed at a beautiful hotel.','He visited the Eiffel Tower.',
+      'They booked the tickets online.','I packed my suitcase the night before.',
+      'Did you visit the museum?','She didn\'t arrive on time.',
+    ],
+    grammar: {
+      title: 'Simple Past — Planejando e Contando Viagens',
+      rules: [
+        'Travel → travel<b>ed</b> | Arrive → arrive<b>d</b> | Stay → stay<b>ed</b> | Visit → visit<b>ed</b>',
+        'Book → book<b>ed</b> | Pack → pack<b>ed</b> | Miss → miss<b>ed</b>',
+        'Negativo: <b>didn\'t</b> + infinitivo → "He didn\'t arrive on time."',
+        'Para contar uma viagem use: <b>First... Then... After that... Finally...</b>',
+      ],
+      table: {
+        headers: ['Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I traveled.','I didn\'t travel.','Did you travel?'],
+          ['She arrived.','She didn\'t arrive.','Did she arrive?'],
+          ['We stayed.','We didn\'t stay.','Did we stay?'],
+          ['He visited.','He didn\'t visit.','Did he visit?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'We ___ at a hotel in Paris. (stay)',a:'stayed',opts:['stay','stays','stayed','staying']},
+      {q:'She ___ to London last year. (travel)',a:'traveled',opts:['travel','travels','traveled','travelling']},
+      {q:'He ___ the Eiffel Tower. (visit)',a:'visited',opts:['visit','visits','visited','visiting']},
+      {q:'They ___ arrive on time. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
+      {q:'___ you book the tickets? (question)',a:'Did',opts:['Have','Did','Does','Were']},
+    ],
+    speak: ['I traveled to another country.','She visited a famous museum.','Did you stay at a hotel?','We arrived early.','He didn\'t pack his passport.'],
+  },
+
+  {
+    id: 16, title: 'Health & Wellness', emoji: '🏥',
+    verbs: ['To Feel / Felt','To Eat / Ate','To Sleep / Slept','To Drink / Drank'],
+    vocab: [
+      {en:'Health',pt:'Saúde'},{en:'Body',pt:'Corpo'},{en:'Head',pt:'Cabeça'},
+      {en:'Stomach',pt:'Estômago'},{en:'Heart',pt:'Coração'},{en:'Muscle',pt:'Músculo'},
+      {en:'Pain',pt:'Dor'},{en:'Headache',pt:'Dor de cabeça'},{en:'Fever',pt:'Febre'},
+      {en:'Cold',pt:'Resfriado'},{en:'Flu',pt:'Gripe'},{en:'Medicine',pt:'Remédio'},
+      {en:'Doctor',pt:'Médico'},{en:'Appointment',pt:'Consulta'},{en:'Hospital',pt:'Hospital'},
+      {en:'Pharmacy',pt:'Farmácia'},{en:'Healthy food',pt:'Comida saudável'},{en:'Junk food',pt:'Comida não saudável'},
+      {en:'Fruit',pt:'Fruta'},{en:'Vegetables',pt:'Legumes/Verduras'},{en:'Water',pt:'Água'},
+      {en:'Exercise',pt:'Exercício'},{en:'Gym',pt:'Academia'},{en:'Running',pt:'Corrida'},
+      {en:'Sleep',pt:'Sono'},{en:'Stress',pt:'Estresse'},{en:'Energy',pt:'Energia'},
+      {en:'Lifestyle',pt:'Estilo de vida'},{en:'Diet',pt:'Dieta'},{en:'Recovery',pt:'Recuperação'},
+    ],
+    expressions: [
+      {expr:'I\'m under the weather.',meaning:'Estou me sentindo mal.',example:'I can\'t come today — I\'m a bit under the weather.'},
+      {expr:'Take it easy.',meaning:'Descanse / Vá com calma.',example:'You worked too hard. Take it easy this weekend.'},
+      {expr:'I need a check-up.',meaning:'Preciso de um check-up.',example:'I haven\'t been to the doctor in a year — I need a check-up.'},
+      {expr:'Sleep it off.',meaning:'Dormir para melhorar.',example:'You have a cold? Just sleep it off and drink water.'},
+    ],
+    sentences: [
+      'I felt tired all day yesterday.','She ate healthy food last week.',
+      'He slept for ten hours after the trip.','We drank a lot of water during exercise.',
+      'Did you feel better after the medicine?','I didn\'t eat breakfast this morning.',
+      'She exercised every day last month.','They recovered quickly from the flu.',
+    ],
+    grammar: {
+      title: 'Simple Past — Verbos Irregulares de Saúde',
+      rules: [
+        'Estes verbos mudam completamente no passado — é preciso memorizar!',
+        'feel → <b>felt</b> | eat → <b>ate</b> | sleep → <b>slept</b> | drink → <b>drank</b>',
+        'Com <b>didn\'t</b>, o verbo volta ao infinitivo: "I didn\'t <b>eat</b>" (não "ate")',
+        'Dica: exercised, recovered, rested são regulares → apenas adicione <b>-ed</b>',
+      ],
+      table: {
+        headers: ['Infinitivo','Passado','Negativo'],
+        rows: [
+          ['feel','felt','didn\'t feel'],
+          ['eat','ate','didn\'t eat'],
+          ['sleep','slept','didn\'t sleep'],
+          ['drink','drank','didn\'t drink'],
+          ['recover','recovered','didn\'t recover'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She ___ very tired yesterday. (feel)',a:'felt',opts:['feeled','feel','felt','feeling']},
+      {q:'I ___ healthy food all week. (eat)',a:'ate',opts:['eated','eat','ate','eating']},
+      {q:'He ___ for 9 hours last night. (sleep)',a:'slept',opts:['sleeped','sleep','slept','sleeping']},
+      {q:'We ___ drink enough water. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
+      {q:'___ you feel better after the medicine?',a:'Did',opts:['Have','Did','Does','Were']},
+    ],
+    speak: ['I felt sick yesterday.','She ate a lot of fruit.','Did you sleep well?','He drank water after the gym.','We didn\'t eat junk food.'],
+  },
+
+  {
+    id: 17, title: 'My Home — There is / There are', emoji: '🏠',
+    verbs: ['There is','There are','There was','There were'],
+    vocab: [
+      {en:'House',pt:'Casa'},{en:'Apartment',pt:'Apartamento'},{en:'Living room',pt:'Sala de estar'},
+      {en:'Kitchen',pt:'Cozinha'},{en:'Bedroom',pt:'Quarto'},{en:'Bathroom',pt:'Banheiro'},
+      {en:'Dining room',pt:'Sala de jantar'},{en:'Garden',pt:'Jardim'},{en:'Garage',pt:'Garagem'},
+      {en:'Sofa',pt:'Sofá'},{en:'Table',pt:'Mesa'},{en:'Chair',pt:'Cadeira'},
+      {en:'Wardrobe',pt:'Guarda-roupa'},{en:'Fridge',pt:'Geladeira'},{en:'Stove',pt:'Fogão'},
+      {en:'Microwave',pt:'Micro-ondas'},{en:'Sink',pt:'Pia'},{en:'Mirror',pt:'Espelho'},
+      {en:'Curtain',pt:'Cortina'},{en:'Rug',pt:'Tapete'},{en:'Bookshelf',pt:'Estante'},
+      {en:'Armchair',pt:'Poltrona'},{en:'Coffee table',pt:'Mesa de centro'},{en:'Nightstand',pt:'Criado-mudo'},
+      {en:'Lamp',pt:'Abajur/Lâmpada'},{en:'Shower',pt:'Chuveiro'},{en:'Toilet',pt:'Vaso sanitário'},
+      {en:'Window',pt:'Janela'},{en:'Door',pt:'Porta'},{en:'Wall',pt:'Parede'},
+    ],
+    expressions: [
+      {expr:'Make yourself at home.',meaning:'Fique à vontade.',example:'Come in, make yourself at home! There\'s coffee in the kitchen.'},
+      {expr:'Home sweet home.',meaning:'Lar doce lar.',example:'After the long trip — home sweet home!'},
+      {expr:'There\'s no place like home.',meaning:'Não há lugar como o lar.',example:'I love traveling but there\'s no place like home.'},
+      {expr:'Housewarming party.',meaning:'Festa de inauguração da casa.',example:'We moved in last week — let\'s have a housewarming party!'},
+    ],
+    sentences: [
+      'There is a sofa in the living room.','There are two bedrooms in my apartment.',
+      'There is a big fridge in the kitchen.','There are no curtains in the bedroom.',
+      'There was a garden when I was a child.','There were three chairs around the table.',
+      'Is there a microwave in the kitchen?','Are there any windows in the bathroom?',
+    ],
+    grammar: {
+      title: 'There is / There are / There was / There were',
+      rules: [
+        '<b>There is</b> → singular (presente): "There is a sofa in the living room."',
+        '<b>There are</b> → plural (presente): "There are two chairs."',
+        '<b>There was</b> → singular (passado): "There was a lamp here."',
+        '<b>There were</b> → plural (passado): "There were books on the shelf."',
+        'Negativo: There <b>isn\'t</b> / <b>aren\'t</b> / <b>wasn\'t</b> / <b>weren\'t</b>',
+      ],
+      table: {
+        headers: ['','Singular','Plural'],
+        rows: [
+          ['Presente','There is a bed.','There are two beds.'],
+          ['Passado','There was a table.','There were chairs.'],
+          ['Negativo (pres.)','There isn\'t a garage.','There aren\'t any windows.'],
+          ['Negativo (pass.)','There wasn\'t a fridge.','There weren\'t curtains.'],
+          ['Pergunta (pres.)','Is there a bathroom?','Are there two rooms?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'___ a sofa in the living room.',a:'There is',opts:['There are','There is','There was','There were']},
+      {q:'___ three bedrooms in my apartment.',a:'There are',opts:['There is','There are','There was','There were']},
+      {q:'___ a garden when I was a child.',a:'There was',opts:['There is','There are','There was','There were']},
+      {q:'There ___ a fridge in the kitchen. (negative, present)',a:"isn't",opts:["aren't","isn't","wasn't","weren't"]},
+      {q:'___ any windows in the bathroom? (question)',a:'Are there',opts:['Is there','Are there','Was there','Were there']},
+    ],
+    speak: ['There is a sofa in my living room.','There are two bedrooms.','Is there a garden?','There was a lamp here before.','There aren\'t any curtains.'],
+  },
+
+  {
+    id: 18, title: 'Past Continuous', emoji: '🎬',
+    verbs: ['Was / Were + verb-ing','While','When','At that moment'],
+    vocab: [
+      {en:'Opportunity',pt:'Oportunidade'},{en:'Challenge',pt:'Desafio'},{en:'Achievement',pt:'Conquista'},
+      {en:'Strategy',pt:'Estratégia'},{en:'Progress',pt:'Progresso'},{en:'Consequence',pt:'Consequência'},
+      {en:'Responsibility',pt:'Responsabilidade'},{en:'Innovation',pt:'Inovação'},{en:'Environment',pt:'Ambiente/Meio ambiente'},
+      {en:'Community',pt:'Comunidade'},{en:'Development',pt:'Desenvolvimento'},{en:'Impact',pt:'Impacto'},
+      {en:'Influence',pt:'Influência'},{en:'Benefit',pt:'Benefício'},{en:'Perspective',pt:'Perspectiva'},
+      {en:'All day',pt:'O dia todo'},{en:'All night',pt:'A noite toda'},{en:'At that time',pt:'Naquele momento'},
+      {en:'Meanwhile',pt:'Enquanto isso'},{en:'Suddenly',pt:'De repente'},{en:'Interrupted',pt:'Interrompido'},
+      {en:'Working',pt:'Trabalhando'},{en:'Sleeping',pt:'Dormindo'},{en:'Driving',pt:'Dirigindo'},
+      {en:'Studying',pt:'Estudando'},{en:'Cooking',pt:'Cozinhando'},{en:'Watching',pt:'Assistindo'},
+      {en:'Running',pt:'Correndo'},{en:'Talking',pt:'Falando'},{en:'Waiting',pt:'Esperando'},
+    ],
+    expressions: [
+      {expr:'I was in the middle of something.',meaning:'Estava no meio de algo.',example:'Sorry I missed your call — I was in the middle of a meeting.'},
+      {expr:'What were you thinking?',meaning:'O que você estava pensando?',example:'You left without a coat? What were you thinking?'},
+      {expr:'It was raining cats and dogs.',meaning:'Estava chovendo muito (forte).',example:'We couldn\'t go out — it was raining cats and dogs.'},
+      {expr:'Time was flying.',meaning:'O tempo estava voando.',example:'We were having so much fun that time was flying.'},
+    ],
+    sentences: [
+      'I was working when she called.','They were studying all night.',
+      'She was cooking dinner at 7pm.','We were watching a movie when the lights went out.',
+      'He was driving to work while it was raining.','What were you doing at 9 o\'clock?',
+      'I wasn\'t sleeping — I was reading.','Were they waiting for me?',
+    ],
+    grammar: {
+      title: 'Past Continuous — Ação em Progresso no Passado',
+      rules: [
+        'Estrutura: <b>was/were</b> + verbo<b>-ing</b>',
+        'I/He/She/It + <b>was</b> | You/We/They + <b>were</b>',
+        'Uso 1 — Ação em progresso num momento passado: "At 8pm, I was studying."',
+        'Uso 2 — Duas ações simultâneas: "She was cooking <b>while</b> he was watching TV."',
+        'Uso 3 — Ação interrompida: "I was sleeping <b>when</b> the phone rang." (rang = Simple Past)',
+      ],
+      table: {
+        headers: ['Afirmativo','Negativo','Pergunta'],
+        rows: [
+          ['I was working.','I wasn\'t working.','Was I working?'],
+          ['She was studying.','She wasn\'t studying.','Was she studying?'],
+          ['They were waiting.','They weren\'t waiting.','Were they waiting?'],
+          ['We were driving.','We weren\'t driving.','Were we driving?'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ when she called. (work)',a:'was working',opts:['worked','was working','were working','working']},
+      {q:'They ___ all night. (study)',a:'were studying',opts:['studied','was studying','were studying','studying']},
+      {q:'___ you waiting for me?',a:'Were',opts:['Was','Were','Did','Have']},
+      {q:'She ___ sleeping — she was reading. (negative)',a:"wasn't",opts:["didn't","wasn't","weren't","not"]},
+      {q:'What ___ he doing at 9pm?',a:'was',opts:['is','was','were','did']},
+    ],
+    speak: ['I was studying at 8pm.','Were you sleeping?','She was cooking when I arrived.','We weren\'t watching TV.','They were talking all night.'],
+  },
+
+  {
+    id: 19, title: 'Superlatives', emoji: '🏆',
+    verbs: ['The most','The least','The -est','Better / Best'],
+    vocab: [
+      {en:'Strong',pt:'Forte'},{en:'Fast',pt:'Rápido'},{en:'Tall',pt:'Alto'},
+      {en:'Big',pt:'Grande'},{en:'Small',pt:'Pequeno'},{en:'Old',pt:'Velho/Antigo'},
+      {en:'New',pt:'Novo'},{en:'Happy',pt:'Feliz'},{en:'Busy',pt:'Ocupado'},
+      {en:'Expensive',pt:'Caro'},{en:'Cheap',pt:'Barato'},{en:'Interesting',pt:'Interessante'},
+      {en:'Boring',pt:'Chato'},{en:'Intelligent',pt:'Inteligente'},{en:'Difficult',pt:'Difícil'},
+      {en:'Easy',pt:'Fácil'},{en:'Beautiful',pt:'Bonito/Bonita'},{en:'Popular',pt:'Popular'},
+      {en:'Important',pt:'Importante'},{en:'Useful',pt:'Útil'},{en:'Dangerous',pt:'Perigoso'},
+      {en:'Safe',pt:'Seguro'},{en:'Comfortable',pt:'Confortável'},{en:'Modern',pt:'Moderno'},
+      {en:'Ancient',pt:'Antigo/Ancestral'},{en:'Famous',pt:'Famoso'},{en:'Crowded',pt:'Lotado'},
+      {en:'Quiet',pt:'Quieto/Tranquilo'},{en:'Friendly',pt:'Amigável'},{en:'Polluted',pt:'Poluído'},
+    ],
+    expressions: [
+      {expr:'The best of all.',meaning:'O melhor de todos.',example:'This is the best coffee I\'ve ever had — the best of all!'},
+      {expr:'Second to none.',meaning:'Sem igual / O melhor.',example:'Her cooking is second to none in this city.'},
+      {expr:'Once in a lifetime.',meaning:'Uma vez na vida.',example:'Seeing the Northern Lights was a once in a lifetime experience.'},
+      {expr:'Top of the class.',meaning:'O melhor da turma.',example:'She studied the most and finished top of the class.'},
+    ],
+    sentences: [
+      'This is the tallest building in the city.','She is the most intelligent student in the class.',
+      'That was the best movie I have ever seen.','English is the most useful language to learn.',
+      'He is the fastest runner on the team.','This is the most expensive restaurant in town.',
+      'It was the worst day of my life.','She is the happiest person I know.',
+    ],
+    grammar: {
+      title: 'Superlatives — O/A Melhor, O/A Maior...',
+      rules: [
+        'Adjetivos curtos (1-2 sílabas): <b>the</b> + adjetivo + <b>-est</b> → the tall<b>est</b>, the fast<b>est</b>',
+        'Adjetivos longos (3+ sílabas): <b>the most</b> + adjetivo → the most beautiful, the most expensive',
+        'Dobrar consoante final: big → the bigg<b>est</b> | hot → the hott<b>est</b>',
+        'y → iest: happy → the happ<b>iest</b> | busy → the bus<b>iest</b>',
+        'Irregulares: good → <b>the best</b> | bad → <b>the worst</b> | far → <b>the furthest</b>',
+      ],
+      table: {
+        headers: ['Adjetivo','Comparativo','Superlativo'],
+        rows: [
+          ['tall','taller than','the tallest'],
+          ['fast','faster than','the fastest'],
+          ['big','bigger than','the biggest'],
+          ['beautiful','more beautiful than','the most beautiful'],
+          ['expensive','more expensive than','the most expensive'],
+          ['good','better than','the best'],
+          ['bad','worse than','the worst'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'She is ___ student in the class. (intelligent)',a:'the most intelligent',opts:['most intelligent','the most intelligent','the intelligenter','most intelligenter']},
+      {q:'This is ___ building in the city. (tall)',a:'the tallest',opts:['the most tall','taller','the tallest','most tall']},
+      {q:'That was ___ day of my life. (bad)',a:'the worst',opts:['the baddest','the most bad','the worst','the badder']},
+      {q:'English is ___ language for business. (useful)',a:'the most useful',opts:['the usefulest','most useful','the most useful','the usefuller']},
+      {q:'He is ___ runner on the team. (fast)',a:'the fastest',opts:['the most fast','the fastest','faster','most fast']},
+    ],
+    speak: ['This is the best day ever.','She is the most intelligent person I know.','It was the worst experience.','English is the most useful language.','He is the tallest in the room.'],
+  },
+
+  {
+    id: 20, title: 'MOST — Quantifier & Reference', emoji: '📊',
+    verbs: ['To Show / Showed','To Believe / Believed','To Choose / Chose','To Spend / Spent'],
+    vocab: [
+      {en:'Most people',pt:'A maioria das pessoas'},{en:'Most of the time',pt:'A maior parte do tempo'},
+      {en:'Most of my money',pt:'A maior parte do meu dinheiro'},{en:'Most likely',pt:'Muito provavelmente'},
+      {en:'For the most part',pt:'Na maior parte'},{en:'Make the most of it',pt:'Aproveitar ao máximo'},
+      {en:'At most',pt:'No máximo'},{en:'The most important',pt:'O mais importante'},
+      {en:'Time',pt:'Tempo'},{en:'Money',pt:'Dinheiro'},{en:'People',pt:'Pessoas'},
+      {en:'Ideas',pt:'Ideias'},{en:'Problems',pt:'Problemas'},{en:'Solutions',pt:'Soluções'},
+      {en:'Friends',pt:'Amigos'},{en:'Family',pt:'Família'},{en:'Work',pt:'Trabalho'},
+      {en:'City',pt:'Cidade'},{en:'Country',pt:'País'},{en:'World',pt:'Mundo'},
+      {en:'Believe',pt:'Acreditar'},{en:'Choose',pt:'Escolher'},{en:'Show',pt:'Mostrar'},
+      {en:'Spend',pt:'Gastar'},{en:'Agree',pt:'Concordar'},{en:'Decide',pt:'Decidir'},
+      {en:'Opinion',pt:'Opinião'},{en:'Experience',pt:'Experiência'},{en:'Result',pt:'Resultado'},
+      {en:'Difference',pt:'Diferença'},{en:'Effort',pt:'Esforço'},
+    ],
+    expressions: [
+      {expr:'For the most part.',meaning:'Na maior parte / Em geral.',example:'For the most part, I enjoy my work — but it\'s stressful sometimes.'},
+      {expr:'Make the most of it.',meaning:'Aproveitar ao máximo.',example:'We only have one week in Paris — let\'s make the most of it!'},
+      {expr:'Most likely.',meaning:'Muito provavelmente.',example:'I don\'t know for sure, but she\'s most likely going to accept the job.'},
+      {expr:'At most.',meaning:'No máximo.',example:'The meeting will take an hour at most.'},
+    ],
+    sentences: [
+      'Most people believe that honesty is important.','I spend most of my time at work.',
+      'She chose the most expensive option.','He showed most of his work to the manager.',
+      'Most of my friends live in another city.','For the most part, I agree with your idea.',
+      'She most likely chose the best solution.','We make the most of every opportunity.',
+    ],
+    grammar: {
+      title: 'MOST — 3 Usos Essenciais',
+      rules: [
+        '<b>Most + substantivo</b> (geral, sem artigo): "Most people like music." → A maioria das pessoas',
+        '<b>The most + adjetivo</b> (superlativo): "The most important thing." → A coisa mais importante',
+        '<b>Most of + the/my/his/...</b> (referência específica): "Most of my money." → A maior parte do meu dinheiro',
+        '⚠️ Atenção: <b>Most</b> people (geral) vs. <b>Most of the</b> people (grupo específico)',
+      ],
+      table: {
+        headers: ['Uso','Estrutura','Exemplo'],
+        rows: [
+          ['Quantificador','Most + noun','Most people work hard.'],
+          ['Superlativo','The most + adj.','The most beautiful city.'],
+          ['Referência','Most of + the/pronoun','Most of my time.'],
+          ['Expressão','For the most part','For the most part, I agree.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'___ people think English is important.',a:'Most',opts:['The most','Most of the','Most','Most of']},
+      {q:'I spend ___ my time at work.',a:'most of',opts:['most','the most','most of','mostly']},
+      {q:'She chose ___ expensive restaurant.',a:'the most',opts:['most','most of','the most','mostly']},
+      {q:'___, I enjoy my job.',a:'For the most part',opts:['Most likely','At most','For the most part','Most of']},
+      {q:'She ___ the best answer. (choose, past)',a:'chose',opts:['choosed','choose','chosen','chose']},
+    ],
+    speak: ['Most people agree with me.','I spend most of my time studying.','For the most part, I\'m happy.','She most likely chose the best option.','Make the most of every day!'],
+  },
+
+  {
+    id: 21, title: 'Can, Could & Would', emoji: '🎯',
+    verbs: ['Can (ability)','Could (past / polite)','Would (polite / hypothetical)','Many / Much / A lot of'],
+    vocab: [
+      {en:'Ability',pt:'Habilidade'},{en:'Request',pt:'Pedido'},{en:'Permission',pt:'Permissão'},
+      {en:'Advice',pt:'Conselho'},{en:'Preference',pt:'Preferência'},{en:'Choice',pt:'Escolha'},
+      {en:'Option',pt:'Opção'},{en:'Budget',pt:'Orçamento'},{en:'Workload',pt:'Carga de trabalho'},
+      {en:'Deadline',pt:'Prazo'},{en:'Feedback',pt:'Retorno/Feedback'},{en:'Challenge',pt:'Desafio'},
+      {en:'Opportunity',pt:'Oportunidade'},{en:'Pressure',pt:'Pressão'},{en:'Balance',pt:'Equilíbrio'},
+      {en:'Effort',pt:'Esforço'},{en:'Goal',pt:'Meta'},{en:'Achievement',pt:'Conquista'},
+      {en:'Issue',pt:'Problema/Questão'},{en:'Support',pt:'Apoio'},{en:'Afford',pt:'Ter dinheiro para'},
+      {en:'Handle',pt:'Lidar com'},{en:'Describe',pt:'Descrever'},{en:'Recommend',pt:'Recomendar'},
+      {en:'Polite',pt:'Educado'},{en:'Favor',pt:'Favor'},{en:'Mind',pt:'Importar-se'},
+      {en:'Abroad',pt:'No exterior'},{en:'Fluent',pt:'Fluente'},{en:'Improve',pt:'Melhorar'},
+    ],
+    expressions: [
+      {expr:'Could you do me a favor?',meaning:'Você poderia me fazer um favor?',example:'Could you do me a favor and send me the file?'},
+      {expr:'I would love to.',meaning:'Eu adoraria.',example:'Would you like to join us? I would love to!'},
+      {expr:'I can\'t afford it right now.',meaning:'Não posso pagar por isso agora.',example:'It\'s a great trip but I can\'t afford it right now.'},
+      {expr:'Would you mind...?',meaning:'Você se importaria de...?',example:'Would you mind closing the window? It\'s cold.'},
+    ],
+    sentences: [
+      'I can handle a lot of pressure at work.','Could you describe your experience?',
+      'I would love to work abroad one day.','She can speak three languages.',
+      'Could you help me with this problem?','He would choose a different career now.',
+      'There are many options — which would you prefer?','I can\'t afford much this month.',
+    ],
+    grammar: {
+      title: 'Can / Could / Would — Modais Essenciais',
+      rules: [
+        '<b>CAN</b>: habilidade presente / permissão → "I can speak English." / "Can I leave early?"',
+        '<b>COULD</b>: habilidade passada / pedido educado → "I could swim as a child." / "Could you help me?"',
+        '<b>WOULD</b>: hipotético / desejo / pedido formal → "I would love to." / "Would you like coffee?"',
+        '<b>MANY</b>: substantivos contáveis → "many books, many people, many options"',
+        '<b>MUCH</b>: substantivos incontáveis → "much time, much money, much work"',
+        '<b>A LOT OF</b>: ambos → "a lot of books / a lot of time"',
+      ],
+      table: {
+        headers: ['Modal','Uso','Exemplo'],
+        rows: [
+          ['Can','Habilidade/permissão','I can handle pressure.'],
+          ['Could','Passado/pedido polido','Could you help me?'],
+          ['Would','Hipotético/desejo','I would love to travel.'],
+          ['Many','Contável (pl.)','Many people agree.'],
+          ['Much','Incontável','I don\'t have much time.'],
+          ['A lot of','Ambos','A lot of work to do.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'___ you speak any other language?',a:'Can',opts:['Would','Could','Can','Should']},
+      {q:'___ you help me with this report?',a:'Could',opts:['Would','Could','Can','Must']},
+      {q:'I ___ love to work abroad.',a:'would',opts:['can','could','would','should']},
+      {q:'There aren\'t ___ options. (countable)',a:'many',opts:['much','many','a lot','very']},
+      {q:'I don\'t have ___ time today. (uncountable)',a:'much',opts:['many','much','a lot','most']},
+    ],
+    speak: ['I can speak two languages.','Could you do me a favor?','I would love to travel.','There are many options.','I don\'t have much time.'],
+  },
+
+  {
+    id: 22, title: 'Future with WILL & WON\'T', emoji: '🚀',
+    verbs: ['Will + verb','Won\'t (will not)','I\'ll / She\'ll / They\'ll','Will + subject + verb?'],
+    vocab: [
+      {en:'Future',pt:'Futuro'},{en:'Plan',pt:'Plano'},{en:'Goal',pt:'Meta'},
+      {en:'Dream',pt:'Sonho'},{en:'Promise',pt:'Promessa'},{en:'Change',pt:'Mudança'},
+      {en:'Decision',pt:'Decisão'},{en:'Result',pt:'Resultado'},{en:'Success',pt:'Sucesso'},
+      {en:'Risk',pt:'Risco'},{en:'Opportunity',pt:'Oportunidade'},{en:'Investment',pt:'Investimento'},
+      {en:'Career',pt:'Carreira'},{en:'Business',pt:'Negócio'},{en:'Course',pt:'Curso'},
+      {en:'Language',pt:'Língua/Idioma'},{en:'Health',pt:'Saúde'},{en:'Money',pt:'Dinheiro'},
+      {en:'House',pt:'Casa'},{en:'Team',pt:'Equipe'},{en:'Project',pt:'Projeto'},
+      {en:'Promotion',pt:'Promoção'},{en:'Prediction',pt:'Previsão'},{en:'Spontaneous',pt:'Espontâneo'},
+      {en:'Offer',pt:'Oferta'},{en:'Refuse',pt:'Recusar'},{en:'Accept',pt:'Aceitar'},
+      {en:'Definitely',pt:'Definitivamente'},{en:'Probably',pt:'Provavelmente'},{en:'Maybe',pt:'Talvez'},
+    ],
+    expressions: [
+      {expr:'I\'ll keep that in mind.',meaning:'Vou ter isso em mente.',example:'Great advice — I\'ll keep that in mind, thank you.'},
+      {expr:'It will all work out.',meaning:'Vai dar tudo certo.',example:'Don\'t worry — it will all work out in the end.'},
+      {expr:'I won\'t let you down.',meaning:'Não vou te decepcionar.',example:'You can count on me — I won\'t let you down.'},
+      {expr:'That will never happen.',meaning:'Isso nunca vai acontecer.',example:'I\'ll quit? That will never happen — I love this job!'},
+    ],
+    sentences: [
+      'I will plan my future carefully.','She won\'t promise what she can\'t do.',
+      'Will they expect big changes?','I\'ll help you with the project.',
+      'He won\'t give up on his dream.','We will travel to Europe next year.',
+      'Will you come to the meeting?','They\'ll probably get the promotion.',
+    ],
+    grammar: {
+      title: 'WILL / WON\'T — O Futuro Espontâneo',
+      rules: [
+        'Afirmativo: Sujeito + <b>will</b> + infinitivo → "I will plan my future."',
+        'Negativo: Sujeito + <b>won\'t</b> + infinitivo → "She won\'t promise that."',
+        'Pergunta: <b>Will</b> + sujeito + infinitivo? → "Will they expect a change?"',
+        'Contrações: I\'ll, You\'ll, He\'ll, She\'ll, We\'ll, They\'ll, Won\'t',
+        '4 usos: <b>Previsão</b> | <b>Promessa</b> | <b>Decisão espontânea</b> | <b>Oferta</b>',
+        '⚠️ WILL ≠ GOING TO: WILL = decisão agora | GOING TO = plano já feito',
+      ],
+      table: {
+        headers: ['Forma','Estrutura','Exemplo'],
+        rows: [
+          ['Afirmativo','will + verb','I will help you.'],
+          ['Negativo','won\'t + verb','She won\'t come.'],
+          ['Pergunta','Will + subj + verb?','Will you help me?'],
+          ['Resposta curta','Yes, I will / No, I won\'t','Yes, I will!'],
+          ['Contração','I\'ll / She\'ll / Won\'t','I\'ll call you later.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ call you tomorrow. (promise)',a:"'ll",opts:["'ll","'m going to","won't","go to"]},
+      {q:'She ___ give up on her dream. (negative)',a:"won't",opts:["don't will","won't","not will","willn't"]},
+      {q:'___ you come to the party?',a:'Will',opts:['Are','Will','Do','Going to']},
+      {q:'Look at those clouds — it ___ rain. (prediction)',a:'will',opts:['will','is going to','go to','shall']},
+      {q:'I ___ keep that in mind. (contraction)',a:"I'll",opts:["I will to","I'm will","I'll","I going to"]},
+    ],
+    speak: ['I\'ll help you with that.','She won\'t give up.','Will you join us?','They\'ll probably come.','I won\'t let you down.'],
+  },
+
+  {
+    id: 23, title: 'Personalities & Moods — Aula 28', emoji: '😊',
+    verbs: ['To Feel / Felt / Felt','To Seem / Seemed / Seemed','To Act / Acted / Acted','To Express / Expressed / Expressed'],
+    vocab: [
+      // Moods & Emotional States
+      {en:'Happy',pt:'Feliz'},{en:'Sad',pt:'Triste'},{en:'Angry',pt:'Com raiva'},
+      {en:'Upset',pt:'Chateado/a'},{en:'Tired',pt:'Cansado/a'},{en:'Anxious',pt:'Ansioso/a'},
+      {en:'Excited',pt:'Animado/a'},{en:'Bored',pt:'Entediado/a'},{en:'Frustrated',pt:'Frustrado/a'},
+      {en:'Nervous',pt:'Nervoso/a'},{en:'Relieved',pt:'Aliviado/a'},{en:'Overwhelmed',pt:'Sobrecarregado/a'},
+      {en:'Confident',pt:'Confiante'},{en:'Embarrassed',pt:'Envergonhado/a'},{en:'Proud',pt:'Orgulhoso/a'},
+      // Personality Types
+      {en:'Outgoing',pt:'Extrovertido/a'},{en:'Shy',pt:'Tímido/a'},{en:'Honest',pt:'Honesto/a'},
+      {en:'Kind',pt:'Gentil / Bondoso/a'},{en:'Stubborn',pt:'Teimoso/a'},{en:'Patient',pt:'Paciente'},
+      {en:'Ambitious',pt:'Ambicioso/a'},{en:'Sensitive',pt:'Sensível'},{en:'Creative',pt:'Criativo/a'},
+      {en:'Reliable',pt:'Confiável'},{en:'Impulsive',pt:'Impulsivo/a'},{en:'Empathetic',pt:'Empático/a'},
+      {en:'Pessimistic',pt:'Pessimista'},{en:'Optimistic',pt:'Otimista'},
+      // Degree adverbs
+      {en:'A little',pt:'Um pouco'},{en:'Quite',pt:'Bastante'},{en:'Extremely',pt:'Extremamente'},
+      {en:'Incredibly',pt:'Incrivelmente'},
+    ],
+    expressions: [
+      {expr:"I'm not in the mood.",meaning:'Não estou com vontade / no clima.',example:"Don't ask me to go out — I'm not in the mood tonight."},
+      {expr:"She's on top of the world.",meaning:'Ela está nas nuvens / feliz demais.',example:"She got the promotion — she's on top of the world right now."},
+      {expr:"He's driving me crazy.",meaning:'Ele está me deixando louco/a.',example:"He keeps interrupting me — he's driving me crazy!"},
+      {expr:"I'm feeling under pressure.",meaning:'Estou me sentindo sob pressão.',example:"With all these deadlines, I'm really feeling under pressure."},
+    ],
+    sentences: [
+      'She is very patient with her students.','I felt anxious before the job interview.',
+      'He seems really tired today.','They acted very confident during the presentation.',
+      'She expressed how excited she was about the trip.','I feel overwhelmed with so much work.',
+      'He is quite stubborn — he never changes his mind.','She seemed relieved when the meeting ended.',
+      'I feel a little nervous about the meeting.','He acted extremely confident in the interview.',
+      'She is incredibly empathetic with her team.','They seem pessimistic about the results.',
+    ],
+    grammar: {
+      title: 'Aula 28 — 3 Estruturas para Descrever Pessoas',
+      rules: [
+        '<b>TO BE + adjetivo</b> → personalidade permanente: "She <b>is</b> very patient." / "He <b>is</b> outgoing."',
+        '<b>TO FEEL / SEEM + adjetivo</b> → estado temporário: "I <b>feel</b> anxious today." / "He <b>seems</b> tired."',
+        '<b>TO ACT + adjetivo</b> → comportamento em situação: "She <b>acted</b> confident." / "Don\'t <b>act</b> so impulsive!"',
+        '<b>Intensificadores (grau):</b> a little → quite → really → very → extremely → incredibly',
+        'Ex: "I\'m <b>a little</b> upset." / "She\'s <b>quite</b> shy." / "He\'s <b>incredibly</b> patient."',
+      ],
+      table: {
+        headers: ['Estrutura','Uso','Exemplo do PDF'],
+        rows: [
+          ['To be + adj.','Personalidade permanente','She is very reliable.'],
+          ['To feel + adj.','Estado emocional agora','I feel nervous today.'],
+          ['To seem + adj.','Aparência / impressão','He seems upset right now.'],
+          ['To act + adj.','Comportamento momentâneo','She acted stubborn.'],
+          ['a little / quite','Grau fraco / médio','I\'m quite tired.'],
+          ['very / extremely','Grau forte / máximo','She\'s extremely confident.'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ very anxious before the exam. (feel — past)',a:'felt',opts:['feel','feeled','felt','feeling']},
+      {q:'She ___ tired today. (seem — present)',a:'seems',opts:['seem','seemed','seems','seeming']},
+      {q:'"He never changes his mind." → He is very ___.',a:'Stubborn',opts:['Patient','Stubborn','Shy','Reliable']},
+      {q:'They ___ really excited during the presentation. (act — past)',a:'acted',opts:['act','acts','acted','acting']},
+      {q:'Which word means "Aliviado/a"?',a:'Relieved',opts:['Relieved','Overwhelmed','Proud','Bored']},
+      {q:'Which word means "Sobrecarregado/a"?',a:'Overwhelmed',opts:['Frustrated','Embarrassed','Overwhelmed','Nervous']},
+      {q:'Which word means "Empático/a"?',a:'Empathetic',opts:['Ambitious','Sensitive','Reliable','Empathetic']},
+      {q:'"She loves meeting new people." → She is very ___.',a:'Outgoing',opts:['Shy','Stubborn','Outgoing','Patient']},
+      {q:'"He makes decisions too fast." → He is very ___.',a:'Impulsive',opts:['Reliable','Patient','Creative','Impulsive']},
+      {q:'What does "I\'m not in the mood" mean?',a:'Não estou com vontade',opts:['Estou feliz','Não estou com vontade','Estou animado','Estou cansado']},
+      {q:'What does "She\'s on top of the world" mean?',a:'Ela está feliz demais',opts:['Ela está triste','Ela está cansada','Ela está feliz demais','Ela está ansiosa']},
+      {q:'Qual intensificador é o MAIS forte?',a:'Extremely',opts:['A little','Quite','Very','Extremely']},
+    ],
+    speak: [
+      'I feel really excited today.','She seems very confident in meetings.',
+      'He acted quite stubborn during the discussion.','I\'m extremely tired this week.',
+      'They seemed relieved after the project ended.','She is incredibly empathetic with her team.',
+      'I\'m not in the mood for this meeting.','He\'s driving me crazy with his impulsive decisions.',
+    ],
+  },
+
+  {
+    id: 24, title: 'Still vs. Yet & Possessives', emoji: '⏳',
+    verbs: ['To Have','To Share','To Keep','To Finish'],
+    vocab: [
+      {en:'Still',pt:'Ainda (continua)'},{en:'Yet',pt:'Ainda não / Já (em perguntas)'},
+      {en:'My',pt:'Meu/Minha'},{en:'Your',pt:'Seu/Sua/Teu/Tua'},{en:'His',pt:'Dele'},
+      {en:'Her',pt:'Dela'},{en:'Our',pt:'Nosso/Nossa'},{en:'Their',pt:'Deles/Delas'},
+      {en:'Its',pt:'Seu/Sua (de coisa/animal)'},{en:'Book',pt:'Livro'},{en:'Car',pt:'Carro'},
+      {en:'Keys',pt:'Chaves'},{en:'Wallet',pt:'Carteira'},{en:'Phone',pt:'Celular'},
+      {en:'Job',pt:'Emprego'},{en:'Work',pt:'Trabalho'},{en:'Project',pt:'Projeto'},
+      {en:'Homework',pt:'Tarefa/Lição de casa'},{en:'Breakfast',pt:'Café da manhã'},
+      {en:'Lunch',pt:'Almoço'},{en:'Dinner',pt:'Jantar'},{en:'Coffee',pt:'Café'},
+      {en:'Dream',pt:'Sonho'},{en:'Goal',pt:'Meta'},{en:'Secret',pt:'Segredo'},
+      {en:'Opinion',pt:'Opinião'},{en:'Feeling',pt:'Sentimento'},{en:'Problem',pt:'Problema'},
+      {en:'Solution',pt:'Solução'},{en:'Idea',pt:'Ideia'},
+    ],
+    expressions: [
+      {expr:'Are you still here?',meaning:'Você ainda está aqui?',example:'Are you still here? I thought you left an hour ago!'},
+      {expr:'I haven\'t finished yet.',meaning:'Ainda não terminei.',example:'Can you wait? I haven\'t finished yet.'},
+      {expr:'Keep it to yourself.',meaning:'Guarde para si / Não conte para ninguém.',example:'It\'s a secret — keep it to yourself, please.'},
+      {expr:"It's my turn.",meaning:'É minha vez.',example:"Stop! It's my turn to speak now."},
+    ],
+    sentences: [
+      'Are you still working on the project?','I still don\'t understand this grammar rule.',
+      'She still lives with her parents.','Have you finished your homework yet?',
+      'I haven\'t eaten breakfast yet.','She hasn\'t arrived yet.',
+      'My phone is on the table.','Their car is still in the garage.',
+    ],
+    grammar: {
+      title: 'STILL vs. YET + Possessive Adjectives',
+      rules: [
+        '<b>STILL</b> (Ainda — algo continua): ANTES do verbo principal ou ENTRE auxiliar e verbo principal',
+        'Ex: "I <b>still</b> don\'t know." / "Are you <b>still</b> here?" / "It\'s <b>still</b> raining."',
+        '<b>YET</b> (Ainda não / Já): NO FINAL da frase — usado em negativos e perguntas',
+        'Ex: "Have you finished <b>yet</b>?" / "I haven\'t eaten <b>yet</b>." / "She hasn\'t arrived <b>yet</b>."',
+        '<b>Possessive Adjectives</b>: sempre ANTES do substantivo — My, Your, His, Her, Its, Our, Their',
+      ],
+      table: {
+        headers: ['Palavra','Posição','Exemplo'],
+        rows: [
+          ['STILL','Antes do verbo principal','I still work there.'],
+          ['STILL','Entre aux. e verbo','Are you still waiting?'],
+          ['YET','No final (negativa)','I haven\'t finished yet.'],
+          ['YET','No final (pergunta)','Have you eaten yet?'],
+          ['My/Your/His...','Antes do substantivo','My book / Her car / Their house'],
+        ]
+      }
+    },
+    quiz: [
+      {q:'I ___ don\'t understand. (still/yet)',a:'still',opts:['yet','still','already','ever']},
+      {q:'Have you finished the project ___?',a:'yet',opts:['still','yet','already','ever']},
+      {q:'She ___ lives with her parents.',a:'still',opts:['yet','still','already','just']},
+      {q:'I haven\'t eaten breakfast ___.',a:'yet',opts:['still','yet','already','just']},
+      {q:'___ car is still in the garage. (they)',a:'Their',opts:['They','Them','Their','Theirs']},
+    ],
+    speak: ['Are you still working?','I haven\'t finished yet.','She still doesn\'t know.','Have you eaten yet?','Their house is very beautiful.'],
+  },
+];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LESSON PROGRESS — Per-lesson per-tool tracking
+// ══════════════════════════════════════════════════════════════════════════════
+const TOOL_KEYS = ['vocab','quiz','build','expr','gram','speak','listen','typing','speed','scramble'];
+
+function getLessonProgress(id) {
+  const key = 'lessonProgress_j' + id;
+  const saved = localStorage.getItem(key);
+  if (saved) return JSON.parse(saved);
+  const blank = { tools:{}, stars:{}, xpEarned:0, weakWords:[], lastActivity:'' };
+  TOOL_KEYS.forEach(k => { blank.tools[k] = false; });
+  ['quiz','listen','typing','speed','scramble'].forEach(k => { blank.stars[k] = 0; });
+  return blank;
+}
+function saveLessonProgress(id, data) {
+  data.lastActivity = new Date().toISOString().slice(0,10);
+  localStorage.setItem('lessonProgress_j' + id, JSON.stringify(data));
+}
+function markToolDone(id, toolKey, stars) {
+  const p = getLessonProgress(id);
+  p.tools[toolKey] = true;
+  if (stars !== undefined && p.stars[toolKey] !== undefined) p.stars[toolKey] = Math.max(p.stars[toolKey], stars);
+  saveLessonProgress(id, p);
+  renderProgressDashboard();
+
+  // ── Guided mode: show Continue banner when current step finishes ─────────
+  if (GUIDED_MODE && activeSteps[guidedStep] === toolKey) {
+    const banner = document.getElementById('guided-continue-banner');
+    if (banner) { banner.style.display = 'block'; window.scrollTo({top:0,behavior:'smooth'}); }
+  }
+}
+function addXPToProgress(id, amount) {
+  const p = getLessonProgress(id);
+  p.xpEarned += amount;
+  saveLessonProgress(id, p);
+  if (window.Store) Store.addXP(amount);
+}
+function recordWeakWord(id, vocab, source) {
+  const p = getLessonProgress(id);
+  if (!p.weakWords.find(w => w.en === vocab.en)) {
+    p.weakWords.push({ en: vocab.en, pt: vocab.pt, source });
+  }
+  saveLessonProgress(id, p);
+}
+function removeWeakWord(id, en) {
+  const p = getLessonProgress(id);
+  p.weakWords = p.weakWords.filter(w => w.en !== en);
+  saveLessonProgress(id, p);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let currentLesson = JADSON_LESSONS[0];
+let currentTool   = 'vocab';
+let vocabIdx      = 0;
+let quizIdx       = 0;
+let quizScore     = 0;
+let quizDone      = false;
+let quizStreak    = 0;
+let buildSentIdx  = 0;
+let buildBuilt    = [];
+let matchLeft     = null;
+let matchedPairs  = new Set();
+let speakIdx      = 0;
+let exprMatchLeft = null;
+let exprMatched   = new Set();
+// Listen
+let listenIdx=0, listenScore=0, listenDone=false, listenMode='en-to-pt', listenStreak=0;
+// Typing
+let typeIdx=0, typeScore=0, typeHints=0, typeDone=false, typeMode='pt-to-en', typeChecked=false;
+// Speed
+let speedIdx=0, speedScore=0, speedDone=false, speedStreak=0;
+let speedTimer=null, speedSecsLeft=6, speedAnswered=false, speedMultiplier=1;
+// Scramble
+let scrambleIdx=0, scrambleInput=[], scrambleHints=0, scrambleDone=false, scrambleAnswered=false;
+// Shuffled arrays — refreshed on every loadLesson()
+let shuffledVocab     = [];
+let shuffledQuiz      = [];
+let shuffledSentences = [];
+let shuffledSpeak     = [];
+// AI-generated content
+let aiQuizQuestions = [];   // AI quiz replaces static quiz in guided mode
+// AI Chat state
+let chatHistory   = [];
+let chatExchanges = 0;
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AI FEATURES
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadAIQuiz(lesson) {
+  const today = new Date().toISOString().slice(0, 10);
+  const cacheKey = 'capyAIQuiz_' + lesson.id + '_' + today;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try { aiQuizQuestions = JSON.parse(cached); return; } catch(e) {}
+  }
+  try {
+    const vocab = lesson.vocab.map(v => v.en).slice(0, 10);
+    const resp = await fetch('/api/lesson-quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic: lesson.title, vocab, level: 'beginner' })
+    });
+    const data = await resp.json();
+    const text = data.candidates[0].content.parts[0].text;
+    // Strip markdown fences if present
+    const clean = text.replace(/```json\n?|\n?```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    aiQuizQuestions = parsed;
+    localStorage.setItem(cacheKey, JSON.stringify(parsed));
+  } catch(e) {
+    aiQuizQuestions = []; // fall back to static quiz on error
+  }
+}
+
+function renderAIChat() {
+  chatHistory = [];
+  chatExchanges = 0;
+  const panel = document.getElementById('panel-aichat');
+  if (!panel) return;
+  // Hide all other panels
+  document.querySelectorAll('.tool-panel').forEach(p => {
+    p.classList.remove('active');
+    if (p.id !== 'panel-aichat') p.style.display = '';
+  });
+  panel.style.display = 'block';
+  document.getElementById('aichat-topic').textContent = '📖 ' + currentLesson.title;
+  document.getElementById('aichat-messages').innerHTML = '';
+  document.getElementById('aichat-done-row').style.display = 'none';
+  document.getElementById('aichat-input').value = '';
+  updateAIRemainingBadge();
+  // Yara opens the conversation
+  const opener = `Great job finishing the lesson on "${currentLesson.title}"! 🌟 Can you tell me one word you learned today?`;
+  appendChatMsg('yara', opener);
+  chatHistory.push({ role: 'model', text: opener });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function appendChatMsg(who, text) {
+  const el = document.getElementById('aichat-messages');
+  const div = document.createElement('div');
+  if (who === 'yara') {
+    div.className = 'flex gap-2 items-start';
+    div.innerHTML = `<span class="text-xl mt-0.5 flex-shrink-0">🦫</span>
+      <div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]">${text}</div>`;
+  } else {
+    div.className = 'flex gap-2 items-start justify-end';
+    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]">${text}</div>`;
+  }
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function showPaywallModal() {
+  document.getElementById('paywall-modal').classList.remove('hidden');
+}
+
+function updateAIRemainingBadge() {
+  const badge = document.getElementById('ai-remaining-badge');
+  if (!badge) return;
+  const rem = Store.getRemainingAI();
+  badge.textContent = `${rem} chat${rem === 1 ? '' : 's'} left today`;
+  badge.style.display = rem > 0 ? 'block' : 'none';
+}
+
+async function sendChat() {
+  const input = document.getElementById('aichat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  // ── AI gate ──
+  if (!Store.consumeAI()) {
+    showPaywallModal();
+    return;
+  }
+  updateAIRemainingBadge();
+
+  input.value = '';
+  input.disabled = true;
+  appendChatMsg('student', msg);
+  chatHistory.push({ role: 'user', text: msg });
+  chatExchanges++;
+  // Show done button after 3 exchanges
+  if (chatExchanges >= 3) document.getElementById('aichat-done-row').style.display = 'block';
+  // Show typing indicator
+  const el = document.getElementById('aichat-messages');
+  const typing = document.createElement('div');
+  typing.id = 'typing-indicator';
+  typing.className = 'flex gap-2 items-start';
+  typing.innerHTML = `<span class="text-xl mt-0.5">🦫</span><div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-400">...</div>`;
+  el.appendChild(typing);
+  el.scrollTop = el.scrollHeight;
+  try {
+    const vocab = currentLesson.vocab.map(v => v.en).slice(0, 8);
+    const resp = await fetch('/api/lesson-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ history: chatHistory.slice(-6), message: msg,
+                             lessonTopic: currentLesson.title, vocab })
+    });
+    const data = await resp.json();
+    const reply = data.candidates[0].content.parts[0].text;
+    typing.remove();
+    appendChatMsg('yara', reply);
+    chatHistory.push({ role: 'model', text: reply });
+  } catch(e) {
+    typing.remove();
+    appendChatMsg('yara', 'Oops, I lost my train of thought! Try again? 🦫');
+  }
+  input.disabled = false;
+  input.focus();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// GUIDED MODE
+// ══════════════════════════════════════════════════════════════════════════════
+const GUIDED_STEPS = ['listen','quiz','game','build','speak','aichat'];
+const GUIDED_LABELS = ['Listening','Quiz','Game','Sentence Builder','Speak','Chat with Yara'];
+
+// Mini-lesson configs — maps mini number (1-4) to the subset of GUIDED_STEPS for that day
+const MINI_CONFIGS = {
+  1: ['listen', 'quiz'],
+  2: ['game'],
+  3: ['build', 'speak'],
+  4: ['aichat']
+};
+
+// Set from URL param at boot; 0 = full lesson mode (backward compat)
+let miniNum = 0;
+
+// The steps active this session — overridden at boot if miniNum > 0
+let activeSteps = GUIDED_STEPS;
+const TRAIL_GAMES = {
+  1:'word_match_game.html',   2:'fill_blank_game.html',  3:'grammar_lab.html',
+  4:'matching_pairs_game.html',5:'sentence_builder_game.html',6:'spelling_bee_game.html',
+  7:'word_scramble_game.html', 8:'word_search_game.html', 9:'fill_blank_game.html',
+  10:'grammar_lab.html',      11:'hangman_game.html',    12:'berry_math_game.html',
+  13:'color_catch_game.html', 14:'word_match_game.html', 15:'word_search_game.html',
+  16:'hangman_game.html',     17:'matching_pairs_game.html',18:'word_search_game.html',
+  19:'word_scramble_game.html',20:'flappy_yara_game.html',21:'spelling_bee_game.html',
+  22:'color_catch_game.html', 23:'word_scramble_game.html', 24:'daily_challenge.html',
+};
+const GAME_NAMES = {
+  'word_match_game.html':'Word Match','fill_blank_game.html':'Fill in the Blank',
+  'grammar_lab.html':'Grammar Lab','matching_pairs_game.html':'Matching Pairs',
+  'sentence_builder_game.html':'Sentence Builder','spelling_bee_game.html':'Spelling Bee',
+  'word_scramble_game.html':'Word Scramble','word_search_game.html':'Word Search',
+  'hangman_game.html':'Hangman','berry_math_game.html':'Berry Math',
+  'color_catch_game.html':'Color Catch','flappy_yara_game.html':'Flappy Yara',
+  'daily_challenge.html':'Daily Challenge',
+};
+
+let GUIDED_MODE = false;
+let guidedStep  = 0;
+
+// v2 = 6-step flow (no vocab). If old v1 key exists, clear it.
+const GUIDED_VERSION = 'v2';
+function _miniSuffix() { return miniNum > 0 ? '_m' + miniNum : ''; }
+function getGuidedStep(lessonId) {
+  const suffix = _miniSuffix();
+  const vKey = 'capyGuidedVer_' + lessonId + suffix;
+  const sKey = 'capyGuidedStep_' + lessonId + suffix;
+  if (localStorage.getItem(vKey) !== GUIDED_VERSION) {
+    localStorage.removeItem(sKey);
+    localStorage.setItem(vKey, GUIDED_VERSION);
+  }
+  return parseInt(localStorage.getItem(sKey) || '0');
+}
+function saveGuidedStep(lessonId, step) {
+  const suffix = _miniSuffix();
+  localStorage.setItem('capyGuidedStep_' + lessonId + suffix, step);
+  localStorage.setItem('capyGuidedVer_' + lessonId + suffix, GUIDED_VERSION);
+}
+
+function updateGuidedHeader() {
+  if (!GUIDED_MODE) return;
+  const steps    = activeSteps;
+  const total    = steps.length;
+  const stepKey  = steps[guidedStep];
+  // Look up label using the global GUIDED_STEPS index
+  const globalIdx = GUIDED_STEPS.indexOf(stepKey);
+  const stepName  = (globalIdx >= 0 ? GUIDED_LABELS[globalIdx] : stepKey) || '';
+
+  document.getElementById('guided-lesson-label').textContent = currentLesson.emoji + ' ' + currentLesson.title;
+  if (miniNum > 0) {
+    document.getElementById('guided-step-label').textContent =
+      `Day ${miniNum} · Step ${guidedStep + 1} of ${total} — ${stepName}`;
+  } else {
+    document.getElementById('guided-step-label').textContent =
+      `Step ${guidedStep + 1} of 6 — ${stepName}`;
+  }
+
+  // Color the step dots; hide dots beyond active step count
+  document.querySelectorAll('.guided-step-dot').forEach(dot => {
+    const s = parseInt(dot.dataset.step);
+    if (s >= total) {
+      dot.style.display = 'none';
+      return;
+    }
+    dot.style.display = '';
+    if (s < guidedStep)        { dot.style.background = '#10b981'; }  // done = green
+    else if (s === guidedStep) { dot.style.background = '#ec4899'; }  // current = pink
+    else                       { dot.style.background = '#e2e8f0'; }  // future = gray
+  });
+
+  // Hide emoji icon labels beyond active step count
+  document.querySelectorAll('.guided-icon-label').forEach(el => {
+    const s = parseInt(el.dataset.step);
+    el.style.display = s >= total ? 'none' : '';
+  });
+}
+
+function guidedNextStep() {
+  if (!GUIDED_MODE) return;
+  // Hide continue banner
+  const banner = document.getElementById('guided-continue-banner');
+  if (banner) banner.style.display = 'none';
+  // Hide game/chat panels if we're leaving them
+  const gamePanel = document.getElementById('panel-game');
+  if (gamePanel) gamePanel.style.display = 'none';
+  const chatPanel = document.getElementById('panel-aichat');
+  if (chatPanel) chatPanel.style.display = 'none';
+
+  guidedStep++;
+  saveGuidedStep(currentLesson.id, guidedStep);
+  if (guidedStep >= activeSteps.length) {
+    guidedLessonComplete();
+    return;
+  }
+  updateGuidedHeader();
+  const nextTool = activeSteps[guidedStep];
+  if (nextTool === 'game') {
+    showGameStep();
+  } else if (nextTool === 'aichat') {
+    renderAIChat();
+    window.scrollTo({top:0, behavior:'smooth'});
+  } else {
+    switchTool(nextTool, true);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+}
+
+function showGameStep() {
+  const gameFile = TRAIL_GAMES[currentLesson.id] || 'word_match_game.html';
+  const gameName = GAME_NAMES[gameFile] || 'Game';
+  document.getElementById('game-step-emoji').textContent  = '🎮';
+  document.getElementById('game-step-title').textContent  = gameName;
+  document.getElementById('game-step-link').href          = gameFile;
+  document.getElementById('game-step-link').setAttribute('href', gameFile);
+  // Hide all other panels, show game panel via style.display (bypasses Tailwind active class)
+  document.querySelectorAll('.tool-panel').forEach(p => {
+    p.classList.remove('active');
+    if (p.id !== 'panel-game' && p.id !== 'panel-aichat') p.style.display = '';
+  });
+  document.getElementById('panel-game').style.display = 'block';
+  document.getElementById('panel-aichat').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function guidedGameDone() {
+  // Mark game as done in progress tracking (bypass banner — we advance directly)
+  const p = getLessonProgress(currentLesson.id);
+  p.tools['game'] = true;
+  saveLessonProgress(currentLesson.id, p);
+  guidedNextStep();
+}
+
+function guidedLessonComplete() {
+  saveGuidedStep(currentLesson.id, 0); // reset step for replay
+
+  const DAY_LABELS = { 1: 'Listen & Quiz', 2: 'Game', 3: 'Build & Speak', 4: 'Chat with Yara' };
+  const isFullMode = miniNum === 0;
+  const isLastMini = miniNum === 4;
+
+  // Calculate XP for this session
+  const fullXP    = currentLesson.xp || 50;
+  const xpReward  = isFullMode ? fullXP : Math.ceil(fullXP / 4);
+
+  if (window.Store) {
+    Store.addXP(xpReward);
+    if (isFullMode) {
+      Store.completeLesson(currentLesson.id);
+      Store.completeLesson('j' + currentLesson.id);
+      Store.activateStreak();
+    } else {
+      Store.completeMini(currentLesson.id, miniNum);  // calls completeLesson on mini 4
+      // also save 'j' format so sidebar stays green
+      if (isLastMini) Store.completeLesson('j' + currentLesson.id);
+    }
+    if ((isFullMode && fullXP >= 40) || (isLastMini && xpReward >= 15)) {
+      Store.unlockBadge('lesson_hero');
+    }
+  }
+
+  // Update overlay texts
+  const completionTitle = isFullMode
+    ? '🎉 Lesson Complete!'
+    : isLastMini
+      ? '🏆 Lesson Complete!'
+      : `✅ Day ${miniNum} Complete!`;
+
+  document.getElementById('gco-lesson-label').textContent =
+    currentLesson.emoji + ' ' + currentLesson.title +
+    (miniNum > 0 ? ` — Day ${miniNum}` : '');
+  document.getElementById('gco-xp').textContent = '+' + xpReward + ' XP';
+
+  // Update overlay heading
+  const overlayHeading = document.querySelector('#guided-complete-overlay h2');
+  if (overlayHeading) overlayHeading.textContent = completionTitle;
+
+  // Wire up Next button
+  const nextBtn = document.getElementById('gco-next-btn');
+  if (isFullMode) {
+    const next = currentLesson.id + 1;
+    const hasNext = next <= 24;
+    if (hasNext) {
+      nextBtn.textContent = 'Next Lesson: ' + next + ' →';
+      nextBtn.onclick = () => { window.location.href = 'lessons.html?lesson=' + next + '&guided=1'; };
+      nextBtn.style.display = '';
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  } else if (!isLastMini) {
+    // Mini 1–3: advance to next mini day
+    const nextMini  = miniNum + 1;
+    const nextLabel = DAY_LABELS[nextMini];
+    nextBtn.textContent = 'Day ' + nextMini + ': ' + nextLabel + ' →';
+    nextBtn.onclick = () => {
+      window.location.href = 'lessons.html?lesson=' + currentLesson.id + '&mini=' + nextMini + '&guided=1';
+    };
+    nextBtn.style.display = '';
+  } else {
+    // Mini 4 (last): go to next lesson's Day 1
+    const nextLesson = currentLesson.id + 1;
+    const hasNext    = nextLesson <= 24;
+    if (hasNext) {
+      nextBtn.textContent = 'Lesson ' + nextLesson + ' — Day 1 →';
+      nextBtn.onclick = () => {
+        window.location.href = 'lessons.html?lesson=' + nextLesson + '&mini=1&guided=1';
+      };
+      nextBtn.style.display = '';
+    } else {
+      nextBtn.style.display = 'none';
+    }
+  }
+
+  document.getElementById('guided-complete-overlay').style.display = 'flex';
+}
+
+// Hook into markToolDone — advance guided step when current tool finishes
+const _origMarkToolDone = markToolDone;
+// (we'll patch markToolDone after definition)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  Components.mount('top-nav-placeholder', Components.renderTopNav('lessons'));
+  // Merge built-in + custom lessons
+  ALL_LESSONS = [...JADSON_LESSONS, ...(Store.state.customLessons || [])];
+
+  const urlParams = new URLSearchParams(location.search);
+  const startId   = parseInt(urlParams.get('lesson') || '1');
+  GUIDED_MODE     = urlParams.get('guided') === '1';
+  miniNum         = parseInt(urlParams.get('mini') || '0');
+  // Override activeSteps for mini mode
+  if (miniNum > 0 && MINI_CONFIGS[miniNum]) {
+    activeSteps = MINI_CONFIGS[miniNum];
+  }
+
+  if (GUIDED_MODE) {
+    // Hide sidebar, mobile picker, tool tabs, progress dashboard
+    document.getElementById('lesson-sidebar').style.display = 'none';
+    document.querySelectorAll('.md\\:hidden').forEach(el => {
+      if (el.querySelector('#mobile-lesson-select')) el.style.display = 'none';
+    });
+    document.getElementById('tool-tabs').style.display     = 'none';
+    document.getElementById('progress-dashboard').style.display = 'none';
+    document.querySelector('main').classList.remove('md:ml-72');
+    document.querySelector('main').classList.add('max-w-2xl','mx-auto');
+    document.getElementById('guided-header').classList.remove('hidden');
+  } else {
+    buildSidebar();
+  }
+
+  loadLesson(startId);
+  if (!GUIDED_MODE) {
+    updateSidebarXP();
+    document.addEventListener('stateChanged', updateSidebarXP);
+  }
+  document.addEventListener('stateChanged', () => renderProgressDashboard());
+});
+
+function updateSidebarXP() {
+  if (!window.Store) return;
+  const xp = Store.state.xp;
+  const pct = Math.min(100, (xp / 500) * 100);
+  const bar = document.getElementById('sidebar-xp-bar');
+  const lbl = document.getElementById('sidebar-xp-label');
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = xp + ' XP total';
+}
+
+function buildSidebar() {
+  const list   = document.getElementById('lesson-list');
+  const select = document.getElementById('mobile-lesson-select');
+  list.innerHTML = '';
+  select.innerHTML = '';
+  ALL_LESSONS.forEach(l => {
+    const done = window.Store && Store.state.completedLessons && Store.state.completedLessons.includes('j' + l.id);
+    // Sidebar item
+    const btn = document.createElement('button');
+    btn.className = `lesson-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 ${l.id === currentLesson.id ? 'active' : ''}`;
+    btn.id = `lesson-btn-${l.id}`;
+    btn.innerHTML = `
+      <span class="lesson-num w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold flex-shrink-0 ${done ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}">
+        ${done ? '✓' : l.id}
+      </span>
+      <span class="text-sm font-semibold leading-snug truncate">${l.emoji} ${l.title}</span>
+    `;
+    btn.onclick = () => loadLesson(l.id);
+    list.appendChild(btn);
+    // Mobile option
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = `Aula ${l.id}: ${l.title}`;
+    select.appendChild(opt);
+  });
+}
+
+function loadLesson(id) {
+  currentLesson = ALL_LESSONS.find(l => l.id === id) || ALL_LESSONS[0];
+  // Sidebar highlight
+  document.querySelectorAll('.lesson-item').forEach(b => b.classList.remove('active'));
+  const active = document.getElementById(`lesson-btn-${id}`);
+  if (active) { active.classList.add('active'); active.scrollIntoView({block:'nearest'}); }
+  // Mobile select
+  const sel = document.getElementById('mobile-lesson-select');
+  if (sel) sel.value = id;
+  // Reset state
+  vocabIdx = 0; quizIdx = 0; quizScore = 0; quizDone = false; quizStreak = 0;
+  buildSentIdx = 0; buildBuilt = []; matchLeft = null; matchedPairs = new Set();
+  speakIdx = 0; exprMatchLeft = null; exprMatched = new Set();
+  listenIdx=0; listenScore=0; listenDone=false; listenStreak=0;
+  typeIdx=0; typeScore=0; typeHints=0; typeDone=false; typeChecked=false;
+  speedIdx=0; speedScore=0; speedDone=false; speedStreak=0; speedMultiplier=1;
+  if (speedTimer) { clearInterval(speedTimer); speedTimer=null; }
+  scrambleIdx=0; scrambleInput=[]; scrambleHints=0; scrambleDone=false; scrambleAnswered=false;
+  // Shuffle content arrays so order changes every time
+  shuffledVocab     = shuffle([...currentLesson.vocab]).slice(0, 15);
+  shuffledQuiz      = shuffle([...(currentLesson.quiz || [])]);
+  shuffledSentences = shuffle([...currentLesson.sentences]);
+  shuffledSpeak     = shuffle([...currentLesson.speak]);
+  // Pre-fetch AI quiz in background (cached by lesson+date)
+  aiQuizQuestions = [];
+  if (GUIDED_MODE) loadAIQuiz(currentLesson);
+  renderHeader();
+  renderProgressDashboard();
+
+  if (GUIDED_MODE) {
+    guidedStep = getGuidedStep(id);
+    updateGuidedHeader();
+    const stepTool = activeSteps[guidedStep];
+    if (stepTool === 'game') {
+      showGameStep();
+    } else if (stepTool === 'aichat') {
+      renderAIChat();
+    } else {
+      switchTool(stepTool, true);
+    }
+  } else {
+    switchTool(currentTool, true);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HEADER
+// ══════════════════════════════════════════════════════════════════════════════
+function renderHeader() {
+  const l = currentLesson;
+  document.getElementById('lesson-header').innerHTML = `
+    <div class="bg-gradient-to-r from-navy to-blue-900 rounded-3xl p-6 text-white">
+      <div class="flex items-center gap-4">
+        <span class="text-5xl">${l.emoji}</span>
+        <div>
+          <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Aula ${l.id} de ${JADSON_LESSONS.length}</p>
+          <h2 class="font-headline text-xl font-extrabold">${l.title}</h2>
+          <div class="flex flex-wrap gap-2 mt-2">
+            ${l.verbs.map(v => `<span class="bg-white/10 border border-white/20 text-xs font-bold px-2.5 py-1 rounded-full">${v}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL SWITCHER
+// ══════════════════════════════════════════════════════════════════════════════
+function switchTool(tool, force = false) {
+  if (tool === currentTool && !force) return;
+  currentTool = tool;
+  document.querySelectorAll('.tool-tab').forEach(t => {
+    const isActive = t.dataset.tool === tool;
+    t.classList.toggle('active', isActive);
+    t.classList.toggle('bg-navy', isActive);
+    t.classList.toggle('text-white', isActive);
+    t.classList.toggle('bg-white', !isActive);
+    t.classList.toggle('text-slate-500', !isActive);
+    t.classList.toggle('border-slate-100', !isActive);
+    t.classList.toggle('border-transparent', isActive);
+  });
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById(`panel-${tool}`);
+  if (panel) panel.classList.add('active');
+  // Stop speed timer when leaving speed tab
+  if (tool !== 'speed' && speedTimer) { clearInterval(speedTimer); speedTimer = null; }
+  // Render
+  if (tool === 'vocab')    renderVocab();
+  if (tool === 'quiz')     renderQuiz();
+  if (tool === 'build')    renderBuild();
+  if (tool === 'expr')     renderExpr();
+  if (tool === 'gram')     renderGram();
+  if (tool === 'speak')    renderSpeak();
+  if (tool === 'listen')   renderListen();
+  if (tool === 'typing')   renderTyping();
+  if (tool === 'speed')    renderSpeed();
+  if (tool === 'scramble') renderScramble();
+  if (tool === 'aichat')   renderAIChat();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 1: FLASHCARDS
+// ══════════════════════════════════════════════════════════════════════════════
+function renderVocab() {
+  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  const card  = vocab[vocabIdx];
+  document.getElementById('panel-vocab').innerHTML = `
+    <div class="space-y-3">
+      <!-- progress dots + counter -->
+      <div class="flex items-center gap-2">
+        <div class="flex gap-1 flex-wrap flex-1">
+          ${vocab.map((_, i) => `<button onclick="vocabGoTo(${i})" class="w-2 h-2 rounded-full transition-all ${i < vocabIdx ? 'bg-emerald-400' : i === vocabIdx ? 'bg-pink-500' : 'bg-slate-200'}"></button>`).join('')}
+        </div>
+        <span class="text-xs font-bold text-slate-400 flex-shrink-0">${vocabIdx + 1} / ${vocab.length}</span>
+      </div>
+
+      <!-- flip card — compact -->
+      <div class="flip-card h-40 mx-auto w-full max-w-sm cursor-pointer" id="flip-card" onclick="document.getElementById('flip-card').classList.toggle('flipped')">
+        <div class="flip-inner w-full h-full">
+          <div class="flip-front absolute inset-0 bg-white rounded-2xl shadow-lg border-2 border-slate-100 flex flex-col items-center justify-center p-4">
+            <p class="font-headline text-3xl font-extrabold text-navy mb-1">${card.en}</p>
+            <p class="text-slate-300 text-xs">Toque para ver a tradução 👆</p>
+          </div>
+          <div class="flip-back bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl shadow-lg border-2 border-pink-100 flex flex-col items-center justify-center p-4">
+            <p class="text-pink-500 font-bold text-xs mb-1">Tradução</p>
+            <p class="font-headline text-2xl font-extrabold text-navy">${card.pt}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- action buttons -->
+      <div class="flex gap-2 justify-center flex-wrap">
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-pink-200">
+          <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> EN
+        </button>
+        <button onclick="speakWord('${card.pt.replace(/'/g,"\\'")}','pt-BR')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-emerald-200">
+          <span class="material-symbols-outlined text-emerald-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> PT
+        </button>
+        ${vocabIdx > 0 ? `<button onclick="vocabGoTo(${vocabIdx-1})" class="px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-500 text-xs shadow-sm hover:bg-slate-50">‹</button>` : ''}
+        ${vocabIdx < vocab.length - 1
+          ? `<button onclick="vocabGoTo(${vocabIdx+1})" class="px-4 py-2 bg-navy text-white rounded-2xl font-bold text-xs shadow-md">Próxima →</button>
+             <button onclick="vocabGoTo(${vocabIdx+1})" class="px-4 py-2 bg-emerald-500 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-emerald-400 active:scale-95 transition-all">Sei essa ✓</button>`
+          : `<button onclick="markToolDone(currentLesson.id,'vocab')" class="px-4 py-2 bg-emerald-500 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-emerald-400 active:scale-95 transition-all">✓ Concluir</button>`
+        }
+      </div>
+
+      <!-- compact word grid -->
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-3">
+        <p class="font-bold text-slate-500 text-xs uppercase tracking-wide mb-2">Palavras da aula</p>
+        <div class="grid grid-cols-3 gap-1.5">
+          ${vocab.map((v,i) => `
+            <button onclick="vocabGoTo(${i})" class="flex flex-col px-2 py-1.5 rounded-xl text-left text-xs ${i===vocabIdx ? 'bg-navy text-white' : 'bg-slate-50 hover:bg-slate-100'} transition-all">
+              <span class="font-bold truncate">${v.en}</span>
+              <span class="${i===vocabIdx ? 'text-blue-200' : 'text-slate-400'} truncate">${v.pt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  // Auto-speak English word on card load
+  setTimeout(() => speakWord(card.en, 'en-US'), 150);
+}
+function vocabGoTo(i) {
+  vocabIdx = i;
+  renderVocab();
+}
+function speakWord(text, lang) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = 0.85;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 2: QUIZ
+// ══════════════════════════════════════════════════════════════════════════════
+function shuffle(a) { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];} return b; }
+
+function renderQuiz() {
+  // In guided mode, prefer AI questions (if loaded); fall back to static
+  const qs = (GUIDED_MODE && aiQuizQuestions.length > 0)
+    ? aiQuizQuestions
+    : (shuffledQuiz.length ? shuffledQuiz : currentLesson.quiz);
+  if (!qs || !qs.length) { document.getElementById('panel-quiz').innerHTML = '<p class="text-center text-slate-400 py-10">Sem quiz para esta aula ainda.</p>'; return; }
+  if (quizDone) { renderQuizFinish(); return; }
+  const q = qs[quizIdx];
+  // Support both static format {q,opts,a} and AI format {q,choices,ans}
+  const opts = shuffle(q.opts || q.choices || []);
+  const answer = q.a || q.ans || '';
+  const streakBadge = quizStreak >= 2
+    ? `<span class="text-xs font-black text-amber-500 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">🔥 ${quizStreak}x</span>`
+    : '';
+  document.getElementById('panel-quiz').innerHTML = `
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-400">${quizIdx+1} / ${qs.length}</span>
+          ${streakBadge}
+        </div>
+        <span class="text-xs font-bold text-emerald-600">${quizScore} ✓</span>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full transition-all duration-300" style="width:${((quizIdx+1)/qs.length)*100}%"></div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+        <p class="font-headline text-lg font-bold text-navy text-center">${q.q}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2" id="quiz-opts">
+        ${opts.map((o,i) => `
+          <button id="qopt-${i}" class="choice-btn bg-white border-2 border-slate-200 rounded-2xl px-3 py-3 font-bold text-navy text-sm hover:border-pink-300 hover:bg-pink-50 shadow-sm transition-all"
+                  onclick="answerQuiz(this,'${o.replace(/'/g,"\\'")}','${answer.replace(/'/g,"\\'")}')">
+            ${o}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+function answerQuiz(btn, chosen, correct) {
+  document.querySelectorAll('.choice-btn').forEach(b => b.setAttribute('disabled',''));
+  const isCorrect = chosen === correct;
+  if (isCorrect) {
+    btn.classList.add('correct'); quizScore++; quizStreak++;
+    removeWeakWord(currentLesson.id, correct);
+  } else {
+    btn.classList.add('wrong'); quizStreak = 0;
+    document.querySelectorAll('.choice-btn').forEach(b => { if(b.textContent.trim()===correct) b.classList.add('correct'); });
+    const wv = currentLesson.vocab.find(v => v.en === correct || v.pt === correct);
+    if (wv) recordWeakWord(currentLesson.id, wv, 'quiz');
+  }
+  setTimeout(() => {
+    quizIdx++;
+    const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
+      ? aiQuizQuestions.length
+      : (shuffledQuiz.length || currentLesson.quiz.length);
+    if (quizIdx >= qLen) { quizDone = true; renderQuizFinish(); }
+    else renderQuiz();
+  }, isCorrect ? 600 : 1200);
+}
+function renderQuizFinish() {
+  const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
+    ? aiQuizQuestions.length
+    : (shuffledQuiz.length || currentLesson.quiz.length);
+  const pct = Math.round((quizScore / qLen) * 100);
+  const stars = pct === 100 ? 3 : pct >= 60 ? 2 : 1;
+  markToolDone(currentLesson.id, 'quiz', stars);
+  addXPToProgress(currentLesson.id, quizScore * 5);
+  if (window.Store) {
+    Store.activateStreak();
+    Store.completeActivity('lessons');
+    if (pct >= 60) Store.completeLesson('j' + currentLesson.id);
+  }
+  document.getElementById('panel-quiz').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">${pct===100?'🎉':pct>=60?'👍':'💪'}</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-1">Quiz Concluído!</h3>
+      <p class="text-slate-500 mb-4">${quizScore} / ${qLen} corretas · ${pct}%</p>
+      <div class="flex justify-center gap-2 mb-5">
+        ${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}
+      </div>
+      <div class="inline-flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-2xl px-5 py-2.5 mb-5">
+        <span class="text-xl">✨</span>
+        <span class="font-bold text-yellow-600">+${quizScore*5} XP ganhos!</span>
+      </div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="quizIdx=0;quizScore=0;quizDone=false;quizStreak=0;renderQuiz()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-all">🔄 Refazer</button>
+        <button onclick="switchTool('build')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90 transition-all">🏗️ Build →</button>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 3: SENTENCE BUILDER
+// ══════════════════════════════════════════════════════════════════════════════
+function renderBuild() {
+  const sents = shuffledSentences.length ? shuffledSentences : currentLesson.sentences;
+  if (buildSentIdx >= sents.length) { renderBuildDone(); return; }
+  const sent = sents[buildSentIdx];
+  const words = shuffle(sent.split(' '));
+  buildBuilt = [];
+  document.getElementById('panel-build').innerHTML = `
+    <div class="space-y-4">
+      <div class="flex justify-between text-xs font-bold text-slate-400">
+        <span>${buildSentIdx+1} / ${sents.length} frases</span>
+        <span>Frase ${buildSentIdx+1}</span>
+      </div>
+
+      <div class="bg-white rounded-3xl border-2 border-slate-200 p-4 min-h-14 flex flex-wrap gap-2 items-center justify-center" id="build-answer">
+        <span class="text-slate-300 text-sm" id="build-placeholder">Toque nas palavras para montar a frase...</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2 justify-center p-4 bg-slate-50 rounded-3xl" id="build-tiles">
+        ${words.map((w,i) => `
+          <button id="build-tile-${i}" class="word-tile bg-white border-2 border-slate-200 rounded-2xl px-4 py-2 font-bold text-navy text-sm shadow-sm hover:border-pink-300 hover:bg-pink-50"
+                  data-word="${w}" data-idx="${i}" onclick="buildAdd(this)">
+            ${w}
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="build-feedback" class="hidden text-center py-2.5 rounded-2xl font-bold text-sm"></div>
+
+      <div class="flex gap-3">
+        <button onclick="buildClear()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all text-sm">✕ Limpar</button>
+        <button onclick="buildCheck('${sent.replace(/'/g,"\\'")}',${buildSentIdx})" class="flex-1 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90 transition-all">✓ Verificar</button>
+      </div>
+    </div>
+  `;
+}
+function buildAdd(btn) {
+  if (btn.classList.contains('used')) return;
+  btn.classList.add('used');
+  buildBuilt.push({w: btn.dataset.word, i: btn.dataset.idx});
+  const area = document.getElementById('build-answer');
+  const ph   = document.getElementById('build-placeholder');
+  if (ph) ph.remove();
+  const tag = document.createElement('span');
+  tag.className = 'word-tile bg-pink-50 border-2 border-pink-200 rounded-2xl px-4 py-2 font-bold text-navy text-sm cursor-pointer hover:bg-red-50 hover:border-red-200 transition-all';
+  tag.textContent = btn.dataset.word;
+  tag.dataset.idx = btn.dataset.idx;
+  tag.onclick = () => { buildBuilt = buildBuilt.filter(x=>x.i!==tag.dataset.idx); document.getElementById(`build-tile-${tag.dataset.idx}`).classList.remove('used'); tag.remove(); if(!document.getElementById('build-answer').children.length) document.getElementById('build-answer').innerHTML='<span class="text-slate-300 text-sm" id="build-placeholder">Toque nas palavras para montar a frase...</span>'; };
+  area.appendChild(tag);
+}
+function buildClear() {
+  buildBuilt = [];
+  document.querySelectorAll('.word-tile.used').forEach(t => t.classList.remove('used'));
+  document.getElementById('build-answer').innerHTML = '<span class="text-slate-300 text-sm" id="build-placeholder">Toque nas palavras para montar a frase...</span>';
+  const fb = document.getElementById('build-feedback');
+  if (fb) { fb.classList.add('hidden'); fb.textContent=''; }
+}
+function buildCheck(sent, idx) {
+  const built = buildBuilt.map(x=>x.w).join(' ');
+  const fb = document.getElementById('build-feedback');
+  if (built === sent) {
+    fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-emerald-100 text-emerald-700';
+    fb.textContent = '✨ Correto! Muito bem!';
+    fb.classList.remove('hidden');
+    speakWord(sent, 'en-US');
+    if (window.Store) Store.addXP(5);
+    setTimeout(() => { buildSentIdx++; renderBuild(); }, 1200);
+  } else {
+    fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-red-100 text-red-600';
+    fb.textContent = '🔄 Tente novamente!';
+    fb.classList.remove('hidden');
+  }
+}
+function renderBuildDone() {
+  markToolDone(currentLesson.id, 'build');
+  document.getElementById('panel-build').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">🏆</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-2">Todas as frases montadas!</h3>
+      <p class="text-slate-500 mb-5">Você completou todas as ${(shuffledSentences.length || currentLesson.sentences.length)} frases desta aula.</p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="buildSentIdx=0;renderBuild()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
+        <button onclick="switchTool('expr')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">💬 Expressões →</button>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 4: EXPRESSIONS
+// ══════════════════════════════════════════════════════════════════════════════
+function renderExpr() {
+  const exprs = currentLesson.expressions;
+  // Cards view
+  document.getElementById('panel-expr').innerHTML = `
+    <div class="space-y-5">
+      <div class="grid sm:grid-cols-2 gap-4">
+        ${exprs.map((e,i) => `
+          <div class="bg-white rounded-3xl border-2 border-slate-100 p-5 shadow-sm hover:border-pink-200 transition-all group">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <p class="font-headline text-lg font-extrabold text-navy">"${e.expr}"</p>
+              <button onclick="speakWord('${e.expr.replace(/'/g,"\\'")}','en-US')" class="flex-shrink-0 w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 transition-all">
+                <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
+              </button>
+            </div>
+            <p class="text-sm font-bold text-pink-500 mb-2">→ ${e.meaning}</p>
+            <div class="bg-slate-50 rounded-2xl px-4 py-3">
+              <p class="text-sm text-slate-600 italic">"${e.example}"</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Match game -->
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5">
+        <p class="font-bold text-slate-700 mb-1">🎮 Jogo de Combinação</p>
+        <p class="text-xs text-slate-400 mb-4">Combine a expressão com o seu significado em português</p>
+        <div id="expr-match-game"></div>
+      </div>
+    </div>
+  `;
+  renderExprMatch();
+}
+
+function renderExprMatch() {
+  const exprs = currentLesson.expressions;
+  exprMatchLeft = null; exprMatched = new Set();
+  const lefts  = shuffle(exprs.map(e => e.expr));
+  const rights = shuffle(exprs.map(e => e.meaning));
+  const container = document.getElementById('expr-match-game');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="grid grid-cols-2 gap-2" id="match-grid">
+      <div class="space-y-2" id="match-left">
+        ${lefts.map((l,i) => `
+          <button id="ml-${i}" class="match-item w-full text-left px-3 py-2.5 rounded-2xl border-2 border-slate-200 bg-slate-50 font-bold text-navy text-xs hover:border-pink-300 transition-all"
+                  data-val="${l.replace(/"/g,'&quot;')}" onclick="exprSelectLeft(this,'${l.replace(/'/g,"\\'")}')">
+            ${l}
+          </button>
+        `).join('')}
+      </div>
+      <div class="space-y-2" id="match-right">
+        ${rights.map((r,i) => `
+          <button id="mr-${i}" class="match-item w-full text-left px-3 py-2.5 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-600 text-xs hover:border-emerald-300 transition-all"
+                  data-val="${r.replace(/"/g,'&quot;')}" onclick="exprSelectRight(this,'${r.replace(/'/g,"\\'")}')">
+            ${r}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+    <div id="match-result" class="hidden text-center mt-4 py-3 rounded-2xl bg-emerald-100 text-emerald-700 font-bold text-sm">🎉 Parabéns! Você combinou tudo!</div>
+  `;
+}
+
+function exprSelectLeft(btn, val) {
+  document.querySelectorAll('#match-left .match-item:not(.matched)').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  exprMatchLeft = val;
+}
+function exprSelectRight(btn, val) {
+  if (!exprMatchLeft) return;
+  const exprs = currentLesson.expressions;
+  const match = exprs.find(e => e.expr === exprMatchLeft);
+  if (match && match.meaning === val) {
+    btn.classList.add('matched');
+    document.querySelectorAll('#match-left .match-item').forEach(b => { if(b.textContent.trim()===exprMatchLeft){b.classList.add('matched');b.classList.remove('selected');} });
+    exprMatched.add(exprMatchLeft);
+    exprMatchLeft = null;
+    if (window.Store) Store.addXP(3);
+    if (exprMatched.size === exprs.length) {
+      document.getElementById('match-result').classList.remove('hidden');
+      markToolDone(currentLesson.id, 'expr');
+    }
+  } else {
+    btn.classList.add('wrong-flash');
+    setTimeout(() => btn.classList.remove('wrong-flash'), 400);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 5: GRAMMAR
+// ══════════════════════════════════════════════════════════════════════════════
+function renderGram() {
+  const g = currentLesson.grammar;
+  if (!g) { document.getElementById('panel-gram').innerHTML = '<p class="text-center text-slate-400 py-10">Gramática em breve.</p>'; return; }
+  markToolDone(currentLesson.id, 'gram');
+  document.getElementById('panel-gram').innerHTML = `
+    <div class="space-y-5">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-5 border border-blue-100">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-blue-500 rounded-2xl flex items-center justify-center text-white font-bold">📐</div>
+          <h3 class="font-headline text-lg font-extrabold text-navy">${g.title}</h3>
+        </div>
+        <div class="space-y-2.5">
+          ${g.rules.map((r,i) => `
+            <div class="flex gap-3 items-start">
+              <span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">${i+1}</span>
+              <p class="text-navy text-sm leading-relaxed">${r}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-navy text-white">
+                ${g.table.headers.map(h => `<th class="px-4 py-3 text-left font-bold text-xs uppercase tracking-wide">${h}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${g.table.rows.map((row,i) => `
+                <tr class="${i%2===0?'bg-slate-50/50':'bg-white'} hover:bg-blue-50/30 transition-colors">
+                  ${row.map((cell,j) => `<td class="px-4 py-3 ${j===0?'font-bold text-navy':'text-slate-700'}">${cell}</td>`).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Fill blank exercise -->
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5">
+        <p class="font-bold text-slate-700 mb-1">✏️ Pratique com as frases da aula</p>
+        <p class="text-xs text-slate-400 mb-4">Leia em voz alta e grave no modo 🎤 Speak</p>
+        <div class="space-y-2">
+          ${currentLesson.sentences.map((s,i) => `
+            <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl">
+              <span class="w-6 h-6 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">${i+1}</span>
+              <p class="text-navy font-medium text-sm">${s}</p>
+              <button onclick="speakWord('${s.replace(/'/g,"\\'")}','en-US')" class="flex-shrink-0 w-7 h-7 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 ml-auto">
+                <span class="material-symbols-outlined text-pink-500 text-xs" style="font-variation-settings:'FILL' 1;">volume_up</span>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 6: SPEAKING PRACTICE
+// ══════════════════════════════════════════════════════════════════════════════
+let recognition = null;
+let isListening  = false;
+
+function renderSpeak() {
+  const phrases = shuffledSpeak.length ? shuffledSpeak : currentLesson.speak;
+  const phrase  = phrases[speakIdx];
+  document.getElementById('panel-speak').innerHTML = `
+    <div class="space-y-5">
+      <div class="text-center bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl border border-teal-100 p-6">
+        <p class="text-xs font-bold text-teal-500 uppercase tracking-wide mb-3">Diga em inglês 🎤</p>
+        <p class="font-headline text-2xl font-extrabold text-navy mb-4">"${phrase}"</p>
+        <button onclick="speakWord('${phrase.replace(/'/g,"\\'")}','en-US')" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-teal-200 text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all mb-4">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir exemplo
+        </button>
+        <div>
+          <button id="mic-btn" onclick="toggleMic('${phrase.replace(/'/g,"\\'")}','${phrase.replace(/'/g,"\\'")}'))"
+                  class="w-20 h-20 rounded-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-teal-500/30 transition-all active:scale-95">
+            <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;">mic</span>
+          </button>
+          <p class="text-xs text-teal-600 mt-2 font-bold">Toque para falar</p>
+        </div>
+      </div>
+
+      <div id="speak-feedback" class="hidden bg-white rounded-3xl border border-slate-100 p-5 text-center shadow-sm"></div>
+
+      <!-- Progress -->
+      <div class="bg-white rounded-3xl border border-slate-100 p-4 shadow-sm">
+        <p class="text-xs font-bold text-slate-400 mb-3">${speakIdx+1} / ${phrases.length} frases</p>
+        <div class="space-y-2">
+          ${phrases.map((p,i) => `
+            <div class="flex items-center gap-3">
+              <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${i<speakIdx?'bg-emerald-500 text-white':i===speakIdx?'bg-teal-500 text-white':'bg-slate-100 text-slate-400'}">${i<speakIdx?'✓':i+1}</span>
+              <span class="text-sm ${i===speakIdx?'font-bold text-navy':'text-slate-500'}">${p}</span>
+              ${i < speakIdx ? '<span class="ml-auto text-emerald-500 text-xs font-bold">✓ Feito</span>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        ${speakIdx > 0 ? `<button onclick="speakIdx--;renderSpeak()" class="px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl text-sm hover:bg-slate-200">‹ Anterior</button>` : ''}
+        <button onclick="skipSpeak()" class="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-500 font-bold rounded-2xl text-sm hover:bg-slate-50">Pular →</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleMic(phrase) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showSpeakFeedback(false, "Microfone não suportado neste navegador. Tente o Chrome.");
+    return;
+  }
+  if (isListening) { recognition.stop(); return; }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  isListening = true;
+  const btn = document.getElementById('mic-btn');
+  if (btn) { btn.style.background = '#ef4444'; btn.style.boxShadow = '0 0 0 8px rgba(239,68,68,0.2)'; }
+  recognition.onresult = (e) => {
+    const spoken = e.results[0][0].transcript.toLowerCase().trim();
+    const target = phrase.toLowerCase().replace(/[.,!?]/g,'');
+    const ok = spoken.includes(target.substring(0,10)) || levenshtein(spoken, target) <= Math.floor(target.length * 0.35);
+    showSpeakFeedback(ok, spoken, phrase);
+    if (ok && window.Store) Store.addXP(8);
+  };
+  recognition.onerror = () => { isListening = false; if (btn) { btn.style.background=''; btn.style.boxShadow=''; } showSpeakFeedback(false, "Não ouvi nada. Tente novamente!"); };
+  recognition.onend   = () => { isListening = false; if (btn) { btn.style.background=''; btn.style.boxShadow=''; } };
+  recognition.start();
+}
+
+function showSpeakFeedback(ok, spoken, target) {
+  const fb = document.getElementById('speak-feedback');
+  if (!fb) return;
+  fb.classList.remove('hidden');
+  if (ok) {
+    fb.innerHTML = `<div class="text-emerald-500 font-extrabold text-xl mb-1">🎉 Excelente!</div>
+                    <p class="text-sm text-slate-500">Você disse: "<span class="font-bold text-navy">${spoken}</span>"</p>`;
+    fb.className = 'bg-emerald-50 border border-emerald-200 rounded-3xl p-5 text-center shadow-sm';
+    const nextIdx = speakIdx + 1;
+    if (nextIdx >= (shuffledSpeak.length || currentLesson.speak.length)) {
+      markToolDone(currentLesson.id, 'speak');
+    }
+    setTimeout(() => { speakIdx = Math.min(nextIdx, (shuffledSpeak.length || currentLesson.speak.length)-1); renderSpeak(); }, 1500);
+  } else {
+    // Record the phrase word as weak (find matching vocab)
+    const wv = currentLesson.vocab.find(v => target.toLowerCase().includes(v.en.toLowerCase()));
+    if (wv) recordWeakWord(currentLesson.id, wv, 'speak');
+    fb.innerHTML = `<div class="text-red-500 font-bold text-base mb-1">Quase! Tente novamente.</div>
+                    <p class="text-xs text-slate-400">Você disse: "${spoken}"</p>
+                    <p class="text-xs text-slate-500 mt-1">Meta: "<b>${target}</b>"</p>`;
+    fb.className = 'bg-red-50 border border-red-200 rounded-3xl p-5 text-center shadow-sm';
+  }
+}
+
+function skipSpeak() {
+  if (speakIdx < (shuffledSpeak.length || currentLesson.speak.length) - 1) { speakIdx++; renderSpeak(); }
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => j===0?i:0));
+  for (let j=1;j<=n;j++) dp[0][j]=j;
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++) dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PROGRESS DASHBOARD
+// ══════════════════════════════════════════════════════════════════════════════
+function renderProgressDashboard() {
+  const p = getLessonProgress(currentLesson.id);
+  const total = TOOL_KEYS.length;
+  const done  = TOOL_KEYS.filter(k => p.tools[k]).length;
+  const pct   = Math.round((done / total) * 100);
+  const toolLabels = {
+    vocab:'🃏 Cards', quiz:'❓ Quiz', build:'🏗️ Build', expr:'💬 Expr',
+    gram:'📐 Grammar', speak:'🎤 Speak', listen:'🔊 Listen',
+    typing:'⌨️ Typing', speed:'⏱️ Speed', scramble:'🧩 Scramble'
+  };
+  const nextTool = TOOL_KEYS.find(k => !p.tools[k]);
+  const weakHtml = p.weakWords.length ? `
+    <div class="mt-3 pt-3 border-t border-slate-100">
+      <p class="text-[10px] font-bold text-orange-500 uppercase tracking-wide mb-1.5">⚠️ Palavras Fracas</p>
+      <div class="flex flex-wrap gap-1.5">
+        ${p.weakWords.slice(0,8).map(w => `
+          <span class="inline-flex items-center gap-1 bg-orange-50 border border-orange-200 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                title="${w.source}">
+            ${w.en} · ${w.pt}
+          </span>
+        `).join('')}
+      </div>
+    </div>` : '';
+  document.getElementById('progress-dashboard').innerHTML = `
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-extrabold text-navy">Maestria da Aula</span>
+          <span class="text-xs font-bold text-slate-400">${done}/${total} ferramentas</span>
+        </div>
+        <div class="flex items-center gap-2">
+          ${p.xpEarned ? `<span class="text-xs font-bold text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-0.5 rounded-full">+${p.xpEarned} XP</span>` : ''}
+          ${nextTool ? `<button onclick="switchTool('${nextTool}')" class="text-xs font-bold bg-pink-500 text-white px-3 py-1 rounded-full hover:bg-pink-600 transition-all">Continuar →</button>` : `<span class="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">✓ Completo!</span>`}
+        </div>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-2 mb-3 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-pink-400 to-emerald-400 rounded-full transition-all duration-500" style="width:${pct}%"></div>
+      </div>
+      <div class="flex flex-wrap gap-1.5">
+        ${TOOL_KEYS.map(k => {
+          const isDone = p.tools[k];
+          const isActive = k === currentTool;
+          const starsStr = p.stars[k] ? ' ' + '⭐'.repeat(p.stars[k]) : '';
+          const cls = isDone ? 'done' : (isActive ? 'active-pill' : 'todo');
+          return `<span class="prog-pill ${cls}" onclick="switchTool('${k}')" title="${toolLabels[k]}">${toolLabels[k]}${starsStr}</span>`;
+        }).join('')}
+      </div>
+      ${weakHtml}
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 7: LISTENING QUIZ
+// ══════════════════════════════════════════════════════════════════════════════
+function renderListen() {
+  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  if (listenDone) { renderListenFinish(); return; }
+  const card = vocab[listenIdx];
+  const others = shuffle(vocab.filter((_,i) => i !== listenIdx)).slice(0,3);
+  const opts   = shuffle([card, ...others]);
+  const isEnToPt = listenMode === 'en-to-pt';
+  const streakHtml = listenStreak >= 2
+    ? `<span class="text-xs font-black text-amber-500 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">🔥 ${listenStreak}x combo!</span>`
+    : '';
+  document.getElementById('panel-listen').innerHTML = `
+    <div class="space-y-3">
+      <!-- Header row -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-400">${listenIdx+1} / ${vocab.length}</span>
+          ${streakHtml}
+        </div>
+        <button onclick="listenMode = listenMode==='en-to-pt'?'pt-to-en':'en-to-pt'; renderListen()"
+                class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-full transition-all">
+          Modo: ${isEnToPt ? 'EN → PT 🔄' : 'PT → EN 🔄'}
+        </button>
+      </div>
+      <!-- Progress bar -->
+      <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-violet-400 to-pink-400 rounded-full transition-all duration-300" style="width:${((listenIdx+1)/vocab.length)*100}%"></div>
+      </div>
+      <!-- Listen button — compact -->
+      <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-4 text-center">
+        <p class="text-xs font-bold text-violet-500 uppercase tracking-wide mb-3">${isEnToPt ? 'Ouça e escolha a tradução' : 'Ouça e escolha em inglês'}</p>
+        <button onclick="speakWord('${isEnToPt ? card.en.replace(/'/g,"\\'") : card.pt.replace(/'/g,"\\'")}','${isEnToPt?'en-US':'pt-BR'}')"
+                class="w-16 h-16 rounded-full bg-violet-500 hover:bg-violet-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-violet-500/30 transition-all active:scale-95">
+          <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">volume_up</span>
+        </button>
+        <p class="text-xs text-violet-400 font-bold mt-2">Toque para ouvir</p>
+      </div>
+      <!-- Choice buttons -->
+      <div class="grid grid-cols-2 gap-2" id="listen-opts">
+        ${opts.map(o => {
+          const display = isEnToPt ? o.pt : o.en;
+          const isCorrect = o.en === card.en;
+          return `<button class="choice-btn bg-white border-2 border-slate-200 rounded-2xl px-3 py-3 font-bold text-navy text-sm hover:border-violet-300 hover:bg-violet-50 shadow-sm transition-all"
+                          onclick="answerListen(this, ${isCorrect})">${display}</button>`;
+        }).join('')}
+      </div>
+      <p class="text-center text-xs font-bold text-emerald-600">✓ ${listenScore} corretas</p>
+    </div>
+  `;
+  setTimeout(() => speakWord(isEnToPt ? card.en : card.pt, isEnToPt ? 'en-US' : 'pt-BR'), 200);
+}
+function answerListen(btn, isCorrect) {
+  document.querySelectorAll('#listen-opts .choice-btn').forEach(b => b.setAttribute('disabled',''));
+  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  if (isCorrect) {
+    btn.classList.add('correct');
+    listenScore++;
+    listenStreak++;
+    removeWeakWord(currentLesson.id, vocab[listenIdx].en);
+    // Flash XP popup
+    const xpPop = document.createElement('div');
+    xpPop.textContent = listenStreak >= 3 ? `+${listenStreak} 🔥` : '✓';
+    xpPop.className = 'fixed text-emerald-600 font-black text-xl pointer-events-none z-[999]';
+    const r = btn.getBoundingClientRect();
+    xpPop.style.cssText = `top:${r.top-20}px;left:${r.left+r.width/2}px;transform:translateX(-50%);animation:xpPop .7s forwards`;
+    document.body.appendChild(xpPop);
+    setTimeout(() => xpPop.remove(), 700);
+  } else {
+    btn.classList.add('wrong');
+    listenStreak = 0;
+    recordWeakWord(currentLesson.id, vocab[listenIdx], 'listen');
+  }
+  setTimeout(() => {
+    listenIdx++;
+    if (listenIdx >= vocab.length) { listenDone = true; renderListenFinish(); }
+    else renderListen();
+  }, isCorrect ? 700 : 1200);
+}
+function renderListenFinish() {
+  const total = shuffledVocab.length || currentLesson.vocab.length;
+  const pct   = Math.round((listenScore / total) * 100);
+  const stars  = pct === 100 ? 3 : pct >= 70 ? 2 : 1;
+  markToolDone(currentLesson.id, 'listen', stars);
+  addXPToProgress(currentLesson.id, listenScore * 5);
+  document.getElementById('panel-listen').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">${pct===100?'🎉':pct>=70?'👂':'💪'}</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-1">Listening Concluído!</h3>
+      <p class="text-slate-500 mb-4">${listenScore} / ${total} corretas · ${pct}%</p>
+      <div class="flex justify-center gap-2 mb-5">${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}</div>
+      <div class="inline-flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-2xl px-5 py-2.5 mb-5">
+        <span class="text-xl">✨</span><span class="font-bold text-yellow-600">+${listenScore*5} XP ganhos!</span>
+      </div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="listenIdx=0;listenScore=0;listenDone=false;listenStreak=0;renderListen()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
+        <button onclick="switchTool('typing')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">⌨️ Typing →</button>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 8: TYPING PRACTICE
+// ══════════════════════════════════════════════════════════════════════════════
+function renderTyping() {
+  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  if (typeDone) { renderTypingFinish(); return; }
+  const card = vocab[typeIdx];
+  const isEnToPt = typeMode === 'en-to-pt';
+  const prompt = isEnToPt ? card.en : card.pt;
+  const answerLang = isEnToPt ? 'PT' : 'EN';
+  document.getElementById('panel-typing').innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400">${typeIdx+1} / ${vocab.length}</span>
+        <button onclick="typeMode = typeMode==='pt-to-en'?'en-to-pt':'pt-to-en'; renderTyping()"
+                class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full">
+          Modo: ${isEnToPt ? 'EN → PT 🔄' : 'PT → EN 🔄'}
+        </button>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full" style="width:${(typeIdx/vocab.length)*100}%"></div>
+      </div>
+
+      <div class="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl border border-cyan-100 p-6 text-center">
+        <p class="text-xs font-bold text-cyan-500 uppercase tracking-wide mb-2">Digite em ${answerLang}</p>
+        <p class="font-headline text-3xl font-extrabold text-navy mb-1">${prompt}</p>
+        <button onclick="speakWord('${prompt.replace(/'/g,"\\'")}','${isEnToPt?'en-US':'pt-BR'}')"
+                class="inline-flex items-center gap-1 text-xs text-cyan-500 font-bold hover:text-cyan-700 mt-1">
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir
+        </button>
+      </div>
+
+      <div id="type-feedback-chars" class="text-center min-h-8 py-2"></div>
+
+      <div class="flex gap-2">
+        <input id="type-input" type="text" placeholder="Digite aqui..."
+               class="flex-1 border-2 border-cyan-200 rounded-2xl px-4 py-3 font-bold text-navy text-sm focus:outline-none focus:border-cyan-400 bg-white"
+               onkeydown="if(event.key==='Enter')checkTyping()"
+               ${typeChecked ? 'disabled' : ''} />
+        <button onclick="useTypeHint()" class="px-4 py-3 bg-amber-100 border-2 border-amber-200 text-amber-700 font-bold rounded-2xl text-sm hover:bg-amber-200 transition-all">
+          💡 Hint
+        </button>
+      </div>
+      <button onclick="checkTyping()" class="w-full py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90 transition-all">
+        ✓ Verificar
+      </button>
+      <p class="text-center text-xs font-bold text-emerald-600">✓ ${typeScore} corretas · 💡 ${typeHints} hints</p>
+    </div>
+  `;
+  if (!typeChecked) setTimeout(() => document.getElementById('type-input')?.focus(), 100);
+}
+function checkTyping() {
+  if (typeChecked) return;
+  const input = document.getElementById('type-input');
+  if (!input) return;
+  const typed  = input.value.trim().toLowerCase();
+  const vocab  = currentLesson.vocab;
+  const card   = vocab[typeIdx];
+  const isEnToPt = typeMode === 'en-to-pt';
+  const correct  = (isEnToPt ? card.pt : card.en).toLowerCase();
+  // Levenshtein tolerance
+  const maxErr = correct.length <= 5 ? 1 : correct.length <= 12 ? 2 : 3;
+  const dist   = levenshtein(typed, correct);
+  const ok     = dist <= maxErr;
+  typeChecked  = true;
+  input.disabled = true;
+  // Wordle-style char feedback
+  const charDiv = document.getElementById('type-feedback-chars');
+  if (charDiv) {
+    const targetChars = correct.split('');
+    const typedChars  = typed.split('');
+    charDiv.innerHTML = targetChars.map((c, i) => {
+      const tc = typedChars[i] || '';
+      const cls = tc === c ? 'hit' : 'miss';
+      return `<span class="type-char ${cls}">${c}</span>`;
+    }).join('');
+  }
+  if (ok) {
+    typeScore++;
+    if (typeHints === 0) addXPToProgress(currentLesson.id, 8);
+    else addXPToProgress(currentLesson.id, 4);
+    removeWeakWord(currentLesson.id, card.en);
+    setTimeout(() => { typeChecked=false; typeIdx++; if(typeIdx>=vocab.length){typeDone=true;renderTypingFinish();}else renderTyping(); }, 1500);
+  } else {
+    recordWeakWord(currentLesson.id, card, 'typing');
+    setTimeout(() => { typeChecked=false; renderTyping(); }, 2000);
+  }
+}
+function useTypeHint() {
+  typeHints++;
+  const vocab  = currentLesson.vocab;
+  const card   = vocab[typeIdx];
+  const isEnToPt = typeMode === 'en-to-pt';
+  const correct  = isEnToPt ? card.pt : card.en;
+  const input    = document.getElementById('type-input');
+  if (!input) return;
+  const curr = input.value;
+  input.value = correct.substring(0, curr.length + 1);
+  input.focus();
+}
+function renderTypingFinish() {
+  const total = shuffledVocab.length || currentLesson.vocab.length;
+  const pct   = Math.round((typeScore / total) * 100);
+  const stars  = pct === 100 ? 3 : pct >= 70 ? 2 : 1;
+  markToolDone(currentLesson.id, 'typing', stars);
+  document.getElementById('panel-typing').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">${pct===100?'🎉':pct>=70?'⌨️':'💪'}</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-1">Typing Concluído!</h3>
+      <p class="text-slate-500 mb-4">${typeScore} / ${total} corretas · ${pct}%</p>
+      <div class="flex justify-center gap-2 mb-5">${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}</div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="typeIdx=0;typeScore=0;typeHints=0;typeDone=false;renderTyping()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
+        <button onclick="switchTool('speed')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">⏱️ Speed →</button>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 9: SPEED ROUND
+// ══════════════════════════════════════════════════════════════════════════════
+function renderSpeed() {
+  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  if (speedDone) { renderSpeedFinish(); return; }
+  const card  = vocab[speedIdx];
+  const others = shuffle(vocab.filter((_,i) => i !== speedIdx)).slice(0,3);
+  const opts   = shuffle([card, ...others]);
+  const multLabel = speedMultiplier > 1 ? `<span class="bg-orange-100 text-orange-600 font-extrabold px-2 py-0.5 rounded-full text-sm">${speedMultiplier}× XP!</span>` : '';
+  const streakBar = speedStreak > 0 ? `<div class="flex items-center gap-1 text-xs font-bold text-orange-500">🔥 ${speedStreak} seguidos ${multLabel}</div>` : '';
+  document.getElementById('panel-speed').innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400">${speedIdx+1} / ${vocab.length}</span>
+        <span class="text-xs font-bold text-emerald-600">✓ ${speedScore}</span>
+      </div>
+      ${streakBar}
+      <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-orange-400 to-red-400 rounded-full" style="width:${(speedIdx/vocab.length)*100}%"></div>
+      </div>
+
+      <div class="flex flex-col items-center bg-gradient-to-br from-orange-50 to-red-50 rounded-3xl border border-orange-100 p-6">
+        <!-- Circular timer -->
+        <div class="relative w-20 h-20 mb-4">
+          <svg class="w-full h-full" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="30" fill="none" stroke="#f1f5f9" stroke-width="6"/>
+            <circle id="speed-ring" class="speed-ring-fill" cx="32" cy="32" r="30"
+                    style="animation: countdown-shrink ${6}s linear forwards;"></circle>
+          </svg>
+          <span id="speed-secs" class="absolute inset-0 flex items-center justify-center font-extrabold text-2xl text-navy">6</span>
+        </div>
+        <p class="font-headline text-3xl font-extrabold text-navy">${card.en}</p>
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')"
+                class="mt-2 text-xs text-orange-500 font-bold flex items-center gap-1 hover:text-orange-700">
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3" id="speed-opts">
+        ${opts.map(o => {
+          const isCorrect = o.en === card.en;
+          return `<button class="choice-btn bg-white border-2 border-slate-200 rounded-2xl px-4 py-4 font-bold text-navy text-sm hover:border-orange-300 hover:bg-orange-50 shadow-sm"
+                          data-correct="${isCorrect}"
+                          onclick="answerSpeed(this,${isCorrect},'${card.en.replace(/'/g,"\\'")}','${card.pt.replace(/'/g,"\\'")}')">
+                    ${o.pt}
+                  </button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  startSpeedTimer(card.en, card.pt);
+}
+function startSpeedTimer(en, pt) {
+  if (speedTimer) clearInterval(speedTimer);
+  speedSecsLeft = 6;
+  speedAnswered = false;
+  const tick = () => {
+    speedSecsLeft--;
+    const el = document.getElementById('speed-secs');
+    if (el) el.textContent = speedSecsLeft;
+    if (speedSecsLeft <= 0) {
+      clearInterval(speedTimer); speedTimer = null;
+      if (!speedAnswered) handleSpeedTimeout(en, pt);
+    }
+  };
+  speedTimer = setInterval(tick, 1000);
+}
+function answerSpeed(btn, isCorrect, en, pt) {
+  if (speedAnswered) return;
+  speedAnswered = true;
+  if (speedTimer) { clearInterval(speedTimer); speedTimer = null; }
+  document.querySelectorAll('#speed-opts .choice-btn').forEach(b => b.setAttribute('disabled',''));
+  if (isCorrect) {
+    btn.classList.add('correct');
+    speedScore++;
+    speedStreak++;
+    speedMultiplier = speedStreak >= 5 ? 3 : speedStreak >= 3 ? 2 : 1;
+    addXPToProgress(currentLesson.id, 10 * speedMultiplier);
+    removeWeakWord(currentLesson.id, en);
+    setTimeout(() => {
+      speedIdx++;
+      if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
+      else renderSpeed();
+    }, 900);
+  } else {
+    btn.classList.add('wrong');
+    speedStreak = 0; speedMultiplier = 1;
+    recordWeakWord(currentLesson.id, {en, pt}, 'speed');
+    document.querySelectorAll('#speed-opts .choice-btn').forEach(b => {
+      if (b.dataset.correct === 'true') b.classList.add('correct');
+    });
+    setTimeout(() => {
+      speedIdx++;
+      if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
+      else renderSpeed();
+    }, 1200);
+  }
+}
+function handleSpeedTimeout(en, pt) {
+  if (speedAnswered) return;
+  speedAnswered = true;
+  speedStreak = 0; speedMultiplier = 1;
+  recordWeakWord(currentLesson.id, {en, pt}, 'speed');
+  document.querySelectorAll('#speed-opts .choice-btn').forEach(b => {
+    b.setAttribute('disabled','');
+    if (b.dataset.correct === 'true') b.classList.add('correct');
+  });
+  setTimeout(() => {
+    speedIdx++;
+    if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
+    else renderSpeed();
+  }, 1200);
+}
+function renderSpeedFinish() {
+  const total = shuffledVocab.length || currentLesson.vocab.length;
+  const pct   = Math.round((speedScore / total) * 100);
+  const stars  = pct === 100 ? 3 : pct >= 70 ? 2 : 1;
+  markToolDone(currentLesson.id, 'speed', stars);
+  document.getElementById('panel-speed').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">${pct===100?'⚡':'⏱️'}</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-1">Speed Round!</h3>
+      <p class="text-slate-500 mb-4">${speedScore} / ${total} corretas · ${pct}%</p>
+      <div class="flex justify-center gap-2 mb-5">${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}</div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="speedIdx=0;speedScore=0;speedDone=false;speedStreak=0;speedMultiplier=1;renderSpeed()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
+        <button onclick="switchTool('scramble')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">🧩 Scramble →</button>
+      </div>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL 10: SCRAMBLE
+// ══════════════════════════════════════════════════════════════════════════════
+function getScrambleWords() {
+  const base = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  return base.filter(v => !v.en.includes(' ') && v.en.length >= 3);
+}
+function renderScramble() {
+  const words = getScrambleWords();
+  if (!words.length) {
+    document.getElementById('panel-scramble').innerHTML = '<p class="text-center text-slate-400 py-10">Sem palavras disponíveis para este jogo nesta aula.</p>';
+    return;
+  }
+  if (scrambleDone || scrambleIdx >= words.length) { renderScrambleFinish(); return; }
+  const card    = words[scrambleIdx];
+  const letters = shuffle(card.en.split(''));
+  scrambleInput = [];
+  scrambleAnswered = false;
+  document.getElementById('panel-scramble').innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400">${scrambleIdx+1} / ${words.length}</span>
+        <span class="text-xs font-bold text-slate-400">💡 ${scrambleHints} hints usados</span>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full" style="width:${(scrambleIdx/words.length)*100}%"></div>
+      </div>
+
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border border-purple-100 p-6 text-center">
+        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em inglês</p>
+        <p class="text-lg font-extrabold text-navy mb-1">${card.pt}</p>
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')"
+                class="text-xs text-purple-400 font-bold flex items-center gap-1 mx-auto hover:text-purple-600">
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir
+        </button>
+      </div>
+
+      <!-- Answer boxes -->
+      <div id="scramble-boxes" class="flex flex-wrap gap-1 justify-center py-3 min-h-14">
+        ${card.en.split('').map((_,i) => `<span class="scramble-box" id="sbox-${i}"> </span>`).join('')}
+      </div>
+
+      <!-- Shuffled letter tiles -->
+      <div id="scramble-tiles" class="flex flex-wrap gap-2 justify-center py-3 bg-slate-50 rounded-3xl">
+        ${letters.map((l,i) => `
+          <button id="stile-${i}" class="scramble-tile" data-letter="${l}" data-idx="${i}"
+                  onclick="scramblePressLetter(${i},'${l}')">
+            ${l}
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="scramble-feedback" class="hidden text-center py-2.5 rounded-2xl font-bold text-sm"></div>
+
+      <div class="flex gap-3">
+        <button onclick="scrambleClear()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl text-sm">✕ Limpar</button>
+        <button onclick="scrambleHintFn()" class="px-4 py-3 bg-amber-100 border border-amber-200 text-amber-700 font-bold rounded-2xl text-sm hover:bg-amber-200">💡 Hint</button>
+        <button onclick="scrambleCheckNow()" class="flex-1 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90 text-sm">✓ Verificar</button>
+      </div>
+    </div>
+  `;
+  renderScrambleBoxes(card.en.length);
+}
+function renderScrambleBoxes(len) {
+  const boxes = document.querySelectorAll('.scramble-box');
+  boxes.forEach((b, i) => {
+    if (scrambleInput[i]) {
+      b.textContent = scrambleInput[i].letter;
+      b.classList.add('filled');
+    } else {
+      b.textContent = ' ';
+      b.classList.remove('filled');
+    }
+  });
+}
+function scramblePressLetter(idx, letter) {
+  const tile = document.getElementById(`stile-${idx}`);
+  if (!tile || tile.classList.contains('used')) return;
+  tile.classList.add('used');
+  scrambleInput.push({ letter, tileIdx: idx });
+  renderScrambleBoxes();
+  // Auto-check when all boxes filled
+  const words = getScrambleWords();
+  const card = words[scrambleIdx];
+  if (scrambleInput.length === card.en.length) {
+    setTimeout(() => scrambleCheckNow(), 400);
+  }
+}
+function scrambleClear() {
+  scrambleInput = [];
+  document.querySelectorAll('.scramble-tile').forEach(t => t.classList.remove('used'));
+  renderScrambleBoxes();
+  const fb = document.getElementById('scramble-feedback');
+  if (fb) { fb.classList.add('hidden'); }
+}
+function scrambleHintFn() {
+  const words = getScrambleWords();
+  const card  = words[scrambleIdx];
+  const nextPos = scrambleInput.length;
+  if (nextPos >= card.en.length) return;
+  const correctLetter = card.en[nextPos];
+  // Find a tile with this letter that is not used yet
+  const tiles = document.querySelectorAll('.scramble-tile:not(.used)');
+  for (const t of tiles) {
+    if (t.dataset.letter === correctLetter) {
+      scrambleHints++;
+      scramblePressLetter(parseInt(t.dataset.idx), correctLetter);
+      break;
+    }
+  }
+}
+function scrambleCheckNow() {
+  if (scrambleAnswered) return;
+  const words = getScrambleWords();
+  const card  = words[scrambleIdx];
+  const built = scrambleInput.map(x => x.letter).join('');
+  const fb    = document.getElementById('scramble-feedback');
+  if (built === card.en) {
+    scrambleAnswered = true;
+    const xpEarned = Math.max(2, 8 - scrambleHints);
+    addXPToProgress(currentLesson.id, xpEarned);
+    removeWeakWord(currentLesson.id, card.en);
+    speakWord(card.en, 'en-US');
+    if (fb) {
+      fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-emerald-100 text-emerald-700';
+      fb.textContent = `✨ Correto! +${xpEarned} XP`;
+      fb.classList.remove('hidden');
+    }
+    setTimeout(() => {
+      scrambleIdx++;
+      scrambleHints = 0;
+      if (scrambleIdx >= words.length) { scrambleDone=true; renderScrambleFinish(); }
+      else renderScramble();
+    }, 1200);
+  } else {
+    recordWeakWord(currentLesson.id, card, 'scramble');
+    if (fb) {
+      fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-red-100 text-red-600';
+      fb.textContent = '🔄 Tente novamente!';
+      fb.classList.remove('hidden');
+    }
+    scrambleClear();
+  }
+}
+function renderScrambleFinish() {
+  const words = getScrambleWords();
+  markToolDone(currentLesson.id, 'scramble', 3);
+  document.getElementById('panel-scramble').innerHTML = `
+    <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+      <div class="text-5xl mb-3">🧩</div>
+      <h3 class="font-headline text-2xl font-extrabold text-navy mb-1">Scramble Concluído!</h3>
+      <p class="text-slate-500 mb-4">Você montou todas as ${words.length} palavras!</p>
+      <div class="flex justify-center gap-2 mb-5"><span class="text-4xl">⭐</span><span class="text-4xl">⭐</span><span class="text-4xl">⭐</span></div>
+      <div class="flex gap-3 justify-center">
+        <button onclick="scrambleIdx=0;scrambleHints=0;scrambleDone=false;renderScramble()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
+        <button onclick="switchTool('vocab')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">🃏 Início →</button>
+      </div>
+    </div>
+  `;
+}
+</script>
+
+<!-- ── PAYWALL MODAL ────────────────────────────────────────────────────── -->
+<div id="paywall-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.65);backdrop-filter:blur(8px)">
+  <div class="bg-[#001a35] border border-white/10 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+    <div class="text-5xl mb-4">🦫</div>
+    <h2 class="font-black text-2xl text-white mb-2">Yara needs a break!</h2>
+    <p class="text-slate-400 text-sm mb-6">You've used all your AI conversations for today.<br>Come back tomorrow or get more now.</p>
+
+    <!-- Option A: Wait -->
+    <div class="bg-white/5 rounded-2xl p-4 mb-3 text-left">
+      <p class="text-white font-bold text-sm">⏰ Wait until tomorrow</p>
+      <p class="text-slate-500 text-xs mt-0.5">Your daily chats reset at midnight.</p>
+    </div>
+
+    <!-- Option B: Buy credits (one-time) -->
+    <a href="https://pay.kiwify.com.br/SEU-LINK-CREDITOS" target="_blank"
+       class="block bg-amber-500/20 border border-amber-500/40 rounded-2xl p-4 mb-3 text-left hover:bg-amber-500/30 transition-all cursor-pointer">
+      <p class="text-amber-300 font-bold text-sm">⚡ Buy +10 chat credits — R$4,90</p>
+      <p class="text-slate-500 text-xs mt-0.5">One-time, no subscription needed.</p>
+    </a>
+
+    <!-- Option C: Upgrade -->
+    <a href="landing.html"
+       class="block bg-gradient-to-r from-pink-600 to-pink-500 rounded-2xl p-4 text-left hover:opacity-90 transition-all cursor-pointer">
+      <p class="text-white font-black text-sm">✨ Upgrade to Plus — R$19,90/mês</p>
+      <p class="text-pink-200 text-xs mt-0.5">15 AI chats/day + all 24 lessons + lesson creator.</p>
+    </a>
+
+    <button onclick="document.getElementById('paywall-modal').classList.add('hidden')"
+      class="mt-5 text-slate-500 text-xs underline hover:text-slate-400 transition-colors">Maybe later</button>
+  </div>
+</div>
+
+</body>
+</html>

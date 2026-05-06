@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Quiz — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: { "primary":"#001f3f", "secondary":"#ec4899", "tertiary":"#10b981", "surface-container":"#002a54" },
+      fontFamily: { "headline":["Plus Jakarta Sans"], "body":["Be Vietnam Pro"], "label":["Lexend"] },
+      borderRadius: { "DEFAULT":"1rem", "lg":"2rem", "xl":"3rem", "full":"9999px" },
+    }
+  }
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .fade-up { animation: fadeUp .4s ease both; }
+  @keyframes correct-pop { 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
+  .correct-pop { animation: correct-pop .35s ease; }
+  @keyframes wrong-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  .wrong-shake { animation: wrong-shake .3s ease; }
+  /* Loading spinner */
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spinner { animation: spin 1s linear infinite; }
+  /* Confetti spark */
+  @keyframes spark { 0%{opacity:1;transform:translate(0,0) scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)} }
+  .spark { position:absolute; width:8px; height:8px; border-radius:50%; animation: spark 0.8s ease forwards; }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 flex-shrink-0">
+  <button onclick="window.location.href='2_Flashcard_Journey_Expedition_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <!-- Yara avatar -->
+  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-pink-400/50 flex-shrink-0 shadow-md">
+    <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+  </div>
+  <div>
+    <p class="font-label text-xs text-pink-400 uppercase tracking-widest font-bold">AI Quiz</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none" id="quiz-title">Loading…</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-2 bg-pink-500/20 border border-pink-500/40 px-3 py-1 rounded-full">
+    <span class="material-symbols-outlined text-pink-400 text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+    <span class="font-label text-pink-300 text-xs font-bold">Gemini AI</span>
+  </div>
+</header>
+
+<!-- ── Main Area ──────────────────────────────────────────────────────────── -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-8 gap-8">
+
+  <!-- Loading state -->
+  <div id="loading-state" class="flex flex-col items-center gap-6 text-center fade-up">
+    <div class="w-24 h-24 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center">
+      <svg class="w-10 h-10 text-emerald-400 spinner" fill="none" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="20" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <p class="font-headline font-bold text-xl text-white">Yara is making your quiz…</p>
+      <p class="font-body text-slate-400 text-sm mt-1">Creating fresh questions just for you! 🌿</p>
+    </div>
+  </div>
+
+  <!-- Quiz state (hidden until loaded) -->
+  <div id="quiz-state" class="hidden w-full max-w-lg flex flex-col gap-6">
+    <!-- Progress pills -->
+    <div class="flex gap-2 justify-center" id="progress-pills"></div>
+
+    <!-- Question card -->
+    <div id="question-card" class="bg-surface-container border border-white/10 rounded-xl p-8 text-center fade-up shadow-xl">
+      <p class="font-label text-emerald-400 text-sm font-bold uppercase tracking-widest mb-3" id="q-number">Question 1 of 4</p>
+      <h2 class="font-headline font-black text-3xl text-white leading-tight mb-2" id="q-text">Loading question…</h2>
+    </div>
+
+    <!-- Options grid -->
+    <div id="options-grid" class="grid grid-cols-2 gap-4"></div>
+
+    <!-- Feedback bar -->
+    <div id="feedback-bar" class="hidden rounded-xl px-6 py-4 text-center fade-up font-label font-bold text-lg"></div>
+  </div>
+
+  <!-- Results state (hidden until done) -->
+  <div id="results-state" class="hidden w-full max-w-sm flex flex-col items-center gap-6 text-center fade-up">
+    <div id="result-icon" class="w-28 h-28 rounded-full flex items-center justify-center shadow-2xl">
+      <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;" id="result-material-icon">emoji_events</span>
+    </div>
+    <div>
+      <p class="font-label text-xs uppercase tracking-widest font-bold mb-1" id="result-label">Quiz Complete!</p>
+      <h2 class="font-headline text-5xl font-black text-white mb-2" id="result-xp">+20 XP</h2>
+      <p class="font-body text-slate-300" id="result-msg">Great job!</p>
+    </div>
+    <!-- Stars -->
+    <div class="flex gap-1" id="result-stars"></div>
+    <!-- Yara message -->
+    <div class="bg-surface-container border border-white/10 rounded-xl px-6 py-4 text-left flex gap-3 items-start w-full">
+      <img src="Hello%20Yara%20profile%20pic%20002.png"
+           class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-emerald-400/40" alt="Yara" onerror="this.onerror=null;this.src='yara.svg'"/>
+      <p class="font-body text-sm text-slate-300 leading-relaxed" id="yara-comment">Amazing work!</p>
+    </div>
+    <div class="flex gap-3 flex-wrap justify-center">
+      <button onclick="retryQuiz()"
+              class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-8 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+        Try Again
+      </button>
+      <button onclick="window.location.href='ai_chat.html'"
+              class="bg-pink-500 hover:bg-pink-600 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-pink-500/30 flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">chat</span>
+        Chat with Yara
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Read URL params ──────────────────────────────────────────────────────────
+const params    = new URLSearchParams(location.search);
+const deckId    = params.get('deck')  || 'forest';
+const deckLabel = params.get('label') || 'Forest Friends';
+const wordsRaw  = params.get('words') || 'Apple,River,Tree,Bird,Sun';
+const words     = wordsRaw.split(',').filter(Boolean);
+
+document.getElementById('quiz-title').textContent = deckLabel + ' Quiz';
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let questions   = [];
+let currentQ    = 0;
+let score       = 0;
+let answered    = false;
+
+// ── Boot: fetch questions ────────────────────────────────────────────────────
+async function loadQuiz() {
+    try {
+        const res  = await fetch('/api/quiz', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ words, deckLabel })
+        });
+        const data = await res.json();
+        const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+
+        // Strip markdown code fences if present
+        const clean = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+        questions   = JSON.parse(clean);
+
+        if (!Array.isArray(questions) || questions.length === 0) throw new Error('Empty');
+
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('quiz-state').classList.remove('hidden');
+        buildProgressPills();
+        renderQuestion();
+    } catch (err) {
+        document.getElementById('loading-state').innerHTML = `
+          <div class="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mb-2">
+            <span class="material-symbols-outlined text-4xl text-red-400">error</span>
+          </div>
+          <p class="font-headline font-bold text-xl text-white">Oops! Could not load quiz</p>
+          <p class="font-body text-slate-400 text-sm mt-1">Make sure the server is running 🌿</p>
+          <button onclick="loadQuiz()" class="mt-4 bg-emerald-500 text-white font-label font-bold px-8 py-3 rounded-full">Try Again</button>`;
+    }
+}
+
+// ── Progress pills ────────────────────────────────────────────────────────────
+function buildProgressPills() {
+    document.getElementById('progress-pills').innerHTML = questions.map((_,i) =>
+        `<div id="pill-${i}" class="w-8 h-2 rounded-full bg-white/20 transition-all duration-300"></div>`
+    ).join('');
+}
+
+function setPill(i, state) {
+    const el = document.getElementById(`pill-${i}`);
+    if (!el) return;
+    el.className = `w-8 h-2 rounded-full transition-all duration-300 ${
+        state === 'correct' ? 'bg-emerald-400' :
+        state === 'wrong'   ? 'bg-red-400' :
+        state === 'active'  ? 'bg-pink-400 scale-110' : 'bg-white/20'
+    }`;
+}
+
+// ── Render question ───────────────────────────────────────────────────────────
+function renderQuestion() {
+    answered = false;
+    const q   = questions[currentQ];
+    const num = `Question ${currentQ + 1} of ${questions.length}`;
+
+    document.getElementById('q-number').textContent = num;
+    document.getElementById('q-text').textContent   = q.question;
+    document.getElementById('feedback-bar').classList.add('hidden');
+    setPill(currentQ, 'active');
+
+    // Shuffle options
+    const opts = [...q.options].sort(() => Math.random() - 0.5);
+
+    document.getElementById('options-grid').innerHTML = opts.map(opt => `
+      <button onclick="handleAnswer('${escQ(opt)}', '${escQ(q.correct)}')"
+              data-option="${escQ(opt)}"
+              class="option-btn relative bg-surface-container hover:bg-white/10 border border-white/15
+                     rounded-xl px-5 py-5 font-label font-bold text-sm text-white
+                     active:scale-95 transition-all text-center">
+        ${opt}
+      </button>
+    `).join('');
+
+    // Re-animate card
+    const card = document.getElementById('question-card');
+    card.classList.remove('fade-up');
+    void card.offsetWidth;
+    card.classList.add('fade-up');
+}
+
+function escQ(str) { return str.replace(/'/g, "\\'"); }
+
+// ── Answer handler ────────────────────────────────────────────────────────────
+function handleAnswer(chosen, correct) {
+    if (answered) return;
+    answered = true;
+
+    const isCorrect = chosen === correct;
+    const btns = document.querySelectorAll('.option-btn');
+
+    btns.forEach(btn => {
+        btn.disabled = true;
+        const val = btn.dataset.option;
+        if (val === correct) {
+            btn.classList.add('bg-emerald-500/30', 'border-emerald-500', 'text-emerald-300', 'correct-pop');
+        } else if (val === chosen && !isCorrect) {
+            btn.classList.add('bg-red-500/30', 'border-red-500', 'text-red-300', 'wrong-shake');
+        } else {
+            btn.classList.add('opacity-40');
+        }
+    });
+
+    const fb = document.getElementById('feedback-bar');
+    fb.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-300', 'bg-red-500/20', 'text-red-300', 'border-emerald-500/40', 'border-red-500/40', 'border');
+    fb.classList.add('border');
+
+    if (isCorrect) {
+        score++;
+        setPill(currentQ, 'correct');
+        fb.textContent = '✅ Correct! Great job! 🎉';
+        fb.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+        launchSparks(fb);
+    } else {
+        setPill(currentQ, 'wrong');
+        fb.textContent = `❌ The answer is "${correct}". Keep trying! 💪`;
+        fb.classList.add('bg-red-500/20', 'text-red-300', 'border-red-500/40');
+    }
+
+    setTimeout(advanceQuestion, isCorrect ? 1200 : 2000);
+}
+
+function advanceQuestion() {
+    currentQ++;
+    if (currentQ < questions.length) {
+        renderQuestion();
+    } else {
+        showResults();
+    }
+}
+
+// ── Confetti sparks ───────────────────────────────────────────────────────────
+function launchSparks(anchor) {
+    const colors = ['#10b981','#ec4899','#f59e0b','#3b82f6','#a855f7'];
+    const rect   = anchor.getBoundingClientRect();
+    const cx     = rect.left + rect.width / 2;
+    const cy     = rect.top  + rect.height / 2;
+    for (let i = 0; i < 12; i++) {
+        const sp = document.createElement('div');
+        sp.className = 'spark';
+        const angle = (i / 12) * 360;
+        const dist  = 40 + Math.random() * 40;
+        sp.style.setProperty('--tx', `${Math.cos(angle * Math.PI/180) * dist}px`);
+        sp.style.setProperty('--ty', `${Math.sin(angle * Math.PI/180) * dist}px`);
+        sp.style.background = colors[i % colors.length];
+        sp.style.left = cx + 'px';
+        sp.style.top  = cy + 'px';
+        sp.style.position = 'fixed';
+        sp.style.zIndex   = '9999';
+        document.body.appendChild(sp);
+        setTimeout(() => sp.remove(), 900);
+    }
+}
+
+// ── Results ───────────────────────────────────────────────────────────────────
+function showResults() {
+    document.getElementById('quiz-state').classList.add('hidden');
+    const res = document.getElementById('results-state');
+    res.classList.remove('hidden');
+
+    const total   = questions.length;
+    const pct     = score / total;
+    const xpEarned = Math.round(pct * 30) + 10; // 10–40 XP
+
+    if (window.Store) {
+        Store.addXP(xpEarned);
+        Store.activateStreak();
+        Store.completeActivity('games');
+        if (pct === 1) Store.unlockBadge('game_hero');
+    }
+
+    // Stars
+    const stars = pct >= 0.85 ? 3 : pct >= 0.5 ? 2 : 1;
+    document.getElementById('result-stars').innerHTML =
+        [1,2,3].map(i => `<span class="material-symbols-outlined text-3xl ${i <= stars ? 'text-yellow-400' : 'text-white/20'}"
+                               style="font-variation-settings:'FILL' 1;">star</span>`).join('');
+
+    // Icon + label
+    const iconEl  = document.getElementById('result-icon');
+    const matIcon = document.getElementById('result-material-icon');
+    if (pct === 1) {
+        iconEl.className = 'w-28 h-28 rounded-full flex items-center justify-center shadow-2xl bg-yellow-400 shadow-yellow-400/30';
+        matIcon.textContent = 'emoji_events';
+    } else if (pct >= 0.5) {
+        iconEl.className = 'w-28 h-28 rounded-full flex items-center justify-center shadow-2xl bg-emerald-500 shadow-emerald-500/30';
+        matIcon.textContent = 'check_circle';
+    } else {
+        iconEl.className = 'w-28 h-28 rounded-full flex items-center justify-center shadow-2xl bg-pink-500 shadow-pink-500/30';
+        matIcon.textContent = 'favorite';
+    }
+
+    document.getElementById('result-label').textContent = 'Quiz Complete!';
+    document.getElementById('result-label').className   = `font-label text-xs uppercase tracking-widest font-bold mb-1 ${pct===1?'text-yellow-400':pct>=0.5?'text-emerald-400':'text-pink-400'}`;
+    document.getElementById('result-xp').textContent    = `+${xpEarned} XP`;
+    document.getElementById('result-msg').textContent   = `${score} out of ${total} correct!`;
+
+    const comments = pct === 1
+        ? ["Perfect score! You are amazing! 🌟 I'm so proud of you!", "Wow! 10/10! You know all the words! 🎉"]
+        : pct >= 0.5
+        ? [`Good job! ${score} correct! Let's keep practising together! 💪`, `You did well! Try again to get a perfect score! 🌿`]
+        : [`Don't worry! Let's study those words again and try once more! I believe in you! 💛`, `Good try! Flashcards can help you remember. Let's go again! 🌿`];
+    document.getElementById('yara-comment').textContent = comments[Math.floor(Math.random() * comments.length)];
+
+    launchSparks(document.getElementById('result-icon'));
+}
+
+function retryQuiz() {
+    currentQ = 0;
+    score    = 0;
+    document.getElementById('results-state').classList.add('hidden');
+    document.getElementById('quiz-state').classList.remove('hidden');
+    buildProgressPills();
+    renderQuestion();
+}
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+loadQuiz();
+</script>
+</body>
+</html>

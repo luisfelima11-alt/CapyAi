@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hangman — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+
+  /* Letter key */
+  .key-btn {
+    width:38px; height:38px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.08); color:#fff; cursor:pointer;
+    font-family:'Lexend',sans-serif; font-weight:700; font-size:0.9rem;
+    transition:all 0.1s; display:flex; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .key-btn:active { transform:scale(0.9); }
+  .key-btn.correct { background:rgba(16,185,129,0.35); border-color:#10b981; color:#6ee7b7; }
+  .key-btn.wrong   { background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.06); color:rgba(255,255,255,0.2); cursor:default; }
+
+  /* Word blanks */
+  .blank {
+    width:32px; height:40px; border-bottom:3px solid rgba(255,255,255,0.3);
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px;
+    font-family:'Lexend',sans-serif; font-weight:700; font-size:1.3rem; color:#fff;
+  }
+  .blank.revealed { border-color:#10b981; color:#6ee7b7; }
+  .blank.reveal-anim { animation:revealLetter 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  /* Hearts */
+  .heart { font-size:1.5rem; transition:all 0.3s; }
+  .heart.lost { opacity:0.2; transform:scale(0.8); filter:grayscale(1); }
+
+  /* Yara SVG stages */
+  #yara-stage { transition:all 0.4s; }
+
+  @keyframes fadeUp       { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes revealLetter { 0%{transform:scale(0) rotate(-10deg)} 80%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  @keyframes shake        { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  @keyframes confettiFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(180px) rotate(360deg);opacity:0} }
+
+  .fade-up { animation:fadeUp 0.4s ease both; }
+  .shake   { animation:shake 0.4s ease; }
+
+  .confetti-piece{position:fixed;pointer-events:none;z-index:9999;width:9px;height:9px;border-radius:2px;animation:confettiFall 1.1s ease-out forwards;}
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-5 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50">
+  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div class="flex-1">
+    <p class="font-label text-xs text-emerald-400 uppercase tracking-widest font-bold">Hangman</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Guess the Word! 🌿</h1>
+  </div>
+  <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+    <span id="score-disp">0</span> pts
+  </div>
+  <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+    <span id="round-disp">1</span>/<span id="total-rounds">8</span>
+  </div>
+</header>
+
+<main class="flex-1 flex flex-col gap-5 px-4 py-5 max-w-md mx-auto w-full">
+
+  <!-- Hearts row -->
+  <div class="flex items-center gap-2 fade-up">
+    <div id="hearts-row" class="flex gap-1"></div>
+    <span class="font-label text-xs text-slate-400 font-bold ml-auto uppercase tracking-widest" id="wrong-count">0 wrong</span>
+  </div>
+
+  <!-- Yara drawing + category -->
+  <div class="bg-navy-light border border-white/10 rounded-[2rem] p-6 flex flex-col items-center gap-3 fade-up">
+    <!-- Yara emoji stages: 0=😊 1=😟 2=😬 3=😰 4=😱 5=💀 -->
+    <div class="text-6xl" id="yara-stage">🦫</div>
+    <p class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold">
+      Category: <span id="category-label" class="text-emerald-400">Animals</span>
+    </p>
+    <p class="font-body text-slate-400 text-sm text-center" id="hint-text"></p>
+  </div>
+
+  <!-- Word blanks -->
+  <div class="flex flex-wrap gap-2 justify-center fade-up" id="blanks-row"></div>
+
+  <!-- Wrong letters -->
+  <div class="text-center fade-up">
+    <p class="font-label text-xs text-slate-500 uppercase tracking-widest font-bold mb-1">Wrong guesses</p>
+    <p class="font-headline font-bold text-red-400 text-xl tracking-widest" id="wrong-letters">—</p>
+  </div>
+
+  <!-- Keyboard -->
+  <div class="flex flex-col gap-2 fade-up" id="keyboard" style="animation-delay:0.1s"></div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Word bank ─────────────────────────────────────────────────────────────────
+const WORDS = [
+  // Lesson 1 — Daily Life
+  {word:'WATER',      cat:'Lesson 1 💬', hint:'Você bebe isso todos os dias'},
+  {word:'FAMILY',     cat:'Lesson 1 💬', hint:'Seus parentes — mãe, pai, irmãos'},
+  {word:'MONEY',      cat:'Lesson 1 💬', hint:'Você usa para comprar coisas'},
+  {word:'PROBLEM',    cat:'Lesson 1 💬', hint:'Uma situação difícil que precisa ser resolvida'},
+  {word:'FRIENDS',    cat:'Lesson 1 💬', hint:'Pessoas que você gosta e confia'},
+  // Lesson 2 — Actions
+  {word:'SCHOOL',     cat:'Lesson 2 🚶', hint:'Lugar onde você vai para aprender'},
+  {word:'MOVIE',      cat:'Lesson 2 🚶', hint:'Você assiste isso no cinema'},
+  {word:'HOSPITAL',   cat:'Lesson 2 🚶', hint:'Lugar onde médicos trabalham'},
+  {word:'MORNING',    cat:'Lesson 2 🚶', hint:'A primeira parte do dia'},
+  // Lesson 3 — Knowledge
+  {word:'MISTAKE',    cat:'Lesson 3 🧠', hint:'Quando você faz algo errado'},
+  {word:'PHOTO',      cat:'Lesson 3 🧠', hint:'Uma imagem tirada com câmera'},
+  {word:'MEDICINE',   cat:'Lesson 3 🧠', hint:'Você toma isso quando está doente'},
+  {word:'LUNCH',      cat:'Lesson 3 🧠', hint:'A refeição do meio-dia'},
+  // Lesson 4 — Ideas
+  {word:'REASON',     cat:'Lesson 4 👀', hint:'O motivo pelo qual algo acontece'},
+  {word:'BIRTHDAY',   cat:'Lesson 4 👀', hint:'O dia que você nasceu'},
+  {word:'ANSWER',     cat:'Lesson 4 👀', hint:'A resposta para uma pergunta'},
+  // Lesson 5 — Communication
+  {word:'STORY',      cat:'Lesson 5 ✉️', hint:'Uma narrativa com começo, meio e fim'},
+  {word:'MANAGER',    cat:'Lesson 5 ✉️', hint:'A pessoa que lidera uma equipe'},
+  {word:'OFFICE',     cat:'Lesson 5 ✉️', hint:'Lugar onde você trabalha'},
+  {word:'DECISION',   cat:'Lesson 5 ✉️', hint:'Uma escolha que você precisa fazer'},
+  // Lesson 7 — Past Simple
+  {word:'TRAVEL',     cat:'Lesson 7 ⏪', hint:'Ir de um lugar para outro'},
+  {word:'VISIT',      cat:'Lesson 7 ⏪', hint:'Ir ver alguém ou algum lugar'},
+  {word:'LISTEN',     cat:'Lesson 7 ⏪', hint:'Prestar atenção ao som'},
+  {word:'RETURN',     cat:'Lesson 7 ⏪', hint:'Voltar para onde você estava'},
+  {word:'CLEAN',      cat:'Lesson 7 ⏪', hint:'Tirar a sujeira de algo'},
+  // Lesson 8 — Travel/Business
+  {word:'AIRPORT',    cat:'Lesson 8 🔄', hint:'Onde os aviões pousam e decolam'},
+  {word:'TICKET',     cat:'Lesson 8 🔄', hint:'Você precisa disso para viajar de avião'},
+  {word:'LUGGAGE',    cat:'Lesson 8 🔄', hint:'Suas malas e bolsas numa viagem'},
+  {word:'MEETING',    cat:'Lesson 8 🔄', hint:'Quando pessoas se reúnem para discutir algo'},
+  {word:'CONTRACT',   cat:'Lesson 8 🔄', hint:'Documento legal entre duas partes'},
+  // Lesson 9 — Prepositions
+  {word:'POCKET',     cat:'Lesson 9 📍', hint:'Pequeno espaço na roupa para guardar coisas'},
+  {word:'CORNER',     cat:'Lesson 9 📍', hint:'O ponto onde duas paredes se encontram'},
+  {word:'CEILING',    cat:'Lesson 9 📍', hint:'A parte de cima de um quarto'},
+  {word:'DRAWER',     cat:'Lesson 9 📍', hint:'Compartimento que desliza numa mesa'},
+  // Lesson 10 — Quantifiers
+  {word:'PLENTY',     cat:'Lesson 10 🔢', hint:'Mais que suficiente'},
+  {word:'SEVERAL',    cat:'Lesson 10 🔢', hint:'Mais de dois mas não muitos'},
+  {word:'ENOUGH',     cat:'Lesson 10 🔢', hint:'A quantidade necessária, não mais'},
+  // Lesson 11 — Adjectives
+  {word:'STRONGER',   cat:'Lesson 11 📊', hint:'Mais forte que outro'},
+  {word:'FASTER',     cat:'Lesson 11 📊', hint:'Mais rápido que outro'},
+  {word:'HAPPIER',    cat:'Lesson 11 📊', hint:'Mais feliz que outro'},
+  {word:'BETTER',     cat:'Lesson 11 📊', hint:'Superior a algo ou alguém'},
+  // Lesson 12 — Future
+  {word:'TOMORROW',   cat:'Lesson 12 🔮', hint:'O dia depois de hoje'},
+  {word:'FUTURE',     cat:'Lesson 12 🔮', hint:'O tempo que ainda vai acontecer'},
+  {word:'PROMISE',    cat:'Lesson 12 🔮', hint:'Você dá sua palavra de que vai fazer algo'},
+  {word:'DREAM',      cat:'Lesson 12 🔮', hint:'Algo que você sonha alcançar'},
+  // Lesson 13 — Work & Career
+  {word:'CAREER',     cat:'Lesson 13 💼', hint:'Sua vida profissional e trabalhos'},
+  {word:'COMPANY',    cat:'Lesson 13 💼', hint:'Uma empresa ou negócio'},
+  {word:'SALARY',     cat:'Lesson 13 💼', hint:'O dinheiro que você ganha por mês'},
+  {word:'INTERVIEW',  cat:'Lesson 13 💼', hint:'Conversa para conseguir um emprego'},
+  {word:'PROMOTION',  cat:'Lesson 13 💼', hint:'Subir de cargo no trabalho'},
+  {word:'DEADLINE',   cat:'Lesson 13 💼', hint:'A data limite para entregar algo'},
+  // Lesson 14 — Technology
+  {word:'COMPUTER',   cat:'Lesson 14 💻', hint:'Máquina eletrônica para trabalho e lazer'},
+  {word:'KEYBOARD',   cat:'Lesson 14 💻', hint:'Você usa isso para digitar'},
+  {word:'INTERNET',   cat:'Lesson 14 💻', hint:'Rede global de computadores'},
+  {word:'PASSWORD',   cat:'Lesson 14 💻', hint:'Código secreto para acessar sua conta'},
+  {word:'BROWSER',    cat:'Lesson 14 💻', hint:'Programa para navegar na internet'},
+  {word:'SOFTWARE',   cat:'Lesson 14 💻', hint:'Programas instalados no computador'},
+  {word:'WEBSITE',    cat:'Lesson 14 💻', hint:'Uma página na internet'},
+  // Lesson 15 — Travel
+  {word:'PASSPORT',   cat:'Lesson 15 ✈️', hint:'Documento para viajar entre países'},
+  {word:'SUITCASE',   cat:'Lesson 15 ✈️', hint:'Mala de viagem com rodinhas'},
+  {word:'CUSTOMS',    cat:'Lesson 15 ✈️', hint:'Controle na chegada de outro país'},
+  {word:'SOUVENIR',   cat:'Lesson 15 ✈️', hint:'Lembrança que você compra numa viagem'},
+  {word:'MUSEUM',     cat:'Lesson 15 ✈️', hint:'Lugar com arte e história para visitar'},
+  {word:'VACATION',   cat:'Lesson 15 ✈️', hint:'Período de descanso e viagem'},
+  // Lesson 16 — Health
+  {word:'HEADACHE',   cat:'Lesson 16 🏥', hint:'Dor na cabeça'},
+  {word:'MEDICINE',   cat:'Lesson 16 🏥', hint:'Remédio que o médico prescreve'},
+  {word:'PHARMACY',   cat:'Lesson 16 🏥', hint:'Loja onde você compra remédios'},
+  {word:'EXERCISE',   cat:'Lesson 16 🏥', hint:'Atividade física para ficar saudável'},
+  {word:'LIFESTYLE',  cat:'Lesson 16 🏥', hint:'A maneira como você vive seu dia a dia'},
+  // Lesson 17 — Home
+  {word:'KITCHEN',    cat:'Lesson 17 🏠', hint:'Onde você cozinha a comida'},
+  {word:'BEDROOM',    cat:'Lesson 17 🏠', hint:'Onde você dorme'},
+  {word:'BATHROOM',   cat:'Lesson 17 🏠', hint:'Onde você toma banho'},
+  {word:'WARDROBE',   cat:'Lesson 17 🏠', hint:'Móvel onde você guarda roupas'},
+  {word:'BOOKSHELF',  cat:'Lesson 17 🏠', hint:'Móvel para guardar livros'},
+  {word:'CURTAIN',    cat:'Lesson 17 🏠', hint:'Tecido que cobre a janela'},
+  {word:'MIRROR',     cat:'Lesson 17 🏠', hint:'Você se olha nele para ver seu reflexo'},
+  // Lesson 18 — Past Continuous
+  {word:'STUDYING',   cat:'Lesson 18 🎬', hint:'Aprendendo de forma ativa'},
+  {word:'COOKING',    cat:'Lesson 18 🎬', hint:'Preparando comida'},
+  {word:'DRIVING',    cat:'Lesson 18 🎬', hint:'Dirigindo um carro'},
+  {word:'WAITING',    cat:'Lesson 18 🎬', hint:'Esperando por algo ou alguém'},
+  {word:'RUNNING',    cat:'Lesson 18 🎬', hint:'Correndo rapidamente'},
+  // Lesson 19 — Superlatives
+  {word:'TALLEST',    cat:'Lesson 19 🏆', hint:'O mais alto de todos'},
+  {word:'FASTEST',    cat:'Lesson 19 🏆', hint:'O mais rápido de todos'},
+  {word:'BIGGEST',    cat:'Lesson 19 🏆', hint:'O maior de todos'},
+  {word:'DANGEROUS',  cat:'Lesson 19 🏆', hint:'Algo que pode causar dano'},
+  {word:'BEAUTIFUL',  cat:'Lesson 19 🏆', hint:'Muito bonito ou atraente'},
+  // Lesson 21 — Modals
+  {word:'ABILITY',    cat:'Lesson 21 🎯', hint:'Capacidade de fazer algo'},
+  {word:'REQUEST',    cat:'Lesson 21 🎯', hint:'Quando você pede algo educadamente'},
+  {word:'WORKLOAD',   cat:'Lesson 21 🎯', hint:'Quantidade de trabalho que você tem'},
+  {word:'FEEDBACK',   cat:'Lesson 21 🎯', hint:'Comentário sobre seu desempenho'},
+  {word:'BUDGET',     cat:'Lesson 21 🎯', hint:'Quanto dinheiro você tem para gastar'},
+  // Lesson 22 — Future Will
+  {word:'INVESTMENT',  cat:'Lesson 22 🚀', hint:'Dinheiro aplicado para render mais'},
+  {word:'PREDICTION',  cat:'Lesson 22 🚀', hint:'Dizer o que vai acontecer no futuro'},
+  // Lesson 23 — Personalities
+  {word:'ANXIOUS',    cat:'Lesson 23 😊', hint:'Sentindo preocupação ou nervosismo'},
+  {word:'EXCITED',    cat:'Lesson 23 😊', hint:'Muito animado com algo'},
+  {word:'CONFIDENT',  cat:'Lesson 23 😊', hint:'Que acredita em si mesmo'},
+  {word:'STUBBORN',   cat:'Lesson 23 😊', hint:'Que não muda de ideia facilmente'},
+  {word:'PATIENT',    cat:'Lesson 23 😊', hint:'Que espera sem se irritar'},
+  {word:'CREATIVE',   cat:'Lesson 23 😊', hint:'Que tem muitas ideias novas'},
+  {word:'RELIABLE',   cat:'Lesson 23 😊', hint:'Em quem você pode confiar sempre'},
+  {word:'SENSITIVE',  cat:'Lesson 23 😊', hint:'Que sente as emoções com intensidade'},
+  {word:'OPTIMISTIC', cat:'Lesson 23 😊', hint:'Que sempre espera o melhor'},
+  // Lesson 24 — Still/Yet
+  {word:'HOMEWORK',   cat:'Lesson 24 ⏳', hint:'Tarefa que o professor passa para fazer em casa'},
+  {word:'BREAKFAST',  cat:'Lesson 24 ⏳', hint:'A primeira refeição do dia'},
+  {word:'WALLET',     cat:'Lesson 24 ⏳', hint:'Onde você guarda dinheiro e cartões'},
+  {word:'OPINION',    cat:'Lesson 24 ⏳', hint:'O que você pensa sobre algo'},
+  {word:'FEELING',    cat:'Lesson 24 ⏳', hint:'Uma emoção ou sensação'},
+  {word:'SECRET',     cat:'Lesson 24 ⏳', hint:'Algo que só você sabe'},
+];
+
+const MAX_WRONG = 6;
+const YARA_STAGES = ['🦫','😟','😬','😰','😱','🥺','💀'];
+const KEYBOARD_ROWS = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let shuffled     = [...WORDS].sort(() => Math.random() - 0.5);
+let roundIdx     = 0;
+let wrongCount   = 0;
+let guessed      = new Set();
+let wrongLetters = [];
+let score        = 0;
+
+document.getElementById('total-rounds').textContent = shuffled.length;
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+buildKeyboard();
+startRound();
+
+function startRound() {
+  const entry = shuffled[roundIdx];
+  wrongCount   = 0;
+  guessed      = new Set();
+  wrongLetters = [];
+
+  document.getElementById('round-disp').textContent     = roundIdx + 1;
+  document.getElementById('category-label').textContent = entry.cat;
+  document.getElementById('hint-text').textContent      = entry.hint;
+  document.getElementById('wrong-letters').textContent  = '—';
+  document.getElementById('wrong-count').textContent    = '0 wrong';
+  document.getElementById('yara-stage').textContent     = YARA_STAGES[0];
+
+  renderHearts();
+  renderBlanks();
+  resetKeyboard();
+}
+
+function renderHearts() {
+  document.getElementById('hearts-row').innerHTML =
+    Array.from({length: MAX_WRONG}, (_, i) =>
+      `<span class="heart${i < wrongCount ? ' lost' : ''}">❤️</span>`
+    ).join('');
+}
+
+function renderBlanks() {
+  const word = shuffled[roundIdx].word;
+  document.getElementById('blanks-row').innerHTML = word.split('').map((ch, i) => {
+    const rev = guessed.has(ch);
+    return `<div class="blank${rev ? ' revealed' : ''}" id="blank-${i}">${rev ? ch : ''}</div>`;
+  }).join('');
+}
+
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = KEYBOARD_ROWS.map(row =>
+    `<div class="flex justify-center gap-1.5">${
+      row.split('').map(l =>
+        `<button class="key-btn" id="key-${l}" onclick="guess('${l}')">${l}</button>`
+      ).join('')
+    }</div>`
+  ).join('');
+}
+
+function resetKeyboard() {
+  document.querySelectorAll('.key-btn').forEach(btn => {
+    btn.classList.remove('correct','wrong');
+    btn.disabled = false;
+  });
+}
+
+// ── Guess ──────────────────────────────────────────────────────────────────────
+function guess(letter) {
+  if (guessed.has(letter)) return;
+  guessed.add(letter);
+
+  const btn = document.getElementById(`key-${letter}`);
+  btn.disabled = true;
+
+  const word = shuffled[roundIdx].word;
+
+  if (word.includes(letter)) {
+    btn.classList.add('correct');
+    // Reveal blanks
+    word.split('').forEach((ch, i) => {
+      if (ch === letter) {
+        const el = document.getElementById(`blank-${i}`);
+        el.textContent = ch;
+        el.classList.add('revealed','reveal-anim');
+        setTimeout(() => el.classList.remove('reveal-anim'), 400);
+      }
+    });
+
+    // Check win
+    if (word.split('').every(ch => guessed.has(ch))) {
+      const pts = 20 + (MAX_WRONG - wrongCount) * 5;
+      score += pts;
+      document.getElementById('score-disp').textContent = score;
+      setTimeout(() => roundResult(true, pts), 500);
+    }
+  } else {
+    btn.classList.add('wrong');
+    wrongCount++;
+    wrongLetters.push(letter);
+
+    document.getElementById('yara-stage').textContent     = YARA_STAGES[Math.min(wrongCount, YARA_STAGES.length-1)];
+    document.getElementById('wrong-letters').textContent  = wrongLetters.join(' ') || '—';
+    document.getElementById('wrong-count').textContent    = wrongCount + ' wrong';
+    renderHearts();
+
+    // Shake blanks
+    const blanksRow = document.getElementById('blanks-row');
+    blanksRow.classList.add('shake');
+    setTimeout(() => blanksRow.classList.remove('shake'), 400);
+
+    if (wrongCount >= MAX_WRONG) {
+      setTimeout(() => roundResult(false, 0), 400);
+    }
+  }
+}
+
+// Physical keyboard support
+document.addEventListener('keydown', e => {
+  const l = e.key.toUpperCase();
+  if (/^[A-Z]$/.test(l) && !document.getElementById(`key-${l}`)?.disabled) guess(l);
+});
+
+// ── Round result ───────────────────────────────────────────────────────────────
+function roundResult(won, pts) {
+  const word  = shuffled[roundIdx].word;
+  const isLast = roundIdx + 1 >= shuffled.length;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/50 backdrop-blur-sm';
+
+  if (won && !isLast) {
+    launchConfetti();
+    overlay.innerHTML = `
+      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-emerald-500/50
+           rounded-[2.5rem] px-10 py-8 flex flex-col items-center gap-4 shadow-2xl text-center max-w-xs mx-4">
+        <div class="text-6xl">🎉</div>
+        <h3 class="font-headline text-3xl font-black text-white">Correct!</h3>
+        <p class="font-headline text-2xl text-emerald-400 font-black">${word}</p>
+        <p class="font-body text-slate-300 text-sm">+${pts} points!</p>
+        <button onclick="this.closest('.fixed').remove(); nextRound()"
+                class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all mt-1">
+          Next Word →
+        </button>
+      </div>`;
+  } else if (!won && !isLast) {
+    overlay.innerHTML = `
+      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-red-500/50
+           rounded-[2.5rem] px-10 py-8 flex flex-col items-center gap-4 shadow-2xl text-center max-w-xs mx-4">
+        <div class="text-6xl">💀</div>
+        <h3 class="font-headline text-3xl font-black text-white">Oops!</h3>
+        <p class="font-body text-slate-300">The word was:</p>
+        <p class="font-headline text-2xl text-red-400 font-black">${word}</p>
+        <button onclick="this.closest('.fixed').remove(); nextRound()"
+                class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all mt-1">
+          Next Word →
+        </button>
+      </div>`;
+  } else {
+    // Final round
+    showGameOver(won, word);
+    overlay.remove();
+    return;
+  }
+
+  document.body.appendChild(overlay);
+}
+
+function nextRound() {
+  roundIdx++;
+  startRound();
+}
+
+// ── Game over ──────────────────────────────────────────────────────────────────
+function showGameOver(lastWon, lastWord) {
+  const correct = shuffled.filter((_, i) => i < roundIdx + (lastWon ? 1 : 0)).length;
+  const stars = correct >= shuffled.length * 0.8 ? 3 : correct >= shuffled.length * 0.5 ? 2 : 1;
+  const xp    = stars === 3 ? 40 : stars === 2 ? 25 : 10;
+
+  if (window.Store) {
+    Store.addXP(xp);
+    Store.completeActivity('games');
+    if (stars === 3) Store.unlockBadge('game_hero');
+  }
+  if (stars >= 2) launchConfetti();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.innerHTML = `
+    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-emerald-500/40
+         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         scale-0 opacity-0 transition-all duration-500">
+      <div class="text-7xl">🌿</div>
+      <div>
+        <p class="font-label text-emerald-400 font-bold text-sm uppercase tracking-widest mb-1">Game Over!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">${score} pts</h2>
+        <p class="font-body text-slate-300">${correct}/${shuffled.length} words guessed</p>
+      </div>
+      <div class="flex gap-1">
+        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-slate-600'}"
+          style="font-variation-settings:'FILL' ${i<=stars?1:0};">star</span>`).join('')}
+      </div>
+      <p class="font-body text-slate-400 text-sm">+${xp} XP earned!</p>
+      <div class="flex gap-3">
+        <button onclick="location.reload()"
+                class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+          Play Again 🔄
+        </button>
+        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg">
+          Games 🌿
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const f = document.getElementById('fin');
+    f.style.transform='scale(1)'; f.style.opacity='1';
+  }));
+}
+
+function launchConfetti() {
+  const colors=['#10b981','#ec4899','#06b6d4','#facc15','#818cf8'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};
+      animation-delay:${Math.random()*0.6}s;animation-duration:${0.9+Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
+}
+</script>
+</body>
+</html>

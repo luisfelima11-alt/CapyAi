@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Classes — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+  *{font-family:'Plus Jakarta Sans',sans-serif}
+  @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .float{animation:floatUp 3s ease-in-out infinite}
+  .card-in{animation:fadeIn .4s ease both}
+  .lesson-card{transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+  .lesson-card:hover{transform:translateY(-4px)}
+  .available-card{background:linear-gradient(135deg,#fff 0%,#fdf4ff 100%)}
+  .available-card:hover{box-shadow:0 20px 40px -8px rgba(168,85,247,.25)}
+  .shine{background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);background-size:200% 100%;animation:shine 2.5s infinite}
+  @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-violet-50/40 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-8">
+
+  <!-- ── Hero ─────────────────────────────────────────────────────────── -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-violet-900 to-purple-900 text-white">
+    <!-- Floating emojis bg -->
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">📚</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.6s">✏️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:8%;animation-delay:1.2s">🎓</span>
+      <span class="absolute text-5xl float" style="top:10%;right:20%;animation-delay:.3s">💬</span>
+      <span class="absolute text-7xl float" style="top:50%;right:8%;animation-delay:.9s">🌟</span>
+      <span class="absolute text-5xl float" style="top:75%;right:25%;animation-delay:1.5s">📖</span>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 py-14 flex flex-col md:flex-row items-center gap-8">
+      <div class="flex-1">
+        <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-bold mb-4">
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">menu_book</span>
+          Jadson's English Course
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
+          📚 English<br><span class="text-violet-300">Classes</span>
+        </h1>
+        <p class="text-white/70 text-lg mb-6 max-w-lg">37 real lessons from Jadson's course — transformed into interactive experiences. Study vocab, grammar, expressions and practise speaking.</p>
+        <!-- Progress bar -->
+        <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden">
+          <div class="h-full rounded-full bg-gradient-to-r from-violet-400 to-pink-400" style="width:32.4%"></div>
+        </div>
+        <p class="text-white/50 text-sm">12 of 37 lessons available · More coming soon</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lesson Grid ────────────────────────────────────────────────────── -->
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-10">
+
+    <!-- Section header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-black text-navy">All Lessons</h2>
+        <p class="text-slate-500 text-sm mt-0.5">Click on an available lesson to start</p>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="inline-flex items-center gap-1.5 bg-violet-100 text-violet-700 font-bold px-3 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-violet-500"></span> Available
+        </span>
+        <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 font-bold px-3 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-slate-400"></span> Soon
+        </span>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="lessons-grid">
+    </div>
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+const LESSONS = [
+  {n:1,  emoji:'💬', title:'To Have, Want, Need & Like',       tags:['Verbs','Present Simple']},
+  {n:2,  emoji:'🚶', title:'To Go, Do, Say & See',              tags:['Verbs','Daily Life']},
+  {n:3,  emoji:'🧠', title:'To Get, Make, Know & Take',         tags:['Verbs','Actions']},
+  {n:4,  emoji:'👀', title:'To Come, Think, Look & Give',       tags:['Verbs','Expressions']},
+  {n:5,  emoji:'✉️', title:'To Tell, Work, Feel & Leave',       tags:['Verbs','Feelings']},
+  {n:6,  emoji:'⚡', title:'Modal Verbs: Can, Could & Should',  tags:['Modals','Permission']},
+  {n:7,  emoji:'⏪', title:'Past Simple — Regular Verbs',        tags:['Past Tense','Actions']},
+  {n:8,  emoji:'🔄', title:'Past Simple — Irregular Verbs',     tags:['Past Tense','Irregular']},
+  {n:9,  emoji:'📍', title:'Prepositions of Place',              tags:['Prepositions','Space']},
+  {n:10, emoji:'🔢', title:'Quantifiers: Many, Much & More',    tags:['Quantifiers','Nouns']},
+  {n:11, emoji:'📊', title:'Adjectives & Comparatives',         tags:['Adjectives','Comparison']},
+  {n:12, emoji:'🔮', title:'Future: Will & Going To',            tags:['Future Tense','Plans']},
+  {n:13, emoji:'💼', title:'Work & Career',                      tags:['Vocabulary','Professional']},
+  {n:14, emoji:'💻', title:'Technology & Digital Life',          tags:['Vocabulary','Tech']},
+  {n:15, emoji:'✈️', title:'Travel & Tourism',                   tags:['Vocabulary','Travel']},
+  {n:16, emoji:'🏠', title:'Home & Daily Routines',              tags:['Vocabulary','Daily Life']},
+  {n:17, emoji:'🍽️', title:'Food, Drinks & Restaurants',        tags:['Vocabulary','Food']},
+  {n:18, emoji:'🛒', title:'Shopping & Money',                   tags:['Vocabulary','Shopping']},
+  {n:19, emoji:'🏥', title:'Health & Body',                      tags:['Vocabulary','Health']},
+  {n:20, emoji:'🏆', title:'Achievements & Challenges',          tags:['Vocabulary','Grammar'], available:true, href:'aula_20.html'},
+  {n:21, emoji:'📊', title:'Comparatives',                       tags:['Grammar','Adjectives'],  available:true, href:'aula_21.html'},
+  {n:22, emoji:'🥇', title:'The Concept of MOST',                tags:['Grammar','Superlatives'],available:true, href:'aula_22.html'},
+  {n:23, emoji:'💬', title:'MOST in Conversation',               tags:['Speaking','Chunks'],     available:true, href:'aula_23.html'},
+  {n:24, emoji:'🍽️', title:'At the Restaurant',                  tags:['Vocabulary','Speaking'], available:true, href:'aula_24.html'},
+  {n:25, emoji:'🔁', title:'Present Perfect',                    tags:['Grammar','Experience']},
+  {n:26, emoji:'🔮', title:'The Future with WILL',               tags:['Grammar','Future'],      available:true, href:'aula_26.html'},
+  {n:27, emoji:'🗣️', title:'Speaking About Your Life',          tags:['Speaking','Vocabulary'], available:true, href:'aula_27.html'},
+  {n:28, emoji:'😊', title:'Personalities & Moods',              tags:['Adjectives','Emotions'], available:true, href:'aula_28.html'},
+  {n:29, emoji:'🗣️', title:'Phrasal Verbs: Part 2',             tags:['Phrasal Verbs','Advanced'], available:true, href:'aula_29.html'},
+  {n:30, emoji:'📣', title:'Reported Speech',                    tags:['Grammar','Reporting'],      available:true, href:'aula_30.html'},
+  {n:31, emoji:'🔀', title:'Passive Voice',                      tags:['Grammar','Passive'],        available:true, href:'aula_31.html'},
+  {n:32, emoji:'😬', title:'Awkward Situations & Apologies',     tags:['Vocabulary','Social'],      available:true, href:'aula_32.html'},
+  {n:33, emoji:'🎯', title:'Opinions & Agreeing/Disagreeing',    tags:['Expressions','Debate']},
+  {n:34, emoji:'📖', title:'Storytelling & Narrative Tenses',    tags:['Grammar','Narrative']},
+  {n:35, emoji:'💡', title:'Problem-Solving & Decisions',        tags:['Vocabulary','Critical']},
+  {n:36, emoji:'🏆', title:'Advanced Vocabulary & Collocations', tags:['Vocabulary','Advanced']},
+  {n:37, emoji:'🎓', title:'Final Review & Real Conversations',  tags:['Review','Speaking']},
+];
+
+const grid = document.getElementById('lessons-grid');
+
+LESSONS.forEach((l, i) => {
+  const card = document.createElement('div');
+  card.className = `card-in lesson-card rounded-2xl border-2 overflow-hidden ${l.available
+    ? 'available-card border-violet-300 cursor-pointer'
+    : 'bg-slate-50 border-slate-200 opacity-75'}`;
+  card.style.animationDelay = `${i * 0.04}s`;
+
+  if (l.available) {
+    card.onclick = () => window.location.href = l.href;
+  }
+
+  card.innerHTML = `
+    <div class="relative p-5">
+      ${l.available ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Available</div>` : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-100 text-slate-400 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Soon</div>`}
+
+      <!-- Number + Emoji -->
+      <div class="flex items-start gap-3 mb-3 pr-16">
+        <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl ${l.available ? 'bg-violet-100' : 'bg-slate-100'}">
+          ${l.emoji}
+        </div>
+        <div>
+          <div class="text-[10px] font-black tracking-widest uppercase ${l.available ? 'text-violet-400' : 'text-slate-400'}">Aula ${String(l.n).padStart(2,'0')}</div>
+          <h3 class="font-black text-sm text-navy leading-snug mt-0.5">${l.title}</h3>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="flex flex-wrap gap-1 mb-4">
+        ${l.tags.map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${l.available ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-500'}">${t}</span>`).join('')}
+      </div>
+
+      <!-- Button -->
+      ${l.available
+        ? `<button class="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+            Start Lesson →
+           </button>`
+        : `<button disabled class="w-full bg-slate-200 text-slate-400 font-black text-sm py-2.5 rounded-xl cursor-not-allowed">
+            Coming Soon
+           </button>`
+      }
+    </div>
+    ${l.available ? '<div class="h-1 shine bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400"></div>' : ''}
+  `;
+
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Daily Challenge — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: { extend: {
+    colors: {
+      "navy": "#001f3f", "navy-light": "#002d5c",
+      "pink-brand": "#ec4899", "green-brand": "#10b981",
+      "surface-container": "#002a54"
+    },
+    fontFamily: { "headline": ["Plus Jakarta Sans"], "body": ["Be Vietnam Pro"], "label": ["Lexend"] },
+    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes popIn    { 0%{transform:scale(0.7)} 80%{transform:scale(1.04)} 100%{transform:scale(1)} }
+  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,0.4)} 50%{box-shadow:0 0 0 10px rgba(244,63,94,0)} }
+  @keyframes shimmer  { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  @keyframes starPop  { 0%{transform:scale(0) rotate(-30deg)} 80%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity:1; }
+    100% { transform: translateY(200px) rotate(360deg); opacity:0; }
+  }
+
+  .fade-up  { animation: fadeUp 0.45s ease both; }
+  .pop-in   { animation: popIn  0.4s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+  .star-pop { animation: starPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 12px;
+  }
+
+  /* Textarea */
+  #answer-input {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 1.5rem;
+    color: #fff;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 1rem;
+    padding: 18px 20px;
+    width: 100%;
+    resize: none;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  #answer-input:focus { border-color: #f43f5e; box-shadow: 0 0 0 3px rgba(244,63,94,0.2); }
+  #answer-input::placeholder { color: rgba(255,255,255,0.3); }
+
+  /* Submit button pulse while loading */
+  #submit-btn.loading { animation: pulse-ring 1.4s ease infinite; pointer-events: none; opacity: 0.8; }
+
+  /* Type pill colors */
+  .pill-sentence  { background: rgba(244,63,94,0.18);  border-color: rgba(244,63,94,0.4);  color: #fda4af; }
+  .pill-describe  { background: rgba(251,146,60,0.18); border-color: rgba(251,146,60,0.4); color: #fdba74; }
+  .pill-translate { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+
+  /* Feedback card */
+  #feedback-card { transition: all 0.4s; }
+
+  /* Countdown */
+  #countdown-digits { font-variant-numeric: tabular-nums; }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 10px; height: 10px; border-radius: 2px;
+    animation: confettiFall 1.2s ease-out forwards;
+  }
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50 flex-shrink-0">
+  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-rose-400/50 flex-shrink-0 shadow-md">
+    <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+  </div>
+  <div class="flex-1">
+    <p class="font-label text-xs text-rose-400 uppercase tracking-widest font-bold">AI Daily Challenge</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Today's Challenge ⚡</h1>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-rose-400 text-base" style="font-variation-settings:'FILL' 1;">local_fire_department</span>
+      <span id="streak-disp">0</span> day streak
+    </div>
+    <div class="bg-rose-500/20 border border-rose-500/40 rounded-full px-4 py-2 font-label font-bold text-sm text-rose-300">
+      +<span id="xp-disp">0</span> XP
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 flex flex-col gap-5 px-4 py-6 max-w-2xl mx-auto w-full">
+
+  <!-- ── LOADING STATE ─────────────────────────────────────────────────── -->
+  <div id="state-loading" class="flex flex-col gap-5">
+    <div class="skeleton h-10 w-32"></div>
+    <div class="bg-navy-light border border-white/10 rounded-[2.5rem] p-8 flex flex-col gap-5">
+      <div class="skeleton h-16 w-16 rounded-2xl"></div>
+      <div class="skeleton h-8 w-48"></div>
+      <div class="skeleton h-5 w-full"></div>
+      <div class="skeleton h-5 w-3/4"></div>
+    </div>
+    <div class="skeleton h-36 rounded-2xl"></div>
+    <div class="skeleton h-14 rounded-full"></div>
+  </div>
+
+  <!-- ── CHALLENGE STATE ───────────────────────────────────────────────── -->
+  <div id="state-challenge" class="hidden flex flex-col gap-5">
+
+    <!-- Date chip -->
+    <div class="flex items-center gap-2 fade-up">
+      <span class="bg-rose-500/20 border border-rose-500/40 text-rose-300 font-label font-bold text-xs px-4 py-2 rounded-full">
+        📅 <span id="date-label"></span>
+      </span>
+      <span id="type-pill" class="border font-label font-bold text-xs px-4 py-2 rounded-full">Challenge</span>
+    </div>
+
+    <!-- Challenge card -->
+    <div class="bg-gradient-to-br from-rose-950 to-navy-light border border-rose-500/20 rounded-[2.5rem] p-8 pop-in" id="challenge-card">
+      <div class="text-6xl mb-4" id="challenge-emoji">⚡</div>
+      <h2 class="font-headline font-black text-white text-3xl mb-3" id="challenge-title">Loading…</h2>
+      <p class="font-body text-slate-300 text-base leading-relaxed mb-5" id="challenge-instruction"></p>
+
+      <!-- Hint -->
+      <button onclick="toggleHint()" id="hint-btn"
+              class="flex items-center gap-2 text-rose-400 font-label font-bold text-sm hover:text-rose-300 transition-colors">
+        <span class="material-symbols-outlined text-base">lightbulb</span>
+        <span id="hint-label">Show hint</span>
+      </button>
+      <p id="hint-text" class="hidden mt-3 bg-white/5 border border-white/10 rounded-xl px-5 py-3 font-body text-slate-400 text-sm italic"></p>
+    </div>
+
+    <!-- Answer area -->
+    <div class="fade-up" style="animation-delay:0.1s">
+      <label class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold block mb-2 px-1">Your Answer</label>
+      <textarea id="answer-input" rows="4" placeholder="Type your answer here…" oninput="onAnswerInput()"></textarea>
+      <p class="text-right font-label text-xs text-slate-500 mt-1 px-1"><span id="char-count">0</span> chars</p>
+    </div>
+
+    <!-- Submit -->
+    <button id="submit-btn" onclick="submitAnswer()"
+            class="w-full py-5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500
+                   text-white font-headline font-bold text-xl rounded-full shadow-xl shadow-rose-500/30
+                   active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none fade-up"
+            disabled style="animation-delay:0.15s">
+      <span id="submit-label">Submit Answer</span>
+    </button>
+
+  </div>
+
+  <!-- ── FEEDBACK STATE ────────────────────────────────────────────────── -->
+  <div id="state-feedback" class="hidden flex flex-col gap-5">
+
+    <!-- Challenge recap (mini) -->
+    <div class="bg-navy-light border border-white/10 rounded-2xl px-6 py-4 flex items-start gap-4 fade-up">
+      <span class="text-3xl mt-1" id="recap-emoji">⚡</span>
+      <div>
+        <p class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold mb-0.5">Challenge</p>
+        <p class="font-body text-white text-sm" id="recap-instruction"></p>
+      </div>
+    </div>
+
+    <!-- Your answer -->
+    <div class="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 fade-up" style="animation-delay:0.05s">
+      <p class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold mb-2">Your Answer</p>
+      <p class="font-body text-white" id="recap-answer"></p>
+    </div>
+
+    <!-- Yara feedback -->
+    <div id="feedback-card" class="bg-gradient-to-br from-rose-950 to-navy-light border border-rose-500/30 rounded-[2.5rem] p-8 pop-in">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-2xl">🦫</div>
+        <div>
+          <p class="font-headline font-bold text-white">Yara says…</p>
+          <p class="font-label text-xs text-rose-400">Your AI tutor</p>
+        </div>
+      </div>
+
+      <!-- Typing dots -->
+      <div id="typing-dots" class="flex gap-1.5 py-2">
+        <span class="w-2.5 h-2.5 bg-rose-400 rounded-full animate-bounce" style="animation-delay:0s"></span>
+        <span class="w-2.5 h-2.5 bg-rose-400 rounded-full animate-bounce" style="animation-delay:0.15s"></span>
+        <span class="w-2.5 h-2.5 bg-rose-400 rounded-full animate-bounce" style="animation-delay:0.3s"></span>
+      </div>
+      <p id="yara-feedback-text" class="hidden font-body text-slate-200 text-base leading-relaxed"></p>
+
+      <!-- Stars -->
+      <div id="star-row" class="hidden flex gap-2 mt-5">
+        <span id="star-1" class="material-symbols-outlined text-4xl text-slate-600">star</span>
+        <span id="star-2" class="material-symbols-outlined text-4xl text-slate-600">star</span>
+        <span id="star-3" class="material-symbols-outlined text-4xl text-slate-600">star</span>
+      </div>
+
+      <!-- XP badge -->
+      <div id="xp-badge" class="hidden mt-4 inline-flex items-center gap-2 bg-rose-500/20 border border-rose-500/40 rounded-full px-5 py-2">
+        <span class="material-symbols-outlined text-rose-400 text-base" style="font-variation-settings:'FILL' 1;">bolt</span>
+        <span class="font-label font-bold text-rose-300">+<span id="xp-earned">20</span> XP earned!</span>
+      </div>
+    </div>
+
+    <!-- Example answer -->
+    <div id="example-box" class="hidden bg-white/5 border border-white/10 rounded-2xl px-6 py-4 fade-up">
+      <p class="font-label text-xs text-green-400 uppercase tracking-widest font-bold mb-2">✨ Example Answer</p>
+      <p class="font-body text-slate-300 text-sm italic" id="example-text"></p>
+    </div>
+
+    <!-- Come back tomorrow -->
+    <div id="comeback-box" class="hidden bg-navy-light border border-white/10 rounded-2xl px-6 py-5 flex items-center gap-4 fade-up">
+      <span class="text-3xl">🌙</span>
+      <div class="flex-1">
+        <p class="font-headline font-bold text-white text-lg">Great job today!</p>
+        <p class="font-body text-slate-400 text-sm">Next challenge in <span id="countdown-digits" class="text-rose-400 font-bold"></span></p>
+      </div>
+      <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+              class="bg-rose-600 hover:bg-rose-500 text-white font-label font-bold px-5 py-2.5 rounded-full active:scale-95 transition-all text-sm">
+        More games
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── ALREADY DONE TODAY STATE ──────────────────────────────────────── -->
+  <div id="state-done" class="hidden flex flex-col gap-5">
+    <div class="bg-gradient-to-br from-rose-950 to-navy-light border border-rose-500/20 rounded-[2.5rem] p-10 flex flex-col items-center gap-4 text-center pop-in">
+      <div class="text-7xl">🏆</div>
+      <h2 class="font-headline font-black text-white text-4xl">Done for today!</h2>
+      <p class="font-body text-slate-300">You already completed today's challenge. Come back tomorrow for a new one!</p>
+      <p class="font-body text-slate-400 text-sm">Next challenge in <span id="countdown-digits-done" class="text-rose-400 font-bold"></span></p>
+      <div class="flex gap-3 mt-2">
+        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                class="bg-rose-600 hover:bg-rose-500 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all">
+          More games 🎮
+        </button>
+        <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+                class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+          Home 🏠
+        </button>
+      </div>
+    </div>
+    <div id="streak-done-badge" class="hidden bg-rose-500/10 border border-rose-500/30 rounded-2xl px-6 py-4 flex items-center gap-3 fade-up">
+      <span class="material-symbols-outlined text-rose-400 text-3xl" style="font-variation-settings:'FILL' 1;">local_fire_department</span>
+      <div>
+        <p class="font-headline font-bold text-white"><span id="streak-done-count">0</span>-day streak! 🔥</p>
+        <p class="font-label text-xs text-slate-400">Keep it up — you're on fire!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ERROR STATE ───────────────────────────────────────────────────── -->
+  <div id="state-error" class="hidden">
+    <div class="bg-navy-light border border-red-500/30 rounded-[2.5rem] p-10 flex flex-col items-center gap-4 text-center">
+      <div class="text-6xl">😔</div>
+      <h2 class="font-headline font-bold text-white text-2xl">Oops! Couldn't load today's challenge</h2>
+      <p class="font-body text-slate-400 text-sm" id="error-msg">Make sure the server is running.</p>
+      <button onclick="loadChallenge()"
+              class="bg-rose-600 hover:bg-rose-500 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all mt-2">
+        Try again
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+const TODAY     = new Date().toISOString().slice(0, 10);
+let challenge   = null;
+let hintVisible = false;
+let xpEarned    = 0;
+
+// ── Completion tracking ────────────────────────────────────────────────────────
+const doneDays  = JSON.parse(localStorage.getItem('capyDailyDone') || '[]');
+const alreadyDone = doneDays.includes(TODAY);
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+initHeader();
+startCountdown();
+
+if (alreadyDone) {
+  showState('done');
+  const streak = doneDays.length;
+  document.getElementById('streak-done-count').textContent = streak;
+  if (streak >= 2) document.getElementById('streak-done-badge').classList.remove('hidden');
+} else {
+  loadChallenge();
+}
+
+function initHeader() {
+  if (window.Store) {
+    document.getElementById('streak-disp').textContent = Store.state.streakDays || 0;
+  }
+}
+
+// ── Load challenge ─────────────────────────────────────────────────────────────
+async function loadChallenge() {
+  showState('loading');
+
+  // Cache by date
+  const cacheKey  = 'capyDailyChallenge';
+  const cached    = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+  if (cached && cached.date === TODAY && cached.data) {
+    challenge = cached.data;
+    renderChallenge();
+    return;
+  }
+
+  try {
+    const res  = await fetch('/api/daily-challenge');
+    const json = await res.json();
+
+    // Check for API-level error (e.g. 429 quota, 401 key)
+    if (json?.error) {
+      const code = json.error.code;
+      const msg  = code === 429
+        ? 'Gemini API rate limit reached. Please wait a minute and try again! ⏳'
+        : `API error ${code}: ${json.error.message?.split('\n')[0]}`;
+      document.getElementById('error-msg').textContent = msg;
+      showState('error');
+      return;
+    }
+
+    // Gemini wraps response in candidates
+    let raw = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    raw = raw.replace(/```json|```/g, '').trim();
+    if (!raw) throw new Error('Empty response from Gemini.');
+    challenge = JSON.parse(raw);
+    localStorage.setItem(cacheKey, JSON.stringify({ date: TODAY, data: challenge }));
+    renderChallenge();
+  } catch (e) {
+    console.error('Challenge load error:', e);
+    document.getElementById('error-msg').textContent = e.message || 'Server error.';
+    showState('error');
+  }
+}
+
+function renderChallenge() {
+  // Date label
+  document.getElementById('date-label').textContent =
+    new Date(TODAY + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
+
+  // Type pill
+  const pill = document.getElementById('type-pill');
+  const typeMap = { sentence: ['📝 Sentence', 'pill-sentence'], describe: ['🎨 Describe', 'pill-describe'], translate: ['🔤 Translate', 'pill-translate'] };
+  const [label, cls] = typeMap[challenge.type] || ['⚡ Challenge', 'pill-sentence'];
+  pill.textContent = label;
+  pill.classList.add(cls);
+
+  document.getElementById('challenge-emoji').textContent      = challenge.emoji || '⚡';
+  document.getElementById('challenge-title').textContent      = challenge.title || 'Today\'s Challenge';
+  document.getElementById('challenge-instruction').textContent = challenge.instruction || '';
+  document.getElementById('hint-text').textContent            = challenge.hint || '';
+
+  showState('challenge');
+}
+
+// ── Hint toggle ────────────────────────────────────────────────────────────────
+function toggleHint() {
+  hintVisible = !hintVisible;
+  document.getElementById('hint-text').classList.toggle('hidden', !hintVisible);
+  document.getElementById('hint-label').textContent = hintVisible ? 'Hide hint' : 'Show hint';
+}
+
+// ── Answer input ───────────────────────────────────────────────────────────────
+function onAnswerInput() {
+  const val = document.getElementById('answer-input').value;
+  document.getElementById('char-count').textContent = val.length;
+  document.getElementById('submit-btn').disabled = val.trim().length < 3;
+}
+
+// ── Submit ─────────────────────────────────────────────────────────────────────
+async function submitAnswer() {
+  const answer = document.getElementById('answer-input').value.trim();
+  if (!answer) return;
+
+  // Populate recap
+  document.getElementById('recap-emoji').textContent      = challenge.emoji || '⚡';
+  document.getElementById('recap-instruction').textContent = challenge.instruction || '';
+  document.getElementById('recap-answer').textContent     = answer;
+
+  showState('feedback');
+  document.getElementById('typing-dots').classList.remove('hidden');
+  document.getElementById('yara-feedback-text').classList.add('hidden');
+  document.getElementById('star-row').classList.add('hidden');
+  document.getElementById('xp-badge').classList.add('hidden');
+  document.getElementById('example-box').classList.add('hidden');
+  document.getElementById('comeback-box').classList.add('hidden');
+
+  // Ask Yara to grade the answer
+  const systemPrompt = `You are Yara the capybara, a warm and encouraging English tutor for young children (age 5-8).
+The child was given this challenge: "${challenge.instruction}"
+Their answer was: "${answer}"
+In exactly 2 sentences: give warm, encouraging feedback and gently correct any mistakes.
+Then on a new line write: STARS:X where X is 1, 2, or 3 (3=excellent, 2=good, 1=needs improvement).
+Be kind and use simple words.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: answer, history: [], systemOverride: systemPrompt })
+    });
+    const data = await res.json();
+    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text
+              || data?.reply
+              || "Great try! Keep practising and you'll get even better! 🌟";
+
+    // Parse stars
+    const starsMatch = raw.match(/STARS:(\d)/i);
+    const stars = starsMatch ? Math.min(3, Math.max(1, parseInt(starsMatch[1]))) : 2;
+    const feedbackText = raw.replace(/STARS:\d/i, '').trim();
+
+    showFeedback(feedbackText, stars);
+  } catch (e) {
+    showFeedback("Amazing effort! You're doing so well — keep it up! 🌟", 2);
+  }
+}
+
+function showFeedback(text, stars) {
+  // Hide dots, show text
+  document.getElementById('typing-dots').classList.add('hidden');
+  const ftEl = document.getElementById('yara-feedback-text');
+  ftEl.textContent = text;
+  ftEl.classList.remove('hidden');
+
+  // Stars with animation
+  const starRow = document.getElementById('star-row');
+  starRow.classList.remove('hidden');
+  ['star-1','star-2','star-3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.style.fontVariationSettings = i < stars ? "'FILL' 1" : "'FILL' 0";
+    el.classList.toggle('text-yellow-400', i < stars);
+    el.classList.toggle('text-slate-600', i >= stars);
+    if (i < stars) {
+      el.classList.add('star-pop');
+      el.style.animationDelay = `${i * 0.15}s`;
+    }
+  });
+
+  // XP
+  xpEarned = stars === 3 ? (challenge.xp || 20) + 10 : stars === 2 ? (challenge.xp || 20) : 10;
+  document.getElementById('xp-earned').textContent = xpEarned;
+  document.getElementById('xp-disp').textContent   = xpEarned;
+  setTimeout(() => document.getElementById('xp-badge').classList.remove('hidden'), 400);
+
+  // Example answer
+  if (challenge.example) {
+    document.getElementById('example-text').textContent = challenge.example;
+    setTimeout(() => document.getElementById('example-box').classList.remove('hidden'), 600);
+  }
+
+  // Come back tomorrow
+  setTimeout(() => document.getElementById('comeback-box').classList.remove('hidden'), 800);
+
+  // Confetti on 3 stars
+  if (stars === 3) setTimeout(launchConfetti, 200);
+
+  // Persist completion
+  if (!doneDays.includes(TODAY)) {
+    doneDays.push(TODAY);
+    localStorage.setItem('capyDailyDone', JSON.stringify(doneDays));
+  }
+
+  // Store XP + badge
+  if (window.Store) {
+    Store.addXP(xpEarned);
+    Store.completeActivity('games');
+    Store.completeActivity('daily_challenge');
+    // 7-day streak badge
+    if (doneDays.length >= 7) Store.unlockBadge('week_warrior');
+  }
+}
+
+// ── Confetti ───────────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const colors = ['#f43f5e','#ec4899','#fb923c','#facc15','#34d399','#818cf8'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left  = Math.random() * 100 + 'vw';
+    el.style.top   = '-20px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDelay    = Math.random() * 0.8 + 's';
+    el.style.animationDuration = (0.9 + Math.random() * 0.8) + 's';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+// ── Countdown to midnight ──────────────────────────────────────────────────────
+function startCountdown() {
+  function update() {
+    const now  = new Date();
+    const midnight = new Date(now); midnight.setHours(24,0,0,0);
+    let diff = Math.floor((midnight - now) / 1000);
+    const h  = String(Math.floor(diff / 3600)).padStart(2, '0');
+    diff %= 3600;
+    const m  = String(Math.floor(diff / 60)).padStart(2, '0');
+    const s  = String(diff % 60).padStart(2, '0');
+    const txt = `${h}:${m}:${s}`;
+    ['countdown-digits','countdown-digits-done'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    });
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+// ── State switcher ─────────────────────────────────────────────────────────────
+function showState(state) {
+  ['loading','challenge','feedback','done','error'].forEach(s => {
+    const el = document.getElementById('state-' + s);
+    if (el) el.classList.toggle('hidden', s !== state);
+  });
+}
+
+// ── Submit button loading indicator ───────────────────────────────────────────
+const _origSubmit = window.submitAnswer;
+window.submitAnswer = async function() {
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading');
+  document.getElementById('submit-label').textContent = 'Checking…';
+  await _origSubmit();
+  btn.classList.remove('loading');
+  document.getElementById('submit-label').textContent = 'Submit Answer';
+};
+</script>
+</body>
+</html>

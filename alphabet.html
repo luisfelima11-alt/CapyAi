@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alphabet Explorer — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  /* Letter key buttons */
+  .letter-key {
+    display: flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 14px; cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900; font-size: 1.3rem;
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.12);
+    color: #fff; transition: all 0.15s; user-select: none; flex-shrink: 0;
+  }
+  .letter-key:hover  { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+  .letter-key.active { background: #6366f1; border-color: #818cf8; box-shadow: 0 0 0 3px rgba(99,102,241,0.35); }
+  .letter-key.done   { background: rgba(16,185,129,0.25); border-color: #10b981; color: #34d399; }
+
+  /* Big letter card */
+  .letter-card {
+    background: linear-gradient(135deg, #0d1b4b 0%, #1e1065 100%);
+    border: 2px solid rgba(255,255,255,0.1); border-radius: 2.5rem;
+  }
+
+  /* Word example cards */
+  .word-card {
+    background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 1.5rem; padding: 20px 24px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .word-card:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+  .word-card:active { transform: scale(0.96); }
+
+  /* Animations */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes popIn  { 0%{transform:scale(0.6) rotate(-8deg)} 80%{transform:scale(1.05) rotate(2deg)} 100%{transform:scale(1) rotate(0)} }
+  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+
+  .fade-up { animation: fadeUp 0.4s ease both; }
+  .pop-in  { animation: popIn  0.45s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  /* Phonics pill */
+  .phonics-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(99,102,241,0.18); border: 1.5px solid rgba(99,102,241,0.4);
+    border-radius: 999px; padding: 6px 16px;
+    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 0.85rem; color: #a5b4fc;
+  }
+
+  /* Progress bar */
+  #alpha-prog { transition: width 0.5s ease; }
+
+  /* Scroll row hide scrollbar */
+  .scroll-row { scrollbar-width: none; -ms-overflow-style: none; }
+  .scroll-row::-webkit-scrollbar { display: none; }
+
+  /* Mode tabs */
+  .mode-tab { flex:1; padding:10px 0; font-family:'Lexend',sans-serif; font-weight:700; font-size:0.8rem;
+    letter-spacing:.05em; text-transform:uppercase; border-bottom:3px solid transparent;
+    transition:all 0.2s; cursor:pointer; }
+  .mode-tab.active { border-color:#6366f1; color:#a5b4fc; }
+  .mode-tab:not(.active) { color:rgba(255,255,255,0.35); }
+
+  /* Mic button */
+  @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,0.5)} 50%{box-shadow:0 0 0 20px rgba(236,72,153,0)} }
+  .mic-listening { animation: mic-pulse 1.2s ease-in-out infinite; }
+
+  /* Result flash */
+  @keyframes flash-green { 0%{background:rgba(16,185,129,0.35)} 100%{background:transparent} }
+  @keyframes flash-red   { 0%{background:rgba(239,68,68,0.35)}  100%{background:transparent} }
+  .flash-correct { animation: flash-green 0.6s ease; }
+  .flash-wrong   { animation: flash-red   0.6s ease; }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0 sticky top-0 z-50">
+  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div>
+    <p class="font-label text-xs text-indigo-400 uppercase tracking-widest font-bold">Alphabet Explorer</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Learn A–Z! 🔤</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-4">
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+      <span id="letters-done">0</span>/26
+    </div>
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+      <span id="score-disp">0</span> pts
+    </div>
+  </div>
+</header>
+
+<!-- Progress bar -->
+<div class="h-1.5 bg-white/10">
+  <div id="alpha-prog" class="h-full bg-gradient-to-r from-indigo-500 to-purple-400 w-0"></div>
+</div>
+
+<!-- Mode switcher -->
+<div class="flex border-b border-white/10 bg-primary/80">
+  <button class="mode-tab active" id="tab-explore" onclick="switchMode('explore')">🔤 Explore</button>
+  <button class="mode-tab"        id="tab-speak"   onclick="switchMode('speak')">🎤 Speak &amp; Learn</button>
+  <button class="mode-tab"        id="tab-quiz"    onclick="switchMode('quiz')">⚡ Quick Quiz</button>
+</div>
+
+<!-- ═══ EXPLORE MODE ════════════════════════════════════════════════════════ -->
+<main id="mode-explore" class="flex-1 flex flex-col gap-6 px-4 py-6 max-w-3xl mx-auto w-full">
+
+  <!-- Alphabet keyboard -->
+  <div class="flex flex-wrap gap-2 justify-center fade-up" id="alpha-keys"></div>
+
+  <!-- Main letter display -->
+  <div class="letter-card p-8 flex flex-col items-center gap-4 pop-in" id="letter-card">
+    <!-- Big letter -->
+    <div class="flex items-center gap-6">
+      <span class="font-headline font-black text-[7rem] leading-none text-white" id="big-upper">A</span>
+      <span class="font-headline font-black text-[5rem] leading-none text-indigo-300" id="big-lower">a</span>
+    </div>
+
+    <!-- Phonics -->
+    <div class="phonics-pill" id="phonics-row">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">music_note</span>
+      <span id="phonics-text">Says: /æ/ like in Apple</span>
+    </div>
+
+    <!-- Hear button -->
+    <button onclick="speakLetter()" id="hear-btn"
+            class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-label font-bold px-6 py-3 rounded-full transition-all shadow-lg shadow-indigo-500/30">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">volume_up</span>
+      Hear the letter
+    </button>
+  </div>
+
+  <!-- Word examples -->
+  <div>
+    <p class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold mb-3 px-1 fade-up">Words that start with this letter</p>
+    <div class="grid grid-cols-2 gap-3" id="word-grid"></div>
+  </div>
+
+  <!-- Fun fact -->
+  <div class="bg-surface-container border border-white/10 rounded-2xl px-6 py-5 fade-up" id="fun-fact-box">
+    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold mb-2">✨ Fun Fact</p>
+    <p class="font-body text-slate-300 text-sm leading-relaxed" id="fun-fact-text"></p>
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex gap-3 justify-between fade-up">
+    <button onclick="prevLetter()"
+            class="flex-1 py-4 bg-white/10 hover:bg-white/20 text-white font-label font-bold rounded-2xl border border-white/15 active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">arrow_back</span> Prev
+    </button>
+    <button onclick="markDone()"
+            class="flex-1 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-label font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-indigo-500/30">
+      Got it! ✓
+    </button>
+    <button onclick="nextLetter()"
+            class="flex-1 py-4 bg-white/10 hover:bg-white/20 text-white font-label font-bold rounded-2xl border border-white/15 active:scale-95 transition-all flex items-center justify-center gap-2">
+      Next <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+  </div>
+
+</main>
+
+<!-- ═══ SPEAK & LEARN MODE ═══════════════════════════════════════════════════ -->
+<main id="mode-speak" class="hidden flex-1 flex flex-col gap-6 px-4 py-6 max-w-lg mx-auto w-full">
+
+  <!-- Progress row -->
+  <div class="flex items-center justify-between">
+    <div class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold">Speak &amp; Learn</div>
+    <div class="flex items-center gap-3">
+      <div class="bg-white/10 rounded-full px-4 py-1.5 font-label font-bold text-sm">
+        <span id="speak-round">1</span> / <span id="speak-total">10</span>
+      </div>
+      <div class="bg-pink-500/20 border border-pink-500/30 rounded-full px-4 py-1.5 font-label font-bold text-sm text-pink-300">
+        <span id="speak-score">0</span> pts
+      </div>
+    </div>
+  </div>
+
+  <!-- Word card to say -->
+  <div class="letter-card p-8 flex flex-col items-center gap-5 text-center" id="speak-card">
+    <p class="font-label text-xs text-indigo-400 uppercase tracking-widest font-bold">Say this word!</p>
+    <div class="text-8xl" id="speak-emoji">🍎</div>
+    <h2 class="font-headline font-black text-white text-5xl" id="speak-word">Apple</h2>
+    <div class="phonics-pill">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">music_note</span>
+      <span id="speak-phonics">Starts with A</span>
+    </div>
+
+    <!-- Listen first button -->
+    <button onclick="speakWordTTS()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 active:scale-95 text-white font-label font-bold px-5 py-2.5 rounded-full transition-all border border-white/15 text-sm">
+      <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">volume_up</span>
+      Hear it first
+    </button>
+  </div>
+
+  <!-- Mic button -->
+  <div class="flex flex-col items-center gap-4">
+    <button id="mic-btn" onclick="toggleMic()"
+            class="w-24 h-24 rounded-full bg-pink-600 hover:bg-pink-500 active:scale-95 transition-all
+                   flex items-center justify-center shadow-2xl shadow-pink-500/40">
+      <span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings:'FILL' 1;" id="mic-icon">mic</span>
+    </button>
+    <p id="mic-hint" class="font-label text-sm text-slate-400 font-bold">Tap the mic and say the word!</p>
+
+    <!-- Transcript display -->
+    <div id="speak-transcript" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 min-h-[56px] flex items-center justify-center hidden">
+      <p class="font-headline font-bold text-white text-2xl text-center" id="transcript-text"></p>
+    </div>
+
+    <!-- Feedback -->
+    <div id="speak-feedback" class="hidden w-full rounded-2xl px-6 py-5 flex flex-col items-center gap-3 text-center">
+      <div class="text-5xl" id="feedback-emoji"></div>
+      <p class="font-headline font-bold text-white text-xl" id="feedback-msg"></p>
+      <p class="font-body text-slate-400 text-sm" id="feedback-sub"></p>
+      <button onclick="speakNext()" class="mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-indigo-500/30">
+        Next word →
+      </button>
+    </div>
+  </div>
+
+  <!-- Speak round finish overlay (hidden by default) -->
+  <div id="speak-finish" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur flex items-center justify-center p-6">
+    <div class="bg-gradient-to-br from-[#001f3f] to-[#0d1b4b] border border-indigo-500/40 rounded-[3rem] px-8 py-10 max-w-sm w-full text-center flex flex-col items-center gap-5">
+      <div class="text-6xl" id="finish-emoji">🎤</div>
+      <h2 class="font-headline text-white text-3xl font-black" id="finish-title">Well done!</h2>
+      <p class="font-body text-slate-300" id="finish-sub"></p>
+      <div class="flex gap-1" id="finish-stars"></div>
+      <div class="flex flex-col gap-3 w-full mt-2">
+        <button onclick="startSpeak()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-label font-bold rounded-2xl active:scale-95 transition-all">
+          Play again 🔄
+        </button>
+        <button onclick="switchMode('explore')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-label font-bold rounded-2xl border border-white/15 active:scale-95 transition-all">
+          Back to Explore
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ QUICK QUIZ MODE ══════════════════════════════════════════════════════ -->
+<main id="mode-quiz" class="hidden flex-1 flex flex-col gap-6 px-4 py-6 max-w-lg mx-auto w-full">
+
+  <!-- Progress -->
+  <div class="flex items-center justify-between">
+    <div class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold">Quick Quiz</div>
+    <div class="flex items-center gap-3">
+      <div id="quiz-hearts" class="flex gap-1"></div>
+      <div class="bg-white/10 rounded-full px-4 py-1.5 font-label font-bold text-sm">
+        <span id="quiz-q-num">1</span> / <span id="quiz-q-total">10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question card -->
+  <div class="letter-card p-8 flex flex-col items-center gap-4 text-center" id="quiz-card">
+    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold" id="quiz-prompt">Which letter does this word start with?</p>
+    <div class="text-7xl" id="quiz-emoji">🍎</div>
+    <h2 class="font-headline font-black text-white text-4xl" id="quiz-word">Apple</h2>
+  </div>
+
+  <!-- Answer choices -->
+  <div class="grid grid-cols-4 gap-3" id="quiz-choices"></div>
+
+  <!-- Quiz finish overlay -->
+  <div id="quiz-finish" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur flex items-center justify-center p-6">
+    <div class="bg-gradient-to-br from-[#001f3f] to-[#0d1b4b] border border-yellow-500/40 rounded-[3rem] px-8 py-10 max-w-sm w-full text-center flex flex-col items-center gap-5">
+      <div class="text-6xl" id="qfinish-emoji">⚡</div>
+      <h2 class="font-headline text-white text-3xl font-black" id="qfinish-title">Quiz Done!</h2>
+      <p class="font-body text-slate-300" id="qfinish-sub"></p>
+      <div class="flex gap-1" id="qfinish-stars"></div>
+      <div class="flex flex-col gap-3 w-full mt-2">
+        <button onclick="startQuiz()" class="w-full py-3 bg-yellow-500 hover:bg-yellow-400 text-navy font-label font-bold rounded-2xl active:scale-95 transition-all">
+          Play again ⚡
+        </button>
+        <button onclick="switchMode('explore')" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-label font-bold rounded-2xl border border-white/15 active:scale-95 transition-all">
+          Back to Explore
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Alphabet Data ─────────────────────────────────────────────────────────────
+const ALPHABET = [
+  { l:'A', phonics:'/æ/ like in Apple',   words:[{w:'Apple',e:'🍎'},{w:'Ant',e:'🐜'},{w:'Arrow',e:'🏹'},{w:'Axe',e:'🪓'}],   fact:'The letter A comes from an ancient Egyptian hieroglyph of an ox head! 🐂' },
+  { l:'B', phonics:'/b/ like in Ball',    words:[{w:'Ball',e:'⚽'},{w:'Bird',e:'🐦'},{w:'Bear',e:'🐻'},{w:'Boat',e:'⛵'}],   fact:'B is one of the most common starting letters for animal names!' },
+  { l:'C', phonics:'/k/ like in Cat',     words:[{w:'Cat',e:'🐱'},{w:'Car',e:'🚗'},{w:'Cake',e:'🎂'},{w:'Cloud',e:'☁️'}],   fact:'C can say /k/ (cat) or /s/ (city) — two sounds in one letter!' },
+  { l:'D', phonics:'/d/ like in Dog',     words:[{w:'Dog',e:'🐶'},{w:'Duck',e:'🦆'},{w:'Door',e:'🚪'},{w:'Drum',e:'🥁'}],   fact:'Dinosaur starts with D — and dinosaurs were HUGE! 🦕' },
+  { l:'E', phonics:'/ɛ/ like in Egg',     words:[{w:'Egg',e:'🥚'},{w:'Elephant',e:'🐘'},{w:'Earth',e:'🌍'},{w:'Eye',e:'👁️'}],  fact:'E is the most used letter in the English language!' },
+  { l:'F', phonics:'/f/ like in Fish',    words:[{w:'Fish',e:'🐟'},{w:'Flower',e:'🌸'},{w:'Frog',e:'🐸'},{w:'Fox',e:'🦊'}],  fact:'Flamingo, firefly, and falcon all start with F! 🦩' },
+  { l:'G', phonics:'/g/ like in Garden',  words:[{w:'Garden',e:'🌻'},{w:'Grape',e:'🍇'},{w:'Giraffe',e:'🦒'},{w:'Globe',e:'🌐'}], fact:'G can be soft /dʒ/ (giraffe) or hard /g/ (garden). Sneaky!' },
+  { l:'H', phonics:'/h/ like in Hat',     words:[{w:'Hat',e:'🎩'},{w:'Heart',e:'❤️'},{w:'Horse',e:'🐴'},{w:'House',e:'🏠'}],  fact:'H is a very breathy letter — you push air out to say it!' },
+  { l:'I', phonics:'/ɪ/ like in Igloo',   words:[{w:'Igloo',e:'🏔️'},{w:'Ice',e:'🧊'},{w:'Island',e:'🏝️'},{w:'Insect',e:'🐛'}], fact:'I is the only letter that is also a word all by itself!' },
+  { l:'J', phonics:'/dʒ/ like in Jump',   words:[{w:'Jungle',e:'🌿'},{w:'Jellyfish',e:'🪼'},{w:'Jam',e:'🫙'},{w:'Jacket',e:'🧥'}], fact:'J is one of the least-used letters in English. A rare treasure!' },
+  { l:'K', phonics:'/k/ like in Kite',    words:[{w:'Kite',e:'🪁'},{w:'Koala',e:'🐨'},{w:'Key',e:'🔑'},{w:'King',e:'👑'}],   fact:'Kangaroo and kiwi both start with K — amazing animals! 🦘' },
+  { l:'L', phonics:'/l/ like in Lion',    words:[{w:'Lion',e:'🦁'},{w:'Leaf',e:'🍃'},{w:'Lemon',e:'🍋'},{w:'Light',e:'💡'}],  fact:'L is a liquid consonant — your tongue touches the top of your mouth!' },
+  { l:'M', phonics:'/m/ like in Moon',    words:[{w:'Moon',e:'🌙'},{w:'Mango',e:'🥭'},{w:'Monkey',e:'🐒'},{w:'Mountain',e:'⛰️'}], fact:'Mmm… M is the sound we make when food tastes delicious!' },
+  { l:'N', phonics:'/n/ like in Nest',    words:[{w:'Nest',e:'🪺'},{w:'Night',e:'🌃'},{w:'Nose',e:'👃'},{w:'Nut',e:'🥜'}],   fact:'Nature, night, and noodles all start with N! 🍜' },
+  { l:'O', phonics:'/ɒ/ like in Orange',  words:[{w:'Orange',e:'🍊'},{w:'Owl',e:'🦉'},{w:'Ocean',e:'🌊'},{w:'Olive',e:'🫒'}],  fact:'O is perfectly round — just like the moon, sun, and a ball!' },
+  { l:'P', phonics:'/p/ like in Penguin', words:[{w:'Penguin',e:'🐧'},{w:'Pizza',e:'🍕'},{w:'Parrot',e:'🦜'},{w:'Panda',e:'🐼'}], fact:'P makes a tiny pop of air when you say it — feel it on your hand!' },
+  { l:'Q', phonics:'/kw/ like in Queen',  words:[{w:'Queen',e:'👸'},{w:'Quail',e:'🐦'},{w:'Question',e:'❓'},{w:'Quilt',e:'🛏️'}], fact:'Q almost always needs a U beside it — they are best friends!' },
+  { l:'R', phonics:'/r/ like in Rain',    words:[{w:'Rain',e:'🌧️'},{w:'Rainbow',e:'🌈'},{w:'Rabbit',e:'🐰'},{w:'Rose',e:'🌹'}], fact:'R is called a "rolling" letter — try rolling your tongue!' },
+  { l:'S', phonics:'/s/ like in Sun',     words:[{w:'Sun',e:'☀️'},{w:'Star',e:'⭐'},{w:'Snake',e:'🐍'},{w:'Strawberry',e:'🍓'}], fact:'S is the most used starting letter for English words!' },
+  { l:'T', phonics:'/t/ like in Tree',    words:[{w:'Tree',e:'🌳'},{w:'Tiger',e:'🐯'},{w:'Train',e:'🚂'},{w:'Turtle',e:'🐢'}],  fact:'Tongue touches the top of your teeth to say T — try it!' },
+  { l:'U', phonics:'/ʌ/ like in Umbrella',words:[{w:'Umbrella',e:'☂️'},{w:'Unicorn',e:'🦄'},{w:'Universe',e:'🌌'},{w:'Uncle',e:'👨'}], fact:'U can say /ʌ/ (umbrella) or /juː/ (unicorn). Double powers!' },
+  { l:'V', phonics:'/v/ like in Violet',  words:[{w:'Violin',e:'🎻'},{w:'Volcano',e:'🌋'},{w:'Vegetables',e:'🥦'},{w:'Van',e:'🚐'}], fact:'V makes a buzzing vibration — put your hand on your throat and feel it!' },
+  { l:'W', phonics:'/w/ like in Water',   words:[{w:'Water',e:'💧'},{w:'Wolf',e:'🐺'},{w:'Wind',e:'🌬️'},{w:'Watermelon',e:'🍉'}], fact:'W is the only letter named with more than one syllable: "double-u"!' },
+  { l:'X', phonics:'/ks/ like in Fox',    words:[{w:'Xylophone',e:'🎵'},{w:'X-ray',e:'🦴'},{w:'Fox',e:'🦊'},{w:'Box',e:'📦'}],  fact:'X usually appears at the END of words — like fox, box, and mix!' },
+  { l:'Y', phonics:'/j/ like in Yellow',  words:[{w:'Yellow',e:'💛'},{w:'Yak',e:'🐃'},{w:'Yarn',e:'🧶'},{w:'Yo-yo',e:'🪀'}],   fact:'Yak, yarn, and yummy all start with Y — what a great letter!' },
+  { l:'Z', phonics:'/z/ like in Zebra',   words:[{w:'Zebra',e:'🦓'},{w:'Zoo',e:'🦁'},{w:'Zigzag',e:'⚡'},{w:'Zero',e:'0️⃣'}],   fact:'Z is the last letter — you made it to the end of the alphabet! 🎉' },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentIdx = 0;
+let score      = 0;
+const doneSet  = new Set(JSON.parse(localStorage.getItem('alphaDone') || '[]'));
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+buildKeys();
+showLetter(0);
+
+function buildKeys() {
+  const row = document.getElementById('alpha-keys');
+  row.innerHTML = ALPHABET.map((a, i) =>
+    `<button class="letter-key${doneSet.has(i) ? ' done' : ''}" id="key-${i}" onclick="showLetter(${i})">${a.l}</button>`
+  ).join('');
+}
+
+function showLetter(idx) {
+  currentIdx = idx;
+  const a = ALPHABET[idx];
+
+  document.getElementById('big-upper').textContent = a.l;
+  document.getElementById('big-lower').textContent = a.l.toLowerCase();
+  document.getElementById('phonics-text').textContent = 'Says: ' + a.phonics;
+  document.getElementById('fun-fact-text').textContent = a.fact;
+
+  // Update progress
+  const done = doneSet.size;
+  document.getElementById('letters-done').textContent = done;
+  document.getElementById('alpha-prog').style.width = `${(done / 26) * 100}%`;
+
+  // Active key
+  document.querySelectorAll('.letter-key').forEach((k, i) => {
+    k.classList.toggle('active', i === idx);
+  });
+
+  // Word grid
+  document.getElementById('word-grid').innerHTML = a.words.map(w =>
+    `<div class="word-card" onclick="speakWord('${w.w}')">
+      <div class="text-4xl mb-2">${w.e}</div>
+      <p class="font-headline font-bold text-white text-xl">${w.w}</p>
+      <p class="font-body text-slate-400 text-sm mt-0.5">
+        <span class="text-indigo-400 font-bold">${w.w[0]}</span>${w.w.slice(1).toLowerCase()}
+      </p>
+    </div>`
+  ).join('');
+
+  // Animate card
+  const card = document.getElementById('letter-card');
+  card.classList.remove('pop-in'); void card.offsetWidth; card.classList.add('pop-in');
+}
+
+function speakLetter() {
+  const a = ALPHABET[currentIdx];
+  const utter = new SpeechSynthesisUtterance(a.l);
+  utter.rate = 0.7; utter.pitch = 1.1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+
+  // Also say the phonics example word
+  setTimeout(() => {
+    const word = a.words[0].w;
+    const u2 = new SpeechSynthesisUtterance(word);
+    u2.rate = 0.8; u2.pitch = 1.0;
+    window.speechSynthesis.speak(u2);
+  }, 700);
+}
+
+function speakWord(word) {
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(word);
+  utter.rate = 0.8; utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+
+function markDone() {
+  if (!doneSet.has(currentIdx)) {
+    doneSet.add(currentIdx);
+    score += 5;
+    document.getElementById('score-disp').textContent = score;
+    localStorage.setItem('alphaDone', JSON.stringify([...doneSet]));
+
+    // Update key
+    const key = document.getElementById(`key-${currentIdx}`);
+    key.classList.remove('active');
+    key.classList.add('done');
+
+    // Update progress
+    const done = doneSet.size;
+    document.getElementById('letters-done').textContent = done;
+    document.getElementById('alpha-prog').style.width = `${(done / 26) * 100}%`;
+
+    // XP
+    if (window.Store) {
+      Store.addXP(5);
+      Store.completeActivity('flashcards');
+    }
+
+    // Completion check
+    if (done === 26) {
+      setTimeout(showComplete, 300);
+    } else {
+      // Auto-advance to next undone
+      nextLetter();
+    }
+  } else {
+    nextLetter();
+  }
+}
+
+function nextLetter() {
+  showLetter((currentIdx + 1) % 26);
+}
+function prevLetter() {
+  showLetter((currentIdx + 25) % 26);
+}
+
+// ── Mode Switcher ──────────────────────────────────────────────────────────────
+let currentMode = 'explore';
+
+function switchMode(mode) {
+  currentMode = mode;
+  ['explore','speak','quiz'].forEach(m => {
+    document.getElementById('mode-' + m).classList.toggle('hidden', m !== mode);
+    document.getElementById('mode-' + m).classList.toggle('flex', m === mode);
+    const tab = document.getElementById('tab-' + m);
+    tab.classList.toggle('active', m === mode);
+  });
+  if (mode === 'speak') startSpeak();
+  if (mode === 'quiz')  startQuiz();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SPEAK & LEARN MODE
+// ══════════════════════════════════════════════════════════════════════════════
+const SPEAK_COUNT  = 10;
+let speakWords     = [];
+let speakIdx       = 0;
+let speakScore     = 0;
+let micListening   = false;
+let recognition    = null;
+
+function buildSpeakWords() {
+  // Flatten all words from all letters, shuffle
+  const all = ALPHABET.flatMap(a => a.words.map(w => ({ ...w, letter: a.l, phonics: a.phonics })));
+  for (let i = all.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  return all.slice(0, SPEAK_COUNT);
+}
+
+function startSpeak() {
+  speakWords  = buildSpeakWords();
+  speakIdx    = 0;
+  speakScore  = 0;
+  document.getElementById('speak-score').textContent = 0;
+  document.getElementById('speak-total').textContent = SPEAK_COUNT;
+  document.getElementById('speak-finish').classList.add('hidden');
+  showSpeakWord();
+}
+
+function showSpeakWord() {
+  const w = speakWords[speakIdx];
+  document.getElementById('speak-round').textContent  = speakIdx + 1;
+  document.getElementById('speak-emoji').textContent  = w.e;
+  document.getElementById('speak-word').textContent   = w.w;
+  document.getElementById('speak-phonics').textContent = 'Starts with ' + w.letter + ' · ' + w.phonics;
+  document.getElementById('speak-feedback').classList.add('hidden');
+  document.getElementById('speak-transcript').classList.add('hidden');
+  document.getElementById('mic-hint').textContent = 'Tap the mic and say the word!';
+  document.getElementById('mic-btn').className = 'w-24 h-24 rounded-full bg-pink-600 hover:bg-pink-500 active:scale-95 transition-all flex items-center justify-center shadow-2xl shadow-pink-500/40';
+  document.getElementById('mic-icon').textContent = 'mic';
+  micListening = false;
+}
+
+function speakWordTTS() {
+  const w = speakWords[speakIdx];
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(w.w);
+  u.rate = 0.75; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+function toggleMic() {
+  if (micListening) { stopMic(); return; }
+  startMic();
+}
+
+function startMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showSpeakFallback();
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 3;
+
+  micListening = true;
+  document.getElementById('mic-btn').classList.add('mic-listening');
+  document.getElementById('mic-icon').textContent = 'stop';
+  document.getElementById('mic-hint').textContent = 'Listening… say the word!';
+  document.getElementById('speak-transcript').classList.remove('hidden');
+  document.getElementById('transcript-text').textContent = '…';
+
+  recognition.onresult = e => {
+    const transcript = Array.from(e.results)
+      .map(r => r[0].transcript).join('').trim();
+    document.getElementById('transcript-text').textContent = transcript;
+    if (e.results[e.results.length - 1].isFinal) {
+      stopMic();
+      gradeSpeak(transcript);
+    }
+  };
+  recognition.onerror = () => { stopMic(); showSpeakFallback(); };
+  recognition.onend   = () => { micListening = false; };
+  recognition.start();
+}
+
+function stopMic() {
+  micListening = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
+  document.getElementById('mic-btn').classList.remove('mic-listening');
+  document.getElementById('mic-icon').textContent = 'mic';
+}
+
+function gradeSpeak(transcript) {
+  const target   = speakWords[speakIdx].w.toLowerCase().trim();
+  const heard    = transcript.toLowerCase().trim();
+  // Accept if target word appears anywhere in transcript
+  const correct  = heard.includes(target) || target.includes(heard) ||
+                   levenshtein(heard, target) <= 2;
+
+  const card = document.getElementById('speak-card');
+  card.classList.add(correct ? 'flash-correct' : 'flash-wrong');
+  setTimeout(() => card.classList.remove('flash-correct','flash-wrong'), 700);
+
+  const fb = document.getElementById('speak-feedback');
+  fb.classList.remove('hidden');
+  fb.className = fb.className.replace(/bg-\S+/g, '');
+
+  if (correct) {
+    speakScore += 10;
+    document.getElementById('speak-score').textContent = speakScore;
+    document.getElementById('feedback-emoji').textContent = ['🎉','⭐','🌟','✨','🏆'][Math.floor(Math.random()*5)];
+    document.getElementById('feedback-msg').textContent  = ['Great job!','Excellent!','Perfect!','Spot on!','Amazing!'][Math.floor(Math.random()*5)];
+    document.getElementById('feedback-sub').textContent  = `You said "${transcript}" — that's correct! 🎤`;
+    fb.classList.add('bg-emerald-500/15', 'border', 'border-emerald-500/30', 'rounded-2xl', 'px-6', 'py-5');
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance('Correct! ' + speakWords[speakIdx].w);
+    u.rate = 0.9; window.speechSynthesis.speak(u);
+  } else {
+    document.getElementById('feedback-emoji').textContent = '🤔';
+    document.getElementById('feedback-msg').textContent  = 'Try again next time!';
+    document.getElementById('feedback-sub').textContent  = `The word was "${speakWords[speakIdx].w}". You said "${transcript}".`;
+    fb.classList.add('bg-red-500/15', 'border', 'border-red-500/30', 'rounded-2xl', 'px-6', 'py-5');
+  }
+}
+
+function showSpeakFallback() {
+  // Speech recognition not available — type the word instead
+  document.getElementById('mic-hint').textContent = 'Microphone unavailable — type the word below:';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Type the word here…';
+  input.className = 'w-full bg-white/10 border border-white/20 rounded-xl px-5 py-3 text-white font-headline text-2xl font-bold text-center focus:outline-none focus:border-indigo-400 mt-2';
+  input.onkeydown = e => { if (e.key === 'Enter') { gradeSpeak(input.value); input.remove(); } };
+  document.getElementById('mic-btn').closest('.flex').appendChild(input);
+  setTimeout(() => input.focus(), 100);
+}
+
+function speakNext() {
+  speakIdx++;
+  if (speakIdx >= SPEAK_COUNT) {
+    showSpeakFinish();
+  } else {
+    showSpeakWord();
+  }
+}
+
+function showSpeakFinish() {
+  const pct   = speakScore / (SPEAK_COUNT * 10);
+  const stars = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1;
+  document.getElementById('finish-emoji').textContent  = pct >= 0.8 ? '🏆' : pct >= 0.5 ? '🌟' : '💪';
+  document.getElementById('finish-title').textContent  = pct >= 0.8 ? 'Amazing Speaker!' : pct >= 0.5 ? 'Good effort!' : 'Keep practising!';
+  document.getElementById('finish-sub').textContent    = `You scored ${speakScore} / ${SPEAK_COUNT * 10} points`;
+  document.getElementById('finish-stars').innerHTML    = [1,2,3].map(i =>
+    `<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}" style="${i<=stars?"font-variation-settings:'FILL' 1;":""}">star</span>`
+  ).join('');
+  document.getElementById('speak-finish').classList.remove('hidden');
+  if (window.Store) {
+    Store.addXP(speakScore);
+    Store.activateStreak();
+    Store.completeActivity('games');
+    if (stars === 3) Store.unlockBadge('fast_tracker');
+  }
+}
+
+// Levenshtein distance for fuzzy matching
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length:m+1}, (_,i) => Array.from({length:n+1}, (_,j) => i||j));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// QUICK QUIZ MODE
+// ══════════════════════════════════════════════════════════════════════════════
+const QUIZ_Q_COUNT = 10;
+let quizWords  = [];
+let quizIdx    = 0;
+let quizLives  = 3;
+let quizScoreQ = 0;
+
+function buildQuizWords() {
+  const all = ALPHABET.flatMap(a => a.words.map(w => ({ ...w, letter: a.l })));
+  for (let i = all.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  return all.slice(0, QUIZ_Q_COUNT);
+}
+
+function startQuiz() {
+  quizWords  = buildQuizWords();
+  quizIdx    = 0;
+  quizLives  = 3;
+  quizScoreQ = 0;
+  document.getElementById('quiz-finish').classList.add('hidden');
+  document.getElementById('quiz-q-total').textContent = QUIZ_Q_COUNT;
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  const q    = quizWords[quizIdx];
+  const type = quizIdx % 2 === 0 ? 'letter' : 'emoji';
+
+  document.getElementById('quiz-q-num').textContent = quizIdx + 1;
+
+  if (type === 'letter') {
+    document.getElementById('quiz-prompt').textContent = 'Which letter does this word start with?';
+    document.getElementById('quiz-emoji').textContent  = q.e;
+    document.getElementById('quiz-word').textContent   = q.w;
+  } else {
+    document.getElementById('quiz-prompt').textContent = 'What emoji matches this word?';
+    document.getElementById('quiz-emoji').textContent  = '❓';
+    document.getElementById('quiz-word').textContent   = q.w;
+  }
+
+  // Build answer choices
+  const correct = type === 'letter' ? q.letter : q.e;
+  let options;
+  if (type === 'letter') {
+    const letters = ALPHABET.map(a => a.l).filter(l => l !== q.letter);
+    for (let i=letters.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [letters[i],letters[j]]=[letters[j],letters[i]]; }
+    options = [q.letter, ...letters.slice(0,3)];
+  } else {
+    const otherWords = ALPHABET.flatMap(a => a.words).filter(w => w.e !== q.e);
+    for (let i=otherWords.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [otherWords[i],otherWords[j]]=[otherWords[j],otherWords[i]]; }
+    options = [q.e, ...otherWords.slice(0,3).map(w => w.e)];
+  }
+  for (let i=options.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
+
+  document.getElementById('quiz-choices').innerHTML = options.map(opt => `
+    <button onclick="answerQuiz('${opt}', '${correct}', this)"
+            class="quiz-choice py-4 rounded-2xl bg-white/8 border-2 border-white/15
+                   font-headline font-black text-white text-2xl hover:bg-white/15
+                   active:scale-95 transition-all">
+      ${opt}
+    </button>`).join('');
+
+  renderHearts();
+}
+
+function renderHearts() {
+  document.getElementById('quiz-hearts').innerHTML = [1,2,3].map(i =>
+    `<span class="material-symbols-outlined text-xl ${i<=quizLives?'text-red-400':'text-white/20'}" style="${i<=quizLives?"font-variation-settings:'FILL' 1;":""}">favorite</span>`
+  ).join('');
+}
+
+function answerQuiz(chosen, correct, btn) {
+  // Disable all choices
+  document.querySelectorAll('.quiz-choice').forEach(b => { b.onclick = null; b.style.pointerEvents='none'; });
+
+  if (chosen === correct) {
+    btn.classList.add('bg-emerald-500/40','border-emerald-400');
+    quizScoreQ += 10;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance('Correct!');
+    u.rate=1.1; window.speechSynthesis.speak(u);
+  } else {
+    btn.classList.add('bg-red-500/30','border-red-400');
+    // Highlight correct
+    document.querySelectorAll('.quiz-choice').forEach(b => {
+      if (b.textContent.trim() === correct) b.classList.add('bg-emerald-500/40','border-emerald-400');
+    });
+    quizLives--;
+    renderHearts();
+  }
+
+  const done = quizIdx + 1 >= QUIZ_Q_COUNT || quizLives <= 0;
+  setTimeout(() => {
+    if (done) { showQuizFinish(); } else { quizIdx++; showQuizQuestion(); }
+  }, 900);
+}
+
+function showQuizFinish() {
+  const total = Math.min(quizIdx + 1, QUIZ_Q_COUNT);
+  const pct   = quizScoreQ / (total * 10);
+  const stars = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1;
+  document.getElementById('qfinish-emoji').textContent = pct >= 0.8 ? '⭐' : pct >= 0.5 ? '🌟' : '💡';
+  document.getElementById('qfinish-title').textContent = pct >= 0.8 ? 'Quiz Champion!' : pct >= 0.5 ? 'Good work!' : 'Keep going!';
+  document.getElementById('qfinish-sub').textContent   = `${quizScoreQ} / ${total * 10} points · ${total} questions`;
+  document.getElementById('qfinish-stars').innerHTML   = [1,2,3].map(i =>
+    `<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}" style="${i<=stars?"font-variation-settings:'FILL' 1;":""}">star</span>`
+  ).join('');
+  document.getElementById('quiz-finish').classList.remove('hidden');
+  if (window.Store) {
+    Store.addXP(quizScoreQ);
+    Store.activateStreak();
+    Store.completeActivity('games');
+    Store.completeActivity('flashcards');
+    if (stars === 3) Store.unlockBadge('explorer');
+  }
+}
+
+// ── Completion overlay ─────────────────────────────────────────────────────────
+function showComplete() {
+  if (window.Store) {
+    Store.addXP(50);
+    Store.unlockBadge('tree_warden');
+  }
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.innerHTML = `
+    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-indigo-500/60
+         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         scale-0 opacity-0 transition-all duration-500">
+      <div class="text-7xl">🔤</div>
+      <div>
+        <p class="font-label text-indigo-400 font-bold text-sm uppercase tracking-widest mb-1">Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">A to Z! 🎉</h2>
+        <p class="font-body text-slate-300">You explored all 26 letters!</p>
+      </div>
+      <div class="flex gap-1">
+        <span class="material-symbols-outlined text-3xl text-yellow-400" style="font-variation-settings:'FILL' 1;">star</span>
+        <span class="material-symbols-outlined text-3xl text-yellow-400" style="font-variation-settings:'FILL' 1;">star</span>
+        <span class="material-symbols-outlined text-3xl text-yellow-400" style="font-variation-settings:'FILL' 1;">star</span>
+      </div>
+      <p class="font-body text-slate-400 text-sm">🏅 Tree Warden badge + 50 bonus XP!</p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Again 🔄</button>
+        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                class="bg-indigo-600 hover:bg-indigo-500 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-indigo-500/30">Games 🌿</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const f = document.getElementById('fin');
+    f.style.transform = 'scale(1)'; f.style.opacity = '1';
+  }));
+}
+</script>
+</body>
+</html>

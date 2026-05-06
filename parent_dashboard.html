@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Parent Dashboard — Capy Yara Adventures</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#001f3f",
+                        "primary-light": "#002a54",
+                        "pink-brand": "#ec4899",
+                        "green-brand": "#10b981",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Lexend"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { background: #001f3f; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+        /* Simple loader */
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #ec4899;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="font-body text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden">
+
+<!-- Parent Gateway Overlay (Blocks access) -->
+<div id="parent-gate" class="fixed inset-0 bg-primary z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+    <div class="w-full max-w-sm bg-primary-light border border-white/10 rounded-[2rem] p-8 shadow-2xl text-center relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-pink-500"></div>
+        <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-6 border-2 border-slate-600 shadow-inner">
+            <span class="material-symbols-outlined text-white text-3xl">lock</span>
+        </div>
+        <h1 class="font-headline text-3xl font-black text-white mb-2">Parents Only</h1>
+        <p class="font-body text-slate-400 text-sm mb-8">Please solve this equation to access your child's learning analytics.</p>
+        
+        <div class="bg-primary/50 inset-0 rounded-xl py-5 mb-6 border border-white/5 mx-4">
+            <p class="font-headline text-4xl font-black text-pink-400 tracking-wider" id="pg-math">?</p>
+        </div>
+        
+        <input type="number" id="pg-answer" placeholder="Your Answer" 
+               class="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white text-center font-headline text-2xl mb-2 focus:outline-none focus:border-pink-500/50 transition-colors">
+        <p id="pg-err" class="text-red-400 text-xs font-label h-4 mb-4 opacity-0 transition-opacity">Incorrect answer. Try again.</p>
+        
+        <button onclick="unlockDashboard()" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-label font-bold py-4 rounded-xl shadow-[0_4px_14px_0_rgba(236,72,153,0.39)] hover:shadow-[0_6px_20px_rgba(236,72,153,0.23)] hover:-translate-y-0.5 active:scale-95 transition-all text-lg">
+            Unlock Dashboard
+        </button>
+<button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="mt-4 font-label text-xs font-bold text-slate-400 hover:text-white transition-colors">Return to Home</button>
+    </div>
+</div>
+
+<!-- Dashboard Content -->
+<div id="dashboard-content" class="flex-1 opacity-0 pointer-events-none transition-opacity duration-1000 p-6 md:p-12 max-w-screen-xl mx-auto w-full">
+    
+    <header class="flex justify-between items-center mb-10 pb-6 border-b border-white/10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-500/20 text-blue-400 flex items-center justify-center rounded-xl">
+                <span class="material-symbols-outlined text-2xl">monitoring</span>
+            </div>
+            <div>
+                <h1 class="font-headline text-2xl md:text-3xl font-black text-white">Yara Analytics</h1>
+                <p class="font-body text-slate-400 text-sm">Parent Dashboard & AI Reporting</p>
+            </div>
+        </div>
+        <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-white font-label font-bold text-sm transition-colors border border-white/10">
+            <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 0;">home</span>
+            Exit
+        </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Child Selector -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="bg-primary-light border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                <!-- deco -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-pink-500/10 rounded-full blur-2xl"></div>
+                
+                <h2 class="font-headline font-bold text-white text-lg mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-pink-400">group</span> Select Explorer
+                </h2>
+                
+                <div id="account-list" class="flex flex-col gap-3">
+                    <!-- Loaded via JS -->
+                    <div class="text-center py-6 text-slate-400 text-sm italic">Loading accounts...</div>
+                </div>
+            </div>
+            
+            <div class="bg-emerald-900/20 border border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden hidden md:block">
+                <h3 class="font-label font-bold text-emerald-400 text-sm uppercase tracking-widest mb-2">Why AI Reports?</h3>
+                <p class="font-body text-emerald-100/70 text-sm leading-relaxed">
+                    Instead of just looking at numbers, our OpenAI integration analyzes your child's gameplay data to generate warm, personalized learning summaries and actionable tips for offline engagement.
+                </p>
+                <span class="material-symbols-outlined absolute -bottom-4 -right-4 text-emerald-500/10 text-8xl">auto_awesome</span>
+            </div>
+        </div>
+        
+        <!-- Right Column: AI Report -->
+        <div class="lg:col-span-8">
+            <div id="report-container" class="bg-primary-light border border-white/10 rounded-3xl p-8 md:p-10 shadow-xl min-h-[400px] flex flex-col">
+                
+                <!-- Initial Empty State -->
+                <div id="empty-state" class="flex-1 flex flex-col items-center justify-center text-center opacity-50 py-12">
+                    <span class="material-symbols-outlined text-6xl text-slate-600 mb-4" style="font-variation-settings:'FILL' 0;">query_stats</span>
+                    <p class="font-label font-bold text-lg text-slate-300">No Child Selected</p>
+                    <p class="font-body text-sm text-slate-500 max-w-sm mt-2">Select a profile on the left to generate their personalized AI progress report.</p>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loading-state" class="flex-1 flex flex-col items-center justify-center hidden">
+                    <div class="loader mb-6"></div>
+                    <p class="font-label font-bold text-pink-400 animate-pulse">Robots are analyzing learning data...</p>
+                    <p class="font-body text-sm text-slate-400 mt-2">Writing personalized summary</p>
+                </div>
+                
+                <!-- Result State -->
+                <div id="result-state" class="hidden flex-col h-full">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div id="rep-avatar" class="text-5xl w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border-4 border-pink-500/20 shadow-lg shadow-pink-500/10">🦫</div>
+                        <div>
+                            <h2 id="rep-title" class="font-headline text-3xl font-black text-white">Progress Report</h2>
+                            <p class="font-body text-slate-400 text-sm mt-1">Generated dynamically by OpenAI</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats summary -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                            <span class="block text-xl mb-1">⭐</span>
+                            <p class="font-headline text-2xl font-bold text-white tracking-tight" id="stat-xp">0</p>
+                            <p class="font-label text-[10px] uppercase text-slate-500 font-bold tracking-widest mt-1">Total XP</p>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                            <span class="block text-xl mb-1">🎖️</span>
+                            <p class="font-headline text-2xl font-bold text-white tracking-tight" id="stat-badges">0</p>
+                            <p class="font-label text-[10px] uppercase text-slate-500 font-bold tracking-widest mt-1">Badges</p>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                            <span class="block text-xl mb-1">🍓</span>
+                            <p class="font-headline text-2xl font-bold text-white tracking-tight" id="stat-berries">0</p>
+                            <p class="font-label text-[10px] uppercase text-slate-500 font-bold tracking-widest mt-1">Berries</p>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                            <span class="block text-xl mb-1">🔥</span>
+                            <p class="font-headline text-2xl font-bold text-white tracking-tight" id="stat-streak">0</p>
+                            <p class="font-label text-[10px] uppercase text-slate-500 font-bold tracking-widest mt-1">Day Streak</p>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Text -->
+                    <div class="prose prose-invert max-w-none">
+                        <h3 class="font-label text-pink-400 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2 border-b border-white/10 pb-2">
+                            <span class="material-symbols-outlined text-lg">edit_note</span> AI Analyst Overview
+                        </h3>
+                        <p id="rep-summary" class="font-body text-slate-200 text-lg leading-relaxed mb-6 whitespace-pre-wrap"></p>
+                        
+                        <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 relative">
+                            <h3 class="font-label text-blue-400 font-bold text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">lightbulb</span> Practical Tip
+                            </h3>
+                            <p id="rep-tip" class="font-body text-blue-100/90 leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ── Parent Gate Logic ─────────────────────────────────────────────────────── */
+let gateAns = 0;
+function initGate() {
+    const a = Math.floor(Math.random() * 8) + 4;
+    const b = Math.floor(Math.random() * 8) + 4;
+    gateAns = a * b; // Multiplication for Parents
+    document.getElementById('pg-math').textContent = `${a} × ${b} =`;
+}
+
+function unlockDashboard() {
+    const v = parseInt(document.getElementById('pg-answer').value, 10);
+    const err = document.getElementById('pg-err');
+    if (v === gateAns) {
+        // Unlock
+        const gate = document.getElementById('parent-gate');
+        gate.style.opacity = '0';
+        setTimeout(() => {
+            gate.style.display = 'none';
+            const dash = document.getElementById('dashboard-content');
+            dash.classList.remove('opacity-0', 'pointer-events-none');
+            loadAccounts();
+        }, 500);
+    } else {
+        err.style.opacity = '1';
+        setTimeout(() => err.style.opacity = '0', 2000);
+    }
+}
+
+document.getElementById('pg-answer').addEventListener('keydown', e => {
+    if(e.key === 'Enter') unlockDashboard();
+});
+
+// Run
+initGate();
+
+/* ── Dashboard Logic ───────────────────────────────────────────────────────── */
+let allAccounts = [];
+
+async function loadAccounts() {
+    try {
+        const res = await fetch('/api/db/accounts');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        allAccounts = data.accounts || [];
+        renderAccountList();
+    } catch(e) {
+        document.getElementById('account-list').innerHTML = `<div class="text-red-400 text-sm p-4 text-center">Failed to load accounts. Try reloading.</div>`;
+    }
+}
+
+function renderAccountList() {
+    const list = document.getElementById('account-list');
+    if (allAccounts.length === 0) {
+        list.innerHTML = `<div class="text-slate-400 text-sm p-4 text-center">No explorer accounts found.</div>`;
+        return;
+    }
+    
+    list.innerHTML = allAccounts.map(acc => `
+        <button onclick="selectChild('${acc.id}')" class="acc-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-pink-500/30 transition-all text-left group">
+            <div class="text-2xl w-12 h-12 flex items-center justify-center rounded-full bg-slate-800 border border-slate-600 group-hover:bg-pink-900/50 group-hover:border-pink-500 transition-colors">
+                ${acc.avatar || '🦫'}
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-headline font-bold text-white text-base truncate">${acc.name}</p>
+                <p class="font-body text-slate-500 text-xs truncate">${acc.email}</p>
+            </div>
+            <span class="material-symbols-outlined text-slate-600 group-hover:text-pink-400 transition-colors">chevron_right</span>
+        </button>
+    `).join('');
+}
+
+async function selectChild(userId) {
+    // UI Update
+    document.getElementById('empty-state').classList.add('hidden');
+    document.getElementById('result-state').classList.add('hidden');
+    document.getElementById('loading-state').classList.remove('hidden');
+    
+    // Find account info
+    const acc = allAccounts.find(a => a.id === userId);
+    if (!acc) return;
+    
+    try {
+        // Fetch raw State from DB
+        const resSettings = await fetch(`/api/db?type=state&userId=${userId}`);
+        const state = await resSettings.json() || {};
+        
+        // Prepare info for UI and AI
+        const xp = state.xp || 0;
+        const badges = state.badges || [];
+        const berries = state.starBerries || 0;
+        const streak = state.streakDays || 0;
+        const lessons = state.completedLessons || [];
+        const lastActive = state.lastQuestDate || 'New';
+        
+        // Trigger AI analysis
+        const aiRes = await fetch('/api/parent-report', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ name: acc.name, xp, badges, lessons, recentDate: lastActive })
+        });
+        
+        if (!aiRes.ok) throw new Error('AI Gen Failed');
+        const report = await aiRes.json();
+        
+        // Populate Result State
+        document.getElementById('rep-avatar').textContent = acc.avatar || '🦫';
+        document.getElementById('rep-title').textContent = report.title || `${acc.name}'s Report`;
+        document.getElementById('stat-xp').textContent = xp;
+        document.getElementById('stat-badges').textContent = badges.length;
+        document.getElementById('stat-berries').textContent = berries;
+        document.getElementById('stat-streak').textContent = streak;
+        
+        document.getElementById('rep-summary').textContent = report.summary;
+        document.getElementById('rep-tip').textContent = report.parentTip;
+        
+        // Switch views
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('result-state').classList.remove('hidden');
+        document.getElementById('result-state').classList.add('flex');
+        
+    } catch(e) {
+        document.getElementById('loading-state').innerHTML = `<p class="text-red-400 font-label">Error generating report. Check connection.</p>`;
+    }
+}
+</script>
+</body>
+</html>

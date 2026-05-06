@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Progress — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config={darkMode:"class",theme:{extend:{
+    colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
+  }}}
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  .xp-bar-fill { transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+</style>
+</head>
+<body class="bg-white font-body text-slate-900 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-28 pb-20 px-6 max-w-4xl mx-auto flex flex-col gap-10">
+
+  <!-- Page header -->
+  <div class="flex items-center gap-6">
+    <div class="relative flex-shrink-0">
+      <div class="w-24 h-24 rounded-[2rem] overflow-hidden bg-pink-50 border-4 border-pink-200 shadow-xl shadow-pink-100">
+        <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+      </div>
+      <div class="absolute -bottom-2 -right-2 bg-yellow-400 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">star</span>
+      </div>
+    </div>
+    <div>
+      <h1 class="font-headline text-5xl font-extrabold text-navy">My Progress</h1>
+      <p class="font-body text-slate-500 text-lg mt-1">Your adventure stats, badges, and achievements.</p>
+    </div>
+  </div>
+
+  <!-- Hero stats row -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <!-- Level card -->
+    <div class="bg-navy rounded-[2rem] p-8 flex flex-col items-center gap-3 text-white text-center shadow-xl">
+      <div class="w-20 h-20 rounded-full bg-pink-brand flex items-center justify-center shadow-lg shadow-pink-500/30">
+        <span id="stat-level" class="font-headline text-3xl font-black">1</span>
+      </div>
+      <div>
+        <p class="font-label text-pink-brand text-xs uppercase tracking-widest font-bold">Current Level</p>
+        <p id="stat-level-title" class="font-headline text-xl font-bold mt-1">Explorer</p>
+      </div>
+    </div>
+    <!-- XP card -->
+    <div class="bg-slate-50 border border-slate-100 rounded-[2rem] p-8 flex flex-col gap-4 shadow-sm">
+      <div class="flex justify-between items-center">
+        <span class="font-label text-slate-500 text-xs uppercase tracking-widest font-bold">Total XP</span>
+        <span id="stat-total-xp" class="font-headline text-2xl font-black text-navy">0</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
+        <div id="stat-xp-bar" class="xp-bar-fill h-full bg-green-brand rounded-full w-0"></div>
+      </div>
+      <p id="stat-xp-label" class="font-label text-slate-400 text-xs text-center">0 / 100 XP to next level</p>
+    </div>
+    <!-- Streak card -->
+    <div class="bg-orange-50 border border-orange-100 rounded-[2rem] p-8 flex flex-col items-center gap-3 text-center shadow-sm">
+      <span class="material-symbols-outlined text-orange-500 text-5xl" style="font-variation-settings:'FILL' 1;">local_fire_department</span>
+      <div>
+        <p class="font-label text-orange-500 text-xs uppercase tracking-widest font-bold">Day Streak</p>
+        <p id="stat-streak" class="font-headline text-5xl font-black text-orange-500">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly streak calendar -->
+  <div class="bg-slate-50 border border-slate-100 rounded-[2rem] p-8 shadow-sm">
+    <h2 class="font-headline text-2xl font-extrabold text-navy mb-6">Weekly Activity</h2>
+    <div id="streak-calendar" class="flex justify-around items-center gap-2"></div>
+  </div>
+
+  <!-- Badges section -->
+  <div>
+    <h2 class="font-headline text-2xl font-extrabold text-navy mb-6">Badge Collection</h2>
+    <div id="badge-grid" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-5 gap-5"></div>
+  </div>
+
+  <!-- Activities section -->
+  <div>
+    <div class="flex items-center gap-3 mb-6">
+      <h2 class="font-headline text-2xl font-extrabold text-navy">Today's Activities</h2>
+      <span class="font-label text-xs font-bold text-slate-400 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">Resets daily</span>
+    </div>
+    <div id="activity-list" class="grid grid-cols-1 sm:grid-cols-3 gap-5"></div>
+  </div>
+
+  <!-- Reset progress -->
+  <div class="border-t border-slate-100 pt-8 flex flex-col items-center gap-3">
+    <p class="font-label text-slate-400 text-sm">Want to start fresh?</p>
+    <button onclick="resetProgress()"
+            class="bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-500
+                   font-label font-bold px-8 py-3 rounded-full border border-slate-200
+                   hover:border-red-200 transition-all active:scale-95 text-sm">
+      Reset All Progress
+    </button>
+  </div>
+
+</main>
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav(''));
+  Components.mount('side-nav-placeholder', Components.renderSideNav(''));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav(''));
+  Components.mount('footer-placeholder', Components.renderFooter());
+
+  const BADGE_CATALOG = [
+    {id:'tree_warden',   icon:'eco',                      color:'bg-emerald-500',  iconColor:'text-white', label:'Tree Warden',   desc:'Complete the Alphabet adventure'},
+    {id:'fast_tracker',  icon:'rocket_launch',            color:'bg-pink-500',     iconColor:'text-white', label:'Fast Tracker',  desc:'Score 80%+ in Pronunciation'},
+    {id:'explorer',      icon:'style',                    color:'bg-pink-500',     iconColor:'text-white', label:'Card Explorer', desc:'Complete a flashcard deck'},
+    {id:'chat_master',   icon:'chat_bubble',              color:'bg-emerald-500',  iconColor:'text-white', label:'Chat Master',   desc:'Finish a full dialogue scene'},
+    {id:'game_hero',     icon:'sports_esports',           color:'bg-pink-500',     iconColor:'text-white', label:'Game Hero',     desc:'Score 40+ pts in Word Match'},
+    {id:'forest_sage',   icon:'auto_awesome',             color:'bg-emerald-500',  iconColor:'text-white', label:'Forest Sage',   desc:'Score 90+ in Forest Puzzle'},
+    {id:'grammar_star',  icon:'school',                   color:'bg-cyan-500',     iconColor:'text-white', label:'Grammar Star',  desc:'Perfect score in Grammar Lab'},
+    {id:'word_wizard',   icon:'spellcheck',               color:'bg-violet-500',   iconColor:'text-white', label:'Word Wizard',   desc:'Score 70+ in Sound Seekers'},
+    {id:'number_wizard', icon:'123',                      color:'bg-amber-500',    iconColor:'text-white', label:'Number Wizard', desc:'3 stars in Number Quest'},
+    {id:'story_teller',  icon:'menu_book',                color:'bg-rose-500',     iconColor:'text-white', label:'Story Teller',  desc:'Generate a Story Time adventure'},
+    {id:'week_warrior',  icon:'local_fire_department',    color:'bg-orange-500',   iconColor:'text-white', label:'Week Warrior',  desc:'Complete 7 Daily Challenges'},
+    {id:'body_champ',    icon:'directions_run',           color:'bg-teal-500',     iconColor:'text-white', label:'Body Champ',    desc:'Coming soon!'},
+    {id:'food_explorer', icon:'restaurant',               color:'bg-yellow-500',   iconColor:'text-white', label:'Food Explorer', desc:'Coming soon!'},
+    {id:'emotion_star',  icon:'sentiment_very_satisfied', color:'bg-fuchsia-500',  iconColor:'text-white', label:'Emotion Star',  desc:'Coming soon!'},
+    {id:'legend',        icon:'emoji_events',             color:'bg-yellow-400',   iconColor:'text-white', label:'Legend',        desc:'Earn every other badge'},
+  ];
+
+  const ACTIVITIES = [
+    {id:'flashcards',   icon:'style',          color:'bg-navy',       label:'Flashcard Journey',  desc:'Complete a full deck of 10 cards'},
+    {id:'dialogue',     icon:'chat_bubble',    color:'bg-pink-500',   label:'Yara Dialogue',      desc:'Finish a full dialogue scene'},
+    {id:'games',        icon:'sports_esports', color:'bg-green-brand',label:'Mini-Games',         desc:'Play any mini-game to completion'},
+    {id:'story_time',   icon:'menu_book',      color:'bg-rose-500',   label:'Story Time',         desc:'Generate a story adventure'},
+    {id:'ai_chat',      icon:'smart_toy',      color:'bg-violet-500', label:'AI Chat',            desc:'Chat with Yara AI'},
+    {id:'pronun_practice', icon:'record_voice_over', color:'bg-cyan-500', label:'Pronunciation',  desc:'Complete a pronunciation session'},
+  ];
+
+  const LEVEL_TITLES = ['Explorer','Sapling','Adventurer','Trail Blazer','Forest Guide',
+                        'Wilderness Scout','Nature Keeper','Tree Whisperer','Forest Sage','Legend'];
+
+  function getLevelTitle(level) {
+    return LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)];
+  }
+
+  function renderPage() {
+    const {xp, streakDays, badges, completedActivities, playerName} = Store.state;
+    const level   = Store.getLevel();
+    const xpInLvl = xp % 100;
+    const pct     = Math.min(xpInLvl, 100);
+
+    // Hero stats
+    document.getElementById('stat-level').textContent       = level;
+    document.getElementById('stat-level-title').textContent = getLevelTitle(level);
+    document.getElementById('stat-total-xp').textContent    = xp + ' XP';
+    document.getElementById('stat-xp-bar').style.width      = pct + '%';
+    document.getElementById('stat-xp-label').textContent    = `${xpInLvl} / 100 XP to Level ${level + 1}`;
+    document.getElementById('stat-streak').textContent      = streakDays;
+
+    // Weekly calendar
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    document.getElementById('streak-calendar').innerHTML = days.map((d, i) => {
+      const lit = i < streakDays;
+      return `<div class="flex flex-col items-center gap-2">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center font-label text-xs font-bold
+                    ${lit ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30' : 'bg-slate-200 text-slate-400'}">
+          ${lit ? '<span class="material-symbols-outlined text-sm" style="font-variation-settings:\'FILL\' 1;">local_fire_department</span>' : d.charAt(0)}
+        </div>
+        <span class="text-[10px] font-label font-bold ${lit ? 'text-orange-500' : 'text-slate-400'}">${d}</span>
+      </div>`;
+    }).join('');
+
+    // Badges
+    document.getElementById('badge-grid').innerHTML = BADGE_CATALOG.map(b => {
+      const unlocked = badges.includes(b.id);
+      return `<div class="flex flex-col items-center gap-3 p-5 rounded-[2rem]
+                          ${unlocked ? 'bg-slate-50 border border-slate-100 shadow-md' : 'bg-white border border-dashed border-slate-200 opacity-60'}
+                          transition-all hover:scale-105 hover:opacity-100 cursor-default"
+                   title="${unlocked ? b.label + ' — Earned!' : b.desc}">
+        <div class="w-16 h-16 rounded-full ${unlocked ? b.color : 'bg-slate-100 border-2 border-dashed border-slate-200'} flex items-center justify-center shadow-md relative">
+          <span class="material-symbols-outlined text-2xl ${unlocked ? b.iconColor : 'text-slate-300'}"
+                style="${unlocked ? "font-variation-settings:'FILL' 1;" : ''}">${unlocked ? b.icon : 'lock'}</span>
+        </div>
+        <div class="text-center">
+          <p class="font-label text-xs font-bold ${unlocked ? 'text-slate-800' : 'text-slate-500'}">${b.label}</p>
+          <p class="font-body text-[10px] ${unlocked ? 'text-emerald-500 font-bold' : 'text-slate-400'} mt-0.5">${unlocked ? '✅ Earned!' : b.desc}</p>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Activities
+    document.getElementById('activity-list').innerHTML = ACTIVITIES.map(a => {
+      const done = completedActivities[a.id];
+      return `<div class="flex items-center gap-5 p-6 rounded-[2rem] bg-slate-50 border
+                          ${done ? 'border-green-brand/30 bg-green-50' : 'border-slate-100'} shadow-sm">
+        <div class="w-14 h-14 rounded-full ${done ? a.color : 'bg-slate-200'} flex items-center justify-center flex-shrink-0 shadow-md">
+          <span class="material-symbols-outlined text-2xl text-white"
+                style="font-variation-settings:'FILL' 1;">${a.icon}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-label font-bold text-sm text-slate-800">${a.label}</p>
+          <p class="font-body text-xs text-slate-500 mt-0.5">${a.desc}</p>
+        </div>
+        <span class="material-symbols-outlined text-2xl ${done ? 'text-green-brand' : 'text-slate-300'}"
+              style="${done ? "font-variation-settings:'FILL' 1;" : ''}">${done ? 'check_circle' : 'radio_button_unchecked'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function resetProgress() {
+    if (!confirm('Reset all your progress? This cannot be undone.')) return;
+    localStorage.removeItem('capyYaraState');
+    location.reload();
+  }
+
+  // Auto-unlock 'legend' when all other 14 badges earned
+  function checkLegend() {
+    const earned = Store.state.badges;
+    const others = BADGE_CATALOG.filter(b => b.id !== 'legend').map(b => b.id);
+    if (others.every(id => earned.includes(id))) Store.unlockBadge('legend');
+  }
+
+  renderPage();
+  checkLegend();
+  document.addEventListener('stateChanged', () => { renderPage(); checkLegend(); });
+
+  // Animate XP bar after paint
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const pct = Math.min(Store.state.xp % 100, 100);
+    document.getElementById('stat-xp-bar').style.width = pct + '%';
+  }));
+</script>
+</body>
+</html>

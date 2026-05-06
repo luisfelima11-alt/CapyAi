@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 22 — The Concept of MOST</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#f59e0b,#fbbf24);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#f59e0b;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-amber-950 to-orange-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🥇</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">⭐</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:16%;animation-delay:1.3s">🏆</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:24%;animation-delay:.4s">👑</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">✨</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:10%;animation-delay:1.6s">💫</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🌟</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1 text-sm font-black text-amber-300 mb-3">Aula 22</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🥇 The Concept<br><span class="text-amber-300">of MOST</span></h1>
+      <p class="text-white/60 text-base mb-5">Master the 3 key uses of MOST: as a superlative, to express majority, and to mean "maximum degree".</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">The Most (superlative)</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Most + noun (majority)</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Most = maximum</span>
+      </div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 5 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY TABS -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Key adjectives and nouns used with superlatives and MOST. Click to flip.</p></div>
+        <div class="text-right"><div class="text-2xl font-black text-amber-600" id="vocab-count">0<span class="text-sm text-slate-400">/18</span></div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3" id="vocab-grid"></div>
+    </div>
+
+    <!-- TAB: EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+      <p class="text-slate-500 text-sm mb-6">4 powerful MOST-related phrases used by native speakers.</p>
+      <div class="grid gap-4" id="expr-grid"></div>
+    </div>
+
+    <!-- TAB: GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">The 3 Uses of MOST</h2>
+      <p class="text-slate-500 text-sm mb-6">MOST is one of the most useful words in English — but it works differently in each context.</p>
+
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 mb-5">
+        <p class="font-black text-navy mb-3">📌 Quick Overview</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white rounded-xl p-3 text-center border border-amber-100"><div class="text-[10px] font-black text-amber-500 uppercase tracking-wider mb-1">Use 1</div><div class="text-sm font-bold text-navy">THE most → <span class="text-amber-600">superlative</span></div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-amber-100"><div class="text-[10px] font-black text-orange-500 uppercase tracking-wider mb-1">Use 2</div><div class="text-sm font-bold text-navy">Most + noun → <span class="text-orange-600">majority</span></div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-amber-100"><div class="text-[10px] font-black text-yellow-600 uppercase tracking-wider mb-1">Use 3</div><div class="text-sm font-bold text-navy">MOST = <span class="text-yellow-600">maximum degree</span></div></div>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <!-- Rule 1: Superlative -->
+        <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g22r1')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">THE MOST + adjective → Superlative</div><div class="text-amber-600 text-sm">Comparing one thing against all others</div></div></div>
+            <span class="material-symbols-outlined text-amber-400 transition-transform" id="g22r1-arrow">expand_more</span>
+          </button>
+          <div id="g22r1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>This is <strong class="text-amber-700">the most interesting</strong> book I've ever read.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>She is <strong class="text-amber-700">the most creative</strong> person on the team.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>Brazil has <strong class="text-amber-700">the most</strong> biodiversity in the world.</span></div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2"><p class="text-xs text-amber-700">📝 <strong>THE</strong> is required before "most" in superlatives. Short adjectives use -EST: tallest, fastest.</p></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 2: Majority -->
+        <div class="rounded-2xl border-2 border-orange-200 bg-orange-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g22r2')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-orange-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">MOST + noun → Majority (no article)</div><div class="text-orange-600 text-sm">More than half — no "the" before MOST</div></div></div>
+            <span class="material-symbols-outlined text-orange-400 transition-transform" id="g22r2-arrow">expand_more</span>
+          </button>
+          <div id="g22r2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span><strong class="text-orange-700">Most people</strong> want to be happy. <span class="text-slate-400">(in general)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span><strong class="text-orange-700">Most countries</strong> have their own language.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span><strong class="text-orange-700">Most of the time</strong>, I prefer to cook at home.</span></div>
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2"><p class="text-xs text-orange-700">📝 <strong>Most of the</strong> + specific group: <em>"Most of the students passed."</em> | <strong>Most</strong> + general: <em>"Most students like music."</em></p></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 3: Maximum degree -->
+        <div class="rounded-2xl border-2 border-yellow-200 bg-yellow-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g22r3')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-yellow-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">MOST = to the greatest degree</div><div class="text-yellow-700 text-sm">Used as an adverb — what you like/do MOST</div></div></div>
+            <span class="material-symbols-outlined text-yellow-500 transition-transform" id="g22r3-arrow">expand_more</span>
+          </button>
+          <div id="g22r3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400 mt-1.5 flex-shrink-0"></span><span>What do you enjoy <strong class="text-yellow-700">most</strong>? <span class="text-slate-400">(= most of all)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400 mt-1.5 flex-shrink-0"></span><span>I like travelling <strong class="text-yellow-700">most</strong> when the weather is good.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400 mt-1.5 flex-shrink-0"></span><span>She worries <strong class="text-yellow-700">most</strong> about her family.</span></div>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2"><p class="text-xs text-yellow-700">📝 In this use, MOST comes after the verb and has no article. It means "above everything else".</p></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-slate-200 bg-white p-5 mb-5">
+        <h3 class="font-black text-navy text-base mb-4">⚡ Superlatives at a glance</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-slate-200"><th class="text-left py-2 pr-4 text-slate-500 font-bold">Adjective</th><th class="text-left py-2 pr-4 text-slate-500 font-bold">Comparative</th><th class="text-left py-2 text-slate-500 font-bold">Superlative</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr><td class="py-2 pr-4 font-bold">good</td><td class="py-2 pr-4 text-emerald-600 font-bold">better</td><td class="py-2 text-amber-600 font-bold">the best</td></tr>
+              <tr><td class="py-2 pr-4 font-bold">bad</td><td class="py-2 pr-4 text-emerald-600 font-bold">worse</td><td class="py-2 text-amber-600 font-bold">the worst</td></tr>
+              <tr><td class="py-2 pr-4 font-bold">fast</td><td class="py-2 pr-4 text-emerald-600 font-bold">faster</td><td class="py-2 text-amber-600 font-bold">the fastest</td></tr>
+              <tr><td class="py-2 pr-4 font-bold">interesting</td><td class="py-2 pr-4 text-emerald-600 font-bold">more interesting</td><td class="py-2 text-amber-600 font-bold">the most interesting</td></tr>
+              <tr><td class="py-2 pr-4 font-bold">popular</td><td class="py-2 pr-4 text-emerald-600 font-bold">more popular</td><td class="py-2 text-amber-600 font-bold">the most popular</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button onclick="markSection()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Grammar as Done</button>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions testing all 3 uses of MOST.</p></div>
+        <div class="flex items-center gap-3">
+          <div class="text-center"><div class="text-2xl font-black text-amber-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+          <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="practice-area"></div>
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Speak &amp; Practise</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence. Say it aloud and notice the different uses of MOST. Check when done.</p>
+      <div class="space-y-3" id="speak-grid"></div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script src="lesson-engine.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'Majority',      pt:'Maioria',          emoji:'👥', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'The majority of students passed.'},
+  {en:'Popular',       pt:'Popular',           emoji:'⭐', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'This is the most popular song of the year.'},
+  {en:'Common',        pt:'Comum',             emoji:'🔁', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'English is the most common language in business.'},
+  {en:'Typical',       pt:'Típico/a',          emoji:'📌', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Most typical meals include rice and beans.'},
+  {en:'Frequent',      pt:'Frequente',         emoji:'🔄', bg:'bg-yellow-50 border-yellow-200', dot:'bg-yellow-400', ex:'She is the most frequent visitor here.'},
+  {en:'Supreme',       pt:'Supremo/a',         emoji:'👑', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'He is the supreme leader of the team.'},
+  {en:'Outstanding',   pt:'Excepcional',       emoji:'🌟', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Her work is the most outstanding I have seen.'},
+  {en:'Superior',      pt:'Superior',          emoji:'🔝', bg:'bg-yellow-50 border-yellow-200', dot:'bg-yellow-400', ex:'This product is superior to all others.'},
+  {en:'Dominant',      pt:'Dominante',         emoji:'💪', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'They are the most dominant team in the league.'},
+  {en:'Exceptional',   pt:'Excepcional',       emoji:'💎', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Most exceptional students get scholarships.'},
+  {en:'Extreme',       pt:'Extremo/a',         emoji:'🔥', bg:'bg-yellow-50 border-yellow-200', dot:'bg-yellow-400', ex:'Most extreme sports require training.'},
+  {en:'Absolute',      pt:'Absoluto/a',        emoji:'💯', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'This is the absolute best solution.'},
+  {en:'Universal',     pt:'Universal',         emoji:'🌍', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Most universal truths apply everywhere.'},
+  {en:'Maximum',       pt:'Máximo/a',          emoji:'📈', bg:'bg-yellow-50 border-yellow-200', dot:'bg-yellow-400', ex:'We reached the maximum level of performance.'},
+  {en:'Minimum',       pt:'Mínimo/a',          emoji:'📉', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'Most tasks require a minimum of effort.'},
+  {en:'Average',       pt:'Médio/a / Médio',   emoji:'📊', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Most salaries are below the average.'},
+  {en:'Remarkable',    pt:'Notável',           emoji:'🎖️', bg:'bg-yellow-50 border-yellow-200', dot:'bg-yellow-400', ex:'That was the most remarkable speech I heard.'},
+  {en:'Valuable',      pt:'Valioso/a',         emoji:'💰', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'Time is the most valuable resource we have.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"For the most part", pt:"Na maior parte / Em geral", emoji:'🗺️',
+   example:"For the most part, the project went really well.",
+   meaning:"Generally speaking; in most cases."},
+  {expr:"Make the most of", pt:"Aproveitar ao máximo", emoji:'🚀',
+   example:"We only have one day in Paris — let's make the most of it!",
+   meaning:"To use something fully; to get maximum benefit from it."},
+  {expr:"At most", pt:"No máximo", emoji:'🔢',
+   example:"It will take at most two hours to finish.",
+   meaning:"Not more than; the maximum amount possible."},
+  {expr:"Most likely", pt:"Muito provavelmente / O mais provável", emoji:'🎯',
+   example:"She will most likely get the promotion — she works the hardest.",
+   meaning:"Very probably; with the highest probability."},
+];
+
+const PRACTICE_QS = [
+  {q:"Which sentence uses MOST as a superlative?", opts:["This is the most popular song","Most people like music","I like jazz most","Most of the time I listen to pop"], a:"This is the most popular song", rule:"THE most + adjective = superlative"},
+  {q:"'___ students like music.' — Which word fits best?", opts:["Most","The most","At most","Most likely"], a:"Most", rule:"Most + noun (no article) = majority in general"},
+  {q:"'Make the most of' means:", opts:["Use something to its full potential","Do the maximum work","Be the most efficient","Spend the most money"], a:"Use something to its full potential", rule:"Expression: make the most of = aproveitar ao máximo"},
+  {q:"Which word means 'Valioso' in English?", opts:["Valuable","Average","Dominant","Extreme"], a:"Valuable", rule:"Vocabulary"},
+  {q:"'She studies ___ when she has a deadline.' (= more than any other time)", opts:["most","the most","most likely","at most"], a:"most", rule:"MOST as adverb = to the greatest degree (no article)"},
+  {q:"'___ of the students passed the exam.' (specific group)", opts:["Most","The most","At most","For the most part"], a:"Most", rule:"Most of the + specific group = majority"},
+  {q:"'At most' means:", opts:["Not more than","Very probably","The greatest amount","In most cases"], a:"Not more than", rule:"Expression: at most = no máximo"},
+  {q:"Which word means 'Excepcional' in English?", opts:["Outstanding","Average","Common","Typical"], a:"Outstanding", rule:"Vocabulary"},
+  {q:"'___, the project went well.' — Which expression fits?", opts:["For the most part","At most","Most likely","The most"], a:"For the most part", rule:"Expression: for the most part = na maior parte"},
+  {q:"'This is ___ interesting book I have ever read.'", opts:["the most","most","at most","most likely"], a:"the most", rule:"THE most + adjective = superlative (needs THE)"},
+];
+
+const SPEAK_SENTENCES = [
+  {text:"This is <strong class='text-amber-600'>the most valuable</strong> lesson I have learned this year."},
+  {text:"<strong class='text-amber-600'>Most people</strong> want to be happy, but few know how to achieve it."},
+  {text:"We only have one week in Brazil — let's <strong class='text-amber-600'>make the most of</strong> it!"},
+  {text:"<strong class='text-amber-600'>For the most part</strong>, learning English is about consistent daily practice."},
+  {text:"What do you enjoy <strong class='text-amber-600'>most</strong> about speaking English with other people?"},
+  {text:"She will <strong class='text-amber-600'>most likely</strong> become <strong class='text-amber-600'>the most outstanding</strong> student in the class."},
+  {text:"<strong class='text-amber-600'>Most of the time</strong>, the simplest solution is <strong class='text-amber-600'>the most effective</strong> one."},
+  {text:"It will take <strong class='text-amber-600'>at most</strong> two hours — and that is <strong class='text-amber-600'>the maximum</strong> I can offer."},
+];
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak'],
+  totalSections: 5,
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE_QS,
+  speak: SPEAK_SENTENCES,
+  accentColor: 'amber',
+});
+</script>
+</body>
+</html>

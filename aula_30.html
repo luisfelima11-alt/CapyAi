@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 30 — Making Plans & Invitations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#14b8a6,#06b6d4);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#14b8a6;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-teal-900 to-cyan-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">📅</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;left:8%;animation-delay:.8s">🤝</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:15%;left:20%;animation-delay:1.4s">🎉</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:30%;animation-delay:.3s">📱</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:25%;animation-delay:1s">💬</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:50%;right:10%;animation-delay:.5s">🗓️</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:3%;animation-delay:1.8s">✅</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">🤙</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-400/30 rounded-full px-4 py-1 text-sm font-black text-teal-300 mb-3">Aula 30</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">📅 Making Plans<br><span class="text-teal-300">&amp; Invitations</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Learn how to invite, accept, decline, and negotiate plans in English — like a native.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Invite</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Accept</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Cancel</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Suggest</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+    </div>
+  </div>
+</div>
+
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+  <div id="tab-vocab" class="fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Flip each card to see the translation.</p></div>
+      <div class="text-right"><div class="text-2xl font-black text-teal-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  </div>
+
+  <div id="tab-expressions" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+    <p class="text-slate-500 text-sm mb-6">Click to reveal the translation and meaning.</p>
+    <div class="grid gap-4" id="expr-grid"></div>
+  </div>
+
+  <div id="tab-grammar" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Grammar: Making Plans</h2>
+    <p class="text-slate-500 text-sm mb-6">Key structures for inviting, accepting, declining, and suggesting.</p>
+    <div class="space-y-4">
+      <div class="rounded-2xl border-2 border-teal-200 bg-teal-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-teal-500 text-white font-black text-sm flex items-center justify-center">1</span>
+            <div><div class="font-black text-navy">INVITING</div><div class="text-teal-600 text-sm font-semibold">Would you like to...? / How about...?</div></div>
+          </div>
+          <span class="material-symbols-outlined text-teal-400 transition-transform" id="g1-arrow">expand_more</span>
+        </button>
+        <div id="g1" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-teal-700'>Would you like to</strong> watch Friends tonight?"</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-teal-700'>How about</strong> we grab coffee this weekend?"</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-teal-700'>Do you want to</strong> hang out on Saturday?"</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-teal-700'>What if we</strong> watched Game of Thrones together?"</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span>
+            <div><div class="font-black text-navy">ACCEPTING</div><div class="text-emerald-600 text-sm font-semibold">I'd love to! / Count me in! / That sounds great!</div></div>
+          </div>
+          <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g2-arrow">expand_more</span>
+        </button>
+        <div id="g2" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>I'd love to!</strong> What time?"</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Count me in!</strong> I've been waiting for this."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>That sounds amazing!</strong> I'm definitely in."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Absolutely!</strong> I'll be there."</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-rose-200 bg-rose-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">3</span>
+            <div><div class="font-black text-navy">DECLINING POLITELY</div><div class="text-rose-600 text-sm font-semibold">I'm afraid I can't... / I'd love to, but...</div></div>
+          </div>
+          <span class="material-symbols-outlined text-rose-400 transition-transform" id="g3-arrow">expand_more</span>
+        </button>
+        <div id="g3" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>I'd love to, but</strong> I already have plans."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>I'm afraid I can't</strong> make it tonight."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>Maybe another time?</strong> I have to work late."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>I have to pass this time</strong>, but let's plan something soon."</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g4')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">4</span>
+            <div><div class="font-black text-navy">SUGGESTING ALTERNATIVES</div><div class="text-amber-700 text-sm font-semibold">What about Saturday instead? / Could we...?</div></div>
+          </div>
+          <span class="material-symbols-outlined text-amber-400 transition-transform" id="g4-arrow">expand_more</span>
+        </button>
+        <div id="g4" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>What about Sunday instead?</strong> I'm free all day."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>Could we reschedule</strong> for next week?"</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>How about we try</strong> a different day? Thursday works for me."</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-practice" class="fade-in hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on making plans.</p></div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div class="text-2xl font-black text-teal-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+        <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+      </div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div id="practice-area"></div>
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+        <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+        <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+        <div class="inline-flex items-center gap-2 bg-teal-100 text-teal-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+        <div class="flex gap-3">
+          <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+          <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-speak" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+    <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat aloud.</p>
+    <div class="space-y-3" id="speak-grid"></div>
+  </div>
+
+  <!-- CHALLENGE -->
+  <div id="tab-challenge" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">🎯 Series Role-Play Challenge</h2>
+    <p class="text-slate-500 text-sm mb-6">Friends · Game of Thrones · House of the Dragon · Elite</p>
+
+    <!-- Role-Play Card -->
+    <div class="border-2 border-amber-400 bg-navy rounded-2xl p-6 mb-6 text-white">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🎭</div>
+        <div>
+          <h3 class="font-black text-lg mb-2 text-amber-300">Role-Play Situation</h3>
+          <p class="text-white/80 text-sm leading-relaxed mb-3">Your friend wants to watch <strong class="text-red-400">Game of Thrones</strong> tonight. You prefer <strong class="text-yellow-300">Friends</strong>. Using the structures from this lesson, negotiate in English!</p>
+          <div class="bg-white/10 rounded-xl p-3 text-sm">
+            <div class="font-bold text-amber-300 mb-2">💡 Use these structures:</div>
+            <div class="grid grid-cols-2 gap-1 text-white/70 text-xs">
+              <span>🟢 "How about we...?"</span><span>🟢 "What if we...?"</span>
+              <span>🟡 "I'd prefer..."</span><span>🟡 "What about...?"</span>
+              <span>🔴 "I'd love to, but..."</span><span>🟢 "Let's make it happen!"</span>
+            </div>
+          </div>
+          <p class="text-white/50 text-xs mt-3">Practice out loud OR write a 4-6 line dialogue below!</p>
+        </div>
+      </div>
+    </div>
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-4 mb-8">
+      <label class="block text-slate-600 text-sm font-bold mb-2">✍️ Write your dialogue here:</label>
+      <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-teal-400 focus:outline-none resize-none" placeholder="You: Would you like to watch Friends tonight? It's hilarious!&#10;Friend: I'd love to, but I really want to watch Game of Thrones...&#10;You: How about we watch one episode of each? ..."></textarea>
+    </div>
+
+    <!-- 3 Invitations -->
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-6">
+      <h3 class="font-black text-navy text-lg mb-1">📝 Write 3 Invitations in English</h3>
+      <p class="text-slate-500 text-sm mb-5">Use the structures from this lesson to invite someone to watch each show!</p>
+      <div class="space-y-4">
+        <div class="bg-white border-2 border-yellow-300 rounded-2xl p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">☕</span>
+            <div><div class="font-black text-navy">Friends</div><div class="text-slate-400 text-xs">Invite a friend for a marathon this weekend</div></div>
+          </div>
+          <p class="text-teal-600 text-xs font-bold mb-2">Starter: "Would you like to...?"</p>
+          <textarea rows="3" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-teal-400 focus:outline-none resize-none" placeholder="Would you like to come over for a Friends marathon this weekend? It'll be so much fun!"></textarea>
+        </div>
+        <div class="bg-white border-2 border-red-300 rounded-2xl p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">🐉</span>
+            <div><div class="font-black text-navy">House of the Dragon</div><div class="text-slate-400 text-xs">Invite someone who's never seen it for the finale</div></div>
+          </div>
+          <p class="text-teal-600 text-xs font-bold mb-2">Starter: "How about we...?"</p>
+          <textarea rows="3" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-teal-400 focus:outline-none resize-none" placeholder="How about we watch the House of the Dragon finale together? You haven't seen it yet — it's incredible!"></textarea>
+        </div>
+        <div class="bg-white border-2 border-blue-300 rounded-2xl p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">🇪🇸</span>
+            <div><div class="font-black text-navy">Elite</div><div class="text-slate-400 text-xs">Convince a friend who prefers American shows to try it</div></div>
+          </div>
+          <p class="text-teal-600 text-xs font-bold mb-2">Starter: "Let's...!" or "What if we...?"</p>
+          <textarea rows="3" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-teal-400 focus:outline-none resize-none" placeholder="Let's give Elite a chance — I know you love American shows, but this Spanish series is even more intense!"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="lesson-engine.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'leisure',pt:'lazer',emoji:'🎮',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'I love spending my leisure time watching Friends.'},
+  {en:'appointment',pt:'compromisso',emoji:'📅',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'I have a doctor\'s appointment tomorrow.'},
+  {en:'gathering',pt:'reunião',emoji:'👥',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'We\'re having a small gathering this weekend.'},
+  {en:'venue',pt:'local do evento',emoji:'📍',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'The venue for the party is perfect.'},
+  {en:'occasion',pt:'ocasião',emoji:'🎉',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'This is a very special occasion!'},
+  {en:'convenient',pt:'conveniente',emoji:'✅',bg:'bg-cyan-50 border-cyan-200',dot:'bg-cyan-400',ex:'Is Friday convenient for you?'},
+  {en:'available',pt:'disponível',emoji:'📲',bg:'bg-cyan-50 border-cyan-200',dot:'bg-cyan-400',ex:'Are you available tonight?'},
+  {en:'flexible',pt:'flexível',emoji:'🤸',bg:'bg-cyan-50 border-cyan-200',dot:'bg-cyan-400',ex:'She is very flexible with her schedule.'},
+  {en:'confirm',pt:'confirmar',emoji:'☑️',bg:'bg-cyan-50 border-cyan-200',dot:'bg-cyan-400',ex:'Can you confirm you\'re coming?'},
+  {en:'reminder',pt:'lembrete',emoji:'🔔',bg:'bg-cyan-50 border-cyan-200',dot:'bg-cyan-400',ex:'Set a reminder for our meeting.'},
+  {en:'proposal',pt:'proposta',emoji:'💡',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'I have a proposal — let\'s watch Elite!'},
+  {en:'hesitate',pt:'hesitar',emoji:'🤔',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Don\'t hesitate to call me anytime!'},
+  {en:'decline',pt:'recusar',emoji:'🙅',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'She had to decline the invitation.'},
+  {en:'negotiate',pt:'negociar',emoji:'🤝',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'We negotiated the time for the meeting.'},
+  {en:'reschedule',pt:'remarcar',emoji:'🔄',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Can we reschedule for next week?'},
+  {en:'prefer',pt:'preferir',emoji:'❤️',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'I prefer watching movies at home.'},
+  {en:'catch up',pt:'se atualizar / se encontrar',emoji:'☕',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'Let\'s catch up over coffee!'},
+  {en:'hang out',pt:'sair / passar tempo junto',emoji:'🎉',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'Do you want to hang out this weekend?'},
+];
+
+const EXPRESSIONS = [
+  {expr:"Rain check",pt:"Deixar para outra hora / adiar convite",emoji:"🌧️",example:"I can't make it tonight — can I take a rain check?",meaning:"Postpone an invitation to another time, with the intention of doing it later."},
+  {expr:"Count me in",pt:"Pode me contar / estou dentro",emoji:"🙋",example:"There's a watch party for Friends tonight — count me in!",meaning:"An enthusiastic way to say you want to participate in something."},
+  {expr:"Something came up",pt:"Surgiu algo / aconteceu um imprevisto",emoji:"😬",example:"I'm so sorry I can't come — something came up at work.",meaning:"An unexpected situation prevented you from following your plan."},
+  {expr:"Let's make it happen",pt:"Vamos fazer acontecer / vamos realizar",emoji:"✊",example:"We've been talking about watching Elite together for months — let's make it happen!",meaning:"A strong commitment to actually doing something you've been planning."},
+];
+
+const PRACTICE = [
+  {q:"Which phrase is used to invite someone?",opts:["I'd love to!","Would you like to...?","I'm afraid I can't","Count me in"],a:"Would you like to...?",rule:"Inviting structure: Would you like to...?"},
+  {q:"Tom says: 'I'd love to, but I have work tonight.' He is ___.",opts:["inviting someone","accepting enthusiastically","declining politely","suggesting an alternative"],a:"declining politely",rule:"Declining: I'd love to, but..."},
+  {q:"What does 'rain check' mean?",opts:["cancel forever","postpone to another time","arrive early","be on time always"],a:"postpone to another time",rule:"Expression: rain check"},
+  {q:"You suggest watching House of the Dragon instead. You say:",opts:["I can't come tonight","Count me in!","How about we watch House of the Dragon?","Something came up"],a:"How about we watch House of the Dragon?",rule:"Suggesting: How about we...?"},
+  {q:"What does 'hesitate' mean?",opts:["to rush immediately","to pause before acting","to confirm something","to accept an offer"],a:"to pause before acting",rule:"Vocabulary: hesitate"},
+  {q:"'Count me in!' means:",opts:["I'm not available","I want to join enthusiastically","I need to cancel","I'm completely unsure"],a:"I want to join enthusiastically",rule:"Expression: count me in"},
+  {q:"To ___ means to change a meeting to a different time.",opts:["cancel","decline","reschedule","confirm"],a:"reschedule",rule:"Vocabulary: reschedule"},
+  {q:"'Something came up' means:",opts:["you are very excited","an unexpected event prevented your plan","you made a new plan","you are fully available"],a:"an unexpected event prevented your plan",rule:"Expression: something came up"},
+  {q:"Which phrase shows you're accepting an invitation?",opts:["I'm afraid I can't","Maybe another time","I'd love to, but...","That sounds great — I'm in!"],a:"That sounds great — I'm in!",rule:"Accepting: That sounds great!"},
+  {q:"What does 'venue' mean?",opts:["the type of event","the place where something happens","the person who invites","the time of the event"],a:"the place where something happens",rule:"Vocabulary: venue"},
+];
+
+const SPEAK = [
+  {text:"Would you like to <strong class='text-teal-600'>catch up</strong> for coffee this weekend?"},
+  {text:"I'm afraid I can't make it — something <strong class='text-teal-600'>came up</strong> at work."},
+  {text:"<strong class='text-teal-600'>Count me in!</strong> I'd love to watch the new episode of House of the Dragon!"},
+  {text:"How about we <strong class='text-teal-600'>reschedule</strong> for next Thursday instead?"},
+  {text:"I'd love to join, but I need to <strong class='text-teal-600'>confirm</strong> my schedule first."},
+  {text:"<strong class='text-teal-600'>Let's make it happen</strong> — we've been planning this for too long!"},
+  {text:"Can I take a <strong class='text-teal-600'>rain check</strong>? I'm not feeling well tonight."},
+  {text:"She didn't <strong class='text-teal-600'>hesitate</strong> to accept the invitation — she loves social events!"},
+];
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
+  totalSections: 6,
+  accentColor: 'teal',
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE,
+  speak: SPEAK,
+});
+</script>
+</body>
+</html>

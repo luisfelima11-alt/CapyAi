@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yara's Forest — Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "navy": "#001f3f",
+              "pink-brand": "#ec4899", // tailwind pink-500
+              "green-brand": "#10b981", // tailwind emerald-500
+              "primary": "#001f3f", // Navy
+              "secondary": "#ec4899", // Pink
+              "tertiary": "#10b981", // Green
+              "on-primary": "#ffffff",
+              "background": "#ffffff",
+              "surface": "#f8fafc",
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-slate-900 font-body selection:bg-pink-brand/30 selection:text-navy">
+<!-- Component Placeholders -->
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-32 pt-28 px-6 max-w-7xl mx-auto">
+<!-- Hero Section -->
+<section class="relative mb-12">
+<div class="grid lg:grid-cols-2 gap-10 items-center">
+<div class="order-2 lg:order-1">
+<h1 class="font-headline text-4xl md:text-6xl font-extrabold text-navy leading-tight mb-5">
+                    Learn English with <span class="text-pink-brand">Yara!</span>
+</h1>
+<p class="font-body text-lg text-slate-500 mb-6 max-w-lg">
+                    A structured learning path — just like Duolingo, but with Yara! Games, lessons and activities guide you step by step.
+                </p>
+
+<!-- ── Main CTAs: Cursos + Trilha Diária ── -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+
+  <!-- CURSOS -->
+  <div onclick="window.location.href='classes.html'" class="group bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 shadow-xl shadow-violet-500/20 cursor-pointer hover:scale-[1.02] active:scale-[0.99] transition-all">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-2xl">📚</span>
+      <p class="text-violet-200 text-xs font-black uppercase tracking-wider">Jadson's Course</p>
+    </div>
+    <p class="text-white font-black text-xl mb-1">Cursos</p>
+    <p class="text-violet-200 text-sm mb-3">Aulas 01 → 37 interativas com vocab, gramática e speaking.</p>
+    <div class="flex items-center justify-between">
+      <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full">8 disponíveis</span>
+      <span class="text-violet-200 group-hover:text-white transition-colors font-bold text-sm">Ver aulas →</span>
+    </div>
+  </div>
+
+  <!-- TRILHA DIÁRIA -->
+  <div id="home-continue-card" onclick="goToLearning()" class="group bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-5 shadow-xl shadow-pink-500/20 cursor-pointer hover:scale-[1.02] active:scale-[0.99] transition-all">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-2xl">🌿</span>
+      <p class="text-pink-200 text-xs font-black uppercase tracking-wider">Learning Path</p>
+    </div>
+    <p id="home-lesson-title" class="text-white font-black text-xl mb-1">Trilha Diária</p>
+    <p id="home-lesson-sub" class="text-pink-200 text-sm mb-3">Suas lições diárias gamificadas — continue de onde parou!</p>
+    <div class="mt-1 bg-white/20 rounded-full h-2 overflow-hidden">
+      <div id="home-progress-bar" class="h-full bg-white rounded-full transition-all" style="width:0%"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="flex flex-wrap gap-3">
+<button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-navy text-white font-label px-6 py-3.5 rounded-full text-base font-bold flex items-center gap-2.5 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-navy/20">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+                        Play Games
+                    </button>
+<button onclick="window.location.href='2_Flashcard_Journey_Expedition_Edition.html'" class="border-2 border-navy text-navy font-label px-6 py-3.5 rounded-full text-base font-bold flex items-center gap-2.5 hover:bg-navy hover:text-white active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">style</span>
+                        Flashcards
+                    </button>
+</div>
+</div>
+<div class="order-1 lg:order-2 relative">
+  <!-- Glow blobs -->
+  <div class="absolute -top-10 -left-10 w-40 h-40 bg-pink-400/25 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-10 -right-10 w-56 h-56 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute top-1/2 -right-6 w-24 h-24 bg-violet-400/15 rounded-full blur-2xl pointer-events-none"></div>
+
+  <!-- Card wrapper with gradient border -->
+  <div class="relative z-10 p-1 rounded-[3rem]" style="background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #10b981 100%);">
+    <div class="relative rounded-[2.6rem] overflow-hidden" style="background: linear-gradient(160deg, #fff5f9 0%, #fdf4ff 50%, #f0fdf4 100%);">
+
+      <!-- Floating deco sparkles -->
+      <span class="absolute top-4 right-6 text-2xl animate-bounce" style="animation-duration:2.2s">✨</span>
+      <span class="absolute top-10 left-8 text-xl animate-bounce" style="animation-duration:3s;animation-delay:.4s">🌿</span>
+      <span class="absolute bottom-16 right-8 text-lg animate-bounce" style="animation-duration:2.6s;animation-delay:.8s">⭐</span>
+
+      <!-- Yara hero image -->
+      <img src="yara.png?v=2" alt="Yara" class="w-full h-auto object-cover relative z-10"/>
+
+      <!-- Yara-Talk Bubble — sits inside card at bottom -->
+      <div class="absolute bottom-5 left-5 z-20" style="animation: floatBubble 3s ease-in-out infinite;">
+        <div class="relative" style="filter:drop-shadow(0 6px 20px rgba(236,72,153,0.25));">
+          <!-- tail -->
+          <div style="position:absolute;top:-10px;right:28px;width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:11px solid white;"></div>
+          <!-- body -->
+          <div class="bg-white rounded-2xl px-4 py-3 max-w-[210px] border border-pink-100">
+            <p class="font-label text-navy font-bold text-sm leading-snug">"Hop in, Explorer!<br>So many words to find today! 🌿"</p>
+            <div class="flex items-center gap-1.5 mt-2">
+              <div class="w-5 h-5 rounded-full overflow-hidden border border-pink-200 flex-shrink-0">
+                <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🦫'"/>
+              </div>
+              <p class="font-label text-pink-500 text-xs font-bold">Yara 🐾</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+</style>
+</div>
+</section>
+<!-- AI Word of the Day -->
+<section class="mb-12">
+  <div id="wotd-card" class="relative overflow-hidden bg-gradient-to-r from-navy to-[#002a54] rounded-[2rem] p-6 md:p-8 flex items-center gap-6 border border-white/10 shadow-lg">
+    <!-- Loading state -->
+    <div id="wotd-loading" class="flex items-center gap-4 text-white">
+      <div class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center animate-pulse">
+        <span class="material-symbols-outlined text-3xl text-white/50">auto_awesome</span>
+      </div>
+      <div>
+        <p class="font-label text-pink-brand font-bold text-xs uppercase tracking-widest mb-1">✨ AI Word of the Day</p>
+        <p class="font-headline text-xl text-white/60">Asking Yara for today's word…</p>
+      </div>
+    </div>
+    <!-- Loaded state (hidden until data arrives) -->
+    <div id="wotd-content" class="hidden w-full flex items-center gap-8">
+      <div class="text-7xl flex-shrink-0" id="wotd-emoji">🌟</div>
+      <div class="flex-1 min-w-0">
+        <p class="font-label text-pink-brand font-bold text-xs uppercase tracking-widest mb-1">✨ AI Word of the Day</p>
+        <div class="flex items-baseline gap-3 flex-wrap">
+          <h2 id="wotd-word" class="font-headline text-4xl font-black text-white">Word</h2>
+          <span id="wotd-pron" class="font-body text-pink-300 text-lg">/wɜːrd/</span>
+          <span id="wotd-pos" class="font-label text-xs text-white/40 italic">noun</span>
+        </div>
+        <p id="wotd-meaning" class="font-body text-slate-300 text-sm mt-1 mb-2">Meaning goes here.</p>
+        <p id="wotd-example" class="font-label text-emerald-400 text-sm italic">"Example sentence."</p>
+        <!-- Mini challenge row -->
+        <div class="flex items-center gap-2 mt-3 flex-wrap">
+          <button onclick="speakWotd()" class="flex items-center gap-1.5 bg-pink-500/20 hover:bg-pink-500/40 border border-pink-500/40 text-pink-300 font-label font-bold text-xs px-3 py-1.5 rounded-full active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
+            Hear it
+          </button>
+          <button id="wotd-challenge-btn" onclick="toggleWotdChallenge()" class="flex items-center gap-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/40 text-yellow-300 font-label font-bold text-xs px-3 py-1.5 rounded-full active:scale-95 transition-all">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">edit_note</span>
+            Can you use it?
+          </button>
+          <span id="wotd-xp-badge" class="hidden font-label text-xs font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-3 py-1.5 rounded-full">+5 XP ✅</span>
+        </div>
+        <!-- Challenge input (hidden by default) -->
+        <div id="wotd-challenge-box" class="hidden mt-3">
+          <p class="font-body text-white/50 text-xs mb-2">Write a sentence using the word <strong id="wotd-challenge-word" class="text-white"></strong>:</p>
+          <div class="flex gap-2">
+            <input id="wotd-challenge-input" type="text" placeholder="e.g. The butterfly was beautiful…"
+                   class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-white font-body text-sm placeholder-white/30 focus:outline-none focus:border-pink-400 transition-all"/>
+            <button onclick="checkWotdChallenge()" class="bg-pink-500 hover:bg-pink-400 text-white font-label font-bold px-4 py-2 rounded-xl active:scale-95 transition-all text-sm flex-shrink-0">
+              Check ✓
+            </button>
+          </div>
+          <p id="wotd-challenge-feedback" class="mt-2 text-sm font-body hidden"></p>
+        </div>
+      </div>
+      <div class="hidden lg:flex flex-col items-end gap-3 flex-shrink-0">
+        <div class="bg-white/10 rounded-xl px-4 py-3 max-w-[180px] text-right">
+          <p class="font-label text-xs text-white/50 mb-1">Fun Fact 💡</p>
+          <p id="wotd-fact" class="font-body text-xs text-white/80 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+    <!-- Error state -->
+    <div id="wotd-error" class="hidden text-white/60 font-body text-sm">
+      <span class="material-symbols-outlined text-2xl align-middle mr-2">wifi_off</span>
+      Word of the Day unavailable — start the server to enable AI features.
+    </div>
+    <!-- Decorative -->
+    <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[10rem] text-white/5 pointer-events-none" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+  </div>
+</section>
+<!-- ── Lessons Banner ─────────────────────────────────────────────── -->
+<section class="mb-12">
+  <div class="relative bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 rounded-[2rem] p-6 overflow-hidden flex flex-col md:flex-row items-center gap-6 shadow-lg shadow-violet-500/20">
+    <!-- BG decoration -->
+    <span class="material-symbols-outlined absolute -right-6 -bottom-6 text-[9rem] text-white/10 pointer-events-none" style="font-variation-settings:'FILL' 1;">menu_book</span>
+    <div class="relative z-10 flex-1">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="bg-white/20 text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-widest">📚 Jadson's English Course</span>
+        <span class="bg-yellow-300 text-yellow-900 text-xs font-extrabold px-2.5 py-1 rounded-full">8 disponíveis</span>
+      </div>
+      <h2 class="font-headline text-2xl font-extrabold text-white mb-2">Cursos — Aula 01 a Aula 37</h2>
+      <p class="text-violet-200 font-body text-sm mb-4">Aulas interativas com vocabulário, gramática, expressões, quiz e speaking. Cada aula é uma aventura completa!</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="classes.html" class="bg-white text-violet-600 font-extrabold px-6 py-3 rounded-2xl shadow-lg hover:bg-violet-50 transition-all active:scale-95 flex items-center gap-2 text-sm">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">play_circle</span>
+          Ver Cursos
+        </a>
+        <a href="aula_20.html" class="bg-white/20 border border-white/30 text-white font-bold px-5 py-3 rounded-2xl hover:bg-white/30 transition-all text-sm">
+          Começar Aula 20 →
+        </a>
+      </div>
+    </div>
+    <!-- Lesson mini-preview -->
+    <div class="hidden md:flex flex-col gap-2 relative z-10 flex-shrink-0">
+      <div class="bg-white/15 border border-white/20 rounded-2xl px-4 py-2.5 text-white text-xs font-bold backdrop-blur-sm">🏆 Aula 20: Achievements &amp; Challenges</div>
+      <div class="bg-white/15 border border-white/20 rounded-2xl px-4 py-2.5 text-white text-xs font-bold backdrop-blur-sm">📊 Aula 21: Comparatives</div>
+      <div class="bg-white/15 border border-white/20 rounded-2xl px-4 py-2.5 text-white text-xs font-bold backdrop-blur-sm">🥇 Aula 22: The Concept of MOST</div>
+      <div class="bg-white/15 border border-white/20 rounded-2xl px-4 py-2.5 text-white/60 text-xs font-bold">+ 5 mais disponíveis...</div>
+    </div>
+  </div>
+</section>
+
+<!-- Bento Grid: Daily Quest & Progress -->
+<section class="mb-14">
+<div class="grid md:grid-cols-3 gap-5">
+<!-- Daily Quest Card -->
+<div class="md:col-span-2 bg-slate-50 border border-slate-100 rounded-[2rem] p-6 flex flex-col gap-5 relative overflow-hidden">
+<div class="flex justify-between items-center relative z-10">
+<div>
+<h2 class="font-headline text-2xl font-extrabold text-navy">Daily Quest</h2>
+<p class="font-label text-slate-400 text-sm">Complete these to earn forest stars!</p>
+</div>
+<div id="quest-counter" class="bg-navy text-white px-4 py-1.5 rounded-full font-bold text-sm">
+                        0 / 3 Done
+                    </div>
+</div>
+<div id="quest-list" class="space-y-3 relative z-10"></div>
+<!-- Decorative element -->
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-navy/5 rotate-12" style="font-variation-settings: 'FILL' 1;">forest</span>
+</div>
+<!-- Profile Mini Stats -->
+<div class="bg-navy rounded-[2rem] p-6 flex flex-col items-center justify-center text-center gap-4 text-white">
+<div class="relative">
+<img alt="Yara avatar" class="w-24 h-24 rounded-full border-4 border-pink-brand object-cover" src="Hello%20Yara%20profile%20pic%20002.png" onerror="this.onerror=null;this.src='yara.svg'"/>
+<div id="stat-level-badge" class="absolute -bottom-2 -right-2 bg-pink-brand text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md">12</div>
+</div>
+<div>
+<h3 id="stat-player-name" class="font-headline text-2xl font-bold">Hi, Explorer!</h3>
+<p id="stat-level-text" class="font-label text-green-brand font-medium italic">Level 12 Sapling</p>
+</div>
+<div class="w-full bg-slate-700 rounded-full h-3 mt-2">
+<div id="stat-xp-bar" class="bg-green-brand h-full rounded-full w-3/4"></div>
+</div>
+<p id="stat-xp-text" class="text-xs font-label text-slate-400">750 / 1000 XP to Level 13</p>
+</div>
+</div>
+</section>
+<!-- Feature Grid: Interactive Zones -->
+<section class="mb-14">
+<h2 class="font-headline text-2xl md:text-3xl font-extrabold text-navy mb-6">Where to next?</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+<!-- Zone 1 -->
+<div onclick="window.location.href='2_Flashcard_Journey_Expedition_Edition.html'" class="group bg-gradient-to-br from-slate-50 to-blue-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-blue-100">
+<div class="w-14 h-14 bg-navy/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-navy/12 transition-all">
+<span class="material-symbols-outlined text-navy text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<h4 class="font-headline text-base font-bold text-navy">Word Forest</h4>
+<p class="font-body text-xs text-slate-500 leading-relaxed">Flashcards and daily vocabulary</p>
+</div>
+<!-- Zone 2 -->
+<div onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="group bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-pink-100">
+<div class="w-14 h-14 bg-pink-brand/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-pink-brand/12 transition-all">
+<span class="material-symbols-outlined text-pink-brand text-3xl" style="font-variation-settings: 'FILL' 1;">extension</span>
+</div>
+<h4 class="font-headline text-base font-bold text-pink-brand">Game Lake</h4>
+<p class="font-body text-xs text-slate-500 leading-relaxed">Puzzles and English challenges</p>
+</div>
+<!-- Zone 3 -->
+<div onclick="window.location.href='3_Dialogue_Expedition_Yara_Turn.html'" class="group bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-emerald-100">
+<div class="w-14 h-14 bg-green-brand/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-green-brand/12 transition-all">
+<span class="material-symbols-outlined text-green-brand text-3xl" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+</div>
+<h4 class="font-headline text-base font-bold text-green-brand">Yara Talk</h4>
+<p class="font-body text-xs text-slate-500 leading-relaxed">Practice real conversations</p>
+</div>
+<!-- Zone 4 -->
+<div onclick="window.location.href='progress.html'" class="group bg-gradient-to-br from-violet-50 to-purple-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-violet-100">
+<div class="w-14 h-14 bg-violet-500/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-violet-500/12 transition-all">
+<span class="material-symbols-outlined text-violet-500 text-3xl" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<h4 class="font-headline text-base font-bold text-violet-600">My Progress</h4>
+<p class="font-body text-xs text-slate-500 leading-relaxed">Badges, XP, and achievements</p>
+</div>
+<!-- Zone 5 — AI Chat -->
+<div onclick="window.location.href='ai_chat.html'" class="group relative bg-gradient-to-br from-pink-50 to-purple-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-pink-200 overflow-hidden">
+  <div class="absolute top-2.5 right-2.5 bg-pink-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
+  <div class="w-14 h-14 bg-pink-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
+    <span class="material-symbols-outlined text-pink-500 text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+  </div>
+  <h4 class="font-headline text-base font-bold text-pink-600">Chat with Yara</h4>
+  <p class="font-body text-xs text-slate-500 leading-relaxed">Talk to Yara in real English</p>
+</div>
+<!-- Zone 6 — Story Time -->
+<div onclick="window.location.href='story_time.html'" class="group relative bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-amber-200 overflow-hidden">
+  <div class="absolute top-2.5 right-2.5 bg-amber-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
+  <div class="w-14 h-14 bg-amber-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
+    <span class="material-symbols-outlined text-amber-600 text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+  </div>
+  <h4 class="font-headline text-base font-bold text-amber-600">AI Story Time</h4>
+  <p class="font-body text-xs text-slate-500 leading-relaxed">Yara writes a story for you</p>
+</div>
+<!-- Zone 7 — Pronunciation Practice -->
+<div onclick="window.location.href='pronun_practice.html'" class="group relative bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-teal-100">
+  <div class="w-14 h-14 bg-teal-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-teal-500/20 transition-all">
+    <span class="material-symbols-outlined text-teal-600 text-3xl" style="font-variation-settings: 'FILL' 1;">mic</span>
+  </div>
+  <h4 class="font-headline text-base font-bold text-teal-600">Say It Right!</h4>
+  <p class="font-body text-xs text-slate-500 leading-relaxed">Practise your pronunciation</p>
+</div>
+</div>
+</section>
+
+<!-- ── Lesson Trail ─────────────────────────────────────────────── -->
+<section class="mb-16">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="font-headline text-2xl font-extrabold text-navy">Lesson Trail 📚</h2>
+      <p class="text-slate-400 text-sm">Follow the trail, one lesson at a time</p>
+    </div>
+    <a href="lessons.html" class="text-pink-brand font-label font-bold text-sm hover:underline">See all →</a>
+  </div>
+  <div id="lesson-trail" class="relative">
+    <div class="text-center py-10 text-slate-300 text-sm">Carregando trilha...</div>
+  </div>
+</section>
+
+</main>
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+    Components.mount('top-nav-placeholder', Components.renderTopNav('home'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('home'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('home'));
+    Components.mount('footer-placeholder', Components.renderFooter());
+
+    // ── Learning Path continue card ──────────────────────────────────────────
+    function goToLearning() {
+      if (!localStorage.getItem('capyPlacementDone')) {
+        window.location.href = 'placement_test.html';
+      } else {
+        window.location.href = 'learn.html';
+      }
+    }
+    (function() {
+      const TRAIL_TITLES = {
+        1:'To Have, Want, Need, Like',   2:'To Go, Do, Say, See',         3:'To Get, Make, Know, Take',
+        4:'To Come, Think, Look, Give',  5:'To Tell, Work, Feel, Leave',   6:'Modal Verbs: Can, Could, Should',
+        7:'Past Simple — Regular Verbs', 8:'Past Simple — Irregular Verbs',9:'Prepositions of Place',
+        10:'Quantifiers: Many, Much, More',11:'Adjectives & Comparatives', 12:'Future: Will & Going to',
+        13:'Work & Career',              14:'Technology & Digital Life',   15:'Travel & Tourism',
+        16:'Health & Wellness',          17:'My Home — There is / There are',18:'Past Continuous',
+        19:'Superlatives',               20:'MOST — Quantifier & Reference',21:'Can, Could & Would',
+        22:"Future with WILL & WON'T",   23:'Personalities & Moods',       24:'Still vs. Yet & Possessives',
+      };
+      const TRAIL_EMOJIS = {
+        1:'💬',2:'🚶',3:'🧠',4:'👀',5:'✉️',6:'⚡',7:'⏪',8:'🔄',9:'📍',10:'🔢',
+        11:'📊',12:'🔮',13:'💼',14:'💻',15:'✈️',16:'🏥',17:'🏠',18:'🎬',
+        19:'🏆',20:'📊',21:'🎯',22:'🚀',23:'😊',24:'⏳',
+      };
+      const rawDone = Store.state.completedLessons || [];
+      // Normalise: accept both numeric (1) and string ('j1') formats
+      const normId  = id => typeof id === 'string' && id.startsWith('j') ? parseInt(id.slice(1)) : parseInt(id);
+      const doneNums = [...new Set(rawDone.map(normId).filter(n => !isNaN(n)))];
+      const done  = doneNums;
+      const total = 24;
+      const pct   = Math.round((done.length / total) * 100);
+      // Find current lesson
+      let current = 1;
+      const start = parseInt(localStorage.getItem('capyStartLesson') || '1');
+      for (let i = start; i <= total; i++) {
+        if (!done.includes(i)) { current = i; break; }
+      }
+      const titleEl = document.getElementById('home-lesson-title');
+      const subEl   = document.getElementById('home-lesson-sub');
+      const barEl   = document.getElementById('home-progress-bar');
+      if (titleEl) {
+        if (!localStorage.getItem('capyPlacementDone')) {
+          titleEl.textContent = 'Find your English level →';
+          subEl.textContent   = 'Take a 2-minute placement test to get started';
+        } else {
+          const step = parseInt(localStorage.getItem('capyGuidedStep_' + current) || '0');
+          const stepLabels = ['Listening','Quiz','Game','Sentence Builder','Speak','Chat with Yara'];
+          titleEl.textContent = `${TRAIL_EMOJIS[current] || '📚'} Lesson ${current}: ${TRAIL_TITLES[current]}`;
+          subEl.textContent   = step > 0
+            ? `Continue — Step ${step + 1}/6 · ${stepLabels[step]}`
+            : `${done.length}/${total} lessons complete · ${pct}%`;
+        }
+      }
+      if (barEl) barEl.style.width = pct + '%';
+    })();
+
+    // ── Daily Quest Pool (10 options, 3 shown per day seeded by date) ──────────
+    const QUEST_POOL = [
+        { id:'flashcards',      label:'Complete a flashcard deck',        emoji:'🃏', href:'2_Flashcard_Journey_Expedition_Edition.html' },
+        { id:'dialogue',        label:'Finish a dialogue with Yara',       emoji:'💬', href:'3_Dialogue_Expedition_Yara_Turn.html' },
+        { id:'games',           label:'Play a game in the pavilion',        emoji:'🎮', href:'5_Game_Pavilion_Forest_Edition.html' },
+        { id:'ai_chat',         label:'Chat with Yara (3 messages)',        emoji:'🤖', href:'ai_chat.html' },
+        { id:'story_time',      label:'Generate an AI story',               emoji:'📖', href:'story_time.html' },
+        { id:'daily_challenge', label:'Complete the daily challenge',       emoji:'⚡', href:'daily_challenge.html' },
+        { id:'word_scramble',   label:'Beat Word Scramble',                 emoji:'🔀', href:'word_scramble_game.html' },
+        { id:'spelling',        label:'Finish Spelling Bee',                emoji:'🐝', href:'spelling_bee_game.html' },
+        { id:'grammar',         label:'Complete a Grammar Lab lesson',      emoji:'🔬', href:'grammar_lab.html' },
+        { id:'number_quest',    label:'Conquer Number Quest',               emoji:'🔢', href:'number_quest.html' },
+        { id:'lessons',         label:'Study a Jadson lesson',              emoji:'📖', href:'lessons.html' },
+    ];
+
+    function getDailyQuests() {
+        const today = new Date().toISOString().slice(0, 10);
+        const seed  = parseInt(today.replace(/-/g, ''), 10);
+        const rng   = s => { const x = Math.sin(s) * 10000; return x - Math.floor(x); };
+        return [...QUEST_POOL]
+            .sort((a, b) => rng(seed + QUEST_POOL.indexOf(a)) - rng(seed + QUEST_POOL.indexOf(b)))
+            .slice(0, 3);
+    }
+
+    const DAILY_QUESTS = getDailyQuests();
+
+    function checkQuestBonus() {
+        const today    = new Date().toISOString().slice(0, 10);
+        const key      = `capyQuestBonus_${today}`;
+        const allDone  = DAILY_QUESTS.every(q => Store.state.completedActivities[q.id]);
+        if (allDone && !localStorage.getItem(key)) {
+            localStorage.setItem(key, '1');
+            Store.addXP(30);
+            document.dispatchEvent(new CustomEvent('streakMilestone', {
+                detail: { days: Store.state.streakDays, msg: '🎉 All quests done! +30 bonus XP!' }
+            }));
+        }
+    }
+
+    function updateUI() {
+        const { xp, completedActivities } = Store.state;
+        const level    = Store.getLevel();
+        const xpCurrent = xp % 100;
+        const pct      = Math.min((xpCurrent / 100) * 100, 100);
+
+        const name = Store.state.playerName;
+        document.getElementById('stat-player-name').textContent = name ? `Hi, ${name}!` : 'Hi, Explorer!';
+        document.getElementById('stat-level-badge').textContent = level;
+        document.getElementById('stat-level-text').textContent  = `Level ${level} Sapling`;
+        document.getElementById('stat-xp-bar').style.width      = `${pct}%`;
+        document.getElementById('stat-xp-text').textContent     = `${xpCurrent} / 100 XP to Level ${level + 1}`;
+
+        const done = DAILY_QUESTS.filter(q => completedActivities[q.id]).length;
+        document.getElementById('quest-counter').textContent = `${done} / ${DAILY_QUESTS.length} Done`;
+
+        document.getElementById('quest-list').innerHTML = DAILY_QUESTS.map(q => {
+            const complete = completedActivities[q.id];
+            return complete
+                ? `<div class="bg-white p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow border border-slate-100">
+                     <span class="text-2xl">${q.emoji}</span>
+                     <span class="material-symbols-outlined text-green-brand text-2xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
+                     <span class="font-body font-semibold text-sm text-slate-500 line-through">${q.label}</span>
+                   </div>`
+                : `<div class="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border-2 border-pink-brand/20">
+                     <span class="text-2xl">${q.emoji}</span>
+                     <span class="material-symbols-outlined text-slate-300 text-2xl">radio_button_unchecked</span>
+                     <span class="font-body font-semibold text-sm text-slate-700">${q.label}</span>
+                     <button onclick="window.location.href='${q.href}'" class="ml-auto bg-pink-brand text-white px-4 py-1.5 rounded-full text-xs font-bold active:scale-95 transition-all flex-shrink-0">Go →</button>
+                   </div>`;
+        }).join('') + (DAILY_QUESTS.every(q => completedActivities[q.id])
+            ? `<div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 p-4 rounded-2xl flex items-center gap-3 mt-2">
+                 <span class="text-2xl">🏆</span>
+                 <span class="font-body font-bold text-amber-700">All quests complete! Come back tomorrow for new ones!</span>
+               </div>`
+            : '');
+
+        checkQuestBonus();
+    }
+
+    updateUI();
+    document.addEventListener('stateChanged', updateUI);
+
+    // ── AI Word of the Day ─────────────────────────────────────────────────────
+    let wotdWord = '';
+    async function loadWordOfDay() {
+        const today = new Date().toISOString().slice(0, 10);
+        const cached = localStorage.getItem('capyWotd');
+        if (cached) {
+            try {
+                const obj = JSON.parse(cached);
+                if (obj.date === today) { showWotd(obj.data); return; }
+            } catch(e) {}
+        }
+        try {
+            const res  = await fetch('/api/word-of-day');
+            const raw  = await res.json();
+            const text = raw?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const clean = text.replace(/```json/gi,'').replace(/```/g,'').trim();
+            const data  = JSON.parse(clean);
+            localStorage.setItem('capyWotd', JSON.stringify({ date: today, data }));
+            showWotd(data);
+        } catch(e) {
+            document.getElementById('wotd-loading').classList.add('hidden');
+            document.getElementById('wotd-error').classList.remove('hidden');
+        }
+    }
+
+    function showWotd(data) {
+        wotdWord = data.word || '';
+        document.getElementById('wotd-loading').classList.add('hidden');
+        document.getElementById('wotd-emoji').textContent    = data.emoji || '🌟';
+        document.getElementById('wotd-word').textContent     = data.word || '';
+        document.getElementById('wotd-pron').textContent     = data.pronunciation || '';
+        document.getElementById('wotd-pos').textContent      = data.partOfSpeech || '';
+        document.getElementById('wotd-meaning').textContent  = data.simpleMeaning || '';
+        document.getElementById('wotd-example').textContent  = '"' + (data.exampleSentence || '') + '"';
+        document.getElementById('wotd-fact').textContent     = data.funFact || '';
+        document.getElementById('wotd-challenge-word').textContent = data.word || '';
+        document.getElementById('wotd-content').classList.remove('hidden');
+        // Show XP badge if already done today
+        const today = new Date().toISOString().slice(0, 10);
+        if (localStorage.getItem(`capyWotdChallenge_${today}`)) {
+            document.getElementById('wotd-xp-badge').classList.remove('hidden');
+            document.getElementById('wotd-challenge-btn').classList.add('hidden');
+        }
+    }
+
+    function toggleWotdChallenge() {
+        const box = document.getElementById('wotd-challenge-box');
+        box.classList.toggle('hidden');
+        if (!box.classList.contains('hidden')) {
+            document.getElementById('wotd-challenge-input').focus();
+        }
+    }
+
+    function checkWotdChallenge() {
+        const input = document.getElementById('wotd-challenge-input').value.trim();
+        const fb    = document.getElementById('wotd-challenge-feedback');
+        if (input.length < 5) {
+            fb.textContent = '✏️ Write a longer sentence!';
+            fb.className   = 'mt-2 text-sm font-body text-yellow-400';
+            fb.classList.remove('hidden');
+            return;
+        }
+        if (!input.toLowerCase().includes(wotdWord.toLowerCase())) {
+            fb.textContent = `🔍 Try including the word "${wotdWord}" in your sentence!`;
+            fb.className   = 'mt-2 text-sm font-body text-orange-400';
+            fb.classList.remove('hidden');
+            return;
+        }
+        // Success!
+        const today = new Date().toISOString().slice(0, 10);
+        fb.textContent = '🎉 Great sentence! You used the word correctly!';
+        fb.className   = 'mt-2 text-sm font-body text-emerald-400 font-bold';
+        fb.classList.remove('hidden');
+        if (!localStorage.getItem(`capyWotdChallenge_${today}`)) {
+            localStorage.setItem(`capyWotdChallenge_${today}`, '1');
+            document.getElementById('wotd-xp-badge').classList.remove('hidden');
+            document.getElementById('wotd-challenge-btn').classList.add('hidden');
+            if (window.Store) { Store.addXP(5); Store.activateStreak(); }
+        }
+    }
+
+    function speakWotd() {
+        if (!wotdWord || !window.speechSynthesis) return;
+        const utt = new SpeechSynthesisUtterance(wotdWord);
+        utt.lang = 'en-US'; utt.rate = 0.85;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utt);
+    }
+
+    loadWordOfDay();
+
+    // ── Lesson Trail ─────────────────────────────────────────────────────────
+    const TRAIL_LESSONS = [
+        {id:1,  title:'To Have, Want, Need, Like',      emoji:'💬', href:'lessons.html?lesson=1'},
+        {id:2,  title:'To Go, Do, Say, See',            emoji:'🚶', href:'lessons.html?lesson=2'},
+        {id:3,  title:'To Get, Make, Know, Take',       emoji:'🧠', href:'lessons.html?lesson=3'},
+        {id:4,  title:'To Come, Think, Look, Give',     emoji:'👀', href:'lessons.html?lesson=4'},
+        {id:5,  title:'To Tell, Work, Feel, Leave',     emoji:'✉️', href:'lessons.html?lesson=5'},
+        {id:6,  title:'Modal Verbs: Can, Could, Should',emoji:'⚡', href:'lessons.html?lesson=6'},
+        {id:7,  title:'Past Simple — Regular Verbs',    emoji:'⏪', href:'lessons.html?lesson=7'},
+        {id:8,  title:'Past Simple — Irregular Verbs',  emoji:'🔄', href:'lessons.html?lesson=8'},
+        {id:9,  title:'Prepositions of Place',          emoji:'📍', href:'lessons.html?lesson=9'},
+        {id:10, title:'Quantifiers: Many, Much, More',  emoji:'🔢', href:'lessons.html?lesson=10'},
+        {id:11, title:'Adjectives & Comparatives',      emoji:'📊', href:'lessons.html?lesson=11'},
+        {id:12, title:'Future: Will & Going to',        emoji:'🔮', href:'lessons.html?lesson=12'},
+        {id:13, title:'Work & Career',                  emoji:'💼', href:'lessons.html?lesson=13'},
+        {id:14, title:'Technology & Digital Life',      emoji:'💻', href:'lessons.html?lesson=14'},
+        {id:15, title:'Travel & Tourism',               emoji:'✈️', href:'lessons.html?lesson=15'},
+        {id:16, title:'Health & Wellness',              emoji:'🏥', href:'lessons.html?lesson=16'},
+        {id:17, title:'My Home — There is / There are', emoji:'🏠', href:'lessons.html?lesson=17'},
+        {id:18, title:'Past Continuous',                emoji:'🎬', href:'lessons.html?lesson=18'},
+        {id:19, title:'Superlatives',                   emoji:'🏆', href:'lessons.html?lesson=19'},
+        {id:20, title:'MOST — Quantifier & Reference',  emoji:'📊', href:'lessons.html?lesson=20'},
+        {id:21, title:'Can, Could & Would',             emoji:'🎯', href:'lessons.html?lesson=21'},
+        {id:22, title:"Future with WILL & WON'T",       emoji:'🚀', href:'lessons.html?lesson=22'},
+        {id:23, title:'Personalities & Moods',          emoji:'😊', href:'lessons.html?lesson=23'},
+        {id:24, title:'Still vs. Yet & Possessives',    emoji:'⏳', href:'lessons.html?lesson=24'},
+    ];
+
+    function renderLessonTrail() {
+        const rawCompleted = (Store.state.completedLessons || []);
+        const normId = id => typeof id === 'string' && id.startsWith('j') ? parseInt(id.slice(1)) : parseInt(id);
+        const completed = [...new Set(rawCompleted.map(normId).filter(n => !isNaN(n)))];
+        const trail     = document.getElementById('lesson-trail');
+        if (!trail) return;
+
+        // Show first 8 lessons
+        const visible = TRAIL_LESSONS.slice(0, 8);
+        const cols = visible.map((l, i) => {
+            const done     = completed.includes(l.id);
+            const unlocked = l.id === 1 || completed.includes(l.id - 1);
+            const side     = i % 2 === 0 ? 'mr-auto' : 'ml-auto'; // zigzag
+
+            let nodeClass, icon, badge;
+            if (done) {
+                nodeClass = 'bg-emerald-500 border-emerald-400 shadow-emerald-400/40';
+                icon      = '✓';
+                badge     = `<span class="absolute -top-1 -right-1 bg-yellow-400 text-yellow-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">Done</span>`;
+            } else if (unlocked) {
+                nodeClass = 'bg-pink-500 border-pink-400 shadow-pink-400/40 animate-pulse-slow';
+                icon      = l.emoji;
+                badge     = `<span class="absolute -top-1 -right-1 bg-blue-400 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">New!</span>`;
+            } else {
+                nodeClass = 'bg-slate-100 border-slate-200 shadow-none opacity-60';
+                icon      = '🔒';
+                badge     = '';
+            }
+
+            return `
+            <div class="flex ${i%2===0?'justify-start':'justify-end'} relative" style="margin-${i%2===0?'right':'left'}:${Math.min(i*8,40)}%">
+              ${i > 0 ? `<div class="absolute ${i%2===0?'right-1/2':'left-1/2'} top-0 w-0.5 h-6 bg-slate-200 -translate-y-6"></div>` : ''}
+              <button onclick="window.location.href='${unlocked||done ? l.href+'&guided=1' : 'learn.html'}'"
+                      class="relative group flex items-center gap-4 bg-white border-2 ${done?'border-emerald-200':unlocked?'border-pink-200':'border-slate-100'} rounded-3xl px-5 py-4 shadow-sm hover:shadow-md transition-all w-full max-w-xs hover:-translate-y-1 cursor-pointer">
+                <div class="relative">
+                  <div class="w-12 h-12 rounded-2xl border-4 ${nodeClass} flex items-center justify-center text-xl shadow-lg flex-shrink-0">
+                    ${icon}
+                  </div>
+                  ${badge}
+                </div>
+                <div class="text-left">
+                  <p class="text-[10px] font-bold text-slate-400 uppercase">Aula ${l.id}</p>
+                  <p class="font-bold text-navy text-sm leading-snug">${l.title}</p>
+                </div>
+                ${unlocked||done ? `<span class="material-symbols-outlined text-slate-300 ml-auto group-hover:text-pink-400 transition-colors">chevron_right</span>` : ''}
+              </button>
+            </div>`;
+        }).join('');
+
+        trail.innerHTML = `
+          <style>
+            @keyframes pulse-slow { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.4)} 50%{box-shadow:0 0 0 8px rgba(236,72,153,0)} }
+            .animate-pulse-slow { animation: pulse-slow 2s ease-in-out infinite; }
+          </style>
+          <div class="space-y-3">${cols}</div>
+          <a href="learn.html" class="mt-5 flex items-center justify-center gap-2 py-3 bg-white border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:border-pink-300 hover:text-pink-500 font-bold text-sm transition-all">
+            <span class="material-symbols-outlined text-base">expand_more</span>
+            Ver todas as 24 aulas na trilha →
+          </a>
+        `;
+    }
+
+    renderLessonTrail();
+    document.addEventListener('stateChanged', renderLessonTrail);
+</script>
+</body></html>

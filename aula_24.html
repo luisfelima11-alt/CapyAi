@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 24 — At the Restaurant</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#f97316,#fb923c);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#f97316;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-orange-950 to-red-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🍽️</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">🥂</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:16%;animation-delay:1.3s">👨‍🍳</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:24%;animation-delay:.4s">🍷</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">🥗</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:10%;animation-delay:1.6s">🍰</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🫕</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-4 py-1 text-sm font-black text-orange-300 mb-3">Aula 24</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🍽️ At the<br><span class="text-orange-300">Restaurant</span></h1>
+      <p class="text-white/60 text-base mb-5">Master restaurant vocabulary, ordering phrases, and special uses of TO HAVE for food and dining situations.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Menu & Ordering</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">TO HAVE</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Food Idioms</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Real Dialogue</span>
+      </div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 5 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY TABS -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Essential restaurant words. Click each card to flip and learn the Portuguese.</p></div>
+        <div class="text-right"><div class="text-2xl font-black text-orange-600" id="vocab-count">0<span class="text-sm text-slate-400">/20</span></div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3" id="vocab-grid"></div>
+    </div>
+
+    <!-- TAB: EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Food &amp; Restaurant Idioms</h2>
+      <p class="text-slate-500 text-sm mb-6">4 food-themed expressions that native speakers use in everyday conversation.</p>
+      <div class="grid gap-4" id="expr-grid"></div>
+    </div>
+
+    <!-- TAB: GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Special Uses of TO HAVE</h2>
+      <p class="text-slate-500 text-sm mb-6">In restaurant and daily life contexts, TO HAVE has special meanings beyond "possessing" something.</p>
+
+      <div class="bg-orange-50 border-2 border-orange-200 rounded-2xl p-5 mb-5">
+        <p class="font-black text-navy mb-3">📌 TO HAVE — 4 Key Uses in Context</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-white rounded-xl p-3 text-center border border-orange-100"><div class="text-[10px] font-black text-orange-500 uppercase tracking-wider mb-1">Ordering</div><div class="text-sm font-bold text-navy">"I'll <span class="text-orange-600">have</span> the pasta"</div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-orange-100"><div class="text-[10px] font-black text-red-500 uppercase tracking-wider mb-1">Eating/Drinking</div><div class="text-sm font-bold text-navy">"We're <span class="text-red-600">having</span> dinner"</div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-orange-100"><div class="text-[10px] font-black text-amber-500 uppercase tracking-wider mb-1">Experience</div><div class="text-sm font-bold text-navy">"<span class="text-amber-600">Have</span> you tried sushi?"</div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-orange-100"><div class="text-[10px] font-black text-emerald-500 uppercase tracking-wider mb-1">Invitation</div><div class="text-sm font-bold text-navy">"<span class="text-emerald-600">Have</span> some cake!"</div></div>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <!-- Rule 1: Ordering -->
+        <div class="rounded-2xl border-2 border-orange-200 bg-orange-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g24r1')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-orange-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">HAVE = ordering at a restaurant</div><div class="text-orange-600 text-sm">Use "I'll have" or "I'd like" to order food</div></div></div>
+            <span class="material-symbols-outlined text-orange-400 transition-transform" id="g24r1-arrow">expand_more</span>
+          </button>
+          <div id="g24r1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span>"<strong class="text-orange-700">I'll have</strong> the grilled salmon, please." <span class="text-slate-400">(ordering)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span>"What will you <strong class="text-orange-700">have</strong>?" — "<strong class="text-orange-700">I'll have</strong> the steak."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span><span>"<strong class="text-orange-700">I'd like</strong> a glass of water, please." <span class="text-slate-400">(more formal)</span></span></div>
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2"><p class="text-xs text-orange-700">📝 "I'll have" = "Vou querer..." — the most natural way to order in English!</p></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 2: Eating/drinking in progress -->
+        <div class="rounded-2xl border-2 border-red-200 bg-red-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g24r2')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-red-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">HAVE = eating or drinking (ongoing)</div><div class="text-red-600 text-sm">TO HAVE replaces "eat" and "drink"</div></div></div>
+            <span class="material-symbols-outlined text-red-400 transition-transform" id="g24r2-arrow">expand_more</span>
+          </button>
+          <div id="g24r2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 mt-1.5 flex-shrink-0"></span><span>"We're <strong class="text-red-700">having</strong> lunch right now." <span class="text-slate-400">(eating)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 mt-1.5 flex-shrink-0"></span><span>"I <strong class="text-red-700">had</strong> coffee this morning." <span class="text-slate-400">(drank)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 mt-1.5 flex-shrink-0"></span><span>"Let's <strong class="text-red-700">have</strong> dinner together tonight." <span class="text-slate-400">(eat)</span></span></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 3: Experience -->
+        <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g24r3')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">HAVE = experience / try for the first time</div><div class="text-amber-600 text-sm">Often used with "ever" and "before"</div></div></div>
+            <span class="material-symbols-outlined text-amber-400 transition-transform" id="g24r3-arrow">expand_more</span>
+          </button>
+          <div id="g24r3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>"<strong class="text-amber-700">Have</strong> you ever <strong class="text-amber-700">had</strong> Brazilian churrasco?" <span class="text-slate-400">(experience)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>"I've never <strong class="text-amber-700">had</strong> sushi before." <span class="text-slate-400">(first time)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span><span>"You should <strong class="text-amber-700">have</strong> the special — it's amazing!" <span class="text-slate-400">(recommendation)</span></span></div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- Useful phrases box -->
+      <div class="rounded-2xl border-2 border-slate-200 bg-white p-5 mb-5">
+        <h3 class="font-black text-navy text-base mb-4">🍽️ Useful Restaurant Phrases</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Ordering</p><p class="text-slate-600">"I'll have the chicken, please."</p></div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Asking for the bill</p><p class="text-slate-600">"Could I have the bill, please?"</p></div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Asking for a recommendation</p><p class="text-slate-600">"What do you recommend?"</p></div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Dietary needs</p><p class="text-slate-600">"Is there anything vegetarian?"</p></div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Complimenting the food</p><p class="text-slate-600">"This is delicious! My compliments to the chef."</p></div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl p-3"><p class="font-black text-orange-700 mb-1">Splitting the bill</p><p class="text-slate-600">"Can we have separate bills?"</p></div>
+        </div>
+      </div>
+
+      <button onclick="markSection()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Grammar as Done</button>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on restaurant vocab, TO HAVE, and food idioms.</p></div>
+        <div class="flex items-center gap-3">
+          <div class="text-center"><div class="text-2xl font-black text-orange-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+          <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="practice-area"></div>
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Speak &amp; Practise</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence. Practise ordering and talking about food. Check when done.</p>
+      <div class="space-y-3" id="speak-grid"></div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script src="lesson-engine.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'Menu',           pt:'Cardápio',            emoji:'📋', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Can I see the menu, please?'},
+  {en:'Waiter',         pt:'Garçom',              emoji:'🧑‍🍳', bg:'bg-red-50 border-red-200',     dot:'bg-red-400',    ex:'The waiter recommended the pasta.'},
+  {en:'Reservation',    pt:'Reserva',             emoji:'📞', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'I made a reservation for two.'},
+  {en:'Starter',        pt:'Entrada',             emoji:'🥗', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'I had a salad as a starter.'},
+  {en:'Main Course',    pt:'Prato Principal',     emoji:'🍝', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'For the main course I had steak.'},
+  {en:'Dessert',        pt:'Sobremesa',           emoji:'🍰', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'The chocolate dessert was incredible.'},
+  {en:'Bill',           pt:'Conta',               emoji:'🧾', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Could we have the bill, please?'},
+  {en:'Tip',            pt:'Gorjeta',             emoji:'💵', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'We left a generous tip.'},
+  {en:'Portion',        pt:'Porção',              emoji:'🍴', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'The portions are very generous here.'},
+  {en:'Cuisine',        pt:'Culinária / Cozinha', emoji:'🌍', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'I love Italian cuisine.'},
+  {en:'Appetizer',      pt:'Aperitivo',           emoji:'🥨', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'We had some appetizers while waiting.'},
+  {en:'Beverage',       pt:'Bebida',              emoji:'🥤', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'What beverage would you like?'},
+  {en:'Recommendation', pt:'Recomendação',        emoji:'👌', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'What do you recommend today?'},
+  {en:'Specialty',      pt:'Especialidade',       emoji:'⭐', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'The house specialty is grilled fish.'},
+  {en:'Ingredient',     pt:'Ingrediente',         emoji:'🧄', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'What ingredients are in this dish?'},
+  {en:'Flavor',         pt:'Sabor',               emoji:'😋', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'The flavor is rich and complex.'},
+  {en:'Vegetarian',     pt:'Vegetariano/a',       emoji:'🥦', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'Is there a vegetarian option?'},
+  {en:'Allergy',        pt:'Alergia',             emoji:'⚠️', bg:'bg-amber-50 border-amber-200',   dot:'bg-amber-400',  ex:'I have an allergy to shellfish.'},
+  {en:'Receipt',        pt:'Recibo',              emoji:'🧾', bg:'bg-orange-50 border-orange-200', dot:'bg-orange-400', ex:'Can I have a receipt for this?'},
+  {en:'Compliment',     pt:'Elogio',              emoji:'👏', bg:'bg-red-50 border-red-200',       dot:'bg-red-400',    ex:'My compliments to the chef!'},
+];
+
+const EXPRESSIONS = [
+  {expr:"Eat like a king", pt:"Comer como um rei / Comer muito bem", emoji:'👑',
+   example:"Every time we visit that restaurant, we eat like kings — the food is incredible!",
+   meaning:"To eat very well; to have a luxurious meal."},
+  {expr:"On the house", pt:"Por conta da casa / De graça", emoji:'🏠',
+   example:"The waiter brought us a free dessert — it was on the house!",
+   meaning:"Something provided free by the restaurant or business."},
+  {expr:"A taste of your own medicine", pt:"Pagar na mesma moeda", emoji:'💊',
+   example:"He was always rude to waiters, and one day the service was bad — a taste of his own medicine.",
+   meaning:"To experience the same bad treatment you give to others."},
+  {expr:"The proof is in the pudding", pt:"O resultado fala por si só / O resultado é o que importa", emoji:'🍮',
+   example:"I wasn't sure about the new chef, but the proof is in the pudding — the food was amazing!",
+   meaning:"You can only judge something by trying it or seeing the results."},
+];
+
+const PRACTICE_QS = [
+  {q:"The natural way to order in a restaurant is:", opts:["I'll have the pasta, please","I want the pasta","Give me the pasta","I desire the pasta"], a:"I'll have the pasta, please", rule:"I'll have = the standard, polite way to order"},
+  {q:"Which word means 'Sobremesa' in English?", opts:["Dessert","Starter","Beverage","Appetizer"], a:"Dessert", rule:"Vocabulary"},
+  {q:"'On the house' means:", opts:["Free, paid by the restaurant","A home-cooked meal","The best table","The house specialty"], a:"Free, paid by the restaurant", rule:"On the house = por conta da casa"},
+  {q:"'Have you ever had sushi?' — Here, HAVE is used to express:", opts:["Experience / trying something","Ordering food","Eating right now","Inviting someone"], a:"Experience / trying something", rule:"Have + ever + past participle = experience"},
+  {q:"Which word means 'Gorjeta' in English?", opts:["Tip","Bill","Receipt","Portion"], a:"Tip", rule:"Vocabulary"},
+  {q:"'We're having dinner.' — Here, HAVING means:", opts:["Eating","Ordering","Paying","Inviting"], a:"Eating", rule:"TO HAVE = eating/drinking in progress"},
+  {q:"'The proof is in the pudding' means:", opts:["Results show the real quality","The dessert is the best part","You need to test before judging","The chef is talented"], a:"Results show the real quality", rule:"Expression meaning"},
+  {q:"Which word means 'Recomendação' in English?", opts:["Recommendation","Reservation","Specialty","Receipt"], a:"Recommendation", rule:"Vocabulary"},
+  {q:"'Eat like a king' means:", opts:["Have a luxurious, delicious meal","Be very picky about food","Pay a lot for food","Cook at home"], a:"Have a luxurious, delicious meal", rule:"Expression meaning"},
+  {q:"A customer says: 'Could I have the bill?' What does HAVE mean here?", opts:["Please bring me","I want to eat","I already paid","I am ordering"], a:"Please bring me", rule:"Could I have = polite request"},
+];
+
+const SPEAK_SENTENCES = [
+  {text:"<strong class='text-orange-600'>I'll have</strong> the grilled salmon with vegetables, please."},
+  {text:"<strong class='text-orange-600'>Have</strong> you ever <strong class='text-orange-600'>had</strong> traditional Brazilian churrasco? It is amazing!"},
+  {text:"We are <strong class='text-orange-600'>having</strong> dinner at a new Italian restaurant tonight — I love Italian cuisine."},
+  {text:"Could I see the menu? I also have a shellfish <strong class='text-orange-600'>allergy</strong> — are there safe options?"},
+  {text:"The house <strong class='text-orange-600'>specialty</strong> was incredible! My compliments to the chef."},
+  {text:"When we go there, we truly <strong class='text-orange-600'>eat like kings</strong> — the portions are enormous."},
+  {text:"I <strong class='text-orange-600'>had</strong> the best <strong class='text-orange-600'>dessert</strong> of my life there — a warm chocolate lava cake."},
+  {text:"Could we have the <strong class='text-orange-600'>bill</strong>, please? And can we leave a <strong class='text-orange-600'>tip</strong> on the card?"},
+];
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak'],
+  totalSections: 5,
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE_QS,
+  speak: SPEAK_SENTENCES,
+  accentColor: 'orange',
+});
+</script>
+</body>
+</html>

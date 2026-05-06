@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Color Catch — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{extend:{
+      colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+      fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+      borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+
+  /* Stroop-style challenge: word color ≠ text color sometimes */
+  #target-word {
+    transition: color .2s, text-shadow .2s;
+  }
+
+  .tile-pop   { animation: tilePop   .4s ease; }
+  .tile-shake { animation: tileShake .4s ease; }
+  @keyframes tilePop   { 0%{transform:scale(1)} 40%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  @keyframes tileShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+
+  /* Countdown ring */
+  #timer-ring {
+    animation: timerShrink linear forwards;
+    transform-origin: center;
+  }
+  @keyframes timerShrink { from{stroke-dashoffset:0} to{stroke-dashoffset:220} }
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-28 pb-20 px-4 flex flex-col items-center gap-8 max-w-xl mx-auto">
+
+  <!-- Header -->
+  <div class="text-center">
+    <span class="font-label text-violet-400 text-sm font-bold uppercase tracking-widest">Mini-Game</span>
+    <h1 class="font-headline text-5xl md:text-6xl font-black text-white mt-1">Color Catch</h1>
+    <p class="font-body text-slate-400 text-lg mt-1">Tap the tile that matches the <em>color name</em>!</p>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="w-full flex items-center justify-between bg-white/5 rounded-2xl px-6 py-4 border border-white/10">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-violet-400 text-2xl" style="font-variation-settings:'FILL' 1;">palette</span>
+      <span id="score-display" class="font-headline font-black text-2xl">0</span>
+      <span class="font-label text-slate-400 text-sm">pts</span>
+    </div>
+    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Round 1 / 8</span>
+    <div id="hearts-display" class="flex gap-1"></div>
+  </div>
+
+  <!-- Target card with timer ring -->
+  <div class="w-full bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 p-10
+              flex flex-col items-center gap-4">
+    <span class="font-label text-slate-400 text-xs uppercase tracking-widest">Find this color:</span>
+
+    <!-- Timer ring + word -->
+    <div class="relative flex items-center justify-center w-44 h-44">
+      <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="34" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/>
+        <circle id="timer-ring" cx="36" cy="36" r="34" fill="none"
+                stroke="currentColor" stroke-width="4"
+                stroke-dasharray="220" stroke-dashoffset="0"
+                stroke-linecap="round"
+                class="text-violet-400"/>
+      </svg>
+      <span id="target-word"
+            class="font-headline text-5xl font-black text-white z-10 select-none">RED</span>
+    </div>
+
+    <p class="font-label text-slate-500 text-xs">Tap fast — the ring is ticking!</p>
+  </div>
+
+  <!-- Color tiles grid (2×2) -->
+  <div id="tiles-grid" class="w-full grid grid-cols-2 gap-5"></div>
+
+  <!-- Feedback -->
+  <div id="feedback-bar"
+       class="w-full rounded-2xl px-8 py-5 flex items-center gap-4 text-lg font-label font-bold
+              opacity-0 transition-opacity duration-300">
+    <span id="feedback-icon" class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;"></span>
+    <span id="feedback-text"></span>
+  </div>
+
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+  Components.mount('footer-placeholder', Components.renderFooter());
+
+  // ── Color palette ─────────────────────────────────────────────────────────
+  const COLORS = [
+    { name: 'Red',    hex: '#ef4444', text: 'text-red-400',    ring: 'text-red-400'    },
+    { name: 'Blue',   hex: '#3b82f6', text: 'text-blue-400',   ring: 'text-blue-400'   },
+    { name: 'Green',  hex: '#22c55e', text: 'text-green-400',  ring: 'text-green-400'  },
+    { name: 'Yellow', hex: '#eab308', text: 'text-yellow-400', ring: 'text-yellow-400' },
+    { name: 'Pink',   hex: '#ec4899', text: 'text-pink-400',   ring: 'text-pink-400'   },
+    { name: 'Purple', hex: '#a855f7', text: 'text-purple-400', ring: 'text-purple-400' },
+    { name: 'Orange', hex: '#f97316', text: 'text-orange-400', ring: 'text-orange-400' },
+    { name: 'White',  hex: '#f1f5f9', text: 'text-slate-100',  ring: 'text-slate-300'  },
+  ];
+
+  const TOTAL_ROUNDS = 8;
+  const MAX_LIVES    = 3;
+  const TIME_LIMIT   = 5; // seconds per round
+
+  let lives = MAX_LIVES, score = 0, round = 0, waitingNext = false;
+  let correctColor = null, timerInterval = null, timeLeft = TIME_LIMIT;
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    return a;
+  }
+
+  function pick4(correctIdx) {
+    const others = shuffle(COLORS.map((_,i)=>i).filter(i=>i!==correctIdx));
+    return shuffle([correctIdx, ...others.slice(0,3)]);
+  }
+
+  // ── Timer ─────────────────────────────────────────────────────────────────
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = TIME_LIMIT;
+    const ring = document.getElementById('timer-ring');
+    ring.style.animation = 'none';
+    void ring.offsetWidth; // reflow
+    ring.style.animationDuration = `${TIME_LIMIT}s`;
+    ring.style.animation = `timerShrink ${TIME_LIMIT}s linear forwards`;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (!waitingNext) timeOut();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    const ring = document.getElementById('timer-ring');
+    ring.style.animation = 'none';
+  }
+
+  function timeOut() {
+    waitingNext = true;
+    lives = Math.max(0, lives - 1);
+    renderHearts();
+    showFeedback(false, `Too slow! The answer was ${correctColor.name}.`);
+    document.querySelectorAll('#tiles-grid button').forEach(b => {
+      if (b.dataset.name === correctColor.name) b.style.outline = '4px solid #10b981';
+    });
+    round++;
+    if (lives <= 0) { setTimeout(finishGame, 1200); return; }
+    setTimeout(renderRound, 1400);
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function renderHearts() {
+    document.getElementById('hearts-display').innerHTML =
+      Array.from({length:MAX_LIVES},(_,i)=>
+        `<span class="material-symbols-outlined text-xl ${i<lives?'text-red-400':'text-white/20'}"
+               style="${i<lives?"font-variation-settings:'FILL' 1;":""}">favorite</span>`
+      ).join('');
+  }
+
+  function renderRound() {
+    if (round >= TOTAL_ROUNDS) { finishGame(); return; }
+    waitingNext = false;
+
+    const correctIdx = Math.floor(Math.random() * COLORS.length);
+    correctColor = COLORS[correctIdx];
+    const tileIndices = pick4(correctIdx);
+
+    document.getElementById('round-display').textContent = `Round ${round+1} / ${TOTAL_ROUNDS}`;
+    hideFeedback();
+
+    // Target word — Stroop effect for harder rounds: color the word differently
+    const wordEl = document.getElementById('target-word');
+    wordEl.textContent = correctColor.name.toUpperCase();
+    if (round >= 4) {
+      // Paint the word text with a random DIFFERENT color (Stroop challenge)
+      const decoyColors = COLORS.filter(c => c.name !== correctColor.name);
+      const decoy = decoyColors[Math.floor(Math.random() * decoyColors.length)];
+      wordEl.style.color = decoy.hex;
+    } else {
+      wordEl.style.color = '#ffffff';
+    }
+
+    // Update timer ring color
+    document.getElementById('timer-ring').style.color = correctColor.hex;
+
+    // Tiles
+    document.getElementById('tiles-grid').innerHTML = tileIndices.map(idx => {
+      const c = COLORS[idx];
+      return `<button data-name="${c.name}" onclick="handleTile(this)"
+                      class="aspect-square rounded-[2rem] border-4 border-white/10
+                             hover:scale-[1.05] active:scale-95 transition-all shadow-xl
+                             hover:border-white/40"
+                      style="background-color:${c.hex};">
+              </button>`;
+    }).join('');
+
+    startTimer();
+  }
+
+  function showFeedback(correct, msg) {
+    const bar  = document.getElementById('feedback-bar');
+    const icon = document.getElementById('feedback-icon');
+    const text = document.getElementById('feedback-text');
+    bar.className = bar.className.replace(/bg-\S+/g,'').replace(/border\S*/g,'').trim();
+    if (correct) {
+      bar.classList.add('bg-green-brand/20','border','border-green-brand/40');
+      icon.textContent = 'check_circle';
+      icon.style.color = '#10b981';
+      text.textContent = msg;
+    } else {
+      bar.classList.add('bg-red-500/20','border','border-red-500/40');
+      icon.textContent = 'cancel';
+      icon.style.color = '#f87171';
+      text.textContent = msg;
+    }
+    bar.style.opacity = '1';
+  }
+
+  function hideFeedback() {
+    document.getElementById('feedback-bar').style.opacity = '0';
+  }
+
+  // ── Logic ──────────────────────────────────────────────────────────────────
+  function handleTile(btn) {
+    if (waitingNext) return;
+    waitingNext = true;
+    stopTimer();
+    document.querySelectorAll('#tiles-grid button').forEach(b => b.disabled = true);
+
+    const correct = btn.dataset.name === correctColor.name;
+    if (correct) {
+      score += (timeLeft >= 3 ? 15 : 10); // bonus for speed
+      document.getElementById('score-display').textContent = score;
+      btn.classList.add('tile-pop');
+      btn.style.outline = '4px solid #10b981';
+      showFeedback(true, `${correctColor.name}! ${timeLeft >= 3 ? '+15 pts (Speed bonus!) ⚡' : '+10 pts 🎉'}`);
+      round++;
+    } else {
+      lives = Math.max(0, lives - 1);
+      renderHearts();
+      btn.classList.add('tile-shake');
+      btn.style.outline = '4px solid #ef4444';
+      document.querySelectorAll('#tiles-grid button').forEach(b => {
+        if (b.dataset.name === correctColor.name) b.style.outline = '4px solid #10b981';
+      });
+      showFeedback(false, `Not quite! That's ${btn.dataset.name}. The answer was ${correctColor.name}.`);
+      round++;
+      if (lives <= 0) { setTimeout(finishGame, 1200); return; }
+    }
+    setTimeout(renderRound, 1500);
+  }
+
+  // ── Finish ─────────────────────────────────────────────────────────────────
+  function finishGame() {
+    stopTimer();
+    const xp = score;
+    if (window.Store) {
+      Store.addXP(xp);
+      Store.activateStreak();
+      Store.completeActivity('games');
+    }
+    const stars = score >= 90 ? 3 : score >= 60 ? 2 : 1;
+    const starHTML = Array.from({length:3},(_,i)=>
+      `<span class="material-symbols-outlined text-4xl ${i<stars?'text-yellow-400':'text-white/20'}"
+             style="${i<stars?"font-variation-settings:'FILL' 1;":""}">star</span>`
+    ).join('');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+    overlay.innerHTML = `
+      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-violet-400/60
+                  rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl
+                  text-center max-w-sm mx-4 scale-0 opacity-0 transition-all duration-500" id="finish-card">
+        <div class="w-24 h-24 rounded-full bg-violet-500 flex items-center justify-center shadow-lg shadow-violet-500/40">
+          <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">palette</span>
+        </div>
+        <div>
+          <p class="font-label text-violet-400 font-bold text-sm uppercase tracking-widest mb-1">Color Master!</p>
+          <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
+          <p class="font-body text-slate-300">Score: <span class="text-white font-bold">${score} pts</span></p>
+        </div>
+        <div class="flex gap-2">${starHTML}</div>
+        <div class="flex gap-3 flex-wrap justify-center">
+          <button onclick="startGame()"
+                  class="bg-white/10 hover:bg-white/20 text-white font-label font-bold
+                         px-8 py-3 rounded-full text-base active:scale-95 transition-all border border-white/20">
+            Play Again
+          </button>
+          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                  class="bg-violet-500 hover:bg-violet-600 text-white font-label font-bold
+                         px-8 py-3 rounded-full text-base active:scale-95 transition-all shadow-lg">
+            Back to Games
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const card = document.getElementById('finish-card');
+      card.style.transform = 'scale(1)';
+      card.style.opacity   = '1';
+    }));
+  }
+
+  function startGame() {
+    document.querySelectorAll('.fixed.inset-0').forEach(e => e.remove());
+    stopTimer();
+    lives = MAX_LIVES; score = 0; round = 0;
+    document.getElementById('score-display').textContent = '0';
+    renderHearts();
+    renderRound();
+  }
+
+  document.addEventListener('DOMContentLoaded', startGame);
+</script>
+</body>
+</html>

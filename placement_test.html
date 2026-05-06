@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Find Your Level — Yara's Forest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { navy:'#001f3f','pink-brand':'#ec4899' }, fontFamily:{ sans:['Plus Jakarta Sans','sans-serif'] } } }
+    };
+  </script>
+  <style>
+    body { font-family:'Plus Jakarta Sans',sans-serif; }
+    .choice-btn { transition:all 0.18s; border:2px solid #e2e8f0; }
+    .choice-btn:not(:disabled):hover { border-color:#ec4899; background:#fdf2f8; color:#9d174d; }
+    .choice-btn.correct { background:#dcfce7!important; border-color:#16a34a!important; color:#15803d!important; }
+    .choice-btn.wrong   { background:#fee2e2!important; border-color:#dc2626!important; color:#b91c1c!important; }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes popIn    { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+    @keyframes shimmer  { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .fade-up  { animation:fadeUp 0.45s ease forwards; }
+    .pop-in   { animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    .yara-float { animation:shimmer 3s ease-in-out infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4"
+      style="background:linear-gradient(135deg,#001f3f 0%,#0a2a50 40%,#0d1b35 100%)">
+
+<div id="app" class="w-full max-w-md">
+
+  <!-- ── WELCOME SCREEN ───────────────────────────────── -->
+  <div id="screen-welcome" class="text-center fade-up">
+    <div class="yara-float text-[90px] mb-4 leading-none">🦫</div>
+    <h1 class="text-3xl md:text-4xl font-black text-white mb-2">Hi! I'm Yara 👋</h1>
+    <p class="text-slate-300 text-base mb-1 max-w-sm mx-auto">
+      Let's find your English level so I can build the <strong class="text-pink-400">perfect learning path</strong> just for you.
+    </p>
+    <p class="text-slate-500 text-sm mb-8">12 quick questions · ~2 minutes</p>
+    <button onclick="startTest()"
+            class="bg-pink-500 hover:bg-pink-400 active:scale-95 text-white font-black text-lg px-10 py-4 rounded-full shadow-2xl shadow-pink-500/30 transition-all w-full mb-4">
+      Let's Go! 🚀
+    </button>
+    <button onclick="skipTest()"
+            class="text-slate-500 hover:text-slate-300 text-sm transition-colors underline">
+      I already know my level — skip →
+    </button>
+  </div>
+
+  <!-- ── QUIZ SCREEN ──────────────────────────────────── -->
+  <div id="screen-quiz" class="hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-3">
+      <span id="q-counter" class="text-slate-400 text-sm font-bold">1 / 12</span>
+      <span id="q-score-badge" class="bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-xs font-black px-3 py-1 rounded-full">⭐ 0 correct</span>
+    </div>
+    <!-- Progress bar -->
+    <div class="bg-white/10 rounded-full h-2.5 mb-6 overflow-hidden">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-pink-500 to-pink-400 rounded-full transition-all duration-500" style="width:0%"></div>
+    </div>
+    <!-- Question card -->
+    <div id="q-card" class="bg-white rounded-3xl p-6 shadow-2xl fade-up">
+      <div class="flex items-center gap-2 mb-4">
+        <span id="q-level-dot" class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+        <span id="q-level-tag" class="text-xs font-bold text-slate-400 uppercase tracking-widest">Starter</span>
+      </div>
+      <p id="q-text" class="text-xl md:text-2xl font-black text-navy mb-6 leading-snug"></p>
+      <div id="q-choices" class="grid grid-cols-2 gap-3"></div>
+      <div id="q-feedback" class="hidden mt-5 text-center">
+        <p id="q-feedback-text" class="font-bold text-base mb-3"></p>
+        <button onclick="nextQuestion()"
+                class="bg-navy text-white font-bold px-8 py-2.5 rounded-full hover:bg-navy/80 transition-all text-sm">
+          Continue →
+        </button>
+      </div>
+    </div>
+    <!-- Yara tip -->
+    <p class="text-center text-slate-500 text-xs mt-4">🦫 Do your best — no pressure!</p>
+  </div>
+
+  <!-- ── RESULT SCREEN ────────────────────────────────── -->
+  <div id="screen-result" class="hidden text-center">
+    <div id="result-emoji" class="text-[80px] mb-3 pop-in leading-none"></div>
+    <div id="result-stars" class="mb-4"></div>
+    <h2 id="result-title" class="text-3xl font-black text-white mb-2"></h2>
+    <p id="result-desc" class="text-slate-300 text-sm mb-2 max-w-sm mx-auto"></p>
+    <p id="result-score" class="text-slate-500 text-xs mb-7"></p>
+
+    <!-- Level card -->
+    <div class="bg-white/8 border border-white/15 rounded-2xl p-5 mb-6 text-left">
+      <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">📚 Your path starts at</p>
+      <p id="result-start" class="text-pink-400 font-black text-lg"></p>
+      <p id="result-start-sub" class="text-slate-500 text-xs mt-1"></p>
+    </div>
+
+    <button onclick="goToTrail()"
+            class="bg-pink-500 hover:bg-pink-400 active:scale-95 text-white font-black text-lg px-8 py-4 rounded-full shadow-2xl shadow-pink-500/30 transition-all w-full">
+      Start My Learning Path 🌟
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── Questions ──────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  // STARTER
+  { level:'Starter',          dot:'#4ade80', q:'What color is the sky?',
+    choices:['Blue','Red','Green','Yellow'], ans:'Blue' },
+  { level:'Starter',          dot:'#4ade80', q:'Which word means "olá" in English?',
+    choices:['Hello','Goodbye','Sorry','Please'], ans:'Hello' },
+  { level:'Starter',          dot:'#4ade80', q:'Which one is an animal?',
+    choices:['Dog','Apple','Chair','Book'], ans:'Dog' },
+  { level:'Starter',          dot:'#4ade80', q:'How many fingers on one hand?',
+    choices:['Three','Four','Five','Six'], ans:'Five' },
+  // ELEMENTARY
+  { level:'Elementary',       dot:'#60a5fa', q:'Complete: "I ___ a student."',
+    choices:['am','is','are','be'], ans:'am' },
+  { level:'Elementary',       dot:'#60a5fa', q:'Which one is a food?',
+    choices:['Apple','Happy','Run','Blue'], ans:'Apple' },
+  { level:'Elementary',       dot:'#60a5fa', q:'Which body part do you see with?',
+    choices:['Eyes','Hands','Feet','Nose'], ans:'Eyes' },
+  { level:'Elementary',       dot:'#60a5fa', q:'What does "run" mean?',
+    choices:['Move fast on foot','Sleep','Eat','Swim'], ans:'Move fast on foot' },
+  // PRE-INTERMEDIATE
+  { level:'Pre-Intermediate', dot:'#f472b6', q:'Complete: "I go to school ___ bus."',
+    choices:['by','on','in','at'], ans:'by' },
+  { level:'Pre-Intermediate', dot:'#f472b6', q:'I feel ___ because I lost my toy.',
+    choices:['Sad','Fast','Big','Cold'], ans:'Sad' },
+  { level:'Pre-Intermediate', dot:'#f472b6', q:'Choose the correct sentence:',
+    choices:['We learn at school.','We learns at school.','We learning school.','We is learn.'], ans:'We learn at school.' },
+  { level:'Pre-Intermediate', dot:'#f472b6', q:'She ___ been to London before.',
+    choices:['has','have','had','is'], ans:'has' },
+];
+
+// ── Level results ──────────────────────────────────────────────────────────────
+const LEVELS = [
+  { key:'starter',          name:'Starter',          emoji:'🌱', score:[0,4],
+    desc:'You\'re just beginning! We\'ll build solid English foundations from scratch.',
+    startLesson:1, startTitle:'Lesson 1 — To Have, Want, Need, Like' },
+  { key:'elementary',       name:'Elementary',       emoji:'🌿', score:[5,7],
+    desc:'Good basics! You know some English — let\'s level you up from here.',
+    startLesson:5, startTitle:'Lesson 5 — Present Continuous' },
+  { key:'pre-intermediate', name:'Pre-Intermediate', emoji:'🌳', score:[8,10],
+    desc:'Nice! Solid foundation — time to tackle grammar and complex topics.',
+    startLesson:10, startTitle:'Lesson 10 — Comparatives & Superlatives' },
+  { key:'intermediate',     name:'Intermediate',     emoji:'🌲', score:[11,12],
+    desc:'Impressive! You\'re already strong — we\'ll focus on fluency and advanced topics.',
+    startLesson:16, startTitle:'Lesson 16 — Health & The Body' },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let current = 0, score = 0, answered = false;
+
+// ── Functions ──────────────────────────────────────────────────────────────────
+function startTest() {
+  document.getElementById('screen-welcome').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = QUESTIONS[current];
+  const pct = Math.round((current / QUESTIONS.length) * 100);
+
+  document.getElementById('q-counter').textContent      = `${current + 1} / ${QUESTIONS.length}`;
+  document.getElementById('q-score-badge').textContent  = `⭐ ${score} correct`;
+  document.getElementById('progress-bar').style.width   = pct + '%';
+  document.getElementById('q-level-tag').textContent    = q.level;
+  document.getElementById('q-level-dot').style.background = q.dot;
+  document.getElementById('q-text').textContent         = q.q;
+  document.getElementById('q-feedback').classList.add('hidden');
+
+  const shuffled = [...q.choices].sort(() => Math.random() - 0.5);
+  document.getElementById('q-choices').innerHTML = shuffled.map(c => `
+    <button class="choice-btn rounded-2xl px-3 py-4 font-bold text-navy text-sm text-left bg-white"
+            onclick="answer(this,'${c.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">
+      ${c}
+    </button>
+  `).join('');
+
+  const card = document.getElementById('q-card');
+  card.classList.remove('fade-up');
+  void card.offsetWidth;
+  card.classList.add('fade-up');
+}
+
+function answer(btn, chosen, correct) {
+  if (answered) return;
+  answered = true;
+  const ok = chosen === correct;
+  if (ok) score++;
+
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.trim() === correct) b.classList.add('correct');
+  });
+  if (!ok) btn.classList.add('wrong');
+
+  const fbText = document.getElementById('q-feedback-text');
+  fbText.textContent = ok ? '✅ Correct!' : `❌ Answer: ${correct}`;
+  fbText.className = `font-bold text-base mb-3 ${ok ? 'text-green-600' : 'text-red-500'}`;
+  document.getElementById('q-feedback').classList.remove('hidden');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= QUESTIONS.length) showResult();
+  else renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-result').classList.remove('hidden');
+
+  let level = LEVELS[0];
+  for (const l of LEVELS) {
+    if (score >= l.score[0] && score <= l.score[1]) { level = l; break; }
+  }
+  // fallback to highest matching
+  for (const l of LEVELS) { if (score >= l.score[0]) level = l; }
+
+  document.getElementById('result-emoji').textContent    = level.emoji;
+  document.getElementById('result-title').textContent    = level.name + ' Level';
+  document.getElementById('result-desc').textContent     = level.desc;
+  document.getElementById('result-score').textContent    = `${score} out of ${QUESTIONS.length} correct`;
+  document.getElementById('result-start').textContent    = level.startTitle;
+  document.getElementById('result-start-sub').textContent = 'You can unlock earlier lessons anytime.';
+  document.getElementById('result-stars').innerHTML      =
+    [1,2,3].map(i => `<span class="text-2xl">${i <= Math.ceil((score/12)*3) ? '⭐' : '☆'}</span>`).join('');
+
+  // Persist
+  localStorage.setItem('capyPlayerLevel',   level.key);
+  localStorage.setItem('capyStartLesson',   level.startLesson);
+  localStorage.setItem('capyPlacementDone', '1');
+}
+
+function goToTrail() { window.location.href = 'learn.html'; }
+function skipTest()  {
+  localStorage.setItem('capyPlayerLevel',   'starter');
+  localStorage.setItem('capyStartLesson',   '1');
+  localStorage.setItem('capyPlacementDone', '1');
+  window.location.href = 'learn.html';
+}
+</script>
+</body>
+</html>

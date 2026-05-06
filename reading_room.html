@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reading Room — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={
+  darkMode:"class",
+  theme:{extend:{
+    colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+  @keyframes popIn{0%{transform:scale(0.7)}80%{transform:scale(1.05)}100%{transform:scale(1)}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(180px) rotate(360deg);opacity:0}}
+
+  .fade-up{animation:fadeUp 0.4s ease both;}
+  .pop-in{animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;}
+
+  .skeleton{
+    background:linear-gradient(90deg,rgba(255,255,255,0.06) 25%,rgba(255,255,255,0.12) 50%,rgba(255,255,255,0.06) 75%);
+    background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:12px;
+  }
+
+  /* Topic chip */
+  .topic-chip{
+    padding:10px 20px;border-radius:999px;cursor:pointer;
+    font-family:'Lexend',sans-serif;font-weight:700;font-size:0.85rem;
+    background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
+    color:#cbd5e1;transition:all 0.15s;-webkit-tap-highlight-color:transparent;
+  }
+  .topic-chip:hover{background:rgba(255,255,255,0.14);transform:translateY(-2px);}
+  .topic-chip.selected{background:rgba(99,102,241,0.3);border-color:#818cf8;color:#c7d2fe;}
+
+  /* Story sentence */
+  .story-sentence{
+    font-family:'Be Vietnam Pro',sans-serif;font-size:1.1rem;line-height:1.8;
+    color:#e2e8f0;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .story-sentence:last-child{border-bottom:none;}
+  .story-sentence.reveal{animation:fadeUp 0.4s ease both;}
+
+  /* Quiz option button */
+  .quiz-opt{
+    width:100%;text-align:left;padding:14px 20px;border-radius:1rem;cursor:pointer;
+    font-family:'Lexend',sans-serif;font-weight:600;font-size:0.95rem;
+    background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+    color:#fff;transition:all 0.15s;-webkit-tap-highlight-color:transparent;
+  }
+  .quiz-opt:hover:not(:disabled){background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);}
+  .quiz-opt.correct{background:rgba(16,185,129,0.25);border-color:#10b981;color:#6ee7b7;}
+  .quiz-opt.wrong  {background:rgba(244,63,94,0.2); border-color:#f43f5e;color:#fca5a5;}
+
+  .confetti-piece{position:fixed;pointer-events:none;z-index:9999;width:9px;height:9px;border-radius:2px;animation:confettiFall 1.1s ease-out forwards;}
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-5 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50">
+  <button onclick="goBack()"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div class="flex-1">
+    <p class="font-label text-xs text-violet-400 uppercase tracking-widest font-bold">Reading Room</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Story Time + Quiz 📖</h1>
+  </div>
+  <div class="bg-violet-500/20 border border-violet-500/40 rounded-full px-4 py-2 font-label font-bold text-sm text-violet-300">
+    +<span id="xp-disp">0</span> XP
+  </div>
+</header>
+
+<main class="flex-1 flex flex-col gap-5 px-4 py-6 max-w-2xl mx-auto w-full">
+
+  <!-- ── SETUP STATE ───────────────────────────────────────────────────── -->
+  <div id="state-setup" class="flex flex-col gap-5">
+    <div class="fade-up">
+      <h2 class="font-headline text-3xl font-black text-white mb-1">Choose a Topic 📚</h2>
+      <p class="font-body text-slate-400">Yara will write a short story for you, then quiz you on it!</p>
+    </div>
+
+    <!-- Topic chips -->
+    <div class="flex flex-wrap gap-3 fade-up" id="topic-chips">
+      <button class="topic-chip" onclick="selectTopic(this,'🦁 Wild Animals')">🦁 Wild Animals</button>
+      <button class="topic-chip" onclick="selectTopic(this,'🌳 The Magic Forest')">🌳 Magic Forest</button>
+      <button class="topic-chip" onclick="selectTopic(this,'🚀 Space Adventure')">🚀 Space Adventure</button>
+      <button class="topic-chip" onclick="selectTopic(this,'🏰 Fairy Tale Kingdom')">🏰 Fairy Tale</button>
+      <button class="topic-chip" onclick="selectTopic(this,'🌊 Ocean Wonders')">🌊 Ocean Wonders</button>
+      <button class="topic-chip" onclick="selectTopic(this,'🍕 Food Festival')">🍕 Food Festival</button>
+      <button class="topic-chip" onclick="selectTopic(this,'❄️ Winter Wonderland')">❄️ Winter</button>
+      <button class="topic-chip selected" onclick="selectTopic(this,'🌈 Rainbow Valley')">🌈 Rainbow Valley</button>
+    </div>
+
+    <!-- Difficulty -->
+    <div class="fade-up" style="animation-delay:0.1s">
+      <p class="font-label text-xs text-slate-400 uppercase tracking-widest font-bold mb-2">Difficulty</p>
+      <div class="flex gap-3">
+        <button onclick="setDiff(this,'easy')"   class="diff-btn selected flex-1 py-3 rounded-2xl font-label font-bold text-sm bg-green-brand/20 border border-green-brand/40 text-green-400">Easy</button>
+        <button onclick="setDiff(this,'medium')" class="diff-btn flex-1 py-3 rounded-2xl font-label font-bold text-sm bg-white/6 border border-white/10 text-slate-400">Medium</button>
+        <button onclick="setDiff(this,'hard')"   class="diff-btn flex-1 py-3 rounded-2xl font-label font-bold text-sm bg-white/6 border border-white/10 text-slate-400">Hard</button>
+      </div>
+    </div>
+
+    <button id="read-btn" onclick="loadStory()"
+            class="w-full py-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500
+                   text-white font-headline font-bold text-xl rounded-full shadow-xl shadow-violet-500/30
+                   active:scale-95 transition-all fade-up" style="animation-delay:0.15s">
+      Generate Story ✨
+    </button>
+  </div>
+
+  <!-- ── LOADING STATE ─────────────────────────────────────────────────── -->
+  <div id="state-loading" class="hidden flex flex-col gap-5">
+    <div class="skeleton h-8 w-48"></div>
+    <div class="bg-navy-light border border-white/10 rounded-[2rem] p-6 flex flex-col gap-3">
+      <div class="skeleton h-5 w-full"></div>
+      <div class="skeleton h-5 w-5/6"></div>
+      <div class="skeleton h-5 w-full"></div>
+      <div class="skeleton h-5 w-4/5"></div>
+      <div class="skeleton h-5 w-full"></div>
+    </div>
+    <div class="skeleton h-10 w-40 rounded-full mx-auto"></div>
+  </div>
+
+  <!-- ── STORY STATE ───────────────────────────────────────────────────── -->
+  <div id="state-story" class="hidden flex flex-col gap-5">
+
+    <!-- Story header -->
+    <div class="flex items-start gap-3 fade-up">
+      <span class="text-4xl" id="story-emoji">📖</span>
+      <div>
+        <p class="font-label text-xs text-violet-400 uppercase tracking-widest font-bold mb-0.5">Today's Story</p>
+        <h2 class="font-headline font-black text-white text-2xl" id="story-title"></h2>
+      </div>
+    </div>
+
+    <!-- Story body -->
+    <div class="bg-navy-light border border-white/10 rounded-[2rem] p-7 flex flex-col fade-up" id="story-body"></div>
+
+    <!-- Moral -->
+    <div class="bg-violet-900/30 border border-violet-500/30 rounded-2xl px-6 py-4 flex items-start gap-3 fade-up">
+      <span class="text-2xl">💡</span>
+      <div>
+        <p class="font-label text-xs text-violet-400 uppercase tracking-widest font-bold mb-1">The Moral</p>
+        <p class="font-body text-slate-200 text-sm" id="story-moral"></p>
+      </div>
+    </div>
+
+    <!-- Read aloud + quiz buttons -->
+    <div class="flex gap-3 fade-up">
+      <button onclick="readAloud()"
+              class="flex-1 py-4 bg-white/10 hover:bg-white/15 border border-white/15 text-white font-label font-bold rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">volume_up</span>
+        Read Aloud
+      </button>
+      <button onclick="startQuiz()"
+              class="flex-1 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500
+                     text-white font-label font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-violet-500/30">
+        Take the Quiz →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── QUIZ STATE ────────────────────────────────────────────────────── -->
+  <div id="state-quiz" class="hidden flex flex-col gap-5">
+
+    <!-- Progress pills -->
+    <div class="flex gap-1.5 fade-up" id="quiz-progress"></div>
+
+    <!-- Question card -->
+    <div class="bg-gradient-to-br from-violet-950 to-navy-light border border-violet-500/20 rounded-[2rem] p-7 pop-in" id="quiz-card">
+      <p class="font-label text-xs text-violet-400 uppercase tracking-widest font-bold mb-3">
+        Question <span id="q-num">1</span> of <span id="q-total">3</span>
+      </p>
+      <p class="font-headline font-bold text-white text-xl leading-snug mb-6" id="q-text"></p>
+      <div class="flex flex-col gap-3" id="q-options"></div>
+    </div>
+
+    <!-- Feedback row -->
+    <div id="q-feedback" class="hidden bg-navy-light border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-3 fade-up">
+      <span class="text-3xl" id="feedback-emoji">✅</span>
+      <p class="font-body text-slate-300 text-sm" id="feedback-text"></p>
+    </div>
+
+    <button id="next-q-btn" onclick="nextQuestion()" class="hidden w-full py-4 bg-violet-600 hover:bg-violet-500
+            text-white font-label font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-violet-500/30 fade-up">
+      Next Question →
+    </button>
+
+  </div>
+
+  <!-- ── RESULTS STATE ─────────────────────────────────────────────────── -->
+  <div id="state-results" class="hidden flex flex-col gap-5">
+    <div id="results-card" class="bg-gradient-to-br from-violet-950 to-navy-light border border-violet-500/30
+         rounded-[3rem] p-10 flex flex-col items-center gap-5 text-center pop-in">
+      <div class="text-7xl" id="result-emoji">🌟</div>
+      <div>
+        <p class="font-label text-violet-400 font-bold text-sm uppercase tracking-widest mb-1">Quiz Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1"><span id="result-score">0</span>/<span id="result-total">3</span></h2>
+        <p class="font-body text-slate-300" id="result-msg"></p>
+      </div>
+      <div class="flex gap-1" id="result-stars"></div>
+      <p class="font-body text-slate-400 text-sm">+<span id="result-xp">0</span> XP earned!</p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="newStory()"
+                class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+          New Story 📚
+        </button>
+        <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+                class="bg-violet-600 hover:bg-violet-500 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-violet-500/30">
+          Home 🏠
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let selectedTopic = '🌈 Rainbow Valley';
+let difficulty    = 'easy';
+let storyData     = null;   // {title, emoji, sentences[], moral, questions[]}
+let quizIdx       = 0;
+let correctCount  = 0;
+let totalXP       = 0;
+
+// ── Topic & difficulty selection ───────────────────────────────────────────────
+function selectTopic(btn, topic) {
+  selectedTopic = topic;
+  document.querySelectorAll('.topic-chip').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function setDiff(btn, diff) {
+  difficulty = diff;
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.remove('selected','bg-green-brand/20','border-green-brand/40','text-green-400','bg-yellow-500/20','border-yellow-500/40','text-yellow-300','bg-red-500/20','border-red-500/40','text-red-300');
+    b.classList.add('bg-white/6','border-white/10','text-slate-400');
+  });
+  const colorMap = {
+    easy:   ['bg-green-brand/20','border-green-brand/40','text-green-400'],
+    medium: ['bg-yellow-500/20','border-yellow-500/40','text-yellow-300'],
+    hard:   ['bg-red-500/20','border-red-500/40','text-red-300'],
+  };
+  colorMap[diff].forEach(c => btn.classList.add(c));
+  btn.classList.add('selected');
+  btn.classList.remove('bg-white/6','border-white/10','text-slate-400');
+}
+
+// ── Load story from OpenAI ─────────────────────────────────────────────────────
+async function loadStory() {
+  showState('loading');
+
+  const diffDesc = difficulty === 'easy' ? 'very simple A1 English for a 5-6 year old'
+                 : difficulty === 'medium' ? 'simple A2 English for a 7-8 year old'
+                 : 'intermediate B1 English for a 9-10 year old';
+
+  const prompt = `Write a short children's story about "${selectedTopic}" using ${diffDesc}.
+Feature Yara the capybara as the main character. Include 5 sentences, each with 1-2 emojis.
+Then create 3 multiple-choice comprehension questions about the story (4 options each, only 1 correct).
+
+Respond ONLY with valid JSON, no markdown fences:
+{
+  "title": "The Brave Rainbow",
+  "emoji": "🌈",
+  "sentences": ["Yara saw a beautiful rainbow. 🌈✨", "..."],
+  "moral": "Always look for colour after rain!",
+  "questions": [
+    {
+      "q": "What did Yara see?",
+      "options": ["A rainbow","A dragon","A cake","A boat"],
+      "correct": "A rainbow",
+      "explanation": "The story says Yara saw a beautiful rainbow."
+    }
+  ]
+}`;
+
+  try {
+    const res  = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        history: [],
+        message: prompt,
+        systemOverride: 'You are a creative children\'s author. Return only valid JSON as instructed.'
+      })
+    });
+    const json = await res.json();
+    let raw = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    raw = raw.replace(/```json|```/g, '').trim();
+    storyData = JSON.parse(raw);
+    renderStory();
+  } catch(e) {
+    console.error(e);
+    showState('setup');
+    alert('Could not load story. Please check the server is running and try again.');
+  }
+}
+
+function renderStory() {
+  document.getElementById('story-emoji').textContent = storyData.emoji || '📖';
+  document.getElementById('story-title').textContent = storyData.title || 'Yara\'s Adventure';
+  document.getElementById('story-moral').textContent = storyData.moral || '';
+
+  const body = document.getElementById('story-body');
+  body.innerHTML = (storyData.sentences || []).map((s, i) =>
+    `<p class="story-sentence reveal" style="animation-delay:${i * 0.1}s">${s}</p>`
+  ).join('');
+
+  showState('story');
+}
+
+function readAloud() {
+  window.speechSynthesis.cancel();
+  const text = (storyData.sentences || []).join(' ');
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.05;
+  window.speechSynthesis.speak(u);
+}
+
+// ── Quiz ───────────────────────────────────────────────────────────────────────
+function startQuiz() {
+  quizIdx      = 0;
+  correctCount = 0;
+  totalXP      = 0;
+
+  const qs = storyData.questions || [];
+  document.getElementById('q-total').textContent = qs.length;
+  renderProgress();
+  showQuestion();
+  showState('quiz');
+}
+
+function renderProgress() {
+  const qs = storyData.questions || [];
+  document.getElementById('quiz-progress').innerHTML = qs.map((_, i) =>
+    `<div class="h-2 flex-1 rounded-full ${i < quizIdx ? 'bg-violet-500' : i === quizIdx ? 'bg-violet-400' : 'bg-white/15'}"></div>`
+  ).join('');
+}
+
+function showQuestion() {
+  const q = storyData.questions[quizIdx];
+  document.getElementById('q-num').textContent  = quizIdx + 1;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-feedback').classList.add('hidden');
+  document.getElementById('next-q-btn').classList.add('hidden');
+
+  // Shuffle options
+  const opts = [...q.options].sort(() => Math.random() - 0.5);
+  document.getElementById('q-options').innerHTML = opts.map(opt =>
+    `<button class="quiz-opt" onclick="answerQ(this, '${opt.replace(/'/g,"\\'")}', '${q.correct.replace(/'/g,"\\'")}', '${(q.explanation||'').replace(/'/g,"\\'")}')">
+      ${opt}
+    </button>`
+  ).join('');
+
+  renderProgress();
+
+  // Animate card
+  const card = document.getElementById('quiz-card');
+  card.classList.remove('pop-in'); void card.offsetWidth; card.classList.add('pop-in');
+}
+
+function answerQ(btn, chosen, correct, explanation) {
+  // Disable all options
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+
+  const isCorrect = chosen === correct;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    // Highlight correct
+    document.querySelectorAll('.quiz-opt').forEach(b => {
+      if (b.textContent.trim() === correct) b.classList.add('correct');
+    });
+  } else {
+    correctCount++;
+    totalXP += 10;
+    document.getElementById('xp-disp').textContent = totalXP;
+  }
+
+  // Feedback
+  document.getElementById('feedback-emoji').textContent  = isCorrect ? '✅' : '💡';
+  document.getElementById('feedback-text').textContent   = isCorrect
+    ? 'Correct! Great reading! 🌟'
+    : `Not quite. ${explanation}`;
+  document.getElementById('q-feedback').classList.remove('hidden');
+  document.getElementById('next-q-btn').classList.remove('hidden');
+  document.getElementById('next-q-btn').textContent = quizIdx + 1 < storyData.questions.length
+    ? 'Next Question →' : 'See Results 🎉';
+}
+
+function nextQuestion() {
+  quizIdx++;
+  if (quizIdx < storyData.questions.length) {
+    showQuestion();
+  } else {
+    showResults();
+  }
+}
+
+// ── Results ────────────────────────────────────────────────────────────────────
+function showResults() {
+  const total  = storyData.questions.length;
+  const stars  = correctCount === total ? 3 : correctCount >= Math.ceil(total * 0.6) ? 2 : 1;
+  const xpBonus = stars === 3 ? 20 : stars === 2 ? 10 : 0;
+  totalXP += xpBonus;
+  document.getElementById('xp-disp').textContent = totalXP;
+
+  const msgs = ['Keep trying! You can do it! 💪', 'Good effort! Try reading again! 📖', 'Amazing! You understood the story! 🌟'];
+  const emojis = ['📖','😊','🌟'];
+
+  document.getElementById('result-emoji').textContent = emojis[stars - 1];
+  document.getElementById('result-score').textContent = correctCount;
+  document.getElementById('result-total').textContent = total;
+  document.getElementById('result-msg').textContent   = msgs[stars - 1];
+  document.getElementById('result-xp').textContent    = totalXP;
+  document.getElementById('result-stars').innerHTML   = [1,2,3].map(i =>
+    `<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-slate-600'}"
+      style="font-variation-settings:'FILL' ${i<=stars?1:0};">star</span>`
+  ).join('');
+
+  if (window.Store) {
+    Store.addXP(totalXP);
+    Store.completeActivity('games');
+    if (stars === 3) Store.unlockBadge('forest_sage');
+  }
+  if (stars >= 2) launchConfetti();
+
+  showState('results');
+}
+
+function newStory() { showState('setup'); storyData = null; quizIdx = 0; correctCount = 0; totalXP = 0; document.getElementById('xp-disp').textContent = 0; }
+
+function goBack() {
+  window.speechSynthesis.cancel();
+  window.location.href = '6_Home_Forest_Expedition.html';
+}
+
+// ── State switcher ─────────────────────────────────────────────────────────────
+function showState(s) {
+  ['setup','loading','story','quiz','results'].forEach(id => {
+    document.getElementById('state-' + id).classList.toggle('hidden', id !== s);
+  });
+}
+
+function launchConfetti() {
+  const colors=['#818cf8','#ec4899','#06b6d4','#facc15','#10b981'];
+  for(let i=0;i<40;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};
+      animation-delay:${Math.random()*0.6}s;animation-duration:${0.9+Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
+}
+
+// Init difficulty button state
+setDiff(document.querySelector('.diff-btn.selected'), 'easy');
+</script>
+</body>
+</html>

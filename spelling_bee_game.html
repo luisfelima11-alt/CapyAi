@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spelling Bee — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  /* Letter boxes */
+  .letter-box {
+    width: 52px; height: 60px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900;
+    font-size: 1.6rem; color: #fff;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    transition: all 0.15s;
+  }
+  .letter-box.active  { border-color: #f59e0b; background: rgba(245,158,11,0.15); box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+  .letter-box.correct { border-color: #10b981; background: rgba(16,185,129,0.2); }
+  .letter-box.wrong   { border-color: #ef4444; background: rgba(239,68,68,0.15); }
+  .letter-box.hint    { border-color: rgba(255,255,255,0.5); }
+
+  /* Keyboard */
+  .key-btn {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 44px; padding: 0 8px; border-radius: 10px;
+    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 0.95rem;
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.15);
+    color: #fff; cursor: pointer; user-select: none;
+    transition: background 0.1s, transform 0.1s;
+  }
+  .key-btn:hover  { background: rgba(255,255,255,0.2); }
+  .key-btn:active { transform: scale(0.88); }
+  .key-btn.used-correct { background: rgba(16,185,129,0.3); border-color: #10b981; color: #6ee7b7; }
+  .key-btn.used-wrong   { background: rgba(239,68,68,0.2);  border-color: #ef4444; color: #fca5a5; opacity: 0.5; pointer-events:none; }
+
+  /* Animations */
+  @keyframes popIn   { from{opacity:0;transform:scale(0.7)rotate(-5deg)} to{opacity:1;transform:scale(1)rotate(0)} }
+  @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  @keyframes correct { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+  @keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes spark   { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
+
+  .pop-in    { animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+  .do-shake  { animation: shake 0.4s ease; }
+  .do-correct{ animation: correct 0.35s ease; }
+  .float     { animation: float 2.5s ease-in-out infinite; }
+  .spark     { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
+
+  /* Progress */
+  #prog-fill { transition: width 0.5s ease; }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col select-none">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
+  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div>
+    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold">🐝 Spelling Bee</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Spell the word!</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-4">
+    <div class="flex gap-1" id="hearts">
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="1">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="2">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="3">favorite</span>
+    </div>
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+      <span id="score-disp">0</span> pts
+    </div>
+  </div>
+</header>
+
+<div class="h-1.5 bg-white/10 flex-shrink-0">
+  <div id="prog-fill" class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 w-0"></div>
+</div>
+
+<!-- Main -->
+<main class="flex-1 flex flex-col items-center justify-start px-4 py-8 gap-6 overflow-y-auto">
+
+  <!-- Round label + image hint -->
+  <div class="text-center pop-in" id="top-area">
+    <p class="font-label text-yellow-400 text-xs font-bold uppercase tracking-widest mb-3" id="round-lbl">Word 1 of 10</p>
+    <!-- Image / emoji hint -->
+    <div class="w-32 h-32 mx-auto rounded-2xl overflow-hidden mb-3 shadow-xl border border-white/10 bg-surface-container float" id="img-wrap">
+      <span class="text-8xl flex items-center justify-center h-full" id="word-emoji">🌿</span>
+    </div>
+    <p class="font-label text-slate-400 text-sm" id="word-hint">Hear the word and spell it!</p>
+  </div>
+
+  <!-- Hear button -->
+  <button onclick="hearWord()" id="hear-btn"
+          class="flex items-center gap-3 bg-yellow-500 hover:bg-yellow-400 text-white font-headline font-black text-lg px-8 py-4 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
+    <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">volume_up</span>
+    Hear the Word!
+  </button>
+
+  <!-- Letter boxes -->
+  <div id="letter-row" class="flex gap-2 flex-wrap justify-center"></div>
+
+  <!-- Feedback -->
+  <div id="feedback" class="hidden font-label font-bold text-base px-6 py-3 rounded-xl text-center"></div>
+
+  <!-- Hint & Clear -->
+  <div class="flex gap-3">
+    <button onclick="useHint()" id="hint-btn"
+            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold text-sm px-5 py-2.5 rounded-full border border-white/20 active:scale-95 transition-all">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">lightbulb</span> Hint
+    </button>
+    <button onclick="clearInput()"
+            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold text-sm px-5 py-2.5 rounded-full border border-white/20 active:scale-95 transition-all">
+      <span class="material-symbols-outlined text-sm">backspace</span> Clear
+    </button>
+  </div>
+
+  <!-- On-screen keyboard -->
+  <div id="keyboard" class="w-full max-w-lg flex flex-col gap-2 items-center mt-2"></div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Word list ─────────────────────────────────────────────────────────────────
+const WORDS = [
+  { word:'CAT',       emoji:'🐱', hint:'A furry pet that says meow' },
+  { word:'DOG',       emoji:'🐶', hint:'A loyal pet that loves walks' },
+  { word:'SUN',       emoji:'☀️', hint:'The big bright star in the sky' },
+  { word:'TREE',      emoji:'🌳', hint:'A tall plant with branches' },
+  { word:'FISH',      emoji:'🐟', hint:'It swims in the water' },
+  { word:'BIRD',      emoji:'🐦', hint:'It has wings and can fly' },
+  { word:'CAKE',      emoji:'🎂', hint:'A sweet treat for birthdays' },
+  { word:'STAR',      emoji:'⭐', hint:'It shines in the night sky' },
+  { word:'RAIN',      emoji:'🌧️', hint:'Water that falls from clouds' },
+  { word:'FROG',      emoji:'🐸', hint:'A green animal that jumps' },
+];
+
+const KEYBOARD_ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Z','X','C','V','B','N','M','⌫'],
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentIdx  = 0;
+let currentInput = [];
+let lives        = 3;
+let score        = 0;
+let hintsUsed    = 0;
+let answered     = false;
+const shuffled   = [...WORDS].sort(() => Math.random() - 0.5);
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+buildKeyboard();
+renderWord();
+
+function renderWord() {
+  answered  = false;
+  hintsUsed = 0;
+  currentInput = [];
+
+  const w = shuffled[currentIdx];
+  document.getElementById('round-lbl').textContent = `Word ${currentIdx+1} of ${shuffled.length}`;
+  document.getElementById('word-emoji').textContent = w.emoji;
+  document.getElementById('word-hint').textContent  = w.hint;
+  document.getElementById('prog-fill').style.width  = `${(currentIdx/shuffled.length)*100}%`;
+  document.getElementById('feedback').classList.add('hidden');
+  document.getElementById('hint-btn').disabled = false;
+
+  // Reset keyboard colours
+  document.querySelectorAll('.key-btn').forEach(b => b.className = 'key-btn');
+
+  buildLetterBoxes(w.word.length);
+
+  // Animate top area
+  const ta = document.getElementById('top-area');
+  ta.classList.remove('pop-in'); void ta.offsetWidth; ta.classList.add('pop-in');
+}
+
+// ── Letter boxes ──────────────────────────────────────────────────────────────
+function buildLetterBoxes(len) {
+  const row = document.getElementById('letter-row');
+  row.innerHTML = '';
+  for (let i = 0; i < len; i++) {
+    const box = document.createElement('div');
+    box.className   = `letter-box ${i===0?'active':''}`;
+    box.id          = `lb-${i}`;
+    row.appendChild(box);
+  }
+}
+
+function updateBoxes() {
+  const word = shuffled[currentIdx].word;
+  for (let i = 0; i < word.length; i++) {
+    const box = document.getElementById(`lb-${i}`);
+    if (!box) continue;
+    box.textContent = currentInput[i] || '';
+    box.classList.remove('active','correct','wrong','hint');
+    if (i === currentInput.length) box.classList.add('active');
+  }
+}
+
+// ── On-screen keyboard ────────────────────────────────────────────────────────
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  KEYBOARD_ROWS.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'flex gap-1.5 justify-center';
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.className   = 'key-btn';
+      btn.textContent = key;
+      btn.id          = key === '⌫' ? 'key-del' : `key-${key}`;
+      btn.onclick     = () => handleKey(key);
+      rowEl.appendChild(btn);
+    });
+    kb.appendChild(rowEl);
+  });
+}
+
+// Physical keyboard support
+document.addEventListener('keydown', e => {
+  const k = e.key.toUpperCase();
+  if (k === 'BACKSPACE') handleKey('⌫');
+  else if (k === 'ENTER') checkSpelling();
+  else if (/^[A-Z]$/.test(k)) handleKey(k);
+});
+
+function handleKey(key) {
+  if (answered) return;
+  const word = shuffled[currentIdx].word;
+  if (key === '⌫') {
+    currentInput.pop();
+    updateBoxes();
+    return;
+  }
+  if (currentInput.length >= word.length) return;
+  currentInput.push(key);
+  updateBoxes();
+  if (currentInput.length === word.length) {
+    setTimeout(checkSpelling, 120);
+  }
+}
+
+// ── Hear the word ─────────────────────────────────────────────────────────────
+function hearWord() {
+  if (!window.speechSynthesis) return;
+  const word = shuffled[currentIdx].word;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(word.toLowerCase());
+  utt.lang = 'en-US'; utt.rate = 0.75; utt.pitch = 1.0;
+  window.speechSynthesis.speak(utt);
+
+  // Also spell it out after 1s (for harder words)
+  // Disabled by default — only on hint
+}
+
+// ── Hint: reveal first unrevealed letter ─────────────────────────────────────
+function useHint() {
+  const word = shuffled[currentIdx].word;
+  if (hintsUsed >= word.length - 1) return;
+  // Fill the next blank with correct letter
+  if (currentInput.length < word.length) {
+    const correctLetter = word[currentInput.length];
+    currentInput.push(correctLetter);
+    hintsUsed++;
+    updateBoxes();
+    // Mark the box as a hint
+    const box = document.getElementById(`lb-${currentInput.length-1}`);
+    if (box) box.classList.add('hint');
+    // Spell it aloud
+    const utt = new SpeechSynthesisUtterance(correctLetter);
+    utt.lang = 'en-US'; utt.rate = 0.7;
+    window.speechSynthesis?.speak(utt);
+    if (currentInput.length === word.length) setTimeout(checkSpelling, 200);
+  }
+}
+
+function clearInput() {
+  // Only clear non-hinted letters
+  currentInput = [];
+  updateBoxes();
+}
+
+// ── Check spelling ────────────────────────────────────────────────────────────
+function checkSpelling() {
+  if (answered) return;
+  answered = true;
+  const word    = shuffled[currentIdx].word;
+  const attempt = currentInput.join('');
+  const isCorrect = attempt === word;
+
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('hidden','bg-emerald-500/20','text-emerald-300','border-emerald-500/40',
+                                'bg-red-500/20','text-red-300','border-red-500/40','border');
+  fb.classList.add('border');
+
+  if (isCorrect) {
+    const pts = Math.max(10 - hintsUsed * 2, 4);
+    score += pts;
+    document.getElementById('score-disp').textContent = score;
+
+    // Colour boxes green
+    for (let i = 0; i < word.length; i++) {
+      const box = document.getElementById(`lb-${i}`);
+      if (box) { box.classList.add('correct'); box.classList.remove('active','hint'); }
+      // Mark keyboard key
+      const key = document.getElementById(`key-${word[i]}`);
+      if (key) key.classList.add('used-correct');
+    }
+
+    fb.textContent = `✅ Correct! "${word}" +${pts} pts 🎉`;
+    fb.classList.add('bg-emerald-500/20','text-emerald-300','border-emerald-500/40');
+    launchSparks();
+    setTimeout(nextWord, 1600);
+  } else {
+    lives--;
+    updateHearts();
+
+    // Colour boxes
+    for (let i = 0; i < word.length; i++) {
+      const box = document.getElementById(`lb-${i}`);
+      if (!box) continue;
+      if (attempt[i] === word[i]) box.classList.add('correct');
+      else                        box.classList.add('wrong');
+      box.classList.remove('active');
+    }
+
+    // Mark wrong keys
+    for (let i = 0; i < attempt.length; i++) {
+      if (attempt[i] !== word[i]) {
+        const key = document.getElementById(`key-${attempt[i]}`);
+        if (key) key.classList.add('used-wrong');
+      }
+    }
+
+    fb.textContent = lives > 0
+      ? `❌ Not quite! The word is "${word}". Try again!`
+      : `💔 The word was "${word}". Let's keep going!`;
+    fb.classList.add('bg-red-500/20','text-red-300','border-red-500/40');
+
+    // Shake the letter row
+    const row = document.getElementById('letter-row');
+    row.classList.add('do-shake');
+    setTimeout(() => row.classList.remove('do-shake'), 450);
+
+    if (lives <= 0) {
+      setTimeout(showFinished, 1800);
+    } else {
+      setTimeout(() => {
+        currentInput = [];
+        answered     = false;
+        buildLetterBoxes(word.length);
+        fb.classList.add('hidden');
+      }, 2200);
+    }
+  }
+}
+
+function updateHearts() {
+  document.querySelectorAll('[data-h]').forEach(h => {
+    if (parseInt(h.dataset.h) > lives) {
+      h.style.opacity = '0.2';
+      h.style.transform = 'scale(0.7)';
+    }
+  });
+}
+
+function nextWord() {
+  currentIdx++;
+  if (currentIdx >= shuffled.length) {
+    showFinished();
+  } else {
+    renderWord();
+  }
+}
+
+// ── Sparks ─────────────────────────────────────────────────────────────────────
+function launchSparks() {
+  const colors = ['#f59e0b','#10b981','#ec4899','#a855f7','#3b82f6'];
+  for (let i = 0; i < 16; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const a = (i/16)*360, d = 55+Math.random()*70;
+    sp.style.setProperty('--tx',`${Math.cos(a*Math.PI/180)*d}px`);
+    sp.style.setProperty('--ty',`${Math.sin(a*Math.PI/180)*d}px`);
+    sp.style.background = colors[i%colors.length];
+    sp.style.left='50vw'; sp.style.top='40vh';
+    document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(), 950);
+  }
+}
+
+// ── Finished overlay ───────────────────────────────────────────────────────────
+function showFinished() {
+  const total    = shuffled.length;
+  const maxScore = total * 10;
+  const pct      = score / maxScore;
+  const xp       = Math.round(pct * 50) + 10;
+  const stars    = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1;
+
+  if (window.Store) {
+    Store.addXP(xp);
+    Store.activateStreak();
+    Store.completeActivity('games');
+    Store.completeActivity('spelling');
+    if (stars === 3) Store.unlockBadge('fast_tracker');
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.innerHTML = `
+    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-yellow-500/60
+         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         scale-0 opacity-0 transition-all duration-500">
+      <div class="text-7xl float">🐝</div>
+      <div>
+        <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">Spelling Bee Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
+        <p class="font-body text-slate-300">Score: ${score} points</p>
+      </div>
+      <div class="flex gap-1">
+        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
+             style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
+      </div>
+      <p class="font-body text-slate-400 text-sm">
+        ${stars===3?'🏅 Perfect speller! Fast Tracker badge unlocked!':
+          stars===2?'Great spelling! Keep practising! 🌿':
+                    'Good effort! Tap "Hear it" to learn each word. 💪'}
+      </p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again 🔄</button>
+        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                class="bg-yellow-500 hover:bg-yellow-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">Games 🌿</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const f=document.getElementById('fin');
+    f.style.transform='scale(1)'; f.style.opacity='1';
+  }));
+  launchSparks();
+}
+</script>
+</body>
+</html>

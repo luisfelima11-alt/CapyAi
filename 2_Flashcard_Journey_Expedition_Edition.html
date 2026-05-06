@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Flashcard Journey (Expedition Edition)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Lexend:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#001f3f", // Navy Blue
+              "secondary": "#ec4899", // Pink (approx tailwind pink-500)
+              "tertiary": "#10b981", // Green (approx tailwind emerald-500)
+              "surface": "#001f3f",
+              "on-surface": "#ffffff",
+              "surface-container": "#002a54",
+              "background": "#001f3f",
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be Vietnam Pro"],
+              "label": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .card-flip-container {
+        perspective: 1000px;
+      }
+      .card-flip-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+      }
+      .card-flip-container.flipped .card-flip-inner {
+        transform: rotateY(180deg);
+      }
+      .card-front, .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .card-back {
+        transform: rotateY(180deg);
+      }
+    </style>
+    <script>
+        function toggleFlip(element) {
+            element.classList.toggle('flipped');
+        }
+    </script>
+    <style>
+    </style>
+</head>
+<body class="bg-primary font-body text-white selection:bg-secondary/30 overflow-x-hidden min-h-screen">
+<!-- Component Placeholders -->
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<!-- Spacer for fixed side nav -->
+<main class="md:pl-32 flex flex-col lg:flex-row items-start justify-center gap-8 pt-28 pb-16 px-6 min-h-screen">
+<!-- Center Content -->
+<div class="flex-1 w-full flex flex-col items-center gap-10">
+<!-- Deck Picker Strip -->
+<div id="deck-picker" class="flex gap-3 overflow-x-auto w-full max-w-2xl pb-1 scrollbar-hide"
+     style="scrollbar-width:none; -ms-overflow-style:none;"></div>
+<!-- AI Topics Row -->
+<div id="ai-topics-row" class="w-full max-w-2xl flex flex-col gap-1"></div>
+<!-- Progress Area -->
+<div class="w-full max-w-2xl bg-white/5 p-8 rounded-xl backdrop-blur-sm">
+<div class="flex justify-between items-end mb-4 px-2">
+<h2 id="deck-label" class="font-headline text-2xl text-white font-bold">🌿 Forest Friends</h2>
+<span id="progress-text" class="font-label text-emerald-400 font-bold">1 / 10 Cards</span>
+</div>
+<div class="h-4 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner">
+<div id="progress-bar-fill" class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 rounded-full w-[10%] transition-all duration-500"></div>
+</div>
+</div>
+<!-- The Big Flashcard -->
+<div id="card-container" class="card-flip-container w-full max-w-lg aspect-[3/4] cursor-pointer" onclick="toggleFlip(this)">
+<div class="card-flip-inner">
+<!-- Front Side -->
+<div class="card-front bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center border-none overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, #001f3f 1px, transparent 0); background-size: 24px 24px;"></div>
+<div class="w-full h-full rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative">
+<img id="card-image" alt="Flashcard Image" class="w-full h-full object-cover" src=""/>
+<span id="card-emoji-placeholder" class="text-9xl select-none" style="display:none;line-height:1;"></span>
+<div class="absolute bottom-6 bg-primary/90 backdrop-blur-md px-6 py-2 rounded-full flex items-center gap-2 border border-white/20">
+<span class="material-symbols-outlined text-emerald-400">touch_app</span>
+<span class="font-label text-white font-medium">Tap to Flip!</span>
+</div>
+</div>
+</div>
+<!-- Back Side -->
+<div class="card-back bg-gradient-to-br from-slate-900 via-primary to-slate-900 rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-white text-center border border-white/10">
+<div class="mb-8">
+<span id="card-icon" class="material-symbols-outlined text-9xl text-emerald-500 opacity-40">eco</span>
+</div>
+<h1 id="card-word" class="font-headline text-8xl font-black tracking-tight mb-4">Apple</h1>
+<p id="card-pron" class="font-body text-2xl text-pink-400 mb-12">/ˈæp.əl/</p>
+<button onclick="event.stopPropagation(); speakWord(document.getElementById('card-word').innerText)"
+        class="bg-pink-500 text-white p-8 rounded-full shadow-lg shadow-pink-500/30 hover:scale-110 active:scale-95 transition-all group"
+        title="Hear it!">
+<span class="material-symbols-outlined text-6xl group-active:scale-90" style="font-variation-settings: 'FILL' 1;">volume_up</span>
+</button>
+<button onclick="event.stopPropagation(); translateWord()"
+        class="bg-white/10 border border-white/20 text-white px-6 py-3 rounded-full hover:bg-white/20 active:scale-95 transition-all flex items-center gap-2 mt-4"
+        title="Translate">
+  <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">translate</span>
+  <span class="font-label font-bold text-sm">Translate</span>
+</button>
+<!-- Translation bubble -->
+<div id="translate-bubble" class="hidden mt-4 bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-center max-w-xs">
+  <p class="font-label text-xs text-slate-400 uppercase tracking-widest mb-1">Translation</p>
+  <p id="translate-result" class="font-headline text-2xl font-bold text-emerald-400"></p>
+  <p id="translate-example" class="font-body text-xs text-slate-400 mt-1 italic"></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Controls -->
+<div class="flex items-center gap-12">
+<button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="flex flex-col items-center gap-2 group">
+<div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-emerald-500 transition-all shadow-md group-hover:scale-110">
+<span class="material-symbols-outlined text-4xl transform rotate-180">pets</span>
+</div>
+<span class="font-label font-bold text-emerald-400">Back</span>
+</button>
+<button onclick="nextCard()" class="flex flex-col items-center gap-2 group">
+<div class="w-24 h-24 bg-pink-500 text-white rounded-full flex items-center justify-center hover:bg-pink-600 transition-all shadow-xl shadow-pink-500/20 group-hover:scale-110 active:scale-90">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">pets</span>
+</div>
+<span class="font-label font-bold text-pink-400">Next Card</span>
+</button>
+</div>
+</div>
+<!-- Right Side: Mini Progress/Badges -->
+<div class="hidden lg:flex w-1/4 flex-col gap-8">
+<div class="bg-white/5 backdrop-blur-md p-8 rounded-xl border border-white/10 shadow-sm">
+<h3 class="font-headline text-emerald-400 font-bold text-xl mb-4">Stickers Earned</h3>
+<div id="sticker-grid" class="grid grid-cols-2 gap-4"></div>
+<button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html#trophies'" class="w-full mt-6 py-3 bg-pink-500 text-white rounded-full font-label font-bold text-sm hover:bg-pink-600 transition-all active:scale-95">View Album</button>
+</div>
+<div onclick="window.location.href='3_Dialogue_Expedition_Yara_Turn.html'" class="relative overflow-hidden bg-emerald-600 rounded-xl p-6 text-white shadow-lg cursor-pointer hover:scale-105 transition-transform">
+<div class="relative z-10">
+<p class="font-label text-xs uppercase font-bold opacity-80 mb-1">Coming Up Next</p>
+<p class="font-headline font-bold text-lg">Dialogue with Yara</p>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/10">chat_bubble</span>
+</div>
+<div class="flex flex-col items-center gap-6 mt-4">
+<div class="relative">
+  <!-- speech bubble above Yara -->
+  <div class="absolute -top-2 -right-2 z-10" style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15));">
+    <div class="bg-white rounded-2xl px-3 py-2 relative max-w-[140px]">
+      <p class="font-label font-bold text-navy text-xs leading-tight">"Great job! Let's find more words! 🌿"</p>
+      <!-- triangle tail pointing down-left toward Yara -->
+      <div style="position:absolute;bottom:-8px;left:18px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid white;"></div>
+    </div>
+  </div>
+  <!-- Yara image in circle -->
+  <div class="w-44 h-44 rounded-full overflow-hidden border-4 border-pink-500/30 bg-white/5 shadow-xl mt-8">
+    <img alt="Capy Yara" class="w-full h-full object-cover mix-blend-multiply" src="yara.png"/>
+  </div>
+</div>
+</div>
+</div>
+</main>
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="flashcards.js"></script>
+<script src="components.js"></script>
+<script>
+    Components.mount('top-nav-placeholder', Components.renderTopNav('flashcards'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('flashcards'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('flashcards'));
+    Components.mount('footer-placeholder', Components.renderFooter());
+
+    const BADGE_ICONS = {
+        tree_warden:  { icon: 'eco',           color: 'text-emerald-500', bg: 'bg-emerald-500/20', border: 'border-emerald-500/30' },
+        fast_tracker: { icon: 'rocket_launch',  color: 'text-pink-500',    bg: 'bg-pink-500/20',    border: 'border-pink-500/30' },
+        explorer:     { icon: 'style',          color: 'text-pink-500',    bg: 'bg-pink-500/20',    border: 'border-pink-500/30' },
+        chat_master:  { icon: 'chat_bubble',    color: 'text-emerald-500', bg: 'bg-emerald-500/20', border: 'border-emerald-500/30' },
+        game_hero:    { icon: 'sports_esports', color: 'text-pink-500',    bg: 'bg-pink-500/20',    border: 'border-pink-500/30' },
+        forest_sage:  { icon: 'auto_awesome',   color: 'text-emerald-500', bg: 'bg-emerald-500/20', border: 'border-emerald-500/30' },
+    };
+
+    function renderStickers() {
+        const badges = Store.state.badges.slice(0, 4);
+        const slots = 4;
+        let html = badges.map(id => {
+            const b = BADGE_ICONS[id] || { icon: 'star', color: 'text-white', bg: 'bg-white/10', border: 'border-white/20' };
+            return `<div class="aspect-square ${b.bg} rounded-full flex items-center justify-center shadow-inner border ${b.border}">
+                <span class="material-symbols-outlined text-3xl ${b.color}" style="font-variation-settings: 'FILL' 1;">${b.icon}</span>
+            </div>`;
+        }).join('');
+        for (let i = badges.length; i < slots; i++) {
+            html += `<div class="aspect-square bg-white/5 rounded-full flex items-center justify-center shadow-inner border-2 border-dashed border-white/20 opacity-40">
+                <span class="material-symbols-outlined text-2xl text-white/40">add</span>
+            </div>`;
+        }
+        document.getElementById('sticker-grid').innerHTML = html;
+    }
+
+    renderStickers();
+    document.addEventListener('stateChanged', renderStickers);
+
+    // ── Translation ───────────────────────────────────────────────────────────
+    async function translateWord() {
+        const word    = document.getElementById('card-word').innerText.trim();
+        const bubble  = document.getElementById('translate-bubble');
+        const result  = document.getElementById('translate-result');
+        const example = document.getElementById('translate-example');
+
+        // Get language from settings
+        const settings = JSON.parse(localStorage.getItem('capySettings') || '{}');
+        const lang     = settings.translateLang || 'Spanish';
+
+        bubble.classList.remove('hidden');
+        result.textContent  = '⏳ Translating…';
+        example.textContent = '';
+
+        try {
+            const res  = await fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ word, targetLang: lang })
+            });
+            const data = await res.json();
+            const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+            const clean = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+            const obj   = JSON.parse(clean);
+            result.textContent  = obj.translation || '—';
+            example.textContent = obj.example     || '';
+        } catch(e) {
+            result.textContent = '⚠️ Unavailable';
+        }
+    }
+</script>
+</body></html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yara's Forest — Aprenda Inglês Conversando</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { navy:'#001229', 'navy-mid':'#001f3f', 'pink-brand':'#ec4899', 'teal-brand':'#14b8a6' },
+        fontFamily: { sans:['Plus Jakarta Sans','sans-serif'] }
+      }}
+    };
+  </script>
+  <style>
+    * { font-family:'Plus Jakarta Sans',sans-serif; }
+
+    /* Animated blobs */
+    @keyframes blobFloat {
+      0%,100% { transform:translate(0,0) scale(1); }
+      33%      { transform:translate(30px,-20px) scale(1.08); }
+      66%      { transform:translate(-20px,15px) scale(0.95); }
+    }
+    .blob { position:absolute; border-radius:9999px; filter:blur(80px); opacity:0.25; animation:blobFloat 12s ease-in-out infinite; pointer-events:none; }
+    .blob-2 { animation-delay:-4s; }
+    .blob-3 { animation-delay:-8s; }
+
+    /* Fade up on scroll */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+
+    /* Chat demo */
+    @keyframes chatIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    .chat-bubble { opacity:0; }
+    .chat-bubble.show { animation:chatIn .4s ease forwards; }
+
+    /* Gradient text */
+    .grad-pink { background:linear-gradient(135deg,#f472b6,#ec4899,#db2777); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .grad-teal { background:linear-gradient(135deg,#2dd4bf,#14b8a6,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+    /* Check / cross for table */
+    .check { color:#34d399; }
+    .cross { color:#475569; }
+
+    /* Pricing card glow */
+    .plus-card { box-shadow:0 0 0 1px rgba(236,72,153,.3), 0 30px 80px rgba(236,72,153,.15); }
+
+    /* Scroll-snap for mobile steps */
+    .steps-scroll { scroll-snap-type:x mandatory; overflow-x:auto; scrollbar-width:none; }
+    .steps-scroll::-webkit-scrollbar { display:none; }
+    .step-snap { scroll-snap-align:start; }
+  </style>
+</head>
+<body class="bg-[#001229] text-white overflow-x-hidden">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TOP NAV
+═══════════════════════════════════════════════════════════════════ -->
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5" style="background:rgba(0,18,41,.85);backdrop-filter:blur(16px)">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
+      <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-pink-400/60 shadow-md bg-pink-100 flex items-center justify-center text-xl">🦫</div>
+      <span class="text-xl font-black tracking-tight">Yara's Forest</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="learn.html" class="hidden sm:block text-slate-400 hover:text-white text-sm font-bold transition-colors">Open App →</a>
+      <a href="#pricing" class="bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black px-5 py-2.5 rounded-full text-sm hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-pink-500/25">
+        Ver Planos
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════════════ -->
+<section class="relative min-h-screen flex items-center pt-24 pb-20 overflow-hidden">
+
+  <!-- Background blobs -->
+  <div class="blob bg-pink-500   w-[600px] h-[600px] top-[-100px]  left-[-200px]"  style="animation-duration:14s"></div>
+  <div class="blob bg-violet-500 w-[500px] h-[500px] bottom-[-80px] right-[-150px]" style="animation-duration:10s;animation-delay:-3s"></div>
+  <div class="blob bg-teal-500   w-[300px] h-[300px] top-[40%]      left-[50%]"    style="animation-duration:18s;animation-delay:-6s"></div>
+
+  <div class="relative max-w-4xl mx-auto px-6 text-center">
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 bg-white/8 border border-white/15 rounded-full px-4 py-2 text-sm font-bold text-slate-300 mb-6">
+      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+      Aprenda inglês conversando com IA — de graça
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-black text-5xl sm:text-6xl md:text-7xl leading-[1.05] mb-6">
+      Fale inglês<br>
+      <span class="grad-pink">do jeito certo.</span>
+    </h1>
+    <p class="text-slate-400 text-lg sm:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
+      24 lições organizadas em trilha, mini-aulas de 12 minutos e conversação real com a Yara — sua professora de IA.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="learn.html"
+         class="bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black px-10 py-4 rounded-2xl text-lg shadow-xl shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all">
+        Começar de graça →
+      </a>
+      <a href="#pricing"
+         class="bg-white/8 border border-white/20 text-white font-bold px-8 py-4 rounded-2xl text-lg hover:bg-white/15 transition-all">
+        Ver plano Plus ✨
+      </a>
+    </div>
+
+    <!-- Social proof mini -->
+    <div class="flex flex-wrap justify-center gap-6 mt-12 text-slate-500 text-sm font-bold">
+      <span>✅ Grátis para começar</span>
+      <span>🔒 Sem cartão necessário</span>
+      <span>🎓 Feito para brasileiros</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════════════════════════ -->
+<section class="border-y border-white/8 py-10 bg-white/3 reveal">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <p class="font-black text-4xl text-white mb-1">24</p>
+        <p class="text-slate-400 text-sm font-bold">Lições completas</p>
+      </div>
+      <div>
+        <p class="font-black text-4xl text-white mb-1">96</p>
+        <p class="text-slate-400 text-sm font-bold">Mini-aulas de 12 min</p>
+      </div>
+      <div>
+        <p class="font-black text-4xl text-white mb-1">6</p>
+        <p class="text-slate-400 text-sm font-bold">Atividades por lição</p>
+      </div>
+      <div>
+        <p class="font-black text-4xl grad-pink mb-1">∞</p>
+        <p class="text-slate-400 text-sm font-bold">Conversas com Yara IA</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════════════════════════════ -->
+<section class="py-24 px-6 reveal">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-14">
+      <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Como funciona</p>
+      <h2 class="font-black text-4xl text-white">Aprenda em 3 passos simples</h2>
+    </div>
+    <div class="steps-scroll md:grid md:grid-cols-3 gap-6 flex">
+      <!-- Step 1 -->
+      <div class="step-snap min-w-[280px] md:min-w-0 bg-white/5 border border-white/10 rounded-3xl p-7 flex-shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-2xl mb-5">🗺️</div>
+        <span class="text-pink-400 font-black text-xs uppercase tracking-widest">Passo 1</span>
+        <h3 class="font-black text-xl text-white mt-2 mb-3">Siga a trilha</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">24 lições divididas em 4 mini-aulas cada. Cada dia tem um foco: Ouvir, Jogo, Praticar ou Conversar.</p>
+      </div>
+      <!-- Step 2 -->
+      <div class="step-snap min-w-[280px] md:min-w-0 bg-white/5 border border-white/10 rounded-3xl p-7 flex-shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-2xl mb-5">🦫</div>
+        <span class="text-violet-400 font-black text-xs uppercase tracking-widest">Passo 2</span>
+        <h3 class="font-black text-xl text-white mt-2 mb-3">Converse com Yara</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Yara é sua professora de IA. Ela corrige, elogia e te desafia a praticar inglês real — sem julgamento.</p>
+      </div>
+      <!-- Step 3 -->
+      <div class="step-snap min-w-[280px] md:min-w-0 bg-white/5 border border-white/10 rounded-3xl p-7 flex-shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-2xl mb-5">🏆</div>
+        <span class="text-amber-400 font-black text-xs uppercase tracking-widest">Passo 3</span>
+        <h3 class="font-black text-xl text-white mt-2 mb-3">Ganhe XP & Badges</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Complete dias, mantenha sua sequência e desbloqueie conquistas. Aprender inglês vira um jogo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     CHAT DEMO (animated)
+═══════════════════════════════════════════════════════════════════ -->
+<section class="py-20 px-6 reveal" id="demo-section">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-12">
+      <p class="text-teal-400 font-black text-sm uppercase tracking-widest mb-3">Conversação real com IA</p>
+      <h2 class="font-black text-4xl text-white">Fale. Yara responde. Você aprende.</h2>
+      <p class="text-slate-400 mt-3 text-base max-w-lg mx-auto">É assim que a fluência acontece: praticando, não decorando.</p>
+    </div>
+
+    <div class="max-w-sm mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+      <!-- Chat header -->
+      <div class="bg-gradient-to-r from-pink-500 to-violet-500 px-5 py-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl flex-shrink-0">🦫</div>
+        <div>
+          <p class="text-white font-black text-base leading-tight">Yara</p>
+          <p class="text-white/70 text-xs">Professora de IA · Online</p>
+        </div>
+        <div class="ml-auto flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+          <span class="text-white/70 text-xs font-bold">ao vivo</span>
+        </div>
+      </div>
+      <!-- Chat messages -->
+      <div id="chat-demo-msgs" class="p-5 space-y-4 min-h-[260px] bg-slate-50/50">
+        <!-- injected by JS -->
+      </div>
+      <!-- Input mock -->
+      <div class="border-t border-slate-100 px-4 py-3 bg-white flex gap-2 items-center">
+        <div class="flex-1 bg-slate-100 rounded-xl px-4 py-2 text-slate-400 text-sm">Type your answer…</div>
+        <div class="w-9 h-9 rounded-xl bg-pink-500 flex items-center justify-center text-white text-sm font-black flex-shrink-0">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     FEATURE COMPARISON
+═══════════════════════════════════════════════════════════════════ -->
+<section class="py-24 px-6 reveal" id="features">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-14">
+      <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Planos</p>
+      <h2 class="font-black text-4xl text-white">O que está incluído</h2>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white/4 rounded-3xl border border-white/10 overflow-hidden">
+      <!-- Header -->
+      <div class="grid grid-cols-3 bg-white/5 border-b border-white/10 px-6 py-4">
+        <div class="text-slate-400 font-black text-sm uppercase tracking-wider">Funcionalidade</div>
+        <div class="text-center">
+          <p class="font-black text-white text-sm">Grátis</p>
+          <p class="text-slate-500 text-xs">R$0/mês</p>
+        </div>
+        <div class="text-center">
+          <p class="font-black grad-pink text-sm">Plus ✨</p>
+          <p class="text-pink-400/70 text-xs">R$19,90/mês</p>
+        </div>
+      </div>
+
+      <!-- Rows -->
+      <div id="feature-rows"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PRICING
+═══════════════════════════════════════════════════════════════════ -->
+<section class="py-24 px-6 relative reveal" id="pricing">
+  <div class="blob bg-pink-600 w-[500px] h-[500px] opacity-15 top-0 left-1/2 -translate-x-1/2"></div>
+  <div class="max-w-4xl mx-auto relative">
+    <div class="text-center mb-12">
+      <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Escolha seu plano</p>
+      <h2 class="font-black text-4xl text-white">Comece grátis. Evolua quando quiser.</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Free card -->
+      <div class="bg-white/4 border border-white/10 rounded-3xl p-8">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <p class="font-black text-2xl text-white">Grátis</p>
+            <p class="text-slate-400 text-sm mt-1">Para começar agora</p>
+          </div>
+          <div class="text-4xl">🌱</div>
+        </div>
+        <div class="mb-8">
+          <p class="font-black text-5xl text-white">R$0</p>
+          <p class="text-slate-500 text-sm mt-1">Para sempre</p>
+        </div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> Capítulo 1 completo (5 lições)</li>
+          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> 20 mini-aulas de 12 min</li>
+          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> 3 conversas com Yara por dia</li>
+          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> XP, streaks e badges</li>
+          <li class="flex items-center gap-3 text-sm text-slate-400"><span class="cross text-lg">✗</span> <span class="line-through opacity-50">Capítulos 2–4 (19 lições)</span></li>
+          <li class="flex items-center gap-3 text-sm text-slate-400"><span class="cross text-lg">✗</span> <span class="line-through opacity-50">Criador de lições</span></li>
+        </ul>
+        <a href="learn.html"
+           class="block w-full text-center bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black py-4 rounded-2xl transition-all text-base active:scale-95">
+          Começar grátis →
+        </a>
+      </div>
+
+      <!-- Plus card -->
+      <div class="plus-card bg-gradient-to-br from-[#0d1f40] to-[#001229] border border-pink-500/30 rounded-3xl p-8 relative overflow-hidden">
+        <!-- Popular badge -->
+        <div class="absolute top-6 right-6 bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black text-xs px-3 py-1.5 rounded-full">
+          Mais popular
+        </div>
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <p class="font-black text-2xl grad-pink">Plus ✨</p>
+            <p class="text-slate-400 text-sm mt-1">Para quem quer fluência</p>
+          </div>
+          <div class="text-4xl">🌿</div>
+        </div>
+        <div class="mb-8">
+          <p class="font-black text-5xl text-white">R$19,90</p>
+          <p class="text-slate-500 text-sm mt-1">/mês · Cancele quando quiser</p>
+        </div>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> <strong>Todas as 24 lições</strong> (96 mini-aulas)</li>
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> <strong>15 conversas com Yara por dia</strong></li>
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> Criador de lições personalizadas</li>
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> AI Quick-Fill no criador</li>
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> XP, streaks, badges e ranking</li>
+          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> Suporte prioritário</li>
+        </ul>
+        <a href="https://pay.kiwify.com.br/SEU-LINK-PLUS" target="_blank"
+           class="block w-full text-center bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black py-4 rounded-2xl text-base shadow-xl shadow-pink-500/25 hover:opacity-90 active:scale-95 transition-all">
+          Assinar por R$19,90/mês →
+        </a>
+        <p class="text-slate-600 text-xs text-center mt-3">Pagamento seguro via Kiwify · Cartão ou Pix</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PRIVATE LESSONS CTA
+═══════════════════════════════════════════════════════════════════ -->
+<section class="py-20 px-6 reveal">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-gradient-to-br from-teal-900/40 to-teal-800/20 border border-teal-500/25 rounded-3xl p-10 text-center">
+      <div class="text-5xl mb-4">👨‍🏫</div>
+      <h2 class="font-black text-3xl text-white mb-3">Aulas Particulares</h2>
+      <p class="text-slate-400 text-base leading-relaxed mb-8 max-w-md mx-auto">
+        Quer acelerar ainda mais com aulas ao vivo? Fale com o professor diretamente pelo WhatsApp e monte um plano personalizado pra você.
+      </p>
+      <a href="https://wa.me/55SEUNUMERO?text=Olá!%20Tenho%20interesse%20nas%20aulas%20particulares%20de%20inglês%20da%20Yara's%20Forest%20🦫"
+         target="_blank"
+         class="inline-flex items-center gap-3 bg-[#25D366] hover:bg-[#1eb858] text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all">
+        <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.196.593 4.25 1.627 6.015L.057 23.882a.5.5 0 0 0 .612.612l5.867-1.57A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.874 9.874 0 0 1-5.031-1.38l-.36-.214-3.732.979.999-3.648-.235-.375A9.862 9.862 0 0 1 2.118 12C2.118 6.48 6.48 2.118 12 2.118S21.882 6.48 21.882 12 17.52 21.882 12 21.882z"/></svg>
+        Falar com o Professor
+      </a>
+      <p class="text-slate-600 text-xs mt-5">Sem preços fixos · Conversa sem compromisso</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════════════ -->
+<footer class="border-t border-white/8 py-12 px-6">
+  <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-2.5">
+      <span class="text-2xl">🦫</span>
+      <span class="font-black text-lg">Yara's Forest</span>
+    </div>
+    <div class="flex gap-6 text-slate-500 text-sm font-bold">
+      <a href="learn.html"            class="hover:text-white transition-colors">Trilha</a>
+      <a href="6_Home_Forest_Expedition.html" class="hover:text-white transition-colors">Home</a>
+      <a href="#pricing"              class="hover:text-white transition-colors">Planos</a>
+    </div>
+    <p class="text-slate-600 text-xs">© 2025 Yara's Forest · Feito com 🦫 para brasileiros</p>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════════════ -->
+<script>
+// ── Scroll reveal ──────────────────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Feature table ──────────────────────────────────────────────────
+const FEATURES = [
+  { label:'Capítulo 1 (5 lições)',       free:true,  plus:true  },
+  { label:'Mini-aulas (4 por lição)',     free:'20',  plus:'96'  },
+  { label:'Capítulos 2–4 (19 lições)',   free:false, plus:true  },
+  { label:'Conversas com Yara / dia',    free:'3',   plus:'15'  },
+  { label:'XP, Streaks e Badges',        free:true,  plus:true  },
+  { label:'Progresso e histórico',       free:true,  plus:true  },
+  { label:'Criador de lições',           free:false, plus:true  },
+  { label:'AI Quick-Fill (criador)',      free:false, plus:true  },
+  { label:'Suporte prioritário',         free:false, plus:true  },
+];
+
+function renderCheck(val) {
+  if (val === true)  return `<span class="check font-black text-xl">✓</span>`;
+  if (val === false) return `<span class="cross text-xl">✗</span>`;
+  return `<span class="text-white font-black text-sm">${val}</span>`;
+}
+
+const rowsHtml = FEATURES.map((f, i) => `
+  <div class="grid grid-cols-3 px-6 py-4 border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/2'} hover:bg-white/4 transition-all">
+    <div class="text-slate-300 text-sm font-bold flex items-center">${f.label}</div>
+    <div class="flex items-center justify-center">${renderCheck(f.free)}</div>
+    <div class="flex items-center justify-center">${renderCheck(f.plus)}</div>
+  </div>`).join('');
+document.getElementById('feature-rows').innerHTML = rowsHtml;
+
+// ── Animated chat demo ─────────────────────────────────────────────
+const DEMO_CHAT = [
+  { who:'yara',    text:'Great job with today\'s lesson! 🌟 Can you use the word "appointment" in a sentence?' },
+  { who:'student', text:'I have an appointment at the doctor tomorrow.' },
+  { who:'yara',    text:'Perfect! That\'s exactly right 🎉 Very natural English. Now try: how would you cancel that appointment?' },
+  { who:'student', text:'I need to cancel my appointment because I\'m sick.' },
+  { who:'yara',    text:'Excellent! You\'re using complex sentences now. That\'s real fluency! 🦫✨' },
+];
+
+const msgEl = document.getElementById('chat-demo-msgs');
+
+function makeBubble(item) {
+  const div = document.createElement('div');
+  div.className = `chat-bubble flex gap-2 items-start ${item.who === 'student' ? 'justify-end' : ''}`;
+  if (item.who === 'yara') {
+    div.innerHTML = `
+      <span class="text-xl mt-0.5 flex-shrink-0">🦫</span>
+      <div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[75%] leading-relaxed">${item.text}</div>`;
+  } else {
+    div.innerHTML = `
+      <div class="bg-pink-500 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[75%] leading-relaxed">${item.text}</div>`;
+  }
+  return div;
+}
+
+let demoIdx = 0;
+let demoTimer = null;
+
+function showNextBubble() {
+  if (demoIdx >= DEMO_CHAT.length) {
+    // Restart after pause
+    demoTimer = setTimeout(() => {
+      msgEl.innerHTML = '';
+      demoIdx = 0;
+      demoTimer = setTimeout(showNextBubble, 600);
+    }, 4000);
+    return;
+  }
+  const b = makeBubble(DEMO_CHAT[demoIdx]);
+  msgEl.appendChild(b);
+  msgEl.scrollTop = msgEl.scrollHeight;
+  setTimeout(() => b.classList.add('show'), 20);
+  demoIdx++;
+  const delay = DEMO_CHAT[demoIdx - 1].who === 'yara' ? 1800 : 1200;
+  demoTimer = setTimeout(showNextBubble, delay);
+}
+
+// Start demo when section is visible
+const demoSection = document.getElementById('demo-section');
+const demoObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && demoIdx === 0) {
+    setTimeout(showNextBubble, 600);
+  }
+}, { threshold: 0.3 });
+demoObserver.observe(demoSection);
+</script>
+
+</body>
+</html>

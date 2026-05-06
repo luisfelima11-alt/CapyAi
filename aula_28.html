@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 28 — Personalities & Moods</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+
+/* Floating header emojis */
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+
+/* Flip card */
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem;}
+.flip-back{transform:rotateY(180deg)}
+
+/* Tab active underline */
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#8b5cf6,#ec4899);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#8b5cf6;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+
+/* Practice shake */
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+
+/* XP pop */
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+
+/* Degree adverb thermometer */
+.thermo-bar{height:10px;border-radius:9999px;background:linear-gradient(90deg,#3b82f6,#22c55e,#eab308,#f97316,#ef4444,#7c3aed)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+
+/* Progress dots */
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- ── HERO ──────────────────────────────────────────────────────────── -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-violet-950 to-purple-900 text-white">
+    <!-- Floating emoji decorations -->
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:10%;left:3%;animation-delay:0s">😊</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">😢</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:15%;animation-delay:1.3s">😠</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:22%;animation-delay:.4s">😰</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">🤩</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:15%;animation-delay:1.6s">😎</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:5%;animation-delay:.2s">😴</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:28%;animation-delay:1s">😳</span>
+    </div>
+
+    <div class="relative max-w-5xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-8">
+      <div class="flex-1">
+        <!-- Back link -->
+        <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+          <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+        </a>
+        <div class="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-400/30 rounded-full px-4 py-1 text-sm font-black text-pink-300 mb-3">
+          Aula 28
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">
+          😊 Personalities<br><span class="text-violet-300">&amp; Moods</span>
+        </h1>
+        <p class="text-white/60 text-base mb-5">Learn how to describe how people feel and who they are — using adjectives, verbs and degree adverbs like a native speaker.</p>
+
+        <!-- Verbs highlight -->
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Feel</span>
+          <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Seem</span>
+          <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Act</span>
+          <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Express</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall section progress -->
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STICKY TAB BAR ─────────────────────────────────────────────────── -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="moods">🌤️ Moods</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="personality">🧠 Personality</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ─────────────────────────────────────────────────────────── -->
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: MOODS -->
+    <div id="tab-moods" class="tab-content fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-navy">Moods & Emotional States</h2>
+          <p class="text-slate-500 text-sm mt-1">Click a card to flip and reveal the translation. Press 🔊 to hear it.</p>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-black text-violet-600" id="moods-count">0<span class="text-sm text-slate-400">/15</span></div>
+          <div class="text-xs text-slate-400 font-bold">learned</div>
+        </div>
+      </div>
+      <!-- Progress bar -->
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+        <div id="moods-bar" class="h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full transition-all duration-500" style="width:0%"></div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="moods-grid"></div>
+    </div>
+
+    <!-- TAB: PERSONALITY -->
+    <div id="tab-personality" class="tab-content fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-navy">Personality Types</h2>
+          <p class="text-slate-500 text-sm mt-1">Flip the cards to learn each personality trait.</p>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-black text-violet-600" id="pers-count">0<span class="text-sm text-slate-400">/15</span></div>
+          <div class="text-xs text-slate-400 font-bold">learned</div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+        <div id="pers-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" style="width:0%"></div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="pers-grid"></div>
+    </div>
+
+    <!-- TAB: EXPRESSIONS -->
+    <div id="tab-expressions" class="tab-content fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+      <p class="text-slate-500 text-sm mb-6">Natural English phrases native speakers use every day. Click to reveal the meaning.</p>
+      <div class="grid gap-4" id="expr-grid"></div>
+    </div>
+
+    <!-- TAB: GRAMMAR -->
+    <div id="tab-grammar" class="tab-content fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Grammar Rules</h2>
+      <p class="text-slate-500 text-sm mb-6">3 key rules for describing personality and mood in English.</p>
+
+      <!-- 3 Rules -->
+      <div class="space-y-4 mb-8">
+        <div class="rounded-2xl border-2 border-violet-200 bg-violet-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('r1')">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-violet-500 text-white font-black text-sm flex items-center justify-center">1</span>
+              <div>
+                <div class="font-black text-navy">TO BE + Adjective</div>
+                <div class="text-violet-600 text-sm font-semibold">Personality — permanent traits</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-violet-400 transition-transform" id="r1-arrow">expand_more</span>
+          </button>
+          <div id="r1" class="px-5 pb-5 hidden">
+            <div class="bg-white rounded-xl p-4 space-y-2">
+              <p class="text-slate-600 text-sm">Use <strong class="text-violet-700">to be</strong> when describing someone's permanent personality.</p>
+              <div class="space-y-1.5 mt-3">
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0"></span><span>She <strong class="text-violet-700">is</strong> shy. <span class="text-slate-400">— always, naturally</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0"></span><span>He <strong class="text-violet-700">is</strong> very ambitious. <span class="text-slate-400">— a core trait</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0"></span><span>They <strong class="text-violet-700">are</strong> incredibly creative. <span class="text-slate-400">— who they are</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('r2')">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-blue-500 text-white font-black text-sm flex items-center justify-center">2</span>
+              <div>
+                <div class="font-black text-navy">TO FEEL / SEEM + Adjective</div>
+                <div class="text-blue-600 text-sm font-semibold">Mood — temporary states</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-blue-400 transition-transform" id="r2-arrow">expand_more</span>
+          </button>
+          <div id="r2" class="px-5 pb-5 hidden">
+            <div class="bg-white rounded-xl p-4 space-y-2">
+              <p class="text-slate-600 text-sm">Use <strong class="text-blue-700">to feel</strong> or <strong class="text-blue-700">to seem</strong> when describing temporary emotional states.</p>
+              <div class="space-y-1.5 mt-3">
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span><span>She <strong class="text-blue-700">feels</strong> nervous. <span class="text-slate-400">— right now</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span><span>He <strong class="text-blue-700">seems</strong> tired today. <span class="text-slate-400">— at this moment</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0"></span><span>I <strong class="text-blue-700">felt</strong> overwhelmed yesterday. <span class="text-slate-400">— past state</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('r3')">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">3</span>
+              <div>
+                <div class="font-black text-navy">TO ACT + Adjective</div>
+                <div class="text-amber-700 text-sm font-semibold">Behavior — how someone is acting</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-amber-400 transition-transform" id="r3-arrow">expand_more</span>
+          </button>
+          <div id="r3" class="px-5 pb-5 hidden">
+            <div class="bg-white rounded-xl p-4 space-y-2">
+              <p class="text-slate-600 text-sm">Use <strong class="text-amber-700">to act</strong> when describing someone's current behavior (which may differ from their personality).</p>
+              <div class="space-y-1.5 mt-3">
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></span><span>He <strong class="text-amber-700">is acting</strong> strange. <span class="text-slate-400">— unusual behavior</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></span><span>Stop <strong class="text-amber-700">acting</strong> stubborn! <span class="text-slate-400">— in this moment</span></span></div>
+                <div class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"></span><span>She <strong class="text-amber-700">acted</strong> confident at the interview. <span class="text-slate-400">— on that occasion</span></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Degree Adverbs -->
+      <div class="rounded-2xl border-2 border-slate-200 bg-white p-6">
+        <h3 class="font-black text-navy text-lg mb-1">🌡️ Degree Adverbs</h3>
+        <p class="text-slate-500 text-sm mb-5">How <em>intense</em> is the feeling? Use these adverbs to express degree.</p>
+        <div class="thermo-bar mb-4"></div>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-2"><div class="text-lg">🧊</div><div class="font-black text-blue-700 text-xs mt-1">A little</div><div class="text-[10px] text-slate-400">Um pouco</div></div>
+          <div class="bg-teal-50 border border-teal-200 rounded-xl p-2"><div class="text-lg">😌</div><div class="font-black text-teal-700 text-xs mt-1">Quite</div><div class="text-[10px] text-slate-400">Bastante</div></div>
+          <div class="bg-green-50 border border-green-200 rounded-xl p-2"><div class="text-lg">😊</div><div class="font-black text-green-700 text-xs mt-1">Really</div><div class="text-[10px] text-slate-400">Realmente</div></div>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-2"><div class="text-lg">😤</div><div class="font-black text-yellow-700 text-xs mt-1">Very</div><div class="text-[10px] text-slate-400">Muito</div></div>
+          <div class="bg-orange-50 border border-orange-200 rounded-xl p-2"><div class="text-lg">🔥</div><div class="font-black text-orange-700 text-xs mt-1">Extremely</div><div class="text-[10px] text-slate-400">Extremamente</div></div>
+          <div class="bg-red-50 border border-red-200 rounded-xl p-2"><div class="text-lg">🌋</div><div class="font-black text-red-700 text-xs mt-1">Incredibly</div><div class="text-[10px] text-slate-400">Incrivelmente</div></div>
+        </div>
+        <div class="mt-4 bg-slate-50 rounded-xl p-4 space-y-1.5">
+          <p class="text-sm text-slate-600"><span class="font-black text-blue-600">A little</span> nervous → <span class="font-black text-red-600">Incredibly</span> nervous</p>
+          <p class="text-sm text-slate-600">She is <span class="font-bold text-violet-600">quite</span> shy. · He seems <span class="font-bold text-orange-600">extremely</span> tired. · I feel <span class="font-bold text-red-600">incredibly</span> proud!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="tab-content fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-navy">Practice</h2>
+          <p class="text-slate-500 text-sm mt-1">10 questions to test what you've learned.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-2xl font-black text-violet-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div>
+            <div class="text-[10px] text-slate-400 font-bold">score</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div>
+            <div class="text-[10px] text-slate-400 font-bold">streak</div>
+          </div>
+        </div>
+      </div>
+      <!-- Progress bar -->
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+        <div id="prac-bar" class="h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full transition-all duration-500" style="width:0%"></div>
+      </div>
+      <div id="practice-area"></div>
+      <!-- Result overlay (hidden by default) -->
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-violet-100 text-violet-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="tab-content fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat it aloud. Check when you've practised it.</p>
+      <div class="space-y-3" id="speak-grid"></div>
+    </div>
+
+    <!-- TAB: HOMEWORK -->
+    <div id="tab-homework" class="tab-content fade-in hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+            <p class="text-white/80 text-sm">Aula 28 — Personalities &amp; Moods</p>
+          </div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔀 Coloque as palavras na ordem certa</h3>
+              <p class="text-slate-500 text-sm mt-1">Toque nas palavras para montar a frase — estilo Duolingo!</p>
+            </div>
+          </div>
+          <div id="wo28-wrap"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔗 Conecte: emoção ↔ tradução</h3>
+              <p class="text-slate-500 text-sm mt-1">Clique numa palavra em inglês e depois na tradução correta em português.</p>
+            </div>
+          </div>
+          <div id="mp28-wrap"></div>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-700 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div>
+              <h3 class="font-black text-navy text-base">❌ Corrija o erro gramatical</h3>
+              <p class="text-slate-500 text-sm mt-1">Cada frase tem um erro. Reescreva corretamente.</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "She loves meet new people — she is very outgoing."</p>
+              <input type="text" id="err28-1" placeholder="She loves …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err28fb1" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "I felt very anxious of the presentation yesterday."</p>
+              <input type="text" id="err28-2" placeholder="I felt very anxious …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err28fb2" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "He is very reliably and always keeps his promises."</p>
+              <input type="text" id="err28-3" placeholder="He is very …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err28fb3" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <button onclick="checkErrors28()" class="bg-red-50 border-2 border-red-200 text-red-700 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-red-100 transition-all">Verificar respostas ✓</button>
+          </div>
+        </div>
+
+        <!-- Task 4: Describe people -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Descreva 3 pessoas com adjetivos de personalidade</h3>
+              <p class="text-slate-500 text-sm mt-1">Pense em 3 pessoas reais. Escreva 1–2 frases sobre cada uma usando adjetivos da aula.</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div><p class="text-xs font-bold text-slate-400 mb-1">Pessoa 1 (nome/função):</p><input type="text" placeholder="e.g. My friend Ana is very outgoing and…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-violet-400"/></div>
+            <div><p class="text-xs font-bold text-slate-400 mb-1">Pessoa 2 (nome/função):</p><input type="text" placeholder="e.g. My brother can be stubborn but…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-violet-400"/></div>
+            <div><p class="text-xs font-bold text-slate-400 mb-1">Pessoa 3 (nome/função):</p><input type="text" placeholder="e.g. My favourite actor is extremely confident…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-violet-400"/></div>
+          </div>
+        </div>
+
+        <!-- Task 5: My Personality paragraph -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Minha Personalidade — parágrafo livre</h3>
+              <p class="text-slate-500 text-sm mt-1">Escreva 4–5 frases descrevendo sua personalidade. Use pelo menos 4 adjetivos e 1 expressão da aula.</p>
+            </div>
+          </div>
+          <textarea rows="5" placeholder="I would describe myself as… I am very… However, sometimes I can be… People say I am… I think my best quality is…" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+        </div>
+
+      </div>
+
+      <button onclick="submitHomework28()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Submit Homework &nbsp;+75 XP
+      </button>
+      <div id="hw-done-28" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const MOODS = [
+  {en:'Happy',       pt:'Feliz',          emoji:'😊', color:'yellow', pos:true,  ex:'I feel really happy today!'},
+  {en:'Sad',         pt:'Triste',         emoji:'😢', color:'blue',   pos:false, ex:'She seems quite sad lately.'},
+  {en:'Angry',       pt:'Com raiva',      emoji:'😠', color:'red',    pos:false, ex:'He is acting very angry.'},
+  {en:'Upset',       pt:'Chateado(a)',    emoji:'😤', color:'orange', pos:false, ex:'She feels upset about it.'},
+  {en:'Tired',       pt:'Cansado(a)',     emoji:'😴', color:'slate',  pos:false, ex:'I am incredibly tired.'},
+  {en:'Anxious',     pt:'Ansioso(a)',     emoji:'😰', color:'purple', pos:false, ex:'He feels anxious before tests.'},
+  {en:'Excited',     pt:'Animado(a)',     emoji:'🤩', color:'pink',   pos:true,  ex:'She is extremely excited!'},
+  {en:'Bored',       pt:'Entediado(a)',   emoji:'😑', color:'gray',   pos:false, ex:'The kids seem really bored.'},
+  {en:'Frustrated',  pt:'Frustrado(a)',   emoji:'😣', color:'red',    pos:false, ex:'I feel quite frustrated.'},
+  {en:'Nervous',     pt:'Nervoso(a)',     emoji:'😬', color:'yellow', pos:false, ex:'She looks a little nervous.'},
+  {en:'Relieved',    pt:'Aliviado(a)',    emoji:'😌', color:'green',  pos:true,  ex:'I feel so relieved now!'},
+  {en:'Overwhelmed', pt:'Sobrecarregado',emoji:'🥵', color:'orange', pos:false, ex:'He seems overwhelmed with work.'},
+  {en:'Confident',   pt:'Confiante',     emoji:'😎', color:'blue',   pos:true,  ex:'She is very confident.'},
+  {en:'Embarrassed', pt:'Envergonhado(a)',emoji:'😳',color:'pink',   pos:false, ex:'I felt embarrassed in class.'},
+  {en:'Proud',       pt:'Orgulhoso(a)',  emoji:'🥲', color:'violet', pos:true,  ex:'I am incredibly proud of you!'},
+];
+
+const PERSONALITY = [
+  {en:'Outgoing',    pt:'Extrovertido(a)', emoji:'🎉', pos:true,  ex:'She is very outgoing at parties.'},
+  {en:'Shy',         pt:'Tímido(a)',       emoji:'🫣', pos:null,  ex:'He is quite shy around strangers.'},
+  {en:'Confident',   pt:'Confiante',       emoji:'💪', pos:true,  ex:'She seems really confident.'},
+  {en:'Honest',      pt:'Honesto(a)',      emoji:'🤝', pos:true,  ex:'He is extremely honest.'},
+  {en:'Kind',        pt:'Gentil',         emoji:'💛', pos:true,  ex:'She is incredibly kind to everyone.'},
+  {en:'Stubborn',    pt:'Teimoso(a)',      emoji:'🐂', pos:false, ex:'He can be very stubborn sometimes.'},
+  {en:'Patient',     pt:'Paciente',       emoji:'⏳', pos:true,  ex:'A good teacher is very patient.'},
+  {en:'Ambitious',   pt:'Ambicioso(a)',   emoji:'🚀', pos:true,  ex:'She is quite ambitious.'},
+  {en:'Sensitive',   pt:'Sensível',       emoji:'🌸', pos:null,  ex:'He is a little sensitive.'},
+  {en:'Creative',    pt:'Criativo(a)',    emoji:'🎨', pos:true,  ex:'She is incredibly creative.'},
+  {en:'Reliable',    pt:'Confiável',      emoji:'🔒', pos:true,  ex:'He is extremely reliable.'},
+  {en:'Impulsive',   pt:'Impulsivo(a)',   emoji:'⚡', pos:false, ex:'She acts very impulsively.'},
+  {en:'Empathetic',  pt:'Empático(a)',    emoji:'❤️', pos:true,  ex:'A good friend is really empathetic.'},
+  {en:'Pessimistic', pt:'Pessimista',     emoji:'☁️', pos:false, ex:'He can be quite pessimistic.'},
+  {en:'Optimistic',  pt:'Otimista',       emoji:'🌈', pos:true,  ex:'She is always very optimistic!'},
+];
+
+const EXPRESSIONS = [
+  {expr:"I'm not in the mood", pt:"Não estou com disposição", emoji:'😑', example:"Sorry, I'm not in the mood to go out tonight — I'm really tired.", meaning:"You don't feel like doing something right now."},
+  {expr:"She's on top of the world", pt:"Ela está nas nuvens / no auge", emoji:'🌟', example:"She just got promoted — she's on top of the world!", meaning:"Someone feels extremely happy and successful."},
+  {expr:"He's driving me crazy", pt:"Ele está me deixando louco(a)", emoji:'😤', example:"He keeps interrupting me — he's driving me crazy!", meaning:"Someone or something is making you very annoyed."},
+  {expr:"I'm feeling under pressure", pt:"Estou me sentindo sob pressão", emoji:'😰', example:"With so many deadlines, I'm really feeling under pressure this week.", meaning:"You feel stressed because of demands or expectations."},
+];
+
+const PRACTICE_QS = [
+  {q:"She ___ shy. She always avoids speaking in public.", opts:["is","feels","acts","seems"], a:"is", rule:"TO BE = permanent personality"},
+  {q:"He ___ nervous before the presentation.", opts:["is acting","feels","is","has"], a:"feels", rule:"TO FEEL = temporary mood"},
+  {q:"I'm not in the mood. What does this expression mean?", opts:["I'm very happy","I don't feel like doing it","I'm feeling great","I'm bored"], a:"I don't feel like doing it", rule:"Expression meaning"},
+  {q:"Choose the correct degree adverb: She is ___ confident (more than 'very').", opts:["a little","quite","very","extremely"], a:"extremely", rule:"Degree adverb scale"},
+  {q:"He ___ strange today — he's usually very friendly.", opts:["is","feels","is acting","seems"], a:"is acting", rule:"TO ACT = current behavior"},
+  {q:"Which word means 'ansioso(a)' in English?", opts:["Relieved","Anxious","Proud","Bored"], a:"Anxious", rule:"Mood vocabulary"},
+  {q:"She's on top of the world. This means she feels...", opts:["under pressure","extremely happy","very nervous","quite tired"], a:"extremely happy", rule:"Expression meaning"},
+  {q:"Which personality trait means 'empático(a)'?", opts:["Impulsive","Stubborn","Empathetic","Pessimistic"], a:"Empathetic", rule:"Personality vocabulary"},
+  {q:"'A little' is ___ strong than 'extremely'.", opts:["more","much more","less","equally"], a:"less", rule:"Degree adverb comparison"},
+  {q:"I ___ overwhelmed with work this week.", opts:["am acting","is","feel","are"], a:"feel", rule:"TO FEEL = temporary mood"},
+];
+
+const SPEAK_SENTENCES = [
+  {text:"I feel <strong class='text-violet-600'>really</strong> happy when I'm with my friends.", highlight:"really"},
+  {text:"She seems <strong class='text-blue-600'>quite</strong> nervous about the exam.", highlight:"quite"},
+  {text:"He is <strong class='text-orange-600'>extremely</strong> stubborn — he never changes his mind!", highlight:"extremely"},
+  {text:"I was feeling <strong class='text-red-600'>incredibly</strong> overwhelmed last week.", highlight:"incredibly"},
+  {text:"She's <strong class='text-green-600'>very</strong> reliable — you can always count on her.", highlight:"very"},
+  {text:"He acted <strong class='text-yellow-600'>a little</strong> strange at the party.", highlight:"a little"},
+  {text:"I'm not in the mood to talk right now — I feel <strong class='text-blue-600'>quite</strong> tired.", highlight:"quite"},
+  {text:"She's on top of the world after getting her promotion! She feels <strong class='text-orange-600'>extremely</strong> proud.", highlight:"extremely"},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const moodsLearned = new Set();
+const persLearned  = new Set();
+const exprShown    = new Set();
+const speakDone    = new Set();
+let sectionsDone   = 0;
+let pracIdx = 0, pracScore = 0, pracStreak = 0;
+let shuffledQs = [];
+
+// ── SECTION PROGRESS DOTS ────────────────────────────────────────────────────
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  c.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = document.createElement('div');
+    d.className = `prog-dot ${i < sectionsDone ? 'bg-violet-400' : 'bg-white/20'}`;
+    c.appendChild(d);
+  }
+  document.getElementById('section-label').textContent = `${sectionsDone} / 7 sections done`;
+}
+buildSectionDots();
+
+// ── FLIP CARDS ────────────────────────────────────────────────────────────────
+function moodColorClass(c) {
+  const map = {yellow:'bg-yellow-400',blue:'bg-blue-400',red:'bg-red-400',orange:'bg-orange-400',slate:'bg-slate-400',purple:'bg-purple-400',pink:'bg-pink-400',gray:'bg-gray-300',green:'bg-green-400',violet:'bg-violet-400'};
+  return map[c] || 'bg-slate-300';
+}
+function moodBgClass(c) {
+  const map = {yellow:'bg-yellow-50 border-yellow-200',blue:'bg-blue-50 border-blue-200',red:'bg-red-50 border-red-200',orange:'bg-orange-50 border-orange-200',slate:'bg-slate-100 border-slate-200',purple:'bg-purple-50 border-purple-200',pink:'bg-pink-50 border-pink-200',gray:'bg-gray-50 border-gray-200',green:'bg-green-50 border-green-200',violet:'bg-violet-50 border-violet-200'};
+  return map[c] || 'bg-slate-50 border-slate-200';
+}
+
+function buildFlipCards(data, gridId, countId, barId, learnedSet, checkFn) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  data.forEach((item, i) => {
+    const isMood = !!item.color;
+    const posClass = item.pos === true ? 'border-emerald-300' : item.pos === false ? 'border-red-200' : 'border-slate-200';
+    const bg = isMood ? moodBgClass(item.color) : (item.pos === true ? 'bg-emerald-50 border-emerald-200' : item.pos === false ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200');
+    const dot = isMood ? moodColorClass(item.color) : (item.pos === true ? 'bg-emerald-400' : item.pos === false ? 'bg-red-400' : 'bg-slate-400');
+
+    const card = document.createElement('div');
+    card.className = 'flip-card h-32';
+    card.dataset.idx = i;
+    card.innerHTML = `
+      <div class="flip-card-inner">
+        <div class="flip-front border-2 ${bg} flex flex-col items-center justify-center p-2 gap-1">
+          <div class="text-3xl">${item.emoji}</div>
+          <div class="font-black text-navy text-sm text-center">${item.en}</div>
+          <button class="mt-1 text-slate-400 hover:text-violet-500 transition-colors" onclick="event.stopPropagation();speak('${item.en}')" title="Listen">
+            <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span>
+          </button>
+        </div>
+        <div class="flip-back border-2 ${bg} flex flex-col items-center justify-center p-2 gap-1">
+          <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Portuguese</div>
+          <div class="font-black text-navy text-sm text-center">${item.pt}</div>
+          <div class="text-[10px] text-slate-500 text-center leading-tight px-1">${item.ex}</div>
+          <div class="w-4 h-1 rounded-full ${dot} mt-1"></div>
+        </div>
+      </div>`;
+
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped') && !learnedSet.has(i)) {
+        learnedSet.add(i);
+        updateFlipProgress(learnedSet, countId, barId, data.length, checkFn);
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function updateFlipProgress(set, countId, barId, total, checkFn) {
+  const n = set.size;
+  document.getElementById(countId).innerHTML = `${n}<span class="text-sm text-slate-400">/${total}</span>`;
+  document.getElementById(barId).style.width = `${(n/total)*100}%`;
+  if (checkFn) checkFn(n === total);
+}
+
+buildFlipCards(MOODS, 'moods-grid', 'moods-count', 'moods-bar', moodsLearned, (done) => { if(done && !sectionsDone) markSection(); });
+buildFlipCards(PERSONALITY, 'pers-grid', 'pers-count', 'pers-bar', persLearned, (done) => { if(done) markSection(); });
+
+function markSection() { sectionsDone++; buildSectionDots(); }
+
+// ── EXPRESSIONS ───────────────────────────────────────────────────────────────
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPRESSIONS.forEach((e, i) => {
+    const card = document.createElement('div');
+    card.className = 'rounded-2xl border-2 border-slate-200 bg-white overflow-hidden hover:border-violet-300 transition-colors';
+    card.innerHTML = `
+      <div class="flex items-start gap-5 p-6">
+        <div class="text-5xl flex-shrink-0 opacity-80">${e.emoji}</div>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-xl font-black text-navy mb-1">"${e.expr}"</h3>
+          <button onclick="toggleExpr(${i})" class="inline-flex items-center gap-1.5 text-violet-600 hover:text-violet-800 text-sm font-bold mb-3 transition-colors">
+            <span class="material-symbols-outlined text-sm">translate</span>
+            <span id="expr-btn-${i}">Show Translation</span>
+          </button>
+          <div id="expr-trans-${i}" class="hidden">
+            <div class="bg-violet-50 border border-violet-200 rounded-xl px-4 py-2 mb-3">
+              <span class="text-violet-700 font-black">🇧🇷 ${e.pt}</span>
+            </div>
+          </div>
+          <p class="text-slate-500 text-sm"><span class="font-bold text-slate-700">Example:</span> "${e.example}"</p>
+          <p class="text-slate-400 text-xs mt-1 italic">${e.meaning}</p>
+        </div>
+        <button onclick="speak('${e.expr.replace(/'/g,"\\'")}','en-US')" class="text-slate-300 hover:text-violet-500 transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">volume_up</span>
+        </button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+buildExpressions();
+
+function toggleExpr(i) {
+  const el = document.getElementById(`expr-trans-${i}`);
+  const btn = document.getElementById(`expr-btn-${i}`);
+  const hidden = el.classList.toggle('hidden');
+  btn.textContent = hidden ? 'Show Translation' : 'Hide Translation';
+  if (!hidden && !exprShown.has(i)) { exprShown.add(i); if (exprShown.size === 4) markSection(); }
+}
+
+// ── ACCORDION ─────────────────────────────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  el.classList.toggle('hidden');
+  arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ── PRACTICE ──────────────────────────────────────────────────────────────────
+function shuffle(a) { return [...a].sort(() => Math.random()-.5); }
+
+function buildPractice() {
+  shuffledQs = shuffle(PRACTICE_QS);
+  pracIdx = 0; pracScore = 0; pracStreak = 0;
+  updatePracStats();
+  renderQuestion();
+}
+
+function updatePracStats() {
+  document.getElementById('prac-score').innerHTML = `${pracScore}<span class="text-sm text-slate-400">/10</span>`;
+  document.getElementById('prac-streak').textContent = `🔥 ${pracStreak}`;
+  document.getElementById('prac-bar').style.width = `${(pracIdx/10)*100}%`;
+}
+
+function renderQuestion() {
+  if (pracIdx >= 10) { showResult(); return; }
+  const q = shuffledQs[pracIdx];
+  const opts = shuffle(q.opts);
+  const area = document.getElementById('practice-area');
+  area.innerHTML = `
+    <div class="fade-in">
+      <div class="text-xs font-black text-violet-400 uppercase tracking-widest mb-2">Question ${pracIdx+1} of 10</div>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 mb-4 shadow-sm">
+        <p class="text-lg font-bold text-navy">${q.q}</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="opts-grid">
+        ${opts.map(o => `
+          <button onclick="answerPrac('${o.replace(/'/g,"\\'")}','${q.a.replace(/'/g,"\\'")}',this)"
+            class="opt-btn text-left bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-700 hover:border-violet-400 hover:bg-violet-50 transition-all active:scale-95">
+            ${o}
+          </button>`).join('')}
+      </div>
+      <div id="prac-feedback" class="mt-4 hidden"></div>
+    </div>`;
+}
+
+function answerPrac(chosen, correct, btn) {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+  const ok = chosen === correct;
+  const fb = document.getElementById('prac-feedback');
+  if (ok) {
+    btn.className = btn.className.replace('border-slate-200','border-emerald-400') + ' bg-emerald-50 text-emerald-700';
+    pracScore++; pracStreak++;
+    showXpPop(btn, '+5 XP 🔥');
+    fb.innerHTML = `<div class="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-2 font-bold text-sm">✅ Correct! ${shuffledQs[pracIdx].rule}</div>`;
+  } else {
+    btn.className = btn.className.replace('border-slate-200','border-red-400') + ' bg-red-50 text-red-700';
+    btn.classList.add('shake');
+    pracStreak = 0;
+    // highlight correct
+    btns.forEach(b => { if (b.textContent.trim() === correct) { b.className = b.className.replace('border-slate-200','border-emerald-400') + ' bg-emerald-50 text-emerald-700'; } });
+    fb.innerHTML = `<div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 font-bold text-sm">❌ Correct answer: <strong>${correct}</strong></div>`;
+  }
+  fb.classList.remove('hidden');
+  pracIdx++;
+  updatePracStats();
+  setTimeout(renderQuestion, 1200);
+}
+
+function showXpPop(el, txt) {
+  const pop = document.createElement('div');
+  pop.className = 'xp-pop fixed text-sm font-black text-violet-600 bg-white border border-violet-200 rounded-full px-3 py-1 shadow z-50';
+  pop.style.cssText = `left:50%;top:60%;transform:translateX(-50%)`;
+  pop.textContent = txt;
+  document.body.appendChild(pop);
+  setTimeout(() => pop.remove(), 800);
+}
+
+function showResult() {
+  document.getElementById('result-msg').textContent = `You scored ${pracScore} out of 10.${pracScore >= 8 ? ' Outstanding! 🌟' : pracScore >= 6 ? ' Keep it up!' : ' Keep practising!'}`;
+  document.getElementById('result-emoji').textContent = pracScore >= 8 ? '🏆' : pracScore >= 6 ? '🎉' : '💪';
+  document.getElementById('result-title').textContent = pracScore >= 8 ? 'Excellent!' : pracScore >= 6 ? 'Well done!' : 'Keep going!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection();
+  if (typeof Store !== 'undefined') { Store.addXP(50); }
+}
+
+function restartPractice() {
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── SPEAK ─────────────────────────────────────────────────────────────────────
+function buildSpeak() {
+  const grid = document.getElementById('speak-grid');
+  SPEAK_SENTENCES.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:border-violet-300 transition-colors';
+    div.innerHTML = `
+      <button onclick="speakRaw(${i})" class="flex-shrink-0 w-12 h-12 rounded-full bg-violet-100 hover:bg-violet-200 text-violet-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <p class="flex-1 text-navy font-semibold text-sm leading-relaxed">${s.text}</p>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="speak-check w-5 h-5 accent-violet-500" onchange="markSpeak(${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Done</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+
+function speakRaw(i) {
+  const plain = SPEAK_SENTENCES[i].text.replace(/<[^>]+>/g,'');
+  speak(plain);
+}
+
+function markSpeak(i, chk) {
+  if (chk.checked) { speakDone.add(i); } else { speakDone.delete(i); }
+  if (speakDone.size >= 6) markSection();
+}
+
+// ── TTS HELPER ────────────────────────────────────────────────────────────────
+function speak(text, lang='en-US') {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── HOMEWORK INTERACTIVE EXERCISES — AULA 28 ─────────────────────────────────
+function hwShuffle28(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+// ---- Word Order ----
+const WO28_DATA = [
+  { s: 'She is very outgoing and confident at parties',      w: ['She','is','very','outgoing','and','confident','at','parties'] },
+  { s: 'He feels anxious before important presentations',    w: ['He','feels','anxious','before','important','presentations'] },
+  { s: 'Every cloud has a silver lining in difficult times', w: ['Every','cloud','has','a','silver','lining','in','difficult','times'] },
+];
+const wo28 = WO28_DATA.map(d => ({ ans: [], bank: hwShuffle28(d.w) }));
+function wo28Render() {
+  const c = document.getElementById('wo28-wrap'); if (!c) return;
+  c.innerHTML = WO28_DATA.map((d,i) => {
+    const st = wo28[i];
+    return `<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i < WO28_DATA.length-1 ? 'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO28_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length ? st.ans.map((w,j)=>`<span onclick="wo28Move(1,${i},${j})" class="cursor-pointer select-none bg-violet-100 text-violet-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-violet-200 active:scale-95 transition-all">${w}</span>`).join('') : '<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo28Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-violet-400 hover:bg-violet-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo28Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo28Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo28fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo28Move(fromBank, si, wi) {
+  if (fromBank) wo28[si].bank.push(wo28[si].ans.splice(wi,1)[0]);
+  else          wo28[si].ans.push(wo28[si].bank.splice(wi,1)[0]);
+  wo28Render();
+}
+function wo28Check(i) {
+  const fb = document.getElementById('wo28fb'+i); if (!fb) return;
+  if (wo28[i].ans.join(' ').toLowerCase() === WO28_DATA[i].s.toLowerCase()) {
+    fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600';
+  } else { fb.textContent='❌ Tente novamente!'; fb.className='text-xs font-black text-red-500'; }
+}
+function wo28Reset(i) {
+  wo28[i] = { ans:[], bank: hwShuffle28(WO28_DATA[i].w) };
+  const fb = document.getElementById('wo28fb'+i); if (fb) fb.textContent='';
+  wo28Render();
+}
+wo28Render();
+
+// ---- Match Pairs ----
+const MP28 = [
+  { l:'Anxious 😰',    r:'Ansioso(a)' },
+  { l:'Relieved 😌',   r:'Aliviado(a)' },
+  { l:'Outgoing 🎉',   r:'Extrovertido(a)' },
+  { l:'Stubborn 🐂',   r:'Teimoso(a)' },
+  { l:'Empathetic ❤️', r:'Empático(a)' },
+];
+const mp28R = hwShuffle28(MP28.map((p,i)=>({label:p.r, pid:i})));
+let mp28SelL = null; const mp28Done = new Set();
+function mp28Render() {
+  const c = document.getElementById('mp28-wrap'); if (!c) return;
+  c.innerHTML = `<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP28.map((p,i)=>`<div id="mp28L${i}" onclick="mp28ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp28Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp28SelL===i?'border-violet-500 bg-violet-100 text-violet-800':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp28R.map((r,i)=>`<div id="mp28R${i}" onclick="mp28ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp28Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${r.label}</div>`).join('')}</div>
+  </div>${mp28Done.size===MP28.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp28ClickL(i) { if(mp28Done.has(i))return; mp28SelL=(mp28SelL===i)?null:i; mp28Render(); }
+function mp28ClickR(i) {
+  if(mp28SelL===null)return; const r=mp28R[i]; if(mp28Done.has(r.pid))return;
+  if(r.pid===mp28SelL){ mp28Done.add(mp28SelL); mp28SelL=null; mp28Render(); }
+  else {
+    const lEl=document.getElementById('mp28L'+mp28SelL), rEl=document.getElementById('mp28R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{ mp28SelL=null; mp28Render(); },700);
+  }
+}
+mp28Render();
+
+// ---- Error Correction ----
+const ERR28_CHECKS = [
+  v => v.includes('loves meeting') && !v.includes('loves meet'),
+  v => v.includes('anxious about') && !v.includes('anxious of'),
+  v => v.includes('reliable') && !v.includes('reliably'),
+];
+const ERR28_HINTS = ['meet → meeting (loves + verb-ing)', 'of → about (anxious about)', 'reliably → reliable (adjective, not adverb)'];
+function checkErrors28() {
+  ERR28_CHECKS.forEach((check,i) => {
+    const inp=document.getElementById('err28-'+(i+1)), fb=document.getElementById('err28fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){ fb.classList.add('hidden'); return; }
+    fb.classList.remove('hidden');
+    if(check(v)){ fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600 mt-1'; }
+    else { fb.textContent=`❌ Dica: "${ERR28_HINTS[i]}"`; fb.className='text-xs font-black text-red-500 mt-1'; }
+  });
+}
+
+function submitHomework28() {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '✓ Submitted!'; btn.classList.add('opacity-75');
+  document.getElementById('hw-done-28').classList.remove('hidden');
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(75);
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+const TABS = ['moods','personality','expressions','grammar','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-'+t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+</script>
+</body>
+</html>

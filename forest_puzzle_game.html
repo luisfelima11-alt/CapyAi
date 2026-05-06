@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forest Puzzle — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{extend:{
+      colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+      fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+      borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  .letter-tile{transition:transform .15s,background .15s,opacity .15s;}
+  .letter-tile:hover{transform:scale(1.08) translateY(-3px);}
+  .letter-tile.used{opacity:.25;pointer-events:none;}
+  .slot-filled{animation:slotPop .25s ease;}
+  .shake-answer{animation:shakeRow .4s ease;}
+  .correct-flash{animation:correctGlow .5s ease;}
+  @keyframes slotPop    {0%{transform:scale(.8)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+  @keyframes shakeRow   {0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  @keyframes correctGlow{0%{box-shadow:0 0 0 0 rgba(16,185,129,.6)}100%{box-shadow:0 0 0 20px rgba(16,185,129,0)}}
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-32 pt-28 pb-20 px-4 flex flex-col items-center gap-8 max-w-xl mx-auto">
+  <div class="text-center">
+    <span class="font-label text-green-brand text-sm font-bold uppercase tracking-widest">Mini-Game</span>
+    <h1 class="font-headline text-5xl md:text-6xl font-black text-white mt-1">Forest Puzzle</h1>
+    <p class="font-body text-slate-400 text-lg mt-1">Unscramble the letters to spell the word!</p>
+  </div>
+  <div class="w-full flex items-center justify-between bg-white/5 rounded-2xl px-6 py-4 border border-white/10">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-green-brand text-2xl" style="font-variation-settings:'FILL' 1;">emoji_events</span>
+      <span id="score-display" class="font-headline font-black text-2xl">0</span>
+      <span class="font-label text-slate-400 text-sm">pts</span>
+    </div>
+    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Word 1 / 8</span>
+    <div id="hearts-display" class="flex gap-1"></div>
+  </div>
+  <div class="w-full bg-white/5 rounded-[2.5rem] border border-white/10 overflow-hidden">
+    <img id="hint-image" src="" alt="Word hint" class="w-full h-48 object-cover"/>
+    <div class="px-8 py-5 text-center">
+      <span class="font-label text-slate-400 text-xs uppercase tracking-widest">What word is this?</span>
+      <p id="hint-pronunciation" class="font-body text-pink-brand text-lg mt-1"></p>
+    </div>
+  </div>
+  <div id="answer-slots" class="flex gap-2 flex-wrap justify-center min-h-[64px]"></div>
+  <div id="letter-tiles" class="flex gap-3 flex-wrap justify-center"></div>
+  <div class="flex gap-4">
+    <button onclick="clearAnswer()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold px-6 py-3 rounded-full border border-white/20 transition-all active:scale-95">
+      <span class="material-symbols-outlined text-xl">backspace</span>Clear
+    </button>
+    <button onclick="submitAnswer()" class="flex items-center gap-2 bg-pink-brand hover:bg-pink-600 text-white font-label font-bold px-8 py-3 rounded-full shadow-lg shadow-pink-500/30 transition-all active:scale-95">
+      <span class="material-symbols-outlined text-xl">check</span>Check
+    </button>
+  </div>
+  <div id="feedback-bar" class="w-full rounded-2xl px-8 py-5 flex items-center gap-4 text-lg font-label font-bold opacity-0 transition-opacity duration-300">
+    <span id="feedback-icon" class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;"></span>
+    <span id="feedback-text"></span>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+  Components.mount('footer-placeholder', Components.renderFooter());
+
+  const WORDS = [
+    {word:'APPLE',   pron:'/ˈæp.əl/',    image:'', emoji:'🍎'},
+    {word:'RIVER',   pron:'/ˈrɪv.ər/',   image:'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'SUN',     pron:'/sʌn/',        image:'https://images.unsplash.com/photo-1533316238634-118805fdbac9?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'MOUNTAIN',pron:'/ˈmaʊn.tən/', image:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'BIRD',    pron:'/bɜːrd/',      image:'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'TREE',    pron:'/triː/',        image:'https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'FLOWER',  pron:'/ˈflaʊ.ər/',  image:'https://images.unsplash.com/photo-1490750967868-88df5691cc5e?auto=format&fit=crop&q=80&w=600&h=300'},
+    {word:'RAIN',    pron:'/reɪn/',        image:'https://images.unsplash.com/photo-1428592953211-077101b2021b?auto=format&fit=crop&q=80&w=600&h=300'},
+  ];
+
+  const TOTAL_ROUNDS = WORDS.length, MAX_LIVES = 3;
+  let lives=MAX_LIVES, score=0, round=0, wordOrder=[], currentWord='', currentScramble=[], playerInput=[];
+
+  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function scramble(word){let s;do{s=shuffle([...word]);}while(s.join('')===word&&word.length>2);return s;}
+
+  function renderHearts(){
+    document.getElementById('hearts-display').innerHTML=
+      Array.from({length:MAX_LIVES},(_,i)=>
+        `<span class="material-symbols-outlined text-xl ${i<lives?'text-red-400':'text-white/20'}"
+               style="${i<lives?"font-variation-settings:'FILL' 1;":""}">favorite</span>`
+      ).join('');
+  }
+
+  function renderRound(){
+    if(round>=TOTAL_ROUNDS){finishGame();return;}
+    playerInput=[];hideFeedback();
+    const entry=WORDS[wordOrder[round]];
+    currentWord=entry.word; currentScramble=scramble([...currentWord]);
+    const hintImg = document.getElementById('hint-image');
+    if (entry.image) { hintImg.src=entry.image; hintImg.style.display=''; } else { hintImg.src=''; hintImg.style.display='none'; }
+    let emojiEl = document.getElementById('hint-emoji');
+    if (!emojiEl) { emojiEl=document.createElement('div'); emojiEl.id='hint-emoji'; emojiEl.className='w-full h-48 flex items-center justify-center text-8xl bg-white/5'; hintImg.parentNode.insertBefore(emojiEl,hintImg); }
+    emojiEl.textContent = entry.emoji||''; emojiEl.style.display = entry.image?'none':'';
+    document.getElementById('hint-pronunciation').textContent=entry.pron;
+    document.getElementById('round-display').textContent=`Word ${round+1} / ${TOTAL_ROUNDS}`;
+    renderSlots(); renderTiles();
+  }
+
+  function renderSlots(){
+    document.getElementById('answer-slots').innerHTML=
+      Array.from({length:currentWord.length},(_,i)=>
+        `<div id="slot-${i}" class="w-14 h-14 rounded-2xl border-2 border-white/20 bg-white/5 flex items-center justify-center font-headline text-2xl font-black text-white transition-all"></div>`
+      ).join('');
+  }
+
+  function renderTiles(){
+    document.getElementById('letter-tiles').innerHTML=
+      currentScramble.map((letter,i)=>
+        `<button id="tile-${i}" data-idx="${i}" onclick="pickLetter(this)"
+                 class="letter-tile w-14 h-14 rounded-2xl bg-navy-light border-2 border-white/20
+                        font-headline text-2xl font-black text-white shadow-lg
+                        hover:bg-pink-brand hover:border-pink-brand active:scale-90 transition-all">
+           ${letter}</button>`
+      ).join('');
+  }
+
+  function pickLetter(btn){
+    if(playerInput.length>=currentWord.length)return;
+    const idx=parseInt(btn.dataset.idx,10);
+    playerInput.push({letter:currentScramble[idx],tileIdx:idx});
+    btn.classList.add('used');
+    const slotIdx=playerInput.length-1;
+    const slot=document.getElementById(`slot-${slotIdx}`);
+    slot.textContent=currentScramble[idx];
+    slot.classList.add('slot-filled','border-pink-brand','bg-pink-brand/20');
+    setTimeout(()=>slot.classList.remove('slot-filled'),300);
+    if(playerInput.length===currentWord.length)setTimeout(submitAnswer,300);
+  }
+
+  function clearAnswer(){
+    playerInput=[]; renderSlots();
+    document.querySelectorAll('.letter-tile').forEach(t=>t.classList.remove('used'));
+  }
+
+  function submitAnswer(){
+    if(playerInput.length<currentWord.length){showFeedback(false,'Fill in all the letters first!');return;}
+    const attempt=playerInput.map(p=>p.letter).join('');
+    if(attempt===currentWord){
+      score+=15;
+      document.getElementById('score-display').textContent=score;
+      for(let i=0;i<currentWord.length;i++){
+        const s=document.getElementById(`slot-${i}`);
+        s.classList.remove('border-pink-brand','bg-pink-brand/20');
+        s.classList.add('border-green-brand','bg-green-brand/20','correct-flash');
+      }
+      showFeedback(true,`"${currentWord}" — Perfect! +15 pts 🎉`);
+      round++;
+      setTimeout(renderRound,1500);
+    } else {
+      lives=Math.max(0,lives-1); renderHearts();
+      const slotsEl=document.getElementById('answer-slots');
+      slotsEl.classList.add('shake-answer');
+      setTimeout(()=>slotsEl.classList.remove('shake-answer'),500);
+      if(lives<=0){
+        showFeedback(false,`The word was "${currentWord}". Moving on…`);
+        round++; setTimeout(renderRound,1800);
+      } else {
+        showFeedback(false,`Not quite! Try again or press Clear.`);
+      }
+    }
+  }
+
+  function showFeedback(correct,msg){
+    const bar=document.getElementById('feedback-bar');
+    const icon=document.getElementById('feedback-icon');
+    bar.className=bar.className.replace(/bg-\S+/g,'').replace(/border\S*/g,'').trim();
+    if(correct){bar.classList.add('bg-green-brand/20','border','border-green-brand/40');icon.textContent='check_circle';icon.style.color='#10b981';}
+    else{bar.classList.add('bg-red-500/20','border','border-red-500/40');icon.textContent='cancel';icon.style.color='#f87171';}
+    document.getElementById('feedback-text').textContent=msg;
+    bar.style.opacity='1';
+  }
+
+  function hideFeedback(){document.getElementById('feedback-bar').style.opacity='0';}
+
+  function finishGame(){
+    const xp=score;
+    if(window.Store){Store.addXP(xp);Store.activateStreak();if(score>=90)Store.unlockBadge('forest_sage');Store.completeActivity('games');}
+    const stars=score>=105?3:score>=60?2:1;
+    const starHTML=Array.from({length:3},(_,i)=>`<span class="material-symbols-outlined text-4xl ${i<stars?'text-yellow-400':'text-white/20'}" style="${i<stars?"font-variation-settings:'FILL' 1;":""}">star</span>`).join('');
+    const overlay=document.createElement('div');
+    overlay.className='fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+    overlay.innerHTML=`
+      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-green-brand/60
+                  rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl
+                  text-center max-w-sm mx-4 scale-0 opacity-0 transition-all duration-500" id="finish-card">
+        <div class="w-24 h-24 rounded-full bg-green-brand flex items-center justify-center shadow-lg shadow-green-500/40">
+          <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        </div>
+        <div>
+          <p class="font-label text-green-brand font-bold text-sm uppercase tracking-widest mb-1">Puzzle Complete!</p>
+          <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
+          <p class="font-body text-slate-300">Score: <span class="text-white font-bold">${score} pts</span></p>
+        </div>
+        <div class="flex gap-2">${starHTML}</div>
+        ${score>=90?`<div class="bg-green-brand/20 border border-green-brand/30 rounded-2xl px-6 py-3"><p class="font-label text-green-brand text-sm font-bold">🌿 Badge Unlocked: Forest Sage!</p></div>`:''}
+        <div class="flex gap-3 flex-wrap justify-center">
+          <button onclick="startGame()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-8 py-3 rounded-full text-base active:scale-95 transition-all border border-white/20">Play Again</button>
+          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-green-brand hover:bg-green-600 text-white font-label font-bold px-8 py-3 rounded-full text-base active:scale-95 transition-all shadow-lg">Back to Games</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=document.getElementById('finish-card');c.style.transform='scale(1)';c.style.opacity='1';}));
+  }
+
+  function startGame(){
+    document.querySelectorAll('.fixed.inset-0').forEach(e=>e.remove());
+    lives=MAX_LIVES;score=0;round=0;
+    wordOrder=shuffle(WORDS.map((_,i)=>i));
+    document.getElementById('score-display').textContent='0';
+    renderHearts();renderRound();
+  }
+
+  document.addEventListener('DOMContentLoaded', startGame);
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 31 — Present Perfect</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#10b981,#14b8a6);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#10b981;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-900 to-teal-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🔁</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;left:8%;animation-delay:.8s">🌍</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:15%;left:20%;animation-delay:1.4s">✨</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:30%;animation-delay:.3s">🏆</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:25%;animation-delay:1s">🎬</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:50%;right:10%;animation-delay:.5s">🔍</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:3%;animation-delay:1.8s">📚</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">💫</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full px-4 py-1 text-sm font-black text-emerald-300 mb-3">Aula 31</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🔁 Present Perfect<br><span class="text-emerald-300">Experiences &amp; Life</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Talk about experiences, achievements and actions connected to the present — like a native speaker.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Experience</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Achieve</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Complete</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Discover</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+    </div>
+  </div>
+</div>
+
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+  <div id="tab-vocab" class="fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Flip each card to see the translation.</p></div>
+      <div class="text-right"><div class="text-2xl font-black text-emerald-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  </div>
+
+  <div id="tab-expressions" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+    <p class="text-slate-500 text-sm mb-6">Click to reveal the translation and meaning.</p>
+    <div class="grid gap-4" id="expr-grid"></div>
+  </div>
+
+  <div id="tab-grammar" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Grammar: Present Perfect</h2>
+    <p class="text-slate-500 text-sm mb-6">Four key rules for using Present Perfect correctly.</p>
+    <div class="space-y-4">
+      <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">FORM — Have/Has + Past Participle</div><div class="text-emerald-600 text-sm font-semibold">I/You/We/They + HAVE · He/She/It + HAS</div></div></div>
+          <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g1-arrow">expand_more</span>
+        </button>
+        <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <p class="text-slate-600 mb-2">Regular past participles: <strong>watch→watched</strong>, <strong>discover→discovered</strong>, <strong>achieve→achieved</strong></p>
+          <p class="text-slate-600">Irregular: <strong>go→gone</strong>, <strong>see→seen</strong>, <strong>write→written</strong>, <strong>take→taken</strong>, <strong>make→made</strong>, <strong>find→found</strong></p>
+          <div class="mt-3 space-y-1">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"I <strong class="text-emerald-700">have watched</strong> all of Friends." (I/you/we/they)</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"She <strong class="text-emerald-700">has seen</strong> every GoT episode." (he/she/it)</span></div>
+          </div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-teal-200 bg-teal-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-teal-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">EVER / NEVER</div><div class="text-teal-600 text-sm font-semibold">Asking about life experiences</div></div></div>
+          <span class="material-symbols-outlined text-teal-400 transition-transform" id="g2-arrow">expand_more</span>
+        </button>
+        <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-teal-700">EVER</strong> = at any point in your life: "Have you <strong>ever</strong> watched Friends?"</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-teal-700">NEVER</strong> = not at any point: "I have <strong>never</strong> seen GoT."</span></div>
+          <div class="mt-2 bg-teal-50 border border-teal-200 rounded-lg p-2 text-xs text-teal-700">Position: EVER and NEVER go between have/has and the past participle.</div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-blue-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">JUST / ALREADY / YET</div><div class="text-blue-600 text-sm font-semibold">Timing of recent actions</div></div></div>
+          <span class="material-symbols-outlined text-blue-400 transition-transform" id="g3-arrow">expand_more</span>
+        </button>
+        <div id="g3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">JUST</strong> = very recently: "I've <strong>just</strong> finished watching it."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">ALREADY</strong> = before expected: "I've <strong>already</strong> seen it twice!"</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">YET</strong> = in negatives/questions: "I haven't watched it <strong>yet</strong>." / "Have you seen it <strong>yet</strong>?"</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-violet-200 bg-violet-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g4')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-violet-500 text-white font-black text-sm flex items-center justify-center">4</span><div><div class="font-black text-navy">FOR / SINCE</div><div class="text-violet-600 text-sm font-semibold">Duration of ongoing actions</div></div></div>
+          <span class="material-symbols-outlined text-violet-400 transition-transform" id="g4-arrow">expand_more</span>
+        </button>
+        <div id="g4" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-violet-700">FOR</strong> = duration: "I've studied English <strong>for</strong> two years."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-violet-700">SINCE</strong> = starting point: "I've lived here <strong>since</strong> 2020."</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-practice" class="fade-in hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on Present Perfect.</p></div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div class="text-2xl font-black text-emerald-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+        <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+      </div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div id="practice-area"></div>
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+        <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+        <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+        <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+        <div class="flex gap-3">
+          <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+          <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-speak" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+    <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat aloud.</p>
+    <div class="space-y-3" id="speak-grid"></div>
+  </div>
+
+  <div id="tab-challenge" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">🎯 Movie Check: Have you ever...?</h2>
+    <p class="text-slate-500 text-sm mb-6">Jadson's favorite movies · Present Perfect · Experiences</p>
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-5 mb-6">
+      <p class="text-slate-700 text-sm font-semibold">Use Present Perfect with <strong class="text-emerald-600">EVER / NEVER / JUST / ALREADY / YET</strong> to talk about your experience with these movies. Answer each question with a full sentence!</p>
+    </div>
+    <div class="space-y-4" id="movie-questions"></div>
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-5 mt-6">
+      <h3 class="font-black text-navy mb-3">✍️ Bonus: Create your own questions!</h3>
+      <p class="text-slate-500 text-sm mb-3">Write 2 "Have you ever...?" questions about movies or series you love:</p>
+      <textarea rows="3" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="1. Have you ever watched...?&#10;2. Have you ever...?"></textarea>
+    </div>
+  </div>
+
+</div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="lesson-engine.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'accomplish',pt:'realizar',emoji:'🏆',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'She accomplished her biggest goal this year.'},
+  {en:'milestone',pt:'marco',emoji:'🎯',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Getting promoted is a major milestone.'},
+  {en:'achievement',pt:'conquista',emoji:'🥇',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'This award is her greatest achievement.'},
+  {en:'journey',pt:'jornada',emoji:'🚶',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Learning English is an amazing journey.'},
+  {en:'encounter',pt:'encontro',emoji:'🤝',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'It was an unexpected encounter.'},
+  {en:'explore',pt:'explorar',emoji:'🔍',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'I love to explore new places and ideas.'},
+  {en:'overcome',pt:'superar',emoji:'💪',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'She overcame many challenges in her career.'},
+  {en:'breakthrough',pt:'avanço',emoji:'💡',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'That was a major breakthrough in the project.'},
+  {en:'succeed',pt:'ter sucesso',emoji:'🌟',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'If you work hard, you will succeed.'},
+  {en:'challenge',pt:'desafio',emoji:'⚔️',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Every challenge is a chance to grow.'},
+  {en:'growth',pt:'crescimento',emoji:'📈',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'Personal growth takes time and effort.'},
+  {en:'opportunity',pt:'oportunidade',emoji:'🚪',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'This is a great opportunity for you.'},
+  {en:'impact',pt:'impacto',emoji:'💥',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'Her work had a huge impact on society.'},
+  {en:'pursuit',pt:'busca / perseguição',emoji:'🎯',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'The pursuit of happiness takes time.'},
+  {en:'unforgettable',pt:'inesquecível',emoji:'✨',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'That trip was truly unforgettable.'},
+  {en:'remarkable',pt:'notável',emoji:'🌟',bg:'bg-emerald-50 border-emerald-200',dot:'bg-emerald-400',ex:'She gave a remarkable performance.'},
+  {en:'extraordinary',pt:'extraordinário',emoji:'🎭',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'Benjamin Button is an extraordinary film.'},
+  {en:'memorable',pt:'memorável',emoji:'📸',bg:'bg-teal-50 border-teal-200',dot:'bg-teal-400',ex:'The concert was truly memorable.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"Been there, done that",pt:"Já passei por isso / já fiz isso",emoji:"🗺️",example:"You want to try skydiving? Been there, done that — it's amazing!",meaning:"You've already had that experience before."},
+  {expr:"A once-in-a-lifetime experience",pt:"Uma experiência única na vida",emoji:"🌟",example:"Watching the premiere of Game of Thrones live was a once-in-a-lifetime experience.",meaning:"Something so special and rare it may never happen again."},
+  {expr:"Come a long way",pt:"Evoluir muito / avançar muito",emoji:"📈",example:"You've come a long way since your first English class — I'm so impressed!",meaning:"You've made significant progress from where you started."},
+  {expr:"The more you know",pt:"Quanto mais você sabe...",emoji:"🧠",example:"I just discovered that Back to the Future was almost never made — the more you know!",meaning:"Used when you learn something new or surprising."},
+];
+
+const PRACTICE = [
+  {q:"Have you ___ watched Friends?",opts:["ever","already","since","just"],a:"ever",rule:"EVER = at any time in your life"},
+  {q:"She ___ already seen that movie twice.",opts:["have","has","had","is"],a:"has",rule:"Has = he/she/it + have"},
+  {q:"I've studied English ___ three years.",opts:["since","for","ever","already"],a:"for",rule:"FOR = duration of time"},
+  {q:"He hasn't called me ___.",opts:["yet","ever","already","just"],a:"yet",rule:"YET = in negative sentences"},
+  {q:"What's the past participle of 'go'?",opts:["went","goed","gone","going"],a:"gone",rule:"Irregular: go → gone"},
+  {q:"'Come a long way' means:",opts:["travel far away","make great progress","arrive late","start a journey"],a:"make great progress",rule:"Expression: come a long way"},
+  {q:"I've ___ finished the movie — I watched the last scene 5 minutes ago.",opts:["ever","yet","just","since"],a:"just",rule:"JUST = very recently"},
+  {q:"Present Perfect is mainly used for:",opts:["completed past with specific time","experiences connected to the present","future plans","repeated habits only"],a:"experiences connected to the present",rule:"Present Perfect connects past experience to now"},
+  {q:"I've lived in São Paulo ___ 2020.",opts:["for","since","ever","already"],a:"since",rule:"SINCE = starting point in time"},
+  {q:"'A once-in-a-lifetime experience' means:",opts:["something you do every day","something unique that rarely happens","a boring routine","a planned activity"],a:"something unique that rarely happens",rule:"Expression: once-in-a-lifetime"},
+];
+
+const SPEAK = [
+  {text:"Have you <strong class='text-emerald-600'>ever</strong> watched a movie that completely changed your perspective?"},
+  {text:"I've <strong class='text-emerald-600'>just</strong> finished watching all seasons of Friends — it was incredible!"},
+  {text:"She has <strong class='text-emerald-600'>never</strong> seen Game of Thrones — she doesn't know what she's missing!"},
+  {text:"I've studied digital marketing <strong class='text-emerald-600'>for</strong> two years now."},
+  {text:"He has <strong class='text-emerald-600'>already</strong> achieved so much in his career — remarkable!"},
+  {text:"Have you seen the new season <strong class='text-emerald-600'>yet</strong>? It's absolutely amazing!"},
+  {text:"She has <strong class='text-emerald-600'>come a long way</strong> since she started learning English."},
+  {text:"I've <strong class='text-emerald-600'>discovered</strong> so many great movies thanks to streaming platforms."},
+];
+
+const MOVIES = [
+  {emoji:"🎬",title:"O Curioso Caso de Benjamin Button",hint:"extraordinary / unforgettable / remarkable",q:"Have you ever watched 'O Curioso Caso de Benjamin Button'?",ex1:"Yes, I have! It's one of the most extraordinary films I've ever seen.",ex2:"No, I haven't watched it yet, but I've heard it's unforgettable."},
+  {emoji:"⏰",title:"De Volta para o Futuro (trilogia)",hint:"journey / adventure / already / yet",q:"Have you ever watched the Back to the Future trilogy?",ex1:"Yes, I've already seen all three films — they're remarkable!",ex2:"I've only watched the first one. I haven't seen the others yet."},
+  {emoji:"🐕",title:"Scooby-Doo 1 e 2",hint:"childhood / memorable / ever",q:"Have you ever watched Scooby-Doo 1 or 2?",ex1:"I've watched Scooby-Doo since I was a child — it's truly memorable!",ex2:"I've seen the first one but haven't watched Scooby-Doo 2 yet."},
+  {emoji:"🕰️",title:"Click (Adam Sandler)",hint:"once-in-a-lifetime / emotional / just",q:"Have you ever watched 'Click' with Adam Sandler?",ex1:"Yes! It's a once-in-a-lifetime kind of story — very emotional.",ex2:"No, I haven't watched it yet, but it sounds incredible."},
+  {emoji:"🟢",title:"Shrek 1 e 2",hint:"since / already / unforgettable",q:"Have you ever watched Shrek 1 or 2?",ex1:"I've watched Shrek since I was very young — it's an unforgettable classic!",ex2:"I've seen Shrek 1 but haven't watched Shrek 2 yet."},
+  {emoji:"🎈",title:"Up: Altas Aventuras",hint:"extraordinary / emotional / unforgettable",q:"Have you ever watched 'Up: Altas Aventuras'?",ex1:"Yes, and I've cried every single time! It's truly extraordinary.",ex2:"I've never watched it, but I've heard it's an unforgettable experience."},
+];
+
+function buildMovieQuestions() {
+  const c = document.getElementById('movie-questions');
+  MOVIES.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-emerald-200 rounded-2xl p-5 hover:border-emerald-400 transition-colors';
+    div.innerHTML = `
+      <div class="flex items-start gap-3 mb-3">
+        <span class="text-3xl">${m.emoji}</span>
+        <div>
+          <div class="font-black text-navy text-sm">${m.title}</div>
+          <p class="text-emerald-700 font-bold text-sm mt-1">${m.q}</p>
+        </div>
+      </div>
+      <textarea rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none mb-2" placeholder="Write your answer here..."></textarea>
+      <button onclick="toggleEx(${i})" class="text-emerald-600 text-xs font-bold hover:text-emerald-800 transition-colors">💡 Show example answers</button>
+      <div id="ex-${i}" class="hidden mt-2 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs space-y-1">
+        <div><span class="font-black text-emerald-700">✅ Yes: </span>${m.ex1}</div>
+        <div><span class="font-black text-slate-500">❌ No: </span>${m.ex2}</div>
+        <div class="text-emerald-600 font-semibold">💡 Try to use: ${m.hint}</div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function toggleEx(i) {
+  const el = document.getElementById('ex-' + i);
+  el.classList.toggle('hidden');
+}
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
+  totalSections: 6,
+  accentColor: 'emerald',
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE,
+  speak: SPEAK,
+});
+
+buildMovieQuestions();
+</script>
+</body>
+</html>

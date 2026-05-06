@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Lesson — Yara's Forest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script src="store.js"></script>
+  <script src="badge-toast.js"></script>
+  <script src="levelup-overlay.js"></script>
+  <script src="components.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {
+        colors: { navy:'#001f3f', 'pink-brand':'#ec4899', 'green-brand':'#10b981' },
+        fontFamily: { sans: ['Plus Jakarta Sans','sans-serif'] }
+      }}
+    };
+  </script>
+  <style>
+    body { font-family:'Plus Jakarta Sans',sans-serif; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .section-card { transition: all .2s; }
+    .accordion-body { overflow:hidden; transition: max-height .35s ease, opacity .25s ease; }
+    .accordion-body.collapsed { max-height:0; opacity:0; }
+    .accordion-body.open { max-height:9999px; opacity:1; }
+    .emoji-opt { transition:transform .15s,background .15s; }
+    .emoji-opt:hover { transform:scale(1.25); }
+    .emoji-opt.selected { background:rgba(20,184,166,.3); outline:2px solid #14b8a6; border-radius:8px; }
+    input[type=text], input[type=number], textarea, select {
+      font-family:'Plus Jakarta Sans',sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#001229] text-white min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-24 pb-32 px-4 max-w-2xl mx-auto">
+
+  <!-- ── PAGE HEADER ─── -->
+  <div class="fade-up mb-8">
+    <button onclick="window.location.href='learn.html'"
+            class="flex items-center gap-2 text-slate-400 hover:text-white text-sm font-bold mb-5 transition-colors">
+      <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Trail
+    </button>
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-3xl">✏️</div>
+      <div>
+        <h1 id="page-title" class="text-3xl font-black text-white">Create Lesson</h1>
+        <p class="text-slate-400 text-sm mt-0.5">Build a custom lesson with all the same features as the course</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FREE PLAN UPGRADE WALL ─── -->
+  <div id="creator-upgrade-wall" class="hidden fade-up text-center py-16">
+    <div class="text-7xl mb-5">✏️</div>
+    <h2 class="font-black text-3xl text-white mb-3">Create Your Own Lessons</h2>
+    <p class="text-slate-400 text-base mb-3">Build fully custom lessons with vocab, quizzes,<br>sentence practice, speaking, and AI Quick-Fill.</p>
+    <p class="text-slate-500 text-sm mb-8">Available on the <span class="text-pink-400 font-bold">Plus plan</span>.</p>
+    <a href="landing.html" class="inline-block bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black px-10 py-4 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all text-lg">
+      Upgrade to Plus ✨
+    </a>
+    <p class="text-slate-600 text-xs mt-6">R$19,90/mês · Cancel anytime</p>
+  </div>
+
+  <!-- ── CREATOR FORM (hidden for free users) ─── -->
+  <div id="creator-form">
+
+  <!-- ── BASIC INFO ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 p-6 mb-4">
+    <h2 class="font-black text-lg text-white mb-5 flex items-center gap-2">
+      <span class="text-teal-400">①</span> Basic Info
+    </h2>
+
+    <!-- Emoji picker -->
+    <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Lesson Emoji</label>
+    <div id="emoji-grid" class="flex flex-wrap gap-2 mb-4">
+      <!-- injected by JS -->
+    </div>
+    <div class="flex items-center gap-2 mb-5">
+      <span class="text-slate-400 text-xs">Or type any emoji:</span>
+      <input id="custom-emoji" type="text" maxlength="2" placeholder="✏️"
+             class="w-14 text-center bg-white/8 border border-white/15 rounded-xl px-2 py-1.5 text-lg text-white focus:outline-none focus:border-teal-400"
+             oninput="syncEmojiFromInput(this.value)"/>
+    </div>
+
+    <!-- Title -->
+    <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Lesson Title <span class="text-red-400">*</span></label>
+    <input id="lesson-title" type="text" placeholder="e.g. Shopping at the Market"
+           class="w-full bg-white/8 border border-white/15 rounded-2xl px-4 py-3 text-white font-bold placeholder:text-white/30 focus:outline-none focus:border-teal-400 transition-colors mb-4"/>
+
+    <!-- XP -->
+    <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">XP Reward</label>
+    <div class="flex gap-2 flex-wrap">
+      <button onclick="selectXP(25,this)"   data-xp="25"  class="xp-btn px-5 py-2 rounded-full border border-white/15 text-sm font-bold text-slate-300 hover:border-teal-400 hover:text-teal-400 transition-all">25 XP</button>
+      <button onclick="selectXP(50,this)"   data-xp="50"  class="xp-btn px-5 py-2 rounded-full border border-white/15 text-sm font-bold text-slate-300 hover:border-teal-400 hover:text-teal-400 transition-all active">50 XP</button>
+      <button onclick="selectXP(75,this)"   data-xp="75"  class="xp-btn px-5 py-2 rounded-full border border-white/15 text-sm font-bold text-slate-300 hover:border-teal-400 hover:text-teal-400 transition-all">75 XP</button>
+      <button onclick="selectXP(100,this)"  data-xp="100" class="xp-btn px-5 py-2 rounded-full border border-white/15 text-sm font-bold text-slate-300 hover:border-teal-400 hover:text-teal-400 transition-all">100 XP</button>
+    </div>
+    <input type="hidden" id="lesson-xp" value="50"/>
+  </div>
+
+  <!-- ── AI QUICK-FILL ─── -->
+  <div class="fade-up section-card bg-gradient-to-br from-violet-500/10 to-teal-500/10 rounded-3xl border border-violet-500/20 p-6 mb-4">
+    <h2 class="font-black text-lg text-white mb-1 flex items-center gap-2">
+      <span class="text-violet-400">✨</span> AI Quick-Fill <span class="text-xs font-normal text-violet-400 bg-violet-500/20 px-2 py-0.5 rounded-full ml-1">Optional</span>
+    </h2>
+    <p class="text-slate-400 text-sm mb-4">Type a topic and let Yara AI generate the whole lesson for you.</p>
+    <div class="flex gap-2">
+      <input id="ai-topic" type="text" placeholder="e.g. Ordering food at a restaurant"
+             class="flex-1 bg-white/8 border border-white/15 rounded-2xl px-4 py-3 text-white font-bold placeholder:text-white/30 focus:outline-none focus:border-violet-400 transition-colors"
+             onkeydown="if(event.key==='Enter') generateWithAI()"/>
+      <button onclick="generateWithAI()" id="ai-btn"
+              class="bg-violet-500 hover:bg-violet-400 text-white font-black px-5 py-3 rounded-2xl text-sm transition-all active:scale-95 flex items-center gap-2 flex-shrink-0">
+        <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+        <span id="ai-btn-text">Generate</span>
+      </button>
+    </div>
+    <p id="ai-status" class="text-xs text-violet-400 mt-2 hidden"></p>
+  </div>
+
+  <!-- ── VOCABULARY ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-4 overflow-hidden">
+    <button onclick="toggleSection('vocab')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-blue-400">📚</span> Vocabulary
+        <span class="text-xs font-normal text-slate-400 ml-1" id="vocab-count">(0 words)</span>
+        <span class="text-red-400 text-xs">*</span>
+      </span>
+      <span id="vocab-chevron" class="material-symbols-outlined text-slate-400 transition-transform">expand_more</span>
+    </button>
+    <div id="vocab-body" class="accordion-body open px-6 pb-6">
+      <p class="text-slate-400 text-xs mb-3">English word / Portuguese translation pairs. Min. 2 required.</p>
+      <div id="vocab-rows" class="flex flex-col gap-2 mb-3"></div>
+      <button onclick="addVocabRow()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add word
+      </button>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-4 overflow-hidden">
+    <button onclick="toggleSection('quiz')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-pink-400">❓</span> Quiz Questions
+        <span class="text-xs font-normal text-slate-400 ml-1" id="quiz-count">(0 questions)</span>
+        <span class="text-red-400 text-xs">*</span>
+      </span>
+      <span id="quiz-chevron" class="material-symbols-outlined text-slate-400 transition-transform">expand_more</span>
+    </button>
+    <div id="quiz-body" class="accordion-body open px-6 pb-6">
+      <p class="text-slate-400 text-xs mb-3">Multiple choice questions. Min. 2 required.</p>
+      <div id="quiz-cards" class="flex flex-col gap-4 mb-3"></div>
+      <button onclick="addQuizCard()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add question
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SENTENCES ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-4 overflow-hidden">
+    <button onclick="toggleSection('sentences')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-orange-400">🏗️</span> Sentence Builder
+        <span class="text-xs font-normal text-slate-400 ml-1" id="sentences-count">(0 sentences)</span>
+        <span class="text-red-400 text-xs">*</span>
+      </span>
+      <span id="sentences-chevron" class="material-symbols-outlined text-slate-400 transition-transform">expand_more</span>
+    </button>
+    <div id="sentences-body" class="accordion-body open px-6 pb-6">
+      <p class="text-slate-400 text-xs mb-3">English sentences — students will reassemble them word by word. Min. 2 required.</p>
+      <div id="sentence-rows" class="flex flex-col gap-2 mb-3"></div>
+      <button onclick="addSentenceRow()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add sentence
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SPEAKING ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-4 overflow-hidden">
+    <button onclick="toggleSection('speak')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-emerald-400">🎤</span> Speaking Phrases
+        <span class="text-xs font-normal text-slate-400 ml-1" id="speak-count">(0 phrases)</span>
+        <span class="text-red-400 text-xs">*</span>
+      </span>
+      <span id="speak-chevron" class="material-symbols-outlined text-slate-400 transition-transform">expand_more</span>
+    </button>
+    <div id="speak-body" class="accordion-body open px-6 pb-6">
+      <p class="text-slate-400 text-xs mb-3">Short phrases students will practice pronouncing. Min. 2 required.</p>
+      <div id="speak-rows" class="flex flex-col gap-2 mb-3"></div>
+      <button onclick="addSpeakRow()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add phrase
+      </button>
+    </div>
+  </div>
+
+  <!-- ── GRAMMAR (optional) ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-4 overflow-hidden">
+    <button onclick="toggleSection('grammar')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-yellow-400">📐</span> Grammar Notes
+        <span class="text-xs font-normal text-slate-400 ml-1">Optional</span>
+      </span>
+      <span id="grammar-chevron" class="material-symbols-outlined text-slate-400 transition-transform rotate-[-90deg]">expand_more</span>
+    </button>
+    <div id="grammar-body" class="accordion-body collapsed px-6 pb-6">
+      <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1 mt-2">Grammar topic title</label>
+      <input id="grammar-title" type="text" placeholder="e.g. The Simple Present Tense"
+             class="w-full bg-white/8 border border-white/15 rounded-2xl px-4 py-3 text-white font-bold placeholder:text-white/30 focus:outline-none focus:border-teal-400 transition-colors mb-3"/>
+      <label class="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Rules / Explanations</label>
+      <div id="grammar-rule-rows" class="flex flex-col gap-2 mb-3"></div>
+      <button onclick="addGrammarRule()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add rule
+      </button>
+    </div>
+  </div>
+
+  <!-- ── EXPRESSIONS (optional) ─── -->
+  <div class="fade-up section-card bg-white/5 rounded-3xl border border-white/10 mb-6 overflow-hidden">
+    <button onclick="toggleSection('expressions')"
+            class="w-full flex items-center justify-between px-6 py-5 hover:bg-white/5 transition-colors">
+      <span class="font-black text-white flex items-center gap-2">
+        <span class="text-purple-400">💬</span> Expressions
+        <span class="text-xs font-normal text-slate-400 ml-1">Optional</span>
+      </span>
+      <span id="expressions-chevron" class="material-symbols-outlined text-slate-400 transition-transform rotate-[-90deg]">expand_more</span>
+    </button>
+    <div id="expressions-body" class="accordion-body collapsed px-6 pb-6">
+      <p class="text-slate-400 text-xs mb-3">Common expressions with meaning and example sentence.</p>
+      <div id="expression-rows" class="flex flex-col gap-3 mb-3"></div>
+      <button onclick="addExpressionRow()"
+              class="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-sm font-bold transition-colors">
+        <span class="material-symbols-outlined text-lg">add_circle</span> Add expression
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ERROR ─── -->
+  <div id="save-error" class="hidden bg-red-500/20 border border-red-500/40 rounded-2xl px-5 py-4 mb-4 text-red-300 text-sm font-bold"></div>
+
+  <!-- ── SAVE BUTTONS ─── -->
+  <div class="flex gap-3 flex-wrap mb-10">
+    <button onclick="saveLesson()"
+            class="flex-1 bg-teal-500 hover:bg-teal-400 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 shadow-lg shadow-teal-500/30 flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">save</span>
+      Save Lesson
+    </button>
+    <button onclick="window.location.href='learn.html'"
+            class="px-6 bg-white/10 hover:bg-white/15 text-white font-bold py-4 rounded-2xl text-base transition-all active:scale-95">
+      Cancel
+    </button>
+  </div>
+
+  </div><!-- /#creator-form -->
+
+  <!-- ── MY LESSONS ─── -->
+  <div id="my-lessons-section" class="hidden">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-black text-white text-xl flex items-center gap-2">
+        <span class="text-teal-400">✏️</span> My Lessons
+      </h2>
+      <span id="my-lessons-count" class="text-slate-400 text-sm font-bold"></span>
+    </div>
+    <div id="my-lessons-list" class="flex flex-col gap-3"></div>
+  </div>
+
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<!-- ── SUCCESS TOAST ─── -->
+<div id="success-toast"
+     class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] bg-teal-500 text-white font-black px-8 py-4 rounded-full shadow-2xl shadow-teal-500/40 flex items-center gap-3 text-sm opacity-0 pointer-events-none transition-all duration-300 scale-90">
+  <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">check_circle</span>
+  <span id="toast-text">Lesson saved!</span>
+</div>
+
+<script>
+// ── Boot ─────────────────────────────────────────────────────────────────────
+Components.mount('top-nav-placeholder', Components.renderTopNav('create'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('create'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('create'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+// ── Free plan gate ────────────────────────────────────────────────────────────
+if (Store.state.planType === 'free') {
+  document.getElementById('creator-form').classList.add('hidden');
+  document.getElementById('creator-upgrade-wall').classList.remove('hidden');
+}
+
+const EMOJIS = ['💬','🛒','🍽️','✈️','🏠','💼','🏥','🎓','🌍','🔥','🎯','🎮','📚','🌿','🏖️','🎵','🤝','💡','🚗','🌟','⚽','🧩','🎪','🦁','🍎','🏋️','🎭','📱','🌙','🧸'];
+const EMOJI_GRID = document.getElementById('emoji-grid');
+let selectedEmoji = '✏️';
+let selectedXP    = 50;
+let editId        = null;  // set if URL has ?edit=ID
+
+// Build emoji grid
+EMOJIS.forEach(e => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = e;
+  btn.className = 'emoji-opt text-2xl p-1.5 rounded-lg cursor-pointer';
+  btn.onclick = () => pickEmoji(e, btn);
+  EMOJI_GRID.appendChild(btn);
+});
+
+function pickEmoji(e, btn) {
+  selectedEmoji = e;
+  document.getElementById('custom-emoji').value = e;
+  document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+}
+function syncEmojiFromInput(v) {
+  if (v) { selectedEmoji = v; document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected')); }
+}
+function selectXP(val, btn) {
+  selectedXP = val;
+  document.getElementById('lesson-xp').value = val;
+  document.querySelectorAll('.xp-btn').forEach(b => {
+    b.classList.remove('bg-teal-500','text-white','border-teal-400');
+    b.classList.add('border-white/15','text-slate-300');
+  });
+  btn.classList.add('bg-teal-500','text-white','border-teal-400');
+  btn.classList.remove('border-white/15','text-slate-300');
+}
+// Set default XP button
+document.querySelector('[data-xp="50"]') && selectXP(50, document.querySelector('[data-xp="50"]'));
+
+// ── Accordion ────────────────────────────────────────────────────────────────
+function toggleSection(key) {
+  const body    = document.getElementById(key + '-body');
+  const chevron = document.getElementById(key + '-chevron');
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  if (isOpen) {
+    body.classList.replace('open', 'collapsed');
+    chevron.style.transform = 'rotate(-90deg)';
+  } else {
+    body.classList.replace('collapsed', 'open');
+    chevron.style.transform = 'rotate(0deg)';
+  }
+}
+
+// ── Helpers for building input rows ──────────────────────────────────────────
+function inputRow(placeholder, value='', onInput='', extraClass='') {
+  return `<input type="text" placeholder="${placeholder}" value="${escHtml(value)}"
+            class="flex-1 bg-white/8 border border-white/12 rounded-xl px-3 py-2.5 text-white text-sm font-bold placeholder:text-white/25 focus:outline-none focus:border-teal-400 transition-colors ${extraClass}"
+            ${onInput ? `oninput="${onInput}"` : ''}/>`;
+}
+function removeBtn(onclick) {
+  return `<button type="button" onclick="${onclick}" class="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0">
+    <span class="material-symbols-outlined text-xl">remove_circle</span>
+  </button>`;
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Vocabulary ────────────────────────────────────────────────────────────────
+function addVocabRow(en='', pt='') {
+  const row = document.createElement('div');
+  row.className = 'flex gap-2 items-center';
+  row.innerHTML = `
+    ${inputRow('English word', en, 'updateVocabCount()')}
+    ${inputRow('Português', pt)}
+    ${removeBtn('this.closest(\'div\').remove(); updateVocabCount()')}`;
+  document.getElementById('vocab-rows').appendChild(row);
+  updateVocabCount();
+}
+function updateVocabCount() {
+  const n = document.querySelectorAll('#vocab-rows > div').length;
+  document.getElementById('vocab-count').textContent = `(${n} word${n!==1?'s':''})`;
+}
+function getVocab() {
+  return [...document.querySelectorAll('#vocab-rows > div')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { en: inputs[0].value.trim(), pt: inputs[1].value.trim() };
+  }).filter(v => v.en);
+}
+
+// ── Quiz ─────────────────────────────────────────────────────────────────────
+let quizCardIdx = 0;
+function addQuizCard(q='', opts=['','','',''], correctIdx=0) {
+  const idx = quizCardIdx++;
+  const card = document.createElement('div');
+  card.className = 'bg-white/5 rounded-2xl border border-white/10 p-4';
+  card.id = `quiz-card-${idx}`;
+  const optsHtml = opts.map((opt, i) => `
+    <label class="flex items-center gap-2 cursor-pointer">
+      <input type="radio" name="correct-${idx}" value="${i}" ${i===correctIdx?'checked':''} class="accent-teal-400"/>
+      <input type="text" placeholder="Option ${String.fromCharCode(65+i)}" value="${escHtml(opt)}"
+             class="flex-1 bg-white/8 border border-white/12 rounded-xl px-3 py-2 text-white text-sm font-bold placeholder:text-white/25 focus:outline-none focus:border-teal-400 transition-colors"/>
+    </label>`).join('');
+  card.innerHTML = `
+    <div class="flex items-start gap-3 mb-3">
+      <span class="text-pink-400 font-black text-sm mt-2.5 flex-shrink-0">Q</span>
+      ${inputRow('Question text', q, '', 'text-sm')}
+      ${removeBtn(`document.getElementById('quiz-card-${idx}').remove(); updateQuizCount()`)}
+    </div>
+    <div class="flex flex-col gap-2 ml-5">
+      <p class="text-slate-500 text-[10px] uppercase tracking-wider font-bold mb-1">Options — select the correct one</p>
+      ${optsHtml}
+    </div>`;
+  document.getElementById('quiz-cards').appendChild(card);
+  updateQuizCount();
+}
+function updateQuizCount() {
+  const n = document.querySelectorAll('#quiz-cards > div').length;
+  document.getElementById('quiz-count').textContent = `(${n} question${n!==1?'s':''})`;
+}
+function getQuiz() {
+  return [...document.querySelectorAll('#quiz-cards > div')].map(card => {
+    const qInput = card.querySelector('div > input[type=text]');
+    const opts   = [...card.querySelectorAll('div > label > input[type=text]')].map(i => i.value.trim());
+    const correctRadio = card.querySelector('input[type=radio]:checked');
+    const correctVal   = correctRadio ? parseInt(correctRadio.value) : 0;
+    return { q: qInput ? qInput.value.trim() : '', opts, a: opts[correctVal] || opts[0] };
+  }).filter(q => q.q);
+}
+
+// ── Sentences ────────────────────────────────────────────────────────────────
+function addSentenceRow(val='') {
+  const row = document.createElement('div');
+  row.className = 'flex gap-2 items-center';
+  row.innerHTML = `
+    ${inputRow('e.g. I like to drink coffee in the morning.', val, 'updateSentencesCount()')}
+    ${removeBtn('this.closest(\'div\').remove(); updateSentencesCount()')}`;
+  document.getElementById('sentence-rows').appendChild(row);
+  updateSentencesCount();
+}
+function updateSentencesCount() {
+  const n = document.querySelectorAll('#sentence-rows > div').length;
+  document.getElementById('sentences-count').textContent = `(${n} sentence${n!==1?'s':''})`;
+}
+function getSentences() {
+  return [...document.querySelectorAll('#sentence-rows > div input')].map(i=>i.value.trim()).filter(Boolean);
+}
+
+// ── Speaking ─────────────────────────────────────────────────────────────────
+function addSpeakRow(val='') {
+  const row = document.createElement('div');
+  row.className = 'flex gap-2 items-center';
+  row.innerHTML = `
+    ${inputRow('e.g. Can I have the menu, please?', val, 'updateSpeakCount()')}
+    ${removeBtn('this.closest(\'div\').remove(); updateSpeakCount()')}`;
+  document.getElementById('speak-rows').appendChild(row);
+  updateSpeakCount();
+}
+function updateSpeakCount() {
+  const n = document.querySelectorAll('#speak-rows > div').length;
+  document.getElementById('speak-count').textContent = `(${n} phrase${n!==1?'s':''})`;
+}
+function getSpeak() {
+  return [...document.querySelectorAll('#speak-rows > div input')].map(i=>i.value.trim()).filter(Boolean);
+}
+
+// ── Grammar ───────────────────────────────────────────────────────────────────
+function addGrammarRule(val='') {
+  const row = document.createElement('div');
+  row.className = 'flex gap-2 items-center';
+  row.innerHTML = `
+    ${inputRow('e.g. Add -s to verbs for He, She, It.', val)}
+    ${removeBtn('this.closest(\'div\').remove()')}`;
+  document.getElementById('grammar-rule-rows').appendChild(row);
+}
+function getGrammar() {
+  const title = document.getElementById('grammar-title').value.trim();
+  const rules = [...document.querySelectorAll('#grammar-rule-rows > div input')].map(i=>i.value.trim()).filter(Boolean);
+  if (!title && rules.length === 0) return { title:'', rules:[], table:{headers:[],rows:[]} };
+  return { title, rules, table:{ headers:[], rows:[] } };
+}
+
+// ── Expressions ──────────────────────────────────────────────────────────────
+function addExpressionRow(expr='', meaning='', example='') {
+  const row = document.createElement('div');
+  row.className = 'bg-white/4 rounded-2xl border border-white/8 p-3 flex flex-col gap-2';
+  row.innerHTML = `
+    <div class="flex gap-2 items-center">
+      ${inputRow('Expression (e.g. Excuse me)', expr)}
+      ${removeBtn('this.closest(\'.bg-white\\/4\').remove()')}
+    </div>
+    <div class="flex gap-2">
+      ${inputRow('Meaning in Portuguese', meaning)}
+      ${inputRow('Example sentence', example)}
+    </div>`;
+  document.getElementById('expression-rows').appendChild(row);
+}
+function getExpressions() {
+  return [...document.querySelectorAll('#expression-rows > div')].map(row => {
+    const inputs = row.querySelectorAll('input[type=text]');
+    return { expr: inputs[0]?.value.trim()||'', meaning: inputs[1]?.value.trim()||'', example: inputs[2]?.value.trim()||'' };
+  }).filter(e => e.expr);
+}
+
+// ── AI Quick-Fill ─────────────────────────────────────────────────────────────
+async function generateWithAI() {
+  const topic = document.getElementById('ai-topic').value.trim();
+  if (!topic) { showToast('Type a topic first!', true); return; }
+  const btn  = document.getElementById('ai-btn');
+  const txt  = document.getElementById('ai-btn-text');
+  const stat = document.getElementById('ai-status');
+  btn.disabled = true;
+  txt.textContent = 'Generating…';
+  stat.textContent = '⏳ Yara AI is building your lesson…';
+  stat.classList.remove('hidden');
+
+  const prompt = `You are an English teacher for Brazilian students. Generate a complete English lesson about: "${topic}". Return ONLY valid JSON, no markdown, no explanation:
+{
+  "title": "short lesson title",
+  "emoji": "one emoji",
+  "vocab": [{"en":"word","pt":"tradução"}],
+  "quiz": [{"q":"question?","opts":["A","B","C","D"],"a":"A"}],
+  "sentences": ["English sentence 1","English sentence 2"],
+  "speak": ["Short phrase 1","Short phrase 2"],
+  "grammar": {"title":"Grammar topic","rules":["Rule 1","Rule 2"]}
+}
+Rules: vocab = 8 items, quiz = 5 questions (the "a" field must exactly match one of the opts strings), sentences = 6 items, speak = 4 items, grammar rules = 2-3 items.`;
+
+  try {
+    const res  = await fetch('/api/ai', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: prompt })
+    });
+    const data = await res.json();
+    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.text || '';
+    const jsonStr = raw.replace(/```json|```/g,'').trim();
+    const lesson  = JSON.parse(jsonStr);
+
+    // Populate form
+    if (lesson.title) document.getElementById('lesson-title').value = lesson.title;
+    if (lesson.emoji) { pickEmoji(lesson.emoji, null); document.getElementById('custom-emoji').value = lesson.emoji; }
+
+    // Vocab
+    document.getElementById('vocab-rows').innerHTML = '';
+    (lesson.vocab || []).forEach(v => addVocabRow(v.en, v.pt));
+
+    // Quiz
+    document.getElementById('quiz-cards').innerHTML = '';
+    quizCardIdx = 0;
+    (lesson.quiz || []).forEach(q => {
+      const ci = q.opts ? q.opts.indexOf(q.a) : 0;
+      addQuizCard(q.q, q.opts || ['','','',''], Math.max(0,ci));
+    });
+
+    // Sentences
+    document.getElementById('sentence-rows').innerHTML = '';
+    (lesson.sentences || []).forEach(s => addSentenceRow(s));
+
+    // Speak
+    document.getElementById('speak-rows').innerHTML = '';
+    (lesson.speak || []).forEach(s => addSpeakRow(s));
+
+    // Grammar
+    if (lesson.grammar?.title) {
+      document.getElementById('grammar-title').value = lesson.grammar.title;
+      document.getElementById('grammar-rule-rows').innerHTML = '';
+      (lesson.grammar.rules || []).forEach(r => addGrammarRule(r));
+      // Open grammar section
+      const gb = document.getElementById('grammar-body');
+      if (gb.classList.contains('collapsed')) toggleSection('grammar');
+    }
+
+    updateVocabCount(); updateQuizCount(); updateSentencesCount(); updateSpeakCount();
+    stat.textContent = '✅ Lesson generated! Review and adjust, then save.';
+    stat.className = 'text-xs text-emerald-400 mt-2';
+  } catch(e) {
+    stat.textContent = '❌ Generation failed. Try a different topic or fill in manually.';
+    stat.className = 'text-xs text-red-400 mt-2';
+  }
+  btn.disabled = false;
+  txt.textContent = 'Generate';
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────────
+function saveLesson() {
+  const title      = document.getElementById('lesson-title').value.trim();
+  const vocab      = getVocab();
+  const quiz       = getQuiz();
+  const sentences  = getSentences();
+  const speak      = getSpeak();
+  const grammar    = getGrammar();
+  const expressions= getExpressions();
+  const xp         = parseInt(document.getElementById('lesson-xp').value) || 50;
+  const errEl      = document.getElementById('save-error');
+
+  const errors = [];
+  if (!title)           errors.push('• Lesson title is required.');
+  if (vocab.length < 2) errors.push('• Add at least 2 vocabulary words.');
+  if (quiz.length < 2)  errors.push('• Add at least 2 quiz questions.');
+  if (sentences.length < 2) errors.push('• Add at least 2 sentences.');
+  if (speak.length < 2) errors.push('• Add at least 2 speaking phrases.');
+
+  if (errors.length > 0) {
+    errEl.innerHTML = errors.join('<br>');
+    errEl.classList.remove('hidden');
+    errEl.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  errEl.classList.add('hidden');
+
+  const lesson = {
+    id:          editId || Store.getNextCustomLessonId(),
+    title,
+    emoji:       selectedEmoji,
+    chapter:     5,
+    xp,
+    verbs:       [],
+    vocab,
+    expressions,
+    sentences,
+    grammar,
+    quiz,
+    speak
+  };
+
+  Store.saveCustomLesson(lesson);
+  showToast(editId ? 'Lesson updated!' : 'Lesson saved! 🎉');
+  setTimeout(() => window.location.href = 'learn.html', 1200);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, isError=false) {
+  const t = document.getElementById('success-toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.className = t.className.replace(/bg-\S+/, isError ? 'bg-red-500' : 'bg-teal-500');
+  t.style.opacity = '1'; t.style.transform = 'translate(-50%,-8px) scale(1)'; t.style.pointerEvents = 'auto';
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translate(-50%,0) scale(0.9)'; t.style.pointerEvents='none'; }, 2800);
+}
+
+// ── My Lessons panel ──────────────────────────────────────────────────────────
+function renderMyLessons() {
+  const lessons = Store.state.customLessons || [];
+  const sec  = document.getElementById('my-lessons-section');
+  const list = document.getElementById('my-lessons-list');
+  const cnt  = document.getElementById('my-lessons-count');
+  if (lessons.length === 0) { sec.classList.add('hidden'); return; }
+  sec.classList.remove('hidden');
+  cnt.textContent = `${lessons.length} lesson${lessons.length!==1?'s':''}`;
+  list.innerHTML = lessons.map(l => `
+    <div class="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+      <span class="text-2xl">${l.emoji || '✏️'}</span>
+      <div class="flex-1 min-w-0">
+        <p class="font-black text-white truncate">${escHtml(l.title)}</p>
+        <p class="text-slate-400 text-xs mt-0.5">${l.vocab?.length||0} words · ${l.quiz?.length||0} questions · ${l.xp} XP</p>
+      </div>
+      <div class="flex gap-2 flex-shrink-0">
+        <button onclick="window.location.href='lesson_creator.html?edit=${l.id}'"
+                class="bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all active:scale-95 flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">edit</span> Edit
+        </button>
+        <button onclick="confirmDelete(${l.id})"
+                class="bg-red-500/20 hover:bg-red-500/40 text-red-300 font-bold px-4 py-2 rounded-xl text-xs transition-all active:scale-95 flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">delete</span>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function confirmDelete(id) {
+  const l = (Store.state.customLessons||[]).find(x=>x.id===id);
+  if (!l) return;
+  if (!confirm(`Delete "${l.title}"? This cannot be undone.`)) return;
+  Store.deleteCustomLesson(id);
+  renderMyLessons();
+  showToast('Lesson deleted.');
+}
+
+// ── Edit mode ─────────────────────────────────────────────────────────────────
+function loadForEdit(id) {
+  const lesson = (Store.state.customLessons||[]).find(l=>l.id===id);
+  if (!lesson) return;
+  editId = id;
+  document.getElementById('page-title').textContent = 'Edit Lesson';
+  document.getElementById('lesson-title').value = lesson.title || '';
+  pickEmoji(lesson.emoji || '✏️', null);
+  document.getElementById('custom-emoji').value = lesson.emoji || '✏️';
+  selectXP(lesson.xp || 50, document.querySelector(`[data-xp="${lesson.xp||50}"]`) || document.querySelector('[data-xp="50"]'));
+
+  // Vocab
+  (lesson.vocab||[]).forEach(v => addVocabRow(v.en, v.pt));
+
+  // Quiz
+  quizCardIdx = 0;
+  (lesson.quiz||[]).forEach(q => {
+    const ci = q.opts ? q.opts.indexOf(q.a) : 0;
+    addQuizCard(q.q, q.opts||['','','',''], Math.max(0,ci));
+  });
+
+  // Sentences
+  (lesson.sentences||[]).forEach(s => addSentenceRow(s));
+
+  // Speak
+  (lesson.speak||[]).forEach(s => addSpeakRow(s));
+
+  // Grammar
+  if (lesson.grammar?.title) {
+    document.getElementById('grammar-title').value = lesson.grammar.title;
+    (lesson.grammar.rules||[]).forEach(r => addGrammarRule(r));
+    const gb = document.getElementById('grammar-body');
+    if (gb.classList.contains('collapsed')) toggleSection('grammar');
+  }
+
+  // Expressions
+  (lesson.expressions||[]).forEach(e => addExpressionRow(e.expr, e.meaning, e.example));
+  if ((lesson.expressions||[]).length > 0) {
+    const eb = document.getElementById('expressions-body');
+    if (eb.classList.contains('collapsed')) toggleSection('expressions');
+  }
+
+  updateVocabCount(); updateQuizCount(); updateSentencesCount(); updateSpeakCount();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Seed empty rows
+  addVocabRow(); addVocabRow();
+  addQuizCard(); addQuizCard();
+  addSentenceRow(); addSentenceRow();
+  addSpeakRow(); addSpeakRow();
+
+  // Check for edit mode
+  const editParam = parseInt(new URLSearchParams(location.search).get('edit') || '0');
+  if (editParam) {
+    // Clear seeded rows first
+    document.getElementById('vocab-rows').innerHTML = '';
+    document.getElementById('quiz-cards').innerHTML = '';
+    document.getElementById('sentence-rows').innerHTML = '';
+    document.getElementById('speak-rows').innerHTML = '';
+    document.getElementById('grammar-rule-rows').innerHTML = '';
+    document.getElementById('expression-rows').innerHTML = '';
+    loadForEdit(editParam);
+  }
+
+  renderMyLessons();
+});
+</script>
+</body>
+</html>

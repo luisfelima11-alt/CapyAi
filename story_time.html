@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Story Time — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  /* Page-turn animation */
+  @keyframes pageIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .page-in { animation: pageIn 0.5s ease both; }
+
+  /* Sentence reveal */
+  @keyframes sentenceIn { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+  .sentence-in { animation: sentenceIn 0.4s ease both; }
+
+  /* Spinner */
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .spin { animation: spin 1s linear infinite; }
+
+  /* Word chip pulse */
+  @keyframes chipPop { 0%{transform:scale(0.8);opacity:0} 80%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+  .chip-pop { animation: chipPop 0.3s ease both; }
+
+  /* Floating capybara */
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .float { animation: float 3s ease-in-out infinite; }
+
+  /* Typewriter cursor */
+  .cursor::after { content:'|'; animation: blink 0.8s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
+  <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div>
+    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold">✨ AI Story Time</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Yara tells a story!</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-2 bg-yellow-500/20 border border-yellow-500/40 px-3 py-1 rounded-full">
+    <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+    <span class="font-label text-yellow-300 text-xs font-bold">Gemini AI</span>
+  </div>
+</header>
+
+<main class="flex-1 flex flex-col items-center px-6 py-10 gap-8 max-w-2xl mx-auto w-full">
+
+  <!-- Step 1: Word picker -->
+  <div id="setup-panel" class="w-full page-in">
+    <div class="text-center mb-8">
+      <div class="float inline-block mb-4">
+        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-400/60 shadow-2xl shadow-yellow-500/20 mx-auto">
+          <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+        </div>
+      </div>
+      <h2 class="font-headline text-3xl font-black text-white mb-2">Pick your story words!</h2>
+      <p class="font-body text-slate-400">Choose 3–5 words and Yara will write a story just for you.</p>
+    </div>
+
+    <!-- Suggested word chips -->
+    <div id="word-chips" class="flex flex-wrap gap-3 justify-center mb-6"></div>
+
+    <!-- Custom word input -->
+    <div class="flex gap-3 mb-6">
+      <input id="custom-word" type="text" placeholder="Add your own word…"
+             class="flex-1 bg-white/10 border border-white/20 rounded-full px-5 py-3 text-white placeholder-white/40 font-body focus:outline-none focus:ring-2 focus:ring-yellow-500/50 transition-all"
+             onkeydown="if(event.key==='Enter') addCustomWord()"/>
+      <button onclick="addCustomWord()"
+              class="bg-yellow-500 hover:bg-yellow-400 text-white font-label font-bold px-5 py-3 rounded-full active:scale-95 transition-all">
+        Add
+      </button>
+    </div>
+
+    <!-- Selected words display -->
+    <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6 min-h-[60px] flex flex-wrap gap-2 items-center" id="selected-display">
+      <p class="text-white/30 font-label text-sm" id="sel-placeholder">No words selected yet…</p>
+    </div>
+
+    <!-- Generate button -->
+    <button onclick="generateStory()" id="gen-btn"
+            class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-headline font-black text-xl py-5 rounded-2xl active:scale-95 transition-all shadow-xl shadow-yellow-500/20 flex items-center justify-center gap-3">
+      <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+      Generate My Story!
+    </button>
+  </div>
+
+  <!-- Step 2: Loading -->
+  <div id="loading-panel" class="hidden w-full flex flex-col items-center gap-6 text-center page-in">
+    <div class="float text-8xl">🦫</div>
+    <div>
+      <p class="font-headline text-2xl font-bold text-white mb-2">Yara is writing your story…</p>
+      <p class="font-body text-slate-400 text-sm">This takes a few seconds. Get ready! 📖</p>
+    </div>
+    <svg class="w-10 h-10 text-yellow-400 spin" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="20" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Step 3: Story display -->
+  <div id="story-panel" class="hidden w-full page-in">
+
+    <!-- Book card -->
+    <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/5 border border-yellow-500/20 rounded-[2rem] p-8 mb-6 shadow-xl">
+      <!-- Title -->
+      <div class="text-center mb-6">
+        <span class="material-symbols-outlined text-yellow-400 text-4xl mb-2 block" style="font-variation-settings:'FILL' 1;">menu_book</span>
+        <h2 id="story-title" class="font-headline text-3xl font-black text-white"></h2>
+        <p class="font-label text-yellow-400/60 text-xs mt-1 uppercase tracking-widest">A story by Yara 🦫</p>
+      </div>
+
+      <!-- Sentences -->
+      <div id="story-sentences" class="space-y-4 mb-6"></div>
+
+      <!-- Moral -->
+      <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-5 py-4 text-center">
+        <p class="font-label text-yellow-400 text-xs uppercase tracking-widest font-bold mb-1">Yara says:</p>
+        <p id="story-moral" class="font-headline text-lg font-bold text-white italic"></p>
+      </div>
+    </div>
+
+    <!-- Highlight: words used -->
+    <div class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6">
+      <p class="font-label text-xs text-slate-400 uppercase tracking-widest mb-3">Words you used:</p>
+      <div id="used-words-row" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Read aloud + actions -->
+    <div class="flex gap-3 flex-wrap justify-center">
+      <button onclick="readAloud()" id="read-btn"
+              class="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/20">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
+        Read Aloud
+      </button>
+      <button onclick="newStory()"
+              class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-sm">refresh</span>
+        New Story
+      </button>
+      <button onclick="window.location.href='ai_chat.html'"
+              class="flex items-center gap-2 bg-pink-500 hover:bg-pink-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-pink-500/20">
+        <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">chat</span>
+        Chat with Yara
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="error-panel" class="hidden w-full text-center page-in">
+    <div class="text-6xl mb-4">😅</div>
+    <p class="font-headline text-xl font-bold text-white mb-2">Yara couldn't write the story</p>
+    <p class="font-body text-slate-400 text-sm mb-6">Make sure the server is running and try again!</p>
+    <button onclick="newStory()" class="bg-yellow-500 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all">Try Again</button>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Suggested words ────────────────────────────────────────────────────────────
+const SUGGESTED = [
+  { word:'Apple',    emoji:'🍎' }, { word:'Tree',      emoji:'🌳' },
+  { word:'River',    emoji:'🌊' }, { word:'Bird',      emoji:'🐦' },
+  { word:'Sun',      emoji:'☀️' }, { word:'Rain',      emoji:'🌧️' },
+  { word:'Flower',   emoji:'🌸' }, { word:'Big',       emoji:'🐘' },
+  { word:'Happy',    emoji:'😊' }, { word:'Run',       emoji:'🏃' },
+  { word:'Friend',   emoji:'🤝' }, { word:'Magic',     emoji:'✨' },
+];
+
+let selectedWords = [];
+let storyData     = null;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  renderChips();
+});
+
+function renderChips() {
+  document.getElementById('word-chips').innerHTML = SUGGESTED.map(w =>
+    `<button onclick="toggleWord('${w.word}')" id="chip-${w.word}"
+             class="chip-pop flex items-center gap-1.5 px-4 py-2 rounded-full font-label font-bold text-sm
+                    bg-white/10 border border-white/20 text-white hover:bg-white/20 active:scale-95 transition-all">
+       <span>${w.emoji}</span> ${w.word}
+     </button>`
+  ).join('');
+}
+
+function toggleWord(word) {
+  if (selectedWords.includes(word)) {
+    selectedWords = selectedWords.filter(w => w !== word);
+    document.getElementById(`chip-${word}`)?.classList.remove('bg-yellow-500','border-yellow-400','shadow-yellow-500/30','shadow-lg');
+    document.getElementById(`chip-${word}`)?.classList.add('bg-white/10','border-white/20');
+  } else {
+    if (selectedWords.length >= 5) return; // max 5
+    selectedWords.push(word);
+    document.getElementById(`chip-${word}`)?.classList.add('bg-yellow-500','border-yellow-400','shadow-yellow-500/30','shadow-lg');
+    document.getElementById(`chip-${word}`)?.classList.remove('bg-white/10','border-white/20');
+  }
+  updateSelectedDisplay();
+}
+
+function addCustomWord() {
+  const input = document.getElementById('custom-word');
+  const word  = input.value.trim();
+  if (!word || selectedWords.includes(word) || selectedWords.length >= 5) return;
+  selectedWords.push(word);
+  input.value = '';
+  updateSelectedDisplay();
+}
+
+function updateSelectedDisplay() {
+  const ph = document.getElementById('sel-placeholder');
+  const display = document.getElementById('selected-display');
+  if (selectedWords.length === 0) {
+    display.innerHTML = '<p class="text-white/30 font-label text-sm" id="sel-placeholder">No words selected yet…</p>';
+    return;
+  }
+  if (ph) ph.remove();
+  display.innerHTML = selectedWords.map(w =>
+    `<span class="flex items-center gap-1.5 bg-yellow-500/20 border border-yellow-500/40 text-yellow-300
+                  font-label font-bold text-sm px-4 py-2 rounded-full">
+       ${w}
+       <button onclick="toggleWord('${w}')" class="text-yellow-400/60 hover:text-yellow-300 ml-1 leading-none">✕</button>
+     </span>`
+  ).join('');
+}
+
+// ── Generate story ─────────────────────────────────────────────────────────────
+async function generateStory() {
+  if (selectedWords.length < 1) {
+    selectedWords = ['apple','tree','bird']; // fallback
+  }
+
+  const name = window.Store?.state?.playerName || 'Explorer';
+
+  show('loading-panel');
+
+  try {
+    const res  = await fetch('/api/story', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ words: selectedWords, name })
+    });
+    const data = await res.json();
+    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+    storyData   = JSON.parse(clean);
+
+    if (window.Store) {
+      Store.addXP(15);
+      Store.activateStreak();
+      Store.unlockBadge('story_teller');
+      Store.completeActivity('story_time');
+    }
+
+    showStory(storyData);
+  } catch (e) {
+    show('error-panel');
+  }
+}
+
+function showStory(data) {
+  show('story-panel');
+
+  document.getElementById('story-title').textContent = data.title || 'Yara\'s Story';
+  document.getElementById('story-moral').textContent = data.moral || '';
+
+  // Sentences with staggered reveal
+  const container = document.getElementById('story-sentences');
+  container.innerHTML = '';
+  (data.sentences || []).forEach((s, i) => {
+    const p = document.createElement('p');
+    p.className = `font-body text-lg text-white/90 leading-relaxed sentence-in`;
+    p.style.animationDelay = `${i * 0.15}s`;
+    p.textContent = s;
+    container.appendChild(p);
+  });
+
+  // Words used row
+  document.getElementById('used-words-row').innerHTML = selectedWords.map(w =>
+    `<span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-label font-bold text-sm px-4 py-1.5 rounded-full">${w}</span>`
+  ).join('');
+}
+
+// ── Read aloud ─────────────────────────────────────────────────────────────────
+function readAloud() {
+  if (!storyData || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const fullText = [storyData.title, ...(storyData.sentences || []), storyData.moral].join('. ');
+  const utt = new SpeechSynthesisUtterance(fullText);
+  utt.lang = 'en-US'; utt.rate = 0.8; utt.pitch = 1.05;
+
+  const btn = document.getElementById('read-btn');
+  btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-pulse" style="font-variation-settings:\'FILL\' 1;">graphic_eq</span> Reading…';
+  utt.onend = () => {
+    btn.innerHTML = '<span class="material-symbols-outlined text-sm" style="font-variation-settings:\'FILL\' 1;">volume_up</span> Read Aloud';
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+function newStory() {
+  selectedWords = [];
+  storyData     = null;
+  renderChips();
+  show('setup-panel');
+}
+
+// ── Show/hide panels ───────────────────────────────────────────────────────────
+function show(id) {
+  ['setup-panel','loading-panel','story-panel','error-panel'].forEach(p => {
+    const el = document.getElementById(p);
+    if (p === id) { el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
+  });
+}
+</script>
+</body>
+</html>

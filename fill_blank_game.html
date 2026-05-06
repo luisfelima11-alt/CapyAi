@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fill in the Blank — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  /* Blank underline */
+  .blank-slot {
+    display: inline-block; min-width: 120px; border-bottom: 4px solid #ec4899;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900;
+    font-size: 1.6rem; color: #ec4899; text-align: center; padding: 0 8px;
+    margin: 0 6px; vertical-align: bottom; transition: all 0.2s;
+  }
+  .blank-slot.filled   { color: #fff; border-bottom-color: #10b981; }
+  .blank-slot.correct  { color: #10b981; border-bottom-color: #10b981; }
+  .blank-slot.wrong    { color: #ef4444; border-bottom-color: #ef4444; }
+
+  /* Option chips */
+  .option-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 12px 24px; border-radius: 999px; cursor: pointer;
+    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 1rem;
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
+    color: #fff; transition: all 0.15s; user-select: none;
+  }
+  .option-chip:hover  { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+  .option-chip:active { transform: scale(0.93); }
+  .option-chip.used   { opacity: 0.25; pointer-events: none; }
+  .option-chip.correct-chip { background: rgba(16,185,129,0.25); border-color: #10b981; }
+  .option-chip.wrong-chip   { background: rgba(239,68,68,0.2);   border-color: #ef4444; }
+
+  /* Animations */
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  @keyframes pop     { 0%{transform:scale(1)} 50%{transform:scale(1.07)} 100%{transform:scale(1)} }
+  @keyframes spark   { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
+
+  .fade-up  { animation: fadeUp 0.4s ease both; }
+  .do-shake { animation: shake 0.4s ease; }
+  .do-pop   { animation: pop   0.3s ease; }
+  .spark    { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
+
+  #prog-fill { transition: width 0.5s ease; }
+  #sentence-area { line-height: 2.8; }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
+  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div>
+    <p class="font-label text-xs text-orange-400 uppercase tracking-widest font-bold">Fill in the Blank</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Complete the sentence! ✏️</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-4">
+    <div class="flex gap-1" id="hearts">
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="1">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="2">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="3">favorite</span>
+    </div>
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+      <span id="score-disp">0</span> pts
+    </div>
+  </div>
+</header>
+
+<div class="h-1.5 bg-white/10">
+  <div id="prog-fill" class="h-full bg-gradient-to-r from-orange-400 to-pink-500 w-0"></div>
+</div>
+
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-10 gap-10">
+
+  <!-- Question number -->
+  <p class="font-label text-orange-400 text-sm font-bold uppercase tracking-widest fade-up" id="q-label">Question 1 of 10</p>
+
+  <!-- Emoji hint -->
+  <div class="text-7xl fade-up" id="q-emoji">🌿</div>
+
+  <!-- Sentence with blank -->
+  <div id="sentence-area"
+       class="w-full max-w-2xl bg-surface-container border border-white/10 rounded-2xl px-8 py-8 text-center text-2xl font-body text-white leading-relaxed shadow-xl fade-up">
+  </div>
+
+  <!-- Feedback -->
+  <div id="feedback" class="hidden font-label font-bold text-base px-6 py-3 rounded-xl text-center border w-full max-w-2xl fade-up"></div>
+
+  <!-- Option chips -->
+  <div id="options-row" class="flex flex-wrap gap-3 justify-center max-w-2xl fade-up"></div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Questions ─────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  { sentence: 'The ___ is bright and warm.',         answer: 'sun',      emoji: '☀️', distractors: ['moon','star','rain'] },
+  { sentence: 'I have a pet ___.',                   answer: 'dog',      emoji: '🐶', distractors: ['bird','tree','cake'] },
+  { sentence: 'She climbed the big ___.',            answer: 'tree',     emoji: '🌳', distractors: ['fish','apple','star'] },
+  { sentence: 'We ate ___ for breakfast.',           answer: 'bread',    emoji: '🍞', distractors: ['rain','sun','bird'] },
+  { sentence: 'The ___ swims in the river.',         answer: 'fish',     emoji: '🐟', distractors: ['dog','flower','cake'] },
+  { sentence: 'I feel very ___ today!',              answer: 'happy',    emoji: '😊', distractors: ['rain','tree','bird'] },
+  { sentence: 'The sky is full of ___ at night.',    answer: 'stars',    emoji: '⭐', distractors: ['dogs','cakes','fish'] },
+  { sentence: 'A ___ flies high in the sky.',        answer: 'bird',     emoji: '🐦', distractors: ['fish','moon','bread'] },
+  { sentence: 'It began to ___ so we stayed inside.',answer: 'rain',     emoji: '🌧️', distractors: ['jump','sleep','sing'] },
+  { sentence: 'She picked a beautiful ___.',         answer: 'flower',   emoji: '🌸', distractors: ['river','star','dog'] },
+  { sentence: 'We counted to ___ in class.',         answer: 'ten',      emoji: '🔢', distractors: ['cat','bird','rain'] },
+  { sentence: 'The ___ hopped across the pond.',     answer: 'frog',     emoji: '🐸', distractors: ['cake','sun','star'] },
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const shuffled  = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+let currentQ    = 0;
+let score       = 0;
+let lives       = 3;
+let answered    = false;
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+renderQuestion();
+
+function renderQuestion() {
+  answered = false;
+  const q  = shuffled[currentQ];
+
+  document.getElementById('q-label').textContent   = `Question ${currentQ+1} of ${shuffled.length}`;
+  document.getElementById('q-emoji').textContent   = q.emoji;
+  document.getElementById('prog-fill').style.width = `${(currentQ/shuffled.length)*100}%`;
+  document.getElementById('feedback').classList.add('hidden');
+
+  // Build sentence with blank
+  const parts = q.sentence.split('___');
+  document.getElementById('sentence-area').innerHTML =
+    parts[0] + `<span class="blank-slot" id="blank">___</span>` + (parts[1] || '');
+
+  // Build options (shuffle answer + distractors)
+  const opts = [q.answer, ...q.distractors].sort(() => Math.random() - 0.5);
+  document.getElementById('options-row').innerHTML = opts.map(opt =>
+    `<button class="option-chip" onclick="pickOption(this,'${opt}','${q.answer}')">${opt}</button>`
+  ).join('');
+
+  // Animate
+  ['sentence-area','options-row','q-emoji','q-label'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('fade-up'); void el.offsetWidth; el.classList.add('fade-up');
+  });
+}
+
+// ── Pick an option ─────────────────────────────────────────────────────────────
+function pickOption(btn, chosen, correct) {
+  if (answered) return;
+  answered = true;
+
+  const blank   = document.getElementById('blank');
+  const fb      = document.getElementById('feedback');
+  const isRight = chosen === correct;
+
+  // Fill blank
+  blank.textContent = chosen;
+  blank.classList.add('filled');
+
+  // Disable all options
+  document.querySelectorAll('.option-chip').forEach(b => {
+    b.classList.add('used');
+    if (b !== btn) b.style.opacity = '0.2';
+  });
+
+  fb.classList.remove('hidden','bg-emerald-500/20','text-emerald-300','border-emerald-500/40',
+                                'bg-red-500/20','text-red-300','border-red-500/40');
+
+  if (isRight) {
+    score += 10;
+    document.getElementById('score-disp').textContent = score;
+    blank.classList.add('correct');
+    btn.classList.add('correct-chip');
+    fb.textContent = `✅ Correct! "${correct}" — well done! 🎉`;
+    fb.classList.add('bg-emerald-500/20','text-emerald-300','border-emerald-500/40');
+    launchSparks();
+    setTimeout(next, 1500);
+  } else {
+    lives--;
+    updateHearts();
+    blank.classList.add('wrong');
+    btn.classList.add('wrong-chip');
+    // Highlight correct
+    document.querySelectorAll('.option-chip').forEach(b => {
+      if (b.textContent === correct) b.classList.add('correct-chip');
+    });
+    fb.textContent = `❌ The answer is "${correct}". Keep going! 💪`;
+    fb.classList.add('bg-red-500/20','text-red-300','border-red-500/40');
+
+    const area = document.getElementById('sentence-area');
+    area.classList.add('do-shake');
+    setTimeout(() => area.classList.remove('do-shake'), 450);
+
+    if (lives <= 0) { setTimeout(showFinished, 1800); return; }
+    setTimeout(next, 2000);
+  }
+}
+
+function updateHearts() {
+  document.querySelectorAll('[data-h]').forEach(h => {
+    if (parseInt(h.dataset.h) > lives) {
+      h.style.opacity   = '0.2';
+      h.style.transform = 'scale(0.7)';
+    }
+  });
+}
+
+function next() {
+  currentQ++;
+  if (currentQ >= shuffled.length) showFinished();
+  else renderQuestion();
+}
+
+// ── Sparks ─────────────────────────────────────────────────────────────────────
+function launchSparks() {
+  const colors = ['#f97316','#ec4899','#10b981','#f59e0b','#a855f7'];
+  for (let i = 0; i < 14; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const a = (i/14)*360, d = 55+Math.random()*65;
+    sp.style.setProperty('--tx',`${Math.cos(a*Math.PI/180)*d}px`);
+    sp.style.setProperty('--ty',`${Math.sin(a*Math.PI/180)*d}px`);
+    sp.style.background = colors[i%colors.length];
+    sp.style.left = '50vw'; sp.style.top = '45vh';
+    document.body.appendChild(sp);
+    setTimeout(() => sp.remove(), 950);
+  }
+}
+
+// ── Finished ──────────────────────────────────────────────────────────────────
+function showFinished() {
+  const pct   = score / (shuffled.length * 10);
+  const xp    = Math.round(pct * 40) + 10;
+  const stars = pct >= 0.85 ? 3 : pct >= 0.5 ? 2 : 1;
+
+  if (window.Store) {
+    Store.addXP(xp);
+    Store.activateStreak();
+    Store.completeActivity('games');
+    if (stars === 3) Store.unlockBadge('grammar_star');
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.innerHTML = `
+    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-orange-500/60
+         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         scale-0 opacity-0 transition-all duration-500">
+      <div class="text-7xl">✏️</div>
+      <div>
+        <p class="font-label text-orange-400 font-bold text-sm uppercase tracking-widest mb-1">Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
+        <p class="font-body text-slate-300">${score} / ${shuffled.length * 10} points</p>
+      </div>
+      <div class="flex gap-1">
+        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
+             style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
+      </div>
+      <p class="font-body text-slate-400 text-sm">
+        ${stars===3?'🏅 Grammar Star badge! Perfect score!':stars===2?'Great work! You know your sentences! 🌿':'Keep practising — you\'re getting better! 💪'}
+      </p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again 🔄</button>
+        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                class="bg-orange-500 hover:bg-orange-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-orange-500/30">Games 🌿</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const f = document.getElementById('fin');
+    f.style.transform = 'scale(1)'; f.style.opacity = '1';
+  }));
+  launchSparks();
+}
+</script>
+</body>
+</html>

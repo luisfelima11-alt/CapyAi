@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tic-Tac-Toe with Yara 🦫</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #0a1628;
+    min-height: 100vh;
+    font-family: 'Lexend', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1rem;
+    padding-top: 4.5rem;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* Back button */
+  #back-btn {
+    position: fixed; top: 1rem; left: 1rem; z-index: 100;
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2); color: #fff;
+    font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 0.85rem;
+    padding: 0.5rem 1rem; border-radius: 999px; cursor: pointer;
+    display: flex; align-items: center; gap: 0.4rem; transition: background 0.2s;
+  }
+  #back-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* Score bar */
+  #scorebar {
+    display: flex; gap: 1rem; justify-content: center; align-items: center;
+    margin-bottom: 1.2rem; flex-wrap: wrap;
+  }
+  .score-pill {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px; padding: 0.45rem 1.1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 0.95rem;
+    display: flex; align-items: center; gap: 0.4rem; color: #fff;
+  }
+  .pill-val { color: #fbbf24; }
+
+  /* Status banner */
+  #status-banner {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900; font-size: 1.1rem;
+    color: #fff; text-align: center; margin-bottom: 1rem; min-height: 1.6rem;
+    transition: all .25s;
+  }
+
+  /* Yara avatar row */
+  #opponents-row {
+    display: flex; justify-content: space-between; align-items: center;
+    width: min(92vw, 370px); margin-bottom: 0.8rem;
+  }
+  .player-tag {
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .player-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .player-avatar.you  { background: rgba(236,72,153,0.25); border-color: #ec4899; }
+  .player-avatar.yara { background: rgba(139,92,246,0.25); border-color: #a78bfa; }
+  .player-label { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.55); letter-spacing:.05em; }
+  .player-symbol { font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:1rem; }
+  .player-symbol.x-sym { color:#ec4899; }
+  .player-symbol.o-sym { color:#a78bfa; }
+  .vs-badge {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px; padding: 0.3rem 0.9rem;
+    font-weight: 800; font-size: 0.75rem; color: rgba(255,255,255,0.4);
+  }
+
+  /* Board */
+  #board {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; width: min(92vw, 370px); margin-bottom: 1.2rem;
+  }
+  .cell {
+    aspect-ratio: 1; background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(2.2rem, 12vw, 3.6rem); font-weight: 900;
+    cursor: pointer; transition: background .15s, transform .12s, border-color .15s;
+    position: relative; overflow: hidden;
+  }
+  .cell:hover:not(.taken) {
+    background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);
+    transform: scale(1.04);
+  }
+  .cell.taken { cursor: default; }
+  .cell.x-mark { color: #ec4899; border-color: rgba(236,72,153,0.4); background: rgba(236,72,153,0.08); }
+  .cell.o-mark { color: #a78bfa; border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08); }
+  .cell.win-cell { animation: winPulse .6s ease forwards; }
+  @keyframes winPulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); box-shadow: 0 0 24px rgba(251,191,36,.6); }
+    100% { transform: scale(1.08); }
+  }
+  .cell.pop { animation: cellPop .22s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  @keyframes cellPop { from{ transform:scale(0.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+  /* Yara is thinking indicator */
+  #thinking-dots {
+    display: none; text-align: center; color: #a78bfa;
+    font-size: 0.82rem; font-weight: 600; letter-spacing: .08em;
+    margin-bottom: 0.6rem;
+  }
+  @keyframes dotBlink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
+  #thinking-dots span { animation: dotBlink 1.4s ease infinite; }
+  #thinking-dots span:nth-child(2) { animation-delay:.2s; }
+  #thinking-dots span:nth-child(3) { animation-delay:.4s; }
+
+  /* Play again / XP */
+  #play-again-btn {
+    display: none; background: linear-gradient(135deg, #ec4899, #a855f7);
+    border: none; border-radius: 14px; color: #fff;
+    font-family: 'Plus Jakarta Sans',sans-serif; font-weight: 800; font-size: 1rem;
+    padding: 0.85rem 2.5rem; cursor: pointer; transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 20px rgba(236,72,153,.35); margin-bottom: 0.5rem;
+  }
+  #play-again-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(236,72,153,.5); }
+
+  /* XP toast */
+  #xp-toast {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1rem;
+    padding: 0.7rem 2rem; border-radius: 999px;
+    box-shadow: 0 8px 30px rgba(236,72,153,.4);
+    transition: transform .4s cubic-bezier(0.34,1.56,0.64,1), opacity .4s;
+    opacity:0; pointer-events:none; z-index:200;
+  }
+  #xp-toast.show { transform: translateX(-50%) translateY(0); opacity:1; }
+
+  /* ── Quiz Overlay ── */
+  #quiz-overlay {
+    position: fixed; inset:0; background: rgba(0,0,0,0.78);
+    backdrop-filter: blur(8px); display: flex;
+    align-items: center; justify-content: center; z-index:9999;
+    opacity:0; pointer-events:none; transition: opacity .35s ease;
+  }
+  #quiz-overlay.show { opacity:1; pointer-events:all !important; }
+  #quiz-overlay.show * { pointer-events:auto !important; }
+  #quiz-box {
+    background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid rgba(139,92,246,.4); border-radius: 1.5rem;
+    box-shadow: 0 0 60px rgba(139,92,246,.3);
+    width: min(94vw, 430px); padding: 1.8rem 1.6rem 2rem;
+    text-align: center; font-family:'Lexend',sans-serif;
+    transform: scale(0.85);
+    transition: transform .35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #quiz-overlay.show #quiz-box { transform: scale(1); }
+
+  #quiz-result-emoji { font-size: 2.5rem; margin-bottom: 0.3rem; }
+  #quiz-result-msg {
+    font-family:'Plus Jakarta Sans',sans-serif; font-weight:900; font-size:1.15rem;
+    color:#fff; margin-bottom: 0.4rem;
+  }
+  #quiz-result-sub { color:#94a3b8; font-size:0.78rem; margin-bottom:1.2rem; line-height:1.5; }
+
+  #quiz-divider {
+    border: none; border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.2rem;
+  }
+  #quiz-badge {
+    display:inline-block; background:rgba(139,92,246,.25); color:#c4b5fd;
+    font-size:0.7rem; font-weight:700; letter-spacing:.08em;
+    padding:.2rem .8rem; border-radius:999px; margin-bottom:.7rem;
+  }
+  #quiz-prompt { color:#e2e8f0; font-size:0.88rem; margin-bottom:.4rem; line-height:1.5; }
+  #quiz-word {
+    color:#fbbf24; font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:1.65rem; font-weight:900; margin-bottom:1rem;
+  }
+  .quiz-choice {
+    display:block; width:100%; padding:.65rem 1rem; margin-bottom:.5rem;
+    background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.12);
+    border-radius:.85rem; color:#e2e8f0; font-family:'Lexend',sans-serif;
+    font-size:0.86rem; font-weight:600; cursor:pointer;
+    transition: background .18s, border-color .18s, transform .1s; text-align:left;
+  }
+  .quiz-choice:hover:not(:disabled) {
+    background:rgba(139,92,246,.22); border-color:rgba(139,92,246,.5); transform:translateX(3px);
+  }
+  .quiz-choice.correct { background:rgba(16,185,129,.25)!important; border-color:#10b981!important; color:#6ee7b7!important; }
+  .quiz-choice.wrong   { background:rgba(239,68,68,.2)!important; border-color:#ef4444!important; color:#fca5a5!important; }
+  #quiz-feedback { min-height:1.4rem; font-size:0.8rem; font-weight:600; margin:.5rem 0 .8rem; color:#a78bfa; }
+  #quiz-continue {
+    display:none; width:100%; padding:.75rem 1rem;
+    background:linear-gradient(135deg,#ec4899,#a855f7); border:none; border-radius:.85rem;
+    color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-size:.95rem; font-weight:800;
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
+    box-shadow:0 4px 20px rgba(236,72,153,.35);
+  }
+  #quiz-continue:hover { transform:translateY(-2px); box-shadow:0 6px 28px rgba(236,72,153,.5); }
+
+  /* Streak dots */
+  #quiz-streak-bar { display:flex; justify-content:center; gap:.35rem; margin-bottom:.9rem; }
+  .qs-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.15); transition:background .3s; }
+  .qs-dot.hit  { background:#10b981; }
+  .qs-dot.miss { background:#ef4444; }
+
+  /* Difficulty mode toggle */
+  #mode-bar {
+    display: flex; gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .mode-btn {
+    padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+    border: 1.5px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.5); cursor: pointer; transition: all .18s;
+    font-family: 'Lexend', sans-serif;
+  }
+  .mode-btn.active {
+    background: rgba(139,92,246,0.25); border-color: #a78bfa; color: #c4b5fd;
+  }
+</style>
+</head>
+<body>
+
+<button id="back-btn" onclick="history.back()">← Back</button>
+
+<!-- Score bar -->
+<div id="scorebar">
+  <div class="score-pill">😊 You: <span class="pill-val" id="score-you">0</span></div>
+  <div class="score-pill">🦫 Yara: <span class="pill-val" id="score-yara">0</span></div>
+  <div class="score-pill">🤝 Tie: <span class="pill-val" id="score-tie">0</span></div>
+</div>
+
+<!-- Difficulty -->
+<div id="mode-bar">
+  <button class="mode-btn active" id="btn-easy"   onclick="setMode('easy')">Easy</button>
+  <button class="mode-btn"        id="btn-medium" onclick="setMode('medium')">Medium</button>
+  <button class="mode-btn"        id="btn-hard"   onclick="setMode('hard')">Hard 🔥</button>
+</div>
+
+<!-- Player vs Yara row -->
+<div id="opponents-row">
+  <div class="player-tag">
+    <div class="player-avatar you">😊</div>
+    <span class="player-label">YOU</span>
+    <span class="player-symbol x-sym">✕</span>
+  </div>
+  <div class="vs-badge">VS</div>
+  <div class="player-tag">
+    <div class="player-avatar yara">🦫</div>
+    <span class="player-label">YARA</span>
+    <span class="player-symbol o-sym">○</span>
+  </div>
+</div>
+
+<!-- Turn status -->
+<div id="status-banner">Your turn — tap a square!</div>
+
+<!-- Yara thinking -->
+<div id="thinking-dots">Yara is thinking<span>.</span><span>.</span><span>.</span></div>
+
+<!-- Board -->
+<div id="board">
+  <div class="cell" id="c0" onclick="playerMove(0)"></div>
+  <div class="cell" id="c1" onclick="playerMove(1)"></div>
+  <div class="cell" id="c2" onclick="playerMove(2)"></div>
+  <div class="cell" id="c3" onclick="playerMove(3)"></div>
+  <div class="cell" id="c4" onclick="playerMove(4)"></div>
+  <div class="cell" id="c5" onclick="playerMove(5)"></div>
+  <div class="cell" id="c6" onclick="playerMove(6)"></div>
+  <div class="cell" id="c7" onclick="playerMove(7)"></div>
+  <div class="cell" id="c8" onclick="playerMove(8)"></div>
+</div>
+
+<!-- Play Again -->
+<button id="play-again-btn" onclick="newGame()">▶ Play Again</button>
+
+<!-- XP toast -->
+<div id="xp-toast">+10 XP 🌟</div>
+
+<!-- ── Quiz Overlay ── -->
+<div id="quiz-overlay">
+  <div id="quiz-box">
+    <!-- Game result -->
+    <div id="quiz-result-emoji">🏆</div>
+    <div id="quiz-result-msg">You Win!</div>
+    <div id="quiz-result-sub">Nice move! Now earn bonus XP with an English challenge.</div>
+    <hr id="quiz-divider"/>
+
+    <!-- Quiz section -->
+    <div id="quiz-badge">ENGLISH CHALLENGE</div>
+    <div id="quiz-streak-bar"></div>
+    <div id="quiz-prompt">What does this mean in Portuguese?</div>
+    <div id="quiz-word">HELLO</div>
+    <div id="quiz-choices"></div>
+    <div id="quiz-feedback"></div>
+    <button id="quiz-continue" onclick="quizContinue()">▶ Play Again</button>
+  </div>
+</div>
+
+<script src="store.js"></script>
+<script>
+// ── Quiz words & phrases ──────────────────────────────────────────────────────
+const QUIZ_ITEMS = [
+  // Single words
+  { type:'word', en:'Appointment', pt:'Compromisso / Consulta' },
+  { type:'word', en:'Beautiful',   pt:'Bonito / Linda' },
+  { type:'word', en:'Breakfast',   pt:'Café da manhã' },
+  { type:'word', en:'Challenge',   pt:'Desafio' },
+  { type:'word', en:'Comfortable', pt:'Confortável' },
+  { type:'word', en:'Dangerous',   pt:'Perigoso' },
+  { type:'word', en:'Delicious',   pt:'Delicioso' },
+  { type:'word', en:'Exhausted',   pt:'Exausto / Esgotado' },
+  { type:'word', en:'Fluent',      pt:'Fluente' },
+  { type:'word', en:'Grateful',    pt:'Grato / Agradecido' },
+  { type:'word', en:'Honest',      pt:'Honesto' },
+  { type:'word', en:'Important',   pt:'Importante' },
+  { type:'word', en:'Journey',     pt:'Jornada / Viagem' },
+  { type:'word', en:'Knowledge',   pt:'Conhecimento' },
+  { type:'word', en:'Language',    pt:'Idioma / Língua' },
+  { type:'word', en:'Necessary',   pt:'Necessário' },
+  { type:'word', en:'Opportunity', pt:'Oportunidade' },
+  { type:'word', en:'Patient',     pt:'Paciente' },
+  { type:'word', en:'Practice',    pt:'Prática' },
+  { type:'word', en:'Responsible', pt:'Responsável' },
+  { type:'word', en:'Schedule',    pt:'Agenda / Horário' },
+  { type:'word', en:'Successful',  pt:'Bem-sucedido' },
+  { type:'word', en:'Terrible',    pt:'Terrível' },
+  { type:'word', en:'Understand',  pt:'Entender / Compreender' },
+  { type:'word', en:'Vocabulary',  pt:'Vocabulário' },
+  // Phrases
+  { type:'phrase', en:'What do you mean?',           pt:'O que você quer dizer?' },
+  { type:'phrase', en:'I\'m sorry to hear that.',    pt:'Sinto muito por isso.' },
+  { type:'phrase', en:'Could you say that again?',   pt:'Você pode repetir?' },
+  { type:'phrase', en:'I\'m not sure about that.',   pt:'Não tenho certeza sobre isso.' },
+  { type:'phrase', en:'Let me think about it.',      pt:'Deixa eu pensar nisso.' },
+  { type:'phrase', en:'That sounds great!',          pt:'Isso parece ótimo!' },
+  { type:'phrase', en:'I\'d like to order, please.', pt:'Gostaria de fazer um pedido.' },
+  { type:'phrase', en:'How much does it cost?',      pt:'Quanto custa?' },
+  { type:'phrase', en:'Can you help me?',            pt:'Você pode me ajudar?' },
+  { type:'phrase', en:'I\'m feeling a bit tired.',   pt:'Estou me sentindo um pouco cansado.' },
+  { type:'phrase', en:'Nice to meet you!',           pt:'Prazer em conhecê-lo!' },
+  { type:'phrase', en:'What time is it?',            pt:'Que horas são?' },
+  { type:'phrase', en:'I forgot my password.',       pt:'Esqueci minha senha.' },
+  { type:'phrase', en:'Can we reschedule?',          pt:'Podemos remarcar?' },
+  { type:'phrase', en:'I\'ll be right back.',        pt:'Já volto.' },
+  // Aula 28 — Personalities & Moods (words)
+  { type:'word', en:'Happy',       pt:'Feliz' },
+  { type:'word', en:'Sad',         pt:'Triste' },
+  { type:'word', en:'Angry',       pt:'Com raiva' },
+  { type:'word', en:'Upset',       pt:'Chateado/a' },
+  { type:'word', en:'Tired',       pt:'Cansado/a' },
+  { type:'word', en:'Anxious',     pt:'Ansioso/a' },
+  { type:'word', en:'Excited',     pt:'Animado/a' },
+  { type:'word', en:'Bored',       pt:'Entediado/a' },
+  { type:'word', en:'Frustrated',  pt:'Frustrado/a' },
+  { type:'word', en:'Nervous',     pt:'Nervoso/a' },
+  { type:'word', en:'Relieved',    pt:'Aliviado/a' },
+  { type:'word', en:'Overwhelmed', pt:'Sobrecarregado/a' },
+  { type:'word', en:'Confident',   pt:'Confiante' },
+  { type:'word', en:'Embarrassed', pt:'Envergonhado/a' },
+  { type:'word', en:'Proud',       pt:'Orgulhoso/a' },
+  { type:'word', en:'Outgoing',    pt:'Extrovertido/a' },
+  { type:'word', en:'Shy',         pt:'Tímido/a' },
+  { type:'word', en:'Honest',      pt:'Honesto/a' },
+  { type:'word', en:'Stubborn',    pt:'Teimoso/a' },
+  { type:'word', en:'Patient',     pt:'Paciente' },
+  { type:'word', en:'Ambitious',   pt:'Ambicioso/a' },
+  { type:'word', en:'Sensitive',   pt:'Sensível' },
+  { type:'word', en:'Creative',    pt:'Criativo/a' },
+  { type:'word', en:'Reliable',    pt:'Confiável' },
+  { type:'word', en:'Impulsive',   pt:'Impulsivo/a' },
+  { type:'word', en:'Empathetic',  pt:'Empático/a' },
+  { type:'word', en:'Pessimistic', pt:'Pessimista' },
+  { type:'word', en:'Optimistic',  pt:'Otimista' },
+  // Aula 28 — Everyday expressions
+  { type:'phrase', en:"I'm not in the mood.",       pt:'Não estou com vontade.' },
+  { type:'phrase', en:"She's on top of the world.", pt:'Ela está feliz demais / nas nuvens.' },
+  { type:'phrase', en:"He's driving me crazy.",     pt:'Ele está me deixando louco/a.' },
+  { type:'phrase', en:"I'm feeling under pressure.",pt:'Estou me sentindo sob pressão.' },
+];
+
+// ── Game state ────────────────────────────────────────────────────────────────
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board = Array(9).fill(null);   // null | 'X' | 'O'
+let gameOver  = false;
+let playerTurn = true;  // true = player (X), false = Yara (O)
+let difficulty = 'easy';
+
+let scoreYou = 0, scoreYara = 0, scoreTie = 0;
+let quizStreak = +localStorage.getItem('tttQuizStreak') || 0;
+const MAX_DOTS = 7;
+
+// ── Difficulty mode ───────────────────────────────────────────────────────────
+function setMode(mode) {
+  difficulty = mode;
+  ['easy','medium','hard'].forEach(m => {
+    document.getElementById('btn-' + m).classList.toggle('active', m === mode);
+  });
+  newGame();
+}
+
+// ── Board rendering ───────────────────────────────────────────────────────────
+function renderBoard() {
+  for (let i = 0; i < 9; i++) {
+    const cell = document.getElementById('c' + i);
+    cell.classList.remove('x-mark','o-mark','win-cell');
+    if (board[i] === 'X') {
+      cell.textContent = '✕';
+      cell.classList.add('x-mark','taken');
+    } else if (board[i] === 'O') {
+      cell.textContent = '○';
+      cell.classList.add('o-mark','taken');
+    } else {
+      cell.textContent = '';
+      cell.classList.remove('taken');
+    }
+  }
+}
+
+function highlightWin(combo) {
+  combo.forEach(i => document.getElementById('c' + i).classList.add('win-cell'));
+}
+
+function animatePop(idx) {
+  const cell = document.getElementById('c' + idx);
+  cell.classList.remove('pop');
+  void cell.offsetWidth; // reflow to restart animation
+  cell.classList.add('pop');
+}
+
+// ── Game logic ────────────────────────────────────────────────────────────────
+function checkWinner(b) {
+  for (const [a, c, d] of WINS) {
+    if (b[a] && b[a] === b[c] && b[a] === b[d]) return { winner: b[a], combo: [a, c, d] };
+  }
+  if (b.every(v => v)) return { winner: 'tie', combo: [] };
+  return null;
+}
+
+function getEmptyCells(b) {
+  return b.map((v, i) => v === null ? i : -1).filter(i => i >= 0);
+}
+
+// Minimax for hard difficulty
+function minimax(b, isMax, depth) {
+  const result = checkWinner(b);
+  if (result) {
+    if (result.winner === 'O') return 10 - depth;
+    if (result.winner === 'X') return depth - 10;
+    return 0;
+  }
+  const empties = getEmptyCells(b);
+  if (isMax) {
+    let best = -Infinity;
+    for (const i of empties) {
+      b[i] = 'O';
+      best = Math.max(best, minimax(b, false, depth + 1));
+      b[i] = null;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (const i of empties) {
+      b[i] = 'X';
+      best = Math.min(best, minimax(b, true, depth + 1));
+      b[i] = null;
+    }
+    return best;
+  }
+}
+
+function yaraMove() {
+  const empties = getEmptyCells(board);
+  if (!empties.length) return;
+
+  let chosen;
+
+  if (difficulty === 'easy') {
+    // Completely random
+    chosen = empties[Math.floor(Math.random() * empties.length)];
+
+  } else if (difficulty === 'medium') {
+    // Win if can, block if can, else random
+    chosen = findWinOrBlock('O') ?? findWinOrBlock('X') ?? empties[Math.floor(Math.random() * empties.length)];
+
+  } else {
+    // Hard: minimax (unbeatable)
+    let best = -Infinity, bestMove = empties[0];
+    for (const i of empties) {
+      board[i] = 'O';
+      const score = minimax(board, false, 0);
+      board[i] = null;
+      if (score > best) { best = score; bestMove = i; }
+    }
+    chosen = bestMove;
+  }
+
+  board[chosen] = 'O';
+  animatePop(chosen);
+  renderBoard();
+
+  const result = checkWinner(board);
+  if (result) { endGame(result); return; }
+
+  playerTurn = true;
+  setStatus('Your turn — tap a square!', '#fff');
+}
+
+function findWinOrBlock(mark) {
+  const empties = getEmptyCells(board);
+  for (const i of empties) {
+    board[i] = mark;
+    if (checkWinner(board)) { board[i] = null; return i; }
+    board[i] = null;
+  }
+  return null;
+}
+
+function playerMove(idx) {
+  if (!playerTurn || gameOver || board[idx]) return;
+  board[idx] = 'X';
+  animatePop(idx);
+  renderBoard();
+
+  const result = checkWinner(board);
+  if (result) { endGame(result); return; }
+
+  playerTurn = false;
+  setStatus('Yara is thinking…', '#a78bfa');
+  document.getElementById('thinking-dots').style.display = 'block';
+
+  setTimeout(() => {
+    document.getElementById('thinking-dots').style.display = 'none';
+    yaraMove();
+  }, difficulty === 'hard' ? 700 : 400 + Math.random() * 300);
+}
+
+function endGame(result) {
+  gameOver = true;
+  playerTurn = false;
+  document.getElementById('play-again-btn').style.display = 'none';
+
+  let emoji, msg, sub;
+  if (result.winner === 'X') {
+    scoreYou++;
+    highlightWin(result.combo);
+    emoji = '🏆'; msg = 'You Win!'; sub = 'Great strategy! Now earn bonus XP with an English challenge.';
+    setStatus('🎉 You win this round!', '#fbbf24');
+    awardXP(15);
+  } else if (result.winner === 'O') {
+    scoreYara++;
+    highlightWin(result.combo);
+    emoji = '🦫'; msg = 'Yara Wins!'; sub = 'Good effort! See if you can get the English challenge right.';
+    setStatus('🦫 Yara wins this round!', '#f87171');
+    awardXP(5);
+  } else {
+    scoreTie++;
+    emoji = '🤝'; msg = "It's a Tie!"; sub = 'Perfect balance! Prove your English skills anyway.';
+    setStatus("🤝 It's a tie!", '#94a3b8');
+    awardXP(8);
+  }
+
+  updateScoreUI();
+
+  // Show quiz after short delay
+  setTimeout(() => showQuiz(emoji, msg, sub), 900);
+}
+
+function newGame() {
+  board = Array(9).fill(null);
+  gameOver = false;
+  playerTurn = true;
+  renderBoard();
+  document.getElementById('play-again-btn').style.display = 'none';
+  document.getElementById('thinking-dots').style.display = 'none';
+  setStatus('Your turn — tap a square!', '#fff');
+}
+
+function setStatus(text, color) {
+  const el = document.getElementById('status-banner');
+  el.textContent = text;
+  el.style.color = color;
+}
+
+function updateScoreUI() {
+  document.getElementById('score-you').textContent  = scoreYou;
+  document.getElementById('score-yara').textContent = scoreYara;
+  document.getElementById('score-tie').textContent  = scoreTie;
+}
+
+// ── XP ────────────────────────────────────────────────────────────────────────
+let toastTimer;
+function awardXP(amount) {
+  try { if (typeof Store !== 'undefined') Store.addXP(amount); } catch(e) {}
+  const t = document.getElementById('xp-toast');
+  t.textContent = `+${amount} XP 🌟`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── Quiz ──────────────────────────────────────────────────────────────────────
+let quizAnswered = false;
+
+function buildStreakBar() {
+  const bar = document.getElementById('quiz-streak-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < MAX_DOTS; i++) {
+    const d = document.createElement('div');
+    d.className = 'qs-dot' + (i < quizStreak ? ' hit' : '');
+    bar.appendChild(d);
+  }
+}
+
+function showQuiz(resultEmoji, resultMsg, resultSub) {
+  quizAnswered = false;
+
+  document.getElementById('quiz-result-emoji').textContent = resultEmoji;
+  document.getElementById('quiz-result-msg').textContent   = resultMsg;
+  document.getElementById('quiz-result-sub').textContent   = resultSub;
+
+  // Pick a random quiz item
+  const item = QUIZ_ITEMS[Math.floor(Math.random() * QUIZ_ITEMS.length)];
+  const isPhrase = item.type === 'phrase';
+
+  document.getElementById('quiz-prompt').textContent = isPhrase
+    ? 'O que significa essa frase em português?'
+    : 'O que significa essa palavra em português?';
+  document.getElementById('quiz-word').textContent = item.en;
+  document.getElementById('quiz-badge').textContent = isPhrase ? 'ENGLISH PHRASE' : 'ENGLISH WORD';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-feedback').style.color = '#a78bfa';
+  document.getElementById('quiz-continue').style.display = 'none';
+
+  // Generate 3 wrong answers
+  const pool   = QUIZ_ITEMS.filter(w => w.en !== item.en);
+  const wrongs = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+  const choices = [...wrongs.map(w => w.pt), item.pt].sort(() => Math.random() - 0.5);
+
+  const correct = item.pt;
+  document.getElementById('quiz-choices').innerHTML = choices.map(c =>
+    `<button class="quiz-choice" onclick='answerQuiz(this,${JSON.stringify(c)},${JSON.stringify(correct)})'>${c}</button>`
+  ).join('');
+
+  buildStreakBar();
+  const ov = document.getElementById('quiz-overlay');
+  ov.style.display = 'flex';           // ensure visible before fade-in
+  requestAnimationFrame(() => ov.classList.add('show'));
+}
+
+function answerQuiz(btn, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.quiz-choice').forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('quiz-feedback');
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    quizStreak = Math.min(quizStreak + 1, MAX_DOTS);
+    localStorage.setItem('tttQuizStreak', quizStreak);
+    const bonus = quizStreak >= 5 ? 10 : quizStreak >= 3 ? 7 : 5;
+    fb.textContent = quizStreak >= 3
+      ? `✅ Correto! +${bonus} XP 🔥 Sequência: ${quizStreak}!`
+      : `✅ Correto! +${bonus} XP`;
+    fb.style.color = '#34d399';
+    try { if (typeof Store !== 'undefined') Store.addXP(bonus); } catch(e) {}
+    buildStreakBar();
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-choice').forEach(b => {
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+    quizStreak = 0;
+    localStorage.setItem('tttQuizStreak', 0);
+    fb.textContent = `❌ Era: ${correct}`;
+    fb.style.color = '#f87171';
+    buildStreakBar();
+  }
+
+  setTimeout(() => { document.getElementById('quiz-continue').style.display = 'block'; }, 600);
+}
+
+function quizContinue() {
+  const ov = document.getElementById('quiz-overlay');
+  ov.classList.remove('show');
+  ov.style.display = 'none';  // immediately remove from layout so children stop intercepting clicks
+  document.getElementById('play-again-btn').style.display = 'block';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+newGame();
+</script>
+</body>
+</html>

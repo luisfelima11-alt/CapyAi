@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 23 — MOST in Conversation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#8b5cf6,#a78bfa);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#8b5cf6;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.chunk-card:hover{transform:translateY(-2px)}
+.chunk-card{transition:all .2s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-purple-950 to-violet-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">💬</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">🗣️</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:16%;animation-delay:1.3s">📖</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:24%;animation-delay:.4s">🤝</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">✨</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:10%;animation-delay:1.6s">🌟</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🏆</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-violet-500/20 border border-violet-400/30 rounded-full px-4 py-1 text-sm font-black text-violet-300 mb-3">Aula 23</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">💬 MOST<br><span class="text-violet-300">in Conversation</span></h1>
+      <p class="text-white/60 text-base mb-5">Read real dialogues, learn MOST chunks, and practise using MOST naturally in speaking and discussion.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">MOST Chunks</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Real Dialogues</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Discussion Questions</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Speaking Tips</span>
+      </div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 5 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY TABS -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="reading">📖 Reading</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="chunks">🧩 MOST Chunks</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: READING -->
+    <div id="tab-reading" class="fade-in">
+      <h2 class="text-2xl font-black text-navy mb-2">Real Dialogue — Using MOST</h2>
+      <p class="text-slate-500 text-sm mb-6">Read this conversation. Notice how MOST is used in different ways.</p>
+
+      <!-- Dialogue -->
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 mb-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-5">
+          <span class="w-3 h-3 rounded-full bg-violet-400"></span>
+          <span class="font-black text-navy text-sm uppercase tracking-wider">Dialogue: A Job Interview</span>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-violet-100 text-violet-600 font-black text-sm flex items-center justify-center">A</div>
+            <div class="bg-violet-50 rounded-2xl rounded-tl-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed">So, tell me — what do you enjoy <strong class="text-violet-600">most</strong> about working in marketing?</p>
+            </div>
+          </div>
+          <div class="flex gap-4 flex-row-reverse">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-black text-sm flex items-center justify-center">B</div>
+            <div class="bg-slate-50 rounded-2xl rounded-tr-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed"><strong class="text-violet-600">Most</strong> of the time, I love the creative side — coming up with new campaigns. But honestly, what I enjoy <strong class="text-violet-600">most</strong> is seeing results.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-violet-100 text-violet-600 font-black text-sm flex items-center justify-center">A</div>
+            <div class="bg-violet-50 rounded-2xl rounded-tl-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed">That's great. In your experience, what's <strong class="text-violet-600">the most</strong> challenging part of the job?</p>
+            </div>
+          </div>
+          <div class="flex gap-4 flex-row-reverse">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-black text-sm flex items-center justify-center">B</div>
+            <div class="bg-slate-50 rounded-2xl rounded-tr-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed"><strong class="text-violet-600">Most</strong> marketers struggle with data analysis. That was <strong class="text-violet-600">the most</strong> difficult skill for me too. But <strong class="text-violet-600">most</strong> companies now offer training.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-violet-100 text-violet-600 font-black text-sm flex items-center justify-center">A</div>
+            <div class="bg-violet-50 rounded-2xl rounded-tl-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed">For <strong class="text-violet-600">the most</strong> part, we work remotely. Does that suit you?</p>
+            </div>
+          </div>
+          <div class="flex gap-4 flex-row-reverse">
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-slate-100 text-slate-600 font-black text-sm flex items-center justify-center">B</div>
+            <div class="bg-slate-50 rounded-2xl rounded-tr-none px-4 py-3 flex-1">
+              <p class="text-navy text-sm leading-relaxed">Absolutely. Remote work is <strong class="text-violet-600">the most</strong> flexible arrangement I could ask for. I make <strong class="text-violet-600">the most</strong> of my time when I work from home.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis box -->
+      <div class="bg-violet-50 border-2 border-violet-200 rounded-2xl p-5 mb-6">
+        <h3 class="font-black text-navy mb-4">🔍 MOST uses in the dialogue</h3>
+        <div class="space-y-3">
+          <div class="flex gap-3 items-start"><span class="bg-violet-500 text-white font-black text-xs rounded-full px-2 py-0.5 flex-shrink-0 mt-0.5">ADVERB</span><p class="text-sm text-slate-700">"what do you enjoy <strong>most</strong>" — to the greatest degree (no article)</p></div>
+          <div class="flex gap-3 items-start"><span class="bg-orange-500 text-white font-black text-xs rounded-full px-2 py-0.5 flex-shrink-0 mt-0.5">MAJORITY</span><p class="text-sm text-slate-700">"<strong>Most</strong> of the time" / "<strong>Most</strong> marketers" — more than half</p></div>
+          <div class="flex gap-3 items-start"><span class="bg-amber-500 text-white font-black text-xs rounded-full px-2 py-0.5 flex-shrink-0 mt-0.5">SUPERLATIVE</span><p class="text-sm text-slate-700">"<strong>the most</strong> challenging" / "<strong>the most</strong> flexible" — highest degree</p></div>
+          <div class="flex gap-3 items-start"><span class="bg-emerald-500 text-white font-black text-xs rounded-full px-2 py-0.5 flex-shrink-0 mt-0.5">EXPRESSION</span><p class="text-sm text-slate-700">"make <strong>the most</strong> of" / "for <strong>the most</strong> part" — fixed phrases</p></div>
+        </div>
+      </div>
+
+      <button onclick="markSection()" class="w-full bg-gradient-to-r from-violet-500 to-purple-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Reading as Done</button>
+    </div>
+
+    <!-- TAB: CHUNKS -->
+    <div id="tab-chunks" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">MOST Chunks</h2>
+      <p class="text-slate-500 text-sm mb-6">These are the most useful MOST collocations. Click each card to see the translation and example.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="chunks-grid">
+      </div>
+
+      <button onclick="markSection()" class="w-full mt-6 bg-gradient-to-r from-violet-500 to-purple-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Chunks as Done</button>
+    </div>
+
+    <!-- TAB: VOCAB -->
+    <div id="tab-vocab" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Words from the dialogue and discussion topics. Click to flip.</p></div>
+        <div class="text-right"><div class="text-2xl font-black text-violet-600" id="vocab-count">0<span class="text-sm text-slate-400">/16</span></div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3" id="vocab-grid"></div>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on MOST usage, chunks and vocabulary.</p></div>
+        <div class="flex items-center gap-3">
+          <div class="text-center"><div class="text-2xl font-black text-violet-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+          <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="practice-area"></div>
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-violet-100 text-violet-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-violet-500 to-purple-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Discussion &amp; Speaking</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each question. Answer aloud using MOST. Check when you've practised.</p>
+      <div class="space-y-3" id="speak-grid"></div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script src="lesson-engine.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+// MOST Chunks data
+const CHUNKS = [
+  {chunk:'most of the time',     pt:'na maior parte do tempo',    use:'Most of the time, I work from home.',        color:'violet'},
+  {chunk:'most people',          pt:'a maioria das pessoas',      use:'Most people want to be happy.',               color:'purple'},
+  {chunk:'the most important',   pt:'o mais importante',          use:'Health is the most important thing.',         color:'violet'},
+  {chunk:'make the most of',     pt:'aproveitar ao máximo',       use:'Make the most of every opportunity.',         color:'purple'},
+  {chunk:'for the most part',    pt:'na maior parte / em geral',  use:'For the most part, the plan worked well.',    color:'violet'},
+  {chunk:'most likely',          pt:'muito provavelmente',        use:'She will most likely get the job.',           color:'purple'},
+  {chunk:'at most',              pt:'no máximo',                  use:'It will cost at most fifty reais.',           color:'violet'},
+  {chunk:'most of all',          pt:'acima de tudo / mais do que tudo', use:'I love travelling, most of all to new places.', color:'purple'},
+  {chunk:'the most common',      pt:'o mais comum',               use:'English is the most common business language.',color:'violet'},
+  {chunk:'most of us',           pt:'a maioria de nós',           use:'Most of us have felt nervous before speaking.', color:'purple'},
+];
+
+// Build chunks grid
+function buildChunks() {
+  const grid = document.getElementById('chunks-grid');
+  if (!grid) return;
+  CHUNKS.forEach((c, i) => {
+    const isViolet = c.color === 'violet';
+    const div = document.createElement('div');
+    div.className = `chunk-card bg-white border-2 ${isViolet ? 'border-violet-200 hover:border-violet-400' : 'border-purple-200 hover:border-purple-400'} rounded-2xl p-5 cursor-pointer`;
+    div.innerHTML = `
+      <div class="flex items-start justify-between gap-2 mb-3">
+        <p class="font-black text-navy text-base">"${c.chunk}"</p>
+        <button onclick="event.stopPropagation();speak('${c.chunk}')" class="text-slate-300 hover:text-${c.color}-500 transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span>
+        </button>
+      </div>
+      <div id="chunk-trans-${i}" class="hidden mb-3">
+        <div class="bg-${isViolet ? 'violet' : 'purple'}-50 border border-${isViolet ? 'violet' : 'purple'}-200 rounded-xl px-3 py-2">
+          <span class="text-${isViolet ? 'violet' : 'purple'}-700 font-black text-sm">🇧🇷 ${c.pt}</span>
+        </div>
+      </div>
+      <p class="text-slate-500 text-xs leading-relaxed">"${c.use}"</p>
+      <button id="chunk-btn-${i}" onclick="toggleChunk(${i})" class="mt-3 text-${isViolet ? 'violet' : 'purple'}-500 text-xs font-black hover:text-${isViolet ? 'violet' : 'purple'}-700 transition-colors">Show Translation</button>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function toggleChunk(i) {
+  const el = document.getElementById(`chunk-trans-${i}`);
+  const btn = document.getElementById(`chunk-btn-${i}`);
+  if (!el) return;
+  const hidden = el.classList.toggle('hidden');
+  btn.textContent = hidden ? 'Show Translation' : 'Hide Translation';
+}
+
+const VOCAB = [
+  {en:'Campaign',      pt:'Campanha',         emoji:'📣', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'We launched a new marketing campaign.'},
+  {en:'Challenge',     pt:'Desafio',          emoji:'⚡', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Most challenges help you grow.'},
+  {en:'Analysis',      pt:'Análise',          emoji:'🔍', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'Data analysis is the most useful skill.'},
+  {en:'Remote',        pt:'Remoto/a',         emoji:'🏠', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Most companies offer remote work now.'},
+  {en:'Arrangement',   pt:'Acordo / Arranjo', emoji:'🤝', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'This is the most flexible arrangement.'},
+  {en:'Struggle',      pt:'Lutar / Dificuldade', emoji:'💪', bg:'bg-purple-50 border-purple-200', dot:'bg-purple-400', ex:'Most people struggle with time management.'},
+  {en:'Result',        pt:'Resultado',        emoji:'📊', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'What matters most is the result.'},
+  {en:'Creative',      pt:'Criativo/a',       emoji:'🎨', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Most creative people think differently.'},
+  {en:'Suit',          pt:'Convir / Adaptar-se', emoji:'✅', bg:'bg-violet-50 border-violet-200', dot:'bg-violet-400', ex:'Does this schedule suit you?'},
+  {en:'Experience',    pt:'Experiência',      emoji:'🌟', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Most of my experience is in design.'},
+  {en:'Flexible',      pt:'Flexível',         emoji:'🤸', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'Remote work is the most flexible option.'},
+  {en:'Honestly',      pt:'Honestamente',     emoji:'💬', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Honestly, most people prefer clear feedback.'},
+  {en:'Absolutely',    pt:'Com certeza / Absolutamente', emoji:'💯', bg:'bg-violet-50 border-violet-200', dot:'bg-violet-400', ex:'Absolutely — that is the most important point.'},
+  {en:'Training',      pt:'Treinamento',      emoji:'📚', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'Most companies provide training.'},
+  {en:'Opportunity',   pt:'Oportunidade',     emoji:'🚀', bg:'bg-violet-50 border-violet-200',  dot:'bg-violet-400', ex:'Make the most of every opportunity.'},
+  {en:'Arrangement',   pt:'Acordo',           emoji:'📋', bg:'bg-purple-50 border-purple-200',  dot:'bg-purple-400', ex:'This is the most suitable arrangement for us.'},
+];
+
+const PRACTICE_QS = [
+  {q:"'___ of the time, I work from home.' — Which form of MOST fits?", opts:["Most","The most","At most","Most likely"], a:"Most", rule:"Most of the time = expression for majority of occasions"},
+  {q:"'Make the most of' means:", opts:["Use something fully","Do the maximum","Be the most efficient","Work the most hours"], a:"Use something fully", rule:"Make the most of = aproveitar ao máximo"},
+  {q:"'___ people prefer face-to-face interviews.' (general statement)", opts:["Most","The most","Most of the","At most"], a:"Most", rule:"Most + noun (no article) = general majority"},
+  {q:"Which word means 'Campanha' in English?", opts:["Campaign","Challenge","Arrangement","Training"], a:"Campaign", rule:"Vocabulary"},
+  {q:"'She will ___ get the promotion.' (very probably)", opts:["most likely","at most","most of all","the most"], a:"most likely", rule:"Most likely = muito provavelmente"},
+  {q:"'What I enjoy ___ is seeing results.' (= above everything else)", opts:["most","the most","most likely","at most"], a:"most", rule:"Enjoy most = to the greatest degree (adverb, no article)"},
+  {q:"'It will cost ___ 100 reais.' (not more than)", opts:["at most","most likely","for the most part","the most"], a:"at most", rule:"At most = no máximo"},
+  {q:"Which word means 'Lutar / ter dificuldade' in English?", opts:["Struggle","Suit","Arrange","Challenge"], a:"Struggle", rule:"Vocabulary"},
+  {q:"'For the most part, the meeting went well.' means:", opts:["Generally, the meeting went well","The meeting was the best ever","Most people attended the meeting","At most, the meeting was good"], a:"Generally, the meeting went well", rule:"For the most part = na maior parte / em geral"},
+  {q:"'___ of us have felt nervous before speaking.' (specific group)", opts:["Most","The most","At most","Most likely"], a:"Most", rule:"Most of us = the majority of our group"},
+];
+
+const SPEAK_SENTENCES = [
+  {text:"What do you enjoy <strong class='text-violet-600'>most</strong> about learning English?"},
+  {text:"<strong class='text-violet-600'>Most of the time</strong>, I practise English by watching series and reading online."},
+  {text:"For me, <strong class='text-violet-600'>the most</strong> challenging part of English is pronunciation."},
+  {text:"<strong class='text-violet-600'>Most people</strong> I know use English at work — it is <strong class='text-violet-600'>the most</strong> useful skill today."},
+  {text:"I want to <strong class='text-violet-600'>make the most of</strong> every English class I attend."},
+  {text:"<strong class='text-violet-600'>For the most part</strong>, remote work suits me — I am <strong class='text-violet-600'>most</strong> productive at home."},
+  {text:"<strong class='text-violet-600'>Most of all</strong>, I want to speak English with confidence and fluency."},
+  {text:"She will <strong class='text-violet-600'>most likely</strong> become <strong class='text-violet-600'>the most</strong> successful student in the group."},
+];
+
+// Init
+buildChunks();
+
+initLesson({
+  tabs: ['reading','chunks','vocab','practice','speak'],
+  totalSections: 5,
+  vocab: VOCAB,
+  practice: PRACTICE_QS,
+  speak: SPEAK_SENTENCES,
+  accentColor: 'violet',
+});
+</script>
+</body>
+</html>

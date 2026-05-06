@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learning Path — Yara's Forest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script src="store.js"></script>
+  <script src="badge-toast.js"></script>
+  <script src="levelup-overlay.js"></script>
+  <script src="components.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode:'class',
+      theme: { extend: { colors:{ navy:'#001f3f','pink-brand':'#ec4899','green-brand':'#10b981' }, fontFamily:{ sans:['Plus Jakarta Sans','sans-serif'] } } }
+    };
+  </script>
+  <style>
+    body { font-family:'Plus Jakarta Sans',sans-serif; }
+    @keyframes pulse-ring {
+      0%   { box-shadow:0 0 0 0 rgba(236,72,153,.6); }
+      70%  { box-shadow:0 0 0 14px rgba(236,72,153,0); }
+      100% { box-shadow:0 0 0 0 rgba(236,72,153,0); }
+    }
+    .node-current { animation:pulse-ring 1.8s ease-out infinite; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .4s ease forwards; }
+    .lesson-node { transition:transform .18s cubic-bezier(0.34,1.56,0.64,1), box-shadow .18s; }
+    .lesson-node.cursor-pointer:hover { transform:scale(1.1); }
+    .lesson-node.cursor-pointer:active { transform:scale(0.95); }
+    /* Filter bar */
+    .filter-btn { transition:all .18s; }
+    .filter-btn.active { background:rgba(236,72,153,.2); border-color:#ec4899; color:#f9a8d4; }
+  </style>
+</head>
+<body class="bg-[#001229] text-white min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-24 pb-32 px-4 max-w-2xl mx-auto">
+
+  <!-- ── HEADER ─────────────────────────────────────────── -->
+  <div class="fade-up mb-8">
+    <!-- Level badge -->
+    <div class="flex items-center gap-3 mb-5">
+      <div id="level-badge" class="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-2 rounded-full">
+        <span id="level-emoji" class="text-xl">🌱</span>
+        <span id="level-name" class="font-black text-sm text-white">Starter Level</span>
+      </div>
+      <a href="placement_test.html" class="text-slate-500 hover:text-slate-300 text-xs underline">Retake test →</a>
+    </div>
+
+    <!-- Continue CTA -->
+    <div id="continue-card" class="hidden bg-gradient-to-r from-pink-600 to-pink-500 rounded-2xl p-5 mb-6 flex items-center justify-between shadow-xl shadow-pink-500/20">
+      <div>
+        <p class="text-pink-100 text-xs font-bold uppercase tracking-wider mb-1">Continue where you left off</p>
+        <p id="continue-title" class="text-white font-black text-lg"></p>
+        <p id="continue-step"  class="text-pink-200 text-xs mt-0.5"></p>
+      </div>
+      <button id="continue-btn" onclick="" class="bg-white text-pink-600 font-black px-5 py-3 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all text-sm flex-shrink-0">
+        Continue →
+      </button>
+    </div>
+
+    <div class="flex items-end justify-between mb-1">
+      <h1 class="font-black text-2xl text-white">Your Learning Path</h1>
+      <span id="trail-progress-label" class="text-slate-500 text-xs font-bold">0 / 24 done</span>
+    </div>
+    <!-- Free plan banner -->
+    <div id="free-plan-banner" class="hidden flex items-center justify-between bg-pink-500/10 border border-pink-500/25 rounded-xl px-4 py-2.5 mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-pink-400 text-sm">🔓</span>
+        <p class="text-pink-300 text-xs font-bold">Free Plan · Chapters 2–4 locked</p>
+      </div>
+      <button onclick="window.location.href='landing.html'" class="text-[10px] font-black text-white bg-pink-500 px-3 py-1.5 rounded-full hover:bg-pink-400 transition-all">
+        Upgrade ✨
+      </button>
+    </div>
+    <!-- overall progress bar -->
+    <div class="bg-white/8 rounded-full h-1.5 mb-2 overflow-hidden">
+      <div id="trail-progress-bar" class="h-full bg-gradient-to-r from-pink-500 to-pink-400 rounded-full transition-all" style="width:0%"></div>
+    </div>
+    <p class="text-slate-500 text-xs">Complete lessons in order to unlock the next one.</p>
+  </div>
+
+  <!-- ── TRAIL ──────────────────────────────────────────── -->
+  <div id="trail-container" class="relative">
+    <!-- Chapters rendered by JS -->
+  </div>
+
+</main>
+
+<!-- ── LESSON POPUP ─────────────────────────────────────── -->
+<div id="lesson-popup" class="hidden fixed inset-0 z-50 flex items-end md:items-center justify-center p-4" style="background:rgba(0,0,0,.6);backdrop-filter:blur(6px)">
+  <div class="bg-[#0d2240] border border-white/15 rounded-3xl w-full max-w-sm p-6 relative">
+    <button onclick="closePopup()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl">✕</button>
+    <div id="popup-emoji"    class="text-5xl mb-3 text-center"></div>
+    <h3 id="popup-title"     class="font-black text-xl text-white text-center mb-1"></h3>
+    <p  id="popup-chapter"   class="text-slate-400 text-xs text-center mb-4"></p>
+    <!-- Step progress -->
+    <div id="popup-steps" class="flex gap-1 justify-center mb-4 flex-wrap"></div>
+    <!-- XP reward -->
+    <p id="popup-xp"         class="text-center text-yellow-400 font-bold text-sm mb-5"></p>
+    <button id="popup-start-btn" onclick="" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-black py-4 rounded-2xl text-lg transition-all active:scale-95 shadow-lg shadow-pink-500/30">
+      Start Lesson →
+    </button>
+    <button id="popup-replay-btn" onclick="" class="hidden w-full mt-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3 rounded-2xl text-sm transition-all">
+      Replay Lesson
+    </button>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script>
+// ── Trail data (22 lessons from Jadson course) ────────────────────────────────
+const TRAIL = [
+  // Chapter 1 — Beginner (Core Verbs)
+  { id:1,  emoji:'💬', title:'To Have, Want, Need, Like',   chapter:1, game:'word_match_game.html',        xp:30 },
+  { id:2,  emoji:'🚶', title:'To Go, Do, Say, See',          chapter:1, game:'fill_blank_game.html',        xp:30 },
+  { id:3,  emoji:'🧠', title:'To Get, Make, Know, Take',     chapter:1, game:'grammar_lab.html',            xp:35 },
+  { id:4,  emoji:'👀', title:'To Come, Think, Look, Give',   chapter:1, game:'matching_pairs_game.html',    xp:35 },
+  { id:5,  emoji:'✉️', title:'To Tell, Work, Feel, Leave',   chapter:1, game:'sentence_builder_game.html',  xp:40 },
+  // Chapter 2 — Elementary (Grammar Foundations)
+  { id:6,  emoji:'⚡', title:'Modal Verbs: Can, Could, Should', chapter:2, game:'spelling_bee_game.html',   xp:40 },
+  { id:7,  emoji:'⏪', title:'Past Simple — Regular Verbs',   chapter:2, game:'word_scramble_game.html',    xp:45 },
+  { id:8,  emoji:'🔄', title:'Past Simple — Irregular Verbs', chapter:2, game:'word_search_game.html',      xp:45 },
+  { id:9,  emoji:'📍', title:'Prepositions of Place',         chapter:2, game:'fill_blank_game.html',       xp:45 },
+  { id:10, emoji:'🔢', title:'Quantifiers: Many, Much, More', chapter:2, game:'berry_math_game.html',       xp:50 },
+  { id:11, emoji:'📊', title:'Adjectives & Comparatives',     chapter:2, game:'hangman_game.html',           xp:50 },
+  { id:12, emoji:'🔮', title:'Future: Will & Going to',       chapter:2, game:'grammar_lab.html',           xp:55 },
+  // Chapter 3 — Pre-Intermediate (Real World Topics)
+  { id:13, emoji:'💼', title:'Work & Career',                 chapter:3, game:'word_match_game.html',       xp:55 },
+  { id:14, emoji:'💻', title:'Technology & Digital Life',     chapter:3, game:'word_search_game.html',      xp:55 },
+  { id:15, emoji:'✈️', title:'Travel & Tourism',              chapter:3, game:'word_scramble_game.html',    xp:60 },
+  { id:16, emoji:'🏥', title:'Health & Wellness',             chapter:3, game:'hangman_game.html',           xp:60 },
+  { id:17, emoji:'🏠', title:'My Home — There is / There are',chapter:3, game:'matching_pairs_game.html',   xp:60 },
+  { id:18, emoji:'🎬', title:'Past Continuous',               chapter:3, game:'fill_blank_game.html',       xp:65 },
+  // Chapter 4 — Intermediate (Advanced Grammar)
+  { id:19, emoji:'🏆', title:'Superlatives',                  chapter:4, game:'word_scramble_game.html',    xp:65 },
+  { id:20, emoji:'📊', title:'MOST — Quantifier & Reference', chapter:4, game:'flappy_yara_game.html',      xp:70 },
+  { id:21, emoji:'🎯', title:'Can, Could & Would',            chapter:4, game:'spelling_bee_game.html',     xp:70 },
+  { id:22, emoji:'🚀', title:'Future with WILL & WON\'T',     chapter:4, game:'color_catch_game.html',      xp:75 },
+  { id:23, emoji:'😊', title:'Personalities & Moods',         chapter:4, game:'word_scramble_game.html',    xp:80 },
+  { id:24, emoji:'⏳', title:'Still vs. Yet & Possessives',   chapter:4, game:'daily_challenge.html',       xp:100 },
+];
+
+const CHAPTERS = [
+  { id:1, name:'Beginner',         color:'from-emerald-600 to-emerald-500', icon:'🌱', lessons:[1,2,3,4,5]   },
+  { id:2, name:'Elementary',       color:'from-blue-600 to-blue-500',       icon:'🌿', lessons:[6,7,8,9,10,11]},
+  { id:3, name:'Pre-Intermediate', color:'from-violet-600 to-violet-500',   icon:'🌳', lessons:[12,13,14,15,16]},
+  { id:4, name:'Intermediate',     color:'from-amber-600 to-amber-500',     icon:'🌲', lessons:[17,18,19,20,21,22,23,24]},
+];
+
+// ── Dynamic "My Lessons" chapter from custom lessons ──────────────────────────
+(function() {
+  const custom = Store.state.customLessons || [];
+  if (custom.length > 0) {
+    custom.forEach(cl => {
+      TRAIL.push({
+        id: cl.id, emoji: cl.emoji || '✏️', title: cl.title,
+        chapter: 5, game: 'word_match_game.html', xp: cl.xp || 50
+      });
+    });
+    CHAPTERS.push({
+      id: 5, name: 'My Lessons', color: 'from-teal-600 to-teal-500',
+      icon: '✏️', lessons: custom.map(l => l.id)
+    });
+  }
+})();
+
+const STEP_LABELS = ['Listen','Quiz','Game','Build','Speak','Chat with Yara'];
+const STEP_ICONS  = ['🔊','❓','🎮','🏗️','🎤','💬'];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const completedLessons = Store.state.completedLessons || [];
+const startLesson      = parseInt(localStorage.getItem('capyStartLesson') || '1');
+const playerLevel      = localStorage.getItem('capyPlayerLevel') || 'starter';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function getStepProgress(lessonId) {
+  return parseInt(localStorage.getItem('capyGuidedStep_' + lessonId) || '0');
+}
+function isDone(id)      { return completedLessons.includes(id) || completedLessons.includes('j' + id); }
+function isUnlocked(id)  {
+  if (id < startLesson)  return true;  // placement test allows starting earlier
+  if (id === startLesson) return true;
+  if (isDone(id))        return true;
+  return isDone(id - 1) || (id === 1);
+}
+function isCurrent(id)  { return !isDone(id) && isUnlocked(id); }
+
+// ── Mini-lesson data ──────────────────────────────────────────────────────────
+const DAY_SUBTITLES    = ['Listen & Quiz', 'Game', 'Build & Speak', 'Chat with Yara'];
+const DAY_ICONS        = ['🔊❓', '🎮', '🏗️🎤', '💬'];
+const MINI_STEP_INDICES = { 1:[0,1], 2:[2], 3:[3,4], 4:[5] };
+
+const MINI_TRAIL = TRAIL.flatMap(lesson =>
+  [1,2,3,4].map(miniNum => ({
+    lessonId: lesson.id,
+    miniNum,
+    emoji:    lesson.emoji,
+    title:    lesson.title,
+    subtitle: `Day ${miniNum} — ${DAY_SUBTITLES[miniNum - 1]}`,
+    dayIcons: DAY_ICONS[miniNum - 1],
+    chapter:  lesson.chapter,
+    xp:       Math.ceil(lesson.xp / 4),
+    game:     lesson.game,
+  }))
+);
+
+function isMiniDone(lessonId, miniNum) {
+  // Backward compat: if lesson was fully completed in old full-mode, all minis count as done
+  if (isDone(lessonId)) return true;
+  return window.Store ? Store.isMiniDone(lessonId, miniNum) : false;
+}
+function isMiniUnlocked(lessonId, miniNum) {
+  if (miniNum === 1) {
+    if (lessonId <= startLesson) return true;
+    if (lessonId === 1)          return true;
+    return isMiniDone(lessonId - 1, 4);
+  }
+  return isMiniDone(lessonId, miniNum - 1);
+}
+function isMiniCurrent(lessonId, miniNum) {
+  return !isMiniDone(lessonId, miniNum) && isMiniUnlocked(lessonId, miniNum);
+}
+function getMiniStepProgress(lessonId, miniNum) {
+  return parseInt(localStorage.getItem(`capyGuidedStep_${lessonId}_m${miniNum}`) || '0');
+}
+
+// ── Build trail HTML ──────────────────────────────────────────────────────────
+function buildTrail() {
+  const container = document.getElementById('trail-container');
+  let html = '';
+
+  CHAPTERS.forEach((ch, ci) => {
+    const chMinis      = MINI_TRAIL.filter(m => m.chapter === ch.id);
+    const chLessons    = TRAIL.filter(l => l.chapter === ch.id);
+    const allDone      = chMinis.every(m => isMiniDone(m.lessonId, m.miniNum));
+    const anyUnlocked  = chMinis.some(m => isMiniUnlocked(m.lessonId, m.miniNum));
+
+    // Between-chapter connector (skip for first chapter)
+    if (ci > 0) {
+      const prevChMinis = MINI_TRAIL.filter(m => m.chapter === CHAPTERS[ci - 1].id);
+      const lastPrev    = prevChMinis[prevChMinis.length - 1];
+      const firstCurr   = chMinis[0];
+      const lastDone    = isMiniDone(lastPrev.lessonId, lastPrev.miniNum);
+      const firstDone   = isMiniDone(firstCurr.lessonId, firstCurr.miniNum);
+      const chConnColor = (lastDone && firstDone)
+        ? 'rgba(74,222,128,0.55)'
+        : (lastDone || isMiniUnlocked(firstCurr.lessonId, firstCurr.miniNum))
+          ? 'rgba(236,72,153,0.4)'
+          : 'rgba(255,255,255,0.06)';
+      const lastIsLeft = (prevChMinis.length - 1) % 2 === 0;
+      const chConnX    = lastIsLeft ? '52px' : 'calc(100% - 88px)';
+      html += `
+        <div class="relative w-full" style="height:36px;pointer-events:none">
+          <div style="position:absolute;left:${chConnX};width:3px;top:0;height:100%;
+            background:repeating-linear-gradient(to bottom,${chConnColor} 0px,${chConnColor} 6px,transparent 6px,transparent 11px);
+          "></div>
+        </div>`;
+    }
+
+    html += `
+      <div class="mb-4 fade-up" style="animation-delay:${ci * 0.08}s">
+        <!-- Chapter header -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-gradient-to-r ${ch.color} rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
+            <span class="text-xl">${ch.icon}</span>
+            <div>
+              <p class="font-black text-white text-sm">${ch.name}</p>
+              <p class="text-white/70 text-[10px]">${chLessons.length} lessons · ${chLessons.length * 4} days</p>
+            </div>
+          </div>
+          ${allDone      ? '<span class="text-green-400 font-bold text-sm">✅ Complete!</span>' : ''}
+          ${!anyUnlocked ? '<span class="text-slate-600 text-sm">🔒 Finish previous chapter</span>' : ''}
+        </div>
+
+        <!-- Mini-nodes in zigzag -->
+        <div class="flex flex-col">`;
+
+    // ── Chapter lock disabled — all chapters open ──────────────
+
+    chMinis.forEach((mini, i) => {
+      const done         = isMiniDone(mini.lessonId, mini.miniNum);
+      const unlocked     = isMiniUnlocked(mini.lessonId, mini.miniNum);
+      const current      = isMiniCurrent(mini.lessonId, mini.miniNum);
+      const step         = getMiniStepProgress(mini.lessonId, mini.miniNum);
+      const isLeft       = i % 2 === 0;
+      const hasNext      = i < chMinis.length - 1;
+      const nextDone     = hasNext ? isMiniDone(chMinis[i+1].lessonId, chMinis[i+1].miniNum) : false;
+      const nextUnlocked = hasNext ? isMiniUnlocked(chMinis[i+1].lessonId, chMinis[i+1].miniNum) : false;
+
+      const lineColor = (done && nextDone)
+        ? 'rgba(74,222,128,0.6)'
+        : (done || nextUnlocked)
+          ? 'rgba(236,72,153,0.5)'
+          : 'rgba(255,255,255,0.08)';
+
+      let nodeClass = 'lesson-node w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center relative shadow-xl select-none ';
+      if (done)         nodeClass += 'bg-gradient-to-br from-green-400 to-emerald-600 border-4 border-green-300 cursor-pointer';
+      else if (current) nodeClass += 'bg-gradient-to-br from-pink-500 to-rose-600 border-4 border-pink-300 node-current cursor-pointer';
+      else if (unlocked)nodeClass += 'bg-white/10 border-2 border-white/25 hover:bg-white/18 cursor-pointer';
+      else              nodeClass += 'bg-white/4 border border-white/8 opacity-50 cursor-pointer hover:opacity-70 transition-opacity';
+
+      const miniStepCount = MINI_STEP_INDICES[mini.miniNum].length;
+      const stepDots = (step > 0 && !done) ? `
+        <div class="absolute -bottom-2.5 flex gap-[3px]">
+          ${Array.from({length: miniStepCount}, (_, s) =>
+            `<div class="w-[5px] h-[5px] rounded-full ${s < step ? 'bg-white shadow-sm' : 'bg-white/20'}"></div>`
+          ).join('')}
+        </div>` : '';
+
+      // Day badge (shows D1/D2/D3/D4)
+      const dayBadge = `<div class="absolute -top-2 -right-2 min-w-[20px] h-[18px] rounded-full bg-[#001229] border border-white/20 flex items-center justify-center text-[7px] font-black text-white/70 px-1">D${mini.miniNum}</div>`;
+
+      const titleColor    = done ? 'text-green-300' : current ? 'text-pink-300' : unlocked ? 'text-white/65' : 'text-white/25';
+      const subtitleColor = done ? 'text-green-400/70' : current ? 'text-pink-400/80' : unlocked ? 'text-white/40' : 'text-white/15';
+      const statusLine    = done ? 'Complete ✓' : current ? 'Ready!' : !unlocked ? '🔒 Locked' : mini.dayIcons;
+
+      const labelLeft = `
+        <div class="ml-3 max-w-[130px]">
+          <p class="text-[10px] font-bold leading-tight ${titleColor}">${mini.title}</p>
+          <p class="text-[9px] ${subtitleColor} mt-0.5">${mini.subtitle}</p>
+          <p class="text-[8px] ${subtitleColor}">${statusLine}</p>
+        </div>`;
+      const labelRight = `
+        <div class="mr-3 max-w-[130px] text-right">
+          <p class="text-[10px] font-bold leading-tight ${titleColor}">${mini.title}</p>
+          <p class="text-[9px] ${subtitleColor} mt-0.5">${mini.subtitle}</p>
+          <p class="text-[8px] ${subtitleColor}">${statusLine}</p>
+        </div>`;
+
+      const nodeInner = `
+        <span class="text-[24px] leading-none">${done ? '✓' : !unlocked ? '🔒' : mini.emoji}</span>
+        ${done    ? '<span class="text-[10px] text-white font-black mt-0.5">Done</span>' : ''}
+        ${current ? '<span class="text-[9px] text-white font-black mt-0.5">▶ Go</span>'  : ''}
+        ${dayBadge}${stepDots}`;
+
+      html += isLeft
+        ? `<div class="flex items-center pl-5">
+             <div class="${nodeClass}" onclick="openPopup(${mini.lessonId},${mini.miniNum})">${nodeInner}</div>
+             ${labelLeft}
+           </div>`
+        : `<div class="flex items-center justify-end pr-5">
+             ${labelRight}
+             <div class="${nodeClass}" onclick="openPopup(${mini.lessonId},${mini.miniNum})">${nodeInner}</div>
+           </div>`;
+
+      if (hasNext) {
+        const boxStyle = `position:absolute;left:52px;right:52px;top:0;height:100%;`;
+        html += isLeft
+          ? `<div class="relative w-full" style="height:48px;pointer-events:none">
+               <div style="${boxStyle}border-top:3px dashed ${lineColor};border-right:3px dashed ${lineColor};border-top-right-radius:30px;"></div>
+             </div>`
+          : `<div class="relative w-full" style="height:48px;pointer-events:none">
+               <div style="${boxStyle}border-top:3px dashed ${lineColor};border-left:3px dashed ${lineColor};border-top-left-radius:30px;"></div>
+             </div>`;
+      }
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Popup ─────────────────────────────────────────────────────────────────────
+let popupLessonId = null;
+let popupMiniNum  = null;
+function openPopup(lessonId, miniNum) {
+  popupLessonId = lessonId;
+  popupMiniNum  = miniNum;
+  const lesson   = TRAIL.find(l => l.id === lessonId);
+  const done     = isMiniDone(lessonId, miniNum);
+  const unlocked = isMiniUnlocked(lessonId, miniNum);
+  const step     = getMiniStepProgress(lessonId, miniNum);
+  const ch       = CHAPTERS.find(c => c.id === lesson.chapter) || CHAPTERS[0];
+  const xpVal    = Math.ceil(lesson.xp / 4);
+
+  document.getElementById('popup-emoji').textContent   = done ? '✅' : !unlocked ? '🔒' : lesson.emoji;
+  document.getElementById('popup-title').textContent   = lesson.title;
+  document.getElementById('popup-chapter').textContent = `${ch.name} · Lesson ${lessonId} — Day ${miniNum} of 4`;
+  document.getElementById('popup-xp').textContent      = done
+    ? '✅ Day complete!'
+    : !unlocked
+      ? (miniNum === 1 ? `🔒 Finish Lesson ${lessonId - 1} Day 4 to unlock` : `🔒 Finish Day ${miniNum - 1} to unlock`)
+      : `🏆 Earn ${xpVal} XP · ${DAY_SUBTITLES[miniNum - 1]}`;
+
+  const startBtn  = document.getElementById('popup-start-btn');
+  const replayBtn = document.getElementById('popup-replay-btn');
+
+  // Locked state
+  if (!unlocked) {
+    document.getElementById('popup-steps').innerHTML = `
+      <div class="text-center py-2">
+        <p class="text-slate-400 text-sm">
+          ${miniNum === 1
+            ? `Finish <strong class="text-white">Lesson ${lessonId - 1} — Day 4</strong> first.`
+            : `Finish <strong class="text-white">Lesson ${lessonId} — Day ${miniNum - 1}</strong> first.`}
+        </p>
+      </div>`;
+    if (miniNum === 1 && lessonId > 1) {
+      startBtn.textContent = `Go to Lesson ${lessonId - 1} — Day 4 →`;
+      startBtn.onclick     = () => { closePopup(); openPopup(lessonId - 1, 4); };
+    } else if (miniNum > 1) {
+      startBtn.textContent = `Go to Day ${miniNum - 1} →`;
+      startBtn.onclick     = () => { closePopup(); openPopup(lessonId, miniNum - 1); };
+    } else {
+      startBtn.textContent = 'Keep studying!';
+      startBtn.onclick     = () => closePopup();
+    }
+    replayBtn.classList.add('hidden');
+    document.getElementById('lesson-popup').classList.remove('hidden');
+    return;
+  }
+
+  // Step dots — only for this mini's steps
+  const activeIndices = MINI_STEP_INDICES[miniNum];
+  document.getElementById('popup-steps').innerHTML = activeIndices.map((globalIdx, localIdx) => {
+    const icon  = STEP_ICONS[globalIdx];
+    const label = STEP_LABELS[globalIdx];
+    const isDoneStep    = done || localIdx < step;
+    const isCurrentStep = localIdx === step && !done;
+    const dotCls = isDoneStep
+      ? 'bg-green-500 border-green-400 text-white shadow-sm shadow-green-500/40'
+      : isCurrentStep
+        ? 'bg-pink-500 border-pink-400 text-white shadow-sm shadow-pink-500/50'
+        : 'bg-white/8 border-white/15 text-slate-500';
+    const labelCls = isDoneStep ? 'text-green-400' : isCurrentStep ? 'text-pink-400' : 'text-slate-600';
+    return `
+      <div class="flex flex-col items-center gap-1">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm border ${dotCls}">
+          ${isDoneStep ? '✓' : icon}
+        </div>
+        <span class="text-[8px] font-bold ${labelCls} leading-tight text-center" style="max-width:36px">${label.split(' ')[0]}</span>
+      </div>`;
+  }).join('');
+
+  const url = `lessons.html?lesson=${lessonId}&mini=${miniNum}&guided=1`;
+
+  if (done) {
+    startBtn.textContent = 'Review Day';
+    startBtn.onclick     = () => window.location.href = url;
+    replayBtn.classList.remove('hidden');
+    replayBtn.textContent = 'Redo Day';
+    replayBtn.onclick     = () => {
+      localStorage.removeItem(`capyGuidedStep_${lessonId}_m${miniNum}`);
+      window.location.href = url;
+    };
+  } else if (step > 0) {
+    const stepCount = activeIndices.length;
+    startBtn.textContent = `Continue — Step ${step + 1}/${stepCount} ${STEP_ICONS[activeIndices[step]] || ''}`;
+    startBtn.onclick     = () => window.location.href = url;
+    replayBtn.classList.remove('hidden');
+    replayBtn.textContent = 'Restart Day';
+    replayBtn.onclick     = () => {
+      localStorage.removeItem(`capyGuidedStep_${lessonId}_m${miniNum}`);
+      window.location.href = url;
+    };
+  } else {
+    startBtn.textContent = `Start Day ${miniNum} →`;
+    startBtn.onclick     = () => window.location.href = url;
+    replayBtn.classList.add('hidden');
+  }
+
+  document.getElementById('lesson-popup').classList.remove('hidden');
+}
+
+function closePopup() {
+  document.getElementById('lesson-popup').classList.add('hidden');
+}
+// Close on backdrop click
+document.getElementById('lesson-popup').addEventListener('click', e => {
+  if (e.target === document.getElementById('lesson-popup')) closePopup();
+});
+
+// ── Continue card ─────────────────────────────────────────────────────────────
+function buildContinueCard() {
+  // Find the first unlocked + not-done mini-node
+  let target = null;
+  for (const mini of MINI_TRAIL) {
+    if (!isMiniDone(mini.lessonId, mini.miniNum) && isMiniUnlocked(mini.lessonId, mini.miniNum)) {
+      target = mini;
+      break;
+    }
+  }
+  if (!target) return;
+
+  const step = getMiniStepProgress(target.lessonId, target.miniNum);
+  const card = document.getElementById('continue-card');
+  const url  = `lessons.html?lesson=${target.lessonId}&mini=${target.miniNum}&guided=1`;
+
+  document.getElementById('continue-title').textContent = `${target.emoji} ${target.title}`;
+  document.getElementById('continue-step').textContent  = step > 0
+    ? `Day ${target.miniNum} · Step ${step + 1} of ${MINI_STEP_INDICES[target.miniNum].length} — ${STEP_LABELS[MINI_STEP_INDICES[target.miniNum][step]] || ''}`
+    : `Day ${target.miniNum} — ${DAY_SUBTITLES[target.miniNum - 1]}`;
+  document.getElementById('continue-btn').onclick = () => window.location.href = url;
+  card.classList.remove('hidden');
+}
+
+// ── Level badge ───────────────────────────────────────────────────────────────
+function setLevelBadge() {
+  const map = {
+    'starter': { name:'Starter', emoji:'🌱' },
+    'elementary': { name:'Elementary', emoji:'🌿' },
+    'pre-intermediate': { name:'Pre-Intermediate', emoji:'🌳' },
+    'intermediate': { name:'Intermediate', emoji:'🌲' },
+  };
+  const l = map[playerLevel] || map['starter'];
+  document.getElementById('level-emoji').textContent = l.emoji;
+  document.getElementById('level-name').textContent  = l.name + ' Level';
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+// If placement not done, redirect
+if (!localStorage.getItem('capyPlacementDone')) {
+  window.location.href = 'placement_test.html';
+}
+
+Components.mount('top-nav-placeholder',    Components.renderTopNav('lessons'));
+Components.mount('side-nav-placeholder',   Components.renderSideNav('lessons'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('lessons'));
+Components.mount('footer-placeholder',     Components.renderFooter());
+
+setLevelBadge();
+buildContinueCard();
+buildTrail();
+
+// ── Free plan banner disabled — all content open ──────────────
+
+// Overall progress bar
+(function() {
+  const total = TRAIL.length;
+  const done  = TRAIL.filter(l => isDone(l.id)).length;
+  const pct   = Math.round((done / total) * 100);
+  const bar   = document.getElementById('trail-progress-bar');
+  const lbl   = document.getElementById('trail-progress-label');
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = `${done} / ${total} done`;
+})();
+</script>
+</body>
+</html>

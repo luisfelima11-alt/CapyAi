@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{
+      "navy":"#001f3f","navy-light":"#002d5c",
+      "pink-brand":"#ec4899","green-brand":"#10b981",
+      "primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"
+    },
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .fade-up { animation: fadeUp 0.4s ease both; }
+  /* Toggle switch */
+  .toggle-track { width:52px; height:28px; border-radius:999px; background:#334155; cursor:pointer; position:relative; transition:background 0.25s; flex-shrink:0; }
+  .toggle-track.on { background:#10b981; }
+  .toggle-thumb { position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:transform 0.25s; box-shadow:0 1px 4px rgba(0,0,0,0.3); }
+  .toggle-track.on .toggle-thumb { transform:translateX(24px); }
+  /* Avatar grid */
+  .avatar-opt { border: 3px solid transparent; border-radius:999px; cursor:pointer; transition:all 0.15s; }
+  .avatar-opt.selected { border-color:#ec4899; box-shadow:0 0 0 3px rgba(236,72,153,0.3); transform:scale(1.1); }
+  .avatar-opt:hover:not(.selected) { transform:scale(1.05); }
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-[#001f3f] font-body text-slate-900 dark:text-white min-h-screen transition-colors duration-300">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-28 pb-20 px-6 max-w-2xl mx-auto flex flex-col gap-6">
+
+  <!-- Page header -->
+  <div class="flex items-center gap-4 mb-2">
+    <div class="w-14 h-14 rounded-2xl bg-slate-200 dark:bg-white/10 flex items-center justify-center shadow-md flex-shrink-0">
+      <span class="material-symbols-outlined text-slate-500 dark:text-slate-300 text-2xl" style="font-variation-settings:'FILL' 1;">settings</span>
+    </div>
+    <div class="flex-1">
+      <h1 class="font-headline text-3xl font-extrabold text-navy dark:text-white">Settings</h1>
+      <p class="font-body text-slate-500 dark:text-slate-400 text-sm mt-0.5">Manage your profile, sounds, and preferences.</p>
+    </div>
+    <button onclick="saveAll()" id="save-btn"
+            class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-6 py-2.5 rounded-full active:scale-95 transition-all shadow-lg shadow-emerald-500/20 flex-shrink-0">
+      Save
+    </button>
+  </div>
+
+  <!-- Profile card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm">
+
+    <!-- Profile header with Yara image -->
+    <div class="flex items-center gap-4 mb-5">
+      <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-pink-400/50 flex-shrink-0 shadow-lg">
+        <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+      </div>
+      <div>
+        <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
+          <span class="material-symbols-outlined text-pink-500" style="font-variation-settings:'FILL' 1;">person</span>
+          Your Profile
+        </h2>
+        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Customize your explorer identity</p>
+      </div>
+    </div>
+
+    <!-- Name -->
+    <label class="block mb-4">
+      <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Explorer Name</span>
+      <input id="name-input" type="text" maxlength="20"
+             class="w-full bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl px-5 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/30 font-label font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all"
+             placeholder="Enter your name…"/>
+    </label>
+
+    <!-- Avatar picker -->
+    <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-3">Choose Avatar</span>
+    <div class="flex gap-3 flex-wrap" id="avatar-grid">
+      <!-- injected by JS -->
+    </div>
+  </section>
+
+  <!-- Sounds card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.08s">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-emerald-500" style="font-variation-settings:'FILL' 1;">volume_up</span>
+      Sound & Speech
+    </h2>
+
+    <div class="space-y-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Sound Effects</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Play sounds during games</p>
+        </div>
+        <div class="toggle-track on" id="sfx-toggle" onclick="toggle(this,'sfx')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Text-to-Speech</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Yara reads words aloud</p>
+        </div>
+        <div class="toggle-track on" id="tts-toggle" onclick="toggle(this,'tts')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">AI Features</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Yara AI Chat, Story Time, Word of the Day</p>
+        </div>
+        <div class="toggle-track on" id="ai-toggle" onclick="toggle(this,'ai')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <!-- Translation language -->
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Translate Words Into</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Language shown on flashcard translate button</p>
+        </div>
+        <select id="lang-select"
+                class="bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-label font-bold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 flex-shrink-0">
+          <option value="Spanish">🇪🇸 Spanish</option>
+          <option value="Portuguese">🇧🇷 Portuguese</option>
+          <option value="French">🇫🇷 French</option>
+          <option value="Italian">🇮🇹 Italian</option>
+          <option value="German">🇩🇪 German</option>
+          <option value="Arabic">🇸🇦 Arabic</option>
+          <option value="Chinese">🇨🇳 Chinese</option>
+          <option value="Japanese">🇯🇵 Japanese</option>
+          <option value="Korean">🇰🇷 Korean</option>
+          <option value="Hindi">🇮🇳 Hindi</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Appearance card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.12s">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-violet-500" style="font-variation-settings:'FILL' 1;">dark_mode</span>
+      Appearance
+    </h2>
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Dark Mode</p>
+        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Switch to a dark theme across all pages</p>
+      </div>
+      <div class="toggle-track" id="dark-toggle" onclick="toggle(this,'darkMode')">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Difficulty card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.16s">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-yellow-500" style="font-variation-settings:'FILL' 1;">tune</span>
+      Difficulty
+    </h2>
+    <div class="grid grid-cols-3 gap-3" id="diff-grid">
+      <button onclick="setDiff('easy')" data-diff="easy"
+              class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
+        🐣 Easy
+      </button>
+      <button onclick="setDiff('medium')" data-diff="medium"
+              class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
+        🌿 Medium
+      </button>
+      <button onclick="setDiff('hard')" data-diff="hard"
+              class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
+        🔥 Hard
+      </button>
+    </div>
+  </section>
+
+  <!-- Account card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.24s" id="account-section">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-blue-500" style="font-variation-settings:'FILL' 1;">manage_accounts</span>
+      Account
+    </h2>
+    <div id="account-info" class="flex items-center gap-4 mb-5 p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
+      <div id="acc-avatar" class="text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/10 rounded-full">🦫</div>
+      <div class="flex-1 min-w-0">
+        <p id="acc-name"  class="font-label font-bold text-slate-900 dark:text-white text-base truncate">Explorer</p>
+        <p id="acc-email" class="font-body text-slate-400 text-xs mt-0.5 truncate">Guest session</p>
+      </div>
+      <span id="acc-badge" class="font-label text-xs font-bold px-3 py-1 rounded-full bg-pink-500/20 text-pink-500 border border-pink-500/30">Guest</span>
+    </div>
+    <div class="flex flex-col gap-3">
+      <button onclick="signOut()"
+              class="w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-500 font-label font-bold rounded-xl border border-red-200 dark:border-red-500/30 active:scale-95 transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-base">logout</span>
+        Sign Out
+      </button>
+    </div>
+  </section>
+
+  <!-- Progress card -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.32s">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-red-500" style="font-variation-settings:'FILL' 1;">warning</span>
+      Progress
+    </h2>
+    <p class="font-body text-slate-500 dark:text-slate-400 text-sm mb-5">Resetting will delete all XP, badges, and streak data. This cannot be undone.</p>
+    <button onclick="resetProgress()"
+            class="w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-500 font-label font-bold rounded-xl border border-red-200 dark:border-red-500/30 active:scale-95 transition-all">
+      Reset All Progress
+    </button>
+  </section>
+
+  <!-- App info -->
+  <section class="text-center fade-up" style="animation-delay:.4s">
+    <p class="font-label text-slate-400 text-xs">Capy Yara Adventures · v2.0</p>
+    <p class="font-label text-slate-400 text-xs mt-1">Powered by OpenAI 🤖 · Built with ❤️</p>
+  </section>
+
+</main>
+
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<!-- Save toast -->
+<div id="save-toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white font-label font-bold px-8 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+  ✅ Settings saved!
+</div>
+
+<!-- Parent Gateway Modal -->
+<div id="parent-modal" class="fixed inset-0 bg-primary/90 backdrop-blur-sm z-[100] flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-[#002a54] border border-white/20 p-8 rounded-[2rem] w-full max-w-sm text-center shadow-2xl relative">
+    <button onclick="closeParentGate()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 border-2 border-slate-600">
+      <span class="material-symbols-outlined text-white text-3xl">lock</span>
+    </div>
+    <h3 class="font-headline text-2xl font-black text-white mb-2">Parents Only</h3>
+    <p class="font-body text-slate-400 text-sm mb-6">Please solve this to continue.</p>
+
+    <div class="bg-[#001f3f] inset-0 rounded-xl py-4 mb-6 border border-white/10">
+      <p class="font-headline text-3xl font-black text-pink-400" id="parent-math">5 + 7 = ?</p>
+    </div>
+
+    <input type="number" id="parent-answer" placeholder="Enter answer" class="w-full bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-white text-center font-headline text-2xl mb-4 focus:outline-none focus:border-pink-500 transition-colors">
+    <p id="parent-err" class="text-red-400 text-xs font-label mb-4 hidden">Incorrect answer. Try again.</p>
+
+    <button onclick="verifyParentSubmit()" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-label font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform text-lg">
+      Verify
+    </button>
+  </div>
+</div>
+
+<script src="store.js"></script>
+<script src="auth.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav(''));
+  Components.mount('side-nav-placeholder', Components.renderSideNav(''));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav(''));
+  Components.mount('footer-placeholder', Components.renderFooter());
+</script>
+
+<script>
+// ── Avatars ───────────────────────────────────────────────────────────────────
+const AVATARS = ['🦫','🐱','🐶','🦊','🐸','🐼','🐨','🦁','🐯','🐻'];
+let selectedAvatar = '🦫';
+let settings = {};
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('capySettings');
+  settings = saved ? JSON.parse(saved) : { sfx:true, tts:true, ai:true, difficulty:'medium', avatar:'🦫', darkMode:false };
+
+  // Name
+  document.getElementById('name-input').value = Store.state.playerName || '';
+
+  // Avatar
+  selectedAvatar = settings.avatar || '🦫';
+  renderAvatars();
+
+  // Toggles
+  applyToggle(document.getElementById('sfx-toggle'),  settings.sfx !== false);
+  applyToggle(document.getElementById('tts-toggle'),  settings.tts !== false);
+  applyToggle(document.getElementById('ai-toggle'),   settings.ai  !== false);
+  applyToggle(document.getElementById('dark-toggle'), settings.darkMode === true);
+
+  // Difficulty
+  setDiff(settings.difficulty || 'medium');
+
+  // Language
+  const langSel = document.getElementById('lang-select');
+  langSel.value = settings.translateLang || 'Spanish';
+
+  // Account
+  loadAccountInfo();
+});
+
+function renderAvatars() {
+  document.getElementById('avatar-grid').innerHTML = AVATARS.map(a =>
+    `<button onclick="pickAvatar('${a}')" id="av-${a.codePointAt(0)}"
+             class="avatar-opt text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-full
+                    ${a===selectedAvatar?'selected':''}">
+       ${a}
+     </button>`
+  ).join('');
+}
+
+function pickAvatar(a) {
+  selectedAvatar = a;
+  document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`av-${a.codePointAt(0)}`)?.classList.add('selected');
+}
+
+// ── Toggles ───────────────────────────────────────────────────────────────────
+function toggle(el, key) {
+  const isOn = el.classList.toggle('on');
+  settings[key] = isOn;
+  // Apply dark mode immediately when toggled
+  if (key === 'darkMode') {
+    localStorage.setItem('capySettings', JSON.stringify(settings));
+    Components.applyDarkMode();
+  }
+}
+
+function applyToggle(el, state) {
+  if (!el) return;
+  if (state) el.classList.add('on'); else el.classList.remove('on');
+}
+
+// ── Difficulty ────────────────────────────────────────────────────────────────
+function setDiff(level) {
+  settings.difficulty = level;
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    const isActive = btn.dataset.diff === level;
+    btn.className = `diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95 ${
+      isActive
+        ? 'bg-yellow-500/20 border-yellow-500 text-yellow-600 dark:text-yellow-300'
+        : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/15 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/30'
+    }`;
+  });
+}
+
+// ── Save ──────────────────────────────────────────────────────────────────────
+function saveAll() {
+  const name = document.getElementById('name-input').value.trim();
+  if (name.length >= 2) Store.setPlayerName(name);
+
+  settings.avatar        = selectedAvatar;
+  settings.translateLang = document.getElementById('lang-select').value;
+  localStorage.setItem('capySettings', JSON.stringify(settings));
+
+  // Sync to capySession so navbar avatar + name updates immediately
+  const _sess = Auth.getSession();
+  if (_sess) {
+    if (name.length >= 2) _sess.name = name;
+    _sess.avatar = selectedAvatar;
+    localStorage.setItem('capySession', JSON.stringify(_sess));
+  }
+
+  // Apply dark mode immediately
+  Components.applyDarkMode();
+
+  // Save to backend asynchronously
+  const sess = Auth.getSession();
+  if (sess && sess.id && sess.id !== 'guest') {
+    fetch('/api/db', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'settings', userId: sess.id, payload: settings })
+    }).catch(e => {});
+  }
+
+  // Show toast
+  const toast = document.getElementById('save-toast');
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+}
+
+// ── Account ───────────────────────────────────────────────────────────────────
+function loadAccountInfo() {
+  const sess = Auth.getSession();
+  if (!sess) return;
+  document.getElementById('acc-avatar').textContent = sess.avatar || '🦫';
+  document.getElementById('acc-name').textContent   = sess.name  || 'Explorer';
+  document.getElementById('acc-email').textContent  = sess.email || 'Guest session';
+  const badge = document.getElementById('acc-badge');
+  if (sess.id === 'guest') {
+    badge.textContent = 'Guest';
+    badge.className   = 'font-label text-xs font-bold px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-500/20 text-slate-500 dark:text-slate-300 border border-slate-300 dark:border-slate-500/30';
+  } else {
+    badge.textContent = 'Explorer';
+    badge.className   = 'font-label text-xs font-bold px-3 py-1 rounded-full bg-pink-500/20 text-pink-500 border border-pink-500/30';
+  }
+}
+
+function signOut() {
+  if (!confirm('Sign out of Capy Yara Adventures?')) return;
+  Auth.logout();
+}
+
+// ── Parent Gateway ────────────────────────────────────────────────────────────
+let parentCallback = null;
+let parentExpected = 0;
+
+function openParentGate(callback) {
+  parentCallback = callback;
+
+  // Generate random problem
+  const a = Math.floor(Math.random() * 8) + 3;
+  const b = Math.floor(Math.random() * 8) + 3;
+  parentExpected = a + b;
+  document.getElementById('parent-math').textContent = `${a} + ${b} = ?`;
+  document.getElementById('parent-answer').value = '';
+  document.getElementById('parent-err').classList.add('hidden');
+
+  const m = document.getElementById('parent-modal');
+  m.classList.remove('hidden');
+  m.offsetHeight; // reflow
+  m.classList.remove('opacity-0');
+}
+
+function closeParentGate() {
+  const m = document.getElementById('parent-modal');
+  m.classList.add('opacity-0');
+  setTimeout(() => m.classList.add('hidden'), 300);
+}
+
+function verifyParentSubmit() {
+  const ans = parseInt(document.getElementById('parent-answer').value, 10);
+  if (ans === parentExpected) {
+    closeParentGate();
+    if(parentCallback) parentCallback();
+  } else {
+    document.getElementById('parent-err').classList.remove('hidden');
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetProgress() {
+  openParentGate(() => {
+    if (!confirm('Are you sure? All XP, badges, and streaks will be lost! 😢')) return;
+    const sess = Auth.getSession();
+    localStorage.removeItem('capyYaraState');
+    if (sess && sess.id !== 'guest') {
+      localStorage.removeItem('capyYaraState_' + sess.id);
+    }
+    localStorage.removeItem('capyWotd');
+    Store.init();
+    alert('Progress reset! Starting fresh 🌿');
+    window.location.href = '6_Home_Forest_Expedition.html';
+  });
+}
+</script>
+</body>
+</html>

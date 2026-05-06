@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yara's Forest — Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Lexend:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "navy": "#001f3f",
+                        "navy-light": "#002d5c",
+                        "pink-brand": "#ec4899",
+                        "pink-brand-dim": "#db2777",
+                        "green-brand": "#10b981",
+                        "green-brand-dim": "#059669",
+                        "surface": "#ffffff",
+                        "on-surface": "#001f3f",
+                        "on-surface-variant": "#475569"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Lexend"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+        }
+        .navy-gradient {
+            background: linear-gradient(180deg, #001f3f 0%, #001122 100%);
+        }
+        .filter-btn {
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: 'Lexend', sans-serif;
+            line-height: 1;
+        }
+        .filter-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .filter-btn.active {
+            background: rgba(236,72,153,0.2);
+            border-color: #ec4899;
+            color: #f9a8d4;
+        }
+    </style>
+</head>
+<body class="bg-navy font-body text-slate-100 selection:bg-pink-brand selection:text-white">
+<!-- Component Placeholders -->
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="relative min-h-screen pt-32 pb-12 px-4 md:pl-32 md:pr-12 overflow-hidden">
+<!-- Forest Elements Background (Recolored) -->
+<div class="absolute top-40 left-10 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[120px] text-green-brand" data-icon="forest">forest</span>
+</div>
+<div class="absolute bottom-20 right-10 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[100px] text-pink-brand" data-icon="local_florist">local_florist</span>
+</div>
+<!-- Hero Section -->
+<header class="max-w-7xl mx-auto mb-6 relative z-10">
+<div class="flex items-center gap-5">
+<div class="relative flex-shrink-0">
+<div class="bg-navy-light rounded-full p-2 relative z-10 shadow-[0_8px_20px_0px_rgba(0,0,0,0.4)]">
+<img alt="Yara the Capybara" class="w-16 h-16 rounded-full object-cover border-4 border-pink-brand" src="yara.png"/>
+</div>
+<div id="stat-level-badge" class="absolute -bottom-2 -right-2 bg-green-brand text-white px-3 py-0.5 rounded-full font-label font-bold text-xs shadow-md">Level 12</div>
+</div>
+<div class="flex-1 min-w-0">
+<h1 class="font-headline text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">Game Pavilion: <span class="text-pink-brand">Forest Edition</span></h1>
+<p class="font-body text-sm text-slate-400 mt-1">Complete missions to earn rare badges!</p>
+<div class="mt-3 flex flex-wrap gap-2">
+<a href="#trophies" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-1.5 rounded-full font-label font-bold text-xs hover:scale-105 transition-all">
+<span class="material-symbols-outlined text-green-brand text-sm" style="font-variation-settings:'FILL' 1;">military_tech</span>Badge Vault
+</a>
+</div>
+</div>
+</div>
+</header>
+<!-- Games Grid -->
+<section class="max-w-7xl mx-auto relative z-10">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-headline text-base font-extrabold text-white">Choose a Game</h2>
+<span class="text-slate-500 text-xs font-label">18 games</span>
+</div>
+<div class="flex gap-2 flex-wrap mb-4" id="filter-bar">
+<button class="filter-btn active" data-filter="all">All</button>
+<button class="filter-btn" data-filter="vocab">📝 Words</button>
+<button class="filter-btn" data-filter="math">🔢 Math</button>
+<button class="filter-btn" data-filter="grammar">🔬 Grammar</button>
+<button class="filter-btn" data-filter="arcade">🕹️ Arcade</button>
+<button class="filter-btn" data-filter="ai">🤖 AI</button>
+</div>
+<div id="games-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+<button onclick="window.location.href='word_match_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-blue-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔤</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Word Match</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='color_catch_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="arcade">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-pink-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🎨</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Color Catch</span>
+<span class="text-[9px] font-bold text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
+</button>
+<button onclick="window.location.href='forest_puzzle_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="arcade">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-emerald-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🌿</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Forest Puzzle</span>
+<span class="text-[9px] font-bold text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
+</button>
+<button onclick="window.location.href='berry_math_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="math">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-red-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🍓</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Berry Math</span>
+<span class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full leading-none">Math</span>
+</button>
+<button onclick="window.location.href='sound_seekers_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-violet-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔊</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Sound Seekers</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='sentence_builder_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-purple-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🏗️</span><span class="absolute top-1 right-1 bg-purple-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Sentence Builder</span>
+<span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full leading-none">Grammar</span>
+</button>
+<button onclick="window.location.href='matching_pairs_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="arcade">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-cyan-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🃏</span><span class="absolute top-1 right-1 bg-cyan-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Matching Pairs</span>
+<span class="text-[9px] font-bold text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
+</button>
+<button onclick="window.location.href='spelling_bee_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-yellow-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🐝</span><span class="absolute top-1 right-1 bg-yellow-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Spelling Bee</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='fill_blank_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-orange-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">✏️</span><span class="absolute top-1 right-1 bg-orange-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Fill in the Blank</span>
+<span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full leading-none">Grammar</span>
+</button>
+<button onclick="window.location.href='alphabet.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-indigo-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-2xl font-black text-white/60 group-hover:scale-110 transition-transform duration-200 select-none">Aa</span><span class="absolute top-1 right-1 bg-indigo-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Alphabet Explorer</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='daily_challenge.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="ai">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-rose-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">⚡</span><span class="absolute top-1 right-1 bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">AI</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">AI Daily Challenge</span>
+<span class="text-[9px] font-bold text-rose-300 bg-rose-500/15 px-2 py-0.5 rounded-full leading-none">AI</span>
+</button>
+<button onclick="window.location.href='word_search_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-teal-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔍</span><span class="absolute top-1 right-1 bg-teal-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Word Search</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='hangman_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-emerald-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🌿</span><span class="absolute top-1 right-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Hangman</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='flappy_yara_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="arcade">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-pink-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🐦</span><span class="absolute top-1 right-1 bg-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Flappy Yara</span>
+<span class="text-[9px] font-bold text-pink-300 bg-pink-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
+</button>
+<button onclick="window.location.href='reading_room.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-violet-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">📖</span><span class="absolute top-1 right-1 bg-violet-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">AI</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Reading Room</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='word_scramble_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-amber-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔀</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Word Scramble</span>
+<span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full leading-none">Words</span>
+</button>
+<button onclick="window.location.href='grammar_lab.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-cyan-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔬</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Grammar Lab</span>
+<span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full leading-none">Grammar</span>
+</button>
+<button onclick="window.location.href='number_quest.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="math">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-violet-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔢</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Number Quest</span>
+<span class="text-[9px] font-bold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full leading-none">Math</span>
+</button>
+<button onclick="window.location.href='tictactoe_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="arcade">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-slate-700 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">⭕</span><span class="absolute top-1 right-1 bg-slate-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full leading-none">NEW</span></div>
+<span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Tic Tac Toe</span>
+<span class="text-[9px] font-bold text-slate-300 bg-slate-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
+</button>
+</div>
+</section>
+<!-- Trophy Room Section -->
+<section class="max-w-7xl mx-auto pt-14 pb-10 relative z-10" id="trophies">
+<div class="mb-8 flex items-center gap-4">
+<h2 class="font-headline text-2xl md:text-3xl font-black text-pink-brand">Badge Vault</h2>
+<div class="h-px flex-1 bg-white/10 rounded-full"></div>
+</div>
+<div id="badge-vault" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4"></div>
+</section>
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+</main>
+<!-- FAB: Return to Top -->
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-8 right-8 bg-pink-brand text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-pink-500/40">
+<span class="material-symbols-outlined text-3xl" data-icon="expand_less">expand_less</span>
+</button>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+    Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+    Components.mount('footer-placeholder', Components.renderFooter());
+
+    const BADGE_CATALOG = [
+        { id: 'tree_warden',    icon: 'eco',                         color: 'bg-emerald-500',  shadow: 'shadow-emerald-500/30', label: 'Tree Warden'   },
+        { id: 'fast_tracker',   icon: 'rocket_launch',               color: 'bg-pink-500',     shadow: 'shadow-pink-500/30',    label: 'Fast Tracker'  },
+        { id: 'explorer',       icon: 'style',                       color: 'bg-pink-500',     shadow: 'shadow-pink-500/30',    label: 'Card Explorer' },
+        { id: 'chat_master',    icon: 'chat_bubble',                 color: 'bg-emerald-500',  shadow: 'shadow-emerald-500/30', label: 'Chat Master'   },
+        { id: 'game_hero',      icon: 'sports_esports',              color: 'bg-pink-500',     shadow: 'shadow-pink-500/30',    label: 'Game Hero'     },
+        { id: 'forest_sage',    icon: 'auto_awesome',                color: 'bg-emerald-500',  shadow: 'shadow-emerald-500/30', label: 'Forest Sage'   },
+        { id: 'grammar_star',   icon: 'school',                      color: 'bg-cyan-500',     shadow: 'shadow-cyan-500/30',    label: 'Grammar Star'  },
+        { id: 'word_wizard',    icon: 'spellcheck',                  color: 'bg-violet-500',   shadow: 'shadow-violet-500/30',  label: 'Word Wizard'   },
+        { id: 'number_wizard',  icon: '123',                         color: 'bg-amber-500',    shadow: 'shadow-amber-500/30',   label: 'Number Wizard' },
+        { id: 'story_teller',   icon: 'menu_book',                   color: 'bg-rose-500',     shadow: 'shadow-rose-500/30',    label: 'Story Teller'  },
+        { id: 'week_warrior',   icon: 'local_fire_department',       color: 'bg-orange-500',   shadow: 'shadow-orange-500/30',  label: 'Week Warrior'  },
+        { id: 'fortnight_hero', icon: 'whatshot',                    color: 'bg-red-500',      shadow: 'shadow-red-500/30',     label: 'Fortnight Hero' },
+        { id: 'body_champ',     icon: 'directions_run',              color: 'bg-teal-500',     shadow: 'shadow-teal-500/30',    label: 'Body Champ'    },
+        { id: 'food_explorer',  icon: 'restaurant',                  color: 'bg-yellow-500',   shadow: 'shadow-yellow-500/30',  label: 'Food Explorer' },
+        { id: 'emotion_star',   icon: 'sentiment_very_satisfied',    color: 'bg-fuchsia-500',  shadow: 'shadow-fuchsia-500/30', label: 'Emotion Star'  },
+        { id: 'legend',         icon: 'emoji_events',                color: 'bg-yellow-400',   shadow: 'shadow-yellow-400/30',  label: 'Legend'        },
+    ];
+
+    function updateUI() {
+        document.getElementById('stat-level-badge').textContent = 'Level ' + Store.getLevel();
+        const unlocked = Store.state.badges;
+        document.getElementById('badge-vault').innerHTML = BADGE_CATALOG.map(b => {
+            if (unlocked.includes(b.id)) {
+                return `<div class="aspect-square bg-navy-light rounded-[2rem] shadow-2xl flex flex-col items-center justify-center p-6 hover:rotate-3 hover:scale-105 transition-all border border-white/10 cursor-default" title="${b.label}">
+                    <div class="w-24 h-24 mb-4 ${b.color} rounded-full flex items-center justify-center shadow-lg ${b.shadow} ring-4 ring-white/20">
+                        <span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">${b.icon}</span>
+                    </div>
+                    <span class="font-label text-sm font-bold text-white text-center">${b.label}</span>
+                    <span class="font-label text-xs text-emerald-400 mt-1">✅ Earned!</span>
+                </div>`;
+            } else {
+                return `<div class="aspect-square bg-white/3 rounded-[2rem] flex flex-col items-center justify-center p-6 opacity-40 hover:opacity-60 transition-opacity border border-dashed border-white/10 cursor-default" title="Locked — keep playing!">
+                    <div class="w-24 h-24 mb-4 bg-slate-800/60 rounded-full flex items-center justify-center border border-white/10">
+                        <span class="material-symbols-outlined text-slate-500 text-4xl">lock</span>
+                    </div>
+                    <span class="font-label text-sm font-bold text-slate-400 text-center">${b.label}</span>
+                    <span class="font-label text-xs text-slate-600 mt-1">🔒 Locked</span>
+                </div>`;
+            }
+        }).join('');
+    }
+
+    Store.completeActivity('games');
+
+    // Auto-unlock Legend when all other badges are earned
+    function checkLegend() {
+        const others = BADGE_CATALOG.filter(b => b.id !== 'legend').map(b => b.id);
+        if (others.every(id => Store.state.badges.includes(id))) Store.unlockBadge('legend');
+    }
+
+    updateUI();
+    checkLegend();
+    document.addEventListener('stateChanged', () => { updateUI(); checkLegend(); });
+
+    // Category filter
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const f = btn.dataset.filter;
+            document.querySelectorAll('#games-grid > button').forEach(tile => {
+                tile.style.display = (f === 'all' || tile.dataset.category === f) ? '' : 'none';
+            });
+        });
+    });
+</script>
+</body></html>

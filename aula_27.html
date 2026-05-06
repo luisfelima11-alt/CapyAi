@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 27 — Speaking About Your Life</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#ec4899,#f43f5e);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#ec4899;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.q-card{transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.q-card:hover{transform:translateY(-2px)}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-rose-950 to-pink-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🗣️</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">💬</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:16%;animation-delay:1.3s">🌟</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:24%;animation-delay:.4s">❤️</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">🏠</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:10%;animation-delay:1.6s">💼</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🎯</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-400/30 rounded-full px-4 py-1 text-sm font-black text-pink-300 mb-3">Aula 27</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🗣️ Speaking About<br><span class="text-pink-300">Your Life</span></h1>
+      <p class="text-white/60 text-base mb-5">Learn vocabulary for personal life and career topics, master a speaking toolkit, and practise answering real conversation questions.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Personal Life</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Work & Career</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Speaking Toolkit</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Discussion Questions</span>
+      </div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 5 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY TABS -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="toolkit">🛠️ Toolkit</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Words for talking about your personal life, family, work, and ambitions.</p></div>
+        <div class="text-right"><div class="text-2xl font-black text-pink-600" id="vocab-count">0<span class="text-sm text-slate-400">/20</span></div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3" id="vocab-grid"></div>
+    </div>
+
+    <!-- TAB: TOOLKIT -->
+    <div id="tab-toolkit" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Speaking Toolkit</h2>
+      <p class="text-slate-500 text-sm mb-6">These sentence starters and connectors will make you sound natural and fluent when talking about yourself.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <!-- Starting your answer -->
+        <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-5">
+          <h3 class="font-black text-navy mb-3 flex items-center gap-2"><span class="text-xl">🎙️</span> Starting your answer</h3>
+          <div class="space-y-2">
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Well, to be honest..."</span>
+              <button onclick="speak('Well, to be honest')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"That's a great question..."</span>
+              <button onclick="speak('That is a great question')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Let me think about that..."</span>
+              <button onclick="speak('Let me think about that')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"From my perspective..."</span>
+              <button onclick="speak('From my perspective')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giving more detail -->
+        <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-5">
+          <h3 class="font-black text-navy mb-3 flex items-center gap-2"><span class="text-xl">📝</span> Adding detail</h3>
+          <div class="space-y-2">
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"What I mean is..."</span>
+              <button onclick="speak('What I mean is')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"For example..."</span>
+              <button onclick="speak('For example')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"In my case..."</span>
+              <button onclick="speak('In my case')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Not only that, but also..."</span>
+              <button onclick="speak('Not only that, but also')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Talking about the past -->
+        <div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-5">
+          <h3 class="font-black text-navy mb-3 flex items-center gap-2"><span class="text-xl">⏪</span> Talking about the past</h3>
+          <div class="space-y-2">
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"I used to..."</span>
+              <button onclick="speak('I used to')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Growing up, I..."</span>
+              <button onclick="speak('Growing up, I')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Back then..."</span>
+              <button onclick="speak('Back then')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-pink-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"I've always..."</span>
+              <button onclick="speak('I have always')" class="text-slate-300 hover:text-pink-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Talking about the future -->
+        <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-5">
+          <h3 class="font-black text-navy mb-3 flex items-center gap-2"><span class="text-xl">🔮</span> Talking about the future</h3>
+          <div class="space-y-2">
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"I'm planning to..."</span>
+              <button onclick="speak('I am planning to')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"My dream is to..."</span>
+              <button onclick="speak('My dream is to')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"Hopefully, I will..."</span>
+              <button onclick="speak('Hopefully, I will')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+            <div class="bg-white rounded-xl px-3 py-2 border border-rose-100 flex items-center justify-between">
+              <span class="text-sm font-bold text-navy">"One of my goals is to..."</span>
+              <button onclick="speak('One of my goals is to')" class="text-slate-300 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">volume_up</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="markSection()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Toolkit as Done</button>
+    </div>
+
+    <!-- TAB: EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Life &amp; Career Idioms</h2>
+      <p class="text-slate-500 text-sm mb-6">4 powerful expressions for talking about your life journey and career.</p>
+      <div class="grid gap-4" id="expr-grid"></div>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on vocabulary, speaking phrases and expressions.</p></div>
+        <div class="flex items-center gap-3">
+          <div class="text-center"><div class="text-2xl font-black text-pink-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+          <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="practice-area"></div>
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-pink-100 text-pink-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Discussion Questions</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each question. Answer aloud using toolkit phrases and vocabulary. Check when done.</p>
+      <div class="mb-4">
+        <div class="inline-flex items-center gap-2 bg-pink-100 text-pink-700 font-black text-sm px-3 py-1.5 rounded-full mb-3">🏠 Personal Life</div>
+        <div class="space-y-3" id="speak-personal"></div>
+      </div>
+      <div class="mb-4">
+        <div class="inline-flex items-center gap-2 bg-rose-100 text-rose-700 font-black text-sm px-3 py-1.5 rounded-full mb-3">💼 Work &amp; Career</div>
+        <div class="space-y-3" id="speak-work"></div>
+      </div>
+    </div>
+
+    <!-- TAB: HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+            <p class="text-white/80 text-sm">Aula 27 — Speaking About Your Life</p>
+          </div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔀 Coloque as palavras na ordem certa</h3>
+              <p class="text-slate-500 text-sm mt-1">Toque nas palavras para montar a frase — estilo Duolingo!</p>
+            </div>
+          </div>
+          <div id="wo27-wrap"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔗 Conecte: inglês ↔ português</h3>
+              <p class="text-slate-500 text-sm mt-1">Clique numa palavra e depois na tradução correta.</p>
+            </div>
+          </div>
+          <div id="mp27-wrap"></div>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-700 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div>
+              <h3 class="font-black text-navy text-base">❌ Corrija o erro gramatical</h3>
+              <p class="text-slate-500 text-sm mt-1">Cada frase tem um erro. Reescreva corretamente.</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "I am very passionate of music."</p>
+              <input type="text" id="err27-1" placeholder="I am very passionate …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err27fb1" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "My upbringing have shaped my values deeply."</p>
+              <input type="text" id="err27-2" placeholder="My upbringing …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err27fb2" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "She is passionate in helping others every day."</p>
+              <input type="text" id="err27-3" placeholder="She is passionate …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err27fb3" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <button onclick="checkErrors27()" class="bg-red-50 border-2 border-red-200 text-red-700 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-red-100 transition-all">Verificar respostas ✓</button>
+          </div>
+        </div>
+
+        <!-- Task 4: Toolkit phrases -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Use as frases do toolkit em contexto</h3>
+              <p class="text-slate-500 text-sm mt-1">Escreva uma frase usando cada expressão naturalmente.</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div><p class="text-xs font-bold text-slate-400 mb-1">"To be honest…"</p><input type="text" placeholder="To be honest, I…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"/></div>
+            <div><p class="text-xs font-bold text-slate-400 mb-1">"Looking back…"</p><input type="text" placeholder="Looking back, I realize…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"/></div>
+            <div><p class="text-xs font-bold text-slate-400 mb-1">"The thing is…"</p><input type="text" placeholder="The thing is, I…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"/></div>
+            <div><p class="text-xs font-bold text-slate-400 mb-1">"I've come a long way…"</p><input type="text" placeholder="I've come a long way since…" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-400"/></div>
+          </div>
+        </div>
+
+        <!-- Task 5: Free paragraph -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Minha História — parágrafo livre</h3>
+              <p class="text-slate-500 text-sm mt-1">Escreva 4–5 frases sobre sua origem, criação e ambições. Use pelo menos 5 palavras do vocabulário desta aula.</p>
+            </div>
+          </div>
+          <textarea rows="5" placeholder="I grew up in… My background is… I have always been passionate about… Looking back, I realize… My ambition is…" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+        </div>
+
+      </div>
+
+      <button onclick="submitHomework('27')" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Submit Homework &nbsp;+75 XP
+      </button>
+      <div id="hw-done-27" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script src="lesson-engine.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'Background',    pt:'Origem / Histórico',      emoji:'🌳', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'Tell me about your background.'},
+  {en:'Childhood',     pt:'Infância',                emoji:'🧒', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My childhood was in a small town.'},
+  {en:'Upbringing',    pt:'Criação / Como foi criado', emoji:'👨‍👩‍👦', bg:'bg-pink-50 border-pink-200', dot:'bg-pink-400',   ex:'My upbringing taught me strong values.'},
+  {en:'Ambition',      pt:'Ambição',                 emoji:'🚀', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My ambition is to become a leader.'},
+  {en:'Passion',       pt:'Paixão',                  emoji:'❤️', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'English is my passion.'},
+  {en:'Milestone',     pt:'Marco / Conquista',       emoji:'🏁', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'Getting this job was a milestone.'},
+  {en:'Routine',       pt:'Rotina',                  emoji:'🔄', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'My morning routine starts at 6 AM.'},
+  {en:'Hobby',         pt:'Hobby / Passatempo',      emoji:'🎨', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My hobby is photography.'},
+  {en:'Relationship',  pt:'Relacionamento',          emoji:'🤝', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'Building relationships takes time.'},
+  {en:'Value',         pt:'Valor',                   emoji:'⭐', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My main value in life is honesty.'},
+  {en:'Experience',    pt:'Experiência',             emoji:'🌟', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'I have experience in marketing.'},
+  {en:'Strength',      pt:'Ponto forte / Força',     emoji:'💪', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My greatest strength is communication.'},
+  {en:'Weakness',      pt:'Fraqueza / Ponto fraco',  emoji:'🤔', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'My weakness is being too perfectionist.'},
+  {en:'Achievement',   pt:'Conquista',               emoji:'🏆', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'My biggest achievement is learning English.'},
+  {en:'Challenge',     pt:'Desafio',                 emoji:'⚡', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'Every challenge helped me grow.'},
+  {en:'Opportunity',   pt:'Oportunidade',            emoji:'🌈', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'This is a great opportunity for growth.'},
+  {en:'Inspiration',   pt:'Inspiração',              emoji:'💡', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'My mother is my greatest inspiration.'},
+  {en:'Purpose',       pt:'Propósito',               emoji:'🎯', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'I found my purpose in helping others.'},
+  {en:'Balance',       pt:'Equilíbrio',              emoji:'⚖️', bg:'bg-pink-50 border-pink-200',    dot:'bg-pink-400',   ex:'I try to maintain a work-life balance.'},
+  {en:'Growth',        pt:'Crescimento',             emoji:'📈', bg:'bg-rose-50 border-rose-200',    dot:'bg-rose-400',   ex:'Personal growth is a lifelong journey.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"Find your calling", pt:"Encontrar sua vocação", emoji:'🎯',
+   example:"She tried many jobs before she found her calling as a teacher.",
+   meaning:"To discover the work or purpose you were meant to do."},
+  {expr:"Start from scratch", pt:"Começar do zero", emoji:'🏗️',
+   example:"After losing his job, he had to start from scratch in a new city.",
+   meaning:"To begin something completely from the beginning."},
+  {expr:"Come a long way", pt:"Ir longe / Evoluir muito", emoji:'🛤️',
+   example:"You have come a long way since your first English lesson!",
+   meaning:"To have made great progress or improvement."},
+  {expr:"Turn over a new leaf", pt:"Mudar de vida / Começar de novo", emoji:'🍃',
+   example:"After the difficult year, she decided to turn over a new leaf and focus on her health.",
+   meaning:"To change your behaviour and make a fresh start."},
+];
+
+const PRACTICE_QS = [
+  {q:"Which word means 'Marco importante / Conquista' in English?", opts:["Milestone","Routine","Background","Balance"], a:"Milestone", rule:"Vocabulary"},
+  {q:"'Come a long way' means:", opts:["Make great progress","Travel far from home","Work for a long time","Have many experiences"], a:"Make great progress", rule:"Expression meaning"},
+  {q:"Which phrase helps you start answering a question naturally?", opts:["Well, to be honest...","I have done...","My milestone is...","From my growth..."], a:"Well, to be honest...", rule:"Speaking toolkit: starting your answer"},
+  {q:"Which word means 'Propósito' in English?", opts:["Purpose","Passion","Strength","Challenge"], a:"Purpose", rule:"Vocabulary"},
+  {q:"'Turn over a new leaf' means:", opts:["Change your behaviour and start fresh","Work harder than before","Travel to a new place","Find a new hobby"], a:"Change your behaviour and start fresh", rule:"Expression meaning"},
+  {q:"'Find your calling' means:", opts:["Discover your true purpose/vocation","Make an important phone call","Find a new job","Learn a new skill"], a:"Discover your true purpose/vocation", rule:"Expression meaning"},
+  {q:"Which phrase is used to add an example to your answer?", opts:["For example...","I used to...","My dream is to...","From my perspective..."], a:"For example...", rule:"Speaking toolkit: adding detail"},
+  {q:"Which word means 'Equilíbrio' in English?", opts:["Balance","Value","Weakness","Growth"], a:"Balance", rule:"Vocabulary"},
+  {q:"'Start from scratch' means:", opts:["Begin completely from zero","Start early in the morning","Work without stopping","Follow your routine"], a:"Begin completely from zero", rule:"Expression meaning"},
+  {q:"'Growing up, I...' is used to talk about:", opts:["Your childhood and past","Your future plans","Your current job","Your hobbies"], a:"Your childhood and past", rule:"Speaking toolkit: talking about the past"},
+];
+
+// Personal life discussion questions
+const PERSONAL_Q = [
+  {text:"Where are you from and what was your <strong class='text-pink-600'>childhood</strong> like?"},
+  {text:"What is your biggest <strong class='text-pink-600'>passion</strong> in life? How did you discover it?"},
+  {text:"What <strong class='text-pink-600'>values</strong> are most important to you and why?"},
+  {text:"Tell me about a <strong class='text-pink-600'>milestone</strong> in your life that changed you."},
+  {text:"What is your daily <strong class='text-pink-600'>routine</strong> like? Are you happy with it?"},
+];
+
+// Work & career questions
+const WORK_Q = [
+  {text:"What is your biggest professional <strong class='text-rose-600'>achievement</strong> so far?"},
+  {text:"What are your main <strong class='text-rose-600'>strengths</strong> and how do you use them at work?"},
+  {text:"What <strong class='text-rose-600'>challenges</strong> have you faced in your career? How did you overcome them?"},
+  {text:"What is your biggest professional <strong class='text-rose-600'>ambition</strong>? Where do you want to be in 5 years?"},
+  {text:"How do you maintain a good work-life <strong class='text-rose-600'>balance</strong> in your daily life?"},
+];
+
+function buildDiscussionGrid(data, gridId) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  data.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:border-pink-300 transition-colors';
+    div.innerHTML = `
+      <button onclick="speak('${item.text.replace(/<[^>]+>/g,'').replace(/'/g,\"'\")}')" class="flex-shrink-0 w-12 h-12 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <p class="flex-1 text-navy font-semibold text-sm leading-relaxed">${item.text}</p>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-pink-500" onchange="checkSpeakDone(this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Done</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+
+let _speakChecked = 0;
+const _totalSpeakItems = PERSONAL_Q.length + WORK_Q.length;
+function checkSpeakDone(chk) {
+  if (chk.checked) _speakChecked++; else _speakChecked--;
+  if (_speakChecked >= Math.min(6, _totalSpeakItems)) markSection();
+}
+
+buildDiscussionGrid(PERSONAL_Q, 'speak-personal');
+buildDiscussionGrid(WORK_Q, 'speak-work');
+
+// ── HOMEWORK INTERACTIVE EXERCISES — AULA 27 ─────────────────────────────────
+function hwShuffle27(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+// ---- Word Order ----
+const WO27_DATA = [
+  { s: 'My biggest ambition is to travel the world',              w: ['My','biggest','ambition','is','to','travel','the','world'] },
+  { s: 'Looking back I realize how much I have grown',            w: ['Looking','back','I','realize','how','much','I','have','grown'] },
+  { s: 'She has come a long way since she started learning English', w: ['She','has','come','a','long','way','since','she','started','learning','English'] },
+];
+const wo27 = WO27_DATA.map(d => ({ ans: [], bank: hwShuffle27(d.w) }));
+function wo27Render() {
+  const c = document.getElementById('wo27-wrap'); if (!c) return;
+  c.innerHTML = WO27_DATA.map((d,i) => {
+    const st = wo27[i];
+    return `<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i < WO27_DATA.length-1 ? 'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO27_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length ? st.ans.map((w,j)=>`<span onclick="wo27Move(1,${i},${j})" class="cursor-pointer select-none bg-pink-100 text-pink-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-pink-200 active:scale-95 transition-all">${w}</span>`).join('') : '<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo27Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-pink-400 hover:bg-pink-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo27Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo27Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo27fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo27Move(fromBank, si, wi) {
+  if (fromBank) wo27[si].bank.push(wo27[si].ans.splice(wi,1)[0]);
+  else          wo27[si].ans.push(wo27[si].bank.splice(wi,1)[0]);
+  wo27Render();
+}
+function wo27Check(i) {
+  const fb = document.getElementById('wo27fb'+i); if (!fb) return;
+  if (wo27[i].ans.join(' ').toLowerCase() === WO27_DATA[i].s.toLowerCase()) {
+    fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600';
+  } else { fb.textContent='❌ Tente novamente!'; fb.className='text-xs font-black text-red-500'; }
+}
+function wo27Reset(i) {
+  wo27[i] = { ans:[], bank: hwShuffle27(WO27_DATA[i].w) };
+  const fb = document.getElementById('wo27fb'+i); if (fb) fb.textContent='';
+  wo27Render();
+}
+wo27Render();
+
+// ---- Match Pairs ----
+const MP27 = [
+  { l:'Background',   r:'Origem / Histórico' },
+  { l:'Upbringing',   r:'Criação / Como foi criado' },
+  { l:'Milestone',    r:'Marco / Conquista' },
+  { l:'Ambition',     r:'Ambição' },
+  { l:'Inspiration',  r:'Inspiração' },
+];
+const mp27R = hwShuffle27(MP27.map((p,i)=>({label:p.r, pid:i})));
+let mp27SelL = null; const mp27Done = new Set();
+function mp27Render() {
+  const c = document.getElementById('mp27-wrap'); if (!c) return;
+  c.innerHTML = `<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP27.map((p,i)=>`<div id="mp27L${i}" onclick="mp27ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp27Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp27SelL===i?'border-pink-500 bg-pink-100 text-pink-800':'border-slate-200 bg-white text-navy hover:border-pink-300 hover:bg-pink-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp27R.map((r,i)=>`<div id="mp27R${i}" onclick="mp27ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp27Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-pink-300 hover:bg-pink-50'}">${r.label}</div>`).join('')}</div>
+  </div>${mp27Done.size===MP27.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp27ClickL(i) { if(mp27Done.has(i))return; mp27SelL=(mp27SelL===i)?null:i; mp27Render(); }
+function mp27ClickR(i) {
+  if(mp27SelL===null)return; const r=mp27R[i]; if(mp27Done.has(r.pid))return;
+  if(r.pid===mp27SelL){ mp27Done.add(mp27SelL); mp27SelL=null; mp27Render(); }
+  else {
+    const lEl=document.getElementById('mp27L'+mp27SelL), rEl=document.getElementById('mp27R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{ mp27SelL=null; mp27Render(); },700);
+  }
+}
+mp27Render();
+
+// ---- Error Correction ----
+const ERR27_CHECKS = [
+  v => v.includes('passionate about') && !v.includes('passionate of'),
+  v => v.includes('has shaped') && !v.includes('have shaped'),
+  v => v.includes('passionate about') && !v.includes('passionate in'),
+];
+const ERR27_HINTS = ['of → about (passionate about)', 'have → has (singular subject: My upbringing)', 'in → about (passionate about)'];
+function checkErrors27() {
+  ERR27_CHECKS.forEach((check,i) => {
+    const inp=document.getElementById('err27-'+(i+1)), fb=document.getElementById('err27fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){ fb.classList.add('hidden'); return; }
+    fb.classList.remove('hidden');
+    if(check(v)){ fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600 mt-1'; }
+    else { fb.textContent=`❌ Dica: "${ERR27_HINTS[i]}"`; fb.className='text-xs font-black text-red-500 mt-1'; }
+  });
+}
+
+function submitHomework(lessonId) {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '✓ Submitted!'; btn.classList.add('opacity-75');
+  document.getElementById('hw-done-' + lessonId).classList.remove('hidden');
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(75);
+}
+window.submitHomework = submitHomework;
+
+initLesson({
+  tabs: ['vocab','toolkit','expressions','practice','speak','homework'],
+  totalSections: 6,
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE_QS,
+  accentColor: 'pink',
+});
+</script>
+</body>
+</html>

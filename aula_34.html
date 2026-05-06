@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 34 — Expressing Opinions</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#f43f5e,#ec4899);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#f43f5e;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-rose-900 to-pink-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🎯</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;left:8%;animation-delay:.8s">💬</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:15%;left:20%;animation-delay:1.4s">🗣️</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:30%;animation-delay:.3s">🤝</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:25%;animation-delay:1s">💡</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:50%;right:10%;animation-delay:.5s">⚖️</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:3%;animation-delay:1.8s">🌟</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">🔥</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-400/30 rounded-full px-4 py-1 text-sm font-black text-rose-300 mb-3">Aula 34</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎯 Expressing Opinions<br><span class="text-rose-300">&amp; Debating</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Learn how to give, agree with, and politely disagree with opinions in English like a confident speaker.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Argue</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Believe</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Support</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Disagree</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+    </div>
+  </div>
+</div>
+
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+  <div id="tab-vocab" class="fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Flip each card to see the translation.</p></div>
+      <div class="text-right"><div class="text-2xl font-black text-rose-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  </div>
+
+  <div id="tab-expressions" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+    <p class="text-slate-500 text-sm mb-6">Click to reveal the translation and meaning.</p>
+    <div class="grid gap-4" id="expr-grid"></div>
+  </div>
+
+  <div id="tab-grammar" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Grammar: Opinions & Debate</h2>
+    <p class="text-slate-500 text-sm mb-6">How to give, agree with, disagree with, and balance opinions politely.</p>
+    <div class="space-y-4">
+      <div class="rounded-2xl border-2 border-rose-200 bg-rose-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">GIVING OPINIONS</div><div class="text-rose-600 text-sm font-semibold">In my opinion... / I strongly believe... / Personally...</div></div></div>
+          <span class="material-symbols-outlined text-rose-400 transition-transform" id="g1-arrow">expand_more</span>
+        </button>
+        <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>In my opinion</strong>, Katy Perry is one of the most creative artists in pop."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>Personally</strong>, I think Elite has more original storytelling than most American series."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-rose-700'>I strongly believe</strong> that consistent marketing is more powerful than viral moments."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">AGREEING</div><div class="text-emerald-600 text-sm font-semibold">I couldn't agree more. / That's a fair point.</div></div></div>
+          <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g2-arrow">expand_more</span>
+        </button>
+        <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>I couldn't agree more</strong> — digital marketing is essential today."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>That's a fair point</strong> about House of the Dragon's production quality."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Exactly!</strong> You have a really valid point."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-red-200 bg-red-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-red-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">DISAGREEING POLITELY</div><div class="text-red-600 text-sm font-semibold">I beg to differ. / Actually, I think... / With all due respect...</div></div></div>
+          <span class="material-symbols-outlined text-red-400 transition-transform" id="g3-arrow">expand_more</span>
+        </button>
+        <div id="g3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>I beg to differ</strong> — James Arthur's emotional impact is stronger."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>With all due respect</strong>, I think Friends holds up better than people say."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>Actually, I see it a bit differently</strong> — let me explain."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g4')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">4</span><div><div class="font-black text-navy">CONCEDING</div><div class="text-amber-700 text-sm font-semibold">You have a point, but... / That's true, however...</div></div></div>
+          <span class="material-symbols-outlined text-amber-400 transition-transform" id="g4-arrow">expand_more</span>
+        </button>
+        <div id="g4" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>You have a point</strong>, but I still think GoT early seasons were better."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>That's true, however</strong>, the marketing strategy for 1D was unique."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-amber-700'>I see where you're coming from</strong>, but I still prefer Elite."</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-practice" class="fade-in hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on expressing opinions.</p></div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div class="text-2xl font-black text-rose-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+        <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+      </div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div id="practice-area"></div>
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+        <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+        <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+        <div class="inline-flex items-center gap-2 bg-rose-100 text-rose-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+        <div class="flex gap-3">
+          <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+          <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-speak" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+    <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat aloud.</p>
+    <div class="space-y-3" id="speak-grid"></div>
+  </div>
+
+  <div id="tab-challenge" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">🎯 Hot Take Challenge</h2>
+    <p class="text-slate-500 text-sm mb-6">Katy Perry · One Direction · Adele · Marketing Digital</p>
+
+    <div class="bg-navy border-2 border-amber-400 rounded-2xl p-5 mb-6 text-white">
+      <div class="flex items-start gap-3">
+        <span class="text-3xl">🔥</span>
+        <div>
+          <h3 class="font-black text-amber-300 text-lg mb-1">What is a "Hot Take"?</h3>
+          <p class="text-white/80 text-sm">A <strong class="text-amber-300">hot take</strong> is a bold, confident opinion — sometimes controversial — that you state and defend. It's a great way to practice expressing and defending your views in English!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-5">
+      <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-3">
+          <span class="text-3xl">🎤</span>
+          <div><div class="font-black text-navy">"One Direction had a better digital marketing strategy than Katy Perry in their peak years."</div><div class="text-slate-500 text-sm mt-1">Do you agree or disagree? Write 3 sentences defending your position.</div></div>
+        </div>
+        <div class="bg-amber-100 border border-amber-300 rounded-xl p-3 mb-3 text-xs text-amber-800">
+          <strong>Starters:</strong> "In my opinion..." / "I beg to differ because..." / "That's a fair point, but..."
+        </div>
+        <textarea rows="4" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="In my opinion, One Direction's strategy was stronger because their fanbase (Directioners) created organic viral content that no marketing budget could replicate..."></textarea>
+      </div>
+
+      <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-3">
+          <span class="text-3xl">📱</span>
+          <div><div class="font-black text-navy">"Adele doesn't need social media — her music sells itself. Most artists should follow her approach."</div><div class="text-slate-500 text-sm mt-1">What's your stance? Write 3 sentences.</div></div>
+        </div>
+        <div class="bg-amber-100 border border-amber-300 rounded-xl p-3 mb-3 text-xs text-amber-800">
+          <strong>Starters:</strong> "I strongly believe..." / "I see where you're coming from, but..." / "Actually, I think..."
+        </div>
+        <textarea rows="4" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="I strongly believe Adele's approach works because of her extraordinary talent, but most artists don't have that level of recognition..."></textarea>
+      </div>
+
+      <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-6">
+        <div class="flex items-start gap-3 mb-3">
+          <span class="text-3xl">🚀</span>
+          <div><div class="font-black text-navy">"For a marketing professional in Brazil, learning English is more important than any digital tool."</div><div class="text-slate-500 text-sm mt-1">This one is personal! Write 3 sentences defending your view.</div></div>
+        </div>
+        <div class="bg-amber-100 border border-amber-300 rounded-xl p-3 mb-3 text-xs text-amber-800">
+          <strong>Starters:</strong> "From my perspective..." / "That's a valid point because..." / "I couldn't agree more because..."
+        </div>
+        <textarea rows="4" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="From my perspective, English is essential in digital marketing because most platforms, tools, and global content are in English..."></textarea>
+      </div>
+    </div>
+
+    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 mt-5">
+      <div class="font-black text-rose-700 text-sm mb-2">🗣️ Remember to use:</div>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">In my opinion...</span>
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">I strongly believe...</span>
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">That's a fair point...</span>
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">I beg to differ...</span>
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">You have a point, but...</span>
+        <span class="bg-white border border-rose-200 text-rose-700 px-2 py-1 rounded-full font-semibold">Let's agree to disagree!</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="lesson-engine.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'perspective',pt:'perspectiva',emoji:'👁️',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'From my perspective, this strategy works.'},
+  {en:'viewpoint',pt:'ponto de vista',emoji:'🔍',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'I respect your viewpoint on this.'},
+  {en:'statement',pt:'declaração',emoji:'📢',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'That\'s a very strong statement.'},
+  {en:'debate',pt:'debate',emoji:'⚖️',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'We had a great debate about the best series.'},
+  {en:'argument',pt:'argumento',emoji:'💬',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'Her argument was very convincing.'},
+  {en:'criticism',pt:'crítica',emoji:'🎯',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'Constructive criticism is always welcome.'},
+  {en:'feedback',pt:'feedback',emoji:'📝',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'I appreciate your honest feedback.'},
+  {en:'insight',pt:'insight',emoji:'💡',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'She gave me a great insight about marketing.'},
+  {en:'stance',pt:'posição',emoji:'🧍',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'What\'s your stance on this issue?'},
+  {en:'valid',pt:'válido',emoji:'✅',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'That\'s a very valid point.'},
+  {en:'bias',pt:'viés',emoji:'⚠️',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'Try to avoid bias in your analysis.'},
+  {en:'evidence',pt:'evidência',emoji:'🔍',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'Do you have evidence to support that?'},
+  {en:'conclusion',pt:'conclusão',emoji:'🏁',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'What\'s your conclusion after watching Elite?'},
+  {en:'persuade',pt:'persuadir',emoji:'🗣️',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'She managed to persuade me to watch Lucifer.'},
+  {en:'controversial',pt:'controverso',emoji:'🔥',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'That\'s a controversial opinion!'},
+  {en:'neutral',pt:'neutro',emoji:'⚖️',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'I\'m trying to stay neutral in this debate.'},
+  {en:'acknowledge',pt:'reconhecer',emoji:'🤝',bg:'bg-rose-50 border-rose-200',dot:'bg-rose-400',ex:'I acknowledge that you have a good point.'},
+  {en:'counterargument',pt:'contra-argumento',emoji:'↩️',bg:'bg-pink-50 border-pink-200',dot:'bg-pink-400',ex:'His counterargument was very strong.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"I see where you're coming from",pt:"Entendo de onde você está vindo / entendo sua perspectiva",emoji:"🤝",example:"I see where you're coming from, but I still think Elite has better storytelling than Friends.",meaning:"You understand someone's point of view even if you don't agree with it."},
+  {expr:"That's a fair point",pt:"Esse é um ponto válido / tem razão nisso",emoji:"✅",example:"That's a fair point — Katy Perry's visual marketing has always been incredibly strong.",meaning:"Acknowledging that someone has made a good or reasonable argument."},
+  {expr:"I beg to differ",pt:"Permito-me discordar / com todo respeito, discordo",emoji:"↩️",example:"I beg to differ — I think One Direction had the most powerful fan engagement strategy in pop history.",meaning:"A polite and formal way to say you disagree."},
+  {expr:"Let's agree to disagree",pt:"Vamos concordar em discordar",emoji:"🤝",example:"We've both made valid points about Friends vs. House of the Dragon — let's agree to disagree!",meaning:"Accept that you and the other person have different opinions and won't change each other's minds."},
+];
+
+const PRACTICE = [
+  {q:"Which phrase is used to give a personal opinion?",opts:["Let's agree to disagree","In my opinion...","I beg to differ","That's a fair point"],a:"In my opinion...",rule:"Opinions: In my opinion..."},
+  {q:"Ana says: 'I beg to differ — The Office is funnier than Friends.' Ana is ___.",opts:["agreeing","giving evidence","disagreeing politely","summarizing"],a:"disagreeing politely",rule:"I beg to differ = polite disagreement"},
+  {q:"'That's a fair point' means:",opts:["I completely disagree","You've made a valid argument","I don't understand you","You are wrong"],a:"You've made a valid argument",rule:"Expression: that's a fair point"},
+  {q:"'Controversial' means:",opts:["very popular everywhere","causing strong disagreement","completely neutral","very boring"],a:"causing strong disagreement",rule:"Vocabulary: controversial"},
+  {q:"Which phrase shows partial agreement (conceding)?",opts:["I strongly believe...","I beg to differ","You have a point, but...","That's not true at all"],a:"You have a point, but...",rule:"Conceding: you have a point, but..."},
+  {q:"'Let's agree to disagree' is used when:",opts:["you want to win the argument","both sides accept they have different views","you completely change your mind","you need more evidence"],a:"both sides accept they have different views",rule:"Expression: agree to disagree"},
+  {q:"To 'persuade' someone means:",opts:["to confuse them","to make them believe or do something","to criticize them harshly","to give neutral information"],a:"to make them believe or do something",rule:"Vocabulary: persuade"},
+  {q:"'Bias' means:",opts:["a completely neutral view","a preference that affects fairness","strong factual evidence","a logical conclusion"],a:"a preference that affects fairness",rule:"Vocabulary: bias"},
+  {q:"Which is the most polite way to disagree?",opts:["You're completely wrong!","That's a ridiculous idea!","Actually, I see it a bit differently...","I don't care about your view"],a:"Actually, I see it a bit differently...",rule:"Polite disagreement"},
+  {q:"What does 'acknowledge' mean?",opts:["to completely ignore","to recognize or admit something","to argue aggressively","to stay neutral always"],a:"to recognize or admit something",rule:"Vocabulary: acknowledge"},
+];
+
+const SPEAK = [
+  {text:"<strong class='text-rose-600'>In my opinion</strong>, Katy Perry is one of the most creative artists in pop music history."},
+  {text:"I <strong class='text-rose-600'>strongly believe</strong> that consistent social media presence is the key to success."},
+  {text:"I see <strong class='text-rose-600'>where you're coming from</strong>, but I think Elite has a more original plot than Friends."},
+  {text:"<strong class='text-rose-600'>That's a fair point</strong> — House of the Dragon does have incredible production value."},
+  {text:"Personally, I think One Direction had the most loyal <strong class='text-rose-600'>fanbase</strong> in music history."},
+  {text:"I <strong class='text-rose-600'>beg to differ</strong> — James Arthur's voice is more powerful than most artists today."},
+  {text:"We've discussed this for a while — maybe we should <strong class='text-rose-600'>agree to disagree</strong>."},
+  {text:"From a marketing <strong class='text-rose-600'>perspective</strong>, Adele's comeback strategy in 2021 was absolutely brilliant."},
+];
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
+  totalSections: 6,
+  accentColor: 'rose',
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE,
+  speak: SPEAK,
+});
+</script>
+</body>
+</html>

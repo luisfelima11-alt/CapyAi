@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 29 — Will vs Going To</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#6366f1,#3b82f6);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#6366f1;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-indigo-900 to-blue-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🔮</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;left:8%;animation-delay:.8s">✈️</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:15%;left:20%;animation-delay:1.4s">🎯</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:30%;animation-delay:.3s">📅</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:25%;animation-delay:1s">⏰</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:50%;right:10%;animation-delay:.5s">🗺️</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:3%;animation-delay:1.8s">🌟</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">🚀</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-400/30 rounded-full px-4 py-1 text-sm font-black text-indigo-300 mb-3">Aula 29</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🔮 Will vs<br><span class="text-indigo-300">Going To</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Master two ways to talk about the future — and know exactly when to use each one.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Plan</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Decide</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Travel</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Achieve</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+  <!-- VOCAB -->
+  <div id="tab-vocab" class="fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Flip each card to see the translation and example.</p></div>
+      <div class="text-right"><div class="text-2xl font-black text-indigo-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  </div>
+
+  <!-- EXPRESSIONS -->
+  <div id="tab-expressions" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+    <p class="text-slate-500 text-sm mb-6">Click to reveal the translation and meaning.</p>
+    <div class="grid gap-4" id="expr-grid"></div>
+  </div>
+
+  <!-- GRAMMAR -->
+  <div id="tab-grammar" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Grammar: Will vs Going To</h2>
+    <p class="text-slate-500 text-sm mb-6">Two future forms — each with a specific purpose.</p>
+    <div class="space-y-4 mb-8">
+
+      <div class="rounded-2xl border-2 border-indigo-200 bg-indigo-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-indigo-500 text-white font-black text-sm flex items-center justify-center">1</span>
+            <div><div class="font-black text-navy">WILL</div><div class="text-indigo-600 text-sm font-semibold">Spontaneous decisions · predictions · promises · offers</div></div>
+          </div>
+          <span class="material-symbols-outlined text-indigo-400 transition-transform" id="g1-arrow">expand_more</span>
+        </button>
+        <div id="g1" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-indigo-700">Spontaneous:</strong> "I'm hungry. I'll order a pizza." <span class="text-slate-400">(decided right now)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-indigo-700">Prediction:</strong> "I think it will rain tomorrow." <span class="text-slate-400">(just an opinion)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-indigo-700">Promise:</strong> "I promise I'll call you tonight."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-indigo-700">Offer:</strong> "Don't worry, I'll help you."</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-blue-500 text-white font-black text-sm flex items-center justify-center">2</span>
+            <div><div class="font-black text-navy">GOING TO</div><div class="text-blue-600 text-sm font-semibold">Plans already made · evidence-based predictions</div></div>
+          </div>
+          <span class="material-symbols-outlined text-blue-400 transition-transform" id="g2-arrow">expand_more</span>
+        </button>
+        <div id="g2" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">Plan already made:</strong> "She's going to travel to London — she already booked the flight."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">Evidence-based prediction:</strong> "Look at those clouds! It's going to rain." <span class="text-slate-400">(you can see the evidence)</span></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0 mt-1.5"></span><span><strong class="text-blue-700">Intention already decided:</strong> "I'm going to study abroad — I've already applied."</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-violet-200 bg-violet-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-violet-500 text-white font-black text-sm flex items-center justify-center">3</span>
+            <div><div class="font-black text-navy">GONNA</div><div class="text-violet-600 text-sm font-semibold">Informal spoken English & music</div></div>
+          </div>
+          <span class="material-symbols-outlined text-violet-400 transition-transform" id="g3-arrow">expand_more</span>
+        </button>
+        <div id="g3" class="px-5 pb-5 hidden">
+          <div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <p class="text-slate-600"><strong class="text-violet-700">gonna</strong> = going to (spoken/informal only — NEVER use in formal writing!)</p>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span>"I'm <strong class="text-violet-700">gonna</strong> call you later." = "I'm <strong>going to</strong> call you later."</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span>"She's <strong class="text-violet-700">gonna</strong> make it." = "She is <strong>going to</strong> make it."</span></div>
+            <div class="mt-2 bg-violet-50 border border-violet-200 rounded-lg p-3 text-xs text-violet-700">🎵 You'll hear "gonna" all the time in songs by Shawn Mendes, Adele, Katy Perry — it's natural spoken English!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="rounded-2xl border-2 border-slate-200 bg-white p-6">
+      <h3 class="font-black text-navy text-lg mb-4">⚡ Quick Reference</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="border-b-2 border-slate-100"><th class="text-left py-2 pr-4 text-slate-500 font-black">Use</th><th class="text-left py-2 pr-4 text-indigo-600 font-black">WILL</th><th class="text-left py-2 text-blue-600 font-black">GOING TO</th></tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr><td class="py-2 pr-4 text-slate-600">Spontaneous decision</td><td class="py-2 pr-4 text-indigo-600">✅ Yes</td><td class="py-2 text-slate-400">❌ No</td></tr>
+            <tr><td class="py-2 pr-4 text-slate-600">Plan already made</td><td class="py-2 pr-4 text-slate-400">❌ No</td><td class="py-2 text-blue-600">✅ Yes</td></tr>
+            <tr><td class="py-2 pr-4 text-slate-600">Promise / Offer</td><td class="py-2 pr-4 text-indigo-600">✅ Yes</td><td class="py-2 text-slate-400">❌ No</td></tr>
+            <tr><td class="py-2 pr-4 text-slate-600">Evidence-based prediction</td><td class="py-2 pr-4 text-slate-400">❌ No</td><td class="py-2 text-blue-600">✅ Yes</td></tr>
+            <tr><td class="py-2 pr-4 text-slate-600">General prediction / opinion</td><td class="py-2 pr-4 text-indigo-600">✅ Yes</td><td class="py-2 text-slate-400">possible</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRACTICE -->
+  <div id="tab-practice" class="fade-in hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions — will or going to?</p></div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div class="text-2xl font-black text-indigo-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+        <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+      </div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div id="practice-area"></div>
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+        <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+        <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+        <div class="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+        <div class="flex gap-3">
+          <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+          <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEAK -->
+  <div id="tab-speak" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+    <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat it aloud.</p>
+    <div class="space-y-3" id="speak-grid"></div>
+  </div>
+
+  <!-- CHALLENGE -->
+  <div id="tab-challenge" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">🎯 Music & Pronunciation Challenge</h2>
+    <p class="text-slate-500 text-sm mb-6">Shawn Mendes · Adele · The Future in Music</p>
+
+    <!-- Pronunciation Tip -->
+    <div class="border-2 border-amber-400 bg-amber-50/40 rounded-2xl p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="text-4xl">🎵</div>
+        <div>
+          <h3 class="font-black text-navy text-lg mb-2">Pronunciation Tip: <span class="text-amber-600">gonna</span></h3>
+          <p class="text-slate-600 text-sm mb-3">In natural spoken English and in songs, <strong class="text-amber-600">"going to"</strong> becomes <strong class="text-amber-600">"gonna"</strong>. This is completely natural — but only in informal speech, never in formal writing.</p>
+          <div class="grid sm:grid-cols-2 gap-2 text-sm">
+            <div class="bg-white border border-amber-200 rounded-xl p-3">
+              <div class="text-slate-400 text-xs font-bold mb-1">INFORMAL / SPOKEN</div>
+              <div class="font-black text-amber-700">"I'm gonna be okay."</div>
+            </div>
+            <div class="bg-white border border-amber-200 rounded-xl p-3">
+              <div class="text-slate-400 text-xs font-bold mb-1">FORMAL / WRITTEN</div>
+              <div class="font-black text-navy">"I am going to be okay."</div>
+            </div>
+          </div>
+          <p class="text-amber-700 text-xs mt-3 font-semibold">🎤 You'll hear "gonna" in almost every pop song — by Shawn Mendes, Adele, Katy Perry and One Direction!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fill in the blank -->
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-6">
+      <h3 class="font-black text-navy text-lg mb-1">📝 Fill in the Blank</h3>
+      <p class="text-slate-500 text-sm mb-5">Complete with <strong class="text-indigo-600">WILL</strong> or <strong class="text-blue-600">GOING TO</strong>. Think carefully about the context!</p>
+      <div class="space-y-4" id="fill-blanks"></div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="lesson-engine.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'schedule',pt:'horário',emoji:'📅',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'I need to check my schedule first.'},
+  {en:'commitment',pt:'compromisso',emoji:'🤝',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'She takes her commitments seriously.'},
+  {en:'destination',pt:'destino',emoji:'🗺️',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'Paris is my dream destination.'},
+  {en:'deadline',pt:'prazo',emoji:'⏰',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'The deadline is next Friday.'},
+  {en:'ambition',pt:'ambição',emoji:'🚀',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'His ambition is to work in marketing.'},
+  {en:'forecast',pt:'previsão',emoji:'🔭',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'The forecast says rain this weekend.'},
+  {en:'arrangement',pt:'arranjo',emoji:'📋',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'We made travel arrangements last week.'},
+  {en:'resolution',pt:'resolução',emoji:'💪',bg:'bg-indigo-50 border-indigo-200',dot:'bg-indigo-400',ex:'My resolution is to travel more.'},
+  {en:'spontaneous',pt:'espontâneo',emoji:'⚡',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'He made a spontaneous decision to call.'},
+  {en:'prediction',pt:'previsão',emoji:'🔮',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'My prediction is that she will succeed.'},
+  {en:'intention',pt:'intenção',emoji:'🎯',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'My intention is to study every day.'},
+  {en:'confirm',pt:'confirmar',emoji:'✅',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'Please confirm your reservation.'},
+  {en:'postpone',pt:'adiar',emoji:'⏸️',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'We had to postpone the trip.'},
+  {en:'volunteer',pt:'voluntário',emoji:'🙋',bg:'bg-blue-50 border-blue-200',dot:'bg-blue-400',ex:'She volunteered to help the team.'},
+  {en:'anticipate',pt:'antecipar',emoji:'👁️',bg:'bg-violet-50 border-violet-200',dot:'bg-violet-400',ex:'I anticipate great results this year.'},
+  {en:'prioritize',pt:'priorizar',emoji:'📊',bg:'bg-violet-50 border-violet-200',dot:'bg-violet-400',ex:'You should prioritize your goals.'},
+  {en:'fulfillment',pt:'realização',emoji:'🏆',bg:'bg-violet-50 border-violet-200',dot:'bg-violet-400',ex:'Career fulfillment is very important.'},
+  {en:'adventure',pt:'aventura',emoji:'🗺️',bg:'bg-violet-50 border-violet-200',dot:'bg-violet-400',ex:'Life is a great adventure!'},
+];
+
+const EXPRESSIONS = [
+  {expr:"Play it by ear",pt:"Improvisar / ver o que acontece",emoji:"🎵",example:"I don't have fixed plans for the weekend — I'll just play it by ear.",meaning:"Decide what to do as things happen, without a fixed plan."},
+  {expr:"Hit the ground running",pt:"Começar com energia e eficiência",emoji:"🏃",example:"When she starts the new job, she'll definitely hit the ground running.",meaning:"Start something energetically and efficiently with no warm-up needed."},
+  {expr:"The ball is in your court",pt:"A decisão é sua / a bola está no seu campo",emoji:"🎾",example:"I sent the proposal — the ball is in your court now.",meaning:"It's your turn to make a decision or take action."},
+  {expr:"Take it one step at a time",pt:"Um passo de cada vez",emoji:"👣",example:"Don't stress about the whole project — just take it one step at a time.",meaning:"Deal with things gradually rather than trying to do everything at once."},
+];
+
+const PRACTICE = [
+  {q:"I'm hungry. I ___ order a pizza.",opts:["will","am going to","might","should"],a:"will",rule:"WILL = spontaneous decision (decided right now)"},
+  {q:"Look at those clouds! It ___ rain.",opts:["will","is going to","might","should"],a:"is going to",rule:"GOING TO = prediction with visible evidence"},
+  {q:"She ___ visit Paris next month — she already booked the flight.",opts:["will","is going to","might","could"],a:"is going to",rule:"GOING TO = plan already made"},
+  {q:"I promise I ___ call you tonight.",opts:["will","am going to","might","could"],a:"will",rule:"WILL = promise"},
+  {q:"What does 'postpone' mean?",opts:["to delay to a later time","to cancel permanently","to confirm something","to rush forward"],a:"to delay to a later time",rule:"Vocabulary: postpone"},
+  {q:"'Spontaneous' means:",opts:["planned carefully in advance","happening naturally without a plan","boring and predictable","absolutely necessary"],a:"happening naturally without a plan",rule:"Vocabulary: spontaneous"},
+  {q:"'The ball is in your court' means:",opts:["I made a mistake","it's your turn to decide or act","I'm playing sports","I'm confused about something"],a:"it's your turn to decide or act",rule:"Expression: the ball is in your court"},
+  {q:"I ___ study harder this semester — I already signed up for extra classes.",opts:["will","am going to","might","should"],a:"am going to",rule:"GOING TO = decision/plan already made"},
+  {q:"Don't worry — I ___ help you with the presentation.",opts:["will","am going to","might","must"],a:"will",rule:"WILL = offer or promise"},
+  {q:"'Gonna' is the informal spoken version of:",opts:["will","going to","might","should"],a:"going to",rule:"gonna = going to (informal speech and songs)"},
+];
+
+const SPEAK = [
+  {text:"I <strong class='text-indigo-600'>will</strong> call you back in five minutes — I promise."},
+  {text:"She <strong class='text-blue-600'>is going to</strong> travel to London next month — she already has the tickets."},
+  {text:"Look at the traffic! We <strong class='text-indigo-600'>are going to</strong> be late for the meeting."},
+  {text:"I'm tired — I think I <strong class='text-blue-600'>will</strong> go to bed early tonight."},
+  {text:"They <strong class='text-indigo-600'>are going to</strong> launch a new marketing campaign next week."},
+  {text:"Don't worry — I <strong class='text-blue-600'>will</strong> help you finish the presentation."},
+  {text:"She <strong class='text-indigo-600'>is going to</strong> study abroad — she's already applied to the university."},
+  {text:"It's really hot in here. I <strong class='text-blue-600'>will</strong> open the window."},
+];
+
+// Challenge fill-in blanks
+const BLANKS = [
+  {sentence:"In songs about heartbreak, the narrator often feels like the pain ___ stay with them — they can already feel it building.",answer:"is going to",hint:"Evidence-based prediction — they can feel it now."},
+  {sentence:"When an artist announces a tour months in advance, they are saying: 'I ___ perform in your city!'",answer:"am going to",hint:"Plan already made in advance."},
+  {sentence:"If you hear your favorite song unexpectedly on the radio, you ___ feel happy instantly — it just happens that way.",answer:"will",hint:"Spontaneous reaction — not planned."},
+  {sentence:"When an artist makes a promise to their fans: 'I ___ always be honest in my music.'",answer:"will",hint:"WILL = promise."},
+  {sentence:"When a singer commits to their art: 'I ___ keep releasing music as long as it connects with people.'",answer:"will",hint:"WILL = strong commitment/promise."},
+];
+
+function buildBlanks() {
+  const container = document.getElementById('fill-blanks');
+  BLANKS.forEach((b, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5 hover:border-amber-300 transition-colors';
+    div.innerHTML = `
+      <p class="text-navy font-semibold text-sm leading-relaxed mb-3">${i+1}. "${b.sentence}"</p>
+      <div class="flex items-center gap-3 flex-wrap">
+        <div id="ans-${i}" class="hidden bg-amber-100 border border-amber-300 text-amber-800 font-black px-4 py-2 rounded-xl text-sm">✅ ${b.answer}</div>
+        <div id="hint-${i}" class="hidden text-slate-500 text-xs italic">${b.hint}</div>
+        <button onclick="showAnswer(${i})" id="btn-${i}" class="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs px-4 py-2 rounded-xl transition-all hover:scale-105">Show Answer</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function showAnswer(i) {
+  document.getElementById('ans-' + i).classList.remove('hidden');
+  document.getElementById('hint-' + i).classList.remove('hidden');
+  document.getElementById('btn-' + i).style.display = 'none';
+}
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
+  totalSections: 6,
+  accentColor: 'indigo',
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE,
+  speak: SPEAK,
+});
+
+buildBlanks();
+</script>
+</body>
+</html>

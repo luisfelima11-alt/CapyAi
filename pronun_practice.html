@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pronunciation Practice — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  /* Mic pulse ring */
+  @keyframes mic-pulse {
+    0%   { box-shadow: 0 0 0 0   rgba(236,72,153,0.7); }
+    70%  { box-shadow: 0 0 0 24px rgba(236,72,153,0); }
+    100% { box-shadow: 0 0 0 0   rgba(236,72,153,0); }
+  }
+  .mic-listening { animation: mic-pulse 1.1s ease infinite; }
+
+  /* Sound wave bars */
+  @keyframes wave { 0%,100%{height:6px} 50%{height:28px} }
+  .bar { display:inline-block; width:5px; border-radius:3px; background:#ec4899;
+         animation: wave 0.7s ease infinite; margin:0 2px; }
+  .bar:nth-child(2){animation-delay:.1s}
+  .bar:nth-child(3){animation-delay:.2s}
+  .bar:nth-child(4){animation-delay:.1s}
+  .bar:nth-child(5){animation-delay:.15s}
+
+  /* Result ring */
+  @keyframes ring-appear { from{stroke-dashoffset:220} to{stroke-dashoffset:var(--offset)} }
+  .score-ring { animation: ring-appear 1s ease forwards; animation-delay: 0.2s; }
+
+  /* Card flip-in */
+  @keyframes flipIn { from{opacity:0;transform:rotateY(-30deg) scale(0.9)} to{opacity:1;transform:rotateY(0) scale(1)} }
+  .flip-in { animation: flipIn 0.45s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  /* Star pop */
+  @keyframes star-pop { 0%{transform:scale(0)rotate(-20deg)} 70%{transform:scale(1.3)rotate(5deg)} 100%{transform:scale(1)rotate(0)} }
+  .star-pop { animation: star-pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+  /* Confetti */
+  @keyframes spark { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
+  .spark { position:fixed; width:8px; height:8px; border-radius:50%; animation:spark 0.9s ease forwards; pointer-events:none; z-index:9999; }
+
+  /* Progress bar */
+  #prog-fill { transition: width 0.5s ease; }
+</style>
+</head>
+<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
+  <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-teal-400/50 flex-shrink-0 shadow-md">
+    <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+  </div>
+  <div>
+    <p class="font-label text-xs text-pink-400 uppercase tracking-widest font-bold">Pronunciation Practice</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Say it like Yara! 🎤</h1>
+  </div>
+  <div class="ml-auto flex items-center gap-3">
+    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+      <span id="score-display">0</span> pts
+    </div>
+  </div>
+</header>
+
+<!-- Progress -->
+<div class="h-1.5 bg-white/10 flex-shrink-0">
+  <div id="prog-fill" class="h-full bg-gradient-to-r from-pink-500 to-purple-500 w-0"></div>
+</div>
+
+<!-- Main -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-8 gap-8">
+
+  <!-- Word card -->
+  <div id="word-card" class="flip-in w-full max-w-md bg-surface-container border border-white/10 rounded-[2rem] p-10 text-center shadow-2xl relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5 pointer-events-none"
+         style="background-image:radial-gradient(circle at 2px 2px,#fff 1px,transparent 0);background-size:24px 24px;"></div>
+    <p class="font-label text-xs text-pink-400 uppercase tracking-widest font-bold mb-4" id="round-label">Word 1 of 10</p>
+    <div class="text-7xl mb-4" id="word-emoji">🌿</div>
+    <h2 class="font-headline text-6xl font-black text-white mb-2" id="word-display">Apple</h2>
+    <p class="font-body text-pink-300 text-xl mb-2" id="word-pron">/ˈæp.əl/</p>
+    <p class="font-label text-slate-400 text-sm" id="word-hint">A red or green fruit 🍎</p>
+
+    <!-- Hear button -->
+    <button onclick="speakWord()" id="hear-btn"
+            class="mt-6 flex items-center gap-2 mx-auto bg-white/10 hover:bg-white/20 text-white font-label font-bold text-sm px-5 py-2.5 rounded-full border border-white/20 active:scale-95 transition-all">
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
+      Hear it
+    </button>
+  </div>
+
+  <!-- Mic area -->
+  <div class="flex flex-col items-center gap-4">
+    <!-- Wave bars (hidden when not listening) -->
+    <div id="wave-bars" class="hidden flex items-end justify-center gap-0.5 h-8">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div>
+    </div>
+
+    <!-- Mic button -->
+    <button id="mic-btn" onclick="toggleMic()"
+            class="w-28 h-28 rounded-full bg-pink-500 flex items-center justify-center shadow-xl shadow-pink-500/30
+                   hover:bg-pink-400 active:scale-90 transition-all">
+      <span class="material-symbols-outlined text-white text-5xl" id="mic-icon" style="font-variation-settings:'FILL' 1;">mic</span>
+    </button>
+    <p id="mic-label" class="font-label text-slate-400 text-sm">Tap the mic and say the word!</p>
+  </div>
+
+  <!-- Result panel (hidden until spoken) -->
+  <div id="result-panel" class="hidden w-full max-w-md flip-in">
+    <!-- Score ring + grade -->
+    <div class="flex items-center gap-6 bg-surface-container border border-white/10 rounded-2xl p-6 mb-4">
+      <!-- SVG ring -->
+      <div class="relative flex-shrink-0 w-20 h-20">
+        <svg viewBox="0 0 80 80" class="w-full h-full -rotate-90">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+          <circle id="score-ring" cx="40" cy="40" r="34" fill="none" stroke-width="8"
+                  stroke-linecap="round" stroke-dasharray="213" stroke-dashoffset="213"
+                  class="score-ring" style="--offset:213;"/>
+        </svg>
+        <span id="ring-pct" class="absolute inset-0 flex items-center justify-center font-headline font-black text-xl text-white">0%</span>
+      </div>
+      <div>
+        <p class="font-label text-xs text-slate-400 uppercase tracking-widest mb-1">You said:</p>
+        <p id="heard-text" class="font-headline text-2xl font-bold text-white mb-1">"…"</p>
+        <div id="stars-row" class="flex gap-1"></div>
+      </div>
+    </div>
+
+    <!-- Feedback message -->
+    <div id="result-msg" class="text-center font-label font-bold text-lg rounded-xl px-6 py-3 mb-4"></div>
+
+    <!-- Next / retry -->
+    <div class="flex gap-3 justify-center">
+      <button onclick="retryWord()" id="retry-btn"
+              class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+        Try Again 🔄
+      </button>
+      <button onclick="nextWord()" id="next-btn"
+              class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-emerald-500/30">
+        Next Word →
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Word list ──────────────────────────────────────────────────────────────────
+const WORDS = [
+  { word:'Apple',      pron:'/ˈæp.əl/',      emoji:'🍎', hint:'A sweet red or green fruit' },
+  { word:'River',      pron:'/ˈrɪv.ər/',     emoji:'🌊', hint:'Water that flows through the forest' },
+  { word:'Bird',       pron:'/bɜːrd/',        emoji:'🐦', hint:'An animal with wings that can fly' },
+  { word:'Tree',       pron:'/triː/',         emoji:'🌳', hint:'A tall plant with branches' },
+  { word:'Sun',        pron:'/sʌn/',          emoji:'☀️', hint:'The big bright star in the sky' },
+  { word:'Flower',     pron:'/ˈflaʊ.ər/',    emoji:'🌸', hint:'A pretty plant that blooms' },
+  { word:'Butterfly',  pron:'/ˈbʌt.ər.flaɪ/', emoji:'🦋', hint:'A beautiful insect with colourful wings' },
+  { word:'Happy',      pron:'/ˈhæp.i/',      emoji:'😊', hint:'How you feel when things are good' },
+  { word:'Yellow',     pron:'/ˈjel.oʊ/',     emoji:'💛', hint:'The colour of the sun' },
+  { word:'Jump',       pron:'/dʒʌmp/',       emoji:'🦘', hint:'To leap up into the air' },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentIdx = 0;
+let score      = 0;
+let recognition = null;
+let isListening = false;
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+renderWord();
+
+function renderWord() {
+  const w = WORDS[currentIdx];
+  document.getElementById('round-label').textContent  = `Word ${currentIdx + 1} of ${WORDS.length}`;
+  document.getElementById('word-emoji').textContent   = w.emoji;
+  document.getElementById('word-display').textContent = w.word;
+  document.getElementById('word-pron').textContent    = w.pron;
+  document.getElementById('word-hint').textContent    = w.hint;
+  document.getElementById('prog-fill').style.width    = `${(currentIdx / WORDS.length) * 100}%`;
+
+  // Reset UI
+  document.getElementById('result-panel').classList.add('hidden');
+  document.getElementById('mic-label').textContent = 'Tap the mic and say the word!';
+  document.getElementById('mic-icon').textContent  = 'mic';
+  document.getElementById('mic-btn').className = 'w-28 h-28 rounded-full bg-pink-500 flex items-center justify-center shadow-xl shadow-pink-500/30 hover:bg-pink-400 active:scale-90 transition-all';
+  document.getElementById('wave-bars').classList.add('hidden');
+
+  // Animate card
+  const card = document.getElementById('word-card');
+  card.classList.remove('flip-in');
+  void card.offsetWidth;
+  card.classList.add('flip-in');
+}
+
+// ── Hear the word ──────────────────────────────────────────────────────────────
+function speakWord() {
+  if (!window.speechSynthesis) return;
+  const utt = new SpeechSynthesisUtterance(WORDS[currentIdx].word);
+  utt.lang = 'en-US'; utt.rate = 0.8; utt.pitch = 1.1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+// ── Mic toggle ─────────────────────────────────────────────────────────────────
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showNoMicMsg();
+    return;
+  }
+  if (isListening) { recognition?.stop(); return; }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang           = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('mic-icon').textContent  = 'stop';
+    document.getElementById('mic-btn').classList.add('mic-listening');
+    document.getElementById('wave-bars').classList.remove('hidden');
+    document.getElementById('wave-bars').classList.add('flex');
+    document.getElementById('mic-label').textContent = 'Listening… say the word!';
+  };
+
+  recognition.onresult = e => {
+    // Grab all alternatives
+    const alts = [];
+    for (let i = 0; i < e.results[0].length; i++) {
+      alts.push(e.results[0][i].transcript.trim().toLowerCase());
+    }
+    processResult(alts);
+  };
+
+  recognition.onerror = () => stopMic();
+  recognition.onend   = () => stopMic();
+  recognition.start();
+}
+
+function stopMic() {
+  isListening = false;
+  document.getElementById('mic-icon').textContent = 'mic';
+  document.getElementById('mic-btn').classList.remove('mic-listening');
+  document.getElementById('wave-bars').classList.add('hidden');
+  document.getElementById('wave-bars').classList.remove('flex');
+  document.getElementById('mic-label').textContent = 'Tap the mic and say the word!';
+}
+
+// ── Score the attempt ──────────────────────────────────────────────────────────
+function processResult(alternatives) {
+  stopMic();
+  const target    = WORDS[currentIdx].word.toLowerCase();
+  const best      = alternatives[0] || '';
+  const exactMatch = alternatives.some(a => a === target);
+  const closeMatch = alternatives.some(a =>
+    a.includes(target) || target.includes(a) || similarity(a, target) >= 0.7
+  );
+
+  let pct, grade, msg, pts;
+  if (exactMatch) {
+    pct = 100; grade = 'Perfect!'; pts = 20;
+    msg = `🌟 Amazing! You said "${WORDS[currentIdx].word}" perfectly!`;
+  } else if (closeMatch) {
+    pct = 75;  grade = 'Great!';   pts = 12;
+    msg = `👍 Really good! Almost perfect — keep practising!`;
+  } else if (similarity(best, target) >= 0.5) {
+    pct = 50;  grade = 'Good Try'; pts = 6;
+    msg = `😊 Good try! The word is "${WORDS[currentIdx].word}". Try again!`;
+  } else {
+    pct = 20;  grade = 'Try Again'; pts = 0;
+    msg = `🌿 Don't worry! Press "Hear it" first, then try saying "${WORDS[currentIdx].word}"`;
+  }
+
+  score += pts;
+  document.getElementById('score-display').textContent = score;
+  showResult(best, pct, grade, msg, pts > 0);
+}
+
+// ── Simple string similarity (Dice coefficient) ────────────────────────────────
+function similarity(a, b) {
+  if (a === b) return 1;
+  if (a.length < 2 || b.length < 2) return 0;
+  const aBigrams = new Map();
+  for (let i = 0; i < a.length - 1; i++) {
+    const bigram = a.slice(i, i + 2);
+    aBigrams.set(bigram, (aBigrams.get(bigram) || 0) + 1);
+  }
+  let intersect = 0;
+  for (let i = 0; i < b.length - 1; i++) {
+    const bigram = b.slice(i, i + 2);
+    if ((aBigrams.get(bigram) || 0) > 0) {
+      aBigrams.set(bigram, aBigrams.get(bigram) - 1);
+      intersect++;
+    }
+  }
+  return (2 * intersect) / (a.length + b.length - 2);
+}
+
+// ── Show result panel ──────────────────────────────────────────────────────────
+function showResult(heard, pct, grade, msg, isGood) {
+  document.getElementById('heard-text').textContent = `"${heard || '?'}"`;
+
+  // Ring
+  const circumference = 213;
+  const offset = circumference - (pct / 100) * circumference;
+  const ring = document.getElementById('score-ring');
+  ring.style.setProperty('--offset', offset);
+  ring.style.strokeDashoffset = circumference; // reset
+  ring.stroke = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+  ring.setAttribute('stroke', pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444');
+  void ring.offsetWidth;
+  ring.style.strokeDashoffset = offset;
+  document.getElementById('ring-pct').textContent = pct + '%';
+
+  // Stars
+  const stars = pct >= 90 ? 3 : pct >= 60 ? 2 : 1;
+  document.getElementById('stars-row').innerHTML =
+    [1,2,3].map((i,idx) => `<span class="material-symbols-outlined text-xl star-pop ${i<=stars?'text-yellow-400':'text-white/20'}"
+         style="font-variation-settings:'FILL' 1;animation-delay:${idx*0.1}s">star</span>`).join('');
+
+  // Message
+  const fb = document.getElementById('result-msg');
+  fb.textContent = msg;
+  fb.className = `text-center font-label font-bold text-base rounded-xl px-6 py-3 mb-4 ${
+    pct >= 75 ? 'bg-emerald-500/20 text-emerald-300' :
+    pct >= 50 ? 'bg-yellow-500/20 text-yellow-300' :
+                'bg-red-500/20 text-red-300'}`;
+
+  document.getElementById('result-panel').classList.remove('hidden');
+
+  if (isGood) launchSparks();
+}
+
+function retryWord() {
+  document.getElementById('result-panel').classList.add('hidden');
+}
+
+function nextWord() {
+  currentIdx++;
+  if (currentIdx >= WORDS.length) {
+    showFinished();
+  } else {
+    renderWord();
+  }
+}
+
+// ── Finish screen ──────────────────────────────────────────────────────────────
+function showFinished() {
+  const maxScore = WORDS.length * 20;
+  const pct      = score / maxScore;
+  const xpEarned = Math.round(pct * 50) + 10;
+  const stars    = pct >= 0.85 ? 3 : pct >= 0.5 ? 2 : 1;
+
+  if (window.Store) {
+    Store.addXP(xpEarned);
+    Store.activateStreak();
+    Store.completeActivity('pronun_practice');
+    if (pct >= 0.8) Store.unlockBadge('fast_tracker');
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.innerHTML = `
+    <div id="fin-card" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-pink-500/60
+         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         scale-0 opacity-0 transition-all duration-500">
+      <div class="w-24 h-24 rounded-full flex items-center justify-center shadow-xl
+                  ${stars===3?'bg-yellow-400 shadow-yellow-400/40':stars===2?'bg-pink-500 shadow-pink-500/40':'bg-slate-600'}">
+        <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">
+          ${stars===3?'emoji_events':'mic'}
+        </span>
+      </div>
+      <div>
+        <p class="font-label text-pink-400 font-bold text-sm uppercase tracking-widest mb-1">Practice Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xpEarned} XP</h2>
+        <p class="font-body text-slate-300">Score: ${score} / ${maxScore} points</p>
+      </div>
+      <div class="flex gap-1">
+        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl star-pop ${i<=stars?'text-yellow-400':'text-white/20'}" style="font-variation-settings:'FILL' 1;animation-delay:${i*0.1}s">star</span>`).join('')}
+      </div>
+      <p class="font-body text-slate-400 text-sm">
+        ${pct>=0.8?'🏅 Fast Tracker badge unlocked! Excellent pronunciation!':
+          pct>=0.5?'Good work! Keep practising every day to improve! 🌿':
+                   'Don\'t give up! Use "Hear it" to learn the sounds. You\'ll get better! 💪'}
+      </p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Try Again 🔄</button>
+        <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="bg-pink-500 hover:bg-pink-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-pink-500/30">Home 🌿</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const c = document.getElementById('fin-card');
+    c.style.transform = 'scale(1)'; c.style.opacity = '1';
+  }));
+  launchSparks();
+}
+
+function showNoMicMsg() {
+  document.getElementById('mic-label').textContent = '⚠️ Microphone not supported in this browser. Try Chrome!';
+}
+
+function launchSparks() {
+  const colors = ['#ec4899','#10b981','#f59e0b','#a855f7','#3b82f6'];
+  for (let i = 0; i < 16; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const angle = (i/16)*360, dist = 60+Math.random()*80;
+    sp.style.setProperty('--tx', `${Math.cos(angle*Math.PI/180)*dist}px`);
+    sp.style.setProperty('--ty', `${Math.sin(angle*Math.PI/180)*dist}px`);
+    sp.style.background = colors[i%colors.length];
+    sp.style.left='50vw'; sp.style.top='55vh';
+    document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(), 950);
+  }
+}
+</script>
+</body>
+</html>

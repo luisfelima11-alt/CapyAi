@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 21 — Comparatives</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#10b981,#34d399);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#10b981;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none">
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">⚖️</span>
+      <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">📊</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:16%;animation-delay:1.3s">🏅</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:24%;animation-delay:.4s">🔍</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">📈</span>
+      <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:10%;animation-delay:1.6s">🥇</span>
+      <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">✨</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 rounded-full px-4 py-1 text-sm font-black text-emerald-300 mb-3">Aula 21</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">📊 Comparatives<br><span class="text-emerald-300">&amp; Comparisons</span></h1>
+      <p class="text-white/60 text-base mb-5">Learn how to compare people, places and things using short adjectives (-er), long adjectives (more/less) and irregular forms.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Adj + -er</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">More / Less</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Better / Worse</span>
+        <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Than</span>
+      </div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 pb-6">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1.5" id="section-dots"></div>
+        <span class="text-white/40 text-xs" id="section-label">0 / 5 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STICKY TABS -->
+  <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+      <div class="flex gap-0 min-w-max">
+        <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB: VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Adjectives commonly used in comparisons. Click to flip &amp; hear each one.</p></div>
+        <div class="text-right"><div class="text-2xl font-black text-emerald-600" id="vocab-count">0<span class="text-sm text-slate-400">/18</span></div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3" id="vocab-grid"></div>
+    </div>
+
+    <!-- TAB: EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+      <p class="text-slate-500 text-sm mb-6">4 comparison-themed idioms native speakers use daily.</p>
+      <div class="grid gap-4" id="expr-grid"></div>
+    </div>
+
+    <!-- TAB: GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Comparative Adjectives</h2>
+      <p class="text-slate-500 text-sm mb-6">Three rules to compare two things in English.</p>
+
+      <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 mb-5">
+        <p class="font-black text-navy mb-3">📌 Structure</p>
+        <div class="bg-white rounded-xl p-4 text-center mb-4">
+          <p class="text-xl font-black text-emerald-700">Subject + verb + <span class="text-emerald-500">comparative adjective</span> + <span class="text-teal-500">than</span> + object</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white rounded-xl p-3 text-center border border-emerald-100"><div class="text-[10px] font-black text-emerald-500 uppercase tracking-wider mb-1">Short adjectives</div><div class="text-sm font-bold text-navy">fast → <span class="text-emerald-600">faster</span></div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-emerald-100"><div class="text-[10px] font-black text-teal-500 uppercase tracking-wider mb-1">Long adjectives</div><div class="text-sm font-bold text-navy">more <span class="text-teal-600">expensive</span></div></div>
+          <div class="bg-white rounded-xl p-3 text-center border border-emerald-100"><div class="text-[10px] font-black text-cyan-500 uppercase tracking-wider mb-1">Irregular</div><div class="text-sm font-bold text-navy">good → <span class="text-cyan-600">better</span></div></div>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <!-- Rule 1 -->
+        <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g21r1')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">Short adjectives → add -ER + than</div><div class="text-emerald-600 text-sm">1–2 syllables (tall, fast, cheap, big, happy)</div></div></div>
+            <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g21r1-arrow">expand_more</span>
+          </button>
+          <div id="g21r1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></span><span>tall → <strong class="text-emerald-700">taller than</strong> &nbsp;|&nbsp; fast → <strong class="text-emerald-700">faster than</strong></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></span><span>big → <strong class="text-emerald-700">bigger than</strong> &nbsp;|&nbsp; happy → <strong class="text-emerald-700">happier than</strong></span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></span><span>cheap → <strong class="text-emerald-700">cheaper than</strong> &nbsp;|&nbsp; healthy → <strong class="text-emerald-700">healthier than</strong></span></div>
+            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-2"><p class="text-xs text-emerald-700">📝 Double the final consonant if the adjective ends in consonant-vowel-consonant: <strong>big → bigger, hot → hotter</strong></p></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="rounded-2xl border-2 border-teal-200 bg-teal-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g21r2')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-teal-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">Long adjectives → MORE / LESS + adjective + than</div><div class="text-teal-600 text-sm">3+ syllables (expensive, interesting, comfortable)</div></div></div>
+            <span class="material-symbols-outlined text-teal-400 transition-transform" id="g21r2-arrow">expand_more</span>
+          </button>
+          <div id="g21r2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></span><span>This phone is <strong class="text-teal-700">more expensive than</strong> the other one.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></span><span>Spanish is <strong class="text-teal-700">less difficult than</strong> Mandarin for English speakers.</span></div>
+            <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></span><span>This job is <strong class="text-teal-700">more interesting than</strong> my last one.</span></div>
+            <div class="bg-teal-50 border border-teal-200 rounded-lg p-3 mt-2"><p class="text-xs text-teal-700">📝 Never say <strong>more faster</strong> or <strong>more bigger</strong> — choose one rule only!</p></div>
+          </div></div>
+        </div>
+
+        <!-- Rule 3 -->
+        <div class="rounded-2xl border-2 border-cyan-200 bg-cyan-50 overflow-hidden">
+          <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g21r3')">
+            <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-cyan-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">Irregular comparatives</div><div class="text-cyan-600 text-sm">These don't follow the rules — memorise them!</div></div></div>
+            <span class="material-symbols-outlined text-cyan-400 transition-transform" id="g21r3-arrow">expand_more</span>
+          </button>
+          <div id="g21r3" class="px-5 pb-5 hidden">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-1">
+              <div class="bg-white border border-cyan-100 rounded-xl p-3 text-center"><div class="font-black text-slate-500 text-sm">good</div><div class="text-lg">→</div><div class="font-black text-cyan-600">better</div></div>
+              <div class="bg-white border border-cyan-100 rounded-xl p-3 text-center"><div class="font-black text-slate-500 text-sm">bad</div><div class="text-lg">→</div><div class="font-black text-cyan-600">worse</div></div>
+              <div class="bg-white border border-cyan-100 rounded-xl p-3 text-center"><div class="font-black text-slate-500 text-sm">far</div><div class="text-lg">→</div><div class="font-black text-cyan-600">further</div></div>
+              <div class="bg-white border border-cyan-100 rounded-xl p-3 text-center"><div class="font-black text-slate-500 text-sm">much/many</div><div class="text-lg">→</div><div class="font-black text-cyan-600">more</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border-2 border-slate-200 bg-white p-5 mb-5">
+        <h3 class="font-black text-navy text-base mb-3">🔍 Quick Spelling Rules</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3"><strong class="text-emerald-700">-e endings:</strong> just add -r &nbsp; <span class="text-slate-500">nice → nicer</span></div>
+          <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3"><strong class="text-emerald-700">-y endings:</strong> change to -ier &nbsp; <span class="text-slate-500">busy → busier</span></div>
+          <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3"><strong class="text-emerald-700">CVC pattern:</strong> double consonant &nbsp; <span class="text-slate-500">hot → hotter</span></div>
+          <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3"><strong class="text-emerald-700">2 syllables:</strong> either form works &nbsp; <span class="text-slate-500">clever → cleverer / more clever</span></div>
+        </div>
+      </div>
+
+      <button onclick="markSection()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">✓ Mark Grammar as Done</button>
+    </div>
+
+    <!-- TAB: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on comparatives, vocabulary and expressions.</p></div>
+        <div class="flex items-center gap-3">
+          <div class="text-center"><div class="text-2xl font-black text-emerald-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+          <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+        </div>
+      </div>
+      <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+      <div id="practice-area"></div>
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+          <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+          <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+          <div class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+          <div class="flex gap-3">
+            <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+            <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <h2 class="text-2xl font-black text-navy mb-2">Speak &amp; Practise</h2>
+      <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence. Repeat aloud using comparative adjectives. Check when done.</p>
+      <div class="space-y-3" id="speak-grid"></div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js"></script>
+<script src="lesson-engine.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'Beautiful',   pt:'Bonito/a',      emoji:'🌸', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'This city is more beautiful than I expected.'},
+  {en:'Expensive',   pt:'Caro/a',        emoji:'💎', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'This hotel is more expensive than the last.'},
+  {en:'Fast',        pt:'Rápido/a',      emoji:'⚡', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'Electric cars are getting faster every year.'},
+  {en:'Intelligent', pt:'Inteligente',   emoji:'🧠', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'She is more intelligent than most in the group.'},
+  {en:'Comfortable', pt:'Confortável',   emoji:'🛋️', bg:'bg-cyan-50 border-cyan-200',     dot:'bg-cyan-400',    ex:'This chair is more comfortable than the old one.'},
+  {en:'Modern',      pt:'Moderno/a',     emoji:'🏙️', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'The new office is much more modern.'},
+  {en:'Popular',     pt:'Popular',       emoji:'⭐', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'This singer is more popular than ever.'},
+  {en:'Difficult',   pt:'Difícil',       emoji:'😤', bg:'bg-cyan-50 border-cyan-200',     dot:'bg-cyan-400',    ex:'This exam was more difficult than the last.'},
+  {en:'Important',   pt:'Importante',    emoji:'🔑', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'Health is more important than money.'},
+  {en:'Interesting', pt:'Interessante',  emoji:'🤩', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'This book is more interesting than the first one.'},
+  {en:'Creative',    pt:'Criativo/a',    emoji:'🎨', bg:'bg-cyan-50 border-cyan-200',     dot:'bg-cyan-400',    ex:'She is more creative than anyone on the team.'},
+  {en:'Powerful',    pt:'Poderoso/a',    emoji:'💪', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'This computer is more powerful than the old one.'},
+  {en:'Efficient',   pt:'Eficiente',     emoji:'⚙️', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'The new process is far more efficient.'},
+  {en:'Reliable',    pt:'Confiável',     emoji:'🤝', bg:'bg-cyan-50 border-cyan-200',     dot:'bg-cyan-400',    ex:'He is more reliable than I thought.'},
+  {en:'Flexible',    pt:'Flexível',      emoji:'🤸', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'Remote work is more flexible than office work.'},
+  {en:'Healthy',     pt:'Saudável',      emoji:'🥗', bg:'bg-teal-50 border-teal-200',     dot:'bg-teal-400',    ex:'Fruit is healthier than candy.'},
+  {en:'Dangerous',   pt:'Perigoso/a',    emoji:'⚠️', bg:'bg-cyan-50 border-cyan-200',     dot:'bg-cyan-400',    ex:'Driving fast is more dangerous than walking.'},
+  {en:'Exciting',    pt:'Emocionante',   emoji:'🎢', bg:'bg-emerald-50 border-emerald-200', dot:'bg-emerald-400', ex:'This trip was more exciting than any other.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"The grass is always greener", pt:"A grama do vizinho é sempre mais verde", emoji:'🌿',
+   example:"She keeps changing jobs — the grass is always greener on the other side.",
+   meaning:"People always think others have it better than them."},
+  {expr:"Better safe than sorry", pt:"Melhor prevenir do que remediar", emoji:'🛡️',
+   example:"Bring an umbrella — better safe than sorry!",
+   meaning:"It's wiser to be cautious than to take risks."},
+  {expr:"Easier said than done", pt:"É mais fácil falar do que fazer", emoji:'💬',
+   example:"'Just be confident!' — easier said than done.",
+   meaning:"Something sounds simple but is actually hard to do."},
+  {expr:"The more the merrier", pt:"Quanto mais, melhor", emoji:'🎉',
+   example:"Bring your friends to the party — the more the merrier!",
+   meaning:"The greater the number, the better the situation."},
+];
+
+const PRACTICE_QS = [
+  {q:"Which is the correct comparative? 'The train is ___ than the bus.'", opts:["faster","more fast","most fast","the fastest"], a:"faster", rule:"Short adj (1 syllable): fast → faster"},
+  {q:"Fill in: 'This hotel is ___ (expensive) than the other one.'", opts:["more expensive","expensiver","most expensive","the most expensive"], a:"more expensive", rule:"Long adj (3 syllables): more + expensive"},
+  {q:"'The grass is always greener' means:", opts:["People always want what others have","Nature is beautiful","Green is a great colour","You should work harder"], a:"People always want what others have", rule:"Idiom meaning"},
+  {q:"What is the comparative of 'good'?", opts:["better","gooder","more good","best"], a:"better", rule:"Irregular comparative: good → better"},
+  {q:"'She is ___ (intelligent) than her sister.'", opts:["more intelligent","intelligenter","intelligentest","most intelligent"], a:"more intelligent", rule:"Long adj (4 syllables): more + intelligent"},
+  {q:"Which adjective uses -ER for its comparative form?", opts:["fast","expensive","interesting","comfortable"], a:"fast", rule:"Fast = 1 syllable → faster"},
+  {q:"'Easier said than done' means:", opts:["It's easy to talk but hard to do","Actions speak louder than words","Doing nothing is best","It gets easier with time"], a:"It's easy to talk but hard to do", rule:"Idiom meaning"},
+  {q:"'He is ___ (healthy) than before after joining the gym.'", opts:["healthier","more healthy","healthyer","most healthy"], a:"healthier", rule:"healthy ends in -y → healthier"},
+  {q:"What is the comparative of 'bad'?", opts:["worse","badder","more bad","worst"], a:"worse", rule:"Irregular comparative: bad → worse"},
+  {q:"'The more the merrier' means:", opts:["More people makes things better","Fewer is better","Quality over quantity","It's better to be alone"], a:"More people makes things better", rule:"Idiom meaning"},
+];
+
+const SPEAK_SENTENCES = [
+  {text:"This city is <strong class='text-emerald-600'>more modern</strong> and <strong class='text-emerald-600'>more exciting</strong> than the one I grew up in."},
+  {text:"She is <strong class='text-emerald-600'>more creative</strong> and <strong class='text-emerald-600'>more reliable</strong> than most people I know."},
+  {text:"The new train is <strong class='text-emerald-600'>faster</strong> and <strong class='text-emerald-600'>more comfortable</strong> than the old one."},
+  {text:"English is <strong class='text-emerald-600'>easier</strong> than I thought, but speaking is <strong class='text-emerald-600'>more difficult</strong> than writing."},
+  {text:"The grass is always greener, but honestly my life is <strong class='text-emerald-600'>better</strong> than ever."},
+  {text:"He is <strong class='text-emerald-600'>more flexible</strong> in his approach, which makes him <strong class='text-emerald-600'>more efficient</strong> at work."},
+  {text:"This laptop is <strong class='text-emerald-600'>more powerful</strong> but also <strong class='text-emerald-600'>more expensive</strong> than the one I have now."},
+  {text:"Learning is <strong class='text-emerald-600'>more interesting</strong> when you apply it to <strong class='text-emerald-600'>real</strong> life situations."},
+];
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak'],
+  totalSections: 5,
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE_QS,
+  speak: SPEAK_SENTENCES,
+  accentColor: 'emerald',
+});
+</script>
+</body>
+</html>

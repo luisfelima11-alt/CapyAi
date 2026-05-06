@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flappy Yara 🦫</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a1628;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Lexend', sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #back-btn {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.2s;
+  }
+  #back-btn:hover { background: rgba(255,255,255,0.22); }
+
+  #game-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #score-bar {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  #score-bar .pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    padding: 0.4rem 1.2rem;
+    font-weight: 800;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .score-val { color: #fbbf24; }
+  .best-val  { color: #34d399; }
+
+  canvas {
+    border-radius: 1.5rem;
+    box-shadow: 0 0 60px rgba(16, 185, 129, 0.25), 0 0 120px rgba(236, 72, 153, 0.1);
+    display: block;
+    cursor: pointer;
+  }
+
+  #hint-text {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  /* ── Quiz Overlay ── */
+  #quiz-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #quiz-overlay.show {
+    opacity: 1;
+    pointer-events: all !important;
+  }
+  #quiz-overlay.show * {
+    pointer-events: auto !important;
+  }
+  #quiz-box {
+    background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+    border: 1px solid rgba(139,92,246,0.4);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 60px rgba(139,92,246,0.3);
+    width: min(92vw, 420px);
+    padding: 1.6rem 1.5rem 1.8rem;
+    text-align: center;
+    font-family: 'Lexend', sans-serif;
+    transform: scale(0.85);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #quiz-overlay.show #quiz-box { transform: scale(1); }
+  #quiz-yara { margin-bottom: 0.6rem; }
+  #quiz-yara img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(236,72,153,0.5); display: inline-block; }
+  #quiz-badge {
+    display: inline-block;
+    background: rgba(139,92,246,0.25);
+    color: #c4b5fd;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.8rem;
+    border-radius: 999px;
+    margin-bottom: 0.8rem;
+  }
+  #quiz-prompt {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+  #quiz-word {
+    color: #fbbf24;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 1.1rem;
+    letter-spacing: -0.01em;
+  }
+  .quiz-choice {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.55rem;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 0.85rem;
+    color: #e2e8f0;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.1s;
+    text-align: left;
+  }
+  .quiz-choice:hover:not(:disabled) {
+    background: rgba(139,92,246,0.22);
+    border-color: rgba(139,92,246,0.5);
+    transform: translateX(3px);
+  }
+  .quiz-choice.correct {
+    background: rgba(16,185,129,0.25) !important;
+    border-color: #10b981 !important;
+    color: #6ee7b7 !important;
+  }
+  .quiz-choice.wrong {
+    background: rgba(239,68,68,0.2) !important;
+    border-color: #ef4444 !important;
+    color: #fca5a5 !important;
+  }
+  #quiz-feedback {
+    min-height: 1.6rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0.8rem;
+    color: #a78bfa;
+  }
+  #quiz-continue {
+    display: none;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    border: none;
+    border-radius: 0.85rem;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(236,72,153,0.35);
+  }
+  #quiz-continue:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(236,72,153,0.5); }
+  #quiz-streak-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+  .qs-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .qs-dot.hit  { background: #10b981; }
+  .qs-dot.miss { background: #ef4444; }
+
+  /* XP toast */
+  #xp-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 0.7rem 2rem;
+    border-radius: 999px;
+    box-shadow: 0 8px 30px rgba(236,72,153,0.4);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 200;
+  }
+  #xp-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<button id="back-btn" onclick="history.back()">← Back</button>
+
+<div id="game-wrapper">
+  <div id="score-bar">
+    <div class="pill">⭐ Score: <span class="score-val" id="disp-score">0</span></div>
+    <div class="pill">🏆 Best: <span class="best-val" id="disp-best">0</span></div>
+  </div>
+  <canvas id="c"></canvas>
+  <div id="hint-text">SPACE · TAP · CLICK to flap</div>
+</div>
+
+<div id="xp-toast">+20 XP — Great job! 🌟</div>
+
+<!-- ── Quiz Overlay ── -->
+<div id="quiz-overlay">
+  <div id="quiz-box">
+    <div id="quiz-yara"><img src="yara.png?v=2" alt="Yara"/></div>
+    <div id="quiz-badge">ENGLISH CHALLENGE</div>
+    <div id="quiz-streak-bar"></div>
+    <div id="quiz-prompt">What does this word mean in Portuguese?</div>
+    <div id="quiz-word">HELLO</div>
+    <div id="quiz-choices"></div>
+    <div id="quiz-feedback"></div>
+    <button id="quiz-continue" onclick="quizContinue()">▶ Play Again</button>
+  </div>
+</div>
+
+<script src="store.js"></script>
+<script>
+// ─────────────────────────────────────────────
+//  roundRect POLYFILL (older Chrome/Safari/Firefox)
+// ─────────────────────────────────────────────
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+    let r = Array.isArray(radii) ? [...radii] : [radii ?? 0];
+    if (r.length === 1) r = [r[0], r[0], r[0], r[0]];
+    else if (r.length === 2) r = [r[0], r[1], r[0], r[1]];
+    else if (r.length === 3) r = [r[0], r[1], r[2], r[1]];
+    let [tl, tr, br, bl] = r.map(v => Math.min(v ?? 0, Math.min(w, h) / 2));
+    this.beginPath();
+    this.moveTo(x + tl, y);
+    this.lineTo(x + w - tr, y);       this.arcTo(x + w, y,     x + w, y + tr,     tr);
+    this.lineTo(x + w, y + h - br);   this.arcTo(x + w, y + h, x + w - br, y + h, br);
+    this.lineTo(x + bl, y + h);       this.arcTo(x,     y + h, x,     y + h - bl,  bl);
+    this.lineTo(x, y + tl);           this.arcTo(x,     y,     x + tl, y,           tl);
+    this.closePath();
+    return this;
+  };
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS SETUP
+// ─────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+
+// Responsive canvas size
+function calcSize() {
+  const maxW = Math.min(window.innerWidth - 32, 420);
+  const maxH = Math.min(window.innerHeight - 160, 640);
+  canvas.width  = maxW;
+  canvas.height = maxH;
+}
+calcSize();
+window.addEventListener('resize', () => {
+  calcSize();
+  // Clamp Yara into new bounds so she doesn't appear outside canvas after resize
+  if (typeof yaraY !== 'undefined') yaraY = Math.max(YARA_R(), Math.min(yaraY, H() - 40 - YARA_R()));
+  if (state === 'dead') drawDeadScreen();
+});
+
+const W = () => canvas.width;
+const H = () => canvas.height;
+
+// ─────────────────────────────────────────────
+//  GAME STATE
+// ─────────────────────────────────────────────
+let state       = 'start';   // 'start' | 'playing' | 'dead'
+let score       = 0;
+let bestScore   = +localStorage.getItem('flappyYaraBest') || 0;
+let xpMilestones = new Set();
+
+// Physics
+let yaraY, yaraVel;
+const GRAVITY   = 0.38;
+const FLAP_VEL  = -7.5;
+const YARA_X    = () => Math.floor(W() * 0.22);
+const YARA_R    = () => Math.min(22, W() * 0.055);   // radius
+
+// Pipes
+let pipes = [];
+const PIPE_W       = () => Math.floor(W() * 0.14);
+const PIPE_GAP     = () => Math.min(H() * 0.3, 145);
+const PIPE_SPEED   = () => Math.min(2.8 + score * 0.045, 7.5); // capped so it doesn't become impossible
+const PIPE_INTERVAL = 110;   // frames between spawns
+let pipeTimer = 0;
+
+// Clouds
+let clouds = [];
+
+// Animation
+let raf, frame = 0;
+let flapAngle = 0;      // wing flap oscillation
+let deadBounce = 0;     // death animation progress
+
+// Yara image
+const yaraImg = new Image();
+let imgLoaded = false;
+yaraImg.onload  = () => { imgLoaded = true; };
+yaraImg.onerror = () => {
+  // Try fallback image
+  const fb = new Image();
+  fb.onload = () => { yaraImg.src = fb.src; imgLoaded = true; };
+  fb.src = 'Hello%20Yara%20profile%20pic%20002.png';
+};
+yaraImg.src = 'yara.png';
+
+// ─────────────────────────────────────────────
+//  CLOUD INIT
+// ─────────────────────────────────────────────
+function initClouds() {
+  clouds = [];
+  for (let i = 0; i < 5; i++) {
+    clouds.push({
+      x: Math.random() * W(),
+      y: Math.random() * H() * 0.55,
+      r: 18 + Math.random() * 28,
+      spd: 0.3 + Math.random() * 0.4
+    });
+  }
+}
+
+// ─────────────────────────────────────────────
+//  RESET
+// ─────────────────────────────────────────────
+function resetGame() {
+  yaraY      = H() / 2;
+  yaraVel    = 0;
+  pipes      = [];
+  pipeTimer  = 0;
+  score      = 0;
+  frame      = 0;
+  flapAngle  = 0;
+  deadBounce = 0;
+  xpMilestones = new Set();
+  initClouds();
+  updateScoreUI();
+}
+
+// ─────────────────────────────────────────────
+//  INPUT
+// ─────────────────────────────────────────────
+function handleFlap() {
+  // Block input while quiz is showing
+  if (document.getElementById('quiz-overlay').classList.contains('show')) return;
+
+  if (state === 'start' || state === 'dead') {
+    cancelAnimationFrame(raf); // cancel any lingering RAF before restarting
+    state = 'playing';
+    resetGame();
+    flap();
+    loop();
+    return;
+  }
+  flap();
+}
+
+function flap() {
+  yaraVel = FLAP_VEL;
+  flapAngle = -0.5;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); handleFlap(); }
+});
+canvas.addEventListener('pointerdown', e => { e.preventDefault(); handleFlap(); });
+
+// ─────────────────────────────────────────────
+//  PIPE SPAWNING
+// ─────────────────────────────────────────────
+function spawnPipe() {
+  const gap  = PIPE_GAP();
+  const minTop = H() * 0.15;
+  const maxTop = H() - gap - H() * 0.15;
+  const topH   = minTop + Math.random() * (maxTop - minTop);
+  pipes.push({ x: W(), topH, passed: false });
+}
+
+// ─────────────────────────────────────────────
+//  COLLISION
+// ─────────────────────────────────────────────
+function checkCollision() {
+  // Use 85% of actual radius for a slightly forgiving hitbox (standard in Flappy Bird games)
+  const r  = Math.floor(YARA_R() * 0.85);
+  const cx = YARA_X();
+  const cy = yaraY;
+  const pw = PIPE_W();
+
+  // Floor / ceiling
+  if (cy - r <= 0 || cy + r >= H() - 40) return true;
+
+  for (const p of pipes) {
+    // Horizontal: exclude the 4px cap overhang on each side (leniency)
+    const left  = p.x + 3;
+    const right = p.x + pw - 3;
+
+    // Vertical: the pipe caps extend 4px INTO the visual gap.
+    // Use the visual cap edges so the hitbox matches what the player sees.
+    //   top cap bottom  = p.topH - 4   (cap at topH-22, height 18 → bottom at topH-4)
+    //   bot cap top     = p.topH + gap + 4  (cap starts at topH+gap+4)
+    const gap1 = p.topH - 4;
+    const gap2 = p.topH + PIPE_GAP() + 4;
+
+    if (cx + r > left && cx - r < right) {
+      if (cy - r < gap1 || cy + r > gap2) return true;
+    }
+  }
+  return false;
+}
+
+// ─────────────────────────────────────────────
+//  XP AWARDS
+// ─────────────────────────────────────────────
+function checkXPMilestones() {
+  const milestones = [5, 10, 20, 30, 50];
+  for (const m of milestones) {
+    if (score >= m && !xpMilestones.has(m)) {
+      xpMilestones.add(m);
+      const xp = m === 5 ? 10 : m === 10 ? 20 : m === 20 ? 30 : m === 30 ? 40 : 60;
+      if (typeof Store !== 'undefined') {
+        try { Store.addXP(xp); } catch(e) {}
+      }
+      showXPToast(xp);
+    }
+  }
+}
+
+let toastTimer;
+function showXPToast(xp) {
+  const t = document.getElementById('xp-toast');
+  t.textContent = `+${xp} XP — ${score >= 50 ? 'Legend! 🔥' : score >= 20 ? 'Amazing! ⚡' : 'Keep going! 🌟'}`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function updateScoreUI() {
+  document.getElementById('disp-score').textContent = score;
+  document.getElementById('disp-best').textContent  = bestScore;
+}
+
+// ─────────────────────────────────────────────
+//  DRAWING HELPERS
+// ─────────────────────────────────────────────
+
+// Background gradient (sky)
+function drawBg() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H());
+  grad.addColorStop(0,   '#0f2b4a');
+  grad.addColorStop(0.6, '#0d3d2a');
+  grad.addColorStop(1,   '#052910');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W(), H());
+}
+
+// Floating clouds
+function drawClouds() {
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#a7f3d0';
+  for (const cl of clouds) {
+    ctx.beginPath();
+    ctx.arc(cl.x,        cl.y,        cl.r,        0, Math.PI * 2);
+    ctx.arc(cl.x + cl.r, cl.y - cl.r * 0.5, cl.r * 0.7, 0, Math.PI * 2);
+    ctx.arc(cl.x - cl.r, cl.y - cl.r * 0.3, cl.r * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function moveClouds() {
+  for (const cl of clouds) {
+    cl.x -= cl.spd;
+    if (cl.x + cl.r * 2 < 0) {
+      cl.x = W() + cl.r;
+      cl.y = Math.random() * H() * 0.55;
+    }
+  }
+}
+
+// Ground strip
+function drawGround() {
+  const gh = 40;
+  ctx.fillStyle = '#14532d';
+  ctx.fillRect(0, H() - gh, W(), gh);
+  // grass blades pattern
+  ctx.fillStyle = '#15803d';
+  for (let x = 0; x < W(); x += 8) {
+    ctx.fillRect(x, H() - gh, 4, 6);
+  }
+  // dirt strip
+  ctx.fillStyle = '#713f12';
+  ctx.fillRect(0, H() - gh + 6, W(), gh - 6);
+}
+
+// Pipes
+function drawPipes() {
+  const pw   = PIPE_W();
+  const gap  = PIPE_GAP();
+  const rnd  = 8;
+
+  for (const p of pipes) {
+    const x    = p.x;
+    const topH = p.topH;
+
+    // Gradient per pipe
+    const gTop = ctx.createLinearGradient(x, 0, x + pw, 0);
+    gTop.addColorStop(0, '#15803d');
+    gTop.addColorStop(0.5, '#22c55e');
+    gTop.addColorStop(1, '#14532d');
+
+    // Top pipe body
+    ctx.fillStyle = gTop;
+    ctx.beginPath();
+    ctx.roundRect(x, 0, pw, topH - 12, [0, 0, rnd, rnd]);
+    ctx.fill();
+
+    // Top pipe cap
+    ctx.fillStyle = '#16a34a';
+    ctx.beginPath();
+    ctx.roundRect(x - 4, topH - 22, pw + 8, 18, rnd);
+    ctx.fill();
+
+    // Bottom pipe body
+    const botY = topH + gap + 12;
+    const gBot = ctx.createLinearGradient(x, 0, x + pw, 0);
+    gBot.addColorStop(0, '#15803d');
+    gBot.addColorStop(0.5, '#22c55e');
+    gBot.addColorStop(1, '#14532d');
+
+    ctx.fillStyle = gBot;
+    ctx.beginPath();
+    ctx.roundRect(x, botY, pw, H() - botY, [rnd, rnd, 0, 0]);
+    ctx.fill();
+
+    // Bottom pipe cap
+    ctx.fillStyle = '#16a34a';
+    ctx.beginPath();
+    ctx.roundRect(x - 4, topH + gap + 4, pw + 8, 18, rnd);
+    ctx.fill();
+
+    // Highlight sheen
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(x + 4, 0, 4, topH - 12);
+    ctx.fillRect(x + 4, botY, 4, H() - botY);
+  }
+}
+
+// Yara (capybara) character
+function drawYara(x, y, r, angle, dead) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+
+  if (imgLoaded) {
+    // Draw image in a circle clip
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(yaraImg, -r, -r, r * 2, r * 2);
+    ctx.restore();
+
+    // Glow ring
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 2, 0, Math.PI * 2);
+    ctx.strokeStyle = dead ? '#ef4444' : '#ec4899';
+    ctx.lineWidth   = 3;
+    ctx.stroke();
+  } else {
+    // Emoji fallback — draw a cute capybara
+    drawCapybaraEmoji(r, dead);
+  }
+
+  // Wing flap overlay (always show a little pink wing)
+  if (!dead) {
+    const wingAngle = Math.sin(frame * 0.25) * 0.4;
+    ctx.save();
+    ctx.rotate(wingAngle);
+    ctx.fillStyle = 'rgba(236,72,153,0.7)';
+    ctx.beginPath();
+    ctx.ellipse(-r * 0.3, r * 0.1, r * 0.55, r * 0.28, -0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+function drawCapybaraEmoji(r, dead) {
+  // ── Capybara (not a beaver!) — round barrel body, wide snout, tiny ears ──
+
+  // Furry body (large horizontal oval, lower center)
+  const bodyGrad = ctx.createRadialGradient(0, r*0.15, r*0.1, 0, r*0.1, r*0.85);
+  bodyGrad.addColorStop(0, '#c8834a');
+  bodyGrad.addColorStop(1, '#7a4a22');
+  ctx.fillStyle = bodyGrad;
+  ctx.beginPath();
+  ctx.ellipse(0, r*0.18, r*0.78, r*0.52, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Head — capybaras have LARGE, wide, rectangular heads
+  ctx.fillStyle = '#b87038';
+  ctx.beginPath();
+  // Wide rounded rectangle head
+  ctx.roundRect(-r*0.52, -r*0.82, r*1.04, r*0.7, r*0.28);
+  ctx.fill();
+
+  // Face highlight
+  ctx.fillStyle = '#c8834a';
+  ctx.beginPath();
+  ctx.ellipse(0, -r*0.5, r*0.38, r*0.26, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Wide flat snout (capybara's most distinctive feature — big square muzzle)
+  ctx.fillStyle = '#d4956a';
+  ctx.beginPath();
+  ctx.roundRect(-r*0.32, -r*0.35, r*0.64, r*0.38, r*0.14);
+  ctx.fill();
+
+  // Nostrils
+  ctx.fillStyle = '#6b3a18';
+  ctx.beginPath(); ctx.ellipse(-r*0.12, -r*0.2, r*0.07, r*0.045, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( r*0.12, -r*0.2, r*0.07, r*0.045, 0, 0, Math.PI*2); ctx.fill();
+
+  // Eyes — capybaras have eyes HIGH on the head, close together
+  const eyeY = -r * 0.68;
+  if (dead) {
+    ctx.strokeStyle = '#2d1a08';
+    ctx.lineWidth = r * 0.06;
+    ctx.lineCap = 'round';
+    for (const ex of [-r*0.19, r*0.19]) {
+      ctx.beginPath();
+      ctx.moveTo(ex - r*0.1, eyeY - r*0.1); ctx.lineTo(ex + r*0.1, eyeY + r*0.1);
+      ctx.moveTo(ex + r*0.1, eyeY - r*0.1); ctx.lineTo(ex - r*0.1, eyeY + r*0.1);
+      ctx.stroke();
+    }
+  } else {
+    // White sclera
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(-r*0.19, eyeY, r*0.14, r*0.13, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse( r*0.19, eyeY, r*0.14, r*0.13, 0, 0, Math.PI*2); ctx.fill();
+    // Dark iris
+    ctx.fillStyle = '#2d1a08';
+    ctx.beginPath(); ctx.arc(-r*0.19, eyeY, r*0.09, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc( r*0.19, eyeY, r*0.09, 0, Math.PI*2); ctx.fill();
+    // Shine
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-r*0.15, eyeY - r*0.04, r*0.03, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc( r*0.23, eyeY - r*0.04, r*0.03, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Tiny rounded ears (capybaras have small rounded ears near the top of the head)
+  ctx.fillStyle = '#9a5e2e';
+  ctx.beginPath(); ctx.ellipse(-r*0.44, -r*0.9, r*0.14, r*0.12, -0.15, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( r*0.44, -r*0.9, r*0.14, r*0.12,  0.15, 0, Math.PI*2); ctx.fill();
+  // Inner ear
+  ctx.fillStyle = '#c87050';
+  ctx.beginPath(); ctx.ellipse(-r*0.44, -r*0.9, r*0.07, r*0.06, -0.15, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( r*0.44, -r*0.9, r*0.07, r*0.06,  0.15, 0, Math.PI*2); ctx.fill();
+
+  // Pink beret hat (Yara's signature!)
+  // Beret brim
+  ctx.fillStyle = '#f9a8d4';
+  ctx.beginPath();
+  ctx.ellipse(0, -r*1.0, r*0.56, r*0.13, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Beret dome
+  const hatGrad = ctx.createRadialGradient(-r*0.1, -r*1.25, r*0.05, 0, -r*1.18, r*0.48);
+  hatGrad.addColorStop(0, '#f472b6');
+  hatGrad.addColorStop(1, '#be185d');
+  ctx.fillStyle = hatGrad;
+  ctx.beginPath();
+  ctx.ellipse(r*0.08, -r*1.2, r*0.45, r*0.28, 0.15, 0, Math.PI*2);
+  ctx.fill();
+  // Hat button/pompom
+  ctx.fillStyle = '#fce7f3';
+  ctx.beginPath(); ctx.arc(r*0.14, -r*1.42, r*0.07, 0, Math.PI*2); ctx.fill();
+
+  // Blush cheeks (cute!)
+  ctx.fillStyle = 'rgba(236,72,153,0.25)';
+  ctx.beginPath(); ctx.ellipse(-r*0.36, -r*0.42, r*0.18, r*0.1, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse( r*0.36, -r*0.42, r*0.18, r*0.1, 0, 0, Math.PI*2); ctx.fill();
+}
+
+// Score on canvas
+function drawScore() {
+  ctx.save();
+  ctx.font = `900 ${Math.max(28, W() * 0.1)}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.15)';
+  ctx.fillText(score, W() / 2, H() * 0.18);
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────
+//  DEAD SCREEN
+// ─────────────────────────────────────────────
+function drawDeadScreen() {
+  // Frozen background already drawn; draw overlay
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, 0, W(), H());
+
+  const isNew = score > 0 && score === bestScore;
+
+  ctx.fillStyle = 'rgba(15,20,40,0.9)';
+  roundRectFill(ctx, W() * 0.06, H() * 0.15, W() * 0.88, H() * 0.68, 22);
+
+  ctx.textAlign = 'center';
+
+  ctx.font      = `900 ${Math.max(22, W() * 0.082)}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillStyle = '#ef4444';
+  ctx.fillText('Oops! 💥', W() / 2, H() * 0.27);
+
+  ctx.font      = `700 ${Math.max(13, W() * 0.045)}px 'Lexend', sans-serif`;
+  ctx.fillStyle = '#fbbf24';
+  ctx.fillText(`Score: ${score}`, W() / 2, H() * 0.36);
+
+  ctx.font      = `600 ${Math.max(11, W() * 0.036)}px 'Lexend', sans-serif`;
+  ctx.fillStyle = isNew ? '#34d399' : '#94a3b8';
+  ctx.fillText(isNew ? `🏆 New Best: ${bestScore}!` : `Best: ${bestScore}`, W() / 2, H() * 0.44);
+
+  // XP earned
+  const earned = [...xpMilestones].reduce((s, m) =>
+    s + (m===5?10 : m===10?20 : m===20?30 : m===30?40 : 60), 0);
+  if (earned > 0) {
+    ctx.font      = `600 ${Math.max(10, W() * 0.032)}px 'Lexend', sans-serif`;
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText(`+${earned} XP earned ⭐`, W() / 2, H() * 0.52);
+  }
+
+  // Restart button
+  ctx.fillStyle = '#ec4899';
+  roundRectFill(ctx, W() * 0.2, H() * 0.59, W() * 0.6, H() * 0.1, 12);
+  ctx.font      = `800 ${Math.max(13, W() * 0.042)}px 'Plus Jakarta Sans', sans-serif`;
+  ctx.fillStyle = '#fff';
+  ctx.fillText('▶  Play Again', W() / 2, H() * 0.655);
+
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────
+//  MAIN GAME LOOP
+// ─────────────────────────────────────────────
+function loop() {
+  if (state !== 'playing') return;
+
+  // Physics
+  yaraVel += GRAVITY;
+  yaraY   += yaraVel;
+  flapAngle = Math.min(flapAngle + 0.06, 0.45);   // tilt nose down
+
+  // Clouds
+  moveClouds();
+
+  // Pipes
+  pipeTimer++;
+  if (pipeTimer >= PIPE_INTERVAL) { spawnPipe(); pipeTimer = 0; }
+
+  const speed = PIPE_SPEED();
+  for (const p of pipes) {
+    p.x -= speed;
+    if (!p.passed && p.x + PIPE_W() < YARA_X()) {
+      p.passed = true;
+      score++;
+      updateScoreUI();
+      checkXPMilestones();
+    }
+  }
+  pipes = pipes.filter(p => p.x + PIPE_W() > -20);
+
+  // Collision
+  if (checkCollision()) {
+    if (score > bestScore) {
+      bestScore = score;
+      localStorage.setItem('flappyYaraBest', bestScore);
+      updateScoreUI();
+    }
+    state = 'dead';
+    drawFrame();       // draw final frame
+    showQuiz();        // show English quiz before dead screen
+    return;
+  }
+
+  // Draw
+  drawFrame();
+  frame++;
+  raf = requestAnimationFrame(loop);
+}
+
+function drawFrame() {
+  drawBg();
+  drawClouds();
+  drawPipes();
+  drawGround();
+  drawScore();
+  const tiltAngle = Math.max(-0.5, Math.min(flapAngle, 0.5));
+  drawYara(YARA_X(), yaraY, YARA_R(), tiltAngle, false);
+}
+
+// ─────────────────────────────────────────────
+//  UTILITY
+// ─────────────────────────────────────────────
+function roundRectFill(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+}
+
+// ─────────────────────────────────────────────
+//  QUIZ — ENGLISH VOCABULARY CHALLENGE
+// ─────────────────────────────────────────────
+
+const QUIZ_WORDS = [
+  // Lesson 1 — Greetings
+  {en:'Hello',       pt:'Olá'},
+  {en:'Goodbye',     pt:'Tchau'},
+  {en:'Please',      pt:'Por favor'},
+  {en:'Thank you',   pt:'Obrigado'},
+  {en:'Sorry',       pt:'Desculpe'},
+  // Lesson 2 — Colors
+  {en:'Red',         pt:'Vermelho'},
+  {en:'Blue',        pt:'Azul'},
+  {en:'Green',       pt:'Verde'},
+  {en:'Yellow',      pt:'Amarelo'},
+  {en:'Pink',        pt:'Rosa'},
+  // Lesson 3 — Numbers
+  {en:'One',         pt:'Um'},
+  {en:'Two',         pt:'Dois'},
+  {en:'Three',       pt:'Três'},
+  {en:'Four',        pt:'Quatro'},
+  {en:'Five',        pt:'Cinco'},
+  // Lesson 4 — Animals
+  {en:'Cat',         pt:'Gato'},
+  {en:'Dog',         pt:'Cachorro'},
+  {en:'Bird',        pt:'Pássaro'},
+  {en:'Fish',        pt:'Peixe'},
+  {en:'Rabbit',      pt:'Coelho'},
+  // Lesson 5 — Family
+  {en:'Mom',         pt:'Mãe'},
+  {en:'Dad',         pt:'Pai'},
+  {en:'Sister',      pt:'Irmã'},
+  {en:'Brother',     pt:'Irmão'},
+  {en:'Baby',        pt:'Bebê'},
+  // Lesson 6 — Food & Drink
+  {en:'Apple',       pt:'Maçã'},
+  {en:'Bread',       pt:'Pão'},
+  {en:'Water',       pt:'Água'},
+  {en:'Milk',        pt:'Leite'},
+  {en:'Cake',        pt:'Bolo'},
+  // Lesson 7 — Body Parts
+  {en:'Head',        pt:'Cabeça'},
+  {en:'Eyes',        pt:'Olhos'},
+  {en:'Hands',       pt:'Mãos'},
+  {en:'Feet',        pt:'Pés'},
+  {en:'Nose',        pt:'Nariz'},
+  // Lesson 8 — Actions
+  {en:'Run',         pt:'Correr'},
+  {en:'Jump',        pt:'Pular'},
+  {en:'Eat',         pt:'Comer'},
+  {en:'Sleep',       pt:'Dormir'},
+  {en:'Play',        pt:'Brincar'},
+  // Lesson 9 — Weather
+  {en:'Sun',         pt:'Sol'},
+  {en:'Rain',        pt:'Chuva'},
+  {en:'Cloud',       pt:'Nuvem'},
+  {en:'Wind',        pt:'Vento'},
+  {en:'Snow',        pt:'Neve'},
+  // Lesson 10 — My House
+  {en:'Door',        pt:'Porta'},
+  {en:'Window',      pt:'Janela'},
+  {en:'Table',       pt:'Mesa'},
+  {en:'Chair',       pt:'Cadeira'},
+  {en:'Bed',         pt:'Cama'},
+  // Lesson 11 — Feelings
+  {en:'Happy',       pt:'Feliz'},
+  {en:'Sad',         pt:'Triste'},
+  {en:'Angry',       pt:'Bravo'},
+  {en:'Scared',      pt:'Assustado'},
+  {en:'Surprised',   pt:'Surpreso'},
+  // Lesson 12 — School
+  {en:'Pen',         pt:'Caneta'},
+  {en:'Book',        pt:'Livro'},
+  {en:'Teacher',     pt:'Professor'},
+  {en:'Friend',      pt:'Amigo'},
+  {en:'Learn',       pt:'Aprender'},
+  // Lesson 13 — Transport
+  {en:'Car',         pt:'Carro'},
+  {en:'Bus',         pt:'Ônibus'},
+  {en:'Bike',        pt:'Bicicleta'},
+  {en:'Train',       pt:'Trem'},
+  {en:'Plane',       pt:'Avião'},
+  // Lesson 14 — Nature
+  {en:'Tree',        pt:'Árvore'},
+  {en:'Flower',      pt:'Flor'},
+  {en:'River',       pt:'Rio'},
+  {en:'Mountain',    pt:'Montanha'},
+  {en:'Sky',         pt:'Céu'},
+  // Lesson 15 — Time
+  {en:'Morning',     pt:'Manhã'},
+  {en:'Afternoon',   pt:'Tarde'},
+  {en:'Night',       pt:'Noite'},
+  {en:'Today',       pt:'Hoje'},
+  {en:'Tomorrow',    pt:'Amanhã'},
+  // Aula 28 — Personalities & Moods
+  {en:'Happy',       pt:'Feliz'},
+  {en:'Sad',         pt:'Triste'},
+  {en:'Angry',       pt:'Com raiva'},
+  {en:'Upset',       pt:'Chateado/a'},
+  {en:'Tired',       pt:'Cansado/a'},
+  {en:'Anxious',     pt:'Ansioso/a'},
+  {en:'Excited',     pt:'Animado/a'},
+  {en:'Bored',       pt:'Entediado/a'},
+  {en:'Frustrated',  pt:'Frustrado/a'},
+  {en:'Nervous',     pt:'Nervoso/a'},
+  {en:'Relieved',    pt:'Aliviado/a'},
+  {en:'Overwhelmed', pt:'Sobrecarregado/a'},
+  {en:'Confident',   pt:'Confiante'},
+  {en:'Embarrassed', pt:'Envergonhado/a'},
+  {en:'Proud',       pt:'Orgulhoso/a'},
+  {en:'Outgoing',    pt:'Extrovertido/a'},
+  {en:'Shy',         pt:'Tímido/a'},
+  {en:'Honest',      pt:'Honesto/a'},
+  {en:'Kind',        pt:'Gentil / Bondoso/a'},
+  {en:'Stubborn',    pt:'Teimoso/a'},
+  {en:'Patient',     pt:'Paciente'},
+  {en:'Ambitious',   pt:'Ambicioso/a'},
+  {en:'Sensitive',   pt:'Sensível'},
+  {en:'Creative',    pt:'Criativo/a'},
+  {en:'Reliable',    pt:'Confiável'},
+  {en:'Impulsive',   pt:'Impulsivo/a'},
+  {en:'Empathetic',  pt:'Empático/a'},
+  {en:'Pessimistic', pt:'Pessimista'},
+  {en:'Optimistic',  pt:'Otimista'},
+];
+
+// Streak tracking (persists per session)
+let quizStreak    = +localStorage.getItem('flappyQuizStreak') || 0;
+let quizAnswered  = false;
+const MAX_STREAK_DOTS = 7;
+
+function buildStreakBar() {
+  const bar = document.getElementById('quiz-streak-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < MAX_STREAK_DOTS; i++) {
+    const d = document.createElement('div');
+    d.className = 'qs-dot' + (i < quizStreak ? ' hit' : '');
+    bar.appendChild(d);
+  }
+}
+
+function showQuiz() {
+  quizAnswered = false;
+
+  // Pick a random word
+  const item = QUIZ_WORDS[Math.floor(Math.random() * QUIZ_WORDS.length)];
+
+  // 3 random wrong answers (different from correct)
+  const pool   = QUIZ_WORDS.filter(w => w.en !== item.en);
+  const wrongs = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+  const choices = [...wrongs.map(w => w.pt), item.pt].sort(() => Math.random() - 0.5);
+
+  // Populate UI
+  document.getElementById('quiz-word').textContent = item.en.toUpperCase();
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-feedback').style.color = '#a78bfa';
+  document.getElementById('quiz-continue').style.display = 'none';
+
+  const correct = item.pt;
+  const choicesEl = document.getElementById('quiz-choices');
+  choicesEl.innerHTML = choices.map(c =>
+    `<button class="quiz-choice" onclick='answerQuiz(this,${JSON.stringify(c)},${JSON.stringify(correct)})'>${c}</button>`
+  ).join('');
+
+  buildStreakBar();
+
+  // Yara image stays as capybara photo (streak shown via streak bar)
+
+  const ov = document.getElementById('quiz-overlay');
+  ov.style.display = 'flex';           // ensure visible before fade-in
+  requestAnimationFrame(() => ov.classList.add('show'));
+}
+
+function answerQuiz(btn, chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  // Disable all buttons
+  document.querySelectorAll('.quiz-choice').forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('quiz-feedback');
+
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    quizStreak = Math.min(quizStreak + 1, MAX_STREAK_DOTS);
+    localStorage.setItem('flappyQuizStreak', quizStreak);
+    const bonus = quizStreak >= 5 ? 10 : quizStreak >= 3 ? 7 : 5;
+    fb.textContent = quizStreak >= 3
+      ? `✅ Correto! +${bonus} XP 🔥 Sequência: ${quizStreak}!`
+      : `✅ Correto! +${bonus} XP`;
+    fb.style.color = '#34d399';
+    try { if (typeof Store !== 'undefined') Store.addXP(bonus); } catch(e) {}
+    // Update streak dots
+    buildStreakBar();
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct answer
+    document.querySelectorAll('.quiz-choice').forEach(b => {
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+    quizStreak = 0;
+    localStorage.setItem('flappyQuizStreak', 0);
+    fb.textContent = `❌ A resposta certa era: ${correct}`;
+    fb.style.color = '#f87171';
+    buildStreakBar();
+  }
+
+  // Show continue button after short delay (let player read feedback)
+  setTimeout(() => {
+    document.getElementById('quiz-continue').style.display = 'block';
+  }, 600);
+}
+
+function quizContinue() {
+  const ov = document.getElementById('quiz-overlay');
+  ov.classList.remove('show');
+  ov.style.display = 'none';  // immediately remove from layout so children stop intercepting clicks
+  drawDeadScreen();            // player can now tap/click canvas to restart
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+updateScoreUI();
+initClouds();
+resetGame();
+
+// Draw animated start screen
+(function startLoop() {
+  if (state === 'start') {
+    drawBg();
+    drawClouds();
+    moveClouds();
+    drawGround();
+    const bob = Math.sin(frame * 0.06) * 6;
+    drawYara(YARA_X(), H() / 2 + bob, YARA_R(), 0, false);
+
+    // Title panel
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.48)';
+    roundRectFill(ctx, W() * 0.08, H() * 0.1, W() * 0.84, H() * 0.32, 20);
+
+    ctx.textAlign = 'center';
+    ctx.font = `900 ${Math.max(20, W() * 0.08)}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.fillStyle = '#ec4899';
+    ctx.fillText('Flappy Yara', W() / 2, H() * 0.21);
+
+    ctx.font = `600 ${Math.max(11, W() * 0.037)}px 'Lexend', sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText('🦫 Tap or press Space to flap!', W() / 2, H() * 0.3);
+
+    if (bestScore > 0) {
+      ctx.font = `700 ${Math.max(10, W() * 0.032)}px 'Lexend', sans-serif`;
+      ctx.fillStyle = '#34d399';
+      ctx.fillText(`Best: ${bestScore}`, W() / 2, H() * 0.38);
+    }
+
+    // Bouncing arrow
+    const bounce = Math.sin(frame * 0.12) * 5;
+    ctx.font = `${Math.max(18, W() * 0.06)}px serif`;
+    ctx.fillText('👇', W() / 2, H() * 0.72 + bounce);
+
+    ctx.restore();
+    frame++;
+    requestAnimationFrame(startLoop);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Berry Math — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{extend:{
+      colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+      fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+      borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  .btn-pop { animation: btnPop .35s ease; }
+  .btn-shake { animation: btnShake .4s ease; }
+  @keyframes btnPop   { 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  @keyframes btnShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-28 pb-20 px-4 flex flex-col items-center gap-8 max-w-xl mx-auto">
+
+  <!-- Header -->
+  <div class="text-center">
+    <span class="font-label text-amber-400 text-sm font-bold uppercase tracking-widest">Mini-Game</span>
+    <h1 class="font-headline text-5xl md:text-6xl font-black text-white mt-1">Berry Math</h1>
+    <p class="font-body text-slate-400 text-lg mt-1">Count the berries and pick the right answer!</p>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="w-full flex items-center justify-between bg-white/5 rounded-2xl px-6 py-4 border border-white/10">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-amber-400 text-2xl" style="font-variation-settings:'FILL' 1;">stars</span>
+      <span id="score-display" class="font-headline font-black text-2xl">0</span>
+      <span class="font-label text-slate-400 text-sm">pts</span>
+    </div>
+    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Round 1 / 8</span>
+    <div id="hearts-display" class="flex gap-1"></div>
+  </div>
+
+  <!-- Problem card -->
+  <div class="w-full bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 p-10 flex flex-col items-center gap-6">
+
+    <!-- Berry visual -->
+    <div id="berry-visual" class="flex flex-wrap justify-center gap-2 min-h-[56px]"></div>
+
+    <!-- Equation -->
+    <div class="flex items-center gap-4">
+      <span id="num-a"  class="font-headline text-7xl font-black text-white">3</span>
+      <span id="op"     class="font-headline text-5xl font-black text-pink-brand">+</span>
+      <span id="num-b"  class="font-headline text-7xl font-black text-white">4</span>
+      <span            class="font-headline text-5xl font-black text-slate-400">=</span>
+      <span            class="font-headline text-7xl font-black text-amber-400">?</span>
+    </div>
+
+    <!-- Hint label -->
+    <p id="hint-label" class="font-label text-slate-400 text-sm"></p>
+  </div>
+
+  <!-- Answer choices -->
+  <div id="choices-grid" class="w-full grid grid-cols-2 gap-4"></div>
+
+  <!-- Feedback -->
+  <div id="feedback-bar"
+       class="w-full rounded-2xl px-8 py-5 flex items-center gap-4 text-lg font-label font-bold
+              opacity-0 transition-opacity duration-300 pointer-events-none">
+    <span id="feedback-icon" class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;"></span>
+    <span id="feedback-text"></span>
+  </div>
+
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+  Components.mount('footer-placeholder', Components.renderFooter());
+
+  // ── Config ────────────────────────────────────────────────────────────────
+  const TOTAL_ROUNDS = 8;
+  const MAX_LIVES    = 3;
+  const BERRY_EMOJI  = '🫐';
+  const OPS = ['+', '-', '×'];
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  let lives = MAX_LIVES, score = 0, round = 0, waitingNext = false;
+  let correctAnswer = 0, currentProblem = {};
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  function makeProblem(roundNum) {
+    const difficulty = roundNum < 3 ? 'easy' : roundNum < 6 ? 'medium' : 'hard';
+    let a, b, op, answer;
+    if (difficulty === 'easy') {
+      op = '+'; a = rand(1,5); b = rand(1,5); answer = a + b;
+    } else if (difficulty === 'medium') {
+      op = Math.random() < .6 ? '+' : '-';
+      if (op === '+') { a = rand(3,9); b = rand(3,9); answer = a + b; }
+      else            { a = rand(5,12); b = rand(1, a); answer = a - b; }
+    } else {
+      op = Math.random() < .5 ? '×' : '+';
+      if (op === '×') { a = rand(2,5); b = rand(2,5); answer = a * b; }
+      else            { a = rand(7,15); b = rand(5,10); answer = a + b; }
+    }
+    return { a, b, op, answer };
+  }
+
+  function makeChoices(correct) {
+    const choices = new Set([correct]);
+    while (choices.size < 4) {
+      const delta = rand(-4, 4);
+      const cand  = correct + delta;
+      if (cand >= 0 && cand !== correct) choices.add(cand);
+    }
+    return shuffle([...choices]);
+  }
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length-1; i>0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function renderHearts() {
+    document.getElementById('hearts-display').innerHTML =
+      Array.from({length:MAX_LIVES},(_,i)=>
+        `<span class="material-symbols-outlined text-xl ${i<lives?'text-red-400':'text-white/20'}"
+               style="${i<lives?"font-variation-settings:'FILL' 1;":""}">favorite</span>`
+      ).join('');
+  }
+
+  function renderBerries(problem) {
+    // Show berries only for easy/medium additions up to 12 total
+    const total = problem.op === '+' ? problem.a + problem.b : -1;
+    if (total > 0 && total <= 12) {
+      const aHtml = Array(problem.a).fill(`<span class="text-3xl">${BERRY_EMOJI}</span>`).join('');
+      const sep   = problem.op === '+'
+        ? `<span class="font-headline text-2xl text-pink-brand mx-2">+</span>`
+        : '';
+      const bHtml = problem.op === '+'
+        ? Array(problem.b).fill(`<span class="text-3xl">${BERRY_EMOJI}</span>`).join('')
+        : '';
+      document.getElementById('berry-visual').innerHTML = aHtml + sep + bHtml;
+      document.getElementById('hint-label').textContent = 'Count the berries!';
+    } else {
+      document.getElementById('berry-visual').innerHTML =
+        `<span class="text-5xl">${BERRY_EMOJI}</span>`;
+      document.getElementById('hint-label').textContent = 'Use your brain, Explorer!';
+    }
+  }
+
+  function renderRound() {
+    if (round >= TOTAL_ROUNDS) { finishGame(); return; }
+    waitingNext = false;
+    currentProblem = makeProblem(round);
+    correctAnswer  = currentProblem.answer;
+
+    document.getElementById('num-a').textContent  = currentProblem.a;
+    document.getElementById('op').textContent     = currentProblem.op;
+    document.getElementById('num-b').textContent  = currentProblem.b;
+    document.getElementById('round-display').textContent = `Round ${round+1} / ${TOTAL_ROUNDS}`;
+    renderBerries(currentProblem);
+    hideFeedback();
+
+    const choices = makeChoices(correctAnswer);
+    document.getElementById('choices-grid').innerHTML = choices.map(val =>
+      `<button data-val="${val}" onclick="handleChoice(this)"
+               class="bg-navy-light rounded-[2rem] py-7 text-5xl font-headline font-black text-white
+                      hover:bg-pink-brand hover:scale-[1.04] active:scale-95 transition-all
+                      border border-white/10 shadow-lg">
+         ${val}
+       </button>`
+    ).join('');
+  }
+
+  function showFeedback(correct) {
+    const bar  = document.getElementById('feedback-bar');
+    const icon = document.getElementById('feedback-icon');
+    const text = document.getElementById('feedback-text');
+    bar.className = bar.className.replace(/bg-\S+/g,'').replace(/border\S*/g,'').trim();
+    if (correct) {
+      bar.classList.add('bg-green-brand/20','border','border-green-brand/40');
+      icon.textContent = 'check_circle';
+      icon.className = icon.className.replace(/text-\S+/g,'text-green-brand');
+      text.textContent = `Correct! ${currentProblem.a} ${currentProblem.op} ${currentProblem.b} = ${correctAnswer} 🎉`;
+    } else {
+      bar.classList.add('bg-red-500/20','border','border-red-500/40');
+      icon.textContent = 'cancel';
+      icon.className = icon.className.replace(/text-\S+/g,'text-red-400');
+      text.textContent = `Oops! The answer was ${correctAnswer}. Keep going!`;
+    }
+    bar.style.opacity = '1';
+  }
+
+  function hideFeedback() {
+    document.getElementById('feedback-bar').style.opacity = '0';
+  }
+
+  // ── Logic ──────────────────────────────────────────────────────────────────
+  function handleChoice(btn) {
+    if (waitingNext) return;
+    waitingNext = true;
+    document.querySelectorAll('#choices-grid button').forEach(b => b.disabled = true);
+
+    const chosen = parseInt(btn.dataset.val, 10);
+    const correct = chosen === correctAnswer;
+
+    if (correct) {
+      score += 10;
+      document.getElementById('score-display').textContent = score;
+      btn.classList.add('btn-pop');
+      btn.style.backgroundColor = '#10b981';
+      showFeedback(true);
+      round++;
+    } else {
+      lives = Math.max(0, lives - 1);
+      renderHearts();
+      btn.classList.add('btn-shake');
+      btn.style.backgroundColor = '#ef4444';
+      // Highlight correct
+      document.querySelectorAll('#choices-grid button').forEach(b => {
+        if (parseInt(b.dataset.val,10) === correctAnswer) b.style.backgroundColor = '#10b981';
+      });
+      showFeedback(false);
+      round++;
+      if (lives <= 0) { setTimeout(finishGame, 1200); return; }
+    }
+    setTimeout(renderRound, 1400);
+  }
+
+  function finishGame() {
+    const xp = score;
+    if (window.Store) {
+      Store.addXP(xp);
+      Store.activateStreak();
+      Store.completeActivity('games');
+    }
+    const stars = score >= 70 ? 3 : score >= 40 ? 2 : 1;
+    const starHTML = Array.from({length:3},(_,i)=>
+      `<span class="material-symbols-outlined text-4xl ${i<stars?'text-yellow-400':'text-white/20'}"
+             style="${i<stars?"font-variation-settings:'FILL' 1;":""}">star</span>`
+    ).join('');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+    overlay.innerHTML = `
+      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-amber-400/60
+                  rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl
+                  text-center max-w-sm mx-4 scale-0 opacity-0 transition-all duration-500" id="finish-card">
+        <div class="w-24 h-24 rounded-full bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40">
+          <span class="text-5xl">🫐</span>
+        </div>
+        <div>
+          <p class="font-label text-amber-400 font-bold text-sm uppercase tracking-widest mb-1">Berry Count Complete!</p>
+          <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
+          <p class="font-body text-slate-300">Score: <span class="text-white font-bold">${score} pts</span></p>
+        </div>
+        <div class="flex gap-2">${starHTML}</div>
+        <div class="flex gap-3 flex-wrap justify-center">
+          <button onclick="startGame()"
+                  class="bg-white/10 hover:bg-white/20 text-white font-label font-bold
+                         px-8 py-3 rounded-full text-base active:scale-95 transition-all border border-white/20">
+            Play Again
+          </button>
+          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
+                  class="bg-amber-500 hover:bg-amber-600 text-white font-label font-bold
+                         px-8 py-3 rounded-full text-base active:scale-95 transition-all shadow-lg">
+            Back to Games
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const card = document.getElementById('finish-card');
+      card.style.transform = 'scale(1)';
+      card.style.opacity   = '1';
+    }));
+  }
+
+  function startGame() {
+    document.querySelectorAll('.fixed.inset-0').forEach(e => e.remove());
+    lives = MAX_LIVES; score = 0; round = 0;
+    document.getElementById('score-display').textContent = '0';
+    renderHearts();
+    renderRound();
+  }
+
+  document.addEventListener('DOMContentLoaded', startGame);
+</script>
+</body>
+</html>

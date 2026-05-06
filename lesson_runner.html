@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lesson — Capy Yara Adventures</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#1B2A4A',
+            'pink-brand': '#FF4B8B',
+            'green-brand': '#00C896',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            headline: ['Plus Jakarta Sans', 'sans-serif'],
+            label: ['Plus Jakarta Sans', 'sans-serif'],
+            body: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f7ff; }
+
+    /* Flip card */
+    .flip-card { perspective: 1000px; cursor: pointer; }
+    .flip-card-inner { transition: transform 0.6s cubic-bezier(.4,2,.6,1); transform-style: preserve-3d; position: relative; }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card-front, .flip-card-back {
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      position: absolute; width: 100%; height: 100%;
+    }
+    .flip-card-back { transform: rotateY(180deg); }
+
+    /* Progress bar */
+    .progress-fill { transition: width 0.5s ease; }
+
+    /* Choice buttons */
+    .choice-btn { transition: all 0.15s; }
+    .choice-btn:active { transform: scale(0.96); }
+    .choice-btn.correct { background: #dcfce7 !important; border-color: #16a34a !important; color: #15803d !important; transform: scale(1.03); }
+    .choice-btn.wrong   { background: #fee2e2 !important; border-color: #dc2626 !important; color: #b91c1c !important; animation: shake 0.3s ease; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    /* Word tiles */
+    .word-tile {
+      cursor: pointer; transition: all 0.15s;
+      user-select: none; -webkit-user-select: none;
+    }
+    .word-tile:active { transform: scale(0.95); }
+    .word-tile.used { opacity: 0.3; pointer-events: none; }
+    .answer-slot { min-height: 2.5rem; border-bottom: 2px solid #94a3b8; }
+
+    /* Step transitions */
+    .step-panel { animation: fadeSlideIn 0.35s ease; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hearts */
+    .heart { transition: all 0.2s; }
+    .heart.lost { opacity: 0.25; transform: scale(0.8); }
+
+    /* Star rating */
+    .star-icon { transition: all 0.4s; }
+    .star-icon.earned { color: #eab308; transform: scale(1.2); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Top Progress Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100 px-4 py-3">
+    <div class="max-w-2xl mx-auto flex items-center gap-4">
+      <button onclick="confirmExit()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors" title="Exit lesson">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+      <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
+        <div id="progress-bar" class="progress-fill h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full" style="width: 0%"></div>
+      </div>
+      <div id="step-label" class="text-xs font-bold text-slate-400 whitespace-nowrap w-16 text-right">1 / 4</div>
+    </div>
+  </header>
+
+  <!-- Main content area -->
+  <main class="pt-20 pb-24 px-4 min-h-screen flex flex-col items-center justify-start">
+    <div id="lesson-stage" class="w-full max-w-2xl">
+      <!-- Populated by JS -->
+    </div>
+  </main>
+
+  <!-- Exit confirmation modal -->
+  <div id="exit-modal" class="hidden fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-5xl mb-4">😢</div>
+      <h2 class="font-headline text-xl font-bold text-navy mb-2">Leave this lesson?</h2>
+      <p class="text-slate-500 text-sm mb-6">Your progress in this lesson won't be saved.</p>
+      <div class="flex gap-3">
+        <button onclick="closeExitModal()" class="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors">Keep going!</button>
+        <button onclick="doExit()" class="flex-1 py-3 rounded-2xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors">Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="store.js"></script>
+  <script src="lessons_data.js"></script>
+  <script>
+    // ─── Bootstrap ────────────────────────────────────────────────────────────
+    const params     = new URLSearchParams(location.search);
+    const lessonId   = parseInt(params.get('lesson') || '1');
+    const lesson     = LESSONS.find(l => l.id === lessonId);
+
+    if (!lesson) {
+      document.getElementById('lesson-stage').innerHTML =
+        `<div class="text-center mt-20"><p class="text-2xl">Lesson not found 😕</p>
+         <button onclick="location.href='6_Home_Forest_Expedition.html'" class="mt-6 px-6 py-3 bg-pink-500 text-white rounded-2xl font-bold">Back to Home</button></div>`;
+    }
+
+    // ─── State ────────────────────────────────────────────────────────────────
+    let currentStep  = 1;   // 1=vocab 2=grammar 3=fillBlanks 4=sentences
+    const TOTAL_STEPS = 4;
+    let vocabIndex   = 0;
+    let fillIndex    = 0;
+    let fillHearts   = 3;
+    let fillWrong    = 0;   // wrong answers count
+    let sentIndex    = 0;
+    let sentWrong    = 0;
+    let sentBuilt    = [];  // current built answer
+    let xpEarned     = lesson ? lesson.xpReward : 0;
+    let starsEarned  = 3;
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'en-US';
+      utt.rate = 0.85;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utt);
+    }
+
+    function setProgress(step) {
+      const pct = ((step - 1) / TOTAL_STEPS) * 100;
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('step-label').textContent = `${step} / ${TOTAL_STEPS}`;
+    }
+
+    function goToStep(step) {
+      currentStep = step;
+      setProgress(step);
+      const stage = document.getElementById('lesson-stage');
+      stage.innerHTML = '';
+      if (step === 1) renderVocab();
+      if (step === 2) renderGrammar();
+      if (step === 3) renderFillBlanks();
+      if (step === 4) renderSentences();
+      if (step === 5) renderFinish();
+    }
+
+    // ─── STEP 1: Vocabulary ───────────────────────────────────────────────────
+    function renderVocab() {
+      vocabIndex = 0;
+      showVocabCard();
+    }
+
+    function showVocabCard() {
+      const vocab = lesson.vocab;
+      const card  = vocab[vocabIndex];
+      const stage = document.getElementById('lesson-stage');
+      stage.innerHTML = `
+        <div class="step-panel">
+          <div class="text-center mb-6">
+            <span class="inline-block bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">Step 1 of 4 — Vocabulary</span>
+            <h1 class="font-headline text-2xl font-extrabold text-navy mt-3">${lesson.emoji} ${lesson.title}</h1>
+          </div>
+
+          <!-- Card counter dots -->
+          <div class="flex justify-center gap-2 mb-6">
+            ${vocab.map((_, i) => `<div class="w-2.5 h-2.5 rounded-full transition-all ${i < vocabIndex ? 'bg-pink-500' : i === vocabIndex ? 'bg-pink-500 scale-125' : 'bg-slate-200'}"></div>`).join('')}
+          </div>
+
+          <!-- Flip card -->
+          <div class="flip-card h-72 mb-6" id="flip-card" onclick="flipCard()">
+            <div class="flip-card-inner w-full h-full">
+              <!-- Front -->
+              <div class="flip-card-front w-full h-full bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 border-2 border-slate-100">
+                <div class="text-7xl mb-4">${card.emoji}</div>
+                <div class="font-headline text-3xl font-extrabold text-navy">${card.word}</div>
+                <div class="text-slate-400 text-sm mt-3 font-body">Tap to flip 👆</div>
+              </div>
+              <!-- Back -->
+              <div class="flip-card-back w-full h-full bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 border-2 border-pink-100">
+                <div class="font-label font-bold text-pink-500 text-lg mb-2">${card.pronunciation}</div>
+                <div class="font-headline text-2xl font-extrabold text-navy mb-3">${card.word}</div>
+                <div class="text-slate-600 text-center text-sm font-body leading-relaxed bg-white rounded-2xl px-4 py-3 shadow-sm w-full">${card.hint}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-3 justify-center mb-6">
+            <button onclick="hearWord('${card.word.replace(/'/g, "\\'")}')" class="flex items-center gap-2 px-5 py-3 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-pink-500 text-base" style="font-variation-settings:'FILL' 1;">volume_up</span>
+              Hear it
+            </button>
+            ${vocabIndex > 0 ? `<button onclick="prevVocab()" class="flex items-center gap-2 px-4 py-3 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-sm">chevron_left</span>
+              Back
+            </button>` : ''}
+            <button onclick="nextVocab()" class="flex items-center gap-2 px-6 py-3 bg-pink-500 rounded-2xl font-bold text-white hover:bg-pink-600 transition-all shadow-md shadow-pink-500/30">
+              ${vocabIndex < vocab.length - 1 ? 'Next word' : 'Continue'}
+              <span class="material-symbols-outlined text-sm">${vocabIndex < vocab.length - 1 ? 'chevron_right' : 'arrow_forward'}</span>
+            </button>
+          </div>
+
+          <div class="text-center text-xs text-slate-400 font-body">${vocabIndex + 1} of ${vocab.length} words</div>
+        </div>
+      `;
+    }
+
+    function flipCard() {
+      document.getElementById('flip-card').classList.toggle('flipped');
+    }
+
+    function hearWord(word) {
+      speak(word);
+    }
+
+    function nextVocab() {
+      if (vocabIndex < lesson.vocab.length - 1) {
+        vocabIndex++;
+        showVocabCard();
+      } else {
+        goToStep(2);
+      }
+    }
+
+    function prevVocab() {
+      if (vocabIndex > 0) {
+        vocabIndex--;
+        showVocabCard();
+      }
+    }
+
+    // ─── STEP 2: Grammar ──────────────────────────────────────────────────────
+    function renderGrammar() {
+      const g = lesson.grammar;
+      document.getElementById('lesson-stage').innerHTML = `
+        <div class="step-panel">
+          <div class="text-center mb-6">
+            <span class="inline-block bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">Step 2 of 4 — Grammar</span>
+            <h1 class="font-headline text-2xl font-extrabold text-navy mt-3">${g.title}</h1>
+          </div>
+
+          <!-- Yara speech bubble -->
+          <div class="flex items-start gap-4 mb-6">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-3xl flex-shrink-0 shadow-lg">🦫</div>
+            <div class="bg-white rounded-3xl rounded-tl-none shadow-lg p-5 border border-slate-100 flex-1">
+              <p class="font-body text-navy text-sm leading-relaxed">${g.rule}</p>
+            </div>
+          </div>
+
+          <!-- Examples -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-8">
+            <p class="font-label font-bold text-slate-500 text-xs uppercase tracking-wide mb-4">Examples</p>
+            <div class="space-y-3">
+              ${g.examples.map((ex, i) => `
+                <div class="flex items-start gap-3">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-0.5">${i+1}</div>
+                  <p class="font-body text-navy text-base leading-relaxed">${ex}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <button onclick="goToStep(3)" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg rounded-2xl shadow-md shadow-emerald-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
+            I understand!
+          </button>
+        </div>
+      `;
+    }
+
+    // ─── STEP 3: Fill in the Blank ────────────────────────────────────────────
+    function renderFillBlanks() {
+      fillIndex  = 0;
+      fillHearts = 3;
+      fillWrong  = 0;
+      showFillQuestion();
+    }
+
+    function showFillQuestion() {
+      const q       = lesson.fillBlanks[fillIndex];
+      const choices = shuffle([q.answer, ...q.distractors.slice(0, 3)]);
+      const stage   = document.getElementById('lesson-stage');
+      stage.innerHTML = `
+        <div class="step-panel">
+          <div class="text-center mb-5">
+            <span class="inline-block bg-amber-100 text-amber-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">Step 3 of 4 — Fill in the Blank</span>
+          </div>
+
+          <!-- Hearts -->
+          <div class="flex justify-center gap-2 mb-4" id="hearts-row">
+            ${[1,2,3].map(i => `<span class="heart text-2xl ${i > fillHearts ? 'lost' : ''}">❤️</span>`).join('')}
+          </div>
+
+          <!-- Progress -->
+          <div class="text-center text-xs font-bold text-slate-400 mb-5">${fillIndex + 1} / ${lesson.fillBlanks.length} questions</div>
+
+          <!-- Question -->
+          <div class="bg-white rounded-3xl shadow-lg p-6 mb-6 border border-slate-100">
+            <p class="font-headline text-xl font-bold text-navy text-center leading-relaxed">
+              ${q.sentence.replace('___', '<span class="inline-block bg-pink-100 text-pink-400 px-3 py-0.5 rounded-xl min-w-[60px] text-center border-b-2 border-pink-300">___</span>')}
+            </p>
+          </div>
+
+          <!-- Choices -->
+          <div class="grid grid-cols-2 gap-3" id="choices-grid">
+            ${choices.map((c, i) => `
+              <button id="choice-${i}" class="choice-btn bg-white border-2 border-slate-200 rounded-2xl px-4 py-4 font-bold text-navy text-base hover:border-pink-300 hover:bg-pink-50 shadow-sm"
+                      onclick="answerFill(this, '${c.replace(/'/g, "\\'")}', '${q.answer.replace(/'/g, "\\'")}')">
+                ${c}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function answerFill(btn, chosen, correct) {
+      // Disable all buttons
+      document.querySelectorAll('.choice-btn').forEach(b => b.setAttribute('disabled', ''));
+
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        speak('Correct!');
+        setTimeout(() => {
+          fillIndex++;
+          if (fillIndex < lesson.fillBlanks.length) {
+            showFillQuestion();
+          } else {
+            goToStep(4);
+          }
+        }, 900);
+      } else {
+        btn.classList.add('wrong');
+        fillHearts--;
+        fillWrong++;
+        if (fillHearts <= 0) {
+          starsEarned = Math.max(1, starsEarned - 1);
+          xpEarned    = Math.floor(xpEarned * 0.7);
+        }
+        // Highlight correct answer
+        document.querySelectorAll('.choice-btn').forEach(b => {
+          if (b.textContent.trim() === correct) b.classList.add('correct');
+        });
+        setTimeout(() => {
+          if (fillHearts <= 0) {
+            // Auto-advance even with no hearts to avoid getting stuck
+            fillIndex++;
+            fillHearts = 3; // reset hearts for next question
+            if (fillIndex < lesson.fillBlanks.length) {
+              showFillQuestion();
+            } else {
+              goToStep(4);
+            }
+          } else {
+            fillIndex++;
+            if (fillIndex < lesson.fillBlanks.length) {
+              showFillQuestion();
+            } else {
+              goToStep(4);
+            }
+          }
+        }, 1100);
+      }
+    }
+
+    // ─── STEP 4: Sentence Builder ─────────────────────────────────────────────
+    function renderSentences() {
+      sentIndex = 0;
+      sentWrong = 0;
+      showSentenceBuilder();
+    }
+
+    function showSentenceBuilder() {
+      const s = lesson.sentences[sentIndex];
+      sentBuilt = [];
+      const shuffled = shuffle([...s.words]);
+
+      document.getElementById('lesson-stage').innerHTML = `
+        <div class="step-panel">
+          <div class="text-center mb-5">
+            <span class="inline-block bg-violet-100 text-violet-600 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">Step 4 of 4 — Build the Sentence</span>
+            <div class="text-3xl mt-3">${s.emoji}</div>
+            <p class="text-slate-500 text-sm mt-2 font-body">${s.hint}</p>
+          </div>
+
+          <div class="text-center text-xs font-bold text-slate-400 mb-4">${sentIndex + 1} / ${lesson.sentences.length}</div>
+
+          <!-- Answer area -->
+          <div id="answer-area" class="min-h-16 bg-white rounded-3xl border-2 border-slate-200 p-4 mb-4 flex flex-wrap gap-2 items-center justify-center shadow-inner" onclick="removeLastWord()">
+            <p id="answer-placeholder" class="text-slate-300 text-sm font-body">Tap words below to build your sentence…</p>
+          </div>
+
+          <!-- Word tiles -->
+          <div id="word-tiles" class="flex flex-wrap gap-2 justify-center p-4 bg-slate-50 rounded-3xl border border-slate-100 mb-6">
+            ${shuffled.map((w, i) => `
+              <button id="tile-${i}" class="word-tile bg-white border-2 border-slate-200 rounded-2xl px-4 py-2.5 font-bold text-navy text-sm shadow-sm hover:border-pink-300 hover:bg-pink-50 transition-all"
+                      data-word="${w.replace(/"/g, '&quot;')}" data-idx="${i}" onclick="addWord(this)">
+                ${w}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Feedback -->
+          <div id="sent-feedback" class="hidden text-center mb-4 py-3 rounded-2xl font-bold text-sm"></div>
+
+          <!-- Check button -->
+          <button id="check-btn" onclick="checkSentence()" class="w-full py-4 bg-navy text-white font-bold text-lg rounded-2xl shadow-md hover:bg-navy/90 transition-all active:scale-95">
+            Check ✓
+          </button>
+        </div>
+      `;
+    }
+
+    function addWord(btn) {
+      if (btn.classList.contains('used')) return;
+      btn.classList.add('used');
+      sentBuilt.push({ word: btn.dataset.word, idx: btn.dataset.idx });
+
+      const area = document.getElementById('answer-area');
+      const placeholder = document.getElementById('answer-placeholder');
+      if (placeholder) placeholder.remove();
+
+      const tag = document.createElement('span');
+      tag.className = 'word-tile bg-pink-50 border-2 border-pink-200 rounded-2xl px-4 py-2 font-bold text-navy text-sm cursor-pointer hover:bg-red-50 hover:border-red-300 transition-all';
+      tag.textContent = btn.dataset.word;
+      tag.dataset.idx = btn.dataset.idx;
+      tag.onclick = () => removeWord(tag);
+      area.appendChild(tag);
+
+      // Hide feedback when building
+      const fb = document.getElementById('sent-feedback');
+      if (fb) { fb.classList.add('hidden'); fb.textContent = ''; }
+    }
+
+    function removeWord(tag) {
+      const idx = tag.dataset.idx;
+      sentBuilt = sentBuilt.filter(w => w.idx !== idx);
+      const tile = document.querySelector(`#tile-${idx}`);
+      if (tile) tile.classList.remove('used');
+      tag.remove();
+      if (document.getElementById('answer-area').children.length === 0) {
+        document.getElementById('answer-area').innerHTML = '<p id="answer-placeholder" class="text-slate-300 text-sm font-body">Tap words below to build your sentence…</p>';
+      }
+    }
+
+    function removeLastWord() {
+      // Only trigger if user clicked the empty part
+    }
+
+    function checkSentence() {
+      const s = lesson.sentences[sentIndex];
+      const built = sentBuilt.map(w => w.word).join(' ');
+      const target = s.words.join(' ');
+      const fb = document.getElementById('sent-feedback');
+
+      if (built === target) {
+        fb.className = 'text-center mb-4 py-3 rounded-2xl font-bold text-sm bg-emerald-100 text-emerald-700';
+        fb.textContent = '✨ Perfect! Well done!';
+        fb.classList.remove('hidden');
+        speak(target);
+        setTimeout(() => {
+          sentIndex++;
+          if (sentIndex < lesson.sentences.length) {
+            showSentenceBuilder();
+          } else {
+            goToStep(5);
+          }
+        }, 1200);
+      } else {
+        fb.className = 'text-center mb-4 py-3 rounded-2xl font-bold text-sm bg-red-100 text-red-600';
+        fb.textContent = '🔄 Not quite! Try again.';
+        fb.classList.remove('hidden');
+        sentWrong++;
+        if (sentWrong >= 2) {
+          starsEarned = Math.max(1, starsEarned - 1);
+          xpEarned    = Math.floor(xpEarned * 0.85);
+        }
+      }
+    }
+
+    // ─── STEP 5: Finish Screen ────────────────────────────────────────────────
+    function renderFinish() {
+      // Award XP + mark complete
+      if (window.Store) {
+        Store.addXP(xpEarned);
+        Store.activateStreak();
+        Store.completeLesson(lesson.id);
+        Store.completeActivity('lessons');
+      }
+
+      // Check if next lesson exists and is unlocked
+      const nextLesson = LESSONS.find(l => l.id === lesson.id + 1);
+      let nextBtn = '';
+      if (nextLesson) {
+        const xp = window.Store ? Store.state.xp : 0;
+        const completedLessons = window.Store ? (Store.state.completedLessons || []) : [];
+        const xpOk = xp >= nextLesson.xpRequired;
+        const prevDone = completedLessons.includes(lesson.id);
+        if (xpOk && prevDone) {
+          nextBtn = `<button onclick="location.href='lesson_runner.html?lesson=${nextLesson.id}'"
+                             class="flex-1 py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-md shadow-pink-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                       Next Lesson <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                     </button>`;
+        }
+      }
+
+      document.getElementById('lesson-stage').innerHTML = `
+        <div class="step-panel text-center">
+          <!-- Confetti emoji -->
+          <div class="text-6xl mb-2">🎉</div>
+          <h1 class="font-headline text-3xl font-extrabold text-navy mb-1">Lesson Complete!</h1>
+          <p class="text-slate-500 font-body mb-6">${lesson.emoji} ${lesson.title}</p>
+
+          <!-- Stars -->
+          <div class="flex justify-center gap-3 mb-6">
+            ${[1,2,3].map(i => `
+              <span class="star-icon text-5xl ${i <= starsEarned ? 'earned' : 'text-slate-200'}">
+                ${i <= starsEarned ? '⭐' : '☆'}
+              </span>
+            `).join('')}
+          </div>
+
+          <!-- XP earned -->
+          <div class="inline-flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-2xl px-6 py-3 mb-8">
+            <span class="text-2xl">✨</span>
+            <span class="font-headline text-xl font-extrabold text-yellow-600">+${xpEarned} XP earned!</span>
+          </div>
+
+          <!-- Stats row -->
+          <div class="grid grid-cols-3 gap-3 mb-8">
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div class="text-2xl mb-1">📖</div>
+              <div class="font-bold text-navy text-sm">${lesson.vocab.length}</div>
+              <div class="text-xs text-slate-400">Words learnt</div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div class="text-2xl mb-1">${fillWrong === 0 ? '🎯' : fillWrong <= 1 ? '👍' : '💪'}</div>
+              <div class="font-bold text-navy text-sm">${lesson.fillBlanks.length - fillWrong}/${lesson.fillBlanks.length}</div>
+              <div class="text-xs text-slate-400">Quiz correct</div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div class="text-2xl mb-1">⭐</div>
+              <div class="font-bold text-navy text-sm">${starsEarned} / 3</div>
+              <div class="text-xs text-slate-400">Stars earned</div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-3">
+            <button onclick="location.href='6_Home_Forest_Expedition.html'"
+                    class="flex-1 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-all active:scale-95">
+              🏠 Back to Trail
+            </button>
+            ${nextBtn}
+          </div>
+        </div>
+      `;
+      // Update the progress bar to 100%
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('step-label').textContent = '✓';
+    }
+
+    // ─── Exit modal ───────────────────────────────────────────────────────────
+    function confirmExit() {
+      document.getElementById('exit-modal').classList.remove('hidden');
+    }
+    function closeExitModal() {
+      document.getElementById('exit-modal').classList.add('hidden');
+    }
+    function doExit() {
+      location.href = '6_Home_Forest_Expedition.html';
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
+    if (lesson) {
+      goToStep(1);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Capy Yara Adventures — Welcome</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js');
+    });
+  }
+</script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: {
+    colors: {
+      navy:       '#001f3f',
+      'navy-mid': '#002d5c',
+      'navy-light':'#0a3d6b',
+      'pink-brand':'#ec4899',
+      'green-brand':'#10b981',
+    },
+    fontFamily: {
+      headline: ['Plus Jakarta Sans'],
+      body:     ['Be Vietnam Pro'],
+      label:    ['Lexend'],
+    },
+    borderRadius: { DEFAULT:'1rem', lg:'2rem', xl:'3rem', full:'9999px' },
+    keyframes: {
+      'float-up':   { '0%,100%':{ transform:'translateY(0)' },    '50%':{ transform:'translateY(-14px)' } },
+      'spin-slow':  { from:{ transform:'rotate(0deg)' },           to:  { transform:'rotate(360deg)' } },
+      'fade-in':    { from:{ opacity:'0', transform:'translateY(16px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
+      'slide-left': { from:{ opacity:'0', transform:'translateX(32px)' }, to:{ opacity:'1', transform:'translateX(0)' } },
+      'pop':        { '0%':{ transform:'scale(0.8)', opacity:'0' }, '70%':{ transform:'scale(1.05)' }, '100%':{ transform:'scale(1)', opacity:'1' } },
+      'pulse-ring': { '0%':{ transform:'scale(1)',   opacity:'0.6' }, '100%':{ transform:'scale(1.6)', opacity:'0' } },
+      'shimmer':    { from:{ backgroundPosition:'200% center' },   to:{ backgroundPosition:'-200% center' } },
+    },
+    animation: {
+      'float-up':   'float-up 3.6s ease-in-out infinite',
+      'float-up-d': 'float-up 4.4s ease-in-out 0.8s infinite',
+      'spin-slow':  'spin-slow 18s linear infinite',
+      'fade-in':    'fade-in 0.5s ease both',
+      'slide-left': 'slide-left 0.45s cubic-bezier(.4,0,.2,1) both',
+      'pop':        'pop 0.4s cubic-bezier(.4,0,.2,1) both',
+      'pulse-ring': 'pulse-ring 2s ease-out infinite',
+      'shimmer':    'shimmer 3s linear infinite',
+    },
+  }},
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  body { background: #001f3f; }
+
+  /* particle dots */
+  .particle {
+    position: absolute; border-radius: 9999px;
+    background: rgba(255,255,255,0.12);
+    animation: float-up var(--dur,4s) ease-in-out var(--delay,0s) infinite;
+  }
+
+  /* tab underline slide */
+  .tab-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; height: 3px; border-radius: 9999px;
+    background: #ec4899;
+    transition: left 0.3s cubic-bezier(.4,0,.2,1), width 0.3s cubic-bezier(.4,0,.2,1);
+    left: var(--tab-left, 0%);
+    width: var(--tab-width, 50%);
+  }
+
+  /* password strength bar segments */
+  .strength-seg { height:4px; border-radius:9999px; transition: background 0.3s; }
+
+  /* shimmer button */
+  .btn-shimmer {
+    background-size: 200% auto;
+    background-image: linear-gradient(120deg, #ec4899 0%, #f97316 30%, #ec4899 60%, #f97316 100%);
+    animation: shimmer 2.5s linear infinite;
+  }
+
+  /* form slide transition */
+  .form-panel { transition: opacity 0.3s, transform 0.3s; }
+  .form-panel.hidden-panel { opacity:0; transform:translateX(24px); pointer-events:none; position:absolute; inset:0; }
+
+  /* input icon slot */
+  .input-wrap { position: relative; }
+  .input-wrap .icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); pointer-events:none; }
+  .input-wrap input { padding-left: 44px; }
+  .input-wrap .eye-btn { position:absolute; right:14px; top:50%; transform:translateY(-50%); }
+</style>
+</head>
+<body class="min-h-screen flex items-stretch">
+
+<!-- ═══ LEFT PANEL (desktop) ═══════════════════════════════════════════════ -->
+<div class="hidden lg:flex w-[52%] relative flex-col items-center justify-center overflow-hidden bg-navy select-none">
+
+  <!-- animated blob bg -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full bg-pink-brand/10 blur-[100px] animate-spin-slow origin-center"></div>
+    <div class="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-green-brand/10 blur-[80px]" style="animation:spin-slow 24s linear reverse infinite"></div>
+  </div>
+
+  <!-- particle field -->
+  <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+
+  <!-- floating badge cards -->
+  <div class="absolute top-24 left-12 animate-float-up">
+    <div class="bg-white/10 backdrop-blur border border-white/15 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+      <div class="w-10 h-10 rounded-full bg-pink-brand flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings:'FILL' 1;">style</span>
+      </div>
+      <div>
+        <p class="font-label text-white text-xs font-bold">Card Explorer</p>
+        <p class="font-body text-white/50 text-[10px]">Complete a deck</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute top-40 right-10 animate-float-up-d">
+    <div class="bg-white/10 backdrop-blur border border-white/15 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+      <div class="w-10 h-10 rounded-full bg-green-brand flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings:'FILL' 1;">local_fire_department</span>
+      </div>
+      <div>
+        <p class="font-label text-white text-xs font-bold">Week Warrior</p>
+        <p class="font-body text-white/50 text-[10px]">7-day streak</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute bottom-32 left-10 animate-float-up" style="animation-duration:5s; animation-delay:1.2s">
+    <div class="bg-white/10 backdrop-blur border border-white/15 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+      <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center">
+        <span class="font-headline text-white text-lg font-black">+XP</span>
+      </div>
+      <div>
+        <p class="font-label text-white text-xs font-bold">Level Up!</p>
+        <p class="font-body text-white/50 text-[10px]">Earn XP every day</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="absolute bottom-20 right-16 animate-float-up-d" style="animation-duration:4s; animation-delay:2s">
+    <div class="bg-white/10 backdrop-blur border border-white/15 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+      <div class="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings:'FILL' 1;">emoji_events</span>
+      </div>
+      <div>
+        <p class="font-label text-white text-xs font-bold">Legend</p>
+        <p class="font-body text-white/50 text-[10px]">Earn every badge</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yara character -->
+  <div class="relative z-10 flex flex-col items-center gap-8">
+    <!-- speech bubble -->
+    <div class="relative bg-white rounded-[1.5rem] px-7 py-5 shadow-2xl max-w-xs text-center">
+      <p class="font-headline text-navy text-xl font-extrabold leading-snug">
+        Ready for your<br/>English adventure?
+      </p>
+      <p class="font-body text-navy/60 text-sm mt-1">15 badges waiting to be earned!</p>
+      <!-- tail -->
+      <div class="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-0 h-0"
+           style="border-left:14px solid transparent;border-right:14px solid transparent;border-top:14px solid white;"></div>
+    </div>
+
+    <!-- Yara -->
+    <div class="relative">
+      <!-- pulse ring -->
+      <div class="absolute inset-0 rounded-full bg-pink-brand/30 animate-pulse-ring"></div>
+      <div class="w-72 h-72 rounded-full border-4 border-white/20 bg-navy-mid/60 flex items-center justify-center overflow-hidden shadow-2xl shadow-pink-brand/20">
+        <img src="yara.png" alt="Capy Yara" class="w-full h-full object-cover mix-blend-multiply drop-shadow-xl"/>
+      </div>
+      <!-- name badge -->
+      <div class="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-pink-brand px-8 py-2 rounded-full shadow-xl shadow-pink-brand/40 whitespace-nowrap">
+        <p class="font-headline text-white text-sm font-extrabold">Capy Yara 🦫</p>
+      </div>
+    </div>
+
+    <!-- stat row -->
+    <div class="flex gap-8 mt-8">
+      <div class="text-center">
+        <p class="font-headline text-white text-2xl font-black">15</p>
+        <p class="font-label text-white/50 text-xs uppercase tracking-widest">Badges</p>
+      </div>
+      <div class="w-px bg-white/15"></div>
+      <div class="text-center">
+        <p class="font-headline text-white text-2xl font-black">20+</p>
+        <p class="font-label text-white/50 text-xs uppercase tracking-widest">Activities</p>
+      </div>
+      <div class="w-px bg-white/15"></div>
+      <div class="text-center">
+        <p class="font-headline text-white text-2xl font-black">∞</p>
+        <p class="font-label text-white/50 text-xs uppercase tracking-widest">Fun</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RIGHT PANEL ═════════════════════════════════════════════════════════ -->
+<div class="flex-1 flex flex-col items-center justify-center px-6 py-12 overflow-y-auto bg-[#f5f7fa] relative">
+
+  <!-- mobile logo -->
+  <div class="lg:hidden flex items-center gap-3 mb-8">
+    <img src="yara.png" alt="Yara" class="w-12 h-12 rounded-full bg-navy p-1"/>
+    <div>
+      <p class="font-headline text-navy text-xl font-extrabold leading-none">Capy Yara</p>
+      <p class="font-body text-slate-500 text-xs">Adventures</p>
+    </div>
+  </div>
+
+  <!-- auth card -->
+  <div class="w-full max-w-md bg-white rounded-[2rem] shadow-2xl shadow-navy/10 overflow-hidden animate-fade-in">
+
+    <!-- card header -->
+    <div class="bg-navy px-8 pt-8 pb-6">
+      <h1 class="font-headline text-white text-3xl font-extrabold">Welcome back 👋</h1>
+      <p class="font-body text-white/60 text-sm mt-1" id="header-sub">Sign in to continue your adventure.</p>
+    </div>
+
+    <!-- tab switcher -->
+    <div class="px-8 pt-5">
+      <div class="relative tab-bar flex border-b border-slate-200 pb-0" id="tab-bar">
+        <button id="tab-login" onclick="switchTab('login')"
+                class="tab-btn flex-1 pb-3 font-label font-bold text-sm transition-colors text-pink-brand">
+          Log In
+        </button>
+        <button id="tab-signup" onclick="switchTab('signup')"
+                class="tab-btn flex-1 pb-3 font-label font-bold text-sm transition-colors text-slate-400">
+          Sign Up
+        </button>
+      </div>
+    </div>
+
+    <!-- forms container -->
+    <div class="relative px-8 py-7" style="min-height:340px;">
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="form-login" class="form-panel flex flex-col gap-5">
+
+        <div class="flex flex-col gap-4">
+          <!-- email -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Email</label>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined icon text-slate-400 text-xl">mail</span>
+              <input id="login-email" type="email" placeholder="your@email.com" autocomplete="email"
+                     class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                            font-body text-sm text-slate-800 placeholder:text-slate-400
+                            focus:outline-none focus:border-pink-brand transition-all"/>
+            </div>
+            <p id="err-login-email" class="text-red-500 text-xs font-label hidden"></p>
+          </div>
+
+          <!-- password -->
+          <div class="flex flex-col gap-1.5">
+            <div class="flex justify-between items-center">
+              <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Password</label>
+              <button onclick="forgotPassword()" class="font-label text-xs text-pink-brand hover:underline">Forgot password?</button>
+            </div>
+            <div class="input-wrap">
+              <span class="material-symbols-outlined icon text-slate-400 text-xl">lock</span>
+              <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"
+                     class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                            font-body text-sm text-slate-800 placeholder:text-slate-400
+                            focus:outline-none focus:border-pink-brand transition-all pr-12"/>
+              <button onclick="togglePw('login-password', this)" class="eye-btn text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined text-xl">visibility</span>
+              </button>
+            </div>
+            <p id="err-login-password" class="text-red-500 text-xs font-label hidden"></p>
+          </div>
+
+          <!-- remember me -->
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input id="remember-me" type="checkbox" class="w-4 h-4 rounded accent-pink-500"/>
+            <span class="font-label text-sm text-slate-600">Remember me</span>
+          </label>
+        </div>
+
+        <!-- submit -->
+        <button onclick="handleLogin()"
+                class="w-full h-12 rounded-xl font-label font-bold text-white text-sm
+                       bg-pink-brand hover:bg-pink-500 active:scale-95 transition-all
+                       shadow-lg shadow-pink-brand/30 flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">login</span>
+          Log In
+        </button>
+
+        <p id="err-login-general" class="text-red-500 text-xs font-label text-center hidden"></p>
+      </div>
+
+      <!-- ── SIGN UP FORM ── -->
+      <div id="form-signup" class="form-panel hidden-panel flex flex-col gap-4">
+
+        <!-- avatar picker -->
+        <div class="flex flex-col gap-2">
+          <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Pick your avatar</label>
+          <div id="avatar-row" class="flex gap-2 flex-wrap">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+
+        <!-- name -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Display Name</label>
+          <div class="input-wrap">
+            <span class="material-symbols-outlined icon text-slate-400 text-xl">badge</span>
+            <input id="signup-name" type="text" placeholder="e.g. Luna, Mateo…" maxlength="24" autocomplete="name"
+                   class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                          font-body text-sm text-slate-800 placeholder:text-slate-400
+                          focus:outline-none focus:border-pink-brand transition-all"/>
+          </div>
+          <p id="err-signup-name" class="text-red-500 text-xs font-label hidden"></p>
+        </div>
+
+        <!-- email -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Email</label>
+          <div class="input-wrap">
+            <span class="material-symbols-outlined icon text-slate-400 text-xl">mail</span>
+            <input id="signup-email" type="email" placeholder="your@email.com" autocomplete="email"
+                   class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                          font-body text-sm text-slate-800 placeholder:text-slate-400
+                          focus:outline-none focus:border-pink-brand transition-all"/>
+          </div>
+          <p id="err-signup-email" class="text-red-500 text-xs font-label hidden"></p>
+        </div>
+
+        <!-- password -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Password</label>
+          <div class="input-wrap">
+            <span class="material-symbols-outlined icon text-slate-400 text-xl">lock</span>
+            <input id="signup-password" type="password" placeholder="Min. 6 characters" autocomplete="new-password"
+                   oninput="updateStrength()"
+                   class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                          font-body text-sm text-slate-800 placeholder:text-slate-400
+                          focus:outline-none focus:border-pink-brand transition-all pr-12"/>
+            <button onclick="togglePw('signup-password', this)" class="eye-btn text-slate-400 hover:text-slate-600 transition-colors">
+              <span class="material-symbols-outlined text-xl">visibility</span>
+            </button>
+          </div>
+          <!-- strength meter -->
+          <div class="flex gap-1 mt-0.5" id="strength-bar">
+            <div class="strength-seg flex-1 bg-slate-200" id="s1"></div>
+            <div class="strength-seg flex-1 bg-slate-200" id="s2"></div>
+            <div class="strength-seg flex-1 bg-slate-200" id="s3"></div>
+            <div class="strength-seg flex-1 bg-slate-200" id="s4"></div>
+          </div>
+          <p id="strength-label" class="text-[11px] font-label text-slate-400"></p>
+          <p id="err-signup-password" class="text-red-500 text-xs font-label hidden"></p>
+        </div>
+
+        <!-- confirm -->
+        <div class="flex flex-col gap-1.5">
+          <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Confirm Password</label>
+          <div class="input-wrap">
+            <span class="material-symbols-outlined icon text-slate-400 text-xl">lock_reset</span>
+            <input id="signup-confirm" type="password" placeholder="Repeat password" autocomplete="new-password"
+                   class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
+                          font-body text-sm text-slate-800 placeholder:text-slate-400
+                          focus:outline-none focus:border-pink-brand transition-all pr-12"/>
+            <button onclick="togglePw('signup-confirm', this)" class="eye-btn text-slate-400 hover:text-slate-600 transition-colors">
+              <span class="material-symbols-outlined text-xl">visibility</span>
+            </button>
+          </div>
+          <p id="err-signup-confirm" class="text-red-500 text-xs font-label hidden"></p>
+        </div>
+
+        <!-- submit -->
+        <button onclick="handleSignup()"
+                class="w-full h-12 rounded-xl font-label font-bold text-white text-sm
+                       bg-pink-brand hover:bg-pink-500 active:scale-95 transition-all
+                       shadow-lg shadow-pink-brand/30 flex items-center justify-center gap-2 mt-1">
+          <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">person_add</span>
+          Create Account
+        </button>
+
+        <p id="err-signup-general" class="text-red-500 text-xs font-label text-center hidden"></p>
+      </div>
+    </div>
+
+    <!-- divider -->
+    <div class="px-8 flex items-center gap-3">
+      <div class="flex-1 h-px bg-slate-200"></div>
+      <span class="font-label text-xs text-slate-400">or</span>
+      <div class="flex-1 h-px bg-slate-200"></div>
+    </div>
+
+    <!-- guest button -->
+    <div class="px-8 py-6">
+      <button onclick="handleGuest()"
+              class="w-full h-12 rounded-xl font-label font-bold text-slate-600 text-sm
+                     bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all border border-slate-200
+                     flex items-center justify-center gap-2">
+        <span class="text-lg">🌿</span>
+        Continue as Guest
+      </button>
+      <p class="text-center font-body text-[11px] text-slate-400 mt-3">
+        Guest progress is saved locally and won't sync across devices.
+      </p>
+    </div>
+  </div>
+
+  <!-- bottom hint -->
+  <p id="bottom-hint" class="mt-6 font-body text-sm text-slate-500 text-center animate-fade-in">
+    Don't have an account?
+    <button onclick="switchTab('signup')" class="text-pink-brand font-bold hover:underline ml-1">Sign up free →</button>
+  </p>
+
+</div>
+
+<!-- ═══ SUCCESS OVERLAY ══════════════════════════════════════════════════════ -->
+<div id="success-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-navy/95 backdrop-blur hidden">
+  <div class="animate-pop flex flex-col items-center gap-6 text-center px-8">
+    <div class="w-28 h-28 rounded-full bg-green-brand flex items-center justify-center shadow-2xl shadow-green-brand/40">
+      <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
+    </div>
+    <div>
+      <p id="success-title" class="font-headline text-white text-3xl font-extrabold">Welcome back!</p>
+      <p id="success-sub"   class="font-body text-white/60 text-base mt-1">Taking you to the forest…</p>
+    </div>
+    <div class="flex gap-1">
+      <div class="w-2 h-2 rounded-full bg-white/40 animate-bounce" style="animation-delay:0s"></div>
+      <div class="w-2 h-2 rounded-full bg-white/40 animate-bounce" style="animation-delay:0.15s"></div>
+      <div class="w-2 h-2 rounded-full bg-white/40 animate-bounce" style="animation-delay:0.3s"></div>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+/* ── avatar picker ──────────────────────────────── */
+const AVATARS = ['🦫','🦊','🐼','🐸','🦁','🐯','🐧','🦋','🐝','🌿'];
+let selectedAvatar = '🦫';
+
+function renderAvatars() {
+  document.getElementById('avatar-row').innerHTML = AVATARS.map(a => `
+    <button onclick="pickAvatar('${a}', this)"
+            data-avatar="${a}"
+            class="avatar-btn w-11 h-11 rounded-full bg-slate-100 hover:bg-pink-100 text-2xl
+                   transition-all border-2 border-transparent flex items-center justify-center
+                   ${a === selectedAvatar ? 'border-pink-brand bg-pink-50 scale-110' : ''}">
+      ${a}
+    </button>`).join('');
+}
+
+function pickAvatar(emoji, btn) {
+  selectedAvatar = emoji;
+  document.querySelectorAll('.avatar-btn').forEach(b => {
+    b.classList.remove('border-pink-brand', 'bg-pink-50', 'scale-110');
+    b.classList.add('border-transparent');
+  });
+  btn.classList.add('border-pink-brand', 'bg-pink-50', 'scale-110');
+  btn.classList.remove('border-transparent');
+}
+renderAvatars();
+
+/* ── tab switcher ───────────────────────────────── */
+let currentTab = 'login';
+
+function switchTab(tab) {
+  currentTab = tab;
+  const loginForm  = document.getElementById('form-login');
+  const signupForm = document.getElementById('form-signup');
+  const tabLogin   = document.getElementById('tab-login');
+  const tabSignup  = document.getElementById('tab-signup');
+  const bar        = document.getElementById('tab-bar');
+  const headerSub  = document.getElementById('header-sub');
+  const hint       = document.getElementById('bottom-hint');
+
+  if (tab === 'login') {
+    loginForm.classList.remove('hidden-panel');
+    signupForm.classList.add('hidden-panel');
+    tabLogin.classList.replace('text-slate-400', 'text-pink-brand');
+    tabSignup.classList.replace('text-pink-brand', 'text-slate-400');
+    bar.style.setProperty('--tab-left',  '0%');
+    bar.style.setProperty('--tab-width', '50%');
+    headerSub.textContent = 'Sign in to continue your adventure.';
+    hint.innerHTML = `Don't have an account? <button onclick="switchTab('signup')" class="text-pink-brand font-bold hover:underline ml-1">Sign up free →</button>`;
+  } else {
+    signupForm.classList.remove('hidden-panel');
+    loginForm.classList.add('hidden-panel');
+    tabSignup.classList.replace('text-slate-400', 'text-pink-brand');
+    tabLogin.classList.replace('text-pink-brand', 'text-slate-400');
+    bar.style.setProperty('--tab-left',  '50%');
+    bar.style.setProperty('--tab-width', '50%');
+    headerSub.textContent = 'Create your free explorer account.';
+    hint.innerHTML = `Already have an account? <button onclick="switchTab('login')" class="text-pink-brand font-bold hover:underline ml-1">Log in →</button>`;
+  }
+  clearErrors();
+}
+
+/* ── error helpers ──────────────────────────────── */
+function clearErrors() {
+  document.querySelectorAll('[id^="err-"]').forEach(el => {
+    el.textContent = '';
+    el.classList.add('hidden');
+  });
+  document.querySelectorAll('input').forEach(i => {
+    i.classList.remove('border-red-400');
+    i.classList.add('border-slate-200');
+  });
+}
+
+function showError(fieldId, msg) {
+  const errEl = document.getElementById('err-' + fieldId);
+  if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
+  const inputId = fieldId.replace('login-','login-').replace('signup-','signup-');
+  const inputEl = document.getElementById(inputId);
+  if (inputEl) { inputEl.classList.replace('border-slate-200', 'border-red-400'); }
+}
+
+/* ── password visibility toggle ────────────────── */
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon  = btn.querySelector('.material-symbols-outlined');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.textContent = 'visibility_off';
+  } else {
+    input.type = 'password';
+    icon.textContent = 'visibility';
+  }
+}
+
+/* ── password strength ──────────────────────────── */
+function updateStrength() {
+  const pw = document.getElementById('signup-password').value;
+  let score = 0;
+  if (pw.length >= 6)  score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/\d/.test(pw) || /[^A-Za-z0-9]/.test(pw)) score++;
+
+  const colors = ['bg-red-400','bg-orange-400','bg-yellow-400','bg-green-brand'];
+  const labels = ['Too short','Weak','Fair','Strong'];
+  for (let i = 1; i <= 4; i++) {
+    const seg = document.getElementById('s' + i);
+    seg.className = 'strength-seg flex-1 ' + (i <= score ? colors[score - 1] : 'bg-slate-200');
+  }
+  document.getElementById('strength-label').textContent = pw.length ? labels[score - 1] || '' : '';
+}
+
+/* ── success splash ─────────────────────────────── */
+function showSuccess(name, isNew = false) {
+  const overlay = document.getElementById('success-overlay');
+  document.getElementById('success-title').textContent = isNew
+    ? `Welcome, ${name}! 🎉`
+    : `Welcome back, ${name}! 🌿`;
+  document.getElementById('success-sub').textContent = 'Taking you to the forest…';
+  overlay.classList.remove('hidden');
+  setTimeout(() => { window.location.href = '6_Home_Forest_Expedition.html'; }, 2000);
+}
+
+/* ── login handler ──────────────────────────────── */
+async function handleLogin() {
+  clearErrors();
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  if (!email)    { showError('login-email',    'Email is required.');    return; }
+  if (!password) { showError('login-password', 'Password is required.'); return; }
+
+  const result = await Auth.login(email, password);
+  if (!result.ok) {
+    showError('login-' + result.field, result.error);
+    return;
+  }
+
+  // Attempt to sync Store with the remote DB or fallback to local
+  const storeKey = 'capyYaraState_' + result.user.id;
+  try {
+    const res = await fetch(`/api/db?type=state&userId=${result.user.id}`);
+    if (res.ok) {
+      const dbState = await res.json();
+      if (dbState) localStorage.setItem(storeKey, JSON.stringify(dbState));
+    }
+    const resSet = await fetch(`/api/db?type=settings&userId=${result.user.id}`);
+    if (resSet.ok) {
+      const dbSet = await resSet.json();
+      if (dbSet) localStorage.setItem('capySettings', JSON.stringify(dbSet));
+    }
+  } catch(e) {}
+  
+  const saved = localStorage.getItem(storeKey);
+  if (saved) localStorage.setItem('capyYaraState', saved);
+
+  showSuccess(result.user.name, false);
+}
+
+/* ── signup handler ─────────────────────────────── */
+async function handleSignup() {
+  clearErrors();
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm  = document.getElementById('signup-confirm').value;
+
+  if (!name)    { showError('signup-name',    'Name is required.');    return; }
+  if (!email)   { showError('signup-email',   'Email is required.');   return; }
+  if (!password){ showError('signup-password','Password is required.'); return; }
+  if (password !== confirm) {
+    showError('signup-confirm', 'Passwords do not match.');
+    return;
+  }
+
+  const result = await Auth.signUp(name, email, password, selectedAvatar);
+  if (!result.ok) {
+    showError('signup-' + result.field, result.error);
+    return;
+  }
+
+  // Also set playerName in the shared store
+  const storeData = JSON.parse(localStorage.getItem('capyYaraState_' + result.user.id) || '{}');
+  storeData.playerName = name;
+  localStorage.setItem('capyYaraState_' + result.user.id, JSON.stringify(storeData));
+  localStorage.setItem('capyYaraState', JSON.stringify(storeData));
+  
+  try {
+    await fetch('/api/db', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'state', userId: result.user.id, payload: storeData })
+    });
+  } catch(e) {}
+
+  showSuccess(result.user.name, true);
+}
+
+/* ── guest handler ──────────────────────────────── */
+function handleGuest() {
+  Auth.continueAsGuest();
+  showSuccess('Explorer', false);
+}
+
+/* ── forgot password ────────────────────────────── */
+function forgotPassword() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    showError('login-email', 'Enter your email above first.');
+    return;
+  }
+  // In a real app this would send an email. Here we just show a friendly message.
+  const users = JSON.parse(localStorage.getItem('capyUsers') || '[]');
+  const user  = users.find(u => u.email === email.toLowerCase());
+  if (!user) {
+    showError('login-email', 'No account found with that email.');
+    return;
+  }
+  alert(`🌿 Password recovery:\n\nIn a real app, a reset link would be sent to ${email}.\n\nFor this prototype, check your browser's localStorage.`);
+}
+
+/* ── particles ──────────────────────────────────── */
+function spawnParticles() {
+  const container = document.getElementById('particles');
+  if (!container) return;
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    const size = Math.random() * 8 + 3;
+    p.className = 'particle';
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%;
+      top:${Math.random() * 100}%;
+      --dur:${3 + Math.random() * 5}s;
+      --delay:${Math.random() * 4}s;
+      opacity:${0.05 + Math.random() * 0.15};
+    `;
+    container.appendChild(p);
+  }
+}
+spawnParticles();
+
+/* ── init tab bar position ──────────────────────── */
+document.getElementById('tab-bar').style.setProperty('--tab-left',  '0%');
+document.getElementById('tab-bar').style.setProperty('--tab-width', '50%');
+
+/* ── keyboard enter support ─────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (currentTab === 'login')  handleLogin();
+  else                         handleSignup();
+});
+
+/* ── redirect if already logged in ─────────────── */
+if (Auth.isLoggedIn()) {
+  const session = Auth.getSession();
+  // Show home directly without splash on auto-redirect
+  window.location.href = '6_Home_Forest_Expedition.html';
+}
+</script>
+</body>
+</html>

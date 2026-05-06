@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rankings — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode:"class",
+  theme:{ extend:{
+    colors:{
+      "navy":"#001f3f","navy-light":"#002a54",
+      "pink-brand":"#ec4899","green-brand":"#10b981",
+      "gold":"#fbbf24","silver":"#94a3b8","bronze":"#b45309"
+    },
+    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
+  }}
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes popIn  { 0%{transform:scale(0.8)} 80%{transform:scale(1.05)} 100%{transform:scale(1)} }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.5)} 50%{box-shadow:0 0 0 10px rgba(251,191,36,0)} }
+
+  .fade-up  { animation: fadeUp 0.5s ease both; }
+  .pop-in   { animation: popIn  0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+  .float    { animation: float  3s ease-in-out infinite; }
+
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 12px;
+  }
+
+  .you-row {
+    background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(16,185,129,0.10));
+    border-left: 3px solid #ec4899;
+  }
+
+  .podium-block { border-radius: 1.5rem 1.5rem 0 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen">
+
+<!-- Nav placeholders -->
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-28 pb-24 px-4 max-w-4xl mx-auto">
+
+  <!-- Header -->
+  <div class="text-center mb-12 fade-up">
+    <div class="float inline-block mb-4">
+      <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-gold/60 shadow-2xl shadow-gold/20 mx-auto">
+        <img src="yara.png?v=2" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+      </div>
+    </div>
+    <h1 class="font-headline text-4xl md:text-5xl font-black text-white mb-2">
+      Global Rankings 🏆
+    </h1>
+    <p class="font-body text-slate-400 max-w-md mx-auto">
+      Top explorers from around the world! Earn XP to climb the ranks.
+    </p>
+  </div>
+
+  <!-- Your stat pill -->
+  <div id="your-pill" class="hidden mb-8 fade-up">
+    <div class="flex items-center justify-center gap-3 bg-pink-500/15 border border-pink-500/30 rounded-full px-6 py-3 w-fit mx-auto">
+      <span class="text-2xl" id="your-avatar">🦫</span>
+      <span class="font-label font-bold text-pink-300 text-sm" id="your-name">You</span>
+      <span class="text-white/30">·</span>
+      <span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
+      <span class="font-label font-bold text-yellow-300 text-sm" id="your-xp">0 XP</span>
+      <span class="text-white/30">·</span>
+      <span class="font-label font-bold text-white/60 text-sm">Rank #<span id="your-rank">—</span></span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="flex flex-col items-center justify-center py-20">
+    <div class="w-12 h-12 border-4 border-pink-500/20 border-t-pink-500 rounded-full mb-4" style="animation:spin 1s linear infinite;"></div>
+    <p class="font-label text-slate-400 font-bold">Summoning Rankings…</p>
+  </div>
+
+  <style>@keyframes spin{to{transform:rotate(360deg)}}.spin-anim{animation:spin 1s linear infinite;}</style>
+
+  <!-- Error -->
+  <div id="error-box" class="hidden flex-col items-center justify-center py-20 text-center">
+    <span class="material-symbols-outlined text-6xl text-red-400 mb-4">wifi_off</span>
+    <p class="font-label text-slate-300 font-bold mb-2">Could not reach the server.</p>
+    <p class="font-body text-slate-500 text-sm mb-5">Make sure the server is running on port 8765.</p>
+    <button onclick="fetchLeaderboard()"
+            class="px-6 py-2.5 bg-pink-500 hover:bg-pink-400 text-white rounded-full font-label font-bold text-sm active:scale-95 transition-all">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div id="leaderboard-content" class="hidden flex-col gap-10">
+
+    <!-- Podium -->
+    <div id="podium" class="flex items-end justify-center gap-3 md:gap-6 h-72 fade-up"></div>
+
+    <!-- List (rank 4+) -->
+    <div class="bg-navy-light border border-white/8 rounded-[2rem] overflow-hidden fade-up" style="animation-delay:0.15s;">
+      <div class="px-6 py-4 border-b border-white/5 bg-white/4 flex gap-4 font-label text-xs uppercase tracking-widest text-slate-500 font-bold">
+        <div class="w-8 text-center">#</div>
+        <div class="flex-1 pl-2">Explorer</div>
+        <div class="w-20 text-right">Badges</div>
+        <div class="w-24 text-right">XP</div>
+      </div>
+      <div id="list-container" class="flex flex-col divide-y divide-white/5"></div>
+    </div>
+
+    <!-- XP tips -->
+    <div class="bg-gradient-to-br from-emerald-900/40 to-navy-light border border-emerald-500/20 rounded-[2rem] p-7 fade-up" style="animation-delay:0.3s;">
+      <h3 class="font-headline text-lg font-bold text-emerald-300 mb-4">⚡ How to climb the ranks</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-white/5 rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-1">🃏</div>
+          <p class="font-label text-xs font-bold text-white">Flashcards</p>
+          <p class="font-body text-xs text-emerald-400 mt-0.5">+50 XP / deck</p>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-1">🎮</div>
+          <p class="font-label text-xs font-bold text-white">Games</p>
+          <p class="font-body text-xs text-emerald-400 mt-0.5">+10–30 XP</p>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-1">💬</div>
+          <p class="font-label text-xs font-bold text-white">Chat with Yara</p>
+          <p class="font-body text-xs text-emerald-400 mt-0.5">+5 XP / msg</p>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-4 text-center">
+          <div class="text-2xl mb-1">🔥</div>
+          <p class="font-label text-xs font-bold text-white">Daily Streak</p>
+          <p class="font-body text-xs text-emerald-400 mt-0.5">+20–250 XP</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav('leaderboard'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('leaderboard'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('leaderboard'));
+  Components.mount('footer-placeholder', Components.renderFooter());
+
+  // ── Avatar colour by name hash ──────────────────────────────────────────────
+  const AV_COLS = [
+    'bg-blue-500','bg-pink-500','bg-emerald-500',
+    'bg-purple-500','bg-orange-500','bg-teal-500','bg-rose-500','bg-amber-500'
+  ];
+  function avColor(str) {
+    if (!str) return AV_COLS[0];
+    const sum = Array.from(str).reduce((a,c) => a + c.charCodeAt(0), 0);
+    return AV_COLS[sum % AV_COLS.length];
+  }
+
+  // ── Get current player from Store ──────────────────────────────────────────
+  function getLocalPlayer() {
+    try {
+      const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
+      const name = sess?.name || Store.state.playerName || 'You';
+      const avatar = sess?.avatar || '🦫';
+      const xp = Store.state.xp || 0;
+      const badges = (Store.state.badges || []).length;
+      return { id: '__local__', name, avatar, xp, badgesCount: badges, isYou: true };
+    } catch(e) {
+      return { id: '__local__', name: 'You', avatar: '🦫', xp: 0, badgesCount: 0, isYou: true };
+    }
+  }
+
+  // ── Fetch & render ──────────────────────────────────────────────────────────
+  let confFired = false;
+
+  async function fetchLeaderboard() {
+    const ld  = document.getElementById('loading');
+    const err = document.getElementById('error-box');
+    const ct  = document.getElementById('leaderboard-content');
+
+    ld.style.display  = 'flex';
+    err.classList.add('hidden');    err.classList.remove('flex');
+    ct.classList.add('hidden');     ct.classList.remove('flex');
+
+    try {
+      const res  = await fetch('/api/db/leaderboard');
+      if (!res.ok) throw new Error('bad status');
+      const remote = await res.json();
+
+      // Inject local player, deduplicate by name
+      const local = getLocalPlayer();
+      const merged = [...remote];
+      const dup = merged.findIndex(u => u.name.toLowerCase() === local.name.toLowerCase());
+      if (dup >= 0) {
+        // Merge XP — take the higher value so local progress shows
+        merged[dup].xp = Math.max(merged[dup].xp, local.xp);
+        merged[dup].isYou = true;
+        merged[dup].badgesCount = Math.max(merged[dup].badgesCount || 0, local.badgesCount);
+      } else if (local.xp > 0 || local.name !== 'You') {
+        merged.push(local);
+      }
+
+      // Sort by XP desc
+      merged.sort((a, b) => b.xp - a.xp);
+
+      // Find player rank
+      const youIdx = merged.findIndex(u => u.isYou);
+      if (youIdx >= 0) {
+        document.getElementById('your-pill').classList.remove('hidden');
+        document.getElementById('your-avatar').textContent = local.avatar;
+        document.getElementById('your-name').textContent   = local.name;
+        document.getElementById('your-xp').textContent     = `${local.xp} XP`;
+        document.getElementById('your-rank').textContent   = youIdx + 1;
+      }
+
+      renderPodium(merged);
+      renderList(merged);
+
+      ld.style.display = 'none';
+      ct.classList.remove('hidden');
+      ct.classList.add('flex');
+
+      if (!confFired && merged.length > 0) {
+        confetti({ particleCount: 80, spread: 65, origin: { y: 0.5 },
+                   colors: ['#fbbf24','#ec4899','#10b981','#3b82f6'] });
+        confFired = true;
+      }
+
+    } catch(e) {
+      ld.style.display = 'none';
+      err.classList.remove('hidden');
+      err.classList.add('flex');
+    }
+  }
+
+  // ── Podium ──────────────────────────────────────────────────────────────────
+  function podiumCard(user, rank) {
+    if (!user) {
+      return `<div class="w-full h-full flex items-center justify-center opacity-20 bg-white/5 rounded-t-3xl border-t-4 border-dashed border-white/20 text-slate-600 text-3xl font-headline">?</div>`;
+    }
+    const col    = avColor(user.name);
+    const medals = ['🥇','🥈','🥉'];
+    const heights = ['h-48 md:h-56','h-36 md:h-44','h-28 md:h-36'];
+    const bgs    = ['bg-[#fbbf24]','bg-[#94a3b8]','bg-[#b45309]'];
+    const rings  = ['ring-4 ring-gold/40','ring-4 ring-silver/40','ring-4 ring-bronze/40'];
+    const youBadge = user.isYou ? `<span class="absolute -top-1 -left-1 bg-pink-500 text-white text-[9px] font-label font-black px-1.5 py-0.5 rounded-full">YOU</span>` : '';
+
+    return `
+      <div class="flex flex-col items-center w-full">
+        <!-- Avatar -->
+        <div class="flex flex-col items-center mb-3 pop-in" style="animation-delay:${(rank-1)*0.1}s">
+          <div class="relative ${col} w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center text-2xl md:text-3xl shadow-xl ${rings[rank-1]} mb-1">
+            ${user.avatar}
+            ${youBadge}
+          </div>
+          <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${user.name}</p>
+          <p class="font-label text-xs text-slate-400">${user.xp.toLocaleString()} XP</p>
+        </div>
+        <!-- Block -->
+        <div class="w-full ${heights[rank-1]} ${bgs[rank-1]} podium-block flex flex-col items-center justify-start pt-3 shadow-2xl relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></div>
+          <span class="text-2xl relative z-10">${medals[rank-1]}</span>
+          <span class="font-headline font-black text-slate-900 text-lg relative z-10">${rank}</span>
+          <span class="font-label text-xs text-slate-800/60 relative z-10">${user.badgesCount} 🏅</span>
+        </div>
+      </div>`;
+  }
+
+  function renderPodium(data) {
+    const podium = document.getElementById('podium');
+    // Order: 2nd, 1st, 3rd (classic podium layout)
+    const order = [data[1], data[0], data[2]];
+    const ranks  = [2, 1, 3];
+    const widths = ['w-28 md:w-36','w-32 md:w-44','w-28 md:w-36'];
+    const offsets= ['translate-y-8','','translate-y-14'];
+
+    podium.innerHTML = order.map((user, i) => `
+      <div class="flex flex-col items-end ${widths[i]} ${offsets[i]}">
+        ${podiumCard(user, ranks[i])}
+      </div>`
+    ).join('');
+  }
+
+  // ── List (rank 4+) ──────────────────────────────────────────────────────────
+  function renderList(data) {
+    const container = document.getElementById('list-container');
+    const rest = data.slice(3);
+
+    if (rest.length === 0) {
+      container.innerHTML = `<div class="py-10 text-center text-slate-500 font-label text-sm italic">
+        Keep playing to see more explorers here! 🌿
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = rest.map((user, i) => {
+      const rank = i + 4;
+      const col  = avColor(user.name);
+      const youCls = user.isYou ? 'you-row' : 'hover:bg-white/[0.03]';
+      return `
+        <div class="px-5 py-4 flex gap-3 items-center transition-colors ${youCls}" style="animation:fadeUp 0.4s ease ${i*0.05}s both;">
+          <div class="w-8 text-center font-headline font-black text-slate-500 text-sm">${rank}</div>
+          <div class="${col} w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 shadow-inner relative">
+            ${user.avatar}
+            ${user.isYou ? '<span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-pink-500 rounded-full border border-navy"></span>' : ''}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-headline font-bold text-sm ${user.isYou ? 'text-pink-300' : 'text-white'} truncate">
+              ${user.name}${user.isYou ? ' <span class="font-label text-xs text-pink-400/70">(You)</span>' : ''}
+            </p>
+            <p class="font-body text-xs text-slate-500">${user.badgesCount} badge${user.badgesCount !== 1 ? 's' : ''} earned</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="font-label font-bold text-sm ${user.isYou ? 'text-pink-300' : 'text-slate-300'}">${user.xp.toLocaleString()}</span>
+            <span class="font-label text-xs text-slate-600 ml-1">XP</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', fetchLeaderboard);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) fetchLeaderboard(); });
+</script>
+</body>
+</html>

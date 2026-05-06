@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grammar Lab — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{
+  colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
+  fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
+  borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
+}}}
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{0%{transform:scale(0.7)}80%{transform:scale(1.05)}100%{transform:scale(1)}}
+  @keyframes confettiFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(200px) rotate(360deg);opacity:0}}
+  .fade-up{animation:fadeUp 0.4s ease both;}
+  .pop-in{animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;}
+
+  /* Lesson tab */
+  .lesson-tab{
+    padding:10px 20px;border-radius:999px;cursor:pointer;font-family:'Lexend',sans-serif;font-weight:700;font-size:0.8rem;
+    background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);color:#94a3b8;
+    transition:all 0.15s;white-space:nowrap;-webkit-tap-highlight-color:transparent;
+  }
+  .lesson-tab.active{background:rgba(234,179,8,0.25);border-color:#eab308;color:#fde047;}
+
+  /* Quiz option */
+  .q-opt{
+    width:100%;text-align:left;padding:14px 20px;border-radius:1.25rem;cursor:pointer;
+    font-family:'Lexend',sans-serif;font-weight:600;font-size:0.9rem;
+    background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);color:#fff;
+    transition:all 0.15s;-webkit-tap-highlight-color:transparent;
+  }
+  .q-opt:hover:not(:disabled){background:rgba(255,255,255,0.12);}
+  .q-opt.correct{background:rgba(16,185,129,0.25);border-color:#10b981;color:#6ee7b7;}
+  .q-opt.wrong  {background:rgba(244,63,94,0.2); border-color:#f43f5e;color:#fca5a5;}
+
+  /* Example sentence highlight */
+  .highlight{color:#fde047;font-weight:700;}
+
+  /* Rule card */
+  .rule-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:1.5rem;padding:20px 24px;}
+
+  .confetti-piece{position:fixed;pointer-events:none;z-index:9999;width:9px;height:9px;border-radius:2px;animation:confettiFall 1.1s ease-out forwards;}
+
+  /* Scroll tabs */
+  .tabs-scroll{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
+  .tabs-scroll::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body class="bg-navy font-body text-white min-h-screen flex flex-col">
+
+<!-- Header -->
+<header class="flex items-center gap-4 px-5 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50">
+  <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
+    <span class="material-symbols-outlined text-xl">arrow_back</span>
+  </button>
+  <div class="flex-1">
+    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold">Grammar Lab</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Learn Grammar! 📝</h1>
+  </div>
+  <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-full px-4 py-2 font-label font-bold text-sm text-yellow-300">
+    <span id="xp-disp">0</span> XP
+  </div>
+</header>
+
+<!-- Lesson tabs (scrollable) -->
+<div class="tabs-scroll border-b border-white/10 bg-navy/80">
+  <div class="flex gap-2 px-4 py-3 w-max" id="tabs-row"></div>
+</div>
+
+<main class="flex-1 flex flex-col gap-6 px-4 py-6 max-w-2xl mx-auto w-full" id="lesson-area"></main>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script>
+// ── Lessons data ───────────────────────────────────────────────────────────────
+const LESSONS = [
+  {
+    id:'articles', icon:'📖', title:'Articles: a / an / the',
+    color:'bg-yellow-500/20 border-yellow-500/30', accent:'text-yellow-400',
+    rules:[
+      { rule:'Use <b>a</b> before consonant sounds', examples:['a <span class="highlight">cat</span>','a <span class="highlight">tree</span>','a <span class="highlight">big</span> dog'] },
+      { rule:'Use <b>an</b> before vowel sounds (a, e, i, o, u)', examples:['an <span class="highlight">apple</span>','an <span class="highlight">elephant</span>','an <span class="highlight">old</span> book'] },
+      { rule:'Use <b>the</b> for specific things we both know about', examples:['<span class="highlight">the</span> sun','<span class="highlight">the</span> cat in the garden','<span class="highlight">the</span> first day'] },
+    ],
+    questions:[
+      { q:'I saw ___ elephant at the zoo.', opts:['a','an','the','—'], correct:'an', exp:'Elephant starts with a vowel sound, so we use "an".' },
+      { q:'She is eating ___ orange.', opts:['a','an','the','—'], correct:'an', exp:'"Orange" starts with a vowel sound, so we use "an".' },
+      { q:'Please close ___ door.', opts:['a','an','the','—'], correct:'the', exp:'We use "the" because both people know which specific door.' },
+      { q:'I have ___ dog named Max.', opts:['a','an','the','—'], correct:'a', exp:'"Dog" starts with a consonant sound, so we use "a".' },
+      { q:'___ moon is very bright tonight.', opts:['A','An','The','—'], correct:'The', exp:'There is only one moon, so we use "the".' },
+    ]
+  },
+  {
+    id:'plurals', icon:'2️⃣', title:'Plural Nouns',
+    color:'bg-blue-500/20 border-blue-500/30', accent:'text-blue-400',
+    rules:[
+      { rule:'Most nouns: add <b>-s</b>', examples:['cat → cat<span class="highlight">s</span>','tree → tree<span class="highlight">s</span>','ball → ball<span class="highlight">s</span>'] },
+      { rule:'Nouns ending in -s, -sh, -ch, -x: add <b>-es</b>', examples:['bus → bus<span class="highlight">es</span>','dish → dish<span class="highlight">es</span>','watch → watch<span class="highlight">es</span>'] },
+      { rule:'Nouns ending in consonant + y: change <b>y → ies</b>', examples:['baby → bab<span class="highlight">ies</span>','city → cit<span class="highlight">ies</span>','butterfly → butterfl<span class="highlight">ies</span>'] },
+      { rule:'Irregular plurals (learn these!)', examples:['child → <span class="highlight">children</span>','mouse → <span class="highlight">mice</span>','tooth → <span class="highlight">teeth</span>','foot → <span class="highlight">feet</span>'] },
+    ],
+    questions:[
+      { q:'One dog, two ___', opts:['dogs','dogz','doges','dog'], correct:'dogs', exp:'Most nouns just add "-s".' },
+      { q:'One bus, three ___', opts:['bus','buss','buses','busis'], correct:'buses', exp:'"Bus" ends in -s, so we add "-es".' },
+      { q:'One baby, many ___', opts:['babys','babies','babyes','babis'], correct:'babies', exp:'"Baby" ends in consonant + y, so we change y to -ies.' },
+      { q:'One child, many ___', opts:['childs','childrens','children','childes'], correct:'children', exp:'"Children" is an irregular plural — you must learn it!' },
+      { q:'One dish, five ___', opts:['dish','dishs','dishez','dishes'], correct:'dishes', exp:'"Dish" ends in -sh, so we add "-es".' },
+    ]
+  },
+  {
+    id:'present', icon:'⏰', title:'Present Simple',
+    color:'bg-green-500/20 border-green-500/30', accent:'text-green-400',
+    rules:[
+      { rule:'I / You / We / They: use the base verb', examples:['I <span class="highlight">eat</span> breakfast.','They <span class="highlight">play</span> football.','We <span class="highlight">love</span> pizza.'] },
+      { rule:'He / She / It: add <b>-s</b> (or -es)', examples:['She <span class="highlight">runs</span> fast.','He <span class="highlight">watches</span> TV.','It <span class="highlight">rains</span> a lot.'] },
+      { rule:'Negative: use <b>do not / does not</b>', examples:['I <span class="highlight">do not</span> like spiders.','She <span class="highlight">does not</span> eat fish.'] },
+      { rule:'Question: use <b>Do / Does</b>', examples:['<span class="highlight">Do</span> you like cake?','<span class="highlight">Does</span> he play piano?'] },
+    ],
+    questions:[
+      { q:'She ___ to school every day.', opts:['go','goes','going','gone'], correct:'goes', exp:'"She" is third person singular — add "-s" → goes.' },
+      { q:'They ___ football on Saturdays.', opts:['plays','playing','play','played'], correct:'play', exp:'"They" uses the base form of the verb.' },
+      { q:'He ___ not like vegetables.', opts:['do','does','is','are'], correct:'does', exp:'With "he", we use "does not".' },
+      { q:'___ you speak English?', opts:['Does','Is','Do','Are'], correct:'Do', exp:'Questions with "you" use "Do".' },
+      { q:'The cat ___ on the sofa.', opts:['sit','siting','sits','sitted'], correct:'sits', exp:'"The cat" is third person singular — add "-s".' },
+    ]
+  },
+  {
+    id:'pronouns', icon:'👤', title:'Pronouns',
+    color:'bg-purple-500/20 border-purple-500/30', accent:'text-purple-400',
+    rules:[
+      { rule:'Subject pronouns (who does the action)', examples:['<span class="highlight">I</span> am a student.','<span class="highlight">She</span> likes cats.','<span class="highlight">They</span> are friends.'] },
+      { rule:'Object pronouns (receives the action)', examples:['Give <span class="highlight">me</span> the book.','She likes <span class="highlight">him</span>.','Help <span class="highlight">them</span>!'] },
+      { rule:'Possessive pronouns (shows ownership)', examples:['This is <span class="highlight">my</span> pencil.','Is this <span class="highlight">your</span> bag?','That is <span class="highlight">her</span> cat.'] },
+    ],
+    questions:[
+      { q:'___ is my best friend. (Emma)', opts:['Her','She','Him','Me'], correct:'She', exp:'"Emma" is the subject, so we use the subject pronoun "She".' },
+      { q:'I gave ___ a gift. (the teacher)', opts:['she','he','her','hers'], correct:'her', exp:'The teacher receives the action, so we use object pronoun "her".' },
+      { q:'Is this ___ pencil? (your pencil)', opts:['you','yours','your','mine'], correct:'your', exp:'"Your" is the possessive pronoun used before a noun.' },
+      { q:'___ are playing in the garden. (the boys)', opts:['Them','Their','He','They'], correct:'They', exp:'"The boys" is the subject, so we use "They".' },
+      { q:'She helped ___ with homework. (me)', opts:['I','my','me','mine'], correct:'me', exp:'"Me" is the object pronoun.' },
+    ]
+  },
+  {
+    id:'adjectives', icon:'🎨', title:'Adjectives',
+    color:'bg-pink-500/20 border-pink-500/30', accent:'text-pink-400',
+    rules:[
+      { rule:'Adjectives describe nouns. They go BEFORE the noun.', examples:['a <span class="highlight">big</span> dog','a <span class="highlight">beautiful</span> flower','a <span class="highlight">cold</span> day'] },
+      { rule:'Comparatives: add <b>-er</b> or use "more"', examples:['big → <span class="highlight">bigger</span>','tall → <span class="highlight">taller</span>','beautiful → <span class="highlight">more beautiful</span>'] },
+      { rule:'Superlatives: add <b>-est</b> or use "most"', examples:['big → the <span class="highlight">biggest</span>','tall → the <span class="highlight">tallest</span>','beautiful → the <span class="highlight">most beautiful</span>'] },
+    ],
+    questions:[
+      { q:'A lion is ___ than a cat.', opts:['big','bigger','biggest','more big'], correct:'bigger', exp:'Comparing two things: use "-er" (comparative).' },
+      { q:'Mount Everest is the ___ mountain in the world.', opts:['tall','taller','tallest','most tall'], correct:'tallest', exp:'Superlative (one out of all): use "-est".' },
+      { q:'This is the ___ cake I have ever eaten!', opts:['delicious','more delicious','most delicious','deliciouser'], correct:'most delicious', exp:'Long adjectives use "most" for superlatives.' },
+      { q:'She has a ___ cat.', opts:['cutely','more cute','cutest','cute'], correct:'cute', exp:'Adjectives go before nouns: "a cute cat".' },
+      { q:'Today is ___ than yesterday.', opts:['cold','coldest','more cold','colder'], correct:'colder', exp:'Short adjectives use "-er" for comparatives.' },
+    ]
+  },
+  {
+    id:'prepositions', icon:'📍', title:'Prepositions of Place',
+    color:'bg-cyan-500/20 border-cyan-500/30', accent:'text-cyan-400',
+    rules:[
+      { rule:'<b>in</b> — inside something', examples:['The cat is <span class="highlight">in</span> the box.','She is <span class="highlight">in</span> the garden.','The fish is <span class="highlight">in</span> the water.'] },
+      { rule:'<b>on</b> — on top of a surface', examples:['The book is <span class="highlight">on</span> the table.','The cat is <span class="highlight">on</span> the sofa.'] },
+      { rule:'<b>under</b> — below something', examples:['The shoes are <span class="highlight">under</span> the bed.','Hide <span class="highlight">under</span> the umbrella!'] },
+      { rule:'<b>next to / beside</b> — right beside something', examples:['Sit <span class="highlight">next to</span> me.','The shop is <span class="highlight">beside</span> the school.'] },
+    ],
+    questions:[
+      { q:'The cat is ___ the box. (inside it)', opts:['on','under','in','beside'], correct:'in', exp:'"In" means inside something.' },
+      { q:'The book is ___ the table. (on top)', opts:['in','under','on','next to'], correct:'on', exp:'"On" means on top of a surface.' },
+      { q:'My shoes are ___ the bed.', opts:['on','in','over','under'], correct:'under', exp:'"Under" means below something.' },
+      { q:'She is sitting ___ her friend.', opts:['under','in','on','next to'], correct:'next to', exp:'"Next to" means directly beside.' },
+      { q:'The fish live ___ the ocean.', opts:['on','under','in','next to'], correct:'in', exp:'"In" is used for being inside a large space like an ocean.' },
+    ]
+  },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentLesson = 0;
+let quizIdx       = 0;
+let quizScore     = 0;
+let xpTotal       = 0;
+let quizMode      = false;
+let doneLessons   = new Set(JSON.parse(localStorage.getItem('grammarDone') || '[]'));
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+buildTabs();
+showLesson(0);
+
+// ── Tabs ───────────────────────────────────────────────────────────────────────
+function buildTabs() {
+  document.getElementById('tabs-row').innerHTML = LESSONS.map((l, i) =>
+    `<button class="lesson-tab${i === 0 ? ' active' : ''}${doneLessons.has(i) ? ' opacity-60' : ''}" id="tab-${i}" onclick="switchLesson(${i})">
+      ${l.icon} ${l.title.split(':')[0]}${doneLessons.has(i) ? ' ✓' : ''}
+    </button>`
+  ).join('');
+}
+
+function switchLesson(idx) {
+  currentLesson = idx; quizIdx = 0; quizScore = 0; quizMode = false;
+  document.querySelectorAll('.lesson-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  showLesson(idx);
+}
+
+// ── Lesson render ──────────────────────────────────────────────────────────────
+function showLesson(idx) {
+  const l = LESSONS[idx];
+  quizMode = false;
+  const area = document.getElementById('lesson-area');
+
+  area.innerHTML = `
+    <!-- Lesson header -->
+    <div class="flex items-center gap-4 fade-up">
+      <div class="text-5xl">${l.icon}</div>
+      <div>
+        <p class="font-label text-xs ${l.accent} uppercase tracking-widest font-bold">Grammar Lesson</p>
+        <h2 class="font-headline font-black text-white text-2xl">${l.title}</h2>
+      </div>
+    </div>
+
+    <!-- Rules -->
+    <div class="flex flex-col gap-4 fade-up" style="animation-delay:0.05s">
+      ${l.rules.map(r => `
+        <div class="rule-card">
+          <p class="font-label font-bold text-white text-sm mb-3">${r.rule}</p>
+          <div class="flex flex-wrap gap-2">
+            ${r.examples.map(e => `
+              <span class="bg-navy border border-white/15 rounded-xl px-4 py-2 font-body text-slate-300 text-sm">${e}</span>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <!-- Start quiz button -->
+    <button onclick="startQuiz()" class="w-full py-5 bg-gradient-to-r from-yellow-500 to-amber-500
+            hover:from-yellow-400 hover:to-amber-400 text-navy font-headline font-bold text-xl
+            rounded-full shadow-xl shadow-yellow-500/30 active:scale-95 transition-all fade-up" style="animation-delay:0.1s">
+      Practice Now! 🎯
+    </button>
+  `;
+}
+
+// ── Quiz ───────────────────────────────────────────────────────────────────────
+function startQuiz() {
+  quizMode = true; quizIdx = 0; quizScore = 0;
+  showQuestion();
+}
+
+function showQuestion() {
+  const l  = LESSONS[currentLesson];
+  const q  = l.questions[quizIdx];
+  const area = document.getElementById('lesson-area');
+  const opts = [...q.opts].sort(() => Math.random() - 0.5);
+
+  area.innerHTML = `
+    <!-- Progress -->
+    <div class="flex gap-1.5 fade-up">
+      ${l.questions.map((_, i) => `<div class="h-2 flex-1 rounded-full ${i < quizIdx ? 'bg-yellow-500' : i === quizIdx ? 'bg-yellow-400' : 'bg-white/15'}"></div>`).join('')}
+    </div>
+
+    <!-- Question card -->
+    <div class="bg-gradient-to-br from-yellow-950 to-navy-light border border-yellow-500/20 rounded-[2rem] p-8 pop-in">
+      <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold mb-3">Question ${quizIdx+1} of ${l.questions.length}</p>
+      <p class="font-headline font-bold text-white text-xl leading-snug mb-6">${q.q}</p>
+      <div class="flex flex-col gap-3" id="q-opts">
+        ${opts.map(opt => `<button class="q-opt" onclick="answerQ(this,'${opt.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}','${q.exp.replace(/'/g,"\\'")}')"> ${opt} </button>`).join('')}
+      </div>
+    </div>
+
+    <div id="q-feedback" class="hidden bg-navy-light border border-white/10 rounded-2xl px-6 py-4 flex items-center gap-3 fade-up">
+      <span class="text-3xl" id="fb-emoji">✅</span>
+      <p class="font-body text-slate-300 text-sm" id="fb-text"></p>
+    </div>
+
+    <button id="next-btn" onclick="nextQuestion()" class="hidden w-full py-4 bg-yellow-500 hover:bg-yellow-400
+            text-navy font-label font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-yellow-500/30 fade-up">
+      ${quizIdx + 1 < l.questions.length ? 'Next Question →' : 'See Results 🎉'}
+    </button>
+  `;
+}
+
+function answerQ(btn, chosen, correct, exp) {
+  document.querySelectorAll('.q-opt').forEach(b => b.disabled = true);
+  const ok = chosen.trim() === correct.trim();
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) document.querySelectorAll('.q-opt').forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct'); });
+  else { quizScore++; }
+
+  document.getElementById('fb-emoji').textContent = ok ? '✅' : '💡';
+  document.getElementById('fb-text').textContent  = ok ? 'Correct! Well done! 🌟' : exp;
+  document.getElementById('q-feedback').classList.remove('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+}
+
+function nextQuestion() {
+  quizIdx++;
+  if (quizIdx < LESSONS[currentLesson].questions.length) showQuestion();
+  else showResults();
+}
+
+// ── Results ────────────────────────────────────────────────────────────────────
+function showResults() {
+  const l     = LESSONS[currentLesson];
+  const total = l.questions.length;
+  const stars = quizScore === total ? 3 : quizScore >= Math.ceil(total*0.6) ? 2 : 1;
+  const xp    = stars === 3 ? 20 : stars === 2 ? 10 : 5;
+  xpTotal += xp;
+  document.getElementById('xp-disp').textContent = xpTotal;
+
+  if (stars >= 2 && !doneLessons.has(currentLesson)) {
+    doneLessons.add(currentLesson);
+    localStorage.setItem('grammarDone', JSON.stringify([...doneLessons]));
+    buildTabs();
+  }
+
+  if (window.Store) { Store.addXP(xp); Store.completeActivity('games'); Store.completeActivity('grammar'); if (stars === 3) Store.unlockBadge('grammar_star'); }
+  if (stars >= 2) launchConfetti();
+
+  const area = document.getElementById('lesson-area');
+  area.innerHTML = `
+    <div class="bg-gradient-to-br from-yellow-950 to-navy-light border border-yellow-500/30 rounded-[3rem] p-10 flex flex-col items-center gap-5 text-center pop-in">
+      <div class="text-7xl">${stars === 3 ? '🏆' : stars === 2 ? '🌟' : '📖'}</div>
+      <div>
+        <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">Quiz Complete!</p>
+        <h2 class="font-headline text-5xl font-black text-white mb-1">${quizScore}/${total}</h2>
+        <p class="font-body text-slate-300">${stars === 3 ? 'Perfect score!' : stars === 2 ? 'Great effort!' : 'Keep practising!'}</p>
+      </div>
+      <div class="flex gap-1">
+        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-slate-600'}" style="font-variation-settings:'FILL' ${i<=stars?1:0};">star</span>`).join('')}
+      </div>
+      <p class="font-body text-slate-400 text-sm">+${xp} XP earned!</p>
+      <div class="flex gap-3 flex-wrap justify-center">
+        <button onclick="switchLesson(${currentLesson})" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+          Try Again 🔄
+        </button>
+        ${currentLesson + 1 < LESSONS.length ? `
+        <button onclick="switchLesson(${currentLesson+1})" class="bg-yellow-500 hover:bg-yellow-400 text-navy font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
+          Next Lesson →
+        </button>` : `
+        <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="bg-yellow-500 hover:bg-yellow-400 text-navy font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
+          Home 🏠
+        </button>`}
+      </div>
+    </div>
+  `;
+}
+
+function launchConfetti() {
+  const colors=['#eab308','#ec4899','#06b6d4','#10b981','#818cf8'];
+  for(let i=0;i<35;i++){
+    const el=document.createElement('div'); el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};animation-delay:${Math.random()*0.6}s;animation-duration:${0.9+Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el); setTimeout(()=>el.remove(),2000);
+  }
+}
+</script>
+</body>
+</html>

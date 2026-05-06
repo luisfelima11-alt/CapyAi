@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dialogue Expedition - Yara's Forest</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Lexend:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "navy": {
+                DEFAULT: "#001f3f",
+                dark: "#00152b",
+                light: "#002d5c"
+              },
+              "pink": {
+                500: "#ec4899",
+                400: "#f472b6",
+                600: "#db2777"
+              },
+              "emerald": {
+                500: "#10b981",
+                400: "#34d399",
+                600: "#059669",
+                900: "#064e3b"
+              },
+              "primary": "#001f3f",
+              "secondary": "#ec4899",
+              "tertiary": "#10b981",
+              "background": "#001f3f",
+              "surface": "#ffffff",
+              "on-surface": "#001f3f",
+              "on-background": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be Vietnam Pro"],
+              "label": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .comic-panel {
+            background-image: radial-gradient(circle at 2px 2px, rgba(236, 72, 153, 0.1) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-navy text-white font-body min-h-screen flex flex-col overflow-x-hidden pt-20">
+<!-- Component Placeholders -->
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<!-- Content Area Offset -->
+<div class="lg:ml-28 flex-grow flex flex-col gap-8">
+<!-- Game Header -->
+<div class="flex justify-between items-end px-4">
+<div>
+<h1 class="text-4xl md:text-5xl font-headline font-black text-white tracking-tight">Dialogue Expedition</h1>
+<p id="scene-subtitle" class="text-pink-400 font-label font-medium mt-1">Help Yara introduce herself!</p>
+</div>
+<div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/20 shadow-sm">
+<span class="material-symbols-outlined text-pink-500" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span id="xp-counter" class="font-label font-bold text-white">120 / 500</span>
+</div>
+</div>
+<!-- Topic Picker -->
+<div id="topic-picker" class="hidden w-full bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 flex flex-col items-center gap-6">
+    <div class="text-center">
+        <p class="font-headline text-2xl font-bold text-white mb-1">Choose a Scene Topic</p>
+        <p class="font-body text-slate-400 text-sm">Yara will create a brand-new grammar adventure!</p>
+    </div>
+    <div class="flex flex-wrap gap-3 justify-center">
+        <button onclick="selectTopic('Pets')"       class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🐶 Pets</button>
+        <button onclick="selectTopic('Family')"     class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">👨‍👩‍👧 Family</button>
+        <button onclick="selectTopic('School')"     class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🏫 School</button>
+        <button onclick="selectTopic('Food')"       class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🍕 Food</button>
+        <button onclick="selectTopic('Seasons')"    class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🌸 Seasons</button>
+        <button onclick="selectTopic('Clothes')"    class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">👕 Clothes</button>
+        <button onclick="selectTopic('Sports')"     class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">⚽ Sports</button>
+        <button onclick="selectTopic('Toys')"       class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🧸 Toys</button>
+        <button onclick="selectTopic('Nature')"     class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🌿 Nature</button>
+        <button onclick="selectTopic('Adventure')"  class="topic-chip px-6 py-3 rounded-full font-label font-bold text-sm bg-white/10 border border-white/20 text-white hover:bg-pink-500/30 hover:border-pink-400/50 active:scale-95 transition-all">🗺️ Adventure</button>
+    </div>
+    <div class="flex flex-col items-center gap-3 w-full max-w-xs">
+        <p id="selected-topic-label" class="font-label text-pink-300 font-bold text-sm h-5"></p>
+        <button id="generate-btn" onclick="generateScene()" disabled
+                class="w-full flex items-center justify-center gap-3 bg-pink-500 hover:bg-pink-600 disabled:bg-white/10 disabled:text-white/30 text-white font-label font-bold px-8 py-4 rounded-full active:scale-95 transition-all shadow-lg shadow-pink-500/30 disabled:shadow-none">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+            Generate AI Scene
+        </button>
+    </div>
+    <button onclick="useFallback()" class="text-white/40 hover:text-white/70 text-xs font-label underline transition-colors">Skip — use default scene</button>
+</div>
+<!-- Loading Overlay -->
+<div id="scene-loading" class="hidden w-full bg-white/5 backdrop-blur-sm rounded-3xl p-12 border border-white/10 flex flex-col items-center gap-6">
+    <div class="w-16 h-16 rounded-full border-4 border-pink-500/30 border-t-pink-500 animate-spin"></div>
+    <p class="font-headline text-2xl font-bold text-white">Yara is writing your scene…</p>
+    <p class="font-body text-slate-400 text-sm text-center">Creating a fun grammar adventure just for you!</p>
+</div>
+<!-- Comic Panel Interaction -->
+<div id="game-panel" class="hidden relative bg-white/5 backdrop-blur-sm rounded-[4rem] p-8 md:p-12 flex flex-col md:row items-center justify-center gap-12 comic-panel border-2 border-white/10 shadow-2xl">
+<!-- Decorative Sparkles -->
+<div class="absolute top-10 right-20 text-pink-400/30">
+<span class="material-symbols-outlined text-4xl" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="absolute bottom-10 left-10 text-emerald-400/30">
+<span class="material-symbols-outlined text-5xl" data-icon="flare">flare</span>
+</div>
+<!-- Capy Yara Character -->
+<div class="relative group">
+<div class="absolute -inset-4 bg-pink-500/20 rounded-full blur-2xl group-hover:bg-pink-500/30 transition-all duration-500"></div>
+<div class="relative w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full p-2 border-4 border-white/20">
+<img alt="Capy Yara" class="w-full h-full object-cover rounded-full mix-blend-multiply" src="yara.png"/>
+</div>
+<div class="absolute -bottom-4 -right-4 bg-pink-500 text-white p-4 rounded-full shadow-lg border-4 border-navy rotate-12">
+<span class="material-symbols-outlined text-3xl" data-icon="emoji_events" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+</div>
+</div>
+<!-- Speech Bubble -->
+<div class="relative flex-grow max-w-xl">
+<div class="bg-white p-8 md:p-12 rounded-t-[3rem] rounded-br-[3rem] rounded-bl-[0.5rem] shadow-2xl">
+<p id="question-text" class="text-2xl md:text-4xl font-headline font-bold text-navy leading-tight">
+                        "Hello! My name is Yara. What is
+                        <span class="inline-block min-w-[120px] border-b-4 border-dashed border-pink-500 text-pink-500 mx-2 h-10 align-middle"></span>
+                        name?"
+                    </p>
+<div class="mt-6 flex items-center gap-2 text-navy/60 font-label font-semibold italic">
+<span class="material-symbols-outlined text-sm" data-icon="volume_up">volume_up</span>
+<span>Tap to listen to Yara</span>
+</div>
+</div>
+<div class="absolute -left-4 bottom-0 w-8 h-8 bg-white [clip-path:polygon(100%_0,0_100%,100%_100%)]"></div>
+</div>
+</div>
+<!-- Choices Section -->
+<div id="choices-grid" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+<!-- Bento Hint/Progress Grid -->
+<div id="bento-grid" class="hidden grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+<div class="md:col-span-2 bg-white/5 backdrop-blur-sm p-6 rounded-2xl flex items-center gap-6 border border-white/10">
+<div class="bg-emerald-500 p-4 rounded-full text-white shadow-lg">
+<span class="material-symbols-outlined text-3xl" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg text-white">Need a hint?</h4>
+<p id="hint-text" class="font-body text-slate-300 text-sm">Think about who Yara is talking to!</p>
+</div>
+</div>
+<div class="bg-pink-500/10 p-6 rounded-2xl flex flex-col justify-center items-center text-pink-400 border border-pink-500/20">
+<span id="question-counter" class="text-3xl font-headline font-black">1 / 8</span>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest">Questions Done</span>
+</div>
+<div class="bg-emerald-500/10 p-6 rounded-2xl flex flex-col justify-center items-center text-emerald-400 border border-emerald-500/20">
+<div id="hearts-display" class="flex gap-1"></div>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest mt-1">Lives Left</span>
+</div>
+</div>
+</div>
+</main>
+<div id="footer-placeholder"></div>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="levelup-overlay.js"></script>
+<script src="badge-toast.js"></script>
+<script src="components.js"></script>
+<script>
+    Components.mount('top-nav-placeholder', Components.renderTopNav('dialogue'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('dialogue'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('dialogue'));
+    Components.mount('footer-placeholder', Components.renderFooter());
+
+    const DEFAULT_QUESTIONS = [
+        { prompt: '"Hello! My name is Yara. What is ___ name?"', correct: 'your', choices: ['your', 'his', 'her'], hint: 'Think about who Yara is talking to!' },
+        { prompt: '"Yara is a capybara. ___ fur is very soft."',  correct: 'her',  choices: ['your', 'his', 'her'], hint: 'Yara is a girl — use "her"!' },
+        { prompt: '"That boy runs fast! Look at ___ go!"',         correct: 'his',  choices: ['your', 'his', 'her'], hint: 'The boy uses "his"!' },
+        { prompt: '"You are a great explorer! ___ adventure starts now!"', correct: 'your', choices: ['your', 'his', 'her'], hint: 'You are the explorer!' },
+        { prompt: '"Marco found a rare bird. ___ feathers are bright blue."', correct: 'its', choices: ['his', 'her', 'its'], hint: 'A bird is a thing — use "its"!' },
+        { prompt: '"Sofia is very smart. ___ answers are always correct."',  correct: 'her', choices: ['his', 'her', 'its'], hint: 'Sofia is a girl — use "her"!' },
+        { prompt: '"The forest is beautiful. ___ trees are very tall."',      correct: 'its', choices: ['your', 'her', 'its'], hint: 'The forest is a thing — use "its"!' },
+        { prompt: '"You found the treasure! Is this map ___?"', correct: 'yours', choices: ['mine', 'yours', 'hers'], hint: 'It belongs to you — the second person!' }
+    ];
+
+    let QUESTIONS = DEFAULT_QUESTIONS.slice();
+
+    // Style map — extended for general use with AI-generated words
+    const CHOICE_COLORS = ['bg-[#001f3f]', 'bg-pink-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-500', 'bg-cyan-600'];
+    const CHOICE_ICONS  = ['person_play', 'face_3', 'face_6', 'pets', 'star', 'school'];
+    const CHOICE_STYLES = {
+        your:  { icon: 'person_play', bg: 'bg-[#001f3f]',   border: 'border-black/30' },
+        his:   { icon: 'face_6',      bg: 'bg-pink-500',    border: 'border-pink-600/50' },
+        her:   { icon: 'face_3',      bg: 'bg-emerald-500', border: 'border-emerald-600/50' },
+        its:   { icon: 'pets',        bg: 'bg-amber-500',   border: 'border-amber-600/50' },
+        yours: { icon: 'person_play', bg: 'bg-[#001f3f]',   border: 'border-black/30' },
+        mine:  { icon: 'person',      bg: 'bg-violet-500',  border: 'border-violet-600/50' },
+        hers:  { icon: 'face_3',      bg: 'bg-emerald-500', border: 'border-emerald-600/50' },
+    };
+
+    function getChoiceStyle(word, idx) {
+        if (CHOICE_STYLES[word.toLowerCase()]) return CHOICE_STYLES[word.toLowerCase()];
+        return { icon: CHOICE_ICONS[idx % CHOICE_ICONS.length], bg: CHOICE_COLORS[idx % CHOICE_COLORS.length], border: 'border-black/20' };
+    }
+
+    let currentQ = 0;
+    let lives = 3;
+    let selectedTopic = null;
+
+    // ── Topic picker logic ─────────────────────────────────────────────────────
+    function selectTopic(topic) {
+        selectedTopic = topic;
+        document.getElementById('selected-topic-label').textContent = `Selected: ${topic}`;
+        document.getElementById('generate-btn').disabled = false;
+        document.querySelectorAll('.topic-chip').forEach(chip => {
+            chip.classList.remove('bg-pink-500', 'text-white', 'border-pink-400');
+            chip.classList.add('bg-white/10', 'text-white');
+        });
+        event.currentTarget.classList.remove('bg-white/10');
+        event.currentTarget.classList.add('bg-pink-500', 'border-pink-400');
+    }
+
+    function useFallback() {
+        QUESTIONS = DEFAULT_QUESTIONS.slice();
+        startGame();
+    }
+
+    async function generateScene() {
+        if (!selectedTopic) return;
+        const today    = new Date().toISOString().slice(0, 10);
+        const cacheKey = `capyDialogue_${selectedTopic}_${today}`;
+        const cached   = localStorage.getItem(cacheKey);
+
+        showState('loading');
+
+        if (cached) {
+            applyScene(JSON.parse(cached));
+            return;
+        }
+
+        try {
+            const res  = await fetch('/api/dialogue-scene', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic: selectedTopic })
+            });
+            const json = await res.json();
+
+            if (json?.error) { useFallback(); return; }
+
+            const raw   = json?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+            const clean = raw.replace(/```json|```/g, '').trim();
+            const scene = JSON.parse(clean);
+
+            localStorage.setItem(cacheKey, JSON.stringify(scene));
+            applyScene(scene);
+        } catch (e) {
+            useFallback();
+        }
+    }
+
+    function applyScene(scene) {
+        // Map AI questions to our format
+        QUESTIONS = (scene.questions || []).map(q => ({
+            prompt:  `"${q.prompt}"`,
+            correct: q.answer,
+            choices: q.choices,
+            hint:    q.explanation || ''
+        }));
+        if (QUESTIONS.length === 0) { useFallback(); return; }
+
+        // Update scene UI
+        const subtitle = document.getElementById('scene-subtitle');
+        if (subtitle) subtitle.textContent = `${scene.emoji || '✨'} ${scene.scene || selectedTopic + ' adventure!'}`;
+
+        // Update speech bubble intro
+        const introEl = document.getElementById('question-text');
+        if (introEl && scene.intro) {
+            introEl.innerHTML = `"${scene.intro}"`;
+        }
+
+        startGame();
+    }
+
+    function showState(state) {
+        document.getElementById('topic-picker').classList.add('hidden');
+        document.getElementById('scene-loading').classList.add('hidden');
+        document.getElementById('game-panel').classList.add('hidden');
+        document.getElementById('choices-grid').classList.add('hidden');
+        document.getElementById('bento-grid').classList.add('hidden');
+
+        if (state === 'picker')  document.getElementById('topic-picker').classList.remove('hidden');
+        if (state === 'loading') document.getElementById('scene-loading').classList.remove('hidden');
+        if (state === 'game') {
+            document.getElementById('game-panel').classList.remove('hidden');
+            document.getElementById('choices-grid').classList.remove('hidden');
+            document.getElementById('bento-grid').classList.remove('hidden');
+        }
+    }
+
+    function startGame() {
+        currentQ = 0;
+        lives    = 3;
+        showState('game');
+        renderQuestion();
+    }
+
+    // ── Game logic ─────────────────────────────────────────────────────────────
+    function renderQuestion() {
+        const q = QUESTIONS[currentQ];
+        document.getElementById('question-text').innerHTML =
+            q.prompt.replace('___',
+                `<span class="inline-block min-w-[120px] border-b-4 border-dashed border-pink-500 text-pink-500 mx-2 h-10 align-middle"></span>`
+            );
+        document.getElementById('hint-text').textContent = q.hint;
+        document.getElementById('question-counter').textContent = `${currentQ + 1} / ${QUESTIONS.length}`;
+        renderHearts();
+        renderChoices();
+    }
+
+    function renderHearts() {
+        document.getElementById('hearts-display').innerHTML = Array.from({ length: 3 }, (_, i) =>
+            `<span class="material-symbols-outlined text-sm ${i < lives ? '' : 'text-white/20'}"
+                   style="${i < lives ? "font-variation-settings: 'FILL' 1;" : ''}">favorite</span>`
+        ).join('');
+    }
+
+    function renderChoices() {
+        const words = QUESTIONS[currentQ].choices;
+        document.getElementById('choices-grid').innerHTML = words.map((word, idx) => {
+            const s = getChoiceStyle(word, idx);
+            return `<button onclick="handleChoice('${word.replace(/'/g,"\\'")}' )"
+                         class="group bg-white/10 p-1 rounded-[2.5rem] hover:scale-105 active:scale-95 transition-all duration-300 shadow-md">
+                    <div class="${s.bg} text-white rounded-[2rem] py-6 px-4 flex flex-col items-center gap-3 transition-colors border-b-8 ${s.border}">
+                        <span class="material-symbols-outlined text-4xl">${s.icon}</span>
+                        <span class="text-3xl font-headline font-extrabold uppercase tracking-wide">${word}</span>
+                    </div>
+                </button>`;
+        }).join('');
+    }
+
+    function handleChoice(word) {
+        if (word === QUESTIONS[currentQ].correct) {
+            currentQ++;
+            if (currentQ >= QUESTIONS.length) {
+                Store.addXP(40);
+                Store.activateStreak();
+                Store.unlockBadge('chat_master');
+                Store.completeActivity('dialogue');
+                showFinishOverlay();
+            } else {
+                renderQuestion();
+            }
+        } else {
+            lives = Math.max(0, lives - 1);
+            renderHearts();
+            const grid = document.getElementById('choices-grid');
+            grid.classList.add('opacity-50');
+            setTimeout(() => grid.classList.remove('opacity-50'), 400);
+        }
+    }
+
+    function showFinishOverlay() {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/70 backdrop-blur-sm';
+        overlay.innerHTML = `
+            <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-pink-500/60 rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl text-center max-w-sm mx-4">
+                <div class="text-6xl">🎉</div>
+                <h2 class="font-headline text-4xl font-black text-white">Scene Complete!</h2>
+                <p class="font-body text-slate-300">+40 XP earned! Amazing grammar explorer!</p>
+                <div class="flex gap-3 flex-wrap justify-center">
+                    <button onclick="this.closest('.fixed').remove(); showState('picker'); selectedTopic=null;"
+                            class="bg-pink-500 hover:bg-pink-600 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all">
+                        ✨ New Scene
+                    </button>
+                    <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
+                            class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-8 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
+                        🌿 Back to Forest
+                    </button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+    }
+
+    function updateXP() {
+        document.getElementById('xp-counter').textContent = `${Store.state.xp} XP`;
+    }
+    updateXP();
+    document.addEventListener('stateChanged', updateXP);
+
+    // Check for today's cached scene or show picker
+    (function init() {
+        const today    = new Date().toISOString().slice(0, 10);
+        // Try the last used topic from today
+        const topics   = ['Pets','Family','School','Food','Seasons','Clothes','Sports','Toys','Nature','Adventure'];
+        let loaded     = false;
+        for (const t of topics) {
+            const cached = localStorage.getItem(`capyDialogue_${t}_${today}`);
+            if (cached) {
+                try {
+                    selectedTopic = t;
+                    applyScene(JSON.parse(cached));
+                    loaded = true;
+                    break;
+                } catch {}
+            }
+        }
+        if (!loaded) showState('picker');
+    })();
+</script>
+</body></html>

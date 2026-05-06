@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 32 — Movies & TV Shows</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#f97316,#ef4444);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#f97316;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.star-btn{cursor:pointer;font-size:1.2rem;color:#d1d5db;transition:color .15s}
+.star-btn.active{color:#f59e0b}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-orange-900 to-red-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:8%;left:3%;animation-delay:0s">🎬</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;left:8%;animation-delay:.8s">🍿</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:15%;left:20%;animation-delay:1.4s">🎭</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:30%;animation-delay:.3s">🌟</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:25%;animation-delay:1s">📺</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:50%;right:10%;animation-delay:.5s">🎥</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:3%;animation-delay:1.8s">🔮</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">✨</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-4 py-1 text-sm font-black text-orange-300 mb-3">Aula 32</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎬 Movies &amp;<br><span class="text-orange-300">TV Shows</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Learn how to recommend, describe and give opinions about movies and series in English.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Recommend</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Enjoy</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Prefer</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Describe</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+    </div>
+  </div>
+</div>
+
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+  <div id="tab-vocab" class="fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Flip each card to see the translation.</p></div>
+      <div class="text-right"><div class="text-2xl font-black text-orange-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  </div>
+
+  <div id="tab-expressions" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+    <p class="text-slate-500 text-sm mb-6">Click to reveal the translation and meaning.</p>
+    <div class="grid gap-4" id="expr-grid"></div>
+  </div>
+
+  <div id="tab-grammar" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Grammar: Talking About Movies & TV</h2>
+    <p class="text-slate-500 text-sm mb-6">Key structures for opinions, recommendations, descriptions and comparisons.</p>
+    <div class="space-y-4">
+      <div class="rounded-2xl border-2 border-orange-200 bg-orange-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-orange-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">GIVING OPINIONS</div><div class="text-orange-600 text-sm font-semibold">In my opinion... / Personally... / I think...</div></div></div>
+          <span class="material-symbols-outlined text-orange-400 transition-transform" id="g1-arrow">expand_more</span>
+        </button>
+        <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-orange-700'>In my opinion</strong>, Friends has the best writing in sitcom history."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-orange-700'>Personally</strong>, I think House of the Dragon is more intense than GoT."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-orange-700'>To be honest</strong>, I prefer series to movies."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-red-200 bg-red-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-red-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">RECOMMENDING</div><div class="text-red-600 text-sm font-semibold">You should watch... / If you like X, try Y.</div></div></div>
+          <span class="material-symbols-outlined text-red-400 transition-transform" id="g2-arrow">expand_more</span>
+        </button>
+        <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>If you like</strong> supernatural stories, <strong class='text-red-700'>you'll love</strong> Lucifer."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>I'd recommend</strong> watching 'Up' — it's extraordinary."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-red-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-red-700'>You should definitely</strong> watch Benjamin Button."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">DESCRIBING PLOTS</div><div class="text-amber-700 text-sm font-semibold">It's about... / It follows... / The story revolves around...</div></div></div>
+          <span class="material-symbols-outlined text-amber-400 transition-transform" id="g3-arrow">expand_more</span>
+        </button>
+        <div id="g3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"Lucifer <strong class='text-amber-700'>is about</strong> a devil who moves to LA and becomes a detective."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"It <strong class='text-amber-700'>follows</strong> a teenager who accidentally travels through time."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"The story <strong class='text-amber-700'>revolves around</strong> a group of friends in New York."</span></div>
+        </div></div>
+      </div>
+      <div class="rounded-2xl border-2 border-violet-200 bg-violet-50 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g4')">
+          <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-violet-500 text-white font-black text-sm flex items-center justify-center">4</span><div><div class="font-black text-navy">COMPARING</div><div class="text-violet-600 text-sm font-semibold">... is better than... / While... / Compared to...</div></div></div>
+          <span class="material-symbols-outlined text-violet-400 transition-transform" id="g4-arrow">expand_more</span>
+        </button>
+        <div id="g4" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-violet-700'>While</strong> Friends is a comedy, Elite is a dark thriller."</span></div>
+          <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-violet-700'>Compared to</strong> GoT, House of the Dragon has a tighter plot."</span></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-practice" class="fade-in hidden">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1">10 questions on movies & TV.</p></div>
+      <div class="flex items-center gap-3">
+        <div class="text-center"><div class="text-2xl font-black text-orange-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+        <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+      </div>
+    </div>
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
+    <div id="practice-area"></div>
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+        <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+        <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+        <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+        <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+        <div class="flex gap-3">
+          <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+          <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-speak" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+    <p class="text-slate-500 text-sm mb-6">Press ▶️ to hear each sentence, then repeat aloud.</p>
+    <div class="space-y-3" id="speak-grid"></div>
+  </div>
+
+  <div id="tab-challenge" class="fade-in hidden">
+    <h2 class="text-2xl font-black text-navy mb-2">🎯 Mini-Review Challenge</h2>
+    <p class="text-slate-500 text-sm mb-6">O Curioso Caso de Benjamin Button · Lucifer</p>
+
+    <!-- Template explanation -->
+    <div class="border-2 border-amber-400 bg-amber-50/30 rounded-2xl p-5 mb-6">
+      <h3 class="font-black text-navy mb-2">📋 The Mini-Review Template</h3>
+      <p class="text-slate-500 text-sm mb-3">Use this template to write reviews of any movie or series in English! Practice with the 2 challenges below.</p>
+      <div class="bg-white border border-amber-200 rounded-xl p-4 text-sm space-y-1 text-slate-600">
+        <div>🎬 <strong>Title:</strong> [name]</div>
+        <div>🏷️ <strong>Genre:</strong> [Drama / Comedy / Fantasy / Thriller...]</div>
+        <div>⭐ <strong>Rating:</strong> [1-5 stars]</div>
+        <div>📖 <strong>It's about:</strong> [one sentence describing the plot]</div>
+        <div>💬 <strong>My opinion:</strong> [In my opinion... / I strongly recommend... / Personally, I feel...]</div>
+        <div>👥 <strong>Best for:</strong> [People who like... / Anyone who loves...]</div>
+      </div>
+    </div>
+
+    <!-- Phrase bank -->
+    <div class="bg-amber-100 border border-amber-300 rounded-2xl p-4 mb-6">
+      <div class="font-black text-amber-800 text-sm mb-2">💡 Useful phrases:</div>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">In my opinion...</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">I strongly recommend...</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">The plot revolves around...</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">The atmosphere is...</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">The cast is incredible...</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">It left me wanting more!</span>
+        <span class="bg-white border border-amber-300 text-amber-700 px-2 py-1 rounded-full font-semibold">A must-watch!</span>
+      </div>
+    </div>
+
+    <!-- Review 1 -->
+    <div class="bg-gradient-to-r from-purple-900 to-navy border-2 border-amber-400 rounded-2xl p-6 mb-4">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-4xl">🎬</span>
+        <div><div class="text-white font-black text-lg">O Curioso Caso de Benjamin Button</div><div class="text-purple-300 text-sm">Write your mini-review using the template!</div></div>
+      </div>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-white/60 text-xs font-bold block mb-1">Genre</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="e.g. Drama, Fantasy..."/></div>
+          <div><label class="text-white/60 text-xs font-bold block mb-1">Rating</label><div class="flex gap-1 mt-1" id="stars1"><span class="star-btn" onclick="rate(1,1)">★</span><span class="star-btn" onclick="rate(1,2)">★</span><span class="star-btn" onclick="rate(1,3)">★</span><span class="star-btn" onclick="rate(1,4)">★</span><span class="star-btn" onclick="rate(1,5)">★</span></div></div>
+        </div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">It's about...</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="The story is about a man who..."/></div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">My opinion</label><textarea rows="3" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none resize-none" placeholder="In my opinion, this film is..."></textarea></div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">Best for</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="People who love..."/></div>
+      </div>
+    </div>
+
+    <!-- Review 2 -->
+    <div class="bg-gradient-to-r from-orange-900 to-red-900 border-2 border-amber-400 rounded-2xl p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-4xl">😈</span>
+        <div><div class="text-white font-black text-lg">Lucifer (Netflix Series)</div><div class="text-orange-300 text-sm">Use at least 3 vocabulary words from this lesson!</div></div>
+      </div>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-white/60 text-xs font-bold block mb-1">Genre</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="e.g. Fantasy, Crime..."/></div>
+          <div><label class="text-white/60 text-xs font-bold block mb-1">Rating</label><div class="flex gap-1 mt-1" id="stars2"><span class="star-btn" onclick="rate(2,1)">★</span><span class="star-btn" onclick="rate(2,2)">★</span><span class="star-btn" onclick="rate(2,3)">★</span><span class="star-btn" onclick="rate(2,4)">★</span><span class="star-btn" onclick="rate(2,5)">★</span></div></div>
+        </div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">It's about...</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="The series follows..."/></div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">My opinion</label><textarea rows="3" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none resize-none" placeholder="Personally, I think Lucifer is..."></textarea></div>
+        <div><label class="text-white/60 text-xs font-bold block mb-1">Best for</label><input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white text-sm focus:border-amber-400 focus:outline-none" placeholder="Anyone who loves..."/></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="lesson-engine.js"></script>
+<script src="components.js"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const VOCAB = [
+  {en:'plot',pt:'trama',emoji:'📖',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'The plot of Lucifer is brilliant.'},
+  {en:'cast',pt:'elenco',emoji:'🎭',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'The cast of Friends is iconic.'},
+  {en:'sequel',pt:'continuação',emoji:'2️⃣',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'Have you seen the sequel yet?'},
+  {en:'genre',pt:'gênero',emoji:'🏷️',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'What is your favorite genre?'},
+  {en:'villain',pt:'vilão',emoji:'😈',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'Every great story needs a villain.'},
+  {en:'suspense',pt:'suspense',emoji:'😰',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'The suspense kept me awake all night.'},
+  {en:'dialogue',pt:'diálogo',emoji:'💬',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'The dialogue in Friends is so clever.'},
+  {en:'performance',pt:'atuação',emoji:'🌟',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'Her performance was unforgettable.'},
+  {en:'director',pt:'diretor',emoji:'🎬',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'The director of this film is amazing.'},
+  {en:'premiere',pt:'estreia',emoji:'🎉',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'I watched the premiere of House of the Dragon.'},
+  {en:'streaming',pt:'streaming',emoji:'📱',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'I watch everything on streaming now.'},
+  {en:'episode',pt:'episódio',emoji:'📺',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'I watched 6 episodes in one night!'},
+  {en:'cliffhanger',pt:'gancho dramático',emoji:'😱',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'That cliffhanger left me speechless!'},
+  {en:'binge-watch',pt:'maratonar',emoji:'🍿',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'I binge-watched all of Elite in a weekend.'},
+  {en:'spoiler',pt:'spoiler',emoji:'🤐',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'Please don\'t give me spoilers!'},
+  {en:'trailer',pt:'trailer',emoji:'▶️',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'I\'ve watched the trailer 10 times already.'},
+  {en:'review',pt:'crítica / resenha',emoji:'⭐',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400',ex:'The reviews for that film were excellent.'},
+  {en:'atmosphere',pt:'atmosfera',emoji:'🌫️',bg:'bg-red-50 border-red-200',dot:'bg-red-400',ex:'The atmosphere in GoT is incredible.'},
+];
+
+const EXPRESSIONS = [
+  {expr:"On the edge of your seat",pt:"Com o coração na boca / em suspense total",emoji:"😱",example:"The finale of House of the Dragon had me on the edge of my seat the entire episode!",meaning:"Something is extremely exciting or suspenseful — you can barely stay still."},
+  {expr:"A must-watch",pt:"Obrigatório assistir / não pode perder",emoji:"👁️",example:"If you like complex characters, Lucifer is an absolute must-watch.",meaning:"Something you absolutely should watch — highly recommended."},
+  {expr:"Spoiler alert",pt:"Aviso de spoiler",emoji:"🚨",example:"Spoiler alert — I'm going to tell you exactly how Elite season 3 ends!",meaning:"A warning that you're about to reveal plot details someone may not know yet."},
+  {expr:"Leave you wanting more",pt:"Te deixar querendo mais",emoji:"🔁",example:"Every episode of Lucifer ends with a cliffhanger that leaves you wanting more.",meaning:"Something is so good that you can't wait for it to continue."},
+];
+
+const PRACTICE = [
+  {q:"Which phrase is used to give a personal opinion?",opts:["I'd recommend...","In my opinion...","It's about...","Spoiler alert"],a:"In my opinion...",rule:"Opinions: In my opinion..."},
+  {q:"'Cliffhanger' means:",opts:["a happy ending","a suspenseful moment that makes you want more","a boring scene","the opening episode"],a:"a suspenseful moment that makes you want more",rule:"Vocabulary: cliffhanger"},
+  {q:"How do you describe the plot of a movie?",opts:["The movie is better than...","The movie is about...","In my opinion...","I'd recommend watching..."],a:"The movie is about...",rule:"Describing: It's about..."},
+  {q:"'Binge-watch' means:",opts:["watch one episode per week","stop watching halfway","watch many episodes in a row","change to another show"],a:"watch many episodes in a row",rule:"Vocabulary: binge-watch"},
+  {q:"How do you recommend a show to someone who likes crime dramas?",opts:["It's about crime.","If you like crime dramas, you'll love Lucifer!","I prefer crime dramas.","Spoiler alert — crime happens."],a:"If you like crime dramas, you'll love Lucifer!",rule:"Recommending: If you like X, you'll love Y"},
+  {q:"'A must-watch' means:",opts:["optional, watch if you want","something you should definitely watch","a specific sequel","a specific genre"],a:"something you should definitely watch",rule:"Expression: must-watch"},
+  {q:"'The cast' refers to:",opts:["the movie story","all the actors in a film or show","the background music","the director"],a:"all the actors in a film or show",rule:"Vocabulary: cast"},
+  {q:"What is a 'premiere'?",opts:["cancellation of a show","a sequel","the first public showing of a film or show","a bad review"],a:"the first public showing of a film or show",rule:"Vocabulary: premiere"},
+  {q:"She really ___ the last season — she watched it in one weekend.",opts:["preferred","enjoyed","described","recommended"],a:"enjoyed",rule:"Verb: enjoy"},
+  {q:"'Atmosphere' in a movie refers to:",opts:["the soundtrack only","the overall mood and feeling of the film","the cast","the specific genre"],a:"the overall mood and feeling of the film",rule:"Vocabulary: atmosphere"},
+];
+
+const SPEAK = [
+  {text:"I'd <strong class='text-orange-600'>recommend</strong> 'O Curioso Caso de Benjamin Button' — it's a must-watch!"},
+  {text:"The <strong class='text-orange-600'>plot</strong> of Lucifer is about a devil who becomes a detective in Los Angeles."},
+  {text:"<strong class='text-orange-600'>In my opinion</strong>, Friends has the best dialogue on television."},
+  {text:"That final episode had me on the <strong class='text-orange-600'>edge of my seat</strong> the whole time!"},
+  {text:"I <strong class='text-orange-600'>prefer</strong> watching series on streaming rather than waiting week by week."},
+  {text:"The <strong class='text-orange-600'>atmosphere</strong> in House of the Dragon is incredibly dark and intense."},
+  {text:"Have you seen the new season yet? <strong class='text-orange-600'>Spoiler alert</strong> — it's absolutely amazing!"},
+  {text:"If you like supernatural stories, Lucifer is definitely a <strong class='text-orange-600'>must-watch</strong>."},
+];
+
+function rate(reviewId, stars) {
+  const container = document.getElementById('stars' + reviewId);
+  const starEls = container.querySelectorAll('.star-btn');
+  starEls.forEach((s, i) => s.classList.toggle('active', i < stars));
+}
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+initLesson({
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
+  totalSections: 6,
+  accentColor: 'orange',
+  vocab: VOCAB,
+  expressions: EXPRESSIONS,
+  practice: PRACTICE,
+  speak: SPEAK,
+});
+</script>
+</body>
+</html>
