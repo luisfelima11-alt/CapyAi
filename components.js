@@ -48,8 +48,8 @@ const Components = {
                     </div>
                     <span class="text-2xl font-black tracking-tight text-navy dark:text-blue-100">Yara's Forest</span>
                 </div>
-                <!-- Center nav links -->
-                <div class="hidden md:flex gap-6 items-center font-['Plus_Jakarta_Sans']">
+                <!-- Center nav links — translate="no" prevents Chrome auto-translate from mangling nav text -->
+                <div class="hidden md:flex gap-6 items-center font-['Plus_Jakarta_Sans']" translate="no">
                     <a href="classes.html"   class="${activeTab==='classes'    ? 'text-pink-500 dark:text-pink-400 font-bold border-b-2 border-pink-500 pb-0.5' : 'text-navy/70 dark:text-slate-400 font-medium hover:text-pink-500 transition-colors'}">Cursos</a>
                     <a href="learn.html"     class="${activeTab==='lessons'    ? 'text-pink-500 dark:text-pink-400 font-bold border-b-2 border-pink-500 pb-0.5' : 'text-navy/70 dark:text-slate-400 font-medium hover:text-pink-500 transition-colors'}">Trilha Diária</a>
                     <a href="9_Game_Pavilion_Yaras_Expedition.html" class="${activeTab==='games' ? 'text-pink-500 dark:text-pink-400 font-bold border-b-2 border-pink-500 pb-0.5' : 'text-navy/70 dark:text-slate-400 font-medium hover:text-pink-500 transition-colors'}">Games</a>
