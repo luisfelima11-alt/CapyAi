@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 33 — Going to & Get Phrasal Verbs</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+.flip-card{perspective:800px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#d97706,#f59e0b);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#d97706;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.shake{animation:shake .35s ease}
+@keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
+.xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-amber-950 to-orange-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:10%;left:3%;animation-delay:0s">📋</span>
+    <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">🗺️</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:15%;animation-delay:1.3s">🚀</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:22%;animation-delay:.4s">⏰</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">🎯</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:15%;animation-delay:1.6s">💪</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:5%;animation-delay:.2s">🔥</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:28%;animation-delay:1s">⚡</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
+      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
+    </a>
+    <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1 text-sm font-black text-amber-300 mb-3">Aula 33</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">📋 Going to<br><span class="text-amber-300">& Get Phrasal Verbs</span></h1>
+    <p class="text-white/60 text-base mb-5 max-w-lg">Express decided plans, use informal GONNA, and master 5 essential GET phrasal verbs like a native speaker.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Get</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Decide</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Prepare</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">To Start</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 7 sections done</span>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+<!-- VOCAB TAB -->
+<div id="tab-vocab" class="tab-content fade-in">
+  <div class="flex items-center justify-between mb-4">
+    <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">Planos, intenções e organização pessoal — flip para ver a tradução.</p></div>
+    <div class="text-right"><div class="text-2xl font-black text-amber-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all duration-500" style="width:0%"></div></div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  <div class="mt-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl">
+    <p class="text-sm font-black text-amber-800 mb-2">💡 Phrasal Verbs — GET</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+      <div class="bg-white rounded-xl p-3 border border-amber-200"><span class="font-black text-amber-700">GET UP</span><br/><span class="text-slate-600">Levantar (da cama)</span></div>
+      <div class="bg-white rounded-xl p-3 border border-amber-200"><span class="font-black text-amber-700">GET ON</span><br/><span class="text-slate-600">Entrar / embarcar</span></div>
+      <div class="bg-white rounded-xl p-3 border border-amber-200"><span class="font-black text-amber-700">GET OFF</span><br/><span class="text-slate-600">Sair / desembarcar</span></div>
+      <div class="bg-white rounded-xl p-3 border border-amber-200"><span class="font-black text-amber-700">GET OUT</span><br/><span class="text-slate-600">Sair de um lugar</span></div>
+      <div class="bg-white rounded-xl p-3 border border-amber-200"><span class="font-black text-amber-700">GET IN</span><br/><span class="text-slate-600">Entrar no carro</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPRESSIONS TAB -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">Everyday Expressions</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique para ver a tradução e o uso.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+</div>
+
+<!-- GRAMMAR TAB -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">Grammar: Going to + GET Phrasal Verbs</h2>
+  <p class="text-slate-500 text-sm mb-6">Planos decididos e os 5 phrasal verbs essenciais com GET.</p>
+  <div class="space-y-4">
+
+    <div class="rounded-2xl border-2 border-amber-200 bg-amber-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">GOING TO — Planos Decididos</div><div class="text-amber-700 text-sm font-semibold">Subject + am/is/are + going to + Verb</div></div></div>
+        <span class="material-symbols-outlined text-amber-400 transition-transform" id="g1-arrow">expand_more</span>
+      </button>
+      <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"I <strong class='text-amber-700'>am going to start</strong> a new routine." → Plano decidido antes.</span></div>
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"She <strong class='text-amber-700'>is going to prepare</strong> the presentation."</span></div>
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 mt-1.5"></span><span>"We <strong class='text-amber-700'>are going to decide</strong> together."</span></div>
+        <div class="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs">
+          <strong class="text-amber-800">⚠️ Going to vs Will:</strong><br/>
+          Going to → plano JÁ decidido antes: <em>"I'm going to buy a phone."</em><br/>
+          Will → decisão espontânea agora: <em>"I'll help you!"</em>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="rounded-2xl border-2 border-orange-200 bg-orange-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-orange-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">GONNA — Forma Falada Informal</div><div class="text-orange-600 text-sm font-semibold">I'm gonna = I'm going to (só na fala!)</div></div></div>
+        <span class="material-symbols-outlined text-orange-400 transition-transform" id="g2-arrow">expand_more</span>
+      </button>
+      <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>✅ Fala: <strong class='text-orange-700'>"I'm gonna</strong> start the project tomorrow."</span></div>
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>✅ Escrita formal: <strong class='text-orange-700'>"I am going to</strong> start the project tomorrow."</span></div>
+        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0 mt-1.5"></span><span>❌ <strong>NUNCA escreva "gonna"</strong> em e-mails profissionais ou redações!</span></div>
+      </div></div>
+    </div>
+
+    <div class="rounded-2xl border-2 border-yellow-200 bg-yellow-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-yellow-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">GET Phrasal Verbs</div><div class="text-yellow-700 text-sm font-semibold">GET UP / ON / OFF / OUT / IN</div></div></div>
+        <span class="material-symbols-outlined text-yellow-500 transition-transform" id="g3-arrow">expand_more</span>
+      </button>
+      <div id="g3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-3 text-sm">
+        <div class="flex gap-2 items-start"><span class="bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded text-xs flex-shrink-0">GET UP</span><span>= levantar (da cama/cadeira) → <em>"I get up at 7am every day."</em></span></div>
+        <div class="flex gap-2 items-start"><span class="bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded text-xs flex-shrink-0">GET ON</span><span>= entrar em / embarcar → <em>"She got on the bus at 8am."</em></span></div>
+        <div class="flex gap-2 items-start"><span class="bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded text-xs flex-shrink-0">GET OFF</span><span>= sair / desembarcar → <em>"He got off the train downtown."</em></span></div>
+        <div class="flex gap-2 items-start"><span class="bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded text-xs flex-shrink-0">GET OUT</span><span>= sair de um lugar/situação → <em>"Get out of bed! It's late!"</em></span></div>
+        <div class="flex gap-2 items-start"><span class="bg-amber-100 text-amber-800 font-black px-2 py-0.5 rounded text-xs flex-shrink-0">GET IN</span><span>= entrar no carro → <em>"She got in the car and drove away."</em></span></div>
+        <div class="mt-2 p-3 bg-yellow-50 rounded-xl border border-yellow-200 text-xs">
+          <strong class="text-yellow-800">🚌 Dica:</strong> GET ON/OFF = transporte público (bus, train, plane) | GET IN/OUT = carro/táxi
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DIALOGUE TAB -->
+<div id="tab-dialogue" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🎭 Yara & Leo — Mission Planning</h2>
+  <p class="text-slate-500 text-sm mb-5">📋 Sala de Planejamento da Guilda. Capy Yara exibe um mapa enorme com os planos para a próxima grande missão.</p>
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+  <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+    <p class="font-black text-amber-800 text-sm mb-2">🎯 Encontre no diálogo:</p>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <div class="bg-white rounded-xl p-2 border border-amber-200">✅ <strong>going to</strong> (plano decidido)</div>
+      <div class="bg-white rounded-xl p-2 border border-amber-200">✅ <strong>gonna</strong> (informal falado)</div>
+      <div class="bg-white rounded-xl p-2 border border-amber-200">✅ <strong>GET UP</strong> ou GET ON</div>
+      <div class="bg-white rounded-xl p-2 border border-amber-200">✅ <strong>GET OUT</strong> of comfort zone</div>
+    </div>
+  </div>
+  <button onclick="markSectionBtn(this)" class="mt-4 bg-amber-500 hover:bg-amber-600 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li o diálogo! (+20 XP)
+  </button>
+</div>
+
+<!-- PRACTICE TAB -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div><h2 class="text-2xl font-black text-navy">Practice Quiz</h2><p class="text-slate-500 text-sm mt-1">10 questions — Going to & GET phrasal verbs</p></div>
+    <div class="flex items-center gap-3">
+      <div class="text-center"><div class="text-2xl font-black text-amber-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+      <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all duration-500" style="width:0%"></div></div>
+  <div id="practice-area"></div>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+        <button onclick="window.location.href='classes.html'" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-400 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Back to Classes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAK TAB -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">Speak & Practise</h2>
+  <p class="text-slate-500 text-sm mb-6">Pressione ▶️ para ouvir e repita em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+</div>
+
+<!-- HOMEWORK TAB -->
+<div id="tab-homework" class="tab-content fade-in hidden">
+  <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-6 mb-6 text-white">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-4xl">📝</span>
+      <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Aula 33 — Going to & GET Phrasal Verbs</p></div>
+    </div>
+    <p class="text-white/70 text-sm">Complete as 5 tarefas interativas. Cada tarefa vale XP!</p>
+  </div>
+
+  <!-- Task 1: Word Order -->
+  <div class="bg-white border-2 border-amber-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">1</span>
+      <div><p class="font-black text-navy text-sm">Word Order — Ordem das Palavras</p><p class="text-slate-500 text-xs">Monte as frases na ordem correta. Toque nas palavras!</p></div>
+    </div>
+    <div id="wo33-wrap"></div>
+  </div>
+
+  <!-- Task 2: Match Pairs -->
+  <div class="bg-white border-2 border-amber-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">2</span>
+      <div><p class="font-black text-navy text-sm">Match the GET Phrasal Verbs</p><p class="text-slate-500 text-xs">Conecte o phrasal verb ao seu significado. Toque em um de cada coluna!</p></div>
+    </div>
+    <div id="mp33-wrap"></div>
+  </div>
+
+  <!-- Task 3: Error Correction -->
+  <div class="bg-white border-2 border-amber-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">3</span>
+      <div><p class="font-black text-navy text-sm">Error Correction — Corrija os Erros</p><p class="text-slate-500 text-xs">Reescreva cada frase corrigindo o erro de "going to" ou GET phrasal verb.</p></div>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+        <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+        <p class="text-sm font-bold text-navy mb-2">"She is going to <u>starts</u> the project tomorrow."</p>
+        <input id="err33-1" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-amber-400 focus:outline-none" oninput="checkErrors33()"/>
+        <p id="err33fb1" class="text-xs font-black mt-1 hidden"></p>
+      </div>
+      <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+        <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+        <p class="text-sm font-bold text-navy mb-2">"I'm gonna <u>wrote</u> a long email tonight."</p>
+        <input id="err33-2" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-amber-400 focus:outline-none" oninput="checkErrors33()"/>
+        <p id="err33fb2" class="text-xs font-black mt-1 hidden"></p>
+      </div>
+      <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+        <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+        <p class="text-sm font-bold text-navy mb-2">"He <u>got on</u> the car and drove away."</p>
+        <input id="err33-3" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-amber-400 focus:outline-none" oninput="checkErrors33()"/>
+        <p id="err33fb3" class="text-xs font-black mt-1 hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task 4: Fill in the blank -->
+  <div class="bg-white border-2 border-amber-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">4</span>
+      <div><p class="font-black text-navy text-sm">Complete com GET phrasal verb correto</p><p class="text-slate-500 text-xs">Use: get up / get on / get off / get out / get in</p></div>
+    </div>
+    <div class="space-y-3">
+      <div class="bg-slate-50 rounded-xl p-3 text-sm">
+        <p class="text-slate-700 mb-1">1. "Every morning I <span class="text-amber-600 font-black">_____</span> at 6am and go for a run."</p>
+        <input type="text" placeholder="phrasal verb..." class="fill-check w-full border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none" data-ans="get up"/>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-3 text-sm">
+        <p class="text-slate-700 mb-1">2. "She <span class="text-amber-600 font-black">_____</span> the bus at the city center stop."</p>
+        <input type="text" placeholder="phrasal verb..." class="fill-check w-full border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none" data-ans="got off"/>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-3 text-sm">
+        <p class="text-slate-700 mb-1">3. "We're going to <span class="text-amber-600 font-black">_____</span> of our comfort zones this season."</p>
+        <input type="text" placeholder="phrasal verb..." class="fill-check w-full border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none" data-ans="get out"/>
+      </div>
+      <div class="bg-slate-50 rounded-xl p-3 text-sm">
+        <p class="text-slate-700 mb-1">4. "He <span class="text-amber-600 font-black">_____</span> the taxi and went straight to the office."</p>
+        <input type="text" placeholder="phrasal verb..." class="fill-check w-full border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:border-amber-400 focus:outline-none" data-ans="got in"/>
+      </div>
+      <button onclick="checkFill33()" class="mt-2 bg-amber-500 hover:bg-amber-600 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-all">Verificar ✓</button>
+      <div id="fill33-result" class="hidden text-sm font-black"></div>
+    </div>
+  </div>
+
+  <!-- Task 5: Free writing -->
+  <div class="bg-white border-2 border-amber-200 rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center">5</span>
+      <div><p class="font-black text-navy text-sm">Meus Planos para os Próximos 30 Dias</p><p class="text-slate-500 text-xs">Escreva 5 frases com GOING TO sobre seus planos. Use GET phrasal verbs em pelo menos 2!</p></div>
+    </div>
+    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-amber-400 focus:outline-none resize-none" placeholder="I am going to get up earlier every morning this month.&#10;I'm going to get on a new fitness routine on Monday.&#10;She is going to...&#10;We are going to...&#10;I'm gonna..."></textarea>
+    <div id="hw-done-33" class="hidden mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+      <p class="text-amber-800 font-black text-sm">🎉 Homework entregue! +75 XP earned! Continue praticando 💪</p>
+    </div>
+    <button onclick="submitHomework33()" class="mt-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
+      🚀 Entregar Homework (+75 XP)
+    </button>
+  </div>
+</div><!-- end homework -->
+
+</div><!-- end max-w -->
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js?v=3"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+// ── SECTION PROGRESS ──────────────────────────────────────────────────────────
+const TOTAL_SECTIONS = 7;
+let sectionsDone = 0;
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  const lb = document.getElementById('section-label');
+  if (!c) return;
+  c.innerHTML = Array.from({length: TOTAL_SECTIONS}, (_,i) =>
+    `<div class="prog-dot ${i < sectionsDone
+      ? 'bg-gradient-to-r from-amber-400 to-orange-400'
+      : 'bg-white/20'}"></div>`).join('');
+  if (lb) lb.textContent = `${sectionsDone} / ${TOTAL_SECTIONS} sections done`;
+}
+buildSectionDots();
+function markSection() {
+  if (sectionsDone < TOTAL_SECTIONS) { sectionsDone++; buildSectionDots(); }
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+const TABS = ['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-'+t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── VOCABULARY ────────────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  {en:'intention',pt:'intenção',emoji:'🎯',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'purpose',pt:'propósito',emoji:'🔑',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'aim',pt:'objetivo',emoji:'🏹',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'target',pt:'meta',emoji:'🎯',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'commitment',pt:'comprometimento',emoji:'🤝',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'deadline',pt:'prazo',emoji:'⏰',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'routine',pt:'rotina',emoji:'🔄',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'discipline',pt:'disciplina',emoji:'💪',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'habit',pt:'hábito',emoji:'⚡',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'priority',pt:'prioridade',emoji:'⭐',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'focus',pt:'foco',emoji:'🔍',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'improvement',pt:'melhoria',emoji:'📈',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'resolution',pt:'resolução',emoji:'📋',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'vision',pt:'visão',emoji:'👁️',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'direction',pt:'direção',emoji:'🧭',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'weekly',pt:'semanal',emoji:'📅',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+  {en:'measure',pt:'medir',emoji:'📏',bg:'bg-orange-50 border-orange-200',dot:'bg-orange-400'},
+  {en:'adjust',pt:'ajustar',emoji:'🔧',bg:'bg-amber-50 border-amber-200',dot:'bg-amber-400'},
+];
+let vocabDone = new Set();
+function buildVocab() {
+  const grid = document.getElementById('vocab-grid');
+  VOCAB_DATA.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card h-24';
+    card.innerHTML = `<div class="flip-card-inner h-full">
+      <div class="flip-front h-full border-2 ${v.bg} rounded-2xl flex flex-col items-center justify-center p-2 gap-1">
+        <span class="text-2xl">${v.emoji}</span>
+        <span class="font-black text-navy text-sm text-center leading-tight">${v.en}</span>
+        <span class="w-2 h-2 rounded-full ${v.dot}"></span>
+      </div>
+      <div class="flip-back h-full bg-gradient-to-br from-amber-500 to-orange-400 rounded-2xl flex items-center justify-center p-2">
+        <span class="font-black text-white text-sm text-center leading-snug">${v.pt}</span>
+      </div>
+    </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) {
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent = vocabDone.size;
+        const pct = (vocabDone.size / VOCAB_DATA.length) * 100;
+        document.getElementById('vocab-bar').style.width = pct + '%';
+        if (vocabDone.size === VOCAB_DATA.length) markSection();
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+buildVocab();
+
+// ── EXPRESSIONS ───────────────────────────────────────────────────────────────
+const EXPR_DATA = [
+  {expr:"I'm gonna...",pt:"Vou... (informal falado de 'going to')",emoji:"💬",example:"I'm gonna start a new routine next Monday!",meaning:"Informal spoken contraction of 'I'm going to'. Never in formal writing."},
+  {expr:"Stick to the plan",pt:"Seguir o plano",emoji:"📋",example:"It's hard, but we need to stick to the plan.",meaning:"To maintain your commitment without deviating."},
+  {expr:"Take it one step at a time",pt:"Um passo de cada vez",emoji:"🪜",example:"Don't rush — take it one step at a time and you'll get there.",meaning:"To approach something gradually without trying to do everything at once."},
+  {expr:"Get the ball rolling",pt:"Colocar as coisas em movimento",emoji:"⚽",example:"Let's get the ball rolling and start the first task!",meaning:"To begin a process or start an activity moving forward."},
+];
+let exprDone = new Set();
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPR_DATA.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'border-2 border-amber-200 bg-white rounded-2xl overflow-hidden cursor-pointer';
+    div.innerHTML = `
+      <div class="p-4 flex items-center gap-4" onclick="toggleExpr(${i})">
+        <span class="text-3xl">${e.emoji}</span>
+        <div class="flex-1">
+          <div class="font-black text-navy">"${e.expr}"</div>
+          <div class="text-amber-600 text-sm font-semibold">${e.pt}</div>
+        </div>
+        <span class="material-symbols-outlined text-amber-400 transition-transform" id="expr-arrow-${i}">expand_more</span>
+      </div>
+      <div id="expr-body-${i}" class="hidden px-4 pb-4">
+        <div class="bg-amber-50 rounded-xl p-3 text-sm space-y-2">
+          <p><strong class="text-navy">Example:</strong> <em>"${e.example}"</em></p>
+          <p><strong class="text-navy">Meaning:</strong> ${e.meaning}</p>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function toggleExpr(i) {
+  const body = document.getElementById('expr-body-'+i);
+  const arrow = document.getElementById('expr-arrow-'+i);
+  body.classList.toggle('hidden');
+  arrow.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  exprDone.add(i);
+  if (exprDone.size === EXPR_DATA.length) markSection();
+}
+buildExpressions();
+
+// ── DIALOGUE ─────────────────────────────────────────────────────────────────
+const DIALOGUE_LINES = [
+  {who:'yara', text:'🦫 <strong>Capy Yara</strong>: Leo, we <strong class="text-amber-600">are going to</strong> start the next chapter of our journey. Are you <strong class="text-amber-600">going to</strong> prepare your equipment?'},
+  {who:'leo',  text:'🧑‍🦱 <strong>Leo</strong>: I\'m <strong class="text-amber-600">gonna</strong> get everything ready tonight! I\'ve already decided — I\'m <strong class="text-amber-600">going to</strong> wake up earlier and train more.'},
+  {who:'yara', text:'🦫 <strong>Capy Yara</strong>: Perfect! The team is <strong class="text-amber-600">going to</strong> meet at sunrise. Are you <strong class="text-amber-600">going to</strong> get on the express route or the mountain path?'},
+  {who:'leo',  text:'🧑‍🦱 <strong>Leo</strong>: I\'m <strong class="text-amber-600">gonna</strong> take the mountain path. I\'ll <strong class="text-orange-600">get up</strong> early, <strong class="text-orange-600">get on</strong> my gear, and <strong class="text-orange-600">get out</strong> before anyone else!'},
+  {who:'yara', text:'🦫 <strong>Capy Yara</strong>: That\'s the spirit! We\'re <strong class="text-amber-600">going to</strong> achieve great things this season. I\'m <strong class="text-amber-600">gonna</strong> prepare the map tonight.'},
+  {who:'leo',  text:'🧑‍🦱 <strong>Leo</strong>: Let\'s <strong class="text-orange-600">get out</strong> of our comfort zones and get on with the mission! I\'m ready, Yara! 🗡️'},
+];
+function buildDialogue() {
+  const c = document.getElementById('dialogue-lines');
+  DIALOGUE_LINES.forEach(l => {
+    const isYara = l.who === 'yara';
+    const div = document.createElement('div');
+    div.className = `flex ${isYara ? 'justify-start' : 'justify-end'} fade-in`;
+    div.innerHTML = `<div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${isYara ? 'bg-amber-50 border-2 border-amber-200 text-navy' : 'bg-navy text-white'}">${l.text}</div>`;
+    c.appendChild(div);
+  });
+}
+buildDialogue();
+
+function markSectionBtn(btn) {
+  btn.disabled = true; btn.textContent = '✓ Lido! +20 XP';
+  btn.classList.add('opacity-75');
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(20);
+}
+
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  markSection();
+}
+
+// ── PRACTICE QUIZ ─────────────────────────────────────────────────────────────
+const QUIZ = [
+  {q:"Which structure expresses a DECIDED plan made BEFORE the moment of speaking?",opts:["Will you go?","I'm going to start a new routine.","I might try later.","She could do it tomorrow."],a:"I'm going to start a new routine.",rule:"Going to = plano já decidido"},
+  {q:"'Gonna' is best described as:",opts:["formal written English","an incorrect form always","an informal spoken form of 'going to'","past tense of 'go'"],a:"an informal spoken form of 'going to'",rule:"Gonna = forma informal falada"},
+  {q:"GET UP means:",opts:["enter a vehicle","exit public transport","rise from bed or a seat","go inside a car"],a:"rise from bed or a seat",rule:"Get up = levantar da cama/cadeira"},
+  {q:"'She got on the bus' means she:",opts:["missed the bus","drove the bus","entered the bus","left the bus"],a:"entered the bus",rule:"Get on = entrar em transporte público"},
+  {q:"'GET OFF' means:",opts:["enter a vehicle","get inside a car","rise from a chair","exit or disembark from transport"],a:"exit or disembark from transport",rule:"Get off = desembarcar / sair"},
+  {q:"Going to vs Will: 'Oh! This box is heavy — _____ help you.' (decided RIGHT NOW)",opts:["I'm going to","I will","I am going","I gonna"],a:"I will",rule:"Will = decisão espontânea no momento"},
+  {q:"'GET IN' is used when entering:",opts:["a bus","a train","a car or taxi","a plane"],a:"a car or taxi",rule:"Get in = entrar num carro / táxi"},
+  {q:"'He is going to prepare the report' shows:",opts:["a spontaneous decision","a future fact","a plan decided before speaking","an ability"],a:"a plan decided before speaking",rule:"Going to = plano decidido antes"},
+  {q:"'GET OUT' means:",opts:["enter a place","board public transport","exit a place or situation","rise from bed"],a:"exit a place or situation",rule:"Get out = sair de um lugar/situação"},
+  {q:"Which is CORRECT formal written English?",opts:["I'm gonna do it","I gonna do it","I am going to do it","I going to do it"],a:"I am going to do it",rule:"Formal: I am going to (não gonna)"},
+];
+let pracIdx=0, pracScore=0, pracStreak=0, pracAnswered=false;
+function buildPractice() {
+  if(pracIdx>=QUIZ.length){showResult();return;}
+  const q=QUIZ[pracIdx];
+  document.getElementById('prac-bar').style.width=(pracIdx/QUIZ.length*100)+'%';
+  document.getElementById('practice-area').innerHTML=`
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
+      <div class="text-xs font-black text-slate-400 mb-3">Question ${pracIdx+1} of ${QUIZ.length}</div>
+      <p class="font-black text-navy text-base mb-5 leading-relaxed">${q.q}</p>
+      <div class="grid grid-cols-1 gap-3" id="opts"></div>
+      <div id="prac-feedback" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
+    </div>`;
+  const opts=document.getElementById('opts');
+  [...q.opts].sort(()=>Math.random()-.5).forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-amber-400 hover:bg-amber-50 transition-all active:scale-98';
+    btn.textContent=o;
+    btn.onclick=()=>answerQ(o,btn,q);
+    opts.appendChild(btn);
+  });
+  pracAnswered=false;
+}
+function answerQ(ans,btn,q){
+  if(pracAnswered)return; pracAnswered=true;
+  const correct=ans===q.a;
+  document.querySelectorAll('#opts button').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q.a) b.className='w-full text-left border-2 border-emerald-400 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-700';
+  });
+  if(!correct) btn.className='w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if(correct){pracScore++;pracStreak++;}else{pracStreak=0;}
+  document.getElementById('prac-score').innerHTML=`${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent='🔥 '+pracStreak;
+  const fb=document.getElementById('prac-feedback');
+  fb.classList.remove('hidden');
+  fb.className=`mt-4 p-3 rounded-xl text-sm font-bold ${correct?'bg-emerald-50 text-emerald-700 border border-emerald-200':'bg-red-50 text-red-700 border border-red-200'}`;
+  fb.innerHTML=`${correct?'✅ Correct!':'❌ Not quite.'} <span class="font-normal">${q.rule}</span>`;
+  pracIdx++;
+  setTimeout(buildPractice,1400);
+}
+function showResult(){
+  document.getElementById('result-msg').textContent=`You scored ${pracScore} out of ${QUIZ.length}.${pracScore>=8?' Outstanding! 🌟':pracScore>=6?' Keep it up!':' Keep practising!'}`;
+  document.getElementById('result-emoji').textContent=pracScore>=8?'🏆':pracScore>=6?'🎉':'💪';
+  document.getElementById('result-title').textContent=pracScore>=8?'Excellent!':pracScore>=6?'Well done!':'Keep going!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection();
+  if(typeof Store!=='undefined') Store.addXP(50);
+}
+function restartPractice(){
+  pracIdx=0;pracScore=0;pracStreak=0;
+  document.getElementById('prac-score').innerHTML='0<span class="text-sm text-slate-400">/10</span>';
+  document.getElementById('prac-streak').textContent='🔥 0';
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── SPEAK ─────────────────────────────────────────────────────────────────────
+const SPEAK_DATA = [
+  {text:"I'm <strong class='text-amber-600'>going to</strong> start a new morning routine this week."},
+  {text:"She is <strong class='text-amber-600'>going to</strong> prepare her task list every Sunday."},
+  {text:"He decided he's <strong class='text-amber-600'>going to</strong> <strong class='text-orange-600'>get up</strong> earlier to focus on his goals."},
+  {text:"<strong class='text-orange-600'>Get up!</strong> We're <strong class='text-amber-600'>going to</strong> be late for the presentation."},
+  {text:"I'm <strong class='text-amber-600'>gonna</strong> <strong class='text-orange-600'>get on</strong> this task right after the meeting!"},
+  {text:"She <strong class='text-orange-600'>got out</strong> of her comfort zone and prepared something incredible."},
+  {text:"He <strong class='text-orange-600'>got in</strong> the car and decided he was <strong class='text-amber-600'>going to</strong> change everything."},
+  {text:"Let's <strong class='text-orange-600'>get out</strong> of our comfort zones — we're <strong class='text-amber-600'>going to</strong> achieve this!"},
+];
+let speakDone = new Set();
+function buildSpeak(){
+  const grid=document.getElementById('speak-grid');
+  SPEAK_DATA.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='bg-white border-2 border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:border-amber-300 transition-colors';
+    div.innerHTML=`
+      <button onclick="speakRaw(${i})" class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <p class="flex-1 text-navy font-semibold text-sm leading-relaxed">${s.text}</p>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-amber-500" onchange="markSpeak(${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Done</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+function speakRaw(i){
+  const plain=SPEAK_DATA[i].text.replace(/<[^>]+>/g,'');
+  speak(plain);
+}
+function markSpeak(i,chk){
+  if(chk.checked) speakDone.add(i); else speakDone.delete(i);
+  if(speakDone.size>=6) markSection();
+}
+function speak(text){
+  if(!window.speechSynthesis)return;
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── HOMEWORK INTERACTIVE ──────────────────────────────────────────────────────
+function hwShuffle33(a){return[...a].sort(()=>Math.random()-.5)}
+
+// Word Order
+const WO33_DATA=[
+  {s:'I am going to start a new morning routine this week',    w:['I','am','going','to','start','a','new','morning','routine','this','week']},
+  {s:'She got off the bus and walked straight to the office',  w:['She','got','off','the','bus','and','walked','straight','to','the','office']},
+  {s:'We are going to get out of our comfort zones together',  w:['We','are','going','to','get','out','of','our','comfort','zones','together']},
+];
+const wo33=WO33_DATA.map(d=>({ans:[],bank:hwShuffle33(d.w)}));
+function wo33Render(){
+  const c=document.getElementById('wo33-wrap');if(!c)return;
+  c.innerHTML=WO33_DATA.map((d,i)=>{
+    const st=wo33[i];
+    return`<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i<WO33_DATA.length-1?'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO33_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length?st.ans.map((w,j)=>`<span onclick="wo33Move(1,${i},${j})" class="cursor-pointer select-none bg-amber-100 text-amber-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-amber-200 active:scale-95 transition-all">${w}</span>`).join(''):'<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo33Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-amber-400 hover:bg-amber-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo33Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo33Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo33fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo33Move(fromBank,si,wi){
+  if(fromBank) wo33[si].bank.push(wo33[si].ans.splice(wi,1)[0]);
+  else         wo33[si].ans.push(wo33[si].bank.splice(wi,1)[0]);
+  wo33Render();
+}
+function wo33Check(i){
+  const fb=document.getElementById('wo33fb'+i);if(!fb)return;
+  if(wo33[i].ans.join(' ').toLowerCase()===WO33_DATA[i].s.toLowerCase()){
+    fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600';
+  }else{fb.textContent='❌ Tente novamente!';fb.className='text-xs font-black text-red-500';}
+}
+function wo33Reset(i){
+  wo33[i]={ans:[],bank:hwShuffle33(WO33_DATA[i].w)};
+  const fb=document.getElementById('wo33fb'+i);if(fb)fb.textContent='';
+  wo33Render();
+}
+wo33Render();
+
+// Match Pairs
+const MP33=[
+  {l:'GET UP ⬆️',   r:'Levantar da cama'},
+  {l:'GET ON 🚌',   r:'Entrar / embarcar'},
+  {l:'GET OFF 🚏',  r:'Sair / desembarcar'},
+  {l:'GET OUT 🚪',  r:'Sair de um lugar'},
+  {l:'GET IN 🚗',   r:'Entrar no carro'},
+];
+const mp33R=hwShuffle33(MP33.map((p,i)=>({label:p.r,pid:i})));
+let mp33SelL=null;const mp33Done=new Set();
+function mp33Render(){
+  const c=document.getElementById('mp33-wrap');if(!c)return;
+  c.innerHTML=`<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP33.map((p,i)=>`<div id="mp33L${i}" onclick="mp33ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp33Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp33SelL===i?'border-amber-500 bg-amber-100 text-amber-800':'border-slate-200 bg-white text-navy hover:border-amber-300 hover:bg-amber-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp33R.map((r,i)=>`<div id="mp33R${i}" onclick="mp33ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp33Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-amber-300 hover:bg-amber-50'}">${r.label}</div>`).join('')}
+    </div></div>${mp33Done.size===MP33.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp33ClickL(i){if(mp33Done.has(i))return;mp33SelL=(mp33SelL===i)?null:i;mp33Render();}
+function mp33ClickR(i){
+  if(mp33SelL===null)return;const r=mp33R[i];if(mp33Done.has(r.pid))return;
+  if(r.pid===mp33SelL){mp33Done.add(mp33SelL);mp33SelL=null;mp33Render();}
+  else{
+    const lEl=document.getElementById('mp33L'+mp33SelL),rEl=document.getElementById('mp33R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{mp33SelL=null;mp33Render();},700);
+  }
+}
+mp33Render();
+
+// Error Correction
+const ERR33_CHECKS=[
+  v=>v.includes('going to start')&&!v.includes('going to starts'),
+  v=>v.includes('gonna write')&&!v.includes('gonna wrote'),
+  v=>v.includes('got in the car')&&!v.includes('got on the car'),
+];
+const ERR33_HINTS=['starts → start (going to + base form, sem -s)','wrote → write (gonna + base form, not past)','got on → got in (entrar no carro = get in)'];
+function checkErrors33(){
+  ERR33_CHECKS.forEach((check,i)=>{
+    const inp=document.getElementById('err33-'+(i+1)),fb=document.getElementById('err33fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){fb.classList.add('hidden');return;}
+    fb.classList.remove('hidden');
+    if(check(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}
+    else{fb.textContent=`❌ Dica: "${ERR33_HINTS[i]}"`;fb.className='text-xs font-black text-red-500 mt-1';}
+  });
+}
+
+// Fill in blank
+function checkFill33(){
+  const inputs=document.querySelectorAll('.fill-check');
+  let correct=0;
+  inputs.forEach(inp=>{
+    const ans=inp.dataset.ans;
+    const v=inp.value.toLowerCase().trim();
+    if(v===ans){inp.classList.add('!border-emerald-400');inp.classList.remove('!border-red-400');correct++;}
+    else{inp.classList.add('!border-red-400');inp.classList.remove('!border-emerald-400');}
+  });
+  const res=document.getElementById('fill33-result');
+  res.classList.remove('hidden');
+  if(correct===inputs.length){res.textContent=`✅ ${correct}/${inputs.length} corretas! Perfeito!`;res.className='text-sm font-black text-emerald-600';}
+  else{res.textContent=`${correct}/${inputs.length} corretas. Tente as vermelhas!`;res.className='text-sm font-black text-amber-600';}
+}
+
+function submitHomework33(){
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='✓ Submitted!';btn.classList.add('opacity-75');
+  document.getElementById('hw-done-33').classList.remove('hidden');
+  markSection();
+  if(typeof Store!=='undefined') Store.addXP(75);
+}
+</script>
+</body>
+</html>

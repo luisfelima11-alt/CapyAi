@@ -78,6 +78,7 @@
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
     </div>
   </div>
 </div>
@@ -242,6 +243,89 @@
     </div>
   </div>
 
+  <!-- HOMEWORK TAB -->
+  <div id="tab-homework" class="fade-in hidden">
+    <div class="bg-gradient-to-br from-rose-500 to-pink-500 rounded-3xl p-6 mb-6 text-white">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-4xl">📝</span>
+        <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Aula 34 — Expressing Opinions & Debating</p></div>
+      </div>
+      <p class="text-white/70 text-sm">Complete as 5 tarefas interativas. Cada tarefa vale XP!</p>
+    </div>
+
+    <!-- Task 1: Word Order -->
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">1</span>
+        <div><p class="font-black text-navy text-sm">Word Order — Ordem das Palavras</p><p class="text-slate-500 text-xs">Monte as frases de opinião na ordem correta. Toque nas palavras!</p></div>
+      </div>
+      <div id="wo34-wrap"></div>
+    </div>
+
+    <!-- Task 2: Match Pairs -->
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">2</span>
+        <div><p class="font-black text-navy text-sm">Match — Opinion Phrases</p><p class="text-slate-500 text-xs">Conecte a expressão ao seu uso. Toque em um de cada coluna!</p></div>
+      </div>
+      <div id="mp34-wrap"></div>
+    </div>
+
+    <!-- Task 3: Error Correction -->
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">3</span>
+        <div><p class="font-black text-navy text-sm">Error Correction — Corrija os Erros</p><p class="text-slate-500 text-xs">Reescreva cada frase corrigindo o erro gramatical.</p></div>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+          <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+          <p class="text-sm font-bold text-navy mb-2">"I <u>am disagree</u> with that statement."</p>
+          <input id="err34-1" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none" oninput="checkErrors34()"/>
+          <p id="err34fb1" class="text-xs font-black mt-1 hidden"></p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+          <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+          <p class="text-sm font-bold text-navy mb-2">"I <u>am thinking</u> that Friends is a better show than Elite."</p>
+          <input id="err34-2" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none" oninput="checkErrors34()"/>
+          <p id="err34fb2" class="text-xs font-black mt-1 hidden"></p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+          <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
+          <p class="text-sm font-bold text-navy mb-2">"From my <u>perspective of view</u>, the marketing strategy failed."</p>
+          <input id="err34-3" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none" oninput="checkErrors34()"/>
+          <p id="err34fb3" class="text-xs font-black mt-1 hidden"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task 4: Complete the debate -->
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">4</span>
+        <div><p class="font-black text-navy text-sm">Complete o Debate</p><p class="text-slate-500 text-xs">Escolha a expressão correta para cada situação.</p></div>
+      </div>
+      <div class="space-y-3" id="debate-fill"></div>
+      <button onclick="checkDebateFill()" class="mt-3 bg-rose-500 hover:bg-rose-600 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-all">Verificar ✓</button>
+      <div id="debate-result" class="hidden text-sm font-black mt-2"></div>
+    </div>
+
+    <!-- Task 5: Free writing -->
+    <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">5</span>
+        <div><p class="font-black text-navy text-sm">Defend Your Opinion</p><p class="text-slate-500 text-xs">Escreva 6-8 frases defendendo sua série favorita. Use: In my opinion / I believe / I think / For example / I understand that / However / In conclusion.</p></div>
+      </div>
+      <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="In my opinion, [série] is the best show because...&#10;I strongly believe that...&#10;For example, in the first season...&#10;I understand that some people think...&#10;However, I still argue that...&#10;In conclusion, I recommend it because..."></textarea>
+      <div id="hw-done-34" class="hidden mt-3 p-3 bg-rose-50 border border-rose-200 rounded-xl">
+        <p class="text-rose-800 font-black text-sm">🎉 Homework entregue! +75 XP earned! Great debater! 🎯</p>
+      </div>
+      <button onclick="submitHomework34()" class="mt-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
+        🚀 Entregar Homework (+75 XP)
+      </button>
+    </div>
+  </div>
+
 </div>
 </main>
 <div id="mobile-nav-placeholder"></div>
@@ -314,14 +398,158 @@ function toggleAccordion(id) {
 }
 
 initLesson({
-  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
-  totalSections: 6,
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge','homework'],
+  totalSections: 7,
   accentColor: 'rose',
   vocab: VOCAB,
   expressions: EXPRESSIONS,
   practice: PRACTICE,
   speak: SPEAK,
 });
+
+// ── HOMEWORK INTERACTIVE ──────────────────────────────────────────────────────
+function hwShuffle34(a){return[...a].sort(()=>Math.random()-.5)}
+
+// Word Order
+const WO34_DATA=[
+  {s:'In my opinion Katy Perry is the most creative artist in pop',   w:['In','my','opinion','Katy','Perry','is','the','most','creative','artist','in','pop']},
+  {s:'I understand your point but I think the evidence says otherwise',w:['I','understand','your','point','but','I','think','the','evidence','says','otherwise']},
+  {s:"Let's agree to disagree because both shows have their merits",  w:["Let's","agree","to","disagree","because","both","shows","have","their","merits"]},
+];
+const wo34=WO34_DATA.map(d=>({ans:[],bank:hwShuffle34(d.w)}));
+function wo34Render(){
+  const c=document.getElementById('wo34-wrap');if(!c)return;
+  c.innerHTML=WO34_DATA.map((d,i)=>{
+    const st=wo34[i];
+    return`<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i<WO34_DATA.length-1?'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO34_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length?st.ans.map((w,j)=>`<span onclick="wo34Move(1,${i},${j})" class="cursor-pointer select-none bg-rose-100 text-rose-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-rose-200 active:scale-95 transition-all">${w}</span>`).join(''):'<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo34Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-rose-400 hover:bg-rose-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo34Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo34Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo34fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo34Move(fromBank,si,wi){
+  if(fromBank) wo34[si].bank.push(wo34[si].ans.splice(wi,1)[0]);
+  else         wo34[si].ans.push(wo34[si].bank.splice(wi,1)[0]);
+  wo34Render();
+}
+function wo34Check(i){
+  const fb=document.getElementById('wo34fb'+i);if(!fb)return;
+  if(wo34[i].ans.join(' ').toLowerCase()===WO34_DATA[i].s.toLowerCase()){
+    fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600';
+  }else{fb.textContent='❌ Tente novamente!';fb.className='text-xs font-black text-red-500';}
+}
+function wo34Reset(i){
+  wo34[i]={ans:[],bank:hwShuffle34(WO34_DATA[i].w)};
+  const fb=document.getElementById('wo34fb'+i);if(fb)fb.textContent='';
+  wo34Render();
+}
+wo34Render();
+
+// Match Pairs
+const MP34=[
+  {l:'"In my opinion..."',          r:'Expressar opinião pessoal'},
+  {l:'"I beg to differ"',           r:'Discordar com respeito'},
+  {l:'"That\'s a fair point"',      r:'Reconhecer argumento válido'},
+  {l:'"I couldn\'t agree more"',    r:'Concordar totalmente'},
+  {l:'"Let\'s agree to disagree"',  r:'Aceitar opiniões diferentes'},
+];
+const mp34R=hwShuffle34(MP34.map((p,i)=>({label:p.r,pid:i})));
+let mp34SelL=null;const mp34Done=new Set();
+function mp34Render(){
+  const c=document.getElementById('mp34-wrap');if(!c)return;
+  c.innerHTML=`<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP34.map((p,i)=>`<div id="mp34L${i}" onclick="mp34ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp34Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp34SelL===i?'border-rose-500 bg-rose-100 text-rose-800':'border-slate-200 bg-white text-navy hover:border-rose-300 hover:bg-rose-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp34R.map((r,i)=>`<div id="mp34R${i}" onclick="mp34ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp34Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-rose-300 hover:bg-rose-50'}">${r.label}</div>`).join('')}
+    </div></div>${mp34Done.size===MP34.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp34ClickL(i){if(mp34Done.has(i))return;mp34SelL=(mp34SelL===i)?null:i;mp34Render();}
+function mp34ClickR(i){
+  if(mp34SelL===null)return;const r=mp34R[i];if(mp34Done.has(r.pid))return;
+  if(r.pid===mp34SelL){mp34Done.add(mp34SelL);mp34SelL=null;mp34Render();}
+  else{
+    const lEl=document.getElementById('mp34L'+mp34SelL),rEl=document.getElementById('mp34R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{mp34SelL=null;mp34Render();},700);
+  }
+}
+mp34Render();
+
+// Error Correction
+const ERR34_CHECKS=[
+  v=>v.includes('i disagree')&&!v.includes('am disagree'),
+  v=>v.includes('i think')&&!v.includes('am thinking'),
+  v=>(v.includes('from my perspective')||v.includes('from a marketing perspective'))&&!v.includes('perspective of view'),
+];
+const ERR34_HINTS=['am disagree → disagree (não usa "am" com disagree)','am thinking → think (verbos de opinião não usam continuous: I think, not I am thinking)','perspective of view → perspective (perspective já inclui "ponto de vista")'];
+function checkErrors34(){
+  ERR34_CHECKS.forEach((check,i)=>{
+    const inp=document.getElementById('err34-'+(i+1)),fb=document.getElementById('err34fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){fb.classList.add('hidden');return;}
+    fb.classList.remove('hidden');
+    if(check(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}
+    else{fb.textContent=`❌ Dica: "${ERR34_HINTS[i]}"`;fb.className='text-xs font-black text-red-500 mt-1';}
+  });
+}
+
+// Debate fill
+const DEBATE_Q=[
+  {situation:'Alguém fez um bom argumento que você reconhece, mas ainda discorda.',opts:["That's a fair point, but...", "I totally agree!", "I beg to differ because..."],ans:"That's a fair point, but..."},
+  {situation:'Você concorda completamente com o que alguém disse.',opts:["I beg to differ","I couldn't agree more!","Let's agree to disagree"],ans:"I couldn't agree more!"},
+  {situation:'Você quer discordar de forma muito educada e formal.',opts:["You're completely wrong!","I beg to differ — I think...","Let's agree to disagree"],ans:"I beg to differ — I think..."},
+  {situation:'Ambos têm opiniões fortes e ninguém vai mudar de ideia.',opts:["I strongly believe you","Let's agree to disagree","That's a fair point"],ans:"Let's agree to disagree"},
+];
+function buildDebateFill(){
+  const c=document.getElementById('debate-fill');if(!c)return;
+  c.innerHTML=DEBATE_Q.map((q,i)=>`
+    <div class="bg-slate-50 rounded-xl p-3">
+      <p class="text-xs font-bold text-slate-500 mb-2">Situação ${i+1}: ${q.situation}</p>
+      <div class="flex flex-wrap gap-2">
+        ${q.opts.map(o=>`<label class="flex items-center gap-1.5 cursor-pointer">
+          <input type="radio" name="debate-${i}" value="${o}" class="accent-rose-500 w-4 h-4"/>
+          <span class="text-xs font-semibold text-navy">${o}</span>
+        </label>`).join('')}
+      </div>
+      <div id="debate-fb-${i}" class="text-xs font-black mt-1 hidden"></div>
+    </div>`).join('');
+}
+buildDebateFill();
+function checkDebateFill(){
+  let correct=0;
+  DEBATE_Q.forEach((q,i)=>{
+    const sel=document.querySelector(`input[name="debate-${i}"]:checked`);
+    const fb=document.getElementById('debate-fb-'+i);
+    if(!fb)return;
+    fb.classList.remove('hidden');
+    if(sel&&sel.value===q.ans){correct++;fb.textContent='✅ '+q.ans;fb.className='text-xs font-black text-emerald-600 mt-1';}
+    else{fb.textContent='❌ Resposta: '+q.ans;fb.className='text-xs font-black text-red-500 mt-1';}
+  });
+  const res=document.getElementById('debate-result');
+  res.classList.remove('hidden');
+  if(correct===DEBATE_Q.length){res.textContent=`✅ ${correct}/${DEBATE_Q.length} corretos! Perfect debater!`;res.className='text-sm font-black text-emerald-600';}
+  else{res.textContent=`${correct}/${DEBATE_Q.length} corretos. Revise as expressões de debate!`;res.className='text-sm font-black text-rose-600';}
+}
+
+function submitHomework34(){
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='✓ Submitted!';btn.classList.add('opacity-75');
+  document.getElementById('hw-done-34').classList.remove('hidden');
+  if(typeof Store!=='undefined') Store.addXP(75);
+}
 </script>
 </body>
 </html>
