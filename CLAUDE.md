@@ -23,9 +23,31 @@ The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
 
 ## Deployment
 
-Vercel (project: `capy-yara-adventures`). No build step. `vercel.json` rewrites:
+Vercel (project: `capy-yara-adventures`). Production URL: **https://capy-yara-adventures.vercel.app**
+
+```bash
+npx vercel --prod --force   # always use --force to bypass cache
+```
+
+`vercel.json` rewrites:
 - `/api/*` → `/api/index.js`
 - `/` → `4_Login_Capy_Yara_Welcomes_You.html`
+
+Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
+
+## GitHub
+
+```
+https://github.com/luisfelima11-alt/CapyAi.git
+```
+
+Typical push after changes:
+```bash
+git add <files>
+git commit -m "description"
+git push origin main
+npx vercel --prod --force
+```
 
 ## Architecture
 
@@ -43,6 +65,10 @@ Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
+
+**⚠️ Cache busting:** All pages reference `components.js?v=3`. When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+
+**⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
 ### State Management (`store.js`)
 
@@ -63,7 +89,36 @@ Auth.requireAuth()      // redirects to login if no session
 Auth.getSession()       // returns session object or null
 Auth.continueAsGuest()  // guest session: {id:'guest', name:'Explorer'}
 ```
-Passwords are base64-encoded (not production-grade). Local DB: `database.json`.
+Passwords are base64-encoded (not production-grade). User data stored in Supabase (see below).
+
+### Backend — Supabase (`api/index.js`)
+
+The API uses Supabase Postgres for persistent user data. Env vars required on Vercel:
+```
+SUPABASE_URL=https://kxihhowppupmfanufkim.supabase.co
+SUPABASE_KEY=<service role key>   # server-side only, never expose client-side
+```
+
+API calls Supabase REST API directly via `fetch()` — no npm package needed:
+```js
+async function sb(path, opts = {}) {
+  const r = await fetch(`${SB_URL}/rest/v1${path}`, {
+    ...opts,
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`,
+                'Content-Type': 'application/json', ...(opts.headers||{}) },
+  });
+  if (r.status === 204) return null;
+  const text = await r.text();
+  return text ? JSON.parse(text) : null;
+}
+```
+
+**Supabase tables:**
+- `accounts` — `id, name, email, password, avatar, created_at`
+- `user_state` — `user_id (PK), data (jsonb), updated_at`
+
+`/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
+Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
 
 ### Lesson Architecture
 
@@ -71,15 +126,16 @@ Trail defined in `learn.html` (`TRAIL` array, 24 lessons, 4 chapters). Each less
 
 ### Aula Pages (`aula_XX.html`)
 
-Each `aula_XX.html` is a self-contained lesson page following a strict 6-tab pattern:
-1. **Tab 1** — Core vocabulary (flip cards)
-2. **Tab 2** — Secondary vocabulary / grammar examples (flip cards)
-3. **Tab 3** — Expressions (flip cards)
-4. **Tab 4** — Grammar focus (structured explanation)
-5. **Tab 5** — Practice (fill-in-blank or matching exercises)
-6. **Tab 6** — Speak (sentences for oral practice + XP reward)
+Each `aula_XX.html` is a self-contained lesson page. **Newer pages (aula_33+)** follow a 7-tab pattern:
+1. **Tab 1** — Vocabulary (flip cards, 18+ words)
+2. **Tab 2** — Expressions (expandable cards with example + meaning)
+3. **Tab 3** — Grammar (accordion sections with rules and examples)
+4. **Tab 4** — Dialogue (Leo & Capy Yara conversation, key structures highlighted)
+5. **Tab 5** — Practice (quiz, 10 questions with auto-scoring)
+6. **Tab 6** — Speak (TTS sentences, 8 items, checkbox to mark done)
+7. **Tab 7** — Homework (interactive exercises, see below)
 
-**Template pattern** (use `aula_28.html` as the reference to copy):
+**Template pattern** (use `aula_33.html` or `aula_28.html` as the reference to copy):
 ```html
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
@@ -139,8 +195,11 @@ Chapter accent colors (hero gradients):
 
 ## Existing Aula Files
 
-Present: `aula_20` – `aula_24`, `aula_26` – `aula_32`, `aula_34`.
-Missing: `aula_25`, `aula_33`, `aula_35`, `aula_36`, `aula_37`.
+Present: `aula_20` – `aula_24`, `aula_26` – `aula_35`.
+Missing: `aula_25`, `aula_36`, `aula_37`.
+
+Pages `aula_33`, `aula_34`, `aula_35` were built with the newer 7-tab pattern including interactive homework.
+Pages `aula_26`, `aula_27`, `aula_28` have homework tabs with interactive exercises (word order, match pairs, error correction).
 
 Lesson content data for aulas 29–37: `C:\Users\Win10\lesson-pdfs\lessons-data.js`
 Custom dialogues for aulas 29–37: `C:\Users\Win10\lesson-pdfs\generate-html.js` (`DIALOGUES` object, keys 29–37)
@@ -221,15 +280,66 @@ const TABS = ['tab1','tab2','...','speak','homework'];
 ```
 And increment section dot loop: `for (let i = 0; i < N+1; i++)` and label `/ N+1 sections done`.
 
-### Homework task types (use 3–4 per lesson)
-- **Sentence writing** — write N sentences using the grammar/vocabulary (inputs)
-- **Fill-in-blank** — short inline fill-ins based on grammar patterns
-- **Translation** — PT→EN sentences targeting lesson structures
-- **Free paragraph** — 4–5 sentences on a personal theme using lesson vocab (textarea)
-- **Expression usage** — write original sentences using idioms from the lesson
+### Homework interactive task types (use 4–5 per lesson)
 
-### XP reward
-Always `+75 XP` on homework submission (vs +50 XP for practice quiz).
+**1. Word Order (Duolingo-style)** — shuffle word tiles, drag/tap to reconstruct a sentence.
+```js
+const WO_DATA = [
+  { s: 'I will achieve my goals this year', w: ['I','will','achieve','my','goals','this','year'] },
+  ...
+];
+const wo = WO_DATA.map(d => ({ ans:[], bank: shuffle(d.w) }));
+// wo[i].ans = built sentence, wo[i].bank = remaining tiles
+// woRender() → click tile to move between bank↔ans
+// woCheck(i) → compare ans.join(' ').toLowerCase() to s.toLowerCase()
+// woReset(i) → restore bank, clear ans
+```
+
+**2. Match Pairs** — two columns; tap left then right to connect pairs.
+```js
+const MP = [
+  { l:'GET UP ⬆️', r:'Levantar da cama' },
+  ...
+];
+const mpR = shuffle(MP.map((p,i) => ({ label:p.r, pid:i })));
+let mpSelL = null; const mpDone = new Set();
+// mpClickL(i) → sets mpSelL
+// mpClickR(i) → if mpR[i].pid === mpSelL, add to mpDone
+// Wrong match: flash red border for 700ms then reset
+```
+
+**3. Error Correction** — show sentence with underlined error; student rewrites in `<input>`.
+```js
+const ERR_CHECKS = [
+  v => v.includes('correct form') && !v.includes('wrong form'),
+  ...
+];
+const ERR_HINTS = ['wrong form → correct form (reason)'];
+function checkErrors() {
+  const v = input.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+  if (check(v)) show '✅ Correto!'; else show `❌ Dica: "${hint}"`;
+}
+```
+
+**4. Multiple-choice identification** — radio buttons per scenario (e.g. WILL use identification).
+```js
+// Build with WILL_USES array: { sentence, opts[], ans }
+// Radio inputs name="will-use-{i}", check on button click
+```
+
+**5. Fill-in-blank** — inline `<input>` with `data-ans` attribute; verify on button click.
+```js
+document.querySelectorAll('.fill-check').forEach(inp => {
+  const correct = inp.value.toLowerCase().trim() === inp.dataset.ans;
+});
+```
+
+**6. Free writing (always last)** — `<textarea>` for open-ended composition. Submit button calls `submitHomework{N}()`.
+
+### XP rewards
+- Practice quiz completion: **+50 XP**
+- Dialogue read button: **+20 XP**
+- Homework submission: **+75 XP**
 
 ---
 
