@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 25 — Present Perfect | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#7c3aed;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+
+/* Flip card */
+.flip-card{perspective:800px;height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.flip-back{background:linear-gradient(135deg,#6d28d9,#7c3aed);transform:rotateY(180deg)}
+
+/* Tabs */
+.tab-btn{position:relative;font-weight:700;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#7c3aed,#ec4899);border-radius:99px;transition:width .25s}
+.tab-btn.active{color:#7c3aed}
+.tab-btn.active::after{width:80%}
+
+/* Progress dots */
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.prog-dot.done{background:linear-gradient(135deg,#7c3aed,#ec4899)}
+
+/* Expression card */
+.expr-card{transition:all .2s}
+.expr-card:hover{transform:translateY(-2px)}
+.expr-detail{display:none}
+.expr-card.open .expr-detail{display:block}
+.expr-card.open .expr-chevron{transform:rotate(180deg)}
+.expr-chevron{transition:transform .25s}
+
+/* Accordion */
+.acc-body{display:none}
+.acc-item.open .acc-body{display:block}
+.acc-item.open .acc-icon{transform:rotate(45deg)}
+.acc-icon{transition:transform .25s;font-style:normal}
+
+/* Practice */
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}
+.opt-btn:hover:not(:disabled){border-color:#7c3aed;background:#f5f3ff}
+.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+
+/* Speak */
+.speak-check{display:none}
+.speak-check:checked + label .speak-box{opacity:.5;text-decoration:line-through}
+
+/* Homework word-order tiles */
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#7c3aed;background:#f5f3ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #a78bfa;border-radius:1rem;background:#faf5ff}
+
+/* Match pairs */
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#7c3aed;background:#f5f3ff}
+.mp-btn.selected{border-color:#7c3aed;background:#ede9fe}
+.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+
+/* Fill blank */
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:110px;text-align:center}
+.fill-inp:focus{border-color:#7c3aed}
+.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-violet-50/30 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- ── HERO ──────────────────────────────────────────────────────────────── -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-violet-950 to-violet-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">📚</span>
+      <span class="absolute text-5xl float" style="top:22%;left:18%;animation-delay:.5s">✨</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🔁</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">💬</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🌟</span>
+      <span class="absolute text-5xl float" style="top:75%;right:22%;animation-delay:1.4s">📖</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <a href="classes.html" class="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm font-bold mb-5 transition-colors">
+        ← Back to Classes
+      </a>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">
+        🔁 Aula 25 · Grammar
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Present<br><span class="text-violet-300">Perfect</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Conecte o passado ao presente com <strong>have/has + Past Participle</strong>. Domine <em>ever, never, already, just</em> e <em>yet</em>.</p>
+      <!-- Progress dots -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STICKY TAB BAR ────────────────────────────────────────────────────── -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- ── TAB: VOCAB ──────────────────────────────────────────────────────── -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2>
+        <p class="text-slate-500 text-sm">Experiências pessoais e conquistas de vida. Clique nos cards para virar.</p>
+      </div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="mt-2 bg-gradient-to-r from-violet-600 to-purple-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✓ I know these words! +20 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: EXPRESSIONS ────────────────────────────────────────────────── -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2>
+        <p class="text-slate-500 text-sm">Frases idiomáticas sobre experiências. Clique para ver mais.</p>
+      </div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-violet-600 to-purple-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✓ Got the expressions! +20 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: GRAMMAR ────────────────────────────────────────────────────── -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2>
+        <p class="text-slate-500 text-sm">A estrutura do Present Perfect e suas palavras-chave.</p>
+      </div>
+
+      <!-- Estrutura visual -->
+      <div class="bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-violet-200">Estrutura</p>
+        <div class="flex flex-wrap items-center gap-2 text-base font-black">
+          <span class="bg-white/20 rounded-xl px-3 py-1">Subject</span>
+          <span class="text-violet-200">+</span>
+          <span class="bg-white/30 rounded-xl px-3 py-1">have / has</span>
+          <span class="text-violet-200">+</span>
+          <span class="bg-pink-400/50 rounded-xl px-3 py-1">Past Participle</span>
+        </div>
+        <div class="mt-4 space-y-1.5 text-sm text-white/90">
+          <p>• <strong>I / You / We / They</strong> → <strong class="text-violet-200">have</strong></p>
+          <p>• <strong>He / She / It</strong> → <strong class="text-violet-200">has</strong></p>
+        </div>
+      </div>
+
+      <!-- Palavras-chave accordion -->
+      <div class="space-y-3 mb-6" id="grammar-acc">
+
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left">
+            <span>⚡ EVER — Alguma vez</span><em class="acc-icon text-slate-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-violet-50 rounded-xl p-3">Usado em perguntas para perguntar sobre experiências de vida.</p>
+            <p>✅ <strong>Have you ever tried</strong> sushi? <em class="text-slate-400">(Você já provou sushi alguma vez?)</em></p>
+            <p>✅ <strong>Has she ever visited</strong> Japan? <em class="text-slate-400">(Ela já visitou o Japão?)</em></p>
+          </div>
+        </div>
+
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left">
+            <span>🚫 NEVER — Nunca</span><em class="acc-icon text-slate-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-violet-50 rounded-xl p-3">Resposta negativa a uma experiência. Não precisa de "not".</p>
+            <p>✅ <strong>I have never tried</strong> surfing. <em class="text-slate-400">(Nunca tentei fazer surf.)</em></p>
+            <p>✅ <strong>They have never visited</strong> the south. <em class="text-slate-400">(Eles nunca visitaram o sul.)</em></p>
+          </div>
+        </div>
+
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left">
+            <span>✅ ALREADY — Já (antes do esperado)</span><em class="acc-icon text-slate-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-violet-50 rounded-xl p-3">Algo aconteceu antes do esperado. Vai entre <em>have</em> e o particípio.</p>
+            <p>✅ <strong>I have already finished</strong> the lesson. <em class="text-slate-400">(Já terminei a lição.)</em></p>
+            <p>✅ <strong>She has already eaten</strong>. <em class="text-slate-400">(Ela já comeu.)</em></p>
+          </div>
+        </div>
+
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left">
+            <span>⚡ JUST — Acabou de acontecer</span><em class="acc-icon text-slate-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-violet-50 rounded-xl p-3">Algo aconteceu há pouquíssimo tempo, agora mesmo.</p>
+            <p>✅ <strong>He has just arrived</strong>. <em class="text-slate-400">(Ele acabou de chegar.)</em></p>
+            <p>✅ <strong>I have just tried</strong> a new approach. <em class="text-slate-400">(Acabei de tentar uma abordagem nova.)</em></p>
+          </div>
+        </div>
+
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left">
+            <span>⏳ YET — Ainda não / Já? (perguntas)</span><em class="acc-icon text-slate-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-violet-50 rounded-xl p-3">Em negativas = "ainda não". Em perguntas = "já?". Sempre no final da frase.</p>
+            <p>✅ <strong>She hasn't called yet</strong>. <em class="text-slate-400">(Ela ainda não ligou.)</em></p>
+            <p>✅ <strong>Have you finished yet?</strong> <em class="text-slate-400">(Você já terminou?)</em></p>
+          </div>
+        </div>
+
+        <!-- Erro clássico -->
+        <div class="acc-item bg-red-50 rounded-2xl border-2 border-red-200 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-red-700 text-left">
+            <span>⚠️ ERRO CLÁSSICO BRASILEIRO</span><em class="acc-icon text-red-400 not-italic">+</em>
+          </button>
+          <div class="acc-body px-5 pb-5 text-sm space-y-3">
+            <p class="text-red-600 font-bold">Se você consegue dizer QUANDO → Simple Past<br>Se é experiência sem data → Present Perfect</p>
+            <div class="space-y-2">
+              <p>❌ <span class="text-red-600 line-through">"I have seen him yesterday."</span></p>
+              <p>✅ <span class="text-green-700">"I saw him yesterday."</span> <em class="text-slate-400 text-xs">(data específica)</em></p>
+              <p class="mt-2">❌ <span class="text-red-600 line-through">"I have went there."</span></p>
+              <p>✅ <span class="text-green-700">"I have been there."</span> <em class="text-slate-400 text-xs">(been, não went)</em></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-violet-600 to-purple-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✓ Grammar understood! +20 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: DIALOGUE ───────────────────────────────────────────────────── -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2>
+        <p class="text-slate-500 text-sm">📚 Biblioteca Mágica de Nano Banana. Leia em voz alta e preste atenção no Present Perfect.</p>
+      </div>
+
+      <!-- Scene -->
+      <div class="bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">
+        📚 Biblioteca Mágica de Nano Banana. Leo encontra Capy Yara lendo um livro enorme. As páginas brilham com letras douradas que flutuam pelo ar.
+      </div>
+
+      <!-- Lines -->
+      <div class="space-y-3 mb-6">
+        <div class="bg-violet-50 border-l-4 border-violet-400 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-violet-700 mb-1">🦫 Capy Yara</p>
+          <p class="text-slate-700 text-sm">Leo! <strong class="text-violet-700">Have you ever tried</strong> reading in English? This magic book holds all the adventures you <strong class="text-violet-700">have already lived</strong>!</p>
+        </div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p>
+          <p class="text-slate-700 text-sm"><strong class="text-violet-700">Have</strong> I? I <strong class="text-violet-700">have never thought</strong> about it. But I <strong class="text-violet-700">have already seen</strong> some English books!</p>
+        </div>
+        <div class="bg-violet-50 border-l-4 border-violet-400 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-violet-700 mb-1">🦫 Capy Yara</p>
+          <p class="text-slate-700 text-sm">Exactly! The Present Perfect connects your past to NOW. You <strong class="text-violet-700">have learned</strong> so much already — <strong class="text-violet-700">have you noticed</strong>?</p>
+        </div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p>
+          <p class="text-slate-700 text-sm">I <strong class="text-violet-700">have just realized</strong> that! I <strong class="text-violet-700">have changed</strong> a lot since we started. I <strong class="text-violet-700">have never given up</strong>!</p>
+        </div>
+        <div class="bg-violet-50 border-l-4 border-violet-400 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-violet-700 mb-1">🦫 Capy Yara</p>
+          <p class="text-slate-700 text-sm">That's the spirit! <strong class="text-violet-700">Have you ever visited</strong> the Crystal Tower? You <strong class="text-violet-700">have grown</strong> enough to try!</p>
+        </div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4">
+          <p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p>
+          <p class="text-slate-700 text-sm">I <strong class="text-violet-700">have not been</strong> there yet — but I'm ready. Let's go, Yara! 🚀</p>
+        </div>
+      </div>
+
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-violet-600 to-purple-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✓ I read the dialogue! +20 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: PRACTICE ───────────────────────────────────────────────────── -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2>
+        <p class="text-slate-500 text-sm">10 questões sobre Present Perfect. Escolha a resposta correta.</p>
+      </div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p>
+        <p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p>
+      </div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Check Answers &nbsp;+50 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: SPEAK ──────────────────────────────────────────────────────── -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2>
+        <p class="text-slate-500 text-sm">Leia cada frase em voz alta usando Present Perfect. Marque quando terminar.</p>
+      </div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-violet-600 to-purple-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✓ All sentences practiced! +20 XP
+      </button>
+    </div>
+
+    <!-- ── TAB: HOMEWORK ────────────────────────────────────────────────────── -->
+    <div id="tab-homework" class="fade-in hidden">
+
+      <!-- Header banner -->
+      <div class="bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+            <p class="text-white/80 text-sm">Aula 25 — Present Perfect</p>
+          </div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Word Order</h3>
+              <p class="text-slate-500 text-sm mt-1">Organize as palavras na ordem correta. Clique nos tiles para montar a frase.</p>
+            </div>
+          </div>
+          <div id="wo25-container" class="space-y-6"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-purple-100 text-purple-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Match the Keywords</h3>
+              <p class="text-slate-500 text-sm mt-1">Conecte cada palavra-chave ao seu uso. Clique em um item de cada coluna.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div id="mp25-left" class="space-y-2"></div>
+            <div id="mp25-right" class="space-y-2"></div>
+          </div>
+          <p id="mp25-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Error Correction</h3>
+              <p class="text-slate-500 text-sm mt-1">Reescreva cada frase corrigindo o erro clássico de brasileiro.</p>
+            </div>
+          </div>
+          <div class="space-y-4" id="err25-container"></div>
+        </div>
+
+        <!-- Task 4: Fill in the Blank -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Fill in the Blank</h3>
+              <p class="text-slate-500 text-sm mt-1">Complete com: <strong>ever / never / already / just / yet</strong>.</p>
+            </div>
+          </div>
+          <div class="space-y-4" id="fill25-container"></div>
+          <button onclick="checkFill25()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">
+            Check Answers
+          </button>
+        </div>
+
+        <!-- Task 5: Free Writing -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div>
+            <div>
+              <h3 class="font-black text-navy text-base">Free Writing ✍️</h3>
+              <p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre experiências da SUA vida usando Present Perfect com <strong>ever, never, already, just</strong> ou <strong>yet</strong>.</p>
+            </div>
+          </div>
+          <textarea rows="6" placeholder="Example: I have never visited the north of Brazil, but I have already planned a trip for next year..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-400 resize-none"></textarea>
+        </div>
+
+      </div>
+
+      <button onclick="submitHomework25()" class="mt-6 w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Submit Homework &nbsp;+75 XP
+      </button>
+      <div id="hw-done-25" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+
+  </div><!-- /max-w -->
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js?v=3"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+// ── Section progress ─────────────────────────────────────────────────────────
+const TOTAL_SECTIONS = 7;
+let sectionsDone = 0;
+const doneSections = new Set();
+
+function buildHeroDots() {
+  const c = document.getElementById('hero-dots');
+  c.innerHTML = '';
+  for (let i = 0; i < TOTAL_SECTIONS; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-dot' + (i < sectionsDone ? ' done' : '');
+    c.appendChild(d);
+  }
+  document.getElementById('hero-label').textContent = `${sectionsDone} / ${TOTAL_SECTIONS} sections done`;
+}
+buildHeroDots();
+
+function markSection(id) {
+  if (doneSections.has(id)) return;
+  doneSections.add(id);
+  sectionsDone++;
+  buildHeroDots();
+  if (typeof Store !== 'undefined') Store.addXP(20);
+  spawnXP('+20 XP');
+}
+
+// ── XP pop ───────────────────────────────────────────────────────────────────
+function spawnXP(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = text;
+  el.style.cssText = `left:${40 + Math.random()*20}%;top:${30 + Math.random()*30}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+const TABS = ['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-'+t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+
+// ── Vocab flip cards ─────────────────────────────────────────────────────────
+const VOCAB = [
+  ['experience','experiência'],['journey','jornada'],['growth','crescimento'],['memory','memória'],
+  ['habit','hábito'],['passion','paixão'],['knowledge','conhecimento'],['culture','cultura'],
+  ['language','idioma'],['history','história'],['event','evento'],['moment','momento'],
+  ['place','lugar'],['relationship','relacionamento'],['opinion','opinião'],
+  ['view','visão / ponto de vista'],['difference','diferença'],['discovery','descoberta'],
+  ['adventure','aventura'],['lesson','lição'],['mistake','erro'],['reward','recompensa'],
+  ['effort','esforço'],['progress','progresso'],['choice','escolha'],['story','história pessoal'],
+  ['connection','conexão'],['value','valor'],['life','vida'],['person','pessoa'],
+];
+
+const vg = document.getElementById('vocab-grid');
+VOCAB.forEach(([en, pt]) => {
+  const d = document.createElement('div');
+  d.className = 'flip-card';
+  d.innerHTML = `<div class="flip-card-inner">
+    <div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div>
+    <div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div>
+  </div>`;
+  d.addEventListener('click', () => d.classList.toggle('flipped'));
+  vg.appendChild(d);
+});
+
+// ── Expressions ──────────────────────────────────────────────────────────────
+const EXPRS = [
+  {
+    phrase: 'So far, so good',
+    meaning: 'Até agora, tudo bem',
+    example: '"Have you finished the lesson?" — "So far, so good! I\'m on the grammar section."',
+    use: 'Quando as coisas estão indo bem até o momento, mas ainda não acabou.'
+  },
+  {
+    phrase: 'Better late than never',
+    meaning: 'Melhor tarde do que nunca',
+    example: '"I have finally started learning English at 40!" — "Better late than never!"',
+    use: 'Para encorajar alguém que começou algo tarde, mas que começou.'
+  },
+  {
+    phrase: 'Live and learn',
+    meaning: 'Errando que se aprende',
+    example: '"I have made so many mistakes in English." — "Live and learn — that\'s how it works!"',
+    use: 'Quando alguém comete um erro e aprende com ele.'
+  },
+  {
+    phrase: 'Once in a lifetime',
+    meaning: 'Uma vez na vida',
+    example: '"I have visited the Amazon — it was a once in a lifetime experience!"',
+    use: 'Para descrever algo raro e memorável que acontece raramente.'
+  },
+];
+
+const el = document.getElementById('expr-list');
+EXPRS.forEach((e, i) => {
+  const d = document.createElement('div');
+  d.className = 'expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';
+  d.innerHTML = `
+    <div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')">
+      <div>
+        <p class="font-black text-navy text-base">${e.phrase}</p>
+        <p class="text-violet-600 font-bold text-sm mt-0.5">${e.meaning}</p>
+      </div>
+      <span class="expr-chevron text-slate-400 text-lg font-black">▾</span>
+    </div>
+    <div class="expr-detail mt-4 space-y-2 text-sm text-slate-600">
+      <p class="bg-violet-50 rounded-xl p-3 italic">${e.example}</p>
+      <p>${e.use}</p>
+    </div>`;
+  el.appendChild(d);
+});
+
+// ── Grammar accordion ─────────────────────────────────────────────────────────
+function toggleAcc(btn) {
+  const item = btn.closest('.acc-item');
+  item.classList.toggle('open');
+  btn.querySelector('.acc-icon').textContent = item.classList.contains('open') ? '−' : '+';
+}
+
+// ── Practice Quiz ─────────────────────────────────────────────────────────────
+const QUIZ = [
+  { q:'Complete: "I ___ seen that movie before."', opts:['have','has','had','am'], ans:0 },
+  { q:'Complete: "She ___ never visited Paris."', opts:['have','has','had','is'], ans:1 },
+  { q:'Complete: "Have you ever ___ to Japan?"', opts:['went','go','been','going'], ans:2 },
+  { q:'Qual palavra sinaliza o Present Perfect?', opts:['yesterday','last year','already','in 2020'], ans:2 },
+  { q:'Escolha a frase CORRETA:', opts:['"I have seen him yesterday."','"I have been there before."','"I have went there."','"She have visited."'], ans:1 },
+  { q:'Complete: "He ___ just arrived."', opts:['have','has','had','is'], ans:1 },
+  { q:'Quando usamos o Simple Past ao invés do Present Perfect?', opts:['Quando falamos de experiências','Quando usamos "ever"','Quando há um tempo específico (yesterday, in 2020)','Quando usamos "already"'], ans:2 },
+  { q:'Tradução correta de "Ela ainda não ligou."', opts:['"She never called."','"She didn\'t call yet."','"She hasn\'t called yet."','"She has called never."'], ans:2 },
+  { q:'Complete: "Have they ___ finished the project?"', opts:['never','yet','already','just'], ans:2 },
+  { q:'Qual frase está ERRADA?', opts:['"Have you ever changed your mind?"','"I have just eaten lunch."','"I have seen him yesterday."','"She has never tried sushi."'], ans:2 },
+];
+
+let quizSubmitted = false;
+const qc = document.getElementById('quiz-container');
+QUIZ.forEach((q, qi) => {
+  const d = document.createElement('div');
+  d.className = 'bg-white rounded-2xl border-2 border-slate-100 p-5';
+  d.innerHTML = `<p class="font-black text-navy text-sm mb-3"><span class="text-violet-400">${qi+1}.</span> ${q.q}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      ${q.opts.map((o,oi) => `<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}
+    </div>`;
+  qc.appendChild(d);
+});
+
+const selected = {};
+function selectOpt(btn) {
+  if (quizSubmitted) return;
+  const qi = btn.dataset.qi;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b => b.classList.remove('selected', 'opt-btn-sel'));
+  btn.style.borderColor = '#7c3aed'; btn.style.background = '#f5f3ff';
+  selected[qi] = parseInt(btn.dataset.oi);
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b => {
+    if (b !== btn) { b.style.borderColor = ''; b.style.background = ''; }
+  });
+}
+
+function submitQuiz() {
+  if (quizSubmitted) return;
+  quizSubmitted = true;
+  let correct = 0;
+  QUIZ.forEach((q, qi) => {
+    const btns = document.querySelectorAll(`[data-qi="${qi}"]`);
+    btns.forEach(b => {
+      b.disabled = true;
+      const oi = parseInt(b.dataset.oi);
+      if (oi === q.ans) b.classList.add('correct');
+      else if (oi === selected[qi]) b.classList.add('wrong');
+    });
+    if (selected[qi] === q.ans) correct++;
+  });
+  document.getElementById('quiz-result').classList.remove('hidden');
+  document.getElementById('quiz-score-text').textContent = `${correct} / ${QUIZ.length} correct!`;
+  document.getElementById('quiz-submit-btn').disabled = true;
+  document.getElementById('quiz-submit-btn').classList.add('opacity-60');
+  markSection('practice');
+  if (typeof Store !== 'undefined') Store.addXP(30);
+  spawnXP('+50 XP');
+}
+
+// ── Speak ─────────────────────────────────────────────────────────────────────
+const SPEAK = [
+  'Have you ever tried a new food you didn\'t expect to like?',
+  'She has visited three different countries this year.',
+  'I have learned so much from my mistakes.',
+  'He has never changed his mind about that decision.',
+  'Have they already finished the project?',
+  'I have just tried a new approach and it worked.',
+  'We have visited that museum before — it\'s amazing.',
+  'Have you ever changed your opinion after a good conversation?',
+];
+
+const sl = document.getElementById('speak-list');
+SPEAK.forEach((s, i) => {
+  const d = document.createElement('div');
+  d.innerHTML = `
+    <input type="checkbox" id="sp${i}" class="speak-check" onchange="checkAllSpeak()"/>
+    <label for="sp${i}" class="cursor-pointer">
+      <div class="speak-box flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center font-black text-violet-700 text-sm">${i+1}</div>
+        <p class="text-slate-700 font-bold text-sm flex-1">${s}</p>
+        <span class="text-slate-300 text-xl">☐</span>
+      </div>
+    </label>`;
+  sl.appendChild(d);
+});
+
+function checkAllSpeak() {
+  const all = SPEAK.length;
+  const done = document.querySelectorAll('.speak-check:checked').length;
+  if (done === all) markSection('speak');
+}
+
+// ── Homework: Word Order ──────────────────────────────────────────────────────
+const WO25_DATA = [
+  { s: 'I have never tried surfing before but I want to', w: ['I','have','never','tried','surfing','before','but','I','want','to'] },
+  { s: 'She has already finished all her lessons this week', w: ['She','has','already','finished','all','her','lessons','this','week'] },
+  { s: 'Have you ever changed your opinion after a conversation', w: ['Have','you','ever','changed','your','opinion','after','a','conversation'] },
+];
+
+function hwShuffle25(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+const wo25 = WO25_DATA.map(d => ({ ans: [], bank: hwShuffle25(d.w), orig: d.w }));
+
+function wo25Render() {
+  const c = document.getElementById('wo25-container');
+  c.innerHTML = '';
+  WO25_DATA.forEach((d, si) => {
+    const st = wo25[si];
+    c.innerHTML += `
+      <div class="border border-slate-100 rounded-xl p-4 space-y-2">
+        <p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p>
+        <div class="wo-ans" id="wo25-ans-${si}">
+          ${st.ans.map((w,wi) => `<div class="wo-tile" onclick="wo25Move(false,${si},${wi})">${w}</div>`).join('')}
+        </div>
+        <div class="wo-bank" id="wo25-bank-${si}">
+          ${st.bank.map((w,wi) => `<div class="wo-tile" onclick="wo25Move(true,${si},${wi})">${w}</div>`).join('')}
+        </div>
+        <div class="flex gap-2">
+          <button onclick="wo25Check(${si})" class="bg-violet-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button>
+          <button onclick="wo25Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button>
+        </div>
+        <p id="wo25-fb-${si}" class="text-xs font-bold hidden"></p>
+      </div>`;
+  });
+}
+
+function wo25Move(fromBank, si, wi) {
+  const st = wo25[si];
+  if (fromBank) {
+    st.ans.push(st.bank.splice(wi,1)[0]);
+  } else {
+    st.bank.push(st.ans.splice(wi,1)[0]);
+  }
+  wo25Render();
+}
+
+function wo25Check(si) {
+  const st = wo25[si];
+  const fb = document.getElementById('wo25-fb-'+si);
+  const correct = st.ans.join(' ').toLowerCase() === WO25_DATA[si].s.toLowerCase();
+  fb.className = 'text-xs font-bold ' + (correct ? 'text-emerald-600' : 'text-red-500');
+  fb.textContent = correct ? '✅ Correct!' : `❌ Try again! (${WO25_DATA[si].s})`;
+  fb.classList.remove('hidden');
+}
+
+function wo25Reset(si) {
+  wo25[si].bank = hwShuffle25(WO25_DATA[si].orig);
+  wo25[si].ans = [];
+  document.getElementById('wo25-fb-'+si).classList.add('hidden');
+  wo25Render();
+}
+
+wo25Render();
+
+// ── Homework: Match Pairs ─────────────────────────────────────────────────────
+const MP25 = [
+  { l:'EVER 🔍', r:'Alguma vez (perguntas)' },
+  { l:'NEVER 🚫', r:'Nunca (negativo)' },
+  { l:'ALREADY ✅', r:'Já (antes do esperado)' },
+  { l:'JUST ⚡', r:'Acabou de acontecer' },
+  { l:'YET ⏳', r:'Ainda não / perguntas neg.' },
+];
+
+function mpShuffle25(arr) {
+  const a = [...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a;
+}
+
+const mp25R = mpShuffle25(MP25.map((p,i) => ({ label:p.r, pid:i })));
+let mp25SelL = null;
+const mp25Done = new Set();
+
+function mp25Render() {
+  const lc = document.getElementById('mp25-left');
+  const rc = document.getElementById('mp25-right');
+  lc.innerHTML = MP25.map((p,i) => `
+    <button onclick="mp25ClickL(${i})" id="mp25L-${i}" class="mp-btn w-full ${mp25Done.has(i)?'matched':''}" ${mp25Done.has(i)?'disabled':''}>
+      ${p.l}
+    </button>`).join('');
+  rc.innerHTML = mp25R.map((p,i) => `
+    <button onclick="mp25ClickR(${i})" id="mp25R-${i}" class="mp-btn w-full ${mp25Done.has(p.pid)?'matched':''}" ${mp25Done.has(p.pid)?'disabled':''}>
+      ${p.label}
+    </button>`).join('');
+}
+
+function mp25ClickL(i) {
+  if (mp25Done.has(i)) return;
+  mp25SelL = i;
+  document.querySelectorAll('#mp25-left .mp-btn').forEach((b,j) => {
+    b.classList.toggle('selected', j === i && !mp25Done.has(j));
+  });
+}
+
+function mp25ClickR(ri) {
+  if (mp25SelL === null) return;
+  const rightItem = mp25R[ri];
+  if (rightItem.pid === mp25SelL) {
+    mp25Done.add(mp25SelL);
+    mp25SelL = null;
+    mp25Render();
+    if (mp25Done.size === MP25.length) {
+      document.getElementById('mp25-done-msg').classList.remove('hidden');
+    }
+  } else {
+    const rb = document.getElementById('mp25R-'+ri);
+    const lb = document.getElementById('mp25L-'+mp25SelL);
+    [rb, lb].forEach(b => { b.classList.add('wrong-flash'); setTimeout(()=>b.classList.remove('wrong-flash'),700); });
+    mp25SelL = null;
+    document.querySelectorAll('#mp25-left .mp-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
+
+mp25Render();
+
+// ── Homework: Error Correction ────────────────────────────────────────────────
+const ERR25 = [
+  { wrong:'"I have seen him yesterday at the mall."', check: v => (v.includes('saw him yesterday') || (v.includes('saw') && v.includes('yesterday'))), hint:'have seen → saw (data específica = Simple Past)' },
+  { wrong:'"She has went to the gym this morning."', check: v => v.includes('went to the gym') || v.includes('has gone'), hint:'has went → went / has gone (particípio é "gone", não "went")' },
+  { wrong:'"Have you ever went to São Paulo?"', check: v => v.includes('been to') || v.includes('ever been'), hint:'ever went → ever been (com Present Perfect usamos "been", não "went")' },
+];
+
+const ec = document.getElementById('err25-container');
+ERR25.forEach((e, i) => {
+  const d = document.createElement('div');
+  d.className = 'space-y-2';
+  d.innerHTML = `
+    <p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p>
+    <input type="text" id="err25-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-violet-400"/>
+    <div class="flex gap-2">
+      <button onclick="checkErr25(${i})" class="bg-violet-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button>
+    </div>
+    <p id="err25-fb-${i}" class="text-xs font-bold hidden"></p>`;
+  ec.appendChild(d);
+});
+
+function checkErr25(i) {
+  const v = document.getElementById('err25-inp-'+i).value.toLowerCase().replace(/[?.!,]/g,'').trim();
+  const fb = document.getElementById('err25-fb-'+i);
+  if (ERR25[i].check(v)) {
+    fb.className = 'text-xs font-bold text-emerald-600';
+    fb.textContent = '✅ Correto!';
+  } else {
+    fb.className = 'text-xs font-bold text-red-500';
+    fb.textContent = `❌ Dica: ${ERR25[i].hint}`;
+  }
+  fb.classList.remove('hidden');
+}
+
+// ── Homework: Fill in the Blank ───────────────────────────────────────────────
+const FILL25 = [
+  { before:'Have you', blank:'ever', after:'tried Japanese food?', ans:'ever' },
+  { before:'I have', blank:'already', after:'finished the homework — it was easy!', ans:'already' },
+  { before:'She has', blank:'just', after:'arrived. She\'s at the door!', ans:'just' },
+  { before:'They have', blank:'never', after:'visited another country.', ans:'never' },
+];
+
+const fc = document.getElementById('fill25-container');
+FILL25.forEach((f, i) => {
+  const d = document.createElement('p');
+  d.className = 'text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';
+  d.innerHTML = `<span>${f.before}</span> <input type="text" id="fill25-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;
+  fc.appendChild(d);
+});
+
+function checkFill25() {
+  FILL25.forEach((f, i) => {
+    const inp = document.getElementById('fill25-'+i);
+    const correct = inp.value.trim().toLowerCase() === f.ans;
+    inp.classList.remove('ok','err');
+    inp.classList.add(correct ? 'ok' : 'err');
+  });
+}
+
+// ── Homework submit ───────────────────────────────────────────────────────────
+function submitHomework25() {
+  const btn = event.target;
+  btn.disabled = true; btn.textContent = '✓ Submitted!'; btn.classList.add('opacity-75');
+  document.getElementById('hw-done-25').classList.remove('hidden');
+  markSection('homework');
+  if (typeof Store !== 'undefined') Store.addXP(75);
+  spawnXP('+75 XP');
+}
+window.submitHomework25 = submitHomework25;
+</script>
+</body>
+</html>
