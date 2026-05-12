@@ -43,7 +43,7 @@ const Components = {
                 <div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto font-['Plus_Jakarta_Sans'] antialiased">
                 <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
                     <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-pink-400/60 shadow-md flex-shrink-0 bg-pink-100 flex items-center justify-center">
-                        <img src="yara.png?v=2" alt="Yara" class="w-full h-full object-cover"
+                        <img src="yara-avatar.png?v=1" alt="Yara" class="w-full h-full object-cover"
                              onerror="this.style.display='none';this.parentElement.innerHTML='🦫'"/>
                     </div>
                     <span class="text-2xl font-black tracking-tight text-navy dark:text-blue-100">Yara's Forest</span>
