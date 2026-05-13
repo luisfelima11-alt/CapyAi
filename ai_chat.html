@@ -1,337 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Chat with Yara — AI English Practice</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "primary": "#001f3f",
-        "secondary": "#ec4899",
-        "tertiary": "#10b981",
-        "surface-container": "#002a54",
-      },
-      fontFamily: {
-        "headline": ["Plus Jakarta Sans"],
-        "body":     ["Be Vietnam Pro"],
-        "label":    ["Lexend"]
-      },
-      borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-    }
-  }
-}
-</script>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Yara AI — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
 <style>
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+* { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-  /* Chat bubble animation */
-  @keyframes bubbleIn {
-    from { opacity: 0; transform: translateY(12px) scale(0.95); }
-    to   { opacity: 1; transform: translateY(0)   scale(1); }
-  }
-  .bubble-in { animation: bubbleIn 0.3s ease both; }
+html, body { height: 100%; overflow: hidden; background: #001f3f; }
 
-  /* Typing dots */
-  @keyframes dot-bounce {
-    0%, 80%, 100% { transform: translateY(0); }
-    40%           { transform: translateY(-6px); }
-  }
-  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; animation: dot-bounce 1.2s ease infinite; }
-  .dot:nth-child(2) { animation-delay:.15s; }
-  .dot:nth-child(3) { animation-delay:.3s; }
+/* Breathe animation for fallback image */
+@keyframes breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%       { transform: scale(1.03) translateY(-6px); }
+}
+.breathe { animation: breathe 4s ease-in-out infinite; }
 
-  /* Sound wave bars (mic active) */
-  @keyframes bar-wave {
-    0%,100% { height:6px; }
-    50%     { height:20px; }
-  }
-  .bar { display:inline-block; width:4px; border-radius:2px; background:#ec4899; animation: bar-wave 0.8s ease infinite; margin:0 1px; }
-  .bar:nth-child(2) { animation-delay:.1s; }
-  .bar:nth-child(3) { animation-delay:.2s; }
-  .bar:nth-child(4) { animation-delay:.1s; }
+/* Speech bubble tail */
+#speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 22px;
+  width: 0; height: 0;
+  border-left: 13px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 14px solid white;
+}
 
-  /* Scrollbar */
-  #chat-messages::-webkit-scrollbar { width:6px; }
-  #chat-messages::-webkit-scrollbar-thumb { background:#ffffff20; border-radius:999px; }
+/* Bubble transition */
+#speech-bubble {
+  transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Mic wave bars */
+@keyframes wave {
+  0%, 100% { height: 6px; }
+  50%       { height: 22px; }
+}
+.wave-bar {
+  width: 3px; border-radius: 99px; background: white;
+  animation: wave .6s ease-in-out infinite;
+}
+
+/* User pill entrance */
+@keyframes pillIn {
+  from { opacity: 0; transform: translateY(10px) scale(.92); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.pill-in { animation: pillIn .25s ease forwards; }
+
+/* Toast entrance */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+#toast { animation: toastIn .3s ease; }
+
+/* Online dot pulse */
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.3} }
+.pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+
+/* Bottom vignette */
+.vignette {
+  background: linear-gradient(to top,
+    rgba(0,31,63,1) 0%,
+    rgba(0,31,63,.7) 20%,
+    rgba(0,31,63,0) 50%);
+}
+
+/* Input focus glow */
+#chat-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(236,72,153,.45); }
+
+/* Scrollbar hide */
+textarea::-webkit-scrollbar { display: none; }
 </style>
 </head>
-<body class="bg-primary font-body text-white min-h-screen flex flex-col overflow-hidden">
+<body class="bg-navy">
 
-<!-- ── Top Bar ────────────────────────────────────────────────────────────── -->
-<header class="flex items-center gap-4 px-6 py-4 bg-primary/90 backdrop-blur border-b border-white/10 flex-shrink-0">
-  <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
-    <span class="material-symbols-outlined text-xl">arrow_back</span>
+<!-- ── TOP BAR ────────────────────────────────────────────────────────────── -->
+<div id="topbar"
+     class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
+     style="background:rgba(0,31,63,.8);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.08);">
+
+  <button onclick="history.length>1?history.back():location.href='6_Home_Forest_Expedition.html'"
+          class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors active:scale-95">
+    <span class="material-symbols-outlined text-white" style="font-size:20px">arrow_back</span>
   </button>
-  <!-- Yara avatar + name -->
-  <div class="flex items-center gap-3">
+
+  <div class="flex items-center gap-2">
     <div class="relative">
-      <img src="Hello%20Yara%20profile%20pic%20002.png"
-           class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400" alt="Yara" onerror="this.onerror=null;this.src='yara.svg'"/>
-      <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-primary" id="status-dot"></span>
+      <img src="yara-avatar.png" alt="Yara"
+           class="w-8 h-8 rounded-full object-cover border-2 border-pink-400/60"
+           onerror="this.src='yara.svg'"/>
+      <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-navy pulse-dot"></span>
     </div>
-    <div>
-      <p class="font-headline font-bold text-white leading-none">Yara</p>
-      <p class="font-label text-xs text-emerald-400" id="status-text">Thinking… 🌿</p>
+    <div class="text-left">
+      <p class="text-white font-black text-sm leading-none">Yara AI</p>
+      <p id="status-text" class="text-emerald-400 text-[10px] font-bold leading-none mt-0.5">Online agora</p>
     </div>
   </div>
-  <!-- AI badge -->
-  <div class="ml-auto flex items-center gap-2 bg-pink-500/20 border border-pink-500/40 px-3 py-1 rounded-full">
-    <span class="material-symbols-outlined text-pink-400 text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
-    <span class="font-label text-pink-300 text-xs font-bold">AI Powered</span>
+
+  <div class="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1.5">
+    <span class="text-yellow-300 text-xs">✨</span>
+    <span class="text-white/80 text-xs font-bold">AI</span>
   </div>
-</header>
-
-<!-- ── Starter Prompts (shown only before first message) ─────────────────── -->
-<div id="starter-prompts" class="flex-shrink-0 px-4 pt-4 flex flex-wrap gap-2 justify-center">
-  <p class="w-full text-center font-label text-xs text-white/30 uppercase tracking-widest mb-1">Try asking…</p>
-  <button onclick="usePrompt(this)" class="starter-btn bg-white/8 hover:bg-white/15 border border-white/15 text-white/70 font-label text-xs px-4 py-2 rounded-full active:scale-95 transition-all">What is your name? 🦫</button>
-  <button onclick="usePrompt(this)" class="starter-btn bg-white/8 hover:bg-white/15 border border-white/15 text-white/70 font-label text-xs px-4 py-2 rounded-full active:scale-95 transition-all">Teach me a new word 📚</button>
-  <button onclick="usePrompt(this)" class="starter-btn bg-white/8 hover:bg-white/15 border border-white/15 text-white/70 font-label text-xs px-4 py-2 rounded-full active:scale-95 transition-all">How do I say hello? 👋</button>
-  <button onclick="usePrompt(this)" class="starter-btn bg-white/8 hover:bg-white/15 border border-white/15 text-white/70 font-label text-xs px-4 py-2 rounded-full active:scale-95 transition-all">Tell me about animals 🐾</button>
-  <button onclick="usePrompt(this)" class="starter-btn bg-white/8 hover:bg-white/15 border border-white/15 text-white/70 font-label text-xs px-4 py-2 rounded-full active:scale-95 transition-all">What colour is the sky? 🌤️</button>
 </div>
 
-<!-- ── Chat Messages ──────────────────────────────────────────────────────── -->
-<div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4 min-h-0">
-  <!-- Yara welcome bubble injected by JS -->
+<!-- ── VIDEO ZONE + BUBBLE ────────────────────────────────────────────────── -->
+<div class="fixed inset-0 flex flex-col" style="padding-top:56px; padding-bottom:134px;">
+
+  <div class="relative flex-1 overflow-hidden bg-navy">
+
+    <!-- Looping video (if provided) -->
+    <video id="yara-video" autoplay loop muted playsinline
+           class="w-full h-full object-cover object-top">
+      <source src="yara-chat.mp4" type="video/mp4"/>
+    </video>
+
+    <!-- Fallback: animated image -->
+    <img id="yara-fallback" src="yara-avatar.png" alt="Yara"
+         class="w-full h-full object-cover object-top absolute inset-0 hidden breathe"
+         onerror="this.src='yara.svg'"/>
+
+    <!-- Bottom vignette -->
+    <div class="absolute inset-x-0 bottom-0 h-2/5 vignette pointer-events-none"></div>
+
+    <!-- ── SPEECH BUBBLE ── -->
+    <div id="speech-bubble"
+         class="absolute left-4 right-4 opacity-0 scale-95 pointer-events-none"
+         style="bottom:12%;">
+      <div class="relative bg-white rounded-[1.4rem] rounded-bl-sm shadow-2xl px-5 py-4 max-w-sm">
+        <!-- Typing dots -->
+        <div id="typing-dots" class="flex items-center gap-1.5 py-1 hidden">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-300 animate-bounce" style="animation-delay:0s"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-300 animate-bounce" style="animation-delay:.15s"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-300 animate-bounce" style="animation-delay:.3s"></span>
+        </div>
+        <!-- Reply text -->
+        <p id="bubble-text" class="text-navy font-semibold text-sm leading-relaxed hidden"></p>
+      </div>
+    </div>
+
+    <!-- ── USER PILL ── -->
+    <div id="user-pill" class="absolute right-4 hidden" style="bottom:12%;">
+      <div class="bg-pink-500 text-white rounded-[1.2rem] rounded-br-sm px-4 py-2.5 text-sm font-bold shadow-xl max-w-[220px]">
+        <p id="user-pill-text" class="leading-snug"></p>
+      </div>
+    </div>
+
+    <!-- ── MIC OVERLAY ── -->
+    <div id="mic-wave" class="absolute inset-0 flex items-center justify-center hidden" style="background:rgba(0,0,0,.45);">
+      <div class="bg-navy/90 backdrop-blur-md rounded-3xl px-10 py-8 flex flex-col items-center gap-4 border border-white/10">
+        <div class="flex items-end gap-1.5" style="height:28px;">
+          <div class="wave-bar" style="animation-delay:.0s"></div>
+          <div class="wave-bar" style="animation-delay:.1s"></div>
+          <div class="wave-bar" style="animation-delay:.2s"></div>
+          <div class="wave-bar" style="animation-delay:.3s"></div>
+          <div class="wave-bar" style="animation-delay:.2s"></div>
+          <div class="wave-bar" style="animation-delay:.1s"></div>
+          <div class="wave-bar" style="animation-delay:.0s"></div>
+        </div>
+        <p class="text-white font-black text-base">Ouvindo...</p>
+        <button onclick="stopMic()"
+                class="text-white/50 text-xs font-bold bg-white/10 px-4 py-1.5 rounded-full hover:bg-white/20 transition-colors">
+          Parar
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<!-- ── Input Bar ──────────────────────────────────────────────────────────── -->
-<div class="flex-shrink-0 border-t border-white/10 bg-surface-container px-4 py-3">
-  <div class="max-w-2xl mx-auto flex items-end gap-3">
-    <!-- Mic button -->
-    <button id="mic-btn"
-            onclick="toggleMic()"
-            class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-white/10 hover:bg-pink-500/20 border border-white/20 transition-all"
-            title="Speak">
-      <span class="material-symbols-outlined text-xl" id="mic-icon">mic</span>
+<!-- ── BOTTOM CONTROLS ────────────────────────────────────────────────────── -->
+<div class="fixed bottom-0 left-0 right-0 z-50">
+
+  <!-- Action row -->
+  <div class="flex items-center justify-center gap-10 px-6 py-4"
+       style="background:rgba(0,31,63,.95);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.08);">
+
+    <!-- Mic -->
+    <button id="mic-btn" onclick="toggleMic()" class="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform">
+      <div id="mic-circle"
+           class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-pink-500/30"
+           style="background:linear-gradient(135deg,#ec4899,#be185d)">
+        <span class="material-symbols-outlined text-white text-2xl" id="mic-icon"
+              style="font-variation-settings:'FILL' 1">mic</span>
+      </div>
+      <span class="text-white/50 text-[10px] font-bold tracking-wide">ÁUDIO</span>
     </button>
-    <!-- Text input -->
-    <div class="flex-1 relative">
-      <textarea id="chat-input"
-                rows="1"
-                placeholder="Type something to Yara…"
-                class="w-full bg-white/10 border border-white/20 rounded-2xl px-5 py-3 pr-14 text-white placeholder-white/40 font-body resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                style="max-height:120px; overflow-y:auto;"
-                onkeydown="handleKey(event)"
-                oninput="autoResize(this)"></textarea>
-    </div>
-    <!-- Send button -->
-    <button id="send-btn"
-            onclick="sendMessage()"
-            class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-90 transition-all shadow-lg shadow-emerald-500/30"
-            title="Send">
-      <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">send</span>
+
+    <!-- Call -->
+    <button onclick="showComingSoon()" class="flex flex-col items-center gap-1.5 group active:scale-95 transition-transform">
+      <div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-violet-500/30"
+           style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">
+        <span class="material-symbols-outlined text-white text-2xl"
+              style="font-variation-settings:'FILL' 1">call</span>
+      </div>
+      <span class="text-white/50 text-[10px] font-bold tracking-wide">LIGAR</span>
+    </button>
+
+  </div>
+
+  <!-- Input bar -->
+  <div class="flex items-center gap-3 px-4 py-3"
+       style="background:#001020;border-top:1px solid rgba(255,255,255,.06);padding-bottom:max(12px,env(safe-area-inset-bottom));">
+    <textarea id="chat-input" rows="1"
+              placeholder="Escreva para Yara..."
+              onkeydown="handleKey(event)"
+              oninput="autoResize(this); hideBubble();"
+              class="flex-1 bg-white/10 text-white placeholder-white/35 rounded-full px-4 py-2.5 text-sm font-medium resize-none leading-snug"
+              style="max-height:90px;overflow-y:auto;border:1px solid rgba(255,255,255,.12);"></textarea>
+    <button id="send-btn" onclick="sendMessage()"
+            class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center active:scale-95 transition-transform shadow-md"
+            style="background:linear-gradient(135deg,#ec4899,#be185d)">
+      <span class="material-symbols-outlined text-white" style="font-size:18px;font-variation-settings:'FILL' 1">send</span>
     </button>
   </div>
-  <!-- Mic wave indicator -->
-  <div id="mic-wave" class="hidden flex justify-center items-end gap-1 mt-2 h-6">
-    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    <span class="font-label text-xs text-pink-400 ml-2">Listening…</span>
-  </div>
+
 </div>
+
+<!-- Toast -->
+<div id="toast"
+     class="fixed z-[60] bg-white/20 backdrop-blur-md text-white font-bold text-sm px-5 py-2.5 rounded-full shadow-xl hidden"
+     style="bottom:148px;left:50%;transform:translateX(-50%);white-space:nowrap;"></div>
 
 <script src="store.js"></script>
 <script>
-// ── Conversation history ──────────────────────────────────────────────────────
-const history = [];
-let isThinking = false;
-let recognition = null;
-let micActive   = false;
+// ─── Video fallback ───────────────────────────────────────────────────────────
+const yaraVideo    = document.getElementById('yara-video');
+const yaraFallback = document.getElementById('yara-fallback');
 
-// ── Starter prompt tap ───────────────────────────────────────────────────────
-function usePrompt(btn) {
-    document.getElementById('chat-input').value = btn.textContent.replace(/[^\w\s?!,.]/g,'').trim();
-    document.getElementById('starter-prompts').style.display = 'none';
-    document.getElementById('chat-input').focus();
+function showFallback() {
+  yaraVideo.classList.add('hidden');
+  yaraFallback.classList.remove('hidden');
 }
 
-// ── Greeting on load ─────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-    const name = (window.Store?.state?.playerName) || 'Explorer';
-    const greetings = [
-        `Hi ${name}! 👋 I'm Yara! I'm so happy to chat with you. What English word did you learn today?`,
-        `Hello ${name}! 🌿 Welcome! I'm Yara the capybara. Can you tell me one English word you know?`,
-        `Hey ${name}! 😊 I'm Yara! Let's practise English together. What is your favourite animal in English?`
-    ];
-    const msg = greetings[Math.floor(Math.random() * greetings.length)];
-    appendBubble('yara', msg);
-    setStatus('Online', true);
+yaraVideo.addEventListener('error', showFallback);
+yaraVideo.addEventListener('loadeddata', () => {
+  yaraFallback.classList.add('hidden');
+  yaraVideo.classList.remove('hidden');
 });
+// If no video present, fall back after short wait
+setTimeout(() => {
+  if (yaraVideo.readyState === 0 || yaraVideo.networkState === 3) showFallback();
+}, 600);
 
-// ── UI helpers ────────────────────────────────────────────────────────────────
-function setStatus(text, online = true) {
-    document.getElementById('status-text').textContent = text;
-    const dot = document.getElementById('status-dot');
-    dot.className = `absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-primary ${online ? 'bg-emerald-400' : 'bg-yellow-400'}`;
+// ─── Speech bubble ────────────────────────────────────────────────────────────
+const bubble     = document.getElementById('speech-bubble');
+const bubbleTxt  = document.getElementById('bubble-text');
+const typingDots = document.getElementById('typing-dots');
+let   bubbleTimr = null;
+
+function showTypingBubble() {
+  typingDots.classList.remove('hidden');
+  bubbleTxt.classList.add('hidden');
+  bubble.classList.remove('opacity-0','scale-95');
+  bubble.classList.add('opacity-100','scale-100');
 }
 
-function appendBubble(role, text) {
-    const wrap = document.getElementById('chat-messages');
-    const div  = document.createElement('div');
-    div.className = `flex gap-3 bubble-in ${role === 'yara' ? 'justify-start' : 'justify-end'}`;
-
-    if (role === 'yara') {
-        div.innerHTML = `
-          <img src="Hello%20Yara%20profile%20pic%20002.png"
-               class="w-9 h-9 rounded-full object-cover flex-shrink-0 self-end border border-emerald-400/40" alt="Yara" onerror="this.onerror=null;this.src='yara.svg'"/>
-          <div class="max-w-[75%] bg-surface-container border border-white/10 rounded-3xl rounded-bl-sm px-5 py-3 font-body text-white text-sm leading-relaxed shadow-lg">${escHtml(text)}</div>`;
-    } else {
-        div.innerHTML = `
-          <div class="max-w-[75%] bg-pink-500 rounded-3xl rounded-br-sm px-5 py-3 font-body text-white text-sm leading-relaxed shadow-lg shadow-pink-500/20">${escHtml(text)}</div>`;
-    }
-
-    wrap.appendChild(div);
-    wrap.scrollTop = wrap.scrollHeight;
-    return div;
+function showBubble(text) {
+  typingDots.classList.add('hidden');
+  bubbleTxt.textContent = text;
+  bubbleTxt.classList.remove('hidden');
+  bubble.classList.remove('opacity-0','scale-95');
+  bubble.classList.add('opacity-100','scale-100');
+  clearTimeout(bubbleTimr);
+  bubbleTimr = setTimeout(hideBubble, 9000);
 }
 
-function showTyping() {
-    const wrap = document.getElementById('chat-messages');
-    const div  = document.createElement('div');
-    div.id        = 'typing-indicator';
-    div.className = 'flex gap-3 justify-start bubble-in';
-    div.innerHTML = `
-      <img src="Hello%20Yara%20profile%20pic%20002.png"
-           class="w-9 h-9 rounded-full object-cover flex-shrink-0 self-end border border-emerald-400/40" alt="Yara" onerror="this.onerror=null;this.src='yara.svg'"/>
-      <div class="bg-surface-container border border-white/10 rounded-3xl rounded-bl-sm px-5 py-4 flex items-center gap-1 shadow-lg">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>`;
-    wrap.appendChild(div);
-    wrap.scrollTop = wrap.scrollHeight;
+function hideBubble() {
+  bubble.classList.remove('opacity-100','scale-100');
+  bubble.classList.add('opacity-0','scale-95');
 }
 
-function hideTyping() {
-    document.getElementById('typing-indicator')?.remove();
+// ─── User pill ────────────────────────────────────────────────────────────────
+const userPill     = document.getElementById('user-pill');
+const userPillText = document.getElementById('user-pill-text');
+let   pillTimer    = null;
+
+function showUserPill(text) {
+  userPillText.textContent = text.length > 55 ? text.slice(0,52)+'…' : text;
+  userPill.classList.remove('hidden');
+  userPill.classList.add('pill-in');
+  clearTimeout(pillTimer);
+  pillTimer = setTimeout(() => {
+    userPill.classList.add('hidden');
+    userPill.classList.remove('pill-in');
+  }, 3500);
 }
 
-function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+// ─── Toast ────────────────────────────────────────────────────────────────────
+const toast = document.getElementById('toast');
+let   toastT = null;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => toast.classList.add('hidden'), 2600);
 }
+function showComingSoon() { showToast('📞 Em breve!'); }
+
+// ─── Status ───────────────────────────────────────────────────────────────────
+const statusEl = document.getElementById('status-text');
+function setStatus(txt, online = true) {
+  statusEl.textContent = txt;
+  statusEl.className = (online ? 'text-emerald-400' : 'text-slate-400')
+    + ' text-[10px] font-bold leading-none mt-0.5';
+}
+
+// ─── Input helpers ────────────────────────────────────────────────────────────
+const input   = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
 
 function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 90) + 'px';
 }
 
 function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-    }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-// ── Send message ──────────────────────────────────────────────────────────────
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+let history      = [];
+let firstMessage = true;
+
 async function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const text  = input.value.trim();
-    if (!text || isThinking) return;
+  const text = input.value.trim();
+  if (!text || sendBtn.disabled) return;
 
-    input.value = '';
-    autoResize(input);
-    appendBubble('user', text);
-    history.push({ role: 'user', text });
-    // Hide starter prompts after first message
-    const sp = document.getElementById('starter-prompts');
-    if (sp) sp.style.display = 'none';
+  input.value = '';
+  autoResize(input);
+  sendBtn.disabled = true;
+  hideBubble();
 
-    isThinking = true;
-    setStatus('Typing… ✍️', false);
-    showTyping();
-    document.getElementById('send-btn').disabled = true;
+  showUserPill(text);
+  history.push({ role: 'user', text });
 
-    try {
-        const res  = await fetch('/api/chat', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ history: history.slice(0, -1), message: text })
-        });
-        const data = await res.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-                   || "Oops! I couldn't think of a reply. Try again! 😅";
+  showTypingBubble();
+  setStatus('Digitando…');
 
-        hideTyping();
-        appendBubble('yara', reply);
-        history.push({ role: 'assistant', text: reply });
+  try {
+    const res  = await fetch('/api/chat', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ history: history.slice(0, -1), message: text }),
+    });
+    const data  = await res.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+                  || data?.reply
+                  || 'Hmm, não consegui responder agora. Tente de novo! 🦫';
 
-        // Award XP for chatting (once per session max 3 times)
-        const userTurns = history.filter(m => m.role === 'user').length;
-        if (window.Store && userTurns <= 3) {
-            Store.addXP(5);
-            Store.activateStreak();
-        }
-        // Unlock chat_master after 5 exchanges; mark activity complete after first reply
-        if (window.Store) {
-            if (userTurns === 1) Store.completeActivity('ai_chat');
-            if (userTurns >= 5) Store.unlockBadge('chat_master');
-        }
-    } catch (err) {
-        hideTyping();
-        appendBubble('yara', "Hmm, I can't connect right now. Is the server running? 🌿");
+    history.push({ role: 'assistant', text: reply });
+    showBubble(reply);
+    setStatus('Online agora');
+
+    if (firstMessage) {
+      firstMessage = false;
+      if (typeof Store !== 'undefined') Store.addXP(10);
     }
-
-    isThinking = false;
-    setStatus('Online', true);
-    document.getElementById('send-btn').disabled = false;
-    document.getElementById('chat-input').focus();
+  } catch (err) {
+    showBubble('Ops! Sem conexão agora. 🌿 Tente mais tarde.');
+    setStatus('Offline', false);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
 }
 
-// ── Web Speech Recognition (mic) ─────────────────────────────────────────────
+// ─── Mic ─────────────────────────────────────────────────────────────────────
+let recognition = null;
+let micActive   = false;
+const micCircle = document.getElementById('mic-circle');
+const micIcon   = document.getElementById('mic-icon');
+const micWave   = document.getElementById('mic-wave');
+
 function toggleMic() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        appendBubble('yara', "Sorry, your browser doesn't support voice input. Try typing instead! 😊");
-        return;
-    }
+  if (micActive) { stopMic(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('🎤 Não suportado neste navegador'); return; }
 
-    if (micActive) {
-        recognition?.stop();
-        return;
-    }
+  recognition = new SR();
+  recognition.lang            = 'en-US';
+  recognition.interimResults  = false;
+  recognition.maxAlternatives = 1;
 
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    recognition.lang          = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+  recognition.onstart  = () => {
+    micActive = true;
+    micCircle.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    micIcon.textContent = 'mic_off';
+    micWave.classList.remove('hidden');
+    setStatus('Ouvindo…');
+  };
+  recognition.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    input.value = t;
+    autoResize(input);
+    stopMic();
+    sendMessage();
+  };
+  recognition.onerror  = () => { stopMic(); showToast('🎤 Não ouvi. Tente de novo!'); };
+  recognition.onend    = () => { if (micActive) stopMic(); };
 
-    recognition.onstart = () => {
-        micActive = true;
-        document.getElementById('mic-icon').textContent = 'mic_off';
-        document.getElementById('mic-btn').classList.add('bg-pink-500/30', 'border-pink-500/60');
-        document.getElementById('mic-wave').classList.remove('hidden');
-        document.getElementById('mic-wave').classList.add('flex');
-    };
-
-    recognition.onresult = e => {
-        const transcript = e.results[0][0].transcript;
-        document.getElementById('chat-input').value = transcript;
-        autoResize(document.getElementById('chat-input'));
-        sendMessage();
-    };
-
-    recognition.onerror = () => stopMic();
-    recognition.onend   = () => stopMic();
-
-    recognition.start();
+  recognition.start();
 }
 
 function stopMic() {
-    micActive = false;
-    document.getElementById('mic-icon').textContent = 'mic';
-    document.getElementById('mic-btn').classList.remove('bg-pink-500/30', 'border-pink-500/60');
-    document.getElementById('mic-wave').classList.add('hidden');
-    document.getElementById('mic-wave').classList.remove('flex');
+  micActive = false;
+  try { recognition?.stop(); } catch(e) {}
+  recognition = null;
+  micCircle.style.background = 'linear-gradient(135deg,#ec4899,#be185d)';
+  micIcon.textContent = 'mic';
+  micWave.classList.add('hidden');
+  setStatus('Online agora');
 }
+
+// ─── Welcome bubble ───────────────────────────────────────────────────────────
+setTimeout(() => {
+  let name = '';
+  try {
+    const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
+    if (sess?.name) name = sess.name.split(' ')[0];
+  } catch(e) {}
+  showBubble(name
+    ? `Olá, ${name}! 🦫 Ready to practice your English today?`
+    : `Olá, Explorer! 🦫 I'm Yara — ask me anything in English!`);
+}, 900);
 </script>
 </body>
 </html>
