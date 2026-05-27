@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -560,9 +560,26 @@ function showSuccess(name, isNew = false) {
   document.getElementById('success-title').textContent = isNew
     ? `Welcome, ${name}! 🎉`
     : `Welcome back, ${name}! 🌿`;
-  document.getElementById('success-sub').textContent = 'Taking you to the forest…';
   overlay.classList.remove('hidden');
-  setTimeout(() => { window.location.href = '6_Home_Forest_Expedition.html'; }, 2000);
+
+  // For new accounts always go to onboarding; for existing check profile
+  if (isNew) {
+    document.getElementById('success-sub').textContent = 'Vamos personalizar seu inglês…';
+    setTimeout(() => { window.location.href = 'onboarding.html'; }, 1800);
+  } else {
+    document.getElementById('success-sub').textContent = 'Taking you to the forest…';
+    setTimeout(async () => {
+      const session = Auth.getSession();
+      if (session && session.id !== 'guest') {
+        const profile = await Auth.fetchProfile(session.id);
+        if (!profile || !profile.onboarding_complete) {
+          window.location.href = 'onboarding.html';
+          return;
+        }
+      }
+      window.location.href = '6_Home_Forest_Expedition.html';
+    }, 1800);
+  }
 }
 
 /* ── login handler ──────────────────────────────── */

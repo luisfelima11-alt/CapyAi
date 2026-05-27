@@ -1,0 +1,667 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 43 — Let's Make Plans! | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">✈️</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🏖️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🗺️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🎒</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🌴</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_32.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_44.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🗓️ Aula 43 · Communicative</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Let's Make<br><span class="text-emerald-300">Plans!</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Capy e Yara planejam uma viagem juntos — Will, Going To e expressões reais de convite em uma conversa autêntica!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 6 sections done</span></div>
+    </div>
+  </div>
+
+  <!-- TABS NAV -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="situation">🎬 Situation</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">💬 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="chunks">🔑 Chunks</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB 1: SITUATION -->
+    <div id="tab-situation" class="fade-in">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎬 The Situation</h2>
+        <p class="text-slate-500 text-sm">Read the context, then go to the dialogue tab.</p>
+      </div>
+
+      <!-- Context card -->
+      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 mb-5">
+        <div class="flex items-start gap-4">
+          <span class="text-4xl">🗓️</span>
+          <div>
+            <h3 class="font-black text-navy text-lg mb-1">Planning a Trip to Rio</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">Capy and Yara are old friends who haven't travelled together in years. It's Monday morning and Yara sends Capy a message out of the blue — she has a week off work and wants to plan a trip to <strong>Rio de Janeiro</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Characters -->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 text-center">
+          <div class="text-5xl mb-2">🦦</div>
+          <div class="font-black text-navy text-base">Capy</div>
+          <div class="text-slate-400 text-xs mt-1">Adventurous · loves to travel</div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 text-center">
+          <div class="text-5xl mb-2">🦁</div>
+          <div class="font-black text-navy text-base">Yara</div>
+          <div class="text-slate-400 text-xs mt-1">Organised · has week off work</div>
+        </div>
+      </div>
+
+      <!-- Grammar focus -->
+      <div class="bg-navy rounded-2xl p-5 text-white mb-6">
+        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Grammar in this dialogue</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">WILL</div>
+            <div class="text-white/70 text-xs">Spontaneous decisions &amp; offers</div>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">GOING TO</div>
+            <div class="text-white/70 text-xs">Plans already made</div>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">INVITATIONS</div>
+            <div class="text-white/70 text-xs">Would you like…? How about…?</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="markSection('situation')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Ready — show me the dialogue! +20 XP</button>
+    </div>
+
+    <!-- TAB 2: DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">💬 The Dialogue</h2>
+        <p class="text-slate-500 text-sm mb-1">Read the conversation. Colours show the grammar: <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-teal-600 font-bold">invitations</span></p>
+      </div>
+      <div class="bg-slate-50 rounded-2xl p-5 mb-6" id="dialogue43-grid"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+
+    <!-- TAB 3: CHUNKS -->
+    <div id="tab-chunks" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🔑 Key Chunks</h2>
+        <p class="text-slate-500 text-sm">8 expressões do diálogo que você pode usar hoje. Clique em 🔊 para ouvir cada uma.</p>
+      </div>
+      <div class="grid gap-4 mb-6" id="chunks43-grid"></div>
+      <div id="chunks43-mark" class="hidden">
+        <button onclick="markSection('chunks')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Chunks learned! +20 XP</button>
+      </div>
+    </div>
+
+    <!-- TAB 4: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">✏️ Practice</h2>
+        <p class="text-slate-500 text-sm">Dois exercícios com o vocabulário do diálogo.</p>
+      </div>
+
+      <!-- Part A -->
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 mb-4">
+        <h3 class="font-black text-navy mb-4">Part A — Will or Going To?</h3>
+        <div id="prac43-area"></div>
+      </div>
+
+      <!-- Part B -->
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 mb-4">
+        <h3 class="font-black text-navy mb-4">Part B — Fill in the gap</h3>
+        <div class="space-y-4" id="fill43-area"></div>
+        <button onclick="checkFill43()" class="mt-4 bg-navy text-white font-black px-6 py-2.5 rounded-xl text-sm hover:opacity-80 transition-all">Check answers ✓</button>
+      </div>
+
+      <button onclick="markSection('practice')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Practice complete! +20 XP</button>
+    </div>
+
+    <!-- TAB 5: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🗣️ Roleplay</h2>
+        <p class="text-slate-500 text-sm">Você é o <strong>Capy</strong> ou a <strong>Yara</strong>. Responda a cada situação em inglês, depois compare com o exemplo.</p>
+      </div>
+      <div class="space-y-4 mb-6" id="speak43-grid"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Roleplay done! +20 XP</button>
+    </div>
+
+    <!-- TAB 6: HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <!-- Header -->
+      <div class="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white mb-6">
+        <p class="text-xs font-black uppercase tracking-widest mb-1 text-white/80">Complete all tasks for +75 XP</p>
+        <h2 class="text-2xl font-black">📋 Homework</h2>
+        <p class="text-white/80 text-sm mt-1">Aula 43 — Let's Make Plans!</p>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">1. Word Order</p>
+          <p class="text-slate-500 text-sm mb-4">Arrange the words to make correct sentences.</p>
+          <div class="space-y-5" id="wo43-wrap"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">2. Match the Pairs</p>
+          <p class="text-slate-500 text-sm mb-4">Connect each expression to its Portuguese equivalent.</p>
+          <div class="grid grid-cols-2 gap-3" id="mp43-wrap"></div>
+          <p class="text-xs text-slate-400 mt-3 font-bold" id="mp43-feedback"></p>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">3. Error Correction</p>
+          <p class="text-slate-500 text-sm mb-4">Find the mistake and rewrite the sentence correctly.</p>
+          <div class="space-y-5">
+
+            <div class="space-y-2">
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2">❌ "Would you like come to Rio with us?"</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp w-full" id="err43-1" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold">💡 Hint: would like come → would like <strong>to</strong> come</p>
+              <button onclick="checkErr43(0)" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden" id="err43fb1"></p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2">❌ "How about we to fly on Friday morning?"</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp w-full" id="err43-2" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold">💡 Hint: How about we to fly → How about we <strong>fly</strong> (no "to")</p>
+              <button onclick="checkErr43(1)" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden" id="err43fb2"></p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2">❌ "She gonna to visit Rio next month."</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp w-full" id="err43-3" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold">💡 Hint: gonna to → <strong>is going to</strong> (correct form: subject + is/are + going to + verb)</p>
+              <button onclick="checkErr43(2)" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden" id="err43fb3"></p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Task 4: Free Writing -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-2">4. Free Writing ✍️</p>
+          <p class="text-slate-500 text-sm mb-3">Planeje uma viagem real com um amigo. Escreva 4–5 frases usando WILL, GOING TO e pelo menos 2 expressões de convite.</p>
+          <textarea id="hw43-free" rows="5" placeholder="Would you like to visit…? I'm going to book… I'll handle… How about we…? Count me in if you want to…" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400"></textarea>
+        </div>
+
+      </div>
+
+      <button onclick="submitHomework43()" id="hw43-submit-btn" class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">Submit Homework +75 XP 🎉</button>
+      <div id="hw43-done" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <p class="text-emerald-700 font-black text-lg">🎉 Homework complete! +75 XP earned!</p>
+        <p class="text-slate-500 text-sm mt-1">You made incredible plans! Great work! ✈️</p>
+      </div>
+    </div>
+
+  </div><!-- end content area -->
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+// ─── mount nav components ─────────────────────────────────────────────────────
+if (typeof Components !== 'undefined') {
+  Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+  if (Components.renderFooter) Components.mount('footer-placeholder', Components.renderFooter());
+}
+
+// ─── SECTIONS & PROGRESS ─────────────────────────────────────────────────────
+const SECTIONS43 = ['situation','dialogue','chunks','practice','speak','homework'];
+const _done43 = new Set();
+
+function markSection(s) {
+  if (_done43.has(s)) return;
+  _done43.add(s);
+  if (typeof Store !== 'undefined') Store.addXP(20);
+  showXP('+20 XP 🔥');
+  updateDots43();
+  if (_done43.size === SECTIONS43.length) {
+    if (typeof Store !== 'undefined') {
+      Store.addXP(30);
+      const st = Store.get();
+      if (!st.completedLessons.includes(43)) { st.completedLessons.push(43); Store._save(st); }
+    }
+  }
+}
+
+function updateDots43() {
+  const dots = document.getElementById('hero-dots');
+  const lbl = document.getElementById('hero-label');
+  if (!dots) return;
+  dots.innerHTML = SECTIONS43.map(s => `<div class="prog-dot ${_done43.has(s) ? 'done' : ''}"></div>`).join('');
+  if (lbl) lbl.textContent = `${_done43.size} / ${SECTIONS43.length} sections done`;
+}
+
+function showXP(msg) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.style.cssText = 'left:50%;top:40%;transform:translateX(-50%)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
+const TABS43 = ['situation','dialogue','chunks','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS43.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ─── DIALOGUE ────────────────────────────────────────────────────────────────
+const DIALOGUE43 = [
+  { speaker:'Yara 🦁', side:'left',  text:`<strong class='text-teal-600'>Would you like</strong> to take a trip this summer, Capy?`,            plain:`Would you like to take a trip this summer, Capy?`            },
+  { speaker:'Capy 🦦', side:'right', text:`That sounds amazing! Where are you thinking?`,                                                        plain:`That sounds amazing! Where are you thinking?`                },
+  { speaker:'Yara 🦁', side:'left',  text:`I<strong class='text-emerald-600'>'m going to</strong> visit Rio — I've <strong class='text-blue-600'>already booked</strong> a week off work.`, plain:`I'm going to visit Rio — I've already booked a week off work.` },
+  { speaker:'Capy 🦦', side:'right', text:`Rio? I <strong class='text-blue-600'>haven't been</strong> there in years! Count me in.`,             plain:`Rio? I haven't been there in years! Count me in.`            },
+  { speaker:'Yara 🦁', side:'left',  text:`Great! I<strong class='text-emerald-600'>'ll book</strong> the hotel tonight if you want.`,           plain:`Great! I'll book the hotel tonight if you want.`             },
+  { speaker:'Capy 🦦', side:'right', text:`Perfect. And I<strong class='text-emerald-600'>'ll organise</strong> the activities — leave it to me!`, plain:`Perfect. And I'll organise the activities — leave it to me!` },
+  { speaker:'Yara 🦁', side:'left',  text:`<strong class='text-teal-600'>How about</strong> we fly on a Friday morning?`,                        plain:`How about we fly on a Friday morning?`                      },
+  { speaker:'Capy 🦦', side:'right', text:`Sounds good. <strong class='text-emerald-600'>Are you going to</strong> book the flights or should I?`, plain:`Sounds good. Are you going to book the flights or should I?` },
+  { speaker:'Yara 🦁', side:'left',  text:`I<strong class='text-emerald-600'>'ll do it</strong> — I have miles to use. <strong class='text-teal-600'>Have you ever</strong> been to Cristo Redentor?`, plain:`I'll do it — I have miles to use. Have you ever been to Cristo Redentor?` },
+  { speaker:'Capy 🦦', side:'right', text:`Not yet! I<strong class='text-emerald-600'>'m going to</strong> go for sure. I think it<strong class='text-emerald-600'>'s going to</strong> be an incredible trip!`, plain:`Not yet! I'm going to go for sure. I think it's going to be an incredible trip!` },
+  { speaker:'Yara 🦁', side:'left',  text:`Me too! I<strong class='text-emerald-600'>'ll send</strong> you a packing list later tonight.`,        plain:`Me too! I'll send you a packing list later tonight.`         },
+  { speaker:'Capy 🦦', side:'right', text:`Can't wait! This <strong class='text-emerald-600'>is going to</strong> be the best trip ever! 🎉`,     plain:`Can't wait! This is going to be the best trip ever!`        },
+];
+
+function buildDialogue() {
+  const grid = document.getElementById('dialogue43-grid');
+  if (!grid) return;
+  grid.innerHTML = DIALOGUE43.map((l, i) => {
+    const isRight = l.side === 'right';
+    return `<div class="flex ${isRight ? 'flex-row-reverse' : 'flex-row'} items-start gap-3 mb-4">
+      <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-xs font-black text-white shadow">${l.speaker.split(' ')[0][0]}</div>
+      <div class="max-w-sm ${isRight ? 'items-end' : 'items-start'} flex flex-col gap-1">
+        <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider ${isRight ? 'text-right' : ''}">${l.speaker}</div>
+        <div class="bg-white border-2 ${isRight ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'} rounded-2xl px-4 py-3 text-sm text-navy font-semibold leading-relaxed shadow-sm">${l.text}</div>
+        <button onclick="speakLine43(${i})" class="text-[10px] text-slate-400 hover:text-emerald-600 font-bold flex items-center gap-1 transition-colors ${isRight ? 'self-end' : ''}">🔊 Listen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function speakLine43(i) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(DIALOGUE43[i].plain);
+  u.lang = 'en-US'; u.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ─── CHUNKS ───────────────────────────────────────────────────────────────────
+const CHUNKS43 = [
+  { expr:`Would you like to...?`,        pt:`Você gostaria de...?`,           use:`Polite invitation or suggestion`,         ex:`Would you like to join us for dinner?`       },
+  { expr:`I'm going to...`,              pt:`Vou... (já decidi)`,             use:`Plan already decided before speaking`,    ex:`I'm going to book the flights tonight.`     },
+  { expr:`I'll...`,                      pt:`Vou... (decidi agora)`,          use:`Spontaneous decision or offer`,           ex:`I'll handle the hotel — don't worry.`       },
+  { expr:`How about we...?`,             pt:`Que tal a gente...?`,            use:`Casual suggestion between friends`,       ex:`How about we leave on Friday morning?`      },
+  { expr:`Count me in!`,                 pt:`Pode me incluir! / Tô dentro!`,  use:`Accepting an invitation enthusiastically`, ex:`A trip to Rio? Count me in!`              },
+  { expr:`Have you ever been to...?`,    pt:`Você já foi a...?`,              use:`Asking about past experiences`,           ex:`Have you ever been to Cristo Redentor?`     },
+  { expr:`I haven't been there in years`, pt:`Faz anos que não vou lá`,      use:`Talking about a long gap in time`,        ex:`I haven't been to the beach in years.`      },
+  { expr:`Leave it to me!`,              pt:`Deixa comigo!`,                  use:`Offering to take responsibility`,         ex:`I'll organise everything — leave it to me!` },
+];
+
+const _chunks43Spoken = new Set();
+
+function buildChunks43() {
+  const grid = document.getElementById('chunks43-grid');
+  if (!grid) return;
+  grid.innerHTML = CHUNKS43.map((c, i) => `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 hover:border-emerald-300 transition-colors">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <h3 class="text-lg font-black text-navy">"${c.expr}"</h3>
+        <button onclick="speakChunk43(${i})" class="flex-shrink-0 w-9 h-9 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-600 flex items-center justify-center transition-all">🔊</button>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-1.5 mb-3 inline-block">
+        <span class="text-emerald-700 font-black text-sm">🇧🇷 ${c.pt}</span>
+      </div>
+      <p class="text-slate-500 text-sm mb-2"><span class="font-bold text-slate-700">Use:</span> ${c.use}</p>
+      <p class="text-slate-500 text-sm italic">"${c.ex}"</p>
+    </div>`).join('');
+}
+
+function speakChunk43(i) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(CHUNKS43[i].expr.replace(/\?|\./g, ''));
+  u.lang = 'en-US'; u.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  _chunks43Spoken.add(i);
+  if (_chunks43Spoken.size >= 4) {
+    const markEl = document.getElementById('chunks43-mark');
+    if (markEl) markEl.classList.remove('hidden');
+  }
+}
+
+// ─── PRACTICE ─────────────────────────────────────────────────────────────────
+const PRAC43 = [
+  { q:`"I just saw the menu — _____ have the pasta!"`, opts:[`I'll`, `I'm going to`], a:`I'll`, rule:`Spontaneous decision made at the moment of speaking → will` },
+  { q:`"She _____ visit Rio — she already booked her flights."`, opts:[`will`, `is going to`], a:`is going to`, rule:`Plan already made before speaking → going to` },
+  { q:`"Would you like to come? _____ be a great party!"`, opts:[`It'll`, `It's going to`], a:`It'll`, rule:`Prediction / opinion with no specific evidence → will` },
+  { q:`"Look at those clouds! It _____ rain!"`, opts:[`will`, `is going to`], a:`is going to`, rule:`Visible evidence = prediction based on what you see → going to` },
+];
+
+function buildPrac43() {
+  const area = document.getElementById('prac43-area');
+  if (!area) return;
+  area.innerHTML = PRAC43.map((q, i) => `
+    <div class="mb-5" id="prac43-q-${i}">
+      <p class="font-semibold text-navy text-sm mb-3">${i + 1}. ${q.q}</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        ${q.opts.map((o, j) => `<button class="opt-btn rounded-xl px-5 py-2.5 text-sm font-bold text-slate-700 bg-white" onclick="prac43Pick(${i},${j},this,'${o.replace(/'/g,"\\'")}','${q.a.replace(/'/g,"\\'")}','${q.rule.replace(/'/g,"\\'")}')">${o}</button>`).join('')}
+      </div>
+      <p class="text-xs font-bold hidden" id="prac43-fb-${i}"></p>
+    </div>`).join('');
+}
+
+function prac43Pick(qi, oi, btn, chosen, correct, rule) {
+  const qEl = document.getElementById('prac43-q-' + qi);
+  qEl.querySelectorAll('.opt-btn').forEach(b => { b.disabled = true; });
+  const fb = document.getElementById('prac43-fb-' + qi);
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    fb.textContent = '✅ Correct! ' + rule;
+    fb.className = 'text-xs font-bold text-emerald-600';
+  } else {
+    btn.classList.add('wrong');
+    // highlight correct
+    qEl.querySelectorAll('.opt-btn').forEach(b => {
+      if (b.textContent.trim() === correct) b.classList.add('correct');
+    });
+    fb.textContent = '❌ Not quite. ' + rule;
+    fb.className = 'text-xs font-bold text-red-500';
+  }
+  fb.classList.remove('hidden');
+}
+
+const FILL43 = [
+  { before:``,        blank:`Would`, after:` you like to join us for the trip?`,  hint:`Polite invitation: ___ you like to...?`, answer:`would` },
+  { before:`How `,   blank:`about`,  after:` we meet at the airport at 6am?`,     hint:`Casual suggestion: How ___ we...?`,      answer:`about` },
+  { before:`Count `, blank:`me`,     after:` in — I love Rio!`,                   hint:`Enthusiastic acceptance: Count ___ in!`, answer:`me`    },
+  { before:`Leave `, blank:`it`,     after:` to me — I'll book everything.`,      hint:`Offering to help: Leave ___ to me!`,    answer:`it`    },
+];
+
+function buildFill43() {
+  const area = document.getElementById('fill43-area');
+  if (!area) return;
+  area.innerHTML = FILL43.map((f, i) => `
+    <div>
+      <div class="flex flex-wrap items-center gap-1 text-sm font-semibold text-slate-700 mb-1">
+        ${f.before ? `<span>${f.before}</span>` : ''}
+        <input type="text" class="fill-inp" id="fill43-${i}" placeholder="?"/>
+        <span>${f.after}</span>
+      </div>
+      <p class="text-xs text-slate-400 font-bold">💡 ${f.hint}</p>
+    </div>`).join('');
+}
+
+function checkFill43() {
+  FILL43.forEach((f, i) => {
+    const inp = document.getElementById('fill43-' + i);
+    if (!inp) return;
+    const ok = inp.value.toLowerCase().trim() === f.answer;
+    inp.className = 'fill-inp ' + (ok ? 'ok' : 'err');
+  });
+}
+
+// ─── SPEAK / ROLEPLAY ─────────────────────────────────────────────────────────
+const SPEAK43 = [
+  { prompt:`Your friend says: "Would you like to take a trip this summer?"`,           hint:`Accept enthusiastically! Say where you want to go and offer to help with something.`, example:`That sounds amazing! I'm going to suggest Rio — and I'll handle the hotel!` },
+  { prompt:`Your friend says: "I'm going to visit Rio — I've already booked time off."`, hint:`React positively! Say you haven't been there recently and that you want to go.`,     example:`Rio? I haven't been there in years! Count me in — leave the activities to me!` },
+  { prompt:`Your friend asks: "How about we fly on a Friday morning?"`,                hint:`Agree and offer to do something (book flights / car / etc.) using will.`,             example:`Sounds perfect! I'll book the flights — I have miles to use.` },
+  { prompt:`Your friend says: "Have you ever been to Cristo Redentor?"`,               hint:`Answer honestly, then say what you're going to do / want to do.`,                    example:`Not yet, but I'm going to go for sure. I think it's going to be incredible!` },
+  { prompt:`End the conversation positively — express excitement about the trip.`,     hint:`Use "going to" or "will" + show enthusiasm!`,                                        example:`I can't wait! This is going to be the best trip ever! I'll send you a packing list tonight.` },
+];
+
+function buildSpeak43() {
+  const grid = document.getElementById('speak43-grid');
+  if (!grid) return;
+  grid.innerHTML = SPEAK43.map((s, i) => `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-5">
+      <div class="flex items-start gap-3 mb-3">
+        <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 font-black text-xs flex items-center justify-center flex-shrink-0">${i + 1}</div>
+        <p class="font-semibold text-navy text-sm leading-relaxed">${s.prompt}</p>
+      </div>
+      <p class="text-slate-400 text-xs mb-3 italic pl-10">💡 ${s.hint}</p>
+      <div id="speak43-ans-${i}" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-2 text-sm text-emerald-800 font-semibold pl-10">✅ "${s.example}"</div>
+      <button onclick="toggleSpeak43(${i})" id="speak43-btn-${i}" class="ml-10 text-xs font-black text-emerald-600 hover:text-emerald-800 transition-colors">👁️ Show example answer</button>
+    </div>`).join('');
+}
+
+function toggleSpeak43(i) {
+  const el = document.getElementById('speak43-ans-' + i);
+  const btn = document.getElementById('speak43-btn-' + i);
+  const hidden = el.classList.toggle('hidden');
+  btn.textContent = hidden ? '👁️ Show example answer' : '🙈 Hide answer';
+}
+
+// ─── HOMEWORK ─────────────────────────────────────────────────────────────────
+
+// Task 1: Word Order
+const WO43_DATA = [
+  { s: `Would you like to visit Rio with me this summer`,  w: [`Would`,`you`,`like`,`to`,`visit`,`Rio`,`with`,`me`,`this`,`summer`] },
+  { s: `I'm going to book the hotel tonight after work`,   w: [`I'm`,`going`,`to`,`book`,`the`,`hotel`,`tonight`,`after`,`work`]   },
+  { s: `I'll handle the flights just leave it to me`,      w: [`I'll`,`handle`,`the`,`flights`,`just`,`leave`,`it`,`to`,`me`]      },
+];
+
+function wo43Render() {
+  const wrap = document.getElementById('wo43-wrap');
+  if (!wrap) return;
+  WO43_DATA.forEach((p, i) => {
+    const shuffled = [...p.w].sort(() => Math.random() - .5);
+    wrap.innerHTML += `
+      <div class="mb-2">
+        <p class="text-xs font-black text-slate-400 uppercase mb-2">Sentence ${i + 1}</p>
+        <div class="wo-ans mb-2" id="wo43-ans-${i}" onclick="wo43ReturnTile(event,${i})"></div>
+        <div class="wo-bank" id="wo43-bank-${i}">${shuffled.map(w => `<span class="wo-tile" onclick="wo43MoveTile(this,${i})">${w}</span>`).join('')}</div>
+        <p class="text-xs mt-1 font-bold hidden" id="wo43-fb-${i}"></p>
+      </div>`;
+  });
+}
+
+function wo43MoveTile(el, i) {
+  document.getElementById('wo43-ans-' + i).appendChild(el);
+  wo43Check(i);
+}
+function wo43ReturnTile(e, i) {
+  if (e.target.classList.contains('wo-tile')) {
+    document.getElementById('wo43-bank-' + i).appendChild(e.target);
+    wo43Check(i);
+  }
+}
+function wo43Check(i) {
+  const tiles = [...document.getElementById('wo43-ans-' + i).querySelectorAll('.wo-tile')];
+  const s = tiles.map(t => t.textContent).join(' ');
+  const fb = document.getElementById('wo43-fb-' + i);
+  if (tiles.length === WO43_DATA[i].w.length) {
+    const ok = s.toLowerCase() === WO43_DATA[i].s.toLowerCase();
+    fb.classList.remove('hidden');
+    fb.textContent = ok ? '✅ Correct!' : '❌ Not quite — try again!';
+    fb.className = `text-xs mt-1 font-bold ${ok ? 'text-emerald-600' : 'text-red-500'}`;
+  } else {
+    fb.classList.add('hidden');
+  }
+}
+
+// Task 2: Match Pairs
+const MP43 = [
+  { l:`Would you like…? 🤝`,  r:`Você gostaria de…?`     },
+  { l:`I'm going to… ✈️`,      r:`Vou… (plano já feito)`  },
+  { l:`I'll… ⚡`,               r:`Vou… (decisão agora)`   },
+  { l:`How about we…? 💡`,     r:`Que tal a gente…?`      },
+  { l:`Count me in! 🎉`,       r:`Tô dentro!`             },
+];
+
+let _mp43State = { selLeft: null, selRight: null, matched: new Set() };
+
+function mp43Render() {
+  const wrap = document.getElementById('mp43-wrap');
+  if (!wrap) return;
+  const rightShuffled = MP43.map((p, i) => ({ text: p.r, origIdx: i })).sort(() => Math.random() - .5);
+  wrap.innerHTML =
+    '<div class="space-y-2 col-span-1">' +
+    MP43.map((p, i) => `<button class="mp-btn w-full" id="mp43-L-${i}" onclick="mp43Sel('L',${i})">${p.l}</button>`).join('') +
+    '</div>' +
+    '<div class="space-y-2 col-span-1">' +
+    rightShuffled.map(r => `<button class="mp-btn w-full" id="mp43-R-${r.origIdx}" onclick="mp43Sel('R',${r.origIdx})">${r.text}</button>`).join('') +
+    '</div>';
+}
+
+function mp43Sel(side, idx) {
+  if (_mp43State.matched.has(side + idx)) return;
+  const btn = document.getElementById(`mp43-${side}-${idx}`);
+  if (side === 'L') {
+    if (_mp43State.selLeft !== null) document.getElementById(`mp43-L-${_mp43State.selLeft}`)?.classList.remove('selected');
+    _mp43State.selLeft = idx;
+    btn.classList.add('selected');
+  } else {
+    if (_mp43State.selRight !== null) document.getElementById(`mp43-R-${_mp43State.selRight}`)?.classList.remove('selected');
+    _mp43State.selRight = idx;
+    btn.classList.add('selected');
+  }
+  if (_mp43State.selLeft !== null && _mp43State.selRight !== null) {
+    const lI = _mp43State.selLeft, rI = _mp43State.selRight;
+    const ok = lI === rI; // index matches because origIdx mirrors left index
+    const lb = document.getElementById(`mp43-L-${lI}`), rb = document.getElementById(`mp43-R-${rI}`);
+    if (ok) {
+      lb.classList.add('matched'); rb.classList.add('matched');
+      lb.disabled = true; rb.disabled = true;
+      _mp43State.matched.add('L' + lI); _mp43State.matched.add('R' + rI);
+      if (_mp43State.matched.size === MP43.length * 2) {
+        document.getElementById('mp43-feedback').textContent = '🎉 All matched!';
+      }
+    } else {
+      lb.classList.add('wrong-flash'); rb.classList.add('wrong-flash');
+      setTimeout(() => {
+        lb.classList.remove('wrong-flash', 'selected');
+        rb.classList.remove('wrong-flash', 'selected');
+      }, 700);
+    }
+    _mp43State.selLeft = null; _mp43State.selRight = null;
+    lb.classList.remove('selected'); rb.classList.remove('selected');
+  }
+}
+
+// Task 3: Error Correction
+const ERR43_CHECKS = [
+  v => v.toLowerCase().includes('would like to come') && !v.toLowerCase().includes('would like come'),
+  v => v.toLowerCase().includes('how about we fly') && !v.toLowerCase().includes('how about we to fly'),
+  v => (v.toLowerCase().includes('is going to visit') || v.toLowerCase().includes("'s going to visit")) && !v.toLowerCase().includes('gonna to'),
+];
+const ERR43_HINTS = [
+  'would like come → would like to come (would like + to + verb)',
+  'how about we to fly → how about we fly (no "to" after "how about we")',
+  'gonna to → is going to (correct form: subject + is/are + going to + verb)',
+];
+const ERR43_FB_IDS = ['err43fb1','err43fb2','err43fb3'];
+const ERR43_INP_IDS = ['err43-1','err43-2','err43-3'];
+
+function checkErr43(i) {
+  const inp = document.getElementById(ERR43_INP_IDS[i]);
+  const fb = document.getElementById(ERR43_FB_IDS[i]);
+  if (!inp || !fb) return;
+  const ok = ERR43_CHECKS[i](inp.value);
+  inp.className = `fill-inp w-full ${ok ? 'ok' : 'err'}`;
+  inp.style.textAlign = 'left';
+  fb.classList.remove('hidden');
+  fb.textContent = ok ? '✅ Correct!' : '❌ Check the hint and try again!';
+  fb.className = `text-xs font-bold ${ok ? 'text-emerald-600' : 'text-red-500'}`;
+}
+
+// Homework submit
+function submitHomework43() {
+  markSection('homework');
+  if (typeof Store !== 'undefined') Store.addXP(75);
+  showXP('+75 XP 🎉');
+  const btn = document.getElementById('hw43-submit-btn');
+  if (btn) { btn.textContent = '🎉 Homework submitted! +75 XP'; btn.disabled = true; }
+  const done = document.getElementById('hw43-done');
+  if (done) done.classList.remove('hidden');
+  const a = document.createElement('a');
+  a.href = 'aula_44.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 44 →';
+  if (btn) btn.insertAdjacentElement('afterend', a);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateDots43();
+  buildDialogue();
+  buildChunks43();
+  buildPrac43();
+  buildFill43();
+  buildSpeak43();
+  wo43Render();
+  mp43Render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 6 — Modal Verbs: Can, Could & Should | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">⚡</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🔑</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🛡️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">💬</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">✨</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_05.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_07.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">⚡ Aula 6 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Modal Verbs:<br><span class="text-emerald-300">Can, Could & Should</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Os modais mais usados no dia a dia — para expressar habilidade, possibilidade, pedidos educados e conselhos!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Habilidades, permissões e conselhos. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões do dia a dia com modais.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">CAN, COULD & SHOULD — usos e diferenças.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Regra de Ouro</p>
+        <p class="font-black text-lg">Modal + verbo base (sem TO)</p>
+        <div class="grid grid-cols-3 gap-2 text-sm font-black mt-3">
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">CAN ⚡</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">COULD 🔑</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">SHOULD 🛡️</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚡ CAN — Habilidade / Permissão</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Mesma forma para todos os sujeitos: <strong>can</strong> (sem -S!)</p>
+            <p>✅ <strong>I can speak English!</strong> → Consigo falar inglês!</p>
+            <p>✅ <strong>Can I use your pen?</strong> → Posso usar sua caneta?</p>
+            <p>✅ <strong>She can run fast.</strong> → Ela consegue correr rápido.</p>
+            <p class="text-red-500">❌ She cans run / She can to run</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔑 COULD — Passado de CAN / Pedido educado</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Forma passada de CAN + pedidos mais formais/educados</p>
+            <p>✅ <strong>Could you help me?</strong> → Você poderia me ajudar? (mais educado)</p>
+            <p>✅ <strong>I could swim when I was 5.</strong> → Eu conseguia nadar quando tinha 5 anos.</p>
+            <p>✅ <strong>Could you repeat that?</strong> → Poderia repetir?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🛡️ SHOULD — Conselho / Recomendação</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Dar conselhos ou recomendações — o que é melhor fazer</p>
+            <p>✅ <strong>You should practice every day.</strong> → Você deveria praticar todo dia.</p>
+            <p>✅ <strong>She shouldn't skip classes.</strong> → Ela não deveria faltar aulas.</p>
+            <p>✅ <strong>Should I call first?</strong> → Devo ligar primeiro?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📊 CAN vs COULD vs SHOULD</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p>⚡ <strong>Can you help me?</strong> → Pedido direto, informal</p>
+            <p>🔑 <strong>Could you help me?</strong> → Pedido educado, mais formal</p>
+            <p>🛡️ <strong>You should help me.</strong> → Conselho / sugestão</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 Todos seguidos de verbo BASE sem TO!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">📚 Biblioteca de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">📚 Biblioteca de Nano Banana. Yara ajuda Leo a entender quando usar CAN, COULD e SHOULD.</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, <strong class="text-emerald-700">can</strong> you read this sentence out loud?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">can</strong> try! But <strong class="text-emerald-700">could</strong> you give me a moment? I need to focus.</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Of course! You <strong class="text-emerald-700">should</strong> always take your time. There's no rush here.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">OK! I <strong class="text-emerald-700">can</strong> do it! Wait... <strong class="text-emerald-700">should</strong> I translate or just read?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Just read first! You <strong class="text-emerald-700">shouldn't</strong> translate everything — you <strong class="text-emerald-700">should</strong> think in English. You <strong class="text-emerald-700">can</strong> do this!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">You're right! I <strong class="text-emerald-700">can't</strong> believe how much better I'm getting. <strong class="text-emerald-700">Could</strong> we do this every day? 🙏</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Can, Could & Should.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 6 — Modal Verbs: Can, Could & Should</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras.</p></div></div><div id="wo6-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Modals</h3><p class="text-slate-500 text-sm mt-1">Conecte o modal ao uso principal.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp6-left" class="space-y-2"></div><div id="mp6-right" class="space-y-2"></div></div><p id="mp6-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro.</p></div></div><div class="space-y-4" id="err6-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>can / can't / could / should / shouldn't</strong>.</p></div></div><div class="space-y-4" id="fill6-container"></div><button onclick="checkFill6()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre suas habilidades e conselhos usando CAN, COULD e SHOULD.</p></div></div><textarea rows="6" placeholder="I can... I can't... Could you...? You should... She shouldn't... When I was young, I could..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework6()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-6" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">⚡</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['ability','habilidade / capacidade'],['permission','permissão'],['request','pedido / solicitação'],['possibility','possibilidade'],['advice','conselho'],['suggestion','sugestão'],['skill','habilidade / talento'],['talent','talento'],['capacity','capacidade'],['potential','potencial'],['opportunity','oportunidade'],['option','opção'],['choice','escolha'],['decision','decisão'],['rule','regra'],['restriction','restrição'],['freedom','liberdade'],['recommendation','recomendação'],['preference','preferência'],['habit','hábito'],['routine','rotina'],['task','tarefa'],['challenge','desafio'],['practice','prática'],['improvement','melhoria'],['progress','progresso'],['goal','objetivo / meta'],['achievement','conquista / realização'],['fluency','fluência'],['confidence','confiança'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"Can you help me?",meaning:'Você pode me ajudar?',example:'"Can you help me with this exercise? I don\'t understand question 3."',use:"Pedido direto e informal. Muito natural no dia a dia."},{phrase:"Could you repeat that?",meaning:'Você poderia repetir isso?',example:'"Could you repeat that? I didn\'t catch the last part — sorry!"',use:"Versão mais educada/formal. Perfeita para situações profissionais."},{phrase:"You should try this!",meaning:'Você deveria tentar isso!',example:'"You should try this new app — it changed my English completely!"',use:"Dar um conselho ou recomendação positiva com SHOULD."},{phrase:"I can't believe it!",meaning:'Não consigo acreditar! / Inacreditável!',example:'"I got 10/10 on my English test!" — "I can\'t believe it! You worked so hard!"',use:"Expressar surpresa ou incredulidade. Muito usado em inglês informal."},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'Complete: "I ___ speak three languages — English, Portuguese and Spanish."',opts:['can','could','should','cans'],ans:0},
+  {q:'Qual forma está CORRETA com modal?',opts:['She can swim fast.','She cans swim fast.','She can to swim fast.','She can swims fast.'],ans:0},
+  {q:'CAN vs COULD (pedido): qual é mais educado?',opts:['Could you open the door?','Can you open the door?','Should you open the door?','You open the door?'],ans:0},
+  {q:'Complete: "You ___ practice every day — it\'s the best way to improve."',opts:['should','can','could','cans'],ans:0},
+  {q:'Complete: "When I was a child, I ___ ride a bike without hands!"',opts:['could','can','should','will'],ans:0},
+  {q:'Complete: "I ___ believe how far I\'ve come — I\'m so proud!"',opts:["can't","couldn't","shouldn't","could not"],ans:0},
+  {q:'Negativa de SHOULD:',opts:["shouldn't","couldn't","can't","will not"],ans:0},
+  {q:'Complete: "___ you help me? I\'m a little lost with this grammar."',opts:['Could','Should','Must','Will'],ans:0},
+  {q:'Qual frase usa SHOULD corretamente?',opts:['You should study more.','You should to study more.','You should studying more.','You should studied more.'],ans:0},
+  {q:'Complete: "She ___ believe it — she got the scholarship!"',opts:["couldn't","can't","shouldn't","could"],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["I can speak English! I can't believe how much I've improved in just a few weeks.","Could you repeat that? I want to make sure I understood every word correctly.","You should try speaking English every day — even for just 5 minutes. It works!","When I was younger, I could barely say 'hello' — now I can have full conversations.","Can you help me? I should review modals but I could use a study partner!","She can teach, she can inspire, and she should know how much she helps everyone.","I couldn't understand before, but now I can! You should see my progress!","Could we practice together? I think we should review can, could and should one more time.",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO6_DATA=[
+  {s:'You should practice every day because you can improve faster than you think',w:['You','should','practice','every','day','because','you','can','improve','faster','than','you','think']},
+  {s:'Could you help me with this exercise — I can not understand the modal rules',w:['Could','you','help','me','with','this','exercise','—','I','can','not','understand','the','modal','rules']},
+  {s:'She could not believe she can now speak English without translating everything',w:['She','could','not','believe','she','can','now','speak','English','without','translating','everything']},
+];
+function hwShuffle6(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo6=WO6_DATA.map(d=>({ans:[],bank:hwShuffle6(d.w),orig:d.w}));
+function wo6Render(){const c=document.getElementById('wo6-container');c.innerHTML='';WO6_DATA.forEach((d,si)=>{const st=wo6[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo6-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo6Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo6-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo6Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo6Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo6Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo6-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo6Move(fromBank,si,wi){const st=wo6[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo6Render();}
+function wo6Check(si){const st=wo6[si];const fb=document.getElementById('wo6-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO6_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again!`;fb.classList.remove('hidden');}
+function wo6Reset(si){wo6[si].bank=hwShuffle6(WO6_DATA[si].orig);wo6[si].ans=[];document.getElementById('wo6-fb-'+si).classList.add('hidden');wo6Render();}
+wo6Render();
+const MP6=[{l:'CAN ⚡',r:'Habilidade / Permissão presente'},{l:'COULD 🔑',r:'Passado de CAN / Pedido educado'},{l:'SHOULD 🛡️',r:'Conselho / Recomendação'},];
+function mpShuffle6(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp6R=mpShuffle6(MP6.map((p,i)=>({label:p.r,pid:i})));
+let mp6SelL=null;const mp6Done=new Set();
+function mp6Render(){document.getElementById('mp6-left').innerHTML=MP6.map((p,i)=>`<button onclick="mp6ClickL(${i})" id="mp6L-${i}" class="mp-btn w-full ${mp6Done.has(i)?'matched':''}" ${mp6Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp6-right').innerHTML=mp6R.map((p,i)=>`<button onclick="mp6ClickR(${i})" id="mp6R-${i}" class="mp-btn w-full ${mp6Done.has(p.pid)?'matched':''}" ${mp6Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp6ClickL(i){if(mp6Done.has(i))return;mp6SelL=i;document.querySelectorAll('#mp6-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp6Done.has(j)));}
+function mp6ClickR(ri){if(mp6SelL===null)return;const item=mp6R[ri];if(item.pid===mp6SelL){mp6Done.add(mp6SelL);mp6SelL=null;mp6Render();if(mp6Done.size===MP6.length)document.getElementById('mp6-done-msg').classList.remove('hidden');}else{[document.getElementById('mp6R-'+ri),document.getElementById('mp6L-'+mp6SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp6SelL=null;document.querySelectorAll('#mp6-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp6Render();
+const ERR6=[{wrong:'"She cans speak English very well and she should to practice more."',check:v=>v.includes('can speak')&&v.includes('should practice'),hint:'cans → can (modals never have -S); should to practice → should practice (modal + base verb, no TO)'},{wrong:'"Could you helping me? I can not to understand this rule."',check:v=>v.includes('could you help')&&v.includes("can't understand")||v.includes('cannot understand'),hint:'could you helping → could you help (modal + base form); can not to understand → can\'t understand (no TO)'},{wrong:'"You should studying more — you can improving much faster."',check:v=>v.includes('should study')&&v.includes('can improve'),hint:'should studying → should study / can improving → can improve (modal + base form always!)'},];
+const ec=document.getElementById('err6-container');
+ERR6.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err6-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr6(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err6-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr6(i){const v=document.getElementById('err6-inp-'+i).value.toLowerCase().replace(/[?.!,—]/g,'').trim();const fb=document.getElementById('err6-fb-'+i);fb.className='text-xs font-bold '+(ERR6[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR6[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR6[i].hint;fb.classList.remove('hidden');}
+const FILL6=[{before:'I',blank:'can',after:"speak English — I couldn't do this a year ago!",ans:'can'},{before:'You',blank:'should',after:'practice speaking every day — fluency comes with consistency.',ans:'should'},{before:'When I was a child, I',blank:'could',after:'run for hours without getting tired!',ans:'could'},{before:'She',blank:"can't",after:"believe how fast she's improving — I'm so proud of her!",ans:"can't"},{before:'You',blank:"shouldn't",after:'translate everything — try to think directly in English.',ans:"shouldn't"},];
+const fc=document.getElementById('fill6-container');
+FILL6.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill6-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill6(){FILL6.forEach((f,i)=>{const inp=document.getElementById('fill6-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework6(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework6()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_07.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 07 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework6=submitHomework6;
+</script>
+</body>
+</html>

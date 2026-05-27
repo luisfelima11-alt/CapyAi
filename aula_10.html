@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 10 — Quantifiers: Many, Much &amp; More | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:130px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🛒</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🔢</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🥕</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">⚖️</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">📦</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_09.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_11.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🔢 Aula 10 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Quantifiers:<br><span class="text-emerald-300">Many, Much &amp; More</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Quanto é muito? Quantos são suficientes? Aprenda a usar <strong>MANY, MUCH, A LOT OF, SOME, ANY</strong> e muito mais para falar sobre quantidade!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Quantificadores e palavras de quantidade. Clique para ver o significado!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões naturais para falar sobre quantidade.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">A regra dos contáveis e incontáveis — a chave para tudo!</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">A Regra Fundamental</p>
+        <div class="space-y-2 text-sm font-black">
+          <div class="bg-white/20 rounded-xl px-4 py-2">🔢 <strong>MANY</strong> + contável (countable) → many books, many people, many times</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">💧 <strong>MUCH</strong> + incontável (uncountable) → much water, much time, much money</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">✅ <strong>A LOT OF</strong> + ambos → a lot of books / a lot of water</div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔢 Contáveis vs Incontáveis</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">A distinção mais importante da língua inglesa para quantificadores!</p>
+            <p><strong>Contáveis (Countable):</strong> têm plural → 1 book, 2 books, 3 apples</p>
+            <p><strong>Incontáveis (Uncountable):</strong> sem plural → water, money, information, advice, news</p>
+            <p class="text-emerald-700 font-bold">⚠️ Atenção: em português muitas palavras são contáveis, mas em inglês não! Ex: "uma informação" → "some information" (nunca: "an information")</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔢 MANY — contáveis (perguntas e negativas)</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Use <strong>MANY</strong> principalmente em perguntas e negativas:</p>
+            <p>❓ <strong>How many</strong> students are in the class?</p>
+            <p>❌ I don't have <strong>many</strong> friends in the city.</p>
+            <p>✅ There are <strong>many</strong> options. (afirmativa também é possível, mas mais formal)</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>💧 MUCH — incontáveis (perguntas e negativas)</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Use <strong>MUCH</strong> com substantivos incontáveis:</p>
+            <p>❓ <strong>How much</strong> water do you drink per day?</p>
+            <p>❌ I don't have <strong>much</strong> time right now — maybe later.</p>
+            <p>❌ There isn't <strong>much</strong> money in my account this month!</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>✅ A LOT OF / LOTS OF — positivo, ambos os tipos</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3"><strong>A LOT OF</strong> funciona com contáveis E incontáveis — perfeito para afirmativas!</p>
+            <p>✅ She has <strong>a lot of</strong> friends. (contável)</p>
+            <p>✅ I drank <strong>a lot of</strong> water today. (incontável)</p>
+            <p>✅ We have <strong>lots of</strong> options — which one do you prefer?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔹 SOME, ANY, FEW, LITTLE, ENOUGH</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Outros quantificadores essenciais:</p>
+            <div class="space-y-1">
+              <p><strong>SOME</strong> → afirmativas e ofertas → I have <strong>some</strong> coffee. / Would you like <strong>some</strong>?</p>
+              <p><strong>ANY</strong> → perguntas e negativas → Do you have <strong>any</strong> milk? / I don't have <strong>any</strong> plans.</p>
+              <p><strong>A FEW</strong> → poucos (contável, positivo) → I have <strong>a few</strong> minutes.</p>
+              <p><strong>FEW</strong> → quase nenhum (contável, negativo) → <strong>Few</strong> people know this secret.</p>
+              <p><strong>A LITTLE</strong> → um pouco (incontável, positivo) → I speak <strong>a little</strong> Spanish.</p>
+              <p><strong>ENOUGH</strong> → suficiente → I have <strong>enough</strong> money for the trip.</p>
+            </div>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📈 MORE, MOST, TOO MANY, TOO MUCH</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Para comparar e exagerar!</p>
+            <p><strong>MORE</strong> + noun → I want <strong>more</strong> coffee. / I need <strong>more</strong> time.</p>
+            <p><strong>THE MORE... THE MORE</strong> → <strong>The more</strong> you practice, <strong>the better</strong> you get!</p>
+            <p><strong>TOO MANY</strong> + contável → There are <strong>too many</strong> people here.</p>
+            <p><strong>TOO MUCH</strong> + incontável → I drank <strong>too much</strong> coffee — I can't sleep!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🛒 Mercado de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🛒 Mercado de Nano Banana. Leo e Yara fazem compras no mercado colorido da ilha e praticam quantificadores!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, do we have <strong class="text-emerald-700">enough</strong> fruit for the week? I think we need to buy <strong class="text-emerald-700">some more</strong>.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Well, there are <strong class="text-emerald-700">a few</strong> bananas left, but not <strong class="text-emerald-700">many</strong>. And we don't have <strong class="text-emerald-700">any</strong> mangoes at all!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Oh no! How <strong class="text-emerald-700">much</strong> money do we have? We can't spend <strong class="text-emerald-700">too much</strong> today — there's <strong class="text-emerald-700">a lot of</strong> stuff we still need for the house.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">We have <strong class="text-emerald-700">some</strong> money left — about 30 coins. There aren't <strong class="text-emerald-700">many</strong> options, but we can get <strong class="text-emerald-700">a little</strong> of everything.</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Perfect! <strong class="text-emerald-700">The more</strong> variety we have, <strong class="text-emerald-700">the better</strong> our meals will be. Also, how <strong class="text-emerald-700">many</strong> lessons have you done this week, Leo?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm"><strong class="text-emerald-700">A lot of</strong> them! There's <strong class="text-emerald-700">so much</strong> to learn, but honestly — <strong class="text-emerald-700">the more</strong> I study, <strong class="text-emerald-700">the more</strong> I love it! 🌟</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre quantificadores.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 10 — Quantifiers: Many, Much &amp; More</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras para formar frases com quantificadores.</p></div></div><div id="wo10-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match: Quantifier → Use</h3><p class="text-slate-500 text-sm mt-1">Conecte o quantificador ao seu uso correto.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp10-left" class="space-y-2"></div><div id="mp10-right" class="space-y-2"></div></div><p id="mp10-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o quantificador errado.</p></div></div><div class="space-y-4" id="err10-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: many / much / a lot of / some / any / enough / a few.</p></div></div><div class="space-y-4" id="fill10-container"></div><button onclick="checkFill10()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre sua rotina usando quantificadores diferentes: many, much, a lot of, some, a few, a little, enough, too much/many.</p></div></div><textarea rows="6" placeholder="I drink a lot of water every day... I don't have much free time... I have a few hobbies... There's so much to learn..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework10()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-10" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">🔢</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['many','muitos/as (contável)'],['much','muito/a (incontável)'],['more','mais'],['most','a maioria / o mais'],['few','poucos (quase nenhum)'],['a few','alguns / alguns poucos'],['little','pouco (quase nenhum)'],['a little','um pouco'],['some','algum / um pouco de'],['any','algum (perguntas/neg.)'],['all','todo / tudo'],['none','nenhum / nada'],['both','ambos / os dois'],['either','qualquer um dos dois'],['neither','nenhum dos dois'],['every','cada / todo'],['each','cada (individual)'],['several','vários'],['enough','suficiente'],['plenty','bastante / de sobra'],['a lot of','muito/s (ambos)'],['lots of','muitos/as (informal)'],['too many','muitos demais (contável)'],['too much','muito demais (incontável)'],['fewer','menos (contável)'],['less','menos (incontável)'],['majority','maioria'],['minority','minoria'],['quantity','quantidade'],['amount','quantidade (incontável)'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"There's so much to learn!",meaning:'Tem tanto para aprender! / Há tanto a aprender!',example:'"Every time I open a new book, I think — there\'s so much to learn! But that\'s what makes it exciting!"',use:'Expressar que algo é vasto ou abundante, geralmente com entusiasmo.'},{phrase:"How many times?",meaning:'Quantas vezes? / Até quando?',example:'"I\'ve told you how many times? Please don\'t forget to bring your notebook to class!"',use:'Pergunta retórica de frustração, ou pergunta genuína sobre frequência.'},{phrase:"A little goes a long way",meaning:'Um pouco faz muita diferença / Um pouco já basta',example:'"You don\'t need to study 6 hours a day. A little goes a long way — just 20 minutes of focused practice!"',use:'Dizer que uma pequena quantidade é suficiente para fazer grande diferença.'},{phrase:"The more, the better!",meaning:'Quanto mais, melhor!',example:'"Should I practice speaking every day? — Absolutely! The more, the better — just don\'t forget to also listen!"',use:'Expressar que maior quantidade leva a melhor resultado.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'"How ___ people came to the party?" (contável)',opts:['many','much','some','any'],ans:0},
+  {q:'"There isn\'t ___ time left — hurry!" (incontável)',opts:['much','many','few','several'],ans:0},
+  {q:'"I have ___ friends in this city — maybe two or three." (poucos, positivo)',opts:['a few','few','a little','little'],ans:0},
+  {q:'"She speaks ___ English — just a few words." (um pouco, incontável)',opts:['a little','a few','some','much'],ans:0},
+  {q:'"Do you have ___ milk? I need some for my coffee." (perguntas)',opts:['any','some','much','many'],ans:0},
+  {q:'"I ate ___ pizza and now I feel sick!" (exagero, incontável)',opts:['too much','too many','enough','lots'],ans:0},
+  {q:'"___ practice you do, ___ better you get!"',opts:['The more / the','Much / very','Many / much','Some / any'],ans:0},
+  {q:'Qual está CORRETO?',opts:['I don\'t have much money.','I don\'t have many money.','I don\'t have a lot money.','I don\'t have some money.'],ans:0},
+  {q:'"A little goes a long way" significa:',opts:['Um pouco faz muita diferença','Pouco é sempre ruim','Você precisa de mais','Nunca é suficiente'],ans:0},
+  {q:'"There are ___ students absent today — only 2 out of 30." (poucos, negativo)',opts:['few','a few','little','a little'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["There's so much to learn in English, but the more you practice, the better you get — a little every day goes a long way!","How many cups of coffee do you drink per day? I drink too much — I really should cut down!","She doesn't have much free time, but she manages to study a little every evening before bed.","We need some more fruit and a few vegetables — there aren't any bananas left in the basket!","The more vocabulary you learn, the more confident you feel when you speak — so keep going!","I have a lot of ideas for the project but not enough time to do all of them this week.","There are too many distractions on my phone, so I put it away and studied for a few hours.","A little goes a long way — even 20 minutes of focused practice every day will change your English!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO10_DATA=[
+  {s:"There is so much to learn but a little goes a long way every single day",w:['There','is','so','much','to','learn','but','a','little','goes','a','long','way','every','single','day']},
+  {s:"How many lessons have you done this week? I finished a lot of them already",w:['How','many','lessons','have','you','done','this','week?','I','finished','a','lot','of','them','already']},
+  {s:"I don't have enough money to buy too many things so I will get a few",w:["I","don't","have","enough","money","to","buy","too","many","things","so","I","will","get","a","few"]},
+];
+function hwShuffle10(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo10=WO10_DATA.map(d=>({ans:[],bank:hwShuffle10(d.w),orig:d.w}));
+function wo10Render(){const c=document.getElementById('wo10-container');c.innerHTML='';WO10_DATA.forEach((d,si)=>{const st=wo10[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo10-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo10Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo10-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo10Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo10Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo10Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo10-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo10Move(fromBank,si,wi){const st=wo10[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo10Render();}
+function wo10Check(si){const st=wo10[si];const fb=document.getElementById('wo10-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO10_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again!`;fb.classList.remove('hidden');}
+function wo10Reset(si){wo10[si].bank=hwShuffle10(WO10_DATA[si].orig);wo10[si].ans=[];document.getElementById('wo10-fb-'+si).classList.add('hidden');wo10Render();}
+wo10Render();
+const MP10=[{l:'MANY',r:'Contável — perguntas e negativas'},{l:'MUCH',r:'Incontável — perguntas e negativas'},{l:'A LOT OF',r:'Contável e incontável — afirmativas'},{l:'A FEW',r:'Contável — pouco, mas positivo'},{l:'A LITTLE',r:'Incontável — pouco, mas positivo'},{l:'ENOUGH',r:'Suficiente — contável e incontável'},];
+function mpShuffle10(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp10R=mpShuffle10(MP10.map((p,i)=>({label:p.r,pid:i})));
+let mp10SelL=null;const mp10Done=new Set();
+function mp10Render(){document.getElementById('mp10-left').innerHTML=MP10.map((p,i)=>`<button onclick="mp10ClickL(${i})" id="mp10L-${i}" class="mp-btn w-full ${mp10Done.has(i)?'matched':''}" ${mp10Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp10-right').innerHTML=mp10R.map((p,i)=>`<button onclick="mp10ClickR(${i})" id="mp10R-${i}" class="mp-btn w-full text-xs ${mp10Done.has(p.pid)?'matched':''}" ${mp10Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp10ClickL(i){if(mp10Done.has(i))return;mp10SelL=i;document.querySelectorAll('#mp10-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp10Done.has(j)));}
+function mp10ClickR(ri){if(mp10SelL===null)return;const item=mp10R[ri];if(item.pid===mp10SelL){mp10Done.add(mp10SelL);mp10SelL=null;mp10Render();if(mp10Done.size===MP10.length)document.getElementById('mp10-done-msg').classList.remove('hidden');}else{[document.getElementById('mp10R-'+ri),document.getElementById('mp10L-'+mp10SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp10SelL=null;document.querySelectorAll('#mp10-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp10Render();
+const ERR10=[{wrong:'"I have much friends at school and we do a lot of fun activities together."',check:v=>v.includes('many friends')&&v.includes('a lot of'),hint:'much friends → many friends (friends é contável!); a lot of fun ✓ está correto'},{wrong:'"How many money do you need? There isn\'t many time left to decide."',check:v=>v.includes('how much money')&&v.includes("isn't much time"),hint:'how many money → how much money (money é incontável); isn\'t many time → isn\'t much time (time é incontável)'},{wrong:'"She ate too many sugar and drank too much coffees — no wonder she can\'t sleep!"',check:v=>v.includes('too much sugar')&&v.includes('too many coffees')||v.includes('too much sugar')&&v.includes('too much coffee'),hint:'too many sugar → too much sugar (sugar é incontável); too much coffees → too many coffees (contável) ou too much coffee (incontável)'},];
+const ec=document.getElementById('err10-container');
+ERR10.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err10-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr10(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err10-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr10(i){const v=document.getElementById('err10-inp-'+i).value.toLowerCase().replace(/[?.!,—']/g,'').trim();const fb=document.getElementById('err10-fb-'+i);fb.className='text-xs font-bold '+(ERR10[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR10[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR10[i].hint;fb.classList.remove('hidden');}
+const FILL10=[{before:'There isn\'t',blank:'much',after:'time before the exam — let\'s focus! (incontável)',ans:'much'},{before:'How',blank:'many',after:'languages do you speak? I\'d love to know! (contável)',ans:'many'},{before:'She drinks',blank:'a lot of',after:'water every day — at least two litres. (afirmativa)',ans:'a lot of'},{before:'I have',blank:'a few',after:'questions about the homework — can you help? (contável, positivo)',ans:'a few'},{before:'Do you have',blank:'any',after:'ideas for the project? We need to decide soon. (pergunta)',ans:'any'},];
+const fc=document.getElementById('fill10-container');
+FILL10.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill10-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill10(){FILL10.forEach((f,i)=>{const inp=document.getElementById('fill10-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework10(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework10()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_11.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 11 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework10=submitHomework10;
+</script>
+</body>
+</html>

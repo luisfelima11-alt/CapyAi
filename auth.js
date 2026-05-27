@@ -111,4 +111,57 @@ const Auth = {
         const guest = { id: 'guest', name: 'Explorer', email: '', avatar: '🌿' };
         this.saveSession(guest);
     },
+
+    /* ── Profile / Onboarding ────────────────────────── */
+
+    /** Fetch user profile from Supabase. Returns null for guests or on error. */
+    async fetchProfile(userId) {
+        if (!userId || userId === 'guest') return null;
+        try {
+            const res = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`);
+            if (res.ok) return await res.json();
+        } catch(e) {}
+        return null;
+    },
+
+    /** Save (upsert) user profile to Supabase. */
+    async saveProfile(userId, profileData) {
+        if (!userId || userId === 'guest') return false;
+        try {
+            const res = await fetch('/api/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, ...profileData })
+            });
+            return res.ok;
+        } catch(e) {}
+        return false;
+    },
+
+    /**
+     * Check if the current user has completed onboarding.
+     * If not → redirect to onboarding.html.
+     * Call this at the top of main pages (learn.html, classes.html, etc.)
+     * Returns true if onboarding is done (or user is guest), false if redirected.
+     */
+    async checkOnboarding() {
+        const session = this.getSession();
+        if (!session || session.id === 'guest') return true; // guests skip onboarding
+        const profile = await this.fetchProfile(session.id);
+        if (!profile || !profile.onboarding_complete) {
+            window.location.href = 'onboarding.html';
+            return false;
+        }
+        // Cache profile in Store for instant reads
+        try {
+            if (window.Store) {
+                Store.state.englishLevel     = profile.english_level    || null;
+                Store.state.goals            = profile.goals            || [];
+                Store.state.interests        = profile.interests        || [];
+                Store.state.dailyGoalMinutes = profile.daily_goal_minutes || 10;
+                Store.state.onboardingComplete = true;
+            }
+        } catch(e) {}
+        return true;
+    },
 };

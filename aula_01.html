@@ -1,0 +1,314 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 1 — To Have, Want, Need & Like | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}
+.tab-btn.active{color:#10b981}
+.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}
+.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">💬</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">❤️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">⭐</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🌿</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🦫</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_02.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">💬 Aula 1 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">To Have, Want,<br><span class="text-emerald-300">Need & Like</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Os 4 verbos essenciais do inglês do dia a dia — domine-os e você já consegue dizer quase tudo sobre sua vida!</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Palavras do cotidiano. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Frases prontas para o dia a dia. Clique para ver mais.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">HAVE, WANT, NEED & LIKE no Present Simple.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Os 4 Verbos Essenciais</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm font-black">
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">HAVE ❤️</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">WANT ⭐</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">NEED 🔑</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">LIKE 😊</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>❤️ HAVE — Ter / Possuir</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I / You / We / They → <strong>have</strong> &nbsp;|&nbsp; He / She / It → <strong>has</strong></p>
+            <p>✅ <strong>I have a dog.</strong> → Eu tenho um cachorro.</p>
+            <p>✅ <strong>She has a great idea.</strong> → Ela tem uma ótima ideia.</p>
+            <p>✅ <strong>Do you have time?</strong> → Você tem tempo?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⭐ WANT — Querer / Desejar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I / You / We / They → <strong>want</strong> &nbsp;|&nbsp; He / She / It → <strong>wants</strong></p>
+            <p>✅ <strong>I want to learn English.</strong> → Quero aprender inglês.</p>
+            <p>✅ <strong>She wants a new phone.</strong> → Ela quer um celular novo.</p>
+            <p>✅ <strong>What do you want?</strong> → O que você quer?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔑 NEED — Precisar / Necessitar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I / You / We / They → <strong>need</strong> &nbsp;|&nbsp; He / She / It → <strong>needs</strong></p>
+            <p>✅ <strong>I need help.</strong> → Preciso de ajuda.</p>
+            <p>✅ <strong>She needs more practice.</strong> → Ela precisa de mais prática.</p>
+            <p>✅ <strong>Do you need anything?</strong> → Precisa de alguma coisa?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>😊 LIKE — Gostar / Curtir</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I / You / We / They → <strong>like</strong> &nbsp;|&nbsp; He / She / It → <strong>likes</strong></p>
+            <p>✅ <strong>I like music.</strong> → Gosto de música.</p>
+            <p>✅ <strong>He likes to read.</strong> → Ele gosta de ler.</p>
+            <p>✅ <strong>Do you like English?</strong> → Você gosta de inglês?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚠️ Regra do -S: He / She / It</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3 font-bold">Na 3ª pessoa do singular (he/she/it) sempre adicione -S!</p>
+            <p>✅ He <strong>has</strong> / She <strong>wants</strong> / It <strong>needs</strong> / He <strong>likes</strong></p>
+            <p class="text-red-500">❌ He have / She want / It need</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 Só HAVE muda para HAS — os outros só adicionam -S!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🌿 Cabana de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🌿 Cabana de Nano Banana. Leo chega pela primeira vez e encontra Capy Yara. É o começo de uma grande aventura!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Hi Leo! Welcome to Nano Banana! Do you <strong class="text-emerald-700">have</strong> everything you need for our adventure?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Hi Yara! I <strong class="text-emerald-700">have</strong> my notebook. I <strong class="text-emerald-700">need</strong> to learn English — I really <strong class="text-emerald-700">want</strong> to speak fluently!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">That's great! I <strong class="text-emerald-700">like</strong> students who are motivated. What kind of things do you <strong class="text-emerald-700">like</strong> to talk about?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">like</strong> music, travel, and food. I also <strong class="text-emerald-700">have</strong> a dog — his name is Bolt! He <strong class="text-emerald-700">needs</strong> a walk every day.</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">love</strong> dogs! Bolt <strong class="text-emerald-700">has</strong> a great owner. You <strong class="text-emerald-700">have</strong> everything — motivation, energy, and a plan. Let's start! 🚀</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Yes! I <strong class="text-emerald-700">want</strong> to practice every day. I <strong class="text-emerald-700">need</strong> your help, Yara. I <strong class="text-emerald-700">like</strong> this place already! 😊</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Have, Want, Need & Like.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p>
+        <p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p>
+      </div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 1 — To Have, Want, Need & Like</p></div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras na ordem correta.</p></div></div>
+          <div id="wo1-container" class="space-y-6"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Verbs</h3><p class="text-slate-500 text-sm mt-1">Conecte cada verbo ao seu significado em português.</p></div></div>
+          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
+          <p id="mp1-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro em cada frase.</p></div></div>
+          <div class="space-y-4" id="err1-container"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>have / has / want / needs / like</strong>.</p></div></div>
+          <div class="space-y-4" id="fill1-container"></div>
+          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre você usando HAVE, WANT, NEED e LIKE. Pelo menos uma frase com He/She/It + verbo correto.</p></div></div>
+          <textarea rows="6" placeholder="I have... I want... I need... I like... She has... He wants..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea>
+        </div>
+      </div>
+      <button onclick="submitHomework1()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-1" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🌿</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['have','ter / possuir'],['want','querer / desejar'],['need','precisar / necessitar'],['like','gostar / curtir'],['love','amar / adorar'],['hate','odiar / detestar'],['prefer','preferir'],['enjoy','curtir / aproveitar'],['own','possuir / ser dono'],['desire','desejar / querer muito'],['require','exigir / necessitar'],['wish','desejar / querer'],['hope','esperar / ter esperança'],['miss','sentir saudade / perder'],['hold','segurar / aguentar'],['keep','guardar / manter'],['buy','comprar'],['sell','vender'],['use','usar / utilizar'],['find','encontrar / achar'],['lose','perder'],['give','dar / oferecer'],['take','pegar / levar'],['share','compartilhar'],['borrow','pedir emprestado'],['lend','emprestar'],['spend','gastar / passar tempo'],['collect','colecionar'],['choose','escolher'],['decide','decidir'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"I'd love to!",meaning:'Adoraria! / Com prazer!',example:'"Do you want to practice English with me?" — "I\'d love to!"',use:"Expressar entusiasmo e aceitação com muito prazer. Mais animado que 'I want to'."},{phrase:"I don't really like that.",meaning:'Não curto muito isso.',example:'"Do you like horror movies?" — "I don\'t really like that — I prefer comedy!"',use:"Forma educada de dizer que não gosta de algo sem soar rude."},{phrase:"I need to talk to you.",meaning:'Preciso falar com você.',example:'"Hey Yara, I need to talk to you about something important!"',use:"Expressar urgência ou necessidade de conversar."},{phrase:"I have no idea.",meaning:'Não tenho ideia. / Não sei.',example:'"Do you know how to say that in English?" — "I have no idea, but I want to learn!"',use:"Admitir que não sabe algo — honesto e natural."},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'Complete: "She ___ a beautiful voice — everyone loves her."',opts:['has','have','is','are'],ans:0},
+  {q:'Complete: "I ___ to learn English this year!"',opts:['want','wants','have','need'],ans:0},
+  {q:'Complete: "He ___ help — the exercise is very difficult."',opts:['needs','need','wants','likes'],ans:0},
+  {q:'Complete: "Do you ___ coffee or tea?"',opts:['like','likes','have','want'],ans:0},
+  {q:'Qual forma está CORRETA?',opts:['She wants a new car.','She want a new car.','She is want a new car.','She wanting a new car.'],ans:0},
+  {q:'Complete: "They ___ three cats and a dog at home."',opts:['have','has','want','need'],ans:0},
+  {q:'Tradução: "Não tenho ideia."',opts:['I have no idea.','I no have idea.','I not have idea.','I have idea not.'],ans:0},
+  {q:'Complete: "I ___ to talk to you about something."',opts:['need','needs','want','like'],ans:0},
+  {q:'Qual frase usa LIKE corretamente?',opts:['He likes to play guitar.','He like to play guitar.','He is like to play guitar.','He liking to play guitar.'],ans:0},
+  {q:'Complete: "She ___ chocolate — she eats it every day!"',opts:['loves','love','is love','wanting'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["I have a dream — I want to speak English fluently one day!","She has two brothers and they both like to play soccer.","Do you need help? I can explain it again — I like to help!","He wants to travel the world but needs to save money first.","I don't really like mornings, but I love the feeling after a good workout.","We have so much to learn — and I'd love to do it together!","She needs more practice, but she already likes the progress she's making.","I have no idea how to cook, but I want to learn — I need a good teacher!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO1_DATA=[
+  {s:'She has a big dream and wants to travel the world',w:['She','has','a','big','dream','and','wants','to','travel','the','world']},
+  {s:'I need help because I have no idea how to do this',w:['I','need','help','because','I','have','no','idea','how','to','do','this']},
+  {s:'He likes to read but needs more time every day',w:['He','likes','to','read','but','needs','more','time','every','day']},
+];
+function hwShuffle1(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle1(d.w),orig:d.w}));
+function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
+function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again! (${WO1_DATA[si].s})`;fb.classList.remove('hidden');}
+function wo1Reset(si){wo1[si].bank=hwShuffle1(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+wo1Render();
+const MP1=[{l:'HAVE ❤️',r:'Ter / Possuir'},{l:'WANT ⭐',r:'Querer / Desejar'},{l:'NEED 🔑',r:'Precisar / Necessitar'},{l:'LIKE 😊',r:'Gostar / Curtir'},];
+function mpShuffle1(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp1R=mpShuffle1(MP1.map((p,i)=>({label:p.r,pid:i})));
+let mp1SelL=null;const mp1Done=new Set();
+function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
+function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp1Render();
+const ERR1=[{wrong:'"She have a great idea and want to share it."',check:v=>v.includes('has')&&v.includes('wants'),hint:'have → has / want → wants (he/she/it + verbo com -S)'},{wrong:'"I likes music but I not like horror movies."',check:v=>v.includes('like music')&&v.includes("don't like")||v.includes("do not like"),hint:"likes → like / not like → don't like (I + verbo base; negativa: don't)"},{wrong:'"He need to study more — he wants be fluent."',check:v=>v.includes('needs')&&v.includes('to be'),hint:'need → needs / wants be → wants to be (he + needs; want + to + verbo)'},];
+const ec=document.getElementById('err1-container');
+ERR1.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err1-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr1(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err1-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr1(i){const v=document.getElementById('err1-inp-'+i).value.toLowerCase().replace(/[?.!,]/g,'').trim();const fb=document.getElementById('err1-fb-'+i);fb.className='text-xs font-bold '+(ERR1[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR1[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR1[i].hint;fb.classList.remove('hidden');}
+const FILL1=[{before:'I',blank:'have',after:'two sisters and they both love music.',ans:'have'},{before:'She',blank:'wants',after:'to become an English teacher one day.',ans:'wants'},{before:'He',blank:'needs',after:'more sleep — he works too much.',ans:'needs'},{before:'Do you',blank:'like',after:'coffee? I prefer tea in the morning.',ans:'like'},{before:'My cat',blank:'has',after:'three colors — she is so beautiful!',ans:'has'},];
+const fc=document.getElementById('fill1-container');
+FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework1(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework1()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_02.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 02 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework1=submitHomework1;
+</script>
+</body>
+</html>

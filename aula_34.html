@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -15,7 +15,7 @@
 *{font-family:'Plus Jakarta Sans',sans-serif}
 @keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .float-emoji{animation:floatEmoji 3s ease-in-out infinite}
-.flip-card{perspective:800px;cursor:pointer}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
 .flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
 .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
@@ -25,6 +25,8 @@
 .tab-btn.active{color:#f43f5e;font-weight:800}
 .tab-btn.active::after{transform:scaleX(1)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.correct{animation:correct-pulse .3s ease}
 .shake{animation:shake .35s ease}
 @keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
 .xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
@@ -50,9 +52,11 @@
     <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">🔥</span>
   </div>
   <div class="relative max-w-5xl mx-auto px-6 py-12">
-    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-    </a>
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+      <a href="aula_33.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+      <a href="aula_35.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+    </div>
     <div class="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-400/30 rounded-full px-4 py-1 text-sm font-black text-rose-300 mb-3">Aula 34</div>
     <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎯 Expressing Opinions<br><span class="text-rose-300">&amp; Debating</span></h1>
     <p class="text-white/60 text-base mb-5 max-w-lg">Learn how to give, agree with, and politely disagree with opinions in English like a confident speaker.</p>
@@ -161,7 +165,7 @@
     </div>
     <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
     <div id="practice-area"></div>
-    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
       <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
         <div class="text-6xl mb-3" id="result-emoji">🎉</div>
         <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -332,7 +336,7 @@
 
 <script src="store.js"></script>
 <script src="lesson-engine.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -545,10 +549,15 @@ function checkDebateFill(){
 }
 
 function submitHomework34(){
-  const btn=event.target;
-  btn.disabled=true;btn.textContent='✓ Submitted!';btn.classList.add('opacity-75');
-  document.getElementById('hw-done-34').classList.remove('hidden');
-  if(typeof Store!=='undefined') Store.addXP(75);
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework34()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_35.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 35 →';
+  btn.insertAdjacentElement('afterend', a);
 }
 </script>
 </body>

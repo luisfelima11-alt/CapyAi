@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -25,6 +25,8 @@
 .tab-btn.active{color:#f97316;font-weight:800}
 .tab-btn.active::after{transform:scaleX(1)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.correct{animation:correct-pulse .3s ease}
 .shake{animation:shake .35s ease}
 @keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
 .xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
@@ -51,9 +53,11 @@
       <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🫕</span>
     </div>
     <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-      </a>
+      <div class="flex items-center gap-3 flex-wrap mb-4">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_23.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_25.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
       <div class="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-4 py-1 text-sm font-black text-orange-300 mb-3">Aula 24</div>
       <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🍽️ At the<br><span class="text-orange-300">Restaurant</span></h1>
       <p class="text-white/60 text-base mb-5">Master restaurant vocabulary, ordering phrases, and special uses of TO HAVE for food and dining situations.</p>
@@ -81,6 +85,7 @@
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
       </div>
     </div>
   </div>
@@ -188,7 +193,7 @@
       </div>
       <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
       <div id="practice-area"></div>
-      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
           <div class="text-6xl mb-3" id="result-emoji">🎉</div>
           <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -209,13 +214,80 @@
       <div class="space-y-3" id="speak-grid"></div>
     </div>
 
+    <!-- TAB: HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+            <p class="text-white/80 text-sm">Aula 24 — At the Restaurant</p>
+          </div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div><h3 class="font-black text-navy text-base">🔀 Coloque as palavras na ordem certa</h3><p class="text-slate-500 text-sm mt-1">Toque nas palavras para montar a frase!</p></div>
+          </div>
+          <div id="wo24-wrap"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div><h3 class="font-black text-navy text-base">🔗 Conecte: restaurante ↔ tradução</h3><p class="text-slate-500 text-sm mt-1">Clique numa palavra em inglês e depois na tradução correta.</p></div>
+          </div>
+          <div id="mp24-wrap"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-700 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div><h3 class="font-black text-navy text-base">❌ Corrija o erro gramatical</h3><p class="text-slate-500 text-sm mt-1">Cada frase tem um erro. Reescreva corretamente.</p></div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "I would like order the steak, please."</p>
+              <input type="text" id="err24-1" placeholder="I would like …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err24fb1" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "She asked for a recommend from the waiter."</p>
+              <input type="text" id="err24-2" placeholder="She asked for a …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err24fb2" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "We make a reservation for 8 o'clock last night."</p>
+              <input type="text" id="err24-3" placeholder="We made …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err24fb3" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <button onclick="checkErrors24()" class="bg-red-50 border-2 border-red-200 text-red-700 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-red-100 transition-all">Verificar respostas ✓</button>
+          </div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div><h3 class="font-black text-navy text-base">✍️ Minha experiência ideal no restaurante</h3><p class="text-slate-500 text-sm mt-1">Descreva seu restaurante favorito ou uma experiência ideal. Use pelo menos 4 palavras do vocabulário da aula.</p></div>
+          </div>
+          <textarea rows="5" placeholder="My favourite restaurant is… I usually order… The waiter recommended… I would describe the menu as… The atmosphere is…" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+        </div>
+      </div>
+      <button onclick="submitHomework24()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Submit Homework &nbsp;+75 XP
+      </button>
+      <div id="hw-done-24" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+
   </div>
 </main>
 
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script src="lesson-engine.js"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -284,9 +356,114 @@ const SPEAK_SENTENCES = [
   {text:"Could we have the <strong class='text-orange-600'>bill</strong>, please? And can we leave a <strong class='text-orange-600'>tip</strong> on the card?"},
 ];
 
+// ── HOMEWORK INTERACTIVE EXERCISES — AULA 24 ─────────────────────────────────
+function hwShuffle24(a) { return [...a].sort(() => Math.random() - 0.5); }
+const WO24_DATA = [
+  { s: 'Could I have the menu please',                    w: ['Could','I','have','the','menu','please'] },
+  { s: 'I would like a glass of water with my meal',      w: ['I','would','like','a','glass','of','water','with','my','meal'] },
+  { s: 'What do you recommend from the menu today',       w: ['What','do','you','recommend','from','the','menu','today'] },
+];
+const wo24 = WO24_DATA.map(d => ({ ans: [], bank: hwShuffle24(d.w) }));
+function wo24Render() {
+  const c = document.getElementById('wo24-wrap'); if (!c) return;
+  c.innerHTML = WO24_DATA.map((d,i) => {
+    const st = wo24[i];
+    return `<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i < WO24_DATA.length-1 ? 'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO24_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length ? st.ans.map((w,j)=>`<span onclick="wo24Move(1,${i},${j})" class="cursor-pointer select-none bg-violet-100 text-violet-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-violet-200 active:scale-95 transition-all">${w}</span>`).join('') : '<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo24Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-violet-400 hover:bg-violet-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo24Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo24Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo24fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo24Move(fromBank, si, wi) {
+  if (fromBank) wo24[si].bank.push(wo24[si].ans.splice(wi,1)[0]);
+  else          wo24[si].ans.push(wo24[si].bank.splice(wi,1)[0]);
+  wo24Render();
+}
+function wo24Check(i) {
+  const fb = document.getElementById('wo24fb'+i); if (!fb) return;
+  if (wo24[i].ans.join(' ').toLowerCase() === WO24_DATA[i].s.toLowerCase()) {
+    fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600';
+  } else { fb.textContent='❌ Tente novamente!'; fb.className='text-xs font-black text-red-500'; }
+}
+function wo24Reset(i) {
+  wo24[i] = { ans:[], bank: hwShuffle24(WO24_DATA[i].w) };
+  const fb = document.getElementById('wo24fb'+i); if (fb) fb.textContent='';
+  wo24Render();
+}
+wo24Render();
+const MP24 = [
+  { l:'Menu 📋',         r:'Cardápio' },
+  { l:'Waiter 🧑‍🍳',      r:'Garçom' },
+  { l:'Bill 🧾',         r:'Conta' },
+  { l:'Reservation 📅',  r:'Reserva' },
+  { l:'Appetizer 🥗',    r:'Entrada' },
+];
+const mp24R = hwShuffle24(MP24.map((p,i)=>({label:p.r, pid:i})));
+let mp24SelL = null; const mp24Done = new Set();
+function mp24Render() {
+  const c = document.getElementById('mp24-wrap'); if (!c) return;
+  c.innerHTML = `<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP24.map((p,i)=>`<div id="mp24L${i}" onclick="mp24ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp24Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp24SelL===i?'border-violet-500 bg-violet-100 text-violet-800':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp24R.map((r,i)=>`<div id="mp24R${i}" onclick="mp24ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp24Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${r.label}</div>`).join('')}</div>
+  </div>${mp24Done.size===MP24.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp24ClickL(i) { if(mp24Done.has(i))return; mp24SelL=(mp24SelL===i)?null:i; mp24Render(); }
+function mp24ClickR(i) {
+  if(mp24SelL===null)return; const r=mp24R[i]; if(mp24Done.has(r.pid))return;
+  if(r.pid===mp24SelL){ mp24Done.add(mp24SelL); mp24SelL=null; mp24Render(); }
+  else {
+    const lEl=document.getElementById('mp24L'+mp24SelL), rEl=document.getElementById('mp24R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{ mp24SelL=null; mp24Render(); },700);
+  }
+}
+mp24Render();
+const ERR24_CHECKS = [
+  v => v.includes('would like to order') && !v.includes('would like order'),
+  v => v.includes('recommendation') && !v.includes('recommend'),
+  v => v.includes('made a reservation') && !v.includes('make a reservation'),
+];
+const ERR24_HINTS = ['would like order → would like to order (would like + to + verb)', 'recommend → recommendation (noun needed after "for a")', 'make → made (past tense — "last night")'];
+function checkErrors24() {
+  ERR24_CHECKS.forEach((check,i) => {
+    const inp=document.getElementById('err24-'+(i+1)), fb=document.getElementById('err24fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){ fb.classList.add('hidden'); return; }
+    fb.classList.remove('hidden');
+    if(check(v)){ fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600 mt-1'; }
+    else { fb.textContent=`❌ Dica: "${ERR24_HINTS[i]}"`; fb.className='text-xs font-black text-red-500 mt-1'; }
+  });
+}
+function submitHomework24(){
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(75);
+  const btn = document.querySelector('[onclick="submitHomework24()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_25.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 25 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+
 initLesson({
-  tabs: ['vocab','expressions','grammar','practice','speak'],
-  totalSections: 5,
+  tabs: ['vocab','expressions','grammar','practice','speak','homework'],
+  totalSections: 6,
   vocab: VOCAB,
   expressions: EXPRESSIONS,
   practice: PRACTICE_QS,

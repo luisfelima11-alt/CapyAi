@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -25,6 +25,8 @@
 .tab-btn.active{color:#3b82f6;font-weight:800}
 .tab-btn.active::after{transform:scaleX(1)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.correct{animation:correct-pulse .3s ease}
 .shake{animation:shake .35s ease}
 @keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
 .xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
@@ -51,9 +53,11 @@
       <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">🚀</span>
     </div>
     <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-      </a>
+      <div class="flex items-center gap-3 flex-wrap mb-4">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_19.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_21.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
       <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1 text-sm font-black text-blue-300 mb-3">Aula 20</div>
       <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🏆 Achievements<br><span class="text-blue-300">&amp; Challenges</span></h1>
       <p class="text-white/60 text-base mb-5">Master 20 advanced vocabulary words, 4 powerful idioms, and the Past Continuous tense to describe actions in progress.</p>
@@ -81,6 +85,7 @@
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
         <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+        <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
       </div>
     </div>
   </div>
@@ -181,7 +186,7 @@
       </div>
       <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
       <div id="practice-area"></div>
-      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
           <div class="text-6xl mb-3" id="result-emoji">🎉</div>
           <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -202,13 +207,101 @@
       <div class="space-y-3" id="speak-grid"></div>
     </div>
 
+    <!-- TAB: HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+            <p class="text-white/80 text-sm">Aula 20 — Achievements, Challenges &amp; Perspectives</p>
+          </div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-4">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔀 Coloque as palavras na ordem certa</h3>
+              <p class="text-slate-500 text-sm mt-1">Toque nas palavras para montar a frase!</p>
+            </div>
+          </div>
+          <div id="wo20-wrap"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div>
+              <h3 class="font-black text-navy text-base">🔗 Conecte: inglês ↔ português</h3>
+              <p class="text-slate-500 text-sm mt-1">Clique numa palavra em inglês e depois na tradução correta.</p>
+            </div>
+          </div>
+          <div id="mp20-wrap"></div>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-700 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div>
+              <h3 class="font-black text-navy text-base">❌ Corrija o erro gramatical</h3>
+              <p class="text-slate-500 text-sm mt-1">Cada frase tem um erro. Reescreva corretamente.</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "I was work late when you called me."</p>
+              <input type="text" id="err20-1" placeholder="I was …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err20fb1" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "While she was sleep, the phone rang."</p>
+              <input type="text" id="err20-2" placeholder="While she was …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err20fb2" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-red-400 mb-1.5">✗ "They was discussing the challenge all afternoon."</p>
+              <input type="text" id="err20-3" placeholder="They …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+              <p id="err20fb3" class="text-xs font-black mt-1 hidden"></p>
+            </div>
+            <button onclick="checkErrors20()" class="bg-red-50 border-2 border-red-200 text-red-700 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-red-100 transition-all">Verificar respostas ✓</button>
+          </div>
+        </div>
+
+        <!-- Task 4: Free Writing -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div>
+              <h3 class="font-black text-navy text-base">✍️ Meu maior desafio — parágrafo livre</h3>
+              <p class="text-slate-500 text-sm mt-1">Descreva um desafio que você enfrentou recentemente. Use o Past Continuous e pelo menos 3 palavras do vocabulário da aula.</p>
+            </div>
+          </div>
+          <textarea rows="5" placeholder="Last year, I was facing a big challenge at work. While I was trying to… The experience taught me that… From my perspective…" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+        </div>
+
+      </div>
+      <button onclick="submitHomework20()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+        ✓ Submit Homework &nbsp;+75 XP
+      </button>
+      <div id="hw-done-20" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+      </div>
+    </div>
+
   </div>
 </main>
 
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script src="lesson-engine.js"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -277,9 +370,121 @@ const SPEAK_SENTENCES = [
   {text:"From my perspective, we <strong class='text-blue-600'>were seizing</strong> a huge opportunity for global expansion."},
 ];
 
+// ── HOMEWORK INTERACTIVE EXERCISES — AULA 20 ─────────────────────────────────
+function hwShuffle20(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+// ---- Word Order ----
+const WO20_DATA = [
+  { s: 'I was making great progress with my English studies', w: ['I','was','making','great','progress','with','my','English','studies'] },
+  { s: 'She was facing a big challenge at work yesterday',    w: ['She','was','facing','a','big','challenge','at','work','yesterday'] },
+  { s: 'They were discussing the environmental impact of the project', w: ['They','were','discussing','the','environmental','impact','of','the','project'] },
+];
+const wo20 = WO20_DATA.map(d => ({ ans: [], bank: hwShuffle20(d.w) }));
+function wo20Render() {
+  const c = document.getElementById('wo20-wrap'); if (!c) return;
+  c.innerHTML = WO20_DATA.map((d,i) => {
+    const st = wo20[i];
+    return `<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i < WO20_DATA.length-1 ? 'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO20_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length ? st.ans.map((w,j)=>`<span onclick="wo20Move(1,${i},${j})" class="cursor-pointer select-none bg-blue-100 text-blue-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-blue-200 active:scale-95 transition-all">${w}</span>`).join('') : '<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo20Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-blue-400 hover:bg-blue-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo20Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo20Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo20fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo20Move(fromBank, si, wi) {
+  if (fromBank) wo20[si].bank.push(wo20[si].ans.splice(wi,1)[0]);
+  else          wo20[si].ans.push(wo20[si].bank.splice(wi,1)[0]);
+  wo20Render();
+}
+function wo20Check(i) {
+  const fb = document.getElementById('wo20fb'+i); if (!fb) return;
+  if (wo20[i].ans.join(' ').toLowerCase() === WO20_DATA[i].s.toLowerCase()) {
+    fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600';
+  } else { fb.textContent='❌ Tente novamente!'; fb.className='text-xs font-black text-red-500'; }
+}
+function wo20Reset(i) {
+  wo20[i] = { ans:[], bank: hwShuffle20(WO20_DATA[i].w) };
+  const fb = document.getElementById('wo20fb'+i); if (fb) fb.textContent='';
+  wo20Render();
+}
+wo20Render();
+
+// ---- Match Pairs ----
+const MP20 = [
+  { l:'Achievement 🏆', r:'Conquista' },
+  { l:'Challenge 💪',   r:'Desafio' },
+  { l:'Consequence ⚡', r:'Consequência' },
+  { l:'Perspective 👁️', r:'Perspectiva' },
+  { l:'Opportunity 🌟', r:'Oportunidade' },
+];
+const mp20R = hwShuffle20(MP20.map((p,i)=>({label:p.r, pid:i})));
+let mp20SelL = null; const mp20Done = new Set();
+function mp20Render() {
+  const c = document.getElementById('mp20-wrap'); if (!c) return;
+  c.innerHTML = `<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP20.map((p,i)=>`<div id="mp20L${i}" onclick="mp20ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp20Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp20SelL===i?'border-blue-500 bg-blue-100 text-blue-800':'border-slate-200 bg-white text-navy hover:border-blue-300 hover:bg-blue-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp20R.map((r,i)=>`<div id="mp20R${i}" onclick="mp20ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp20Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-blue-300 hover:bg-blue-50'}">${r.label}</div>`).join('')}</div>
+  </div>${mp20Done.size===MP20.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp20ClickL(i) { if(mp20Done.has(i))return; mp20SelL=(mp20SelL===i)?null:i; mp20Render(); }
+function mp20ClickR(i) {
+  if(mp20SelL===null)return; const r=mp20R[i]; if(mp20Done.has(r.pid))return;
+  if(r.pid===mp20SelL){ mp20Done.add(mp20SelL); mp20SelL=null; mp20Render(); }
+  else {
+    const lEl=document.getElementById('mp20L'+mp20SelL), rEl=document.getElementById('mp20R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{ mp20SelL=null; mp20Render(); },700);
+  }
+}
+mp20Render();
+
+// ---- Error Correction ----
+const ERR20_CHECKS = [
+  v => v.includes('was working') && !v.includes('was work'),
+  v => v.includes('was sleeping') && !v.includes('was sleep'),
+  v => v.includes('were discussing') && !v.includes('was discussing'),
+];
+const ERR20_HINTS = ['was work → was working (Past Continuous: was/were + verb-ing)', 'was sleep → was sleeping (was + verb-ing)', 'was → were (they = plural, use were)'];
+function checkErrors20() {
+  ERR20_CHECKS.forEach((check,i) => {
+    const inp=document.getElementById('err20-'+(i+1)), fb=document.getElementById('err20fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){ fb.classList.add('hidden'); return; }
+    fb.classList.remove('hidden');
+    if(check(v)){ fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600 mt-1'; }
+    else { fb.textContent=`❌ Dica: "${ERR20_HINTS[i]}"`; fb.className='text-xs font-black text-red-500 mt-1'; }
+  });
+}
+
+function submitHomework20(){
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(75);
+  const btn = document.querySelector('[onclick="submitHomework20()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_21.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 21 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+
 initLesson({
-  tabs: ['vocab','expressions','grammar','practice','speak'],
-  totalSections: 5,
+  tabs: ['vocab','expressions','grammar','practice','speak','homework'],
+  totalSections: 6,
   vocab: VOCAB,
   expressions: EXPRESSIONS,
   practice: PRACTICE_QS,

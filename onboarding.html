@@ -1,0 +1,503 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bem-vindo à Capy English! | Onboarding</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+  * { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .option-card { transition: all .2s ease; border: 2px solid transparent; }
+  .option-card.selected { border-color: #10b981; background: #ecfdf5; transform: scale(1.03); }
+  .option-card.selected .check { display: flex !important; }
+  .step { display: none; }
+  .step.active { display: block; }
+  @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  .float { animation: floatY 3s ease-in-out infinite; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  .slide-in { animation: slideIn .4s ease forwards; }
+</style>
+<script>
+  tailwind.config = {
+    theme: { extend: { colors: { navy: '#0f172a' } } }
+  }
+</script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-navy overflow-x-hidden">
+
+<script src="auth.js"></script>
+<script src="store.js"></script>
+
+<!-- Guard: redirect to login if not authenticated -->
+<script>
+(function() {
+  if (!Auth.isLoggedIn()) {
+    window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
+  }
+  // If already completed, go to learn
+  const session = Auth.getSession();
+  if (session && session.id !== 'guest') {
+    Auth.fetchProfile(session.id).then(p => {
+      if (p && p.onboarding_complete) window.location.href = '6_Home_Forest_Expedition.html';
+    });
+  }
+})();
+</script>
+
+<div class="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative">
+
+  <!-- Floating decorations -->
+  <div class="absolute top-10 left-8 text-4xl opacity-20 float" style="animation-delay:.3s">🌿</div>
+  <div class="absolute top-24 right-12 text-3xl opacity-20 float" style="animation-delay:.8s">⭐</div>
+  <div class="absolute bottom-20 left-16 text-3xl opacity-20 float" style="animation-delay:1.2s">🎵</div>
+  <div class="absolute bottom-10 right-8 text-4xl opacity-20 float" style="animation-delay:.5s">✨</div>
+
+  <div class="w-full max-w-lg">
+
+    <!-- Yara + title -->
+    <div class="text-center mb-8 slide-in">
+      <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-emerald-400/60 shadow-2xl shadow-emerald-500/30 mx-auto mb-4 bg-emerald-900 flex items-center justify-center">
+        <img src="yara-avatar.png?v=1" alt="Yara" class="w-full h-full object-cover"
+             onerror="this.style.display='none';this.parentElement.innerHTML='🦫'"/>
+      </div>
+      <h1 class="text-3xl font-black text-white mb-1">Oi! Eu sou a Yara! 🌿</h1>
+      <p class="text-emerald-300 font-semibold">Vou personalizar seu inglês. Responde 5 perguntinhas!</p>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="flex gap-2 mb-8 px-2">
+      <div id="bar-1" class="h-2 rounded-full flex-1 bg-emerald-500 transition-all"></div>
+      <div id="bar-2" class="h-2 rounded-full flex-1 bg-white/20 transition-all"></div>
+      <div id="bar-3" class="h-2 rounded-full flex-1 bg-white/20 transition-all"></div>
+      <div id="bar-4" class="h-2 rounded-full flex-1 bg-white/20 transition-all"></div>
+      <div id="bar-5" class="h-2 rounded-full flex-1 bg-white/20 transition-all"></div>
+    </div>
+
+    <!-- Card container -->
+    <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/10">
+
+      <!-- STEP 1: English level -->
+      <div class="step active" id="step-1">
+        <div class="slide-in">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">📚</div>
+            <h2 class="text-xl font-black text-white">Qual é seu nível de inglês?</h2>
+            <p class="text-white/60 text-sm mt-1">Seja honesto! Isso nos ajuda a adaptar as aulas.</p>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <button class="option-card level-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="beginner">
+              <span class="text-2xl">🌱</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">Iniciante</div>
+                <div class="text-white/60 text-sm">Conheço poucas palavras em inglês</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card level-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="elementary">
+              <span class="text-2xl">🌿</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">Básico</div>
+                <div class="text-white/60 text-sm">Entendo frases simples do dia a dia</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card level-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="intermediate">
+              <span class="text-2xl">🌳</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">Intermediário</div>
+                <div class="text-white/60 text-sm">Consigo me comunicar em inglês</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card level-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="advanced">
+              <span class="text-2xl">🏆</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">Avançado</div>
+                <div class="text-white/60 text-sm">Leio, ouço e falo bem em inglês</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Goals (multi-select) -->
+      <div class="step" id="step-2">
+        <div class="slide-in">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">🎯</div>
+            <h2 class="text-xl font-black text-white">Por que você quer aprender inglês?</h2>
+            <p class="text-white/60 text-sm mt-1">Pode selecionar mais de um!</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="travel">
+              <div class="text-3xl mb-1">✈️</div>
+              <div class="font-bold text-white text-sm">Viagens</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="work">
+              <div class="text-3xl mb-1">💼</div>
+              <div class="font-bold text-white text-sm">Trabalho</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="entertainment">
+              <div class="text-3xl mb-1">🎬</div>
+              <div class="font-bold text-white text-sm">Séries & Filmes</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="games">
+              <div class="text-3xl mb-1">🎮</div>
+              <div class="font-bold text-white text-sm">Games</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="study">
+              <div class="text-3xl mb-1">📚</div>
+              <div class="font-bold text-white text-sm">Estudos / TOEFL</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card goal-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="family">
+              <div class="text-3xl mb-1">👨‍👩‍👧</div>
+              <div class="font-bold text-white text-sm">Família no Exterior</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Interests (multi-select) -->
+      <div class="step" id="step-3">
+        <div class="slide-in">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">❤️</div>
+            <h2 class="text-xl font-black text-white">O que você mais gosta?</h2>
+            <p class="text-white/60 text-sm mt-1">Yara vai usar seus hobbies nas aulas!</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="music">
+              <div class="text-3xl mb-1">🎵</div>
+              <div class="font-bold text-white text-sm">Música</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="sports">
+              <div class="text-3xl mb-1">⚽</div>
+              <div class="font-bold text-white text-sm">Esportes</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="food">
+              <div class="text-3xl mb-1">🍕</div>
+              <div class="font-bold text-white text-sm">Gastronomia</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="travel">
+              <div class="text-3xl mb-1">🌍</div>
+              <div class="font-bold text-white text-sm">Viagens</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="tech">
+              <div class="text-3xl mb-1">💻</div>
+              <div class="font-bold text-white text-sm">Tecnologia</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="art">
+              <div class="text-3xl mb-1">🎨</div>
+              <div class="font-bold text-white text-sm">Arte & Cultura</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="series">
+              <div class="text-3xl mb-1">📺</div>
+              <div class="font-bold text-white text-sm">Séries & TV</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+            <button class="option-card interest-btn bg-white/10 hover:bg-white/20 rounded-2xl p-4 text-center cursor-pointer w-full" data-value="games">
+              <div class="text-3xl mb-1">🎮</div>
+              <div class="font-bold text-white text-sm">Games</div>
+              <div class="check hidden w-5 h-5 rounded-full bg-emerald-500 items-center justify-center text-white text-xs font-black mx-auto mt-1">✓</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Specific interests (free text) -->
+      <div class="step" id="step-4-detail">
+        <div class="slide-in">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2" id="detail-emoji">✍️</div>
+            <h2 class="text-xl font-black text-white" id="detail-title">Conta mais sobre o que você gosta!</h2>
+            <p class="text-white/60 text-sm mt-1" id="detail-subtitle">Quanto mais detalhes, mais personalizada fica a sua experiência!</p>
+          </div>
+          <div>
+            <textarea id="interests-detail-input"
+              maxlength="200"
+              placeholder="Ex: BTS, Harry Potter, Flamengo, Studio Ghibli, Call of Duty..."
+              class="w-full bg-white/10 border-2 border-white/20 focus:border-emerald-400 rounded-2xl px-5 py-4 text-white placeholder-white/40 font-semibold resize-none transition-all focus:outline-none leading-relaxed"
+              rows="4"
+              oninput="document.getElementById('detail-count').textContent = this.value.length + '/200'"
+            ></textarea>
+            <div class="flex justify-between items-center mt-2">
+              <p class="text-white/40 text-xs">Opcional — pode pular se preferir</p>
+              <p id="detail-count" class="text-white/40 text-xs">0/200</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Daily goal -->
+      <div class="step" id="step-5">
+        <div class="slide-in">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">⏱️</div>
+            <h2 class="text-xl font-black text-white">Quantos minutos por dia?</h2>
+            <p class="text-white/60 text-sm mt-1">Consistência é mais importante que quantidade!</p>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <button class="option-card time-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="5">
+              <span class="text-2xl">⚡</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">5 minutos — Corrido</div>
+                <div class="text-white/60 text-sm">Perfeito para dias muito ocupados</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card time-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="10">
+              <span class="text-2xl">🌿</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">10 minutos — Tranquilo</div>
+                <div class="text-white/60 text-sm">O ritmo ideal para maioria dos alunos</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card time-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="20">
+              <span class="text-2xl">🎯</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">20 minutos — Dedicado</div>
+                <div class="text-white/60 text-sm">Progresso acelerado e consistente</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+            <button class="option-card time-btn bg-white/10 hover:bg-white/20 rounded-2xl px-5 py-4 text-left flex items-center gap-4 cursor-pointer w-full" data-value="30">
+              <span class="text-2xl">🏆</span>
+              <div class="flex-1">
+                <div class="font-bold text-white">30+ minutos — Intensivo</div>
+                <div class="text-white/60 text-sm">Para quem quer fluência rápida!</div>
+              </div>
+              <div class="check hidden w-6 h-6 rounded-full bg-emerald-500 items-center justify-center text-white text-sm font-black">✓</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="flex gap-3 mt-8">
+        <button id="btn-back" onclick="prevStep()" class="hidden flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3.5 rounded-2xl transition-all active:scale-95">
+          ← Voltar
+        </button>
+        <button id="btn-next" onclick="nextStep()" disabled
+                class="flex-1 bg-emerald-500 hover:bg-emerald-400 disabled:bg-white/20 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-2xl transition-all active:scale-95">
+          Próximo →
+        </button>
+        <button id="btn-save" onclick="saveProfile()" class="hidden flex-1 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-white font-black py-3.5 rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-500/40">
+          Começar! 🌿
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Step counter -->
+    <p id="step-label" class="text-center text-white/40 text-sm mt-4 font-semibold">Passo 1 de 5</p>
+
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+const profile = {
+  level: null,
+  goals: [],
+  interests: [],
+  interestsDetail: '',
+  minutes: null
+};
+
+// ── Single-select: level ──────────────────────────────────────
+document.querySelectorAll('.level-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    profile.level = btn.dataset.value;
+    document.getElementById('btn-next').disabled = false;
+  });
+});
+
+// ── Multi-select: goals ───────────────────────────────────────
+document.querySelectorAll('.goal-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('selected');
+    const v = btn.dataset.value;
+    if (btn.classList.contains('selected')) {
+      if (!profile.goals.includes(v)) profile.goals.push(v);
+    } else {
+      profile.goals = profile.goals.filter(g => g !== v);
+    }
+    document.getElementById('btn-next').disabled = profile.goals.length === 0;
+  });
+});
+
+// ── Multi-select: interests ───────────────────────────────────
+document.querySelectorAll('.interest-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('selected');
+    const v = btn.dataset.value;
+    if (btn.classList.contains('selected')) {
+      if (!profile.interests.includes(v)) profile.interests.push(v);
+    } else {
+      profile.interests = profile.interests.filter(i => i !== v);
+    }
+    document.getElementById('btn-next').disabled = profile.interests.length === 0;
+  });
+});
+
+// ── Single-select: time ───────────────────────────────────────
+document.querySelectorAll('.time-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    profile.minutes = parseInt(btn.dataset.value);
+    document.getElementById('btn-save').disabled = false;
+  });
+});
+
+// ── Personalise step 4 subtitle based on interests ────────────
+function updateDetailStep() {
+  const map = {
+    music:  { emoji: '🎵', title: 'Que tipo de música você gosta?', sub: 'Conta seus artistas, bandas ou gêneros favoritos!' },
+    sports: { emoji: '⚽', title: 'Que esportes você acompanha?',   sub: 'Seus times, modalidades ou atletas favoritos!' },
+    series: { emoji: '📺', title: 'Que séries ou filmes você curte?', sub: 'Gêneros, títulos, atores favoritos!' },
+    games:  { emoji: '🎮', title: 'Que games você joga?',           sub: 'Plataformas, gêneros ou títulos favoritos!' },
+    tech:   { emoji: '💻', title: 'Que área de tecnologia te interessa?', sub: 'Programação, IA, gadgets, jogos...' },
+    travel: { emoji: '🌍', title: 'Para onde você quer viajar?',    sub: 'Países, cidades ou experiências dos seus sonhos!' },
+    food:   { emoji: '🍕', title: 'Que culinárias ou pratos você adora?', sub: 'Restaurantes, cozinhas do mundo, receitas...' },
+    art:    { emoji: '🎨', title: 'Que tipo de arte ou cultura você aprecia?', sub: 'Artistas, movimentos, museus, cinema...' },
+  };
+  // Pick first interest that has a specific question
+  const match = profile.interests.find(i => map[i]);
+  const cfg = match ? map[match] : { emoji: '✍️', title: 'Conta mais sobre o que você gosta!', sub: 'Quanto mais detalhes, mais personalizada fica a Yara!' };
+  document.getElementById('detail-emoji').textContent = cfg.emoji;
+  document.getElementById('detail-title').textContent = cfg.title;
+  document.getElementById('detail-subtitle').textContent = cfg.sub;
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+function showStep(n) {
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === n);
+  });
+
+  // Progress bars
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById('bar-' + i).className =
+      'h-2 rounded-full flex-1 transition-all ' + (i <= n ? 'bg-emerald-500' : 'bg-white/20');
+  }
+
+  document.getElementById('step-label').textContent = `Passo ${n} de ${totalSteps}`;
+  document.getElementById('btn-back').classList.toggle('hidden', n === 1);
+
+  const isLast = n === totalSteps;
+  document.getElementById('btn-next').classList.toggle('hidden', isLast);
+  document.getElementById('btn-save').classList.toggle('hidden', !isLast);
+
+  // Reset button states per step
+  const nextBtn = document.getElementById('btn-next');
+  if (n === 1) nextBtn.disabled = !profile.level;
+  else if (n === 2) nextBtn.disabled = profile.goals.length === 0;
+  else if (n === 3) nextBtn.disabled = profile.interests.length === 0;
+  else nextBtn.disabled = false; // step 4 (detail) is optional — always enabled
+
+  const saveBtn = document.getElementById('btn-save');
+  saveBtn.disabled = !profile.minutes;
+
+  // Update the specific interests prompt when entering step 4
+  if (n === 4) updateDetailStep();
+}
+
+function nextStep() {
+  // Capture detail text when leaving step 4
+  if (currentStep === 4) {
+    profile.interestsDetail = (document.getElementById('interests-detail-input').value || '').trim();
+  }
+  if (currentStep < totalSteps) {
+    currentStep++;
+    showStep(currentStep);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
+
+// ── Save profile ───────────────────────────────────────────────
+async function saveProfile() {
+  // Capture detail text if still on last step
+  profile.interestsDetail = (document.getElementById('interests-detail-input').value || '').trim();
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    const session = Auth.getSession();
+    if (!session || session.id === 'guest') {
+      localStorage.setItem('capyPlacementDone', '1');
+      window.location.href = '6_Home_Forest_Expedition.html';
+      return;
+    }
+
+    await Auth.saveProfile(session.id, {
+      english_level: profile.level,
+      goals: profile.goals,
+      interests: profile.interests,
+      interests_detail: profile.interestsDetail || null,
+      daily_goal_minutes: profile.minutes,
+      onboarding_complete: true
+    });
+
+    // Update Store locally
+    if (window.Store) {
+      Store.state.englishLevel = profile.level;
+      Store.state.goals = profile.goals;
+      Store.state.interests = profile.interests;
+      Store.state.dailyGoalMinutes = profile.minutes;
+      Store.state.onboardingComplete = true;
+      Store.save();
+    }
+
+    // Mark placement as done so learn.html doesn't redirect to test
+    localStorage.setItem('capyPlacementDone', '1');
+
+    // Success animation
+    btn.textContent = '✓ Pronto! Bem-vinda à floresta!';
+    btn.className = btn.className.replace('from-emerald-500 to-teal-400', 'from-green-500 to-emerald-400');
+
+    setTimeout(() => {
+      window.location.href = '6_Home_Forest_Expedition.html';
+    }, 1000);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Começar! 🌿';
+    alert('Erro ao salvar. Tente novamente.');
+  }
+}
+
+// Initialize
+showStep(1);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 5 — To Tell, Work, Feel & Leave | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">✉️</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">💼</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">❤️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🚪</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">😊</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_04.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_06.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">✉️ Aula 5 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">To Tell, Work,<br><span class="text-emerald-300">Feel & Leave</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Verbos para contar histórias, falar sobre trabalho, expressar emoções e despedidas — essenciais para conversas reais!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Verbos e adjetivos de sentimentos. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Frases para contar, sentir e se despedir.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">TELL, WORK, FEEL & LEAVE — usos e estruturas.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Verbos de Comunicação e Emoção</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm font-black">
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">TELL ✉️</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">WORK 💼</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">FEEL ❤️</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">LEAVE 🚪</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>✉️ TELL — Contar / Dizer para alguém</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>tell</strong> | He/She/It <strong>tells</strong></p>
+            <p>✅ <strong>Tell me more!</strong> → Me conta mais!</p>
+            <p>✅ <strong>She tells great stories.</strong> → Ela conta ótimas histórias.</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs">💡 TELL sempre precisa de um objeto (pessoa): <em>tell ME, tell HIM, tell the truth</em></p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>💼 WORK — Trabalhar / Funcionar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>work</strong> | He/She/It <strong>works</strong></p>
+            <p>✅ <strong>She works from home.</strong> → Ela trabalha de casa.</p>
+            <p>✅ <strong>This plan works perfectly.</strong> → Esse plano funciona perfeitamente.</p>
+            <p>✅ <strong>Hard work pays off.</strong> → Trabalho duro compensa.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>❤️ FEEL — Sentir / Se sentir</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>feel</strong> | He/She/It <strong>feels</strong></p>
+            <p>✅ <strong>How do you feel?</strong> → Como você está se sentindo?</p>
+            <p>✅ <strong>I feel like pizza tonight!</strong> → Estou com vontade de pizza hoje!</p>
+            <p>✅ <strong>She feels confident now.</strong> → Ela se sente confiante agora.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🚪 LEAVE — Sair / Deixar / Ir embora</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>leave</strong> | He/She/It <strong>leaves</strong></p>
+            <p>✅ <strong>Leave it to me!</strong> → Deixa comigo!</p>
+            <p>✅ <strong>I leave work at 6pm.</strong> → Saio do trabalho às 18h.</p>
+            <p>✅ <strong>Don't leave me!</strong> → Não me deixe!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">📚 Sala de Estudos de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">📚 Sala de Estudos de Nano Banana. Leo se sente nervoso antes do primeiro teste e Yara o apoia com palavras e histórias.</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, how do you <strong class="text-emerald-700">feel</strong> today? You <strong class="text-emerald-700">left</strong> early yesterday.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">feel</strong> nervous. Can I <strong class="text-emerald-700">tell</strong> you something? I'm scared to <strong class="text-emerald-700">work</strong> hard and still fail.</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm"><strong class="text-emerald-700">Tell me</strong> everything! That <strong class="text-emerald-700">feeling</strong> is normal. Let me <strong class="text-emerald-700">tell</strong> you a story...</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Please! I need to hear it. I don't want to <strong class="text-emerald-700">leave</strong> this course — I <strong class="text-emerald-700">feel</strong> like it's working!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">It IS <strong class="text-emerald-700">working</strong>! Every student who <strong class="text-emerald-700">feels</strong> nervous at first is the one who succeeds later. Don't <strong class="text-emerald-700">leave</strong>. <strong class="text-emerald-700">Leave</strong> it to me — we <strong class="text-emerald-700">work</strong> through this together! 💪</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Thank you, Yara. I <strong class="text-emerald-700">feel</strong> so much better! I'm going to <strong class="text-emerald-700">tell</strong> myself every day: "<strong class="text-emerald-700">Work hard</strong> and it will pay off!" 🌟</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Tell, Work, Feel & Leave.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 5 — To Tell, Work, Feel & Leave</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras.</p></div></div><div id="wo5-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Verbs</h3><p class="text-slate-500 text-sm mt-1">Conecte o verbo ao significado.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp5-left" class="space-y-2"></div><div id="mp5-right" class="space-y-2"></div></div><p id="mp5-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro.</p></div></div><div class="space-y-4" id="err5-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>tell / tells / feel / works / leave</strong>.</p></div></div><div class="space-y-4" id="fill5-container"></div><button onclick="checkFill5()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre como você se sente no trabalho/estudo usando TELL, WORK, FEEL e LEAVE.</p></div></div><textarea rows="6" placeholder="I feel... when I work... I tell myself... I leave... She feels... He works..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework5()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-5" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">💼</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['tell','contar / dizer para'],['work','trabalhar / funcionar'],['feel','sentir / se sentir'],['leave','sair / deixar / ir embora'],['inform','informar'],['report','reportar / relatar'],['describe','descrever'],['operate','operar / funcionar'],['labor','trabalhar arduamente'],['effort','esforço'],['tired','cansado'],['excited','animado / empolgado'],['happy','feliz / contente'],['sad','triste'],['angry','bravo / irritado'],['nervous','nervoso / ansioso'],['calm','calmo / tranquilo'],['bored','entediado'],['afraid','com medo / assustado'],['proud','orgulhoso'],['surprised','surpreso'],['relieved','aliviado'],['confident','confiante'],['anxious','ansioso'],['lonely','solitário'],['worried','preocupado'],['grateful','grato'],['hopeful','esperançoso'],['motivated','motivado'],['inspired','inspirado'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"Tell me more!",meaning:'Me conta mais!',example:'"I had an amazing experience in London!" — "Tell me more! I want to hear everything!"',use:"Pedir para alguém continuar contando uma história ou dar mais detalhes."},{phrase:"How do you feel?",meaning:'Como você está se sentindo?',example:'"How do you feel about your English progress? Are you happy with it?"',use:"Perguntar sobre o estado emocional ou opinião de alguém."},{phrase:"I feel like...",meaning:'Tenho vontade de... / Parece que...',example:'"I feel like going for a walk. Do you want to come?"',use:"Expressar vontade (+ -ing) ou uma impressão subjetiva sobre algo."},{phrase:"Leave it to me!",meaning:'Deixa comigo! / Eu me encarrego!',example:'"Who\'s going to organize the party?" — "Leave it to me! I love planning!"',use:'Assumir responsabilidade por algo com confiança.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'TELL vs SAY: qual está correto?',opts:['Tell me the truth.','Say me the truth.','Tell to me the truth.','Say the truth to me always.'],ans:0},
+  {q:'Complete: "She ___ from home every Tuesday and Thursday."',opts:['works','work','feels','leaves'],ans:0},
+  {q:'Complete: "How do you ___ about starting a new language?"',opts:['feel','tell','work','leave'],ans:0},
+  {q:'Complete: "Leave it to ___! I will organize everything."',opts:['me','I','my','mine'],ans:0},
+  {q:'Complete: "I ___ like going to the beach today — the weather is perfect."',opts:['feel','tell','work','leave'],ans:0},
+  {q:'Complete: "He ___ great stories — everyone loves listening to him."',opts:['tells','says','works','feels'],ans:0},
+  {q:'Complete: "She ___ work at 5pm and goes straight to the gym."',opts:['leaves','leave','feels','tells'],ans:0},
+  {q:'Qual adjetivo de emoção está correto?',opts:['I feel confident.','I feel confidently.','I am feel confident.','I feeling confident.'],ans:0},
+  {q:'Complete: "This study method really ___ — I see results every week!"',opts:['works','work','feels','tells'],ans:0},
+  {q:'Complete: "___ me more about your trip — it sounds incredible!"',opts:['Tell','Say','Work','Feel'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["Tell me more about yourself — I feel like we have a lot in common!","She works really hard every day, but she always leaves the office with a smile.","I feel like this English course is really working — tell me you feel it too!","Leave it to me — I'll tell everyone about the plan and make sure it works.","How do you feel when you leave your comfort zone and speak English out loud?","He tells amazing stories and works so well under pressure — I feel inspired by him.","I feel nervous sometimes, but I tell myself it's okay and it always works out.","Leave your fears behind — work hard, feel confident, and tell the world who you are!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO5_DATA=[
+  {s:'I feel nervous but I tell myself to work hard and leave the fear behind',w:['I','feel','nervous','but','I','tell','myself','to','work','hard','and','leave','the','fear','behind']},
+  {s:'She tells great stories and feels happy when she leaves people inspired',w:['She','tells','great','stories','and','feels','happy','when','she','leaves','people','inspired']},
+  {s:'Leave it to me — I feel confident and this method works perfectly',w:['Leave','it','to','me','—','I','feel','confident','and','this','method','works','perfectly']},
+];
+function hwShuffle5(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo5=WO5_DATA.map(d=>({ans:[],bank:hwShuffle5(d.w),orig:d.w}));
+function wo5Render(){const c=document.getElementById('wo5-container');c.innerHTML='';WO5_DATA.forEach((d,si)=>{const st=wo5[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo5-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo5Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo5-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo5Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo5Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo5Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo5-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo5Move(fromBank,si,wi){const st=wo5[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo5Render();}
+function wo5Check(si){const st=wo5[si];const fb=document.getElementById('wo5-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO5_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again!`;fb.classList.remove('hidden');}
+function wo5Reset(si){wo5[si].bank=hwShuffle5(WO5_DATA[si].orig);wo5[si].ans=[];document.getElementById('wo5-fb-'+si).classList.add('hidden');wo5Render();}
+wo5Render();
+const MP5=[{l:'TELL ✉️',r:'Contar / Dizer para alguém'},{l:'WORK 💼',r:'Trabalhar / Funcionar'},{l:'FEEL ❤️',r:'Sentir / Se sentir'},{l:'LEAVE 🚪',r:'Sair / Deixar / Ir embora'},];
+function mpShuffle5(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp5R=mpShuffle5(MP5.map((p,i)=>({label:p.r,pid:i})));
+let mp5SelL=null;const mp5Done=new Set();
+function mp5Render(){document.getElementById('mp5-left').innerHTML=MP5.map((p,i)=>`<button onclick="mp5ClickL(${i})" id="mp5L-${i}" class="mp-btn w-full ${mp5Done.has(i)?'matched':''}" ${mp5Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp5-right').innerHTML=mp5R.map((p,i)=>`<button onclick="mp5ClickR(${i})" id="mp5R-${i}" class="mp-btn w-full ${mp5Done.has(p.pid)?'matched':''}" ${mp5Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp5ClickL(i){if(mp5Done.has(i))return;mp5SelL=i;document.querySelectorAll('#mp5-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp5Done.has(j)));}
+function mp5ClickR(ri){if(mp5SelL===null)return;const item=mp5R[ri];if(item.pid===mp5SelL){mp5Done.add(mp5SelL);mp5SelL=null;mp5Render();if(mp5Done.size===MP5.length)document.getElementById('mp5-done-msg').classList.remove('hidden');}else{[document.getElementById('mp5R-'+ri),document.getElementById('mp5L-'+mp5SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp5SelL=null;document.querySelectorAll('#mp5-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp5Render();
+const ERR5=[{wrong:'"She says me the truth — I feel reliedly and I leave the meeting happy."',check:v=>v.includes('tells me')&&v.includes('relieved'),hint:'says me → tells me (TELL + person / SAY + something); reliedly → relieved (adjective, not adverb)'},{wrong:'"I feel like go to the beach — leave it for me to organize."',check:v=>v.includes('feel like going')&&v.includes('leave it to me'),hint:'feel like go → feel like going (-ING after "feel like"); leave it for me → leave it to me'},{wrong:'"He works hardly but feels tired and leaves office early."',check:v=>v.includes('works hard')&&v.includes('feels tired')&&(v.includes('leaves the office')||v.includes('leaves work')),hint:'works hardly → works hard (hard is already an adverb); leaves office → leaves the office'},];
+const ec=document.getElementById('err5-container');
+ERR5.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err5-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr5(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err5-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr5(i){const v=document.getElementById('err5-inp-'+i).value.toLowerCase().replace(/[?.!,—]/g,'').trim();const fb=document.getElementById('err5-fb-'+i);fb.className='text-xs font-bold '+(ERR5[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR5[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR5[i].hint;fb.classList.remove('hidden');}
+const FILL5=[{before:'I',blank:'feel',after:'so motivated every time I complete a new lesson!',ans:'feel'},{before:'She',blank:'tells',after:'the best stories — everyone sits and listens in silence.',ans:'tells'},{before:'He',blank:'works',after:'from home and loves the flexibility it gives him.',ans:'works'},{before:'Leave it to',blank:'me',after:'— I\'ll organize everything and make sure it goes well.',ans:'me'},{before:'She',blank:'leaves',after:'work at 6pm and goes straight to her English class.',ans:'leaves'},];
+const fc=document.getElementById('fill5-container');
+FILL5.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill5-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill5(){FILL5.forEach((f,i)=>{const inp=document.getElementById('fill5-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework5(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework5()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_06.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 06 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework5=submitHomework5;
+</script>
+</body>
+</html>

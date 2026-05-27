@@ -1,19 +1,45 @@
 {
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/",           "destination": "/4_Login_Capy_Yara_Welcomes_You.html" }
+  "version": 2,
+  "builds": [
+    { "src": "api/index.js", "use": "@vercel/node" },
+    { "src": "*.html",       "use": "@vercel/static" },
+    { "src": "*.js",         "use": "@vercel/static", "config": { "exclude": ["api/**"] } },
+    { "src": "*.css",        "use": "@vercel/static" },
+    { "src": "*.png",        "use": "@vercel/static" },
+    { "src": "*.jpg",        "use": "@vercel/static" },
+    { "src": "*.mp4",        "use": "@vercel/static" },
+    { "src": "*.json",       "use": "@vercel/static", "config": { "exclude": ["vercel.json", "package.json"] } }
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(.*)\\.html",
       "headers": [
-        { "key": "Cache-Control",     "value": "no-store, no-cache, must-revalidate, proxy-revalidate, s-maxage=0" },
-        { "key": "Pragma",            "value": "no-cache" },
-        { "key": "Expires",           "value": "0" },
-        { "key": "Surrogate-Control", "value": "no-store" }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Pragma",        "value": "no-cache" },
+        { "key": "Expires",       "value": "0" }
+      ]
+    },
+    {
+      "source": "/components.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/components.js\\?v=:version",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.js\\?v=:version",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "^/$",       "dest": "/4_Login_Capy_Yara_Welcomes_You.html" }
   ]
 }

@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 8 — Past Simple: Irregular Verbs | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:130px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🔄</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🏛️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">📜</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">⚡</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🗝️</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_07.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_09.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🔄 Aula 8 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Past Simple:<br><span class="text-emerald-300">Irregular Verbs</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Verbos irregulares não seguem a regra do <strong>-ED</strong> — cada um tem sua própria forma no passado. São os mais usados do inglês!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Verbos irregulares: presente → passado. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões naturais com verbos irregulares.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Como usar verbos irregulares no passado.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-2 text-emerald-100">A Regra de Ouro</p>
+        <div class="space-y-2 text-sm font-black">
+          <div class="bg-white/20 rounded-xl px-4 py-2">✅ Afirmativa: <strong>sujeito + forma irregular</strong> → I went / She said</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">❌ Negativa: <strong>sujeito + didn't + verbo BASE</strong> → I didn't go</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">❓ Pergunta: <strong>Did + sujeito + verbo BASE?</strong> → Did she say?</div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔄 Por que são irregulares?</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">São os verbos mais antigos e mais usados do inglês — e cada um mudou de forma própria ao longo dos séculos!</p>
+            <p>Regular: <strong>walk → walked</strong> (apenas +ED)</p>
+            <p>Irregular: <strong>go → went</strong> (forma completamente diferente!)</p>
+            <p class="font-bold text-emerald-700">A boa notícia: são só ~150 verbos irregulares comuns — e você já usa vários no dia a dia!</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚡ Grupo 1: Mudança total (os mais comuns)</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">A forma muda completamente:</p>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+              <p>go → <strong>went</strong></p><p>say → <strong>said</strong></p>
+              <p>see → <strong>saw</strong></p><p>come → <strong>came</strong></p>
+              <p>think → <strong>thought</strong></p><p>give → <strong>gave</strong></p>
+              <p>make → <strong>made</strong></p><p>get → <strong>got</strong></p>
+              <p>find → <strong>found</strong></p><p>know → <strong>knew</strong></p>
+            </div>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔁 Grupo 2: Verbos que ficam iguais no passado</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Mesma forma no presente e no passado — atenção ao contexto!</p>
+            <p>put → <strong>put</strong> | cut → <strong>cut</strong> | hit → <strong>hit</strong></p>
+            <p>read → <strong>read</strong> (pronuncia-se diferente: "red"!) | let → <strong>let</strong></p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>❌ Negativa e pergunta: sempre verbo BASE!</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Com <strong>didn't</strong> e <strong>Did</strong>, sempre use o verbo no infinitivo — nunca a forma irregular!</p>
+            <p>✅ <strong>I didn't go</strong> (não: I didn't went)</p>
+            <p>✅ <strong>Did you see her?</strong> (não: Did you saw her?)</p>
+            <p>✅ <strong>He didn't know</strong> → Ele não sabia</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🏆 Top 10 irregulares mais usados</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Memorize estes primeiro!</p>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 font-bold">
+              <p>1. be → <span class="text-emerald-600">was/were</span></p>
+              <p>2. have → <span class="text-emerald-600">had</span></p>
+              <p>3. go → <span class="text-emerald-600">went</span></p>
+              <p>4. do → <span class="text-emerald-600">did</span></p>
+              <p>5. say → <span class="text-emerald-600">said</span></p>
+              <p>6. get → <span class="text-emerald-600">got</span></p>
+              <p>7. make → <span class="text-emerald-600">made</span></p>
+              <p>8. know → <span class="text-emerald-600">knew</span></p>
+              <p>9. think → <span class="text-emerald-600">thought</span></p>
+              <p>10. see → <span class="text-emerald-600">saw</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🏛️ Museu de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🏛️ Museu de Nano Banana. Leo e Yara visitam o museu histórico da ilha e encontram artefatos do passado!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo! Did you <strong class="text-emerald-700">know</strong> this museum has artifacts from ancient Nano Banana? Look at this — someone <strong class="text-emerald-700">made</strong> this over 500 years ago!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Wow! I <strong class="text-emerald-700">had</strong> no idea! I <strong class="text-emerald-700">came</strong> here thinking it was a small place, but it's huge! How did you <strong class="text-emerald-700">find</strong> out about it?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">A local <strong class="text-emerald-700">told</strong> me! They <strong class="text-emerald-700">said</strong> the first settlers <strong class="text-emerald-700">built</strong> everything by hand — no machines. They <strong class="text-emerald-700">knew</strong> exactly what they <strong class="text-emerald-700">were</strong> doing.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">That's incredible. I <strong class="text-emerald-700">saw</strong> a painting over there — it <strong class="text-emerald-700">showed</strong> capybaras and humans together. They really <strong class="text-emerald-700">got</strong> along well!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Always! And <strong class="text-emerald-700">did you know</strong> that the first capybara here <strong class="text-emerald-700">taught</strong> the settlers to swim? She <strong class="text-emerald-700">went</strong> into the river and everyone <strong class="text-emerald-700">followed</strong>!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">didn't know</strong> that! I <strong class="text-emerald-700">thought</strong> capybaras were always just friendly, but they <strong class="text-emerald-700">were</strong> teachers too! Just like you, Yara! 🌟</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Past Simple com verbos irregulares.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 8 — Past Simple: Irregular Verbs</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras para formar frases no Past Simple.</p></div></div><div id="wo8-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match: Present → Past</h3><p class="text-slate-500 text-sm mt-1">Conecte o verbo à sua forma irregular no passado.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp8-left" class="space-y-2"></div><div id="mp8-right" class="space-y-2"></div></div><p id="mp8-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro com verbos irregulares.</p></div></div><div class="space-y-4" id="err8-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Use a forma irregular correta dos verbos.</p></div></div><div class="space-y-4" id="fill8-container"></div><button onclick="checkFill8()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre algo que aconteceu com você recentemente. Use pelo menos 5 verbos irregulares diferentes!</p></div></div><textarea rows="6" placeholder="Last week I went... I had... I saw... I got... I made..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework8()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-8" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">🔄</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['go → went','ir → foi/fui'],['do → did','fazer → fez/fiz'],['say → said','dizer → disse'],['see → saw','ver → viu/vi'],['come → came','vir → veio/vim'],['think → thought','pensar → pensou'],['give → gave','dar → deu/dei'],['tell → told','contar → contou'],['have → had','ter → teve/tive'],['know → knew','saber/conhecer → sabia'],['take → took','pegar/levar → pegou'],['make → made','fazer → fez/fiz'],['get → got','conseguir/ficar → conseguiu'],['find → found','encontrar → encontrou'],['put → put','colocar → colocou'],['bring → brought','trazer → trouxe'],['buy → bought','comprar → comprou'],['teach → taught','ensinar → ensinou'],['catch → caught','pegar/pegar → pegou'],['run → ran','correr → correu'],['begin → began','começar → começou'],['speak → spoke','falar → falou'],['write → wrote','escrever → escreveu'],['read → read','ler → leu'],['leave → left','deixar/sair → saiu'],['feel → felt','sentir → sentiu'],['build → built','construir → construiu'],['lose → lost','perder → perdeu'],['win → won','ganhar → ganhou'],['send → sent','enviar → enviou'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-xs">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"Did you know that...?",meaning:'Você sabia que...? / Você sabia disso?',example:'"Did you know that English has over 1,000 irregular verbs? Don\'t worry — you only need about 100!"',use:'Compartilhar uma informação interessante ou surpreendente.'},{phrase:"It went really well!",meaning:'Foi muito bem! / Correu muito bem!',example:'"How was your presentation? — It went really well! I spoke clearly and everyone understood me."',use:'Reportar um evento passado positivo usando o irregular WENT.'},{phrase:"I had no idea!",meaning:'Eu não tinha ideia! / Não sabia disso!',example:'"You knew how to fix computers all along? I had no idea! Why didn\'t you say anything?"',use:'Expressar surpresa genuína ao descobrir algo novo.'},{phrase:"That was incredible!",meaning:'Isso foi incrível! / Foi fantástico!',example:'"We saw the sunrise from the mountain — that was incredible! I\'ve never felt so alive."',use:'Expressar entusiasmo sobre uma experiência passada.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'Past Simple de GO:',opts:['went','goed','gone','going'],ans:0},
+  {q:'Past Simple de THINK:',opts:['thought','thinked','thinkt','thunk'],ans:0},
+  {q:'Past Simple de BUY:',opts:['bought','buyed','boughted','buyd'],ans:0},
+  {q:'Qual frase está CORRETA?',opts:['She said she was tired.','She said she were tired.','She sayed she was tired.','She says she was tired.'],ans:0},
+  {q:'Negativa correta de GO no passado:',opts:["I didn't go","I didn't went","I not went","I don't go"],ans:0},
+  {q:'Pergunta correta com SEE no passado:',opts:['Did you see it?','Did you saw it?','Do you saw it?','You seen it?'],ans:0},
+  {q:'Complete: "She ___ (teach) me everything I know about English!"',opts:['taught','teached','teaches','teaching'],ans:0},
+  {q:'Complete: "I ___ (not / know) the answer, so I looked it up."',opts:["didn't know","didn't knew","don't know","not knew"],ans:0},
+  {q:'Qual verbo irregular está INCORRETO?',opts:['thinked','went','said','had'],ans:0},
+  {q:'"Did you know that...?" é usado para:',opts:['Compartilhar algo surpreendente','Fazer uma pergunta direta','Pedir ajuda','Expressar tristeza'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["Last week I went to the market, bought fresh fruit, and made a delicious smoothie — it went really well!","Did you know that the ancient settlers built everything by hand? They had no machines at all!","She thought she was lost, but then she found the museum and everything made sense again.","I told my friend what happened and she said it was the most incredible story she had ever heard.","He ran to catch the bus but it had already left — he didn't say anything, he just laughed.","I had no idea she could speak five languages! She taught herself from books and never went to school for it.","We saw something amazing last night — the sky went orange and purple at the same time. That was incredible!","She wrote a letter, sent it by hand, and waited three weeks for a reply — back when people did that!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO8_DATA=[
+  {s:"I went to the museum and saw something incredible that made me think",w:['I','went','to','the','museum','and','saw','something','incredible','that','made','me','think']},
+  {s:"She didn't know the answer but she found it in five minutes",w:["She","didn't","know","the","answer","but","she","found","it","in","five","minutes"]},
+  {s:"Did you get my message? I sent it last night and thought you saw it",w:["Did","you","get","my","message?","I","sent","it","last","night","and","thought","you","saw","it"]},
+];
+function hwShuffle8(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo8=WO8_DATA.map(d=>({ans:[],bank:hwShuffle8(d.w),orig:d.w}));
+function wo8Render(){const c=document.getElementById('wo8-container');c.innerHTML='';WO8_DATA.forEach((d,si)=>{const st=wo8[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo8-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo8Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo8-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo8Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo8Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo8Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo8-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo8Move(fromBank,si,wi){const st=wo8[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo8Render();}
+function wo8Check(si){const st=wo8[si];const fb=document.getElementById('wo8-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO8_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again!`;fb.classList.remove('hidden');}
+function wo8Reset(si){wo8[si].bank=hwShuffle8(WO8_DATA[si].orig);wo8[si].ans=[];document.getElementById('wo8-fb-'+si).classList.add('hidden');wo8Render();}
+wo8Render();
+const MP8=[{l:'go →',r:'went'},{l:'think →',r:'thought'},{l:'buy →',r:'bought'},{l:'teach →',r:'taught'},{l:'find →',r:'found'},{l:'write →',r:'wrote'},];
+function mpShuffle8(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp8R=mpShuffle8(MP8.map((p,i)=>({label:p.r,pid:i})));
+let mp8SelL=null;const mp8Done=new Set();
+function mp8Render(){document.getElementById('mp8-left').innerHTML=MP8.map((p,i)=>`<button onclick="mp8ClickL(${i})" id="mp8L-${i}" class="mp-btn w-full ${mp8Done.has(i)?'matched':''}" ${mp8Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp8-right').innerHTML=mp8R.map((p,i)=>`<button onclick="mp8ClickR(${i})" id="mp8R-${i}" class="mp-btn w-full ${mp8Done.has(p.pid)?'matched':''}" ${mp8Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp8ClickL(i){if(mp8Done.has(i))return;mp8SelL=i;document.querySelectorAll('#mp8-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp8Done.has(j)));}
+function mp8ClickR(ri){if(mp8SelL===null)return;const item=mp8R[ri];if(item.pid===mp8SelL){mp8Done.add(mp8SelL);mp8SelL=null;mp8Render();if(mp8Done.size===MP8.length)document.getElementById('mp8-done-msg').classList.remove('hidden');}else{[document.getElementById('mp8R-'+ri),document.getElementById('mp8L-'+mp8SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp8SelL=null;document.querySelectorAll('#mp8-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp8Render();
+const ERR8=[{wrong:'"I goed to the store and buyed some food — it was a great day!"',check:v=>v.includes('went')&&v.includes('bought'),hint:'goed → went (go é irregular); buyed → bought (buy é irregular)'},{wrong:'"Did you went to the party? I thinked you were there!"',check:v=>v.includes('did you go')&&v.includes('thought'),hint:'did you went → did you go (com DID, use o verbo BASE); thinked → thought (think é irregular)'},{wrong:'"She sended the email and then leaved the office early."',check:v=>v.includes('sent')&&v.includes('left'),hint:'sended → sent (send é irregular); leaved → left (leave é irregular)'},];
+const ec=document.getElementById('err8-container');
+ERR8.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err8-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr8(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err8-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr8(i){const v=document.getElementById('err8-inp-'+i).value.toLowerCase().replace(/[?.!,—']/g,'').trim();const fb=document.getElementById('err8-fb-'+i);fb.className='text-xs font-bold '+(ERR8[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR8[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR8[i].hint;fb.classList.remove('hidden');}
+const FILL8=[{before:'Last night I',blank:'went',after:'to the cinema and saw an amazing movie. (go)',ans:'went'},{before:'She',blank:'taught',after:'herself English in just one year — incredible! (teach)',ans:'taught'},{before:'I',blank:"didn't know",after:'the answer so I asked Yara for help. (not / know)',ans:"didn't know"},{before:'Did you',blank:'find',after:'your keys? I saw them on the table earlier. (find)',ans:'find'},{before:'He',blank:'won',after:'the competition and everyone was so happy for him. (win)',ans:'won'},];
+const fc=document.getElementById('fill8-container');
+FILL8.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill8-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill8(){FILL8.forEach((f,i)=>{const inp=document.getElementById('fill8-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework8(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework8()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_09.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 09 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework8=submitHomework8;
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 3 — To Get, Make, Know & Take | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🧠</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🔬</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">💡</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🏗️</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">⚡</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_02.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_04.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🧠 Aula 3 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">To Get, Make,<br><span class="text-emerald-300">Know & Take</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">4 verbos super versáteis — cada um tem dezenas de usos no inglês. Dominá-los vai transformar sua fluência!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Verbos versáteis e suas variações. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões nativas com GET, MAKE, KNOW e TAKE.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">GET, MAKE, KNOW & TAKE — os usos mais importantes.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Verbos Super Versáteis</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm font-black">
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">GET 📦</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">MAKE 🏗️</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">KNOW 🧠</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">TAKE ⚡</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📦 GET — Pegar / Receber / Ficar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>get</strong> | He/She/It <strong>gets</strong></p>
+            <p>✅ <strong>I get the bus at 8am.</strong> → Pego o ônibus às 8h.</p>
+            <p>✅ <strong>She gets tired easily.</strong> → Ela fica cansada facilmente.</p>
+            <p>✅ <strong>Get ready!</strong> → Se prepare! / Vamos!</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs">💡 GET + adjective = become: <em>get tired / get excited / get better</em></p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🏗️ MAKE — Fazer / Criar / Causar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>make</strong> | He/She/It <strong>makes</strong></p>
+            <p>✅ <strong>I make coffee every morning.</strong> → Faço café toda manhã.</p>
+            <p>✅ <strong>She makes mistakes but learns fast.</strong> → Ela erra mas aprende rápido.</p>
+            <p>✅ <strong>Make yourself at home!</strong> → Fique à vontade!</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs">💡 MAKE vs DO: MAKE = criar algo. DO = realizar uma atividade.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🧠 KNOW — Saber / Conhecer</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>know</strong> | He/She/It <strong>knows</strong></p>
+            <p>✅ <strong>I know how to cook.</strong> → Sei cozinhar.</p>
+            <p>✅ <strong>Do you know her?</strong> → Você a conhece?</p>
+            <p>✅ <strong>I know, right?</strong> → Eu sei, né?</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚡ TAKE — Pegar / Levar / Precisar de tempo</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>take</strong> | He/She/It <strong>takes</strong></p>
+            <p>✅ <strong>It takes time to learn a language.</strong> → Leva tempo aprender um idioma.</p>
+            <p>✅ <strong>Take a photo!</strong> → Tire uma foto!</p>
+            <p>✅ <strong>She takes the train to work.</strong> → Ela vai de trem para o trabalho.</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🔬 Laboratório de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🔬 Laboratório de Nano Banana. Yara mostra seu laboratório mágico para Leo e ensina sobre esses 4 verbos poderosos.</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Welcome to my lab, Leo! Do you <strong class="text-emerald-700">know</strong> what we <strong class="text-emerald-700">make</strong> here?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I have no idea! I <strong class="text-emerald-700">know</strong> it looks amazing though. What does it <strong class="text-emerald-700">take</strong> to work here?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">It <strong class="text-emerald-700">takes</strong> curiosity and practice! We <strong class="text-emerald-700">make</strong> language potions here. <strong class="text-emerald-700">Get ready</strong> — your first lesson starts now!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">A language potion! Can I <strong class="text-emerald-700">take</strong> one? What does it <strong class="text-emerald-700">make</strong> me feel?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">It <strong class="text-emerald-700">makes</strong> you feel confident! You <strong class="text-emerald-700">get</strong> excited to speak. You <strong class="text-emerald-700">know</strong> what? I think you're ready!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">get</strong> it! It <strong class="text-emerald-700">takes</strong> courage to speak, but you <strong class="text-emerald-700">make</strong> it easy, Yara. I <strong class="text-emerald-700">know</strong> I can do this! 🧪✨</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Get, Make, Know & Take.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 3 — To Get, Make, Know & Take</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras.</p></div></div><div id="wo3-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Verbs</h3><p class="text-slate-500 text-sm mt-1">Conecte o verbo ao uso principal.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp3-left" class="space-y-2"></div><div id="mp3-right" class="space-y-2"></div></div><p id="mp3-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro.</p></div></div><div class="space-y-4" id="err3-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>get / gets / make / know / takes</strong>.</p></div></div><div class="space-y-4" id="fill3-container"></div><button onclick="checkFill3()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre o que você sabe fazer (KNOW), o que você faz (MAKE), o que você pega (GET) e o que leva tempo (TAKE).</p></div></div><textarea rows="6" placeholder="I know how to... It takes me... I make... I get excited when... She takes..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework3()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-3" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">🧪</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['get','pegar / receber / ficar'],['make','fazer / criar / causar'],['know','saber / conhecer'],['take','pegar / levar / demorar'],['create','criar'],['produce','produzir'],['build','construir / montar'],['understand','entender / compreender'],['realize','perceber / realizar'],['recognize','reconhecer'],['receive','receber'],['obtain','obter / conseguir'],['grab','pegar / agarrar'],['pick up','pegar / buscar'],['bring','trazer'],['carry','carregar'],['try','tentar / experimentar'],['start','começar / iniciar'],['finish','terminar / acabar'],['decide','decidir'],['choose','escolher'],['learn','aprender'],['teach','ensinar'],['help','ajudar'],['ask','perguntar / pedir'],['answer','responder'],['explain','explicar'],['describe','descrever'],['discover','descobrir'],['achieve','alcançar / conquistar'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"Make yourself at home!",meaning:'Fique à vontade!',example:'"Welcome to my place! Make yourself at home — the kitchen is all yours!"',use:'Convidar alguém a se sentir confortável em um espaço.'},{phrase:"I know, right?",meaning:'Eu sei, né? / Exatamente!',example:'"English is so fun when you practice with songs!" — "I know, right?"',use:'Concordar com entusiasmo com algo que foi dito.'},{phrase:"It takes time.",meaning:'Leva tempo.',example:'"I want to be fluent tomorrow!" — "It takes time, but you\'re on the right track!"',use:'Explicar que algo exige paciência e dedicação.'},{phrase:"Get ready!",meaning:'Se prepare! / Vamos!',example:'"Get ready — your English adventure starts now!"',use:'Avisar que algo vai começar ou pedir para se preparar.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'Complete: "It ___ courage to speak English in public!"',opts:['takes','makes','gets','knows'],ans:0},
+  {q:'Complete: "She ___ amazing food — everyone loves her cooking."',opts:['makes','gets','takes','knows'],ans:0},
+  {q:'Complete: "Do you ___ how to play the guitar?"',opts:['know','get','make','take'],ans:0},
+  {q:'Complete: "I ___ excited when I learn something new!"',opts:['get','make','take','know'],ans:0},
+  {q:'GET + adjective: qual exemplo está CORRETO?',opts:['get tired','get a coffee','get the bus','get homework'],ans:0},
+  {q:'MAKE vs DO: qual é correto?',opts:['make a mistake','do a mistake','make homework','do a cake'],ans:0},
+  {q:'Complete: "She ___ the train to work every morning."',opts:['takes','gets','makes','knows'],ans:0},
+  {q:'Complete: "I know, ___? This song is incredible!"',opts:['right','true','yes','so'],ans:0},
+  {q:'Complete: "He ___ five languages — he is truly amazing."',opts:['knows','makes','gets','takes'],ans:0},
+  {q:'Qual expressão significa "Fique à vontade"?',opts:['Make yourself at home.','Get yourself at home.','Take yourself home.','Know your home.'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["I know how to cook basic meals, but I want to make more complex dishes.","It takes time to get fluent, but if you make the effort, you'll get there!","Make yourself at home — I know you're going to love this place.","She gets nervous before exams, but she knows everything — she always does great.","Get ready! We're going to take a photo in front of the waterfall.","I know this is difficult, but it takes patience — you'll get better every day.","He makes his own bread and he knows the best recipe in Nano Banana.","I don't know yet, but I'm going to take a chance and speak — here we go!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO3_DATA=[
+  {s:'It takes a lot of effort to make your dreams come true',w:['It','takes','a','lot','of','effort','to','make','your','dreams','come','true']},
+  {s:'She knows how to get excited about learning new things',w:['She','knows','how','to','get','excited','about','learning','new','things']},
+  {s:'Make yourself at home and take your time to get comfortable',w:['Make','yourself','at','home','and','take','your','time','to','get','comfortable']},
+];
+function hwShuffle3(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo3=WO3_DATA.map(d=>({ans:[],bank:hwShuffle3(d.w),orig:d.w}));
+function wo3Render(){const c=document.getElementById('wo3-container');c.innerHTML='';WO3_DATA.forEach((d,si)=>{const st=wo3[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo3-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo3Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo3-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo3Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo3Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo3Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo3-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo3Move(fromBank,si,wi){const st=wo3[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo3Render();}
+function wo3Check(si){const st=wo3[si];const fb=document.getElementById('wo3-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO3_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again! (${WO3_DATA[si].s})`;fb.classList.remove('hidden');}
+function wo3Reset(si){wo3[si].bank=hwShuffle3(WO3_DATA[si].orig);wo3[si].ans=[];document.getElementById('wo3-fb-'+si).classList.add('hidden');wo3Render();}
+wo3Render();
+const MP3=[{l:'GET 📦',r:'Receber / Ficar (+ adj)'},{l:'MAKE 🏗️',r:'Criar / Produzir algo'},{l:'KNOW 🧠',r:'Saber / Ter conhecimento'},{l:'TAKE ⚡',r:'Pegar / Demorar / Precisar'},];
+function mpShuffle3(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp3R=mpShuffle3(MP3.map((p,i)=>({label:p.r,pid:i})));
+let mp3SelL=null;const mp3Done=new Set();
+function mp3Render(){document.getElementById('mp3-left').innerHTML=MP3.map((p,i)=>`<button onclick="mp3ClickL(${i})" id="mp3L-${i}" class="mp-btn w-full ${mp3Done.has(i)?'matched':''}" ${mp3Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp3-right').innerHTML=mp3R.map((p,i)=>`<button onclick="mp3ClickR(${i})" id="mp3R-${i}" class="mp-btn w-full ${mp3Done.has(p.pid)?'matched':''}" ${mp3Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp3ClickL(i){if(mp3Done.has(i))return;mp3SelL=i;document.querySelectorAll('#mp3-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp3Done.has(j)));}
+function mp3ClickR(ri){if(mp3SelL===null)return;const item=mp3R[ri];if(item.pid===mp3SelL){mp3Done.add(mp3SelL);mp3SelL=null;mp3Render();if(mp3Done.size===MP3.length)document.getElementById('mp3-done-msg').classList.remove('hidden');}else{[document.getElementById('mp3R-'+ri),document.getElementById('mp3L-'+mp3SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp3SelL=null;document.querySelectorAll('#mp3-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp3Render();
+const ERR3=[{wrong:'"She makes a lot of mistakes but she gets over it — she knows what takes."',check:v=>v.includes('gets over')&&v.includes('takes time')||v.includes('what it takes'),hint:'takes → it takes / what takes → what it takes'},{wrong:'"I know how make a cake — it takes only 30 minutes."',check:v=>v.includes('how to make'),hint:'how make → how to make (know how TO + verb base)'},{wrong:'"He gets nervous but makes his best — he knows take risks."',check:v=>v.includes('does his best')&&v.includes('to take'),hint:'makes his best → does his best / knows take → knows how to take / to take risks'},];
+const ec=document.getElementById('err3-container');
+ERR3.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err3-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr3(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err3-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr3(i){const v=document.getElementById('err3-inp-'+i).value.toLowerCase().replace(/[?.!,]/g,'').trim();const fb=document.getElementById('err3-fb-'+i);fb.className='text-xs font-bold '+(ERR3[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR3[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR3[i].hint;fb.classList.remove('hidden');}
+const FILL3=[{before:'I',blank:'know',after:'how to speak three languages — it takes years of practice!',ans:'know'},{before:'She',blank:'makes',after:'the best cookies in the neighborhood — everyone loves them.',ans:'makes'},{before:'Learning English',blank:'takes',after:'time, but you get better every single day.',ans:'takes'},{before:'I',blank:'get',after:'excited when I understand a whole conversation in English!',ans:'get'},{before:'He',blank:'gets',after:'nervous before speaking, but he always does great in the end.',ans:'gets'},];
+const fc=document.getElementById('fill3-container');
+FILL3.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill3-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill3(){FILL3.forEach((f,i)=>{const inp=document.getElementById('fill3-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework3(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework3()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_04.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 04 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework3=submitHomework3;
+</script>
+</body>
+</html>

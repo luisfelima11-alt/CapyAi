@@ -1,0 +1,326 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 38 — 1st Conditional | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🎲</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">⚡</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🌧️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🏆</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🎯</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_37.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_39.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🎲 Aula 38 · Advanced Grammar</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">1st<br><span class="text-emerald-300">Conditional</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Se isso acontecer, aquilo vai acontecer — aprenda a falar sobre situações reais e possíveis no futuro com o 1st Conditional!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Vocabulário do 1st Conditional. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões com condicionais no inglês real.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">A estrutura do 1st Conditional — situações reais e possíveis.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">The 1st Conditional Formula</p>
+        <div class="bg-white/20 rounded-2xl px-5 py-4 text-center mb-3">
+          <p class="text-xl font-black">IF + Present Simple → WILL + base verb</p>
+        </div>
+        <div class="space-y-2 text-sm font-black">
+          <div class="bg-white/20 rounded-xl px-4 py-2">✅ <strong>If it rains</strong>, I will stay home.</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">✅ I will stay home <strong>if it rains</strong>. (comma only before IF)</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">❌ If it will rain, I stay home. (WRONG — no will in IF clause)</div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6" id="grammar-acc"></div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🏟️ Estádio de Nano Banana — o jogo depende do tempo!</p></div>
+      <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 space-y-4 mb-6" id="dialogue-box"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Dialogue studied! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice</h2><p class="text-slate-500 text-sm">Teste seu conhecimento do 1st Conditional!</p></div>
+      <div id="quiz-area" class="space-y-6 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4">
+        <p class="text-2xl font-black text-emerald-700 mb-1" id="quiz-score-text"></p>
+        <p class="text-slate-500 text-sm">Keep practising!</p>
+      </div>
+      <button onclick="submitQuiz()" id="quiz-submit-btn" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">Check Answers +50 XP</button>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Pratique o 1st Conditional em voz alta!</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I practised speaking! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📋 Homework</h2><p class="text-slate-500 text-sm">Complete todas as tarefas para ganhar +75 XP!</p></div>
+      <div class="space-y-8">
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">1. Word Order</p>
+          <p class="text-slate-500 text-sm mb-4">Arrange the words to form correct 1st Conditional sentences.</p>
+          <div class="space-y-5" id="wo38-container"></div>
+        </div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">2. Match the Pairs</p>
+          <p class="text-slate-500 text-sm mb-4">Connect each IF clause to its correct result clause.</p>
+          <div class="grid grid-cols-2 gap-3" id="mp38-area"></div>
+          <p class="text-xs text-slate-400 mt-3 font-bold" id="mp38-feedback"></p>
+        </div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">3. Error Correction</p>
+          <p class="text-slate-500 text-sm mb-4">Find and fix the 1st Conditional mistake in each sentence.</p>
+          <div class="space-y-4" id="err38-container"></div>
+        </div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-1">4. Fill in the Blank</p>
+          <p class="text-slate-500 text-sm mb-3">Complete with the correct verb form.</p>
+          <div class="space-y-4" id="fill38-container"></div>
+          <button onclick="checkFill38()" class="mt-4 bg-emerald-500 text-white font-black px-6 py-2 rounded-xl hover:scale-105 transition-all text-sm">Check ✓</button>
+        </div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <p class="font-black text-navy mb-2">5. Free Writing ✍️</p>
+          <p class="text-slate-500 text-sm mb-3">Write 4 real 1st Conditional sentences about your own life. Use IF + Present Simple → WILL. Think about your plans, goals, and everyday situations.</p>
+          <textarea id="hw38-free" rows="5" placeholder="e.g. If I study hard, I will pass the exam. If it doesn't rain tomorrow, I will go to the park..." class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400"></textarea>
+        </div>
+      </div>
+      <button onclick="submitHomework38()" class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">Submit Homework +75 XP 🎉</button>
+      <div id="hw38-done" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <p class="text-emerald-700 font-black text-lg">🎉 Homework complete! +75 XP earned!</p>
+        <p class="text-slate-500 text-sm mt-1">If you keep practising, you will master English!</p>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+const VOCAB38=[
+  {w:'condition',t:'condição'},{w:'result',t:'resultado'},
+  {w:'unless',t:'a menos que / se não'},{w:'possibility',t:'possibilidade'},
+  {w:'chance',t:'chance / oportunidade'},{w:'likely',t:'provável'},
+  {w:'possible',t:'possível'},{w:'happen',t:'acontecer'},
+  {w:'situation',t:'situação'},{w:'weather',t:'tempo (clima)'},
+  {w:'plan',t:'plano'},{w:'depend',t:'depender'},
+  {w:'decision',t:'decisão'},{w:'succeed',t:'ter sucesso / conseguir'},
+  {w:'fail',t:'falhar / não conseguir'},{w:'miss',t:'perder / sentir falta'},
+  {w:'catch',t:'pegar / alcançar'},{w:'arrive',t:'chegar'},
+  {w:'leave',t:'sair / partir'},{w:'win',t:'ganhar / vencer'},
+  {w:'lose',t:'perder'},{w:'invite',t:'convidar'},
+  {w:'prepare',t:'preparar'},{w:'remind',t:'lembrar (alguém)'},
+  {w:'cancel',t:'cancelar'},{w:'postpone',t:'adiar'},
+  {w:'schedule',t:'agendar / cronograma'},{w:'assume',t:'supor / assumir'},
+  {w:'predict',t:'prever / predizer'},{w:'expect',t:'esperar / prever'}
+];
+
+const EXPRESSIONS38=[
+  {expr:"If it ain't broke, don't fix it.",mean:"Em time que está ganhando não se mexe.",ex:"The app is working fine — if it ain't broke, don't fix it!",tip:"Expressão informal americana. 'Ain't' = isn't/aren't. Usada para dizer: não mude o que já funciona."},
+  {expr:"Cross that bridge when you come to it.",mean:"Resolver o problema quando chegar a hora.",ex:"I'll worry about the exam results later — I'll cross that bridge when I come to it.",tip:"Não se preocupe antecipadamente. Enfrente os problemas quando eles chegarem."},
+  {expr:"Just in case",mean:"Por precaução / caso aconteça",ex:"Take an umbrella just in case it rains.",tip:"'Just in case' implica uma condição possível mas não certa. Muito usado no dia a dia."},
+  {expr:"If all goes well",mean:"Se tudo correr bem",ex:"If all goes well, we will finish the project by Friday.",tip:"Expressão otimista para planos futuros. Alternativas: 'fingers crossed', 'hopefully'."}
+];
+
+const GRAMMAR_ACC38=[
+  {icon:'📐',title:'Full Structure',body:'<b>IF clause</b> (condition) + <b>Main clause</b> (result)<br><br>IF + Present Simple, WILL + base verb<br>OR<br>WILL + base verb + IF + Present Simple<br><br>✅ "If you <b>study</b>, you <b>will pass</b>."<br>✅ "You <b>will pass</b> if you <b>study</b>." (no comma needed when IF is in the middle)'},
+  {icon:'🚫',title:'UNLESS = IF ... NOT',body:'<b>UNLESS</b> means "if not" — it introduces a negative condition.<br><br>✅ "I will go <b>unless</b> it rains." = "I will go <b>if it doesn\'t rain</b>."<br>✅ "<b>Unless</b> you hurry, you will miss the bus."<br>❌ Do NOT use "unless...not": "Unless you don\'t hurry" is WRONG.'},
+  {icon:'❓',title:'Questions with Will',body:'To form questions in the 1st Conditional, invert will and the subject in the main clause:<br><br>"<b>Will</b> you come if I invite you?"<br>"What <b>will</b> you do if it rains?"<br>"<b>Will</b> she help us if we ask her?"'},
+  {icon:'🔮',title:'1st vs 2nd Conditional',body:'<b>1st Conditional</b> = REAL / POSSIBLE situation (could actually happen):<br>"If it <b>rains</b> tomorrow, I <b>will</b> cancel." (possible!)<br><br><b>2nd Conditional</b> = UNREAL / HYPOTHETICAL (unlikely or impossible):<br>"If I <b>were</b> a bird, I <b>would</b> fly." (not real)<br><br>Key signal: 1st uses PRESENT + WILL. 2nd uses PAST + WOULD.'}
+];
+
+const DIALOGUE38=[
+  {who:'Leo 🦁',msg:"Capy! Are you coming to the big football match at the stadium today?"},
+  {who:'Capy 🦫',msg:"I will come if the weather is good. Have you checked the forecast?"},
+  {who:'Leo 🦁',msg:"It says there's a 60% chance of rain. If it rains heavily, they will cancel the match."},
+  {who:'Capy 🦫',msg:"Oh no! If they cancel it, I will be really disappointed."},
+  {who:'Yara 🦦',msg:"Don't worry! If we leave early, we'll get good seats before the storm arrives."},
+  {who:'Leo 🦁',msg:"Good idea. And if we win today, Nano Banana will be champions!"},
+  {who:'Capy 🦫',msg:"Unless the other team plays perfectly — they're really good."},
+  {who:'Yara 🦦',msg:"True. But if our goalkeeper plays well, we will have a strong chance."},
+  {who:'Leo 🦁',msg:"I'll bring an umbrella just in case. If it starts raining, we'll use it."},
+  {who:'Capy 🦫',msg:"Perfect. If all goes well, this will be the best match of the year!"},
+  {who:'Yara 🦦',msg:"And if Nano Banana wins, I will buy everyone coconut ice cream!"}
+];
+
+const QUIZ38=[
+  {q:"Which sentence is correct 1st Conditional?",opts:["If it will rain, I stay home.","If it rains, I will stay home.","If it rained, I will stay home.","If it rains, I stay home."],ans:1},
+  {q:"Complete: 'If you ___ hard, you will succeed.'",opts:["worked","will work","work","working"],ans:2},
+  {q:"'Unless it rains' means:",opts:["If it rains","If it doesn't rain","Even though it rains","Because it rains"],ans:1},
+  {q:"Where does the comma go?",opts:["I will call you, if you are free.","If you are free I will call you.","If you are free, I will call you.","I will call you if, you are free."],ans:2},
+  {q:"'___ you study, you will fail the exam.'",opts:["If","Unless","Although","Because"],ans:1},
+  {q:"Which uses 1st Conditional correctly?",opts:["If I were rich, I would travel.","If she works hard, she will get promoted.","If they had known, they would have called.","If I am taller, I play basketball."],ans:1}
+];
+
+const SPEAK38=[
+  {ph:"If it rains, I will stay home.",pt:"Se chover, vou ficar em casa."},
+  {ph:"If you study hard, you will pass.",pt:"Se você estudar muito, vai passar."},
+  {ph:"I will come unless it rains.",pt:"Vou vir, a menos que chova."},
+  {ph:"What will you do if you miss the bus?",pt:"O que você vai fazer se perder o ônibus?"},
+  {ph:"If all goes well, we will win!",pt:"Se tudo correr bem, vamos ganhar!"},
+  {ph:"Take an umbrella just in case.",pt:"Leve um guarda-chuva por precaução."},
+  {ph:"If she calls, I will answer.",pt:"Se ela ligar, vou atender."},
+  {ph:"We will cancel if the weather is bad.",pt:"Vamos cancelar se o tempo estiver ruim."}
+];
+
+const wo38=[
+  {words:["If","it","rains","we","will","cancel","the","match"],ans:"If it rains we will cancel the match"},
+  {words:["You","will","miss","the","bus","unless","you","hurry"],ans:"You will miss the bus unless you hurry"},
+  {words:["If","she","studies","she","will","pass","the","exam"],ans:"If she studies she will pass the exam"},
+  {words:["What","will","you","do","if","you","fail"],ans:"What will you do if you fail"}
+];
+
+const mp38={
+  left:["If it rains,","If you hurry,","If she calls,","If we win,","If he studies,","Unless you try,"],
+  right:["I will answer.","you will catch the bus.","we will be champions!","you will never know.","I will stay home.","he will pass."],
+  pairs:{0:4,1:1,2:0,3:2,4:5,5:3}
+};
+
+const err38=[
+  {wrong:"If she will study hard, she will get a good grade.",hint:"Nunca use WILL na cláusula IF: 'will study' → 'studies'",check:s=>s.toLowerCase().includes('if she studies')},
+  {wrong:"Unless you don't hurry, you will miss the train.",hint:"UNLESS já é negativo. 'Unless you don't' = dupla negação. Use: 'Unless you hurry'",check:s=>s.toLowerCase().includes('unless you hurry')&&!s.toLowerCase().includes("don't")},
+  {wrong:"If it rains tomorrow, I stay home.",hint:"Na cláusula resultado, use WILL: 'I stay' → 'I will stay'",check:s=>s.toLowerCase().includes('i will stay')}
+];
+
+const fill38=[
+  {sent:"If you ___ (not study), you will fail.",ans:["don't study","do not study"]},
+  {sent:"___ it rains, we will cancel the picnic.",ans:["if"]},
+  {sent:"She will come ___ she has time.",ans:["if"]},
+  {sent:"I will help you ___ you ask me.",ans:["if"]},
+  {sent:"___ you hurry, you will miss the flight.",ans:["unless","if you don't hurry"]}
+];
+
+const sections=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+const done={};let quizAnswers={};
+let mp38State={selLeft:null,selRight:null,matched:new Set()};
+
+function renderDots(){const c=document.getElementById('hero-dots');c.innerHTML=sections.map(s=>`<div class="prog-dot${done[s]?' done':''}" title="${s}"></div>`).join('');document.getElementById('hero-label').textContent=`${Object.keys(done).length} / 7 sections done`;}
+function xpPop(xp){const el=document.createElement('div');el.className='xp-pop';el.textContent=`+${xp} XP!`;el.style.cssText=`top:${window.innerHeight/2}px;left:${window.innerWidth/2-30}px`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+function markSection(s){if(done[s])return;done[s]=true;Store.addXP(20);xpPop(20);renderDots();}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=btn.dataset.tab;document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));document.getElementById('tab-'+t).classList.remove('hidden');});});
+
+(function(){const g=document.getElementById('vocab-grid');VOCAB38.forEach(v=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front text-white font-black text-sm">${v.w}</div><div class="flip-back text-white font-bold text-xs">${v.t}</div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));g.appendChild(d);});})();
+(function(){const c=document.getElementById('expr-list');EXPRESSIONS38.forEach(e=>{c.innerHTML+=`<div class="expr-card bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left" onclick="this.closest('.expr-card').classList.toggle('open')"><div><span class="font-black text-navy">"${e.expr}"</span><span class="text-slate-500 text-sm ml-2">— ${e.mean}</span></div><span class="expr-chevron text-slate-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-1"><p class="text-sm text-slate-600 italic">"${e.ex}"</p><p class="text-xs text-emerald-600 font-bold mt-1">💡 ${e.tip}</p></div></div>`;});})();
+(function(){const c=document.getElementById('grammar-acc');GRAMMAR_ACC38.forEach(a=>{c.innerHTML+=`<div class="acc-item bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left font-black text-navy" onclick="this.closest('.acc-item').classList.toggle('open')"><span>${a.icon} ${a.title}</span><i class="acc-icon not-italic text-xl text-slate-400">+</i></button><div class="acc-body px-5 pb-4 text-sm text-slate-600 leading-relaxed">${a.body}</div></div>`;});})();
+(function(){const c=document.getElementById('dialogue-box');DIALOGUE38.forEach(l=>{const isLeo=l.who.startsWith('L');const isYara=l.who.startsWith('Y');const emoji=isLeo?'🦁':isYara?'🦦':'🦫';const left=isLeo||isYara;c.innerHTML+=`<div class="flex ${left?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${left?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${left?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
+(function(){const c=document.getElementById('quiz-area');QUIZ38.forEach((q,i)=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl p-5"><p class="font-black text-navy mb-3">${i+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,j)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-sm font-bold text-left text-slate-700" onclick="selectOpt(${i},${j},this)">${o}</button>`).join('')}</div></div>`;});})();
+
+function selectOpt(qi,oi,el){if(el.disabled)return;document.querySelectorAll(`#quiz-area > div:nth-child(${qi+1}) .opt-btn`).forEach(b=>b.classList.remove('selected'));el.classList.add('selected');quizAnswers[qi]=oi;}
+function submitQuiz(){let score=0;QUIZ38.forEach((q,i)=>{document.querySelectorAll(`#quiz-area > div:nth-child(${i+1}) .opt-btn`).forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(quizAnswers[i]===j)b.classList.add('wrong');});if(quizAnswers[i]===q.ans)score++;});document.getElementById('quiz-score-text').textContent=`You got ${score}/${QUIZ38.length} correct!`;document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-submit-btn').disabled=true;if(!done['practice']){done['practice']=true;Store.addXP(50);xpPop(50);renderDots();}}
+
+(function(){const c=document.getElementById('speak-list');SPEAK38.forEach(s=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 flex items-center justify-between gap-3"><div><p class="font-black text-navy">${s.ph}</p><p class="text-sm text-slate-500">${s.pt}</p></div><button onclick="speak('${s.ph.replace(/'/g,"\\'")}',this)" class="flex-shrink-0 bg-emerald-100 text-emerald-700 font-black text-xs px-3 py-2 rounded-xl hover:bg-emerald-200 transition-all">🔊 Listen</button></div>`;});})();
+function speak(text,btn){const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=0.9;window.speechSynthesis.speak(u);btn.textContent='🔊 Playing...';setTimeout(()=>btn.textContent='🔊 Listen',2000);}
+
+(function(){const c=document.getElementById('wo38-container');wo38.forEach((p,i)=>{const shuffled=[...p.words].sort(()=>Math.random()-.5);c.innerHTML+=`<div class="mb-2"><p class="text-xs font-black text-slate-400 uppercase mb-2">Sentence ${i+1}</p><div class="wo-ans mb-2" id="wo38-ans-${i}" onclick="wo38ReturnTile(event,${i})"></div><div class="wo-bank" id="wo38-bank-${i}">${shuffled.map(w=>`<span class="wo-tile" onclick="wo38MoveTile(this,${i})">${w}</span>`).join('')}</div><p class="text-xs mt-1 font-bold hidden" id="wo38-fb-${i}"></p></div>`;});})();
+function wo38MoveTile(el,i){document.getElementById('wo38-ans-'+i).appendChild(el);wo38Check(i);}
+function wo38ReturnTile(e,i){if(e.target.classList.contains('wo-tile')){document.getElementById('wo38-bank-'+i).appendChild(e.target);wo38Check(i);}}
+function wo38Check(i){const tiles=[...document.getElementById('wo38-ans-'+i).querySelectorAll('.wo-tile')];const s=tiles.map(t=>t.textContent).join(' ');const fb=document.getElementById('wo38-fb-'+i);if(tiles.length===wo38[i].words.length){const ok=s.toLowerCase()===wo38[i].ans.toLowerCase();fb.classList.remove('hidden');fb.textContent=ok?'✅ Correct!':'❌ Not quite — try again!';fb.className=`text-xs mt-1 font-bold ${ok?'text-emerald-600':'text-red-500'}`;}else fb.classList.add('hidden');}
+
+(function(){
+  const c=document.getElementById('mp38-area');
+  const rightItems=mp38.right.map((r,i)=>({text:r,origIdx:i})).sort(()=>Math.random()-.5);
+  c.innerHTML='<div class="space-y-2 col-span-1">'+mp38.left.map((l,i)=>`<button class="mp-btn w-full text-xs" id="mp38-L-${i}" onclick="mp38Sel('L',${i})">${l}</button>`).join('')+'</div>'+
+    '<div class="space-y-2 col-span-1">'+rightItems.map((r,i)=>`<button class="mp-btn w-full text-xs" id="mp38-R-${r.origIdx}" onclick="mp38Sel('R',${r.origIdx})">${r.text}</button>`).join('')+'</div>';
+})();
+function mp38Sel(side,idx){if(mp38State.matched.has(side+idx))return;const btn=document.getElementById(`mp38-${side}-${idx}`);if(side==='L'){if(mp38State.selLeft!==null)document.getElementById(`mp38-L-${mp38State.selLeft}`)?.classList.remove('selected');mp38State.selLeft=idx;btn.classList.add('selected');}else{if(mp38State.selRight!==null)document.getElementById(`mp38-R-${mp38State.selRight}`)?.classList.remove('selected');mp38State.selRight=idx;btn.classList.add('selected');}if(mp38State.selLeft!==null&&mp38State.selRight!==null){const lI=mp38State.selLeft,rI=mp38State.selRight;const ok=mp38.pairs[lI]===rI;const lb=document.getElementById(`mp38-L-${lI}`),rb=document.getElementById(`mp38-R-${rI}`);if(ok){lb.classList.add('matched');rb.classList.add('matched');lb.disabled=true;rb.disabled=true;mp38State.matched.add('L'+lI);mp38State.matched.add('R'+rI);if(mp38State.matched.size===mp38.left.length*2)document.getElementById('mp38-feedback').textContent='🎉 All matched!';}else{lb.classList.add('wrong-flash');rb.classList.add('wrong-flash');setTimeout(()=>{lb.classList.remove('wrong-flash','selected');rb.classList.remove('wrong-flash','selected');},700);}mp38State.selLeft=null;mp38State.selRight=null;lb.classList.remove('selected');rb.classList.remove('selected');}}
+
+(function(){const c=document.getElementById('err38-container');err38.forEach((e,i)=>{c.innerHTML+=`<div class="space-y-2"><p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2">❌ ${e.wrong}</p><input type="text" placeholder="Write the corrected sentence..." class="fill-inp w-full" id="err38-inp-${i}" style="width:100%;text-align:left"/><p class="text-xs text-slate-400 font-bold">💡 Hint: ${e.hint}</p><button onclick="checkErr38(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button><p class="text-xs font-bold hidden" id="err38-fb-${i}"></p></div>`;});})();
+function checkErr38(i){const inp=document.getElementById(`err38-inp-${i}`);const fb=document.getElementById(`err38-fb-${i}`);const ok=err38[i].check(inp.value);inp.className=`fill-inp w-full ${ok?'ok':'err'}`;fb.classList.remove('hidden');fb.textContent=ok?'✅ Correct!':'❌ Check the hint and try again!';fb.className=`text-xs font-bold ${ok?'text-emerald-600':'text-red-500'}`;}
+
+(function(){const c=document.getElementById('fill38-container');fill38.forEach((f,i)=>{const parts=f.sent.split('___');c.innerHTML+=`<div class="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-700"><span>${parts[0]}</span><input type="text" class="fill-inp" id="fill38-${i}" style="width:140px"/><span>${parts[1]||''}</span></div>`;});})();
+function checkFill38(){fill38.forEach((f,i)=>{const inp=document.getElementById(`fill38-${i}`);const ok=f.ans.some(a=>inp.value.trim().toLowerCase()===a.toLowerCase());inp.className=`fill-inp ${ok?'ok':'err'}`;});}
+
+function submitHomework38(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework38()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_39.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 39 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+renderDots();
+</script>
+</body>
+</html>

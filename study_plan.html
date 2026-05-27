@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Meu Plano de Estudos | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease both}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0)}}
+.glow{animation:pulse-glow 2s ease-in-out infinite}
+.activity-aula{border-left:4px solid #10b981;background:linear-gradient(135deg,#f0fdf4,#ecfdf5)}
+.activity-youtube{border-left:4px solid #ef4444;background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+.activity-music{border-left:4px solid #a855f7;background:linear-gradient(135deg,#faf5ff,#f3e8ff)}
+.activity-review{border-left:4px solid #f59e0b;background:linear-gradient(135deg,#fffbeb,#fef3c7)}
+.activity-serie{border-left:4px solid #3b82f6;background:linear-gradient(135deg,#eff6ff,#dbeafe)}
+.day-card{transition:all .2s}
+.day-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-indigo-950 to-violet-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl" style="top:10%;left:5%">📅</span>
+      <span class="absolute text-5xl" style="top:60%;right:8%">🌿</span>
+      <span class="absolute text-6xl" style="top:20%;right:25%">✨</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">📅 Cronograma Personalizado</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">Seu Plano<br><span class="text-indigo-300">de Estudos</span></h1>
+      <p class="text-white/70 max-w-lg">A Yara cria um cronograma semanal perfeito para você — baseado nos seus interesses, nível e tempo disponível.</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- Profile summary + generate button -->
+    <div id="profile-summary" class="bg-white rounded-2xl border-2 border-slate-100 p-6 mb-6 fade-in">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="font-black text-navy text-lg mb-1">Pronto para montar sua semana?</h2>
+          <p id="profile-desc" class="text-slate-500 text-sm">Carregando seu perfil...</p>
+        </div>
+        <button id="generate-btn" onclick="generatePlan()"
+                class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-black px-8 py-3.5 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm text-base glow">
+          ✨ Gerar Meu Plano
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="plan-loading" class="hidden text-center py-16">
+      <div class="text-5xl mb-4 animate-bounce">🌿</div>
+      <p class="font-black text-slate-600 text-xl mb-2">Yara está montando seu plano...</p>
+      <p class="text-slate-400 text-sm">Isso leva alguns segundos</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="plan-error" class="hidden bg-red-50 border-2 border-red-100 rounded-2xl p-6 text-center">
+      <div class="text-4xl mb-3">😅</div>
+      <p class="font-black text-red-700 mb-2">Não consegui gerar o plano</p>
+      <p id="error-msg" class="text-red-500 text-sm mb-4"></p>
+      <button onclick="generatePlan()" class="bg-red-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all">Tentar novamente</button>
+    </div>
+
+    <!-- Weekly plan grid -->
+    <div id="plan-container" class="hidden fade-in"></div>
+
+    <!-- Legend -->
+    <div id="plan-legend" class="hidden mt-6 bg-white rounded-2xl border-2 border-slate-100 p-5">
+      <p class="font-black text-navy text-sm mb-3">Legenda</p>
+      <div class="flex flex-wrap gap-3 text-xs font-bold">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>Aula</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>YouTube Lab</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-purple-500 inline-block"></span>Music Lab</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>Revisão</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>Série/Filme</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="auth.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('studyplan'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('studyplan'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('studyplan'));
+
+// ── Profile Loading ───────────────────────────────────────────────────────────
+let userProfile = null;
+
+async function loadProfile() {
+  const descEl = document.getElementById('profile-desc');
+  try {
+    const session = JSON.parse(localStorage.getItem('capySession') || '{}');
+    const userId = session?.id;
+    if (!userId || userId === 'guest') {
+      descEl.textContent = 'Faça login para gerar um plano personalizado!';
+      return;
+    }
+    const res = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`);
+    const p = await res.json();
+    userProfile = p;
+    if (p) {
+      const level = p.english_level || 'beginner';
+      const mins = p.daily_goal_minutes || 10;
+      const interests = (p.interests || []).join(', ') || 'diversos';
+      descEl.textContent = `Nível: ${level} · Meta: ${mins} min/dia · Interesses: ${interests}`;
+    } else {
+      descEl.textContent = 'Complete o onboarding para um plano totalmente personalizado!';
+    }
+  } catch(e) {
+    descEl.textContent = 'Não foi possível carregar seu perfil.';
+  }
+}
+
+// ── Generate Plan ─────────────────────────────────────────────────────────────
+async function generatePlan() {
+  const loading = document.getElementById('plan-loading');
+  const container = document.getElementById('plan-container');
+  const errorEl = document.getElementById('plan-error');
+  const legend = document.getElementById('plan-legend');
+  const btn = document.getElementById('generate-btn');
+
+  loading.classList.remove('hidden');
+  container.classList.add('hidden');
+  errorEl.classList.add('hidden');
+  legend.classList.add('hidden');
+  btn.disabled = true;
+
+  try {
+    const session = JSON.parse(localStorage.getItem('capySession') || '{}');
+    const userId = session?.id || 'guest';
+    const state = typeof Store !== 'undefined' ? Store.state : {};
+    const currentLesson = state.currentLesson || 1;
+    const p = userProfile || {};
+
+    const res = await fetch('/api/study-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        currentLesson,
+        dailyGoalMinutes: p.daily_goal_minutes || 10,
+        interests: p.interests || [],
+        level: p.english_level || 'beginner'
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (!data.weeklyPlan) throw new Error('Plano inválido recebido.');
+
+    renderPlan(data);
+  } catch(err) {
+    loading.classList.add('hidden');
+    errorEl.classList.remove('hidden');
+    document.getElementById('error-msg').textContent = err.message || 'Tente novamente.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Render Plan ───────────────────────────────────────────────────────────────
+function renderPlan(data) {
+  const loading = document.getElementById('plan-loading');
+  const container = document.getElementById('plan-container');
+  const legend = document.getElementById('plan-legend');
+
+  loading.classList.add('hidden');
+
+  const typeColor = { aula: 'emerald', youtube: 'red', music: 'purple', review: 'amber', serie: 'blue' };
+  const typeLabel = { aula: 'Aula', youtube: 'YouTube Lab', music: 'Music Lab', review: 'Revisão', serie: 'Série' };
+
+  const weekHtml = (data.weeklyPlan || []).map(day => {
+    const acts = (day.activities || []).map(act => {
+      const color = typeColor[act.type] || 'slate';
+      const label = typeLabel[act.type] || act.type;
+      const linkEl = act.link
+        ? `<a href="${act.link}" class="mt-3 inline-flex items-center gap-1 bg-${color}-500 text-white text-xs font-black px-4 py-1.5 rounded-full hover:scale-105 transition-all">
+             Abrir →
+           </a>`
+        : '';
+      return `
+        <div class="activity-${act.type || 'aula'} rounded-xl p-4">
+          <div class="flex items-start justify-between gap-2 mb-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">${act.icon || '📖'}</span>
+              <span class="text-xs font-black text-slate-400 uppercase tracking-widest">${label}</span>
+            </div>
+            <span class="text-xs font-bold text-slate-400 whitespace-nowrap">⏱ ${act.duration || '?'} min</span>
+          </div>
+          <p class="font-black text-navy text-sm">${act.title || ''}</p>
+          ${act.description ? `<p class="text-slate-500 text-xs mt-1">${act.description}</p>` : ''}
+          ${linkEl}
+        </div>`;
+    }).join('');
+
+    const totalMins = (day.activities || []).reduce((s, a) => s + (a.duration || 0), 0);
+    const isRest = day.isRestDay;
+
+    return `
+      <div class="day-card bg-white rounded-2xl border-2 ${isRest ? 'border-slate-100' : 'border-indigo-100'} overflow-hidden">
+        <div class="px-5 py-4 ${isRest ? 'bg-slate-50' : 'bg-indigo-50'} border-b ${isRest ? 'border-slate-100' : 'border-indigo-100'} flex items-center justify-between">
+          <div>
+            <p class="font-black ${isRest ? 'text-slate-500' : 'text-indigo-700'} text-base">${day.day || ''}</p>
+            ${isRest ? '<p class="text-slate-400 text-xs">Dia de descanso leve</p>' : ''}
+          </div>
+          ${!isRest ? `<span class="text-xs font-bold text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full">${totalMins} min</span>` : ''}
+        </div>
+        <div class="p-4 space-y-3">
+          ${acts || '<p class="text-slate-400 text-sm text-center py-4">Descanso — recarregue as energias! 🌿</p>'}
+        </div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="mb-6 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-2xl p-5 text-white">
+      <p class="font-black text-lg mb-1">🎯 Meta da Semana</p>
+      <p class="text-white/85 text-sm">${data.weeklyGoal || 'Pratique todos os dias e evolua com a Yara!'}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      ${weekHtml}
+    </div>
+    <div class="mt-6 text-center">
+      <button onclick="generatePlan()" class="text-slate-400 hover:text-indigo-500 text-sm font-bold transition-colors">
+        🔄 Gerar novo plano
+      </button>
+    </div>`;
+
+  container.classList.remove('hidden');
+  legend.classList.remove('hidden');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadProfile();
+</script>
+</body>
+</html>

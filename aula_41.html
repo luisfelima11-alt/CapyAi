@@ -1,0 +1,550 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 41 — Relative Clauses | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🔗</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">📚</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🔍</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">📖</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🧠</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_40.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_42.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🔗 Aula 41 · Advanced Grammar</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Relative<br><span class="text-emerald-300">Clauses</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">WHO, WHICH, THAT, WHERE, WHOSE — aprenda a conectar ideias e descrever pessoas, coisas e lugares com precisão!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Termos de gramática e conceitos de cláusulas relativas. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões naturais com pronomes relativos.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Como usar WHO, WHICH, THAT, WHERE e WHOSE corretamente.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Relative Pronouns at a Glance</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-white/10 rounded-xl p-3 text-center"><p class="text-lg font-black">WHO</p><p class="text-emerald-100 text-sm">for people</p><p class="text-white/80 text-xs mt-1">The teacher <strong>who</strong> inspired me</p></div>
+          <div class="bg-white/10 rounded-xl p-3 text-center"><p class="text-lg font-black">WHICH</p><p class="text-emerald-100 text-sm">for things / animals</p><p class="text-white/80 text-xs mt-1">The book <strong>which</strong> I read</p></div>
+          <div class="bg-white/10 rounded-xl p-3 text-center"><p class="text-lg font-black">THAT</p><p class="text-emerald-100 text-sm">people or things (informal)</p><p class="text-white/80 text-xs mt-1">The movie <strong>that</strong> won the prize</p></div>
+          <div class="bg-white/10 rounded-xl p-3 text-center"><p class="text-lg font-black">WHERE</p><p class="text-emerald-100 text-sm">for places</p><p class="text-white/80 text-xs mt-1">The city <strong>where</strong> I was born</p></div>
+          <div class="bg-white/10 rounded-xl p-3 text-center sm:col-span-2"><p class="text-lg font-black">WHOSE</p><p class="text-emerald-100 text-sm">possession (of whom / of which)</p><p class="text-white/80 text-xs mt-1">The student <strong>whose</strong> essay won</p></div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6" id="acc-grammar"></div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2>
+        <p class="text-slate-500 text-sm">📚 Biblioteca de Nano Banana — Capy e Yara procuram livros e descrevem o que querem.</p>
+      </div>
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm space-y-4 mb-6" id="dialogue-lines"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Dialogue done! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">6 perguntas sobre cláusulas relativas. Escolha a resposta correta!</p></div>
+      <div class="space-y-6 mb-6" id="quiz-container"></div>
+      <div id="quiz-result" class="hidden"></div>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speaking Practice</h2><p class="text-slate-500 text-sm">Ouça e repita as frases com cláusulas relativas em voz alta!</p></div>
+      <div class="space-y-3 mb-6" id="speak-list"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Speaking done! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📋 Homework</h2><p class="text-slate-500 text-sm">Quatro exercícios para consolidar cláusulas relativas.</p></div>
+
+      <!-- Word Order -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">1. Word Order</h3>
+        <p class="text-slate-500 text-xs mb-3">Arranje as palavras para formar uma frase com cláusula relativa.</p>
+        <div id="wo41-bank" class="wo-bank mb-2"></div>
+        <p class="text-xs text-slate-400 mb-1">↓ Your sentence:</p>
+        <div id="wo41-ans" class="wo-ans mb-3"></div>
+        <button onclick="checkWO41()" class="bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition mr-2">Check ✓</button>
+        <button onclick="resetWO41()" class="bg-slate-100 text-slate-600 font-bold px-5 py-2 rounded-xl text-sm hover:bg-slate-200 transition">Reset</button>
+        <p id="wo41-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Match Pairs -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">2. Match the Pairs</h3>
+        <p class="text-slate-500 text-xs mb-3">Conecte cada início de frase à sua cláusula relativa correta.</p>
+        <div class="grid grid-cols-2 gap-3" id="mp41-grid"></div>
+        <p id="mp41-msg" class="mt-3 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Error Correction -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">3. Error Correction</h3>
+        <p class="text-slate-500 text-xs mb-3">Corrija os erros nas cláusulas relativas abaixo.</p>
+        <div class="space-y-3" id="err41-list"></div>
+        <button onclick="checkErr41()" class="mt-3 bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition">Check ✓</button>
+        <p id="err41-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Fill in the blank -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-6">
+        <h3 class="font-black text-navy mb-1">4. Fill in the Blank</h3>
+        <p class="text-slate-500 text-xs mb-3">Complete com WHO, WHICH, THAT, WHERE ou WHOSE.</p>
+        <div class="space-y-3" id="fill41-list"></div>
+        <button onclick="checkFill41()" class="mt-3 bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition">Check ✓</button>
+        <p id="fill41-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Free Writing -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-6">
+        <h3 class="font-black text-navy mb-1">5. Free Writing ✍️</h3>
+        <p class="text-slate-500 text-xs mb-3">Write 3 sentences about yourself or your city using relative clauses (who, which, where, whose).</p>
+        <textarea class="w-full border-2 border-emerald-100 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400 transition" rows="5" placeholder="Example: I have a friend who speaks five languages. The city where I live has amazing food..."></textarea>
+      </div>
+
+      <button onclick="submitHomework41()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm text-lg">🎉 Submit Homework +75 XP</button>
+    </div>
+
+  </div><!-- /max-w -->
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+// ── Progress dots ────────────────────────────────────────────────
+const SECTIONS = ['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+const done = {};
+const dotsEl = document.getElementById('hero-dots');
+const labelEl = document.getElementById('hero-label');
+SECTIONS.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'prog-dot'; d.id = 'dot-'+s;
+  dotsEl.appendChild(d);
+});
+function updateDots(){
+  const n = Object.keys(done).length;
+  SECTIONS.forEach(s => document.getElementById('dot-'+s).classList.toggle('done', !!done[s]));
+  labelEl.textContent = n + ' / 7 sections done';
+}
+function spawnXP(pts){
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = '+'+pts+' XP!';
+  el.style.cssText = 'left:50%;top:60%;transform:translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1300);
+}
+function markSection(s, pts=20){
+  if(done[s]) return;
+  done[s] = true;
+  Store.addXP(pts);
+  spawnXP(pts);
+  updateDots();
+}
+updateDots();
+
+// ── Tabs ─────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+// ── Vocabulary (30 words) ────────────────────────────────────────
+const VOCAB = [
+  ['clause','a group of words with subject + verb'],
+  ['relative','related to or describing something else'],
+  ['pronoun','a word replacing a noun (who, which, that)'],
+  ['define','to make the meaning of something specific'],
+  ['describe','to say what something is like'],
+  ['identify','to recognise and name something'],
+  ['refer','to mention or relate to'],
+  ['essential','necessary; cannot be removed'],
+  ['additional','extra; added information'],
+  ['comma','punctuation mark (,) used for extra info'],
+  ['information','facts or details about something'],
+  ['detail','a small but important fact'],
+  ['specify','to state something clearly and exactly'],
+  ['which','pronoun for things or animals'],
+  ['whose','pronoun showing possession'],
+  ['where','pronoun for places'],
+  ['when','pronoun for times'],
+  ['why','pronoun for reasons'],
+  ['person','a human being'],
+  ['thing','an object or abstract idea'],
+  ['place','a location or area'],
+  ['time','a moment or period'],
+  ['reason','the cause or explanation for something'],
+  ['example','an instance that illustrates a point'],
+  ['sentence','a complete grammatical unit with meaning'],
+  ['grammar','the rules of a language'],
+  ['connect','to link two ideas or sentences'],
+  ['relate','to show a connection between things'],
+  ['modify','to describe or limit a noun'],
+  ['combine','to join two parts into one'],
+];
+const grid = document.getElementById('vocab-grid');
+VOCAB.forEach(([w,d]) => {
+  const c = document.createElement('div');
+  c.className = 'flip-card';
+  c.innerHTML = `<div class="flip-card-inner"><div class="flip-front text-white font-black text-base">${w}</div><div class="flip-back text-white font-bold text-xs">${d}</div></div>`;
+  c.addEventListener('click', () => c.classList.toggle('flipped'));
+  grid.appendChild(c);
+});
+
+// ── Expressions ──────────────────────────────────────────────────
+const EXPRS = [
+  {phrase:'The thing is…', example:'"The thing is, I need someone who understands me."', tip:'Use this to introduce the key point of what you're about to say.'},
+  {phrase:"That's the one!", example:'"That\'s the one! The book that I was looking for!"', tip:'Use THAT informally for people or things in spoken English.'},
+  {phrase:'Which reminds me…', example:'"He mentioned the library, which reminds me — I need to return a book."', tip:'Which reminds me introduces a new thought connected to what was just said.'},
+  {phrase:'The person who…', example:'"The person who arrives first gets the best seat."', tip:'The person who is one of the most common relative clause patterns in English.'},
+];
+const exprList = document.getElementById('expr-list');
+EXPRS.forEach((e, i) => {
+  const d = document.createElement('div');
+  d.className = 'expr-card bg-white rounded-2xl border-2 border-emerald-100 overflow-hidden shadow-sm';
+  d.innerHTML = `<button onclick="this.closest('.expr-card').classList.toggle('open')" class="w-full flex items-center justify-between px-5 py-4 text-left"><span class="font-black text-navy">${e.phrase}</span><span class="expr-chevron text-emerald-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-2"><p class="text-slate-700 text-sm italic">${e.example}</p><p class="text-xs text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2 font-bold">💡 ${e.tip}</p></div>`;
+  exprList.appendChild(d);
+});
+
+// ── Grammar Accordion ────────────────────────────────────────────
+const ACC = [
+  {title:'WHO vs WHICH vs THAT', body:`
+    <p class="text-sm text-slate-600 mb-3"><strong>WHO</strong> — use for people:<br><em>"The woman <strong>who</strong> called you is my aunt."</em></p>
+    <p class="text-sm text-slate-600 mb-3"><strong>WHICH</strong> — use for things and animals:<br><em>"The cat <strong>which</strong> lives here is very friendly."</em><br>Also used in non-defining clauses: <em>"My car, <strong>which</strong> is very old, still runs well."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>THAT</strong> — informal, for people OR things (defining clauses only):<br><em>"The movie <strong>that</strong> won the award was amazing."</em><br>⚠️ Do NOT use THAT in non-defining clauses (with commas).</p>
+  `},
+  {title:'WHERE / WHEN / WHOSE', body:`
+    <p class="text-sm text-slate-600 mb-3"><strong>WHERE</strong> — for places:<br><em>"This is the café <strong>where</strong> we first met."</em></p>
+    <p class="text-sm text-slate-600 mb-3"><strong>WHEN</strong> — for times:<br><em>"I remember the day <strong>when</strong> we graduated."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>WHOSE</strong> — possession (replaces his/her/its/their):<br><em>"The author <strong>whose</strong> book I read won a prize."</em><br>= I read her book → <em>the author whose book I read</em></p>
+  `},
+  {title:'Defining vs Non-Defining Clauses', body:`
+    <p class="text-sm text-slate-600 mb-2"><strong>Defining clause</strong> — essential information (no commas):<br><em>"The student <strong>who</strong> studies hard will pass."</em><br>Without this clause, we don't know WHICH student.</p>
+    <p class="text-sm text-slate-600 mb-2"><strong>Non-defining clause</strong> — extra, non-essential info (with commas):<br><em>"Capy, <strong>who</strong> lives in Nano Banana, loves swimming."</em><br>Remove it and the sentence still works: <em>"Capy loves swimming."</em></p>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2"><p class="text-xs font-bold text-amber-800">⚠️ Key rules for non-defining: always use WHO or WHICH (not THAT), always add commas, the clause adds bonus info only.</p></div>
+  `},
+  {title:'Omitting the Relative Pronoun', body:`
+    <p class="text-sm text-slate-600 mb-2">You can DROP the relative pronoun when it is the <strong>object</strong> of the clause (not the subject):</p>
+    <p class="text-sm text-slate-600 mb-1">✅ <em>"The book <strong>that</strong> I read was great."</em> → <em>"The book I read was great."</em></p>
+    <p class="text-sm text-slate-600 mb-3">✅ <em>"The person <strong>who</strong> you met is my boss."</em> → <em>"The person you met is my boss."</em></p>
+    <p class="text-sm text-slate-600 mb-2">❌ You CANNOT drop it when it is the <strong>subject</strong>:</p>
+    <p class="text-sm text-slate-600">❌ <em>"The woman called you is my aunt."</em> (missing WHO — the subject)</p>
+  `},
+];
+const accEl = document.getElementById('acc-grammar');
+ACC.forEach((a,i) => {
+  const item = document.createElement('div');
+  item.className = 'acc-item bg-white rounded-2xl border-2 border-emerald-100 overflow-hidden shadow-sm';
+  item.innerHTML = `<button onclick="this.closest('.acc-item').classList.toggle('open')" class="w-full flex items-center justify-between px-5 py-4 text-left"><span class="font-black text-navy text-sm">${a.title}</span><i class="acc-icon font-black text-emerald-500 text-lg leading-none">+</i></button><div class="acc-body px-5 pb-4">${a.body}</div>`;
+  accEl.appendChild(item);
+});
+
+// ── Dialogue ─────────────────────────────────────────────────────
+const DIALOGUE = [
+  {sp:'🦫 Capy', msg:'Yara, I need a book that teaches grammar in a fun way.'},
+  {sp:'🦦 Yara', msg:'Oh, I know just the one! The book which I finished last week was perfect for that.'},
+  {sp:'🦫 Capy', msg:'Really? Who is the author whose writing you liked so much?'},
+  {sp:'🦦 Yara', msg:'Her name is Professor Lima. She\'s the linguist who made grammar actually interesting.'},
+  {sp:'📚 Librarian 🧑‍💼', msg:'Can I help? I know a section where all the grammar books are kept.'},
+  {sp:'🦫 Capy', msg:'Yes please! The section that has intermediate grammar — that\'s what we need.'},
+  {sp:'📚 Librarian 🧑‍💼', msg:'Follow me. This is the room where advanced learners usually study. Very quiet here.'},
+  {sp:'🦦 Yara', msg:'Capy, look at this one! "Grammar Hacks for Humans," which has great reviews online.'},
+  {sp:'🦫 Capy', msg:'The cover whose design looks like a puzzle… that one?'},
+  {sp:'🦦 Yara', msg:'Exactly! The day when I discovered this book changed my English forever.'},
+  {sp:'📚 Librarian 🧑‍💼', msg:'That\'s a great choice. The author, who is a former English teacher, writes very clearly.'},
+  {sp:'🦫 Capy', msg:'Perfect. I\'ll take it. This is the library where I will spend all my weekends!'},
+];
+const dlEl = document.getElementById('dialogue-lines');
+DIALOGUE.forEach(l => {
+  const isCapy = l.sp.includes('Capy');
+  const isYara = l.sp.includes('Yara');
+  const d = document.createElement('div');
+  d.className = `flex gap-3 ${isCapy ? '' : 'flex-row-reverse text-right'}`;
+  d.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-xl">${l.sp.split(' ')[0]}</div><div class="max-w-sm"><p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">${l.sp}</p><div class="bg-emerald-50 rounded-2xl px-4 py-2.5"><p class="text-sm text-slate-700 font-medium">${l.msg}</p></div></div>`;
+  dlEl.appendChild(d);
+});
+
+// ── Quiz ─────────────────────────────────────────────────────────
+const QUIZ = [
+  {q:'Choose the correct pronoun: "The woman ___ called you is my neighbour."', opts:['who','which','where','whose'], ans:0},
+  {q:'Choose the correct pronoun: "That\'s the café ___ we had our first date."', opts:['which','who','where','whose'], ans:2},
+  {q:'Which sentence uses a NON-DEFINING relative clause correctly?', opts:['My sister, who lives in London, is a doctor.','The girl who is tall is my sister.','I read the book that you recommended.','The day that we met was special.'], ans:0},
+  {q:'Choose the correct pronoun: "This is the student ___ essay won first prize."', opts:['who','which','whose','where'], ans:2},
+  {q:'In which sentence can you DROP the relative pronoun?', opts:['The man who called me is here.','The book that I bought is great.','The city where I was born is big.','The woman whose car I borrowed is angry.'], ans:1},
+  {q:'"She is the singer ___ voice everyone loves." Choose the correct pronoun.', opts:['who','which','whose','where'], ans:2},
+];
+let quizScore = 0;
+let quizDone = 0;
+const qc = document.getElementById('quiz-container');
+QUIZ.forEach((q, qi) => {
+  const d = document.createElement('div');
+  d.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm';
+  d.innerHTML = `<p class="font-black text-navy mb-3 text-sm">${qi+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-left text-sm font-bold text-slate-700" onclick="answerQ(this,${qi},${oi},${q.ans})">${o}</button>`).join('')}</div>`;
+  qc.appendChild(d);
+});
+function answerQ(btn, qi, chosen, correct){
+  if(btn.disabled) return;
+  btn.closest('.grid').querySelectorAll('button').forEach(b => b.disabled = true);
+  if(chosen === correct){ btn.classList.add('correct'); quizScore++; } else { btn.classList.add('wrong'); btn.closest('.grid').querySelectorAll('button')[correct].classList.add('correct'); }
+  quizDone++;
+  if(quizDone === QUIZ.length){ setTimeout(showQuizResult, 400); }
+}
+function showQuizResult(){
+  const r = document.getElementById('quiz-result');
+  const pct = Math.round(quizScore/QUIZ.length*100);
+  r.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-sm text-center';
+  r.innerHTML = `<p class="text-4xl font-black text-navy mb-1">${quizScore}/${QUIZ.length}</p><p class="text-slate-500 mb-3">${pct >= 80 ? '🎉 Excellent! You mastered relative clauses!' : pct >= 50 ? '👍 Good effort! Review the grammar tab.' : '💪 Keep practising! Read the Grammar tab again.'}</p><button onclick="markSection('practice',50)" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">Claim +50 XP</button>`;
+  r.classList.remove('hidden');
+}
+
+// ── Speak ────────────────────────────────────────────────────────
+const SPEAK_LINES = [
+  'The teacher who inspired me the most was very patient.',
+  'This is the book which changed my life.',
+  'The city where I grew up is very small.',
+  'I have a friend whose mother speaks six languages.',
+  'The movie that everyone is talking about won three awards.',
+  'She is the person who I told you about yesterday.',
+  'The restaurant where we ate last night was incredible.',
+  'That is the student whose project we all admired.',
+];
+const speakEl = document.getElementById('speak-list');
+SPEAK_LINES.forEach((line, i) => {
+  const d = document.createElement('div');
+  d.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-4 shadow-sm flex items-center gap-4';
+  d.innerHTML = `<span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-black flex-shrink-0 flex items-center justify-center text-sm">${i+1}</span><p class="flex-1 text-sm font-bold text-navy">${line}</p><button onclick="speak('${line.replace(/'/g,"\\'")}')" class="flex-shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white font-black px-4 py-2 rounded-xl text-xs transition">▶ Listen</button>`;
+  speakEl.appendChild(d);
+});
+function speak(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── Homework: Word Order ──────────────────────────────────────────
+const wo41Words = ['The','library','where','Capy','studies','is','very','quiet'];
+const wo41Answer = 'The library where Capy studies is very quiet';
+let wo41State = {bank:[...wo41Words.map((_,i)=>i)], ans:[]};
+function renderWO41(){
+  const bank = document.getElementById('wo41-bank');
+  const ans = document.getElementById('wo41-ans');
+  bank.innerHTML = ''; ans.innerHTML = '';
+  wo41State.bank.forEach(i => {
+    const t = document.createElement('span');
+    t.className='wo-tile'; t.textContent=wo41Words[i];
+    t.onclick=()=>{wo41State.bank=wo41State.bank.filter(x=>x!==i);wo41State.ans.push(i);renderWO41();};
+    bank.appendChild(t);
+  });
+  wo41State.ans.forEach(i => {
+    const t = document.createElement('span');
+    t.className='wo-tile'; t.textContent=wo41Words[i];
+    t.onclick=()=>{wo41State.ans=wo41State.ans.filter(x=>x!==i);wo41State.bank.push(i);renderWO41();};
+    ans.appendChild(t);
+  });
+}
+function checkWO41(){
+  const msg=document.getElementById('wo41-msg');
+  const formed=wo41State.ans.map(i=>wo41Words[i]).join(' ');
+  msg.classList.remove('hidden');
+  if(formed===wo41Answer){msg.className='mt-2 text-sm font-bold text-emerald-600';msg.textContent='✅ Correct! Well done!';}
+  else{msg.className='mt-2 text-sm font-bold text-red-500';msg.textContent='❌ Not quite. Try again!';}
+}
+function resetWO41(){
+  wo41State={bank:[...wo41Words.map((_,i)=>i)],ans:[]};
+  renderWO41();
+  const msg=document.getElementById('wo41-msg'); msg.classList.add('hidden');
+}
+renderWO41();
+
+// ── Homework: Match Pairs ─────────────────────────────────────────
+const mp41Left  = ['The person who…','The city where…','The book which…','The student whose…','The moment when…','The reason why…'];
+const mp41Right = ['…I grew up has changed a lot.','…I read last week was brilliant.','…essay won is very talented.','…we first met was unforgettable.','…helped me is my mentor.','…I left is still a mystery.'];
+const mp41Correct = {0:4, 1:0, 2:1, 3:2, 4:3, 5:5};
+let mp41Sel = null;
+let mp41Matched = {};
+function renderMP41(){
+  const g = document.getElementById('mp41-grid');
+  g.innerHTML = '';
+  const leftCol = document.createElement('div'); leftCol.className='flex flex-col gap-2';
+  const rightCol = document.createElement('div'); rightCol.className='flex flex-col gap-2';
+  mp41Left.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className='mp-btn'+(mp41Matched[i]!==undefined?' matched':'');
+    b.textContent=t; b.id='mp41-L'+i; b.disabled=mp41Matched[i]!==undefined;
+    b.onclick=()=>selectMP41('L',i);
+    leftCol.appendChild(b);
+  });
+  mp41Right.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className='mp-btn'+(Object.values(mp41Matched).includes(i)?' matched':'');
+    b.textContent=t; b.id='mp41-R'+i; b.disabled=Object.values(mp41Matched).includes(i);
+    b.onclick=()=>selectMP41('R',i);
+    rightCol.appendChild(b);
+  });
+  g.appendChild(leftCol); g.appendChild(rightCol);
+}
+function selectMP41(side, idx){
+  if(!mp41Sel){ mp41Sel={side,idx}; document.getElementById('mp41-'+side+idx).classList.add('selected'); return; }
+  if(mp41Sel.side===side){ document.getElementById('mp41-'+mp41Sel.side+mp41Sel.idx).classList.remove('selected'); mp41Sel={side,idx}; document.getElementById('mp41-'+side+idx).classList.add('selected'); return; }
+  const L = side==='L'?idx:mp41Sel.idx;
+  const R = side==='R'?idx:mp41Sel.idx;
+  if(mp41Correct[L]===R){ mp41Matched[L]=R; mp41Sel=null; renderMP41(); const msg=document.getElementById('mp41-msg'); if(Object.keys(mp41Matched).length===mp41Left.length){msg.className='mt-3 text-sm font-bold text-emerald-600';msg.textContent='🎉 All matched! Perfect!';msg.classList.remove('hidden');} }
+  else { const lb=document.getElementById('mp41-L'+L); const rb=document.getElementById('mp41-R'+R); lb.classList.add('wrong-flash'); rb.classList.add('wrong-flash'); setTimeout(()=>{lb.classList.remove('wrong-flash','selected');rb.classList.remove('wrong-flash');},700); mp41Sel=null; }
+}
+renderMP41();
+
+// ── Homework: Error Correction ────────────────────────────────────
+const err41Data = [
+  {wrong:'The man which called me is my brother.', hint:'Use WHO for people, not WHICH.', correct:'who'},
+  {wrong:'Paris, that is the capital of France, is beautiful.', hint:'Use WHICH (not THAT) in non-defining clauses.', correct:'which'},
+  {wrong:'The house where I born is in São Paulo.', hint:'WHERE needs a full verb clause: where I was born.', correct:'was born'},
+  {wrong:'She is the student who\'s essay won the prize.', hint:'WHOSE (possession), not WHO\'S (who is).', correct:'whose'},
+];
+const errList = document.getElementById('err41-list');
+err41Data.forEach((e,i) => {
+  const d = document.createElement('div');
+  d.className='bg-slate-50 rounded-xl p-3';
+  d.innerHTML = `<p class="text-sm text-red-600 font-bold mb-1 line-through">${e.wrong}</p><p class="text-xs text-slate-500 mb-2">💡 Hint: ${e.hint}</p><input class="fill-inp w-full" id="err41-${i}" placeholder="Type the correction…" style="width:100%;text-align:left"/>`;
+  errList.appendChild(d);
+});
+function checkErr41(){
+  const answers=['who','which','was born','whose'];
+  let ok=0;
+  err41Data.forEach((_,i)=>{
+    const inp=document.getElementById('err41-'+i);
+    const val=inp.value.trim().toLowerCase();
+    if(val===answers[i]){inp.classList.add('ok');inp.classList.remove('err');ok++;}
+    else{inp.classList.add('err');inp.classList.remove('ok');}
+  });
+  const msg=document.getElementById('err41-msg');
+  msg.classList.remove('hidden');
+  msg.className='mt-2 text-sm font-bold '+(ok===err41Data.length?'text-emerald-600':'text-red-500');
+  msg.textContent=ok===err41Data.length?'✅ All correct!':'❌ '+ok+'/'+err41Data.length+' correct. Check the hints!';
+}
+
+// ── Homework: Fill in the Blank ───────────────────────────────────
+const fill41Data = [
+  {sentence:'The scientist ___ discovered penicillin was Alexander Fleming.', answer:'who'},
+  {sentence:'Rome, ___ is the capital of Italy, has incredible history.', answer:'which'},
+  {sentence:'That\'s the park ___ we used to play as children.', answer:'where'},
+  {sentence:'I have a colleague ___ sister is a famous actress.', answer:'whose'},
+  {sentence:'This is the exact moment ___ everything changed.', answer:'when'},
+];
+const fillEl = document.getElementById('fill41-list');
+fill41Data.forEach((f,i) => {
+  const parts = f.sentence.split('___');
+  const d = document.createElement('div');
+  d.className='flex items-center flex-wrap gap-1 text-sm font-bold text-slate-700';
+  d.innerHTML=`<span>${parts[0]}</span><input class="fill-inp" id="fill41-${i}" placeholder="?"/><span>${parts[1]}</span>`;
+  fillEl.appendChild(d);
+});
+function checkFill41(){
+  const answers=fill41Data.map(f=>f.answer);
+  let ok=0;
+  fill41Data.forEach((_,i)=>{
+    const inp=document.getElementById('fill41-'+i);
+    const val=inp.value.trim().toLowerCase();
+    if(val===answers[i]){inp.classList.add('ok');inp.classList.remove('err');ok++;}
+    else{inp.classList.add('err');inp.classList.remove('ok');}
+  });
+  const msg=document.getElementById('fill41-msg');
+  msg.classList.remove('hidden');
+  msg.className='mt-2 text-sm font-bold '+(ok===fill41Data.length?'text-emerald-600':'text-red-500');
+  msg.textContent=ok===fill41Data.length?'✅ Perfect! All blanks correct!':'❌ '+ok+'/'+fill41Data.length+' correct. Keep trying!';
+}
+
+// ── Submit Homework ───────────────────────────────────────────────
+function submitHomework41(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework41()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_42.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 42 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 42 — Linking Words | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:160px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🧩</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">📰</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">✍️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🔗</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">💬</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_41.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_43.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🧩 Aula 42 · Advanced Grammar</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Linking<br><span class="text-emerald-300">Words</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">However, although, therefore, furthermore — aprenda a conectar ideias e escrever com fluidez como um falante nativo!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Os principais linking words do inglês. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões sofisticadas para conectar ideias naturalmente.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Categorias de linking words e como posicioná-las na frase.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">The 4 Main Categories</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-sm font-black mb-1">🔄 Contrast</p><p class="text-xs text-emerald-100">however, although, despite, even though, whereas, nevertheless</p></div>
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-sm font-black mb-1">➡️ Result</p><p class="text-xs text-emerald-100">therefore, so, consequently, as a result, thus, hence</p></div>
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-sm font-black mb-1">➕ Addition</p><p class="text-xs text-emerald-100">furthermore, moreover, in addition, also, besides, additionally</p></div>
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-sm font-black mb-1">💡 Reason</p><p class="text-xs text-emerald-100">because, since, as, due to, owing to</p></div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6" id="acc-grammar"></div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2>
+        <p class="text-slate-500 text-sm">📰 Jornal de Nano Banana — Capy e Yara escrevem um artigo juntos.</p>
+      </div>
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm space-y-4 mb-6" id="dialogue-lines"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Dialogue done! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">6 perguntas sobre linking words. Escolha a resposta correta!</p></div>
+      <div class="space-y-6 mb-6" id="quiz-container"></div>
+      <div id="quiz-result" class="hidden"></div>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speaking Practice</h2><p class="text-slate-500 text-sm">Ouça e repita as frases com linking words em voz alta!</p></div>
+      <div class="space-y-3 mb-6" id="speak-list"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Speaking done! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📋 Homework</h2><p class="text-slate-500 text-sm">Quatro exercícios para dominar os linking words.</p></div>
+
+      <!-- Word Order -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">1. Word Order</h3>
+        <p class="text-slate-500 text-xs mb-3">Arranje as palavras para formar uma frase com linking word.</p>
+        <div id="wo42-bank" class="wo-bank mb-2"></div>
+        <p class="text-xs text-slate-400 mb-1">↓ Your sentence:</p>
+        <div id="wo42-ans" class="wo-ans mb-3"></div>
+        <button onclick="checkWO42()" class="bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition mr-2">Check ✓</button>
+        <button onclick="resetWO42()" class="bg-slate-100 text-slate-600 font-bold px-5 py-2 rounded-xl text-sm hover:bg-slate-200 transition">Reset</button>
+        <p id="wo42-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Match Pairs -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">2. Match the Pairs</h3>
+        <p class="text-slate-500 text-xs mb-3">Conecte cada frase à sua continuação lógica com o linking word correto.</p>
+        <div class="grid grid-cols-2 gap-3" id="mp42-grid"></div>
+        <p id="mp42-msg" class="mt-3 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Error Correction -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-4">
+        <h3 class="font-black text-navy mb-1">3. Error Correction</h3>
+        <p class="text-slate-500 text-xs mb-3">Corrija o linking word errado em cada frase.</p>
+        <div class="space-y-3" id="err42-list"></div>
+        <button onclick="checkErr42()" class="mt-3 bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition">Check ✓</button>
+        <p id="err42-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Fill in the blank -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-6">
+        <h3 class="font-black text-navy mb-1">4. Fill in the Blank</h3>
+        <p class="text-slate-500 text-xs mb-3">Complete com o linking word mais adequado.</p>
+        <div class="space-y-3" id="fill42-list"></div>
+        <button onclick="checkFill42()" class="mt-3 bg-emerald-500 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-emerald-600 transition">Check ✓</button>
+        <p id="fill42-msg" class="mt-2 text-sm font-bold hidden"></p>
+      </div>
+
+      <!-- Free Writing -->
+      <div class="bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm mb-6">
+        <h3 class="font-black text-navy mb-1">5. Free Writing ✍️</h3>
+        <p class="text-slate-500 text-xs mb-3">Write a short paragraph (4–5 sentences) about your city or daily life. Use at least 3 different linking words from this lesson.</p>
+        <textarea class="w-full border-2 border-emerald-100 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400 transition" rows="5" placeholder="Example: I love my city. However, the traffic is terrible. Therefore, I usually take the bus. Furthermore, the public transport is cheap and reliable..."></textarea>
+      </div>
+
+      <button onclick="submitHomework42()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm text-lg">🎉 Submit Homework +75 XP</button>
+    </div>
+
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+// ── Progress dots ────────────────────────────────────────────────
+const SECTIONS = ['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+const done = {};
+const dotsEl = document.getElementById('hero-dots');
+const labelEl = document.getElementById('hero-label');
+SECTIONS.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'prog-dot'; d.id = 'dot-'+s;
+  dotsEl.appendChild(d);
+});
+function updateDots(){
+  const n = Object.keys(done).length;
+  SECTIONS.forEach(s => document.getElementById('dot-'+s).classList.toggle('done', !!done[s]));
+  labelEl.textContent = n + ' / 7 sections done';
+}
+function spawnXP(pts){
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = '+'+pts+' XP!';
+  el.style.cssText = 'left:50%;top:60%;transform:translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1300);
+}
+function markSection(s, pts=20){
+  if(done[s]) return;
+  done[s] = true;
+  Store.addXP(pts);
+  spawnXP(pts);
+  updateDots();
+}
+updateDots();
+
+// ── Tabs ─────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+    document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+// ── Vocabulary (30 words) ────────────────────────────────────────
+const VOCAB = [
+  ['however','despite that; used to show contrast'],
+  ['therefore','for that reason; as a result'],
+  ['although','even though; used for contrast'],
+  ['despite','without being affected by; even with'],
+  ['furthermore','in addition; also (more formal)'],
+  ['moreover','in addition to that; even more so'],
+  ['nevertheless','despite this; however (formal)'],
+  ['consequently','as a result; because of this'],
+  ['whereas','in contrast to; while (comparison)'],
+  ['meanwhile','at the same time; during that period'],
+  ['additionally','as an extra point; also'],
+  ['similarly','in the same way; likewise'],
+  ['likewise','in the same way; also'],
+  ['instead','in place of; as an alternative'],
+  ['otherwise','in a different case; if not'],
+  ['thereby','by that means; as a result of that'],
+  ['hence','therefore; for this reason (formal)'],
+  ['thus','in this way; therefore (formal)'],
+  ['nonetheless','despite everything; however'],
+  ['regardless','without concern for; anyway'],
+  ['admittedly','it must be admitted; granted'],
+  ['granted','it is true that; admittedly'],
+  ['provided','on the condition that; as long as'],
+  ['unless','except if; if not'],
+  ['whenever','every time that; at any time'],
+  ['wherever','in any place that; no matter where'],
+  ['whoever','any person who; no matter who'],
+  ['whatever','anything that; no matter what'],
+  ['whichever','any one that; no matter which'],
+  ['so','therefore; with the result that'],
+];
+const grid = document.getElementById('vocab-grid');
+VOCAB.forEach(([w,d]) => {
+  const c = document.createElement('div');
+  c.className = 'flip-card';
+  c.innerHTML = `<div class="flip-card-inner"><div class="flip-front text-white font-black text-base">${w}</div><div class="flip-back text-white font-bold text-xs">${d}</div></div>`;
+  c.addEventListener('click', () => c.classList.toggle('flipped'));
+  grid.appendChild(c);
+});
+
+// ── Expressions ──────────────────────────────────────────────────
+const EXPRS = [
+  {phrase:'On the other hand…', example:'"I love summer. On the other hand, I hate the heat."', tip:'Use this to introduce an opposing or contrasting point of view.'},
+  {phrase:'In spite of everything…', example:'"In spite of everything, we managed to finish the project on time."', tip:'In spite of = despite. It is followed by a noun or -ing verb, not a clause.'},
+  {phrase:'That said…', example:'"The food was expensive. That said, it was absolutely delicious."', tip:'That said acknowledges a previous point before introducing a contrast. Very natural in spoken English.'},
+  {phrase:'All things considered…', example:'"All things considered, I think the trip was a great success."', tip:'Use at the start of a conclusion to show you have weighed all the factors.'},
+];
+const exprList = document.getElementById('expr-list');
+EXPRS.forEach(e => {
+  const d = document.createElement('div');
+  d.className = 'expr-card bg-white rounded-2xl border-2 border-emerald-100 overflow-hidden shadow-sm';
+  d.innerHTML = `<button onclick="this.closest('.expr-card').classList.toggle('open')" class="w-full flex items-center justify-between px-5 py-4 text-left"><span class="font-black text-navy">${e.phrase}</span><span class="expr-chevron text-emerald-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-2"><p class="text-slate-700 text-sm italic">${e.example}</p><p class="text-xs text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2 font-bold">💡 ${e.tip}</p></div>`;
+  exprList.appendChild(d);
+});
+
+// ── Grammar Accordion ────────────────────────────────────────────
+const ACC = [
+  {title:'Contrast Words', body:`
+    <p class="text-sm text-slate-600 mb-2"><strong>HOWEVER</strong> — starts a new sentence or clause:<br><em>"I studied hard. <strong>However</strong>, I didn't pass."</em> / <em>"I studied hard; <strong>however</strong>, I didn't pass."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>ALTHOUGH / EVEN THOUGH</strong> — inside one sentence:<br><em>"<strong>Although</strong> it was raining, we went for a walk."</em><br><em>"<strong>Even though</strong> she was tired, she kept going."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>DESPITE / IN SPITE OF</strong> — followed by a noun or -ing verb:<br><em>"<strong>Despite</strong> the rain, we went out."</em> ✅<br><em>"<strong>Despite</strong> being tired, she kept going."</em> ✅<br><em>"Despite that she was tired…"</em> ❌ (use ALTHOUGH)</p>
+    <p class="text-sm text-slate-600 mb-2"><strong>WHEREAS / WHILE</strong> — direct comparison:<br><em>"Capy loves swimming, <strong>whereas</strong> Yara prefers reading."</em></p>
+  `},
+  {title:'Result & Reason Words', body:`
+    <p class="text-sm text-slate-600 mb-2"><strong>THEREFORE / CONSEQUENTLY / AS A RESULT</strong>:<br><em>"She trained every day. <strong>Therefore</strong>, she won the race."</em><br><em>"It rained all day. <strong>Consequently</strong>, the match was cancelled."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>SO</strong> — connects two clauses informally:<br><em>"It was hot, <strong>so</strong> we went swimming."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>BECAUSE / SINCE / AS</strong> — give a reason:<br><em>"I left early <strong>because</strong> I was tired."</em><br><em>"<strong>Since</strong> you're here, let's start the meeting."</em></p>
+    <p class="text-sm text-slate-600"><strong>DUE TO / OWING TO</strong> — followed by a noun:<br><em>"The flight was delayed <strong>due to</strong> bad weather."</em></p>
+  `},
+  {title:'Addition Words', body:`
+    <p class="text-sm text-slate-600 mb-2"><strong>FURTHERMORE / MOREOVER</strong> — add a stronger, more important point:<br><em>"The hotel was beautiful. <strong>Furthermore</strong>, it was very affordable."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>IN ADDITION / ADDITIONALLY</strong> — add a related point:<br><em>"She speaks Spanish. <strong>In addition</strong>, she is learning Japanese."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>ALSO / BESIDES</strong> — informal addition:<br><em>"I like coffee. I <strong>also</strong> love tea."</em><br><em>"<strong>Besides</strong> English, I speak French."</em></p>
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mt-2"><p class="text-xs font-bold text-emerald-800">💡 Tip: Furthermore and moreover are more formal and emphatic than also. Use them in writing or formal speech.</p></div>
+  `},
+  {title:'Position Rules', body:`
+    <p class="text-sm text-slate-600 mb-2"><strong>At the START of a sentence</strong> (followed by a comma):<br><em>"<strong>However,</strong> the results were surprising."</em><br><em>"<strong>Therefore,</strong> we need a new plan."</em><br><em>"<strong>Furthermore,</strong> this affects everyone."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>In the MIDDLE</strong> (between two independent clauses with semicolon):<br><em>"The plan failed; <strong>however,</strong> we learned a lot."</em></p>
+    <p class="text-sm text-slate-600 mb-2"><strong>ALTHOUGH / DESPITE</strong> — start of sentence or middle:<br><em>"<strong>Although</strong> it was hard, I enjoyed it."</em><br><em>"I enjoyed it, <strong>although</strong> it was hard."</em></p>
+    <p class="text-sm text-slate-600"><strong>SO / BECAUSE</strong> — always in the MIDDLE of a sentence:<br><em>"I was tired, <strong>so</strong> I went to bed."</em><br><em>"I went to bed <strong>because</strong> I was tired."</em></p>
+  `},
+];
+const accEl = document.getElementById('acc-grammar');
+ACC.forEach(a => {
+  const item = document.createElement('div');
+  item.className = 'acc-item bg-white rounded-2xl border-2 border-emerald-100 overflow-hidden shadow-sm';
+  item.innerHTML = `<button onclick="this.closest('.acc-item').classList.toggle('open')" class="w-full flex items-center justify-between px-5 py-4 text-left"><span class="font-black text-navy text-sm">${a.title}</span><i class="acc-icon font-black text-emerald-500 text-lg leading-none">+</i></button><div class="acc-body px-5 pb-4">${a.body}</div>`;
+  accEl.appendChild(item);
+});
+
+// ── Dialogue ─────────────────────────────────────────────────────
+const DIALOGUE = [
+  {sp:'🦫 Capy', msg:'Yara, I\'m writing an article about Nano Banana. However, I don\'t know how to start.'},
+  {sp:'🦦 Yara', msg:'Well, start with the main idea. Furthermore, make sure the first sentence grabs attention.'},
+  {sp:'🦫 Capy', msg:'OK, I wrote: "Nano Banana is a small town. Despite its size, it has a lot to offer."'},
+  {sp:'🦦 Yara', msg:'Perfect! That contrast with "despite" works really well. Keep going!'},
+  {sp:'📰 Editor 🦁 Leo', msg:'I read your draft. The content is good; however, the paragraphs are too short.'},
+  {sp:'🦫 Capy', msg:'I see. So I need to add more details to each paragraph, therefore making it longer?'},
+  {sp:'📰 Editor 🦁 Leo', msg:'Exactly. Also, use more linking words to connect your ideas more smoothly.'},
+  {sp:'🦦 Yara', msg:'Capy, you could say: "The market opens early. Consequently, locals arrive before 7am."'},
+  {sp:'🦫 Capy', msg:'I love it! Moreover, I could add: "Although the weather is hot, the festival never stops."'},
+  {sp:'📰 Editor 🦁 Leo', msg:'Now THAT is good writing. The contrast makes it vivid. In addition, the rhythm is great.'},
+  {sp:'🦦 Yara', msg:'See? You\'re a natural writer, Capy. That said, we still need to check the grammar!'},
+  {sp:'🦫 Capy', msg:'Ha! Nevertheless, I am very proud of this article. Nano Banana deserves to be famous!'},
+];
+const dlEl = document.getElementById('dialogue-lines');
+DIALOGUE.forEach(l => {
+  const isCapy = l.sp.includes('Capy');
+  const d = document.createElement('div');
+  d.className = `flex gap-3 ${isCapy ? '' : 'flex-row-reverse text-right'}`;
+  d.innerHTML = `<div class="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-xl">${l.sp.split(' ')[0]}</div><div class="max-w-sm"><p class="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-1">${l.sp}</p><div class="bg-emerald-50 rounded-2xl px-4 py-2.5"><p class="text-sm text-slate-700 font-medium">${l.msg}</p></div></div>`;
+  dlEl.appendChild(d);
+});
+
+// ── Quiz ─────────────────────────────────────────────────────────
+const QUIZ = [
+  {q:'Choose the correct linking word: "I was tired. ___, I kept working."', opts:['However','So','Because','Despite'], ans:0},
+  {q:'"___ the rain, we enjoyed the picnic." Which word fits?', opts:['Although','However','Despite','Therefore'], ans:2},
+  {q:'Which sentence is correct?', opts:['Despite it was raining, we went out.','Although the rain, we went out.','Despite the rain, we went out.','However it was raining, we went out.'], ans:2},
+  {q:'"She studies hard. ___, she always passes her exams." Choose the best linking word.', opts:['However','Consequently','Although','Despite'], ans:1},
+  {q:'Choose the correct linking word: "___ being expensive, the restaurant was worth it."', opts:['However','Although','Despite','Therefore'], ans:2},
+  {q:'"I love English. ___, I also love maths." Which word best shows addition?', opts:['However','Furthermore','Despite','Consequently'], ans:1},
+];
+let quizScore = 0;
+let quizDone = 0;
+const qc = document.getElementById('quiz-container');
+QUIZ.forEach((q, qi) => {
+  const d = document.createElement('div');
+  d.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-5 shadow-sm';
+  d.innerHTML = `<p class="font-black text-navy mb-3 text-sm">${qi+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-left text-sm font-bold text-slate-700" onclick="answerQ(this,${qi},${oi},${q.ans})">${o}</button>`).join('')}</div>`;
+  qc.appendChild(d);
+});
+function answerQ(btn, qi, chosen, correct){
+  if(btn.disabled) return;
+  btn.closest('.grid').querySelectorAll('button').forEach(b => b.disabled = true);
+  if(chosen === correct){ btn.classList.add('correct'); quizScore++; } else { btn.classList.add('wrong'); btn.closest('.grid').querySelectorAll('button')[correct].classList.add('correct'); }
+  quizDone++;
+  if(quizDone === QUIZ.length){ setTimeout(showQuizResult, 400); }
+}
+function showQuizResult(){
+  const r = document.getElementById('quiz-result');
+  const pct = Math.round(quizScore/QUIZ.length*100);
+  r.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-sm text-center';
+  r.innerHTML = `<p class="text-4xl font-black text-navy mb-1">${quizScore}/${QUIZ.length}</p><p class="text-slate-500 mb-3">${pct >= 80 ? '🎉 Excellent! You mastered linking words!' : pct >= 50 ? '👍 Good effort! Review the grammar tab.' : '💪 Keep practising! Check the Grammar tab again.'}</p><button onclick="markSection('practice',50)" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">Claim +50 XP</button>`;
+  r.classList.remove('hidden');
+}
+
+// ── Speak ────────────────────────────────────────────────────────
+const SPEAK_LINES = [
+  'I love the city. However, the traffic is terrible.',
+  'Despite the cold weather, we went for a long walk.',
+  'She worked hard. Consequently, she got promoted.',
+  'Although he was nervous, he gave a great speech.',
+  'The food was amazing. Furthermore, the prices were very reasonable.',
+  'I was late because the bus broke down.',
+  'It was a difficult year. Nevertheless, we achieved our goals.',
+  'She speaks French. In addition, she is learning Mandarin.',
+];
+const speakEl = document.getElementById('speak-list');
+SPEAK_LINES.forEach((line, i) => {
+  const d = document.createElement('div');
+  d.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-4 shadow-sm flex items-center gap-4';
+  d.innerHTML = `<span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-black flex-shrink-0 flex items-center justify-center text-sm">${i+1}</span><p class="flex-1 text-sm font-bold text-navy">${line}</p><button onclick="speak('${line.replace(/'/g,"\\'")}')" class="flex-shrink-0 bg-emerald-500 hover:bg-emerald-600 text-white font-black px-4 py-2 rounded-xl text-xs transition">▶ Listen</button>`;
+  speakEl.appendChild(d);
+});
+function speak(text){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── Homework: Word Order ──────────────────────────────────────────
+const wo42Words = ['Despite','the','rain,','we','enjoyed','the','festival'];
+const wo42Answer = 'Despite the rain, we enjoyed the festival';
+let wo42State = {bank:[...wo42Words.map((_,i)=>i)], ans:[]};
+function renderWO42(){
+  const bank = document.getElementById('wo42-bank');
+  const ans = document.getElementById('wo42-ans');
+  bank.innerHTML = ''; ans.innerHTML = '';
+  wo42State.bank.forEach(i => {
+    const t = document.createElement('span');
+    t.className='wo-tile'; t.textContent=wo42Words[i];
+    t.onclick=()=>{wo42State.bank=wo42State.bank.filter(x=>x!==i);wo42State.ans.push(i);renderWO42();};
+    bank.appendChild(t);
+  });
+  wo42State.ans.forEach(i => {
+    const t = document.createElement('span');
+    t.className='wo-tile'; t.textContent=wo42Words[i];
+    t.onclick=()=>{wo42State.ans=wo42State.ans.filter(x=>x!==i);wo42State.bank.push(i);renderWO42();};
+    ans.appendChild(t);
+  });
+}
+function checkWO42(){
+  const msg=document.getElementById('wo42-msg');
+  const formed=wo42State.ans.map(i=>wo42Words[i]).join(' ');
+  msg.classList.remove('hidden');
+  if(formed===wo42Answer){msg.className='mt-2 text-sm font-bold text-emerald-600';msg.textContent='✅ Correct! Excellent!';}
+  else{msg.className='mt-2 text-sm font-bold text-red-500';msg.textContent='❌ Not quite. Try again!';}
+}
+function resetWO42(){
+  wo42State={bank:[...wo42Words.map((_,i)=>i)],ans:[]};
+  renderWO42();
+  const msg=document.getElementById('wo42-msg'); msg.classList.add('hidden');
+}
+renderWO42();
+
+// ── Homework: Match Pairs ─────────────────────────────────────────
+const mp42Left  = ['I was exhausted.','She trained every day.','The price was high.','He failed the test.','It was a long journey.','I missed the bus.'];
+const mp42Right = ['Nevertheless, the quality was worth it.','However, he never gave up.','Consequently, I arrived late.','Therefore, I went straight to bed.','However, the destination was beautiful.','Consequently, she won the championship.'];
+const mp42Correct = {0:3, 1:5, 2:0, 3:1, 4:4, 5:2};
+let mp42Sel = null;
+let mp42Matched = {};
+function renderMP42(){
+  const g = document.getElementById('mp42-grid');
+  g.innerHTML = '';
+  const leftCol = document.createElement('div'); leftCol.className='flex flex-col gap-2';
+  const rightCol = document.createElement('div'); rightCol.className='flex flex-col gap-2';
+  mp42Left.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className='mp-btn'+(mp42Matched[i]!==undefined?' matched':'');
+    b.textContent=t; b.id='mp42-L'+i; b.disabled=mp42Matched[i]!==undefined;
+    b.onclick=()=>selectMP42('L',i);
+    leftCol.appendChild(b);
+  });
+  mp42Right.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.className='mp-btn'+(Object.values(mp42Matched).includes(i)?' matched':'');
+    b.textContent=t; b.id='mp42-R'+i; b.disabled=Object.values(mp42Matched).includes(i);
+    b.onclick=()=>selectMP42('R',i);
+    rightCol.appendChild(b);
+  });
+  g.appendChild(leftCol); g.appendChild(rightCol);
+}
+function selectMP42(side, idx){
+  if(!mp42Sel){ mp42Sel={side,idx}; document.getElementById('mp42-'+side+idx).classList.add('selected'); return; }
+  if(mp42Sel.side===side){ document.getElementById('mp42-'+mp42Sel.side+mp42Sel.idx).classList.remove('selected'); mp42Sel={side,idx}; document.getElementById('mp42-'+side+idx).classList.add('selected'); return; }
+  const L = side==='L'?idx:mp42Sel.idx;
+  const R = side==='R'?idx:mp42Sel.idx;
+  if(mp42Correct[L]===R){ mp42Matched[L]=R; mp42Sel=null; renderMP42(); const msg=document.getElementById('mp42-msg'); if(Object.keys(mp42Matched).length===mp42Left.length){msg.className='mt-3 text-sm font-bold text-emerald-600';msg.textContent='🎉 All matched! Brilliant!';msg.classList.remove('hidden');} }
+  else { const lb=document.getElementById('mp42-L'+L); const rb=document.getElementById('mp42-R'+R); lb.classList.add('wrong-flash'); rb.classList.add('wrong-flash'); setTimeout(()=>{lb.classList.remove('wrong-flash','selected');rb.classList.remove('wrong-flash');},700); mp42Sel=null; }
+}
+renderMP42();
+
+// ── Homework: Error Correction ────────────────────────────────────
+const err42Data = [
+  {wrong:'Despite it was raining, we went out.', hint:'Despite is followed by a noun or -ing verb, not a clause. Use "Although" for a clause.', correct:'although'},
+  {wrong:'I was tired, however I kept going.', hint:'However connects two separate sentences or uses a semicolon. It needs a full stop or semicolon before it.', correct:'so'},
+  {wrong:'She studied hard. Consequently, but she failed.', hint:'Don\'t combine a result word with a contrast word. Choose one.', correct:'however'},
+  {wrong:'Furthermore to that, it was also cheaper.', hint:'Furthermore stands alone — it does not need "to that". Just use "Furthermore," or "In addition,".', correct:'furthermore'},
+];
+const errList = document.getElementById('err42-list');
+err42Data.forEach((e,i) => {
+  const d = document.createElement('div');
+  d.className='bg-slate-50 rounded-xl p-3';
+  d.innerHTML = `<p class="text-sm text-red-600 font-bold mb-1 line-through">${e.wrong}</p><p class="text-xs text-slate-500 mb-2">💡 Hint: ${e.hint}</p><input class="fill-inp" id="err42-${i}" placeholder="Correct linking word…" style="width:100%;text-align:left"/>`;
+  errList.appendChild(d);
+});
+function checkErr42(){
+  const answers=['although','so','however','furthermore'];
+  let ok=0;
+  err42Data.forEach((_,i)=>{
+    const inp=document.getElementById('err42-'+i);
+    const val=inp.value.trim().toLowerCase();
+    if(val===answers[i]){inp.classList.add('ok');inp.classList.remove('err');ok++;}
+    else{inp.classList.add('err');inp.classList.remove('ok');}
+  });
+  const msg=document.getElementById('err42-msg');
+  msg.classList.remove('hidden');
+  msg.className='mt-2 text-sm font-bold '+(ok===err42Data.length?'text-emerald-600':'text-red-500');
+  msg.textContent=ok===err42Data.length?'✅ All correct!':'❌ '+ok+'/'+err42Data.length+' correct. Check the hints!';
+}
+
+// ── Homework: Fill in the Blank ───────────────────────────────────
+const fill42Data = [
+  {sentence:'The exam was difficult. ___, everyone passed.', answer:'however'},
+  {sentence:'She practised for months. ___, she became fluent.', answer:'consequently'},
+  {sentence:'___ the bad reviews, I loved the film.', answer:'despite'},
+  {sentence:'He is smart. ___, he is very hardworking.', answer:'furthermore'},
+  {sentence:'I was hungry, ___ I stopped at a café.', answer:'so'},
+];
+const fillEl = document.getElementById('fill42-list');
+fill42Data.forEach((f,i) => {
+  const parts = f.sentence.split('___');
+  const d = document.createElement('div');
+  d.className='flex items-center flex-wrap gap-1 text-sm font-bold text-slate-700 bg-slate-50 rounded-xl p-3';
+  d.innerHTML=`<span>${parts[0]}</span><input class="fill-inp" id="fill42-${i}" placeholder="?"/><span>${parts[1]}</span>`;
+  fillEl.appendChild(d);
+});
+function checkFill42(){
+  const answers=fill42Data.map(f=>f.answer);
+  let ok=0;
+  fill42Data.forEach((_,i)=>{
+    const inp=document.getElementById('fill42-'+i);
+    const val=inp.value.trim().toLowerCase();
+    if(val===answers[i]){inp.classList.add('ok');inp.classList.remove('err');ok++;}
+    else{inp.classList.add('err');inp.classList.remove('ok');}
+  });
+  const msg=document.getElementById('fill42-msg');
+  msg.classList.remove('hidden');
+  msg.className='mt-2 text-sm font-bold '+(ok===fill42Data.length?'text-emerald-600':'text-red-500');
+  msg.textContent=ok===fill42Data.length?'✅ Perfect! All blanks correct!':'❌ '+ok+'/'+fill42Data.length+' correct. Keep trying!';
+}
+
+// ── Submit Homework ───────────────────────────────────────────────
+function submitHomework42(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework42()"]');
+  btn.textContent = '🎉 Course Complete! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'classes.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-amber-300 text-amber-700 font-black py-3 rounded-2xl hover:bg-amber-50 transition-all text-sm';
+  a.textContent = '🏆 Back to Classes — You finished the course!';
+  btn.insertAdjacentElement('afterend', a);
+}
+</script>
+</body>
+</html>

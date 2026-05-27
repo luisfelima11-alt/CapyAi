@@ -1,0 +1,411 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 37 — Modals: Could, Should, Must, Might | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#d97706;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#d97706,#f59e0b)}
+.flip-back{background:linear-gradient(135deg,#b45309,#d97706);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#d97706,#ec4899);border-radius:99px;transition:width .25s}
+.tab-btn.active{color:#d97706}
+.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.prog-dot.done{background:linear-gradient(135deg,#d97706,#ec4899)}
+.expr-detail{display:none}
+.expr-card.open .expr-detail{display:block}
+.expr-card.open .expr-chevron{transform:rotate(180deg)}
+.expr-chevron{transition:transform .25s}
+.acc-body{display:none}
+.acc-item.open .acc-body{display:block}
+.acc-item.open .acc-icon{transform:rotate(45deg)}
+.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}
+.opt-btn:hover:not(:disabled){border-color:#d97706;background:#fffbeb}
+.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#d97706;background:#fffbeb}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #fbbf24;border-radius:1rem;background:#fffbeb}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#d97706;background:#fffbeb}
+.mp-btn.selected{border-color:#d97706;background:#fef3c7}
+.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:130px;text-align:center}
+.fill-inp:focus{border-color:#d97706}
+.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-amber-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-amber-950 to-orange-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">📜</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">⚖️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🛡️</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">💬</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🔑</span>
+      <span class="absolute text-5xl float" style="top:75%;right:22%;animation-delay:1.4s">✨</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_36.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_38.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">📜 Aula 37 · Grammar</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Modal Verbs:<br><span class="text-amber-300">Could, Should, Must & Might</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Expresse possibilidade, conselho, obrigação e sugestão com os modais mais usados do inglês — como nativo!</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Regras, obrigações e possibilidades. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões do dia a dia com modais. Clique para ver mais.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Modal Verbs — força e uso de cada um.</p></div>
+
+      <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-amber-100">Ordem de Força</p>
+        <div class="flex items-center gap-2 overflow-x-auto text-sm font-black">
+          <span class="bg-red-500/80 rounded-xl px-4 py-2 text-center whitespace-nowrap">MUST 🔴</span>
+          <span class="text-white/60">›</span>
+          <span class="bg-orange-400/80 rounded-xl px-4 py-2 text-center whitespace-nowrap">SHOULD 🟠</span>
+          <span class="text-white/60">›</span>
+          <span class="bg-yellow-400/80 rounded-xl px-4 py-2 text-center whitespace-nowrap">COULD 🟡</span>
+          <span class="text-white/60">›</span>
+          <span class="bg-white/20 rounded-xl px-4 py-2 text-center whitespace-nowrap">MIGHT 🟢</span>
+        </div>
+        <p class="text-white/70 text-xs mt-3">Mais forte (obrigação) → Mais fraco (possibilidade incerta)</p>
+      </div>
+
+      <div class="space-y-3 mb-6" id="grammar-acc">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔴 MUST — Obrigação forte / Certeza</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-amber-50 rounded-xl p-3">Expressar obrigação forte (você TEM que fazer) ou certeza quase absoluta.</p>
+            <p>✅ <strong>You must study every day.</strong> → Você tem que estudar todos os dias.</p>
+            <p>✅ <strong>She must be tired — she worked 12 hours.</strong> → Ela deve estar cansada.</p>
+            <p>✅ <strong>I must not be late again.</strong> → Não devo me atrasar de novo.</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">⚠️ MUST NOT = proibição total. Diferente de DON'T HAVE TO (sem obrigação).</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🟠 SHOULD — Conselho / Recomendação</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-amber-50 rounded-xl p-3">Dar conselhos, recomendações ou opiniões. Mais suave que MUST.</p>
+            <p>✅ <strong>You should give it a try!</strong> → Você deveria tentar!</p>
+            <p>✅ <strong>She should see a doctor.</strong> → Ela deveria ver um médico.</p>
+            <p>✅ <strong>You shouldn't skip breakfast.</strong> → Você não deveria pular o café.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🟡 COULD — Possibilidade / Sugestão educada</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-amber-50 rounded-xl p-3">Sugerir algo de forma educada, indicar possibilidade ou forma passada de CAN.</p>
+            <p>✅ <strong>Could you do me a favor?</strong> → Você poderia me fazer um favor?</p>
+            <p>✅ <strong>We could go to the beach this weekend.</strong> → Poderíamos ir à praia.</p>
+            <p>✅ <strong>I could speak English better as a kid.</strong> → Eu falava inglês melhor quando criança.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🟢 MIGHT — Possibilidade incerta</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-amber-50 rounded-xl p-3">Indicar uma possibilidade menor ou mais incerta que COULD. Equivale a "talvez".</p>
+            <p>✅ <strong>It might be worth it.</strong> → Pode valer a pena.</p>
+            <p>✅ <strong>She might call you later.</strong> → Ela talvez ligue mais tarde.</p>
+            <p>✅ <strong>I might not make it to the party.</strong> → Talvez eu não consiga ir à festa.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📊 Comparação: Must vs Should vs Could vs Might</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-3">
+            <p class="bg-amber-50 rounded-xl p-3 font-bold">Mesma ideia — forças diferentes:</p>
+            <div class="space-y-1.5">
+              <p>🔴 <strong>You must study.</strong> — Você TEM que estudar. (obrigação)</p>
+              <p>🟠 <strong>You should study.</strong> — Você deveria estudar. (conselho)</p>
+              <p>🟡 <strong>You could study.</strong> — Você poderia estudar. (opção/sugestão)</p>
+              <p>🟢 <strong>You might study.</strong> — Você talvez estude. (incerteza)</p>
+            </div>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 Dica: Todos são seguidos pelo verbo no infinitivo sem TO!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">📜 Sala do Conselho de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">📜 Sala do Conselho de Nano Banana. Os Guardiões Modais testam Leo para ver se ele merece uma missão especial. Cada guardião representa um modal verb.</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-amber-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, we are in the Council Room! The Modal Guardians are here to test you. Are you ready?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-amber-700">might</strong> be nervous, but I'll try my best!</p></div>
+        <div class="bg-red-50 border-l-4 border-red-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-red-700 mb-1">🔴 Guardian MUST</p><p class="text-slate-700 text-sm">Leo, you <strong class="text-amber-700">must</strong> answer correctly! You <strong class="text-amber-700">must not</strong> make excuses. Responsibility is a strong obligation!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I understand. I <strong class="text-amber-700">must</strong> take this seriously. What is my first challenge?</p></div>
+        <div class="bg-orange-50 border-l-4 border-orange-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-orange-700 mb-1">🟠 Guardian SHOULD</p><p class="text-slate-700 text-sm">You <strong class="text-amber-700">should</strong> think before you speak, Leo. You <strong class="text-amber-700">should</strong> listen carefully. My advice? Practice every day — you <strong class="text-amber-700">should give it a try</strong>!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">You're right — I <strong class="text-amber-700">should</strong> study more. I <strong class="text-amber-700">shouldn't</strong> give up!</p></div>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-yellow-700 mb-1">🟡 Guardian COULD</p><p class="text-slate-700 text-sm"><strong class="text-amber-700">Could</strong> you do me a favor? Tell me how you <strong class="text-amber-700">could</strong> improve your English. What options do you have?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-amber-700">could</strong> watch English movies, I <strong class="text-amber-700">could</strong> practice with Yara every day, or I <strong class="text-amber-700">could</strong> join an online class!</p></div>
+        <div class="bg-green-50 border-l-4 border-green-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-green-700 mb-1">🟢 Guardian MIGHT</p><p class="text-slate-700 text-sm">It <strong class="text-amber-700">might</strong> be worth it, Leo. You <strong class="text-amber-700">might</strong> be surprised by how fast you improve. The journey <strong class="text-amber-700">might</strong> be hard, but you <strong class="text-amber-700">might</strong> become a legend!</p></div>
+        <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-amber-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, you passed! You understood all the Modal Guardians. You <strong class="text-amber-700">must</strong> be proud of yourself! 🏆</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-amber-700">couldn't</strong> have done it without you, Yara! I <strong class="text-amber-700">might</strong> be the Modal Guardian now! 📜✨</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Modal Verbs.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p>
+        <p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p>
+      </div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-amber-500 to-pink-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 37 — Modal Verbs: Could, Should, Must, Might</p></div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-5">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+            <div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras na ordem correta.</p></div>
+          </div>
+          <div id="wo37-container" class="space-y-6"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+            <div><h3 class="font-black text-navy text-base">Match the Modal Verbs</h3><p class="text-slate-500 text-sm mt-1">Conecte cada modal ao seu uso principal.</p></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div id="mp37-left" class="space-y-2"></div>
+            <div id="mp37-right" class="space-y-2"></div>
+          </div>
+          <p id="mp37-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+            <div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro em cada frase.</p></div>
+          </div>
+          <div class="space-y-4" id="err37-container"></div>
+        </div>
+
+        <!-- Task 4: Fill in the Blank -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5">
+            <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+            <div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>must / should / could / might</strong>.</p></div>
+          </div>
+          <div class="space-y-4" id="fill37-container"></div>
+          <button onclick="checkFill37()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
+        </div>
+
+        <!-- Task 5: Free Writing -->
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div>
+            <div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre suas regras de vida, sonhos ou planos. Use pelo menos um MUST, SHOULD, COULD e MIGHT.</p></div>
+          </div>
+          <textarea rows="6" placeholder="I must practice English every day... I should sleep earlier... I could start a new hobby... I might travel to the US next year... I must not give up on my dreams!" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+        </div>
+      </div>
+
+      <button onclick="submitHomework37()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-37" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">📜</div>
+        <p class="font-black text-emerald-700">Homework complete! +75 XP earned! You're now a Modal Guardian!</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const TOTAL_SECTIONS = 7;
+let sectionsDone = 0;
+const doneSections = new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+
+// Vocab
+const VOCAB=[['rule','regra'],['regulation','regulamento'],['obligation','obrigação'],['necessity','necessidade'],['possibility','possibilidade'],['advice','conselho'],['permission','permissão'],['restriction','restrição'],['consequence','consequência'],['duty','dever'],['option','opção'],['alternative','alternativa'],['risk','risco'],['warning','aviso'],['guidance','orientação'],['limit','limite'],['expectation','expectativa'],['standard','padrão'],['behavior','comportamento'],['recommendation','recomendação'],['caution','cautela'],['priority','prioridade'],['suggestion','sugestão'],['tip','dica'],['best practice','boa prática'],['ideal','ideal'],['right','certo / direito'],['wrong','errado'],['responsibility','responsabilidade'],['requirement','requisito'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+
+// Expressions
+const EXPRS=[{phrase:'You should give it a try!',meaning:'Você deveria tentar!',example:'"Learning English is hard at first, but you should give it a try — it changes your life!"',use:'Incentivo com SHOULD para sugerir que alguém experimente algo novo.'},{phrase:'You must be kidding!',meaning:'Você deve estar brincando! / Isso não é possível!',example:'"You ran a marathon in 3 hours? You must be kidding — that\'s incredible!"',use:'Expressar incredulidade usando MUST para indicar certeza sobre o estado do falante.'},{phrase:'It might be worth it.',meaning:'Pode valer a pena.',example:'"The course is expensive, but it might be worth it if you practice daily."',use:'MIGHT para expressar possibilidade positiva com incerteza.'},{phrase:'Could you do me a favor?',meaning:'Você poderia me fazer um favor?',example:'"Hey, could you do me a favor and check my pronunciation? I want to improve!"',use:'COULD para fazer pedidos de forma educada e indireta.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-amber-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-amber-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+
+// Grammar accordion
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+
+// Quiz
+const QUIZ=[
+  {q:'Complete: "You ___ study every day — it is not optional!"',opts:['must','might','could','should'],ans:0},
+  {q:'Qual modal indica CONSELHO (recomendação)?',opts:['should','must','might','can'],ans:0},
+  {q:'Complete: "___ you do me a favor and help me practice?"',opts:['Could','Must','Should','Might'],ans:0},
+  {q:'Complete: "It ___ be worth it — give the course a try."',opts:['might','must','should','could'],ans:0},
+  {q:'Qual frase indica PROIBIÇÃO TOTAL?',opts:['You must not enter.','You should not enter.','You could not enter.','You might not enter.'],ans:0},
+  {q:'Complete: "You ___ be kidding! That\'s incredible!"',opts:['must','should','could','might'],ans:0},
+  {q:'Qual é a ordem de força correta (mais forte → mais fraco)?',opts:['MUST › SHOULD › COULD › MIGHT','MIGHT › COULD › SHOULD › MUST','SHOULD › MUST › MIGHT › COULD','COULD › MUST › MIGHT › SHOULD'],ans:0},
+  {q:'Complete: "She ___ speak Spanish when she was young."',opts:['could','should','must','might'],ans:0},
+  {q:'Complete: "I ___ not give up on my dreams!"',opts:['must','might','could','should'],ans:0},
+  {q:'Qual palavra significa "consequência"?',opts:['consequence','obligation','expectation','restriction'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-amber-400">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#d97706';btn.style.background='#fffbeb';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+
+// Speak
+const SPEAK=['You must practice English every day — it is the only way to become fluent!','Could you do me a favor and repeat that sentence? I want to make sure I understood.','I should give that new podcast a try — it might really help my listening skills.',"You must be kidding! She finished the whole course in one week? That's incredible!",'It might be worth it to wake up early and study before work — just give it a try.','I could speak a little English before, but now I should focus on speaking more fluently.','You should not give up — every mistake is a lesson. You must believe in yourself!','The exam might be hard, but I could study extra this week and I should be prepared.',];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center font-black text-amber-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+
+// Homework: Word Order
+const WO37_DATA=[
+  {s:'You must not give up on your dreams',w:['You','must','not','give','up','on','your','dreams']},
+  {s:'Could you do me a favor and check my homework',w:['Could','you','do','me','a','favor','and','check','my','homework']},
+  {s:'She should give the new course a try because it might be worth it',w:['She','should','give','the','new','course','a','try','because','it','might','be','worth','it']},
+];
+function hwShuffle37(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo37=WO37_DATA.map(d=>({ans:[],bank:hwShuffle37(d.w),orig:d.w}));
+function wo37Render(){const c=document.getElementById('wo37-container');c.innerHTML='';WO37_DATA.forEach((d,si)=>{const st=wo37[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo37-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo37Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo37-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo37Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo37Check(${si})" class="bg-amber-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo37Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo37-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo37Move(fromBank,si,wi){const st=wo37[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo37Render();}
+function wo37Check(si){const st=wo37[si];const fb=document.getElementById('wo37-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO37_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again! (${WO37_DATA[si].s})`;fb.classList.remove('hidden');}
+function wo37Reset(si){wo37[si].bank=hwShuffle37(WO37_DATA[si].orig);wo37[si].ans=[];document.getElementById('wo37-fb-'+si).classList.add('hidden');wo37Render();}
+wo37Render();
+
+// Match Pairs
+const MP37=[{l:'MUST 🔴',r:'Obrigação forte / Certeza'},{l:'SHOULD 🟠',r:'Conselho / Recomendação'},{l:'COULD 🟡',r:'Possibilidade / Pedido educado'},{l:'MIGHT 🟢',r:'Possibilidade incerta / Talvez'},];
+function mpShuffle37(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp37R=mpShuffle37(MP37.map((p,i)=>({label:p.r,pid:i})));
+let mp37SelL=null;const mp37Done=new Set();
+function mp37Render(){document.getElementById('mp37-left').innerHTML=MP37.map((p,i)=>`<button onclick="mp37ClickL(${i})" id="mp37L-${i}" class="mp-btn w-full ${mp37Done.has(i)?'matched':''}" ${mp37Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp37-right').innerHTML=mp37R.map((p,i)=>`<button onclick="mp37ClickR(${i})" id="mp37R-${i}" class="mp-btn w-full ${mp37Done.has(p.pid)?'matched':''}" ${mp37Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp37ClickL(i){if(mp37Done.has(i))return;mp37SelL=i;document.querySelectorAll('#mp37-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp37Done.has(j)));}
+function mp37ClickR(ri){if(mp37SelL===null)return;const item=mp37R[ri];if(item.pid===mp37SelL){mp37Done.add(mp37SelL);mp37SelL=null;mp37Render();if(mp37Done.size===MP37.length)document.getElementById('mp37-done-msg').classList.remove('hidden');}else{[document.getElementById('mp37R-'+ri),document.getElementById('mp37L-'+mp37SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp37SelL=null;document.querySelectorAll('#mp37-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp37Render();
+
+// Error Correction
+const ERR37=[{wrong:'"You should to study more — modals are important."',check:v=>v.includes('should study')&&!v.includes('to study'),hint:'should to study → should study (modal + verbo base, sem TO)'},{wrong:'"She must is tired after working so hard."',check:v=>v.includes('must be')&&!v.includes('must is'),hint:'must is → must be (after modal, use the base verb: BE not IS)'},{wrong:'"Could you doing me a favor and help me?"',check:v=>v.includes('could you do')&&!v.includes('doing'),hint:'doing → do (after modal COULD, always use base verb)'},];
+const ec=document.getElementById('err37-container');
+ERR37.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err37-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-400"/><div class="flex gap-2"><button onclick="checkErr37(${i})" class="bg-amber-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err37-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr37(i){const v=document.getElementById('err37-inp-'+i).value.toLowerCase().replace(/[?.!,]/g,'').trim();const fb=document.getElementById('err37-fb-'+i);fb.className='text-xs font-bold '+(ERR37[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR37[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR37[i].hint;fb.classList.remove('hidden');}
+
+// Fill in the Blank
+const FILL37=[{before:'You',blank:'must',after:'arrive on time — it is a strict requirement.',ans:'must'},{before:'I',blank:'should',after:'give that new series a try — everyone is recommending it.',ans:'should'},{before:'She',blank:'could',after:'speak three languages when she was a child.',ans:'could'},{before:'It',blank:'might',after:'rain later, so you should bring an umbrella just in case.',ans:'might'},];
+const fc=document.getElementById('fill37-container');
+FILL37.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill37-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill37(){FILL37.forEach((f,i)=>{const inp=document.getElementById('fill37-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+
+// Homework submit
+function submitHomework37(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework37()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_38.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 38 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework37=submitHomework37;
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 12 — Future: Will &amp; Going To | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:150px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🔮</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🚀</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">📅</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">⭐</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🌅</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_11.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_13.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🔮 Aula 12 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Future:<br><span class="text-emerald-300">Will &amp; Going To</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Dois jeitos de falar sobre o futuro — e eles não são iguais! Aprenda quando usar <strong>WILL</strong> e quando usar <strong>GOING TO</strong>.</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Palavras do futuro e planos. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões naturais para falar sobre o futuro.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">WILL vs GOING TO — a diferença que importa.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-2 text-emerald-100">A Diferença Essencial</p>
+        <div class="space-y-2 text-sm font-black">
+          <div class="bg-white/20 rounded-xl px-4 py-2">⚡ <strong>WILL</strong> → decisão espontânea / promessa / previsão sem evidência</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">📅 <strong>GOING TO</strong> → plano já decidido / evidência visível no presente</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">✅ Ambos falam do futuro — mas a <strong>escolha muda o significado!</strong></div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚡ WILL — quando usar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Use <strong>WILL</strong> para decisões tomadas no momento, promessas e previsões gerais:</p>
+            <p>💡 Decisão espontânea: "The phone is ringing! — <strong>I'll get it!</strong>"</p>
+            <p>🤝 Promessa: "<strong>I'll never forget</strong> this moment, I promise."</p>
+            <p>🔮 Previsão: "<strong>I think it will rain</strong> tomorrow." / "You'll love this place!"</p>
+            <p>🙋 Oferta: "<strong>I'll carry</strong> that for you — it looks heavy!"</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📅 GOING TO — quando usar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Use <strong>GOING TO</strong> para planos decididos e evidências visíveis:</p>
+            <p>📋 Plano pré-decidido: "<strong>I'm going to study</strong> tonight — it's in my calendar."</p>
+            <p>🌩️ Evidência visível: "Look at those clouds — it<strong>'s going to rain!</strong>"</p>
+            <p>💪 Intenção firme: "She<strong>'s going to move</strong> to London next year — flights are booked!"</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📝 Estrutura das frases</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Como montar as frases:</p>
+            <p><strong>WILL:</strong> sujeito + <strong>will</strong> + verbo base → I will go / She will help</p>
+            <p><strong>Won't</strong> = will not → I <strong>won't</strong> be late, I promise!</p>
+            <p><strong>GOING TO:</strong> sujeito + <strong>am/is/are going to</strong> + verbo base</p>
+            <p>I <strong>am going to</strong> study. / She <strong>is going to</strong> travel. / They <strong>are going to</strong> help.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔁 Diferença prática — exemplo real</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">Veja a diferença no mesmo contexto:</p>
+            <p>📞 "The phone is ringing!" → "<strong>I'll get it!</strong>" ← decisão agora</p>
+            <p>📅 "Who's calling the client today?" → "<strong>I'm going to call</strong> at 3pm." ← já estava planejado</p>
+            <p>🌦️ "It <strong>will</strong> be a great summer!" ← previsão/esperança</p>
+            <p>🌦️ "It <strong>'s going to</strong> rain — look at those clouds!" ← evidência</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🌅 Terraço de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🌅 Terraço de Nano Banana. Leo e Yara planejam o futuro enquanto assistem ao pôr do sol da ilha!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, look at those clouds — it <strong class="text-emerald-700">'s going to rain</strong> tonight! But for now, the sunset is beautiful. What are you <strong class="text-emerald-700">going to do</strong> next month?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">'m going to work hard</strong> on my speaking — it's already planned. And I <strong class="text-emerald-700">think I'll</strong> sign up for the advanced course too. I just decided right now!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">That's wonderful! I <strong class="text-emerald-700">will</strong> always be here to support you — I promise. Things <strong class="text-emerald-700">will get better</strong> every day if you stay consistent.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I know! I <strong class="text-emerald-700">'m going to set</strong> a daily goal — 30 minutes every morning. I already bought the notebook. It <strong class="text-emerald-700">will</strong> make a huge difference, I can feel it!</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">'m going to</strong> create a special challenge for you! It starts Monday — I <strong class="text-emerald-700">won't</strong> tell you what it is yet… it <strong class="text-emerald-700">will</strong> be a surprise!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">'ll be right back</strong> — let me grab my jacket, it <strong class="text-emerald-700">'s going to get</strong> cold! And I <strong class="text-emerald-700">will</strong> not miss a single day — I promise! 🌟</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre WILL e GOING TO.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 12 — Future: Will &amp; Going To</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras com WILL e GOING TO.</p></div></div><div id="wo12-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match: Situation → WILL or GOING TO</h3><p class="text-slate-500 text-sm mt-1">Conecte a situação ao tempo verbal correto.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp12-left" class="space-y-2"></div><div id="mp12-right" class="space-y-2"></div></div><p id="mp12-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro com WILL ou GOING TO.</p></div></div><div class="space-y-4" id="err12-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com will, won't, 'm going to ou 's going to.</p></div></div><div class="space-y-4" id="fill12-container"></div><button onclick="checkFill12()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre seus planos e previsões para o próximo mês. Use WILL e GOING TO corretamente.</p></div></div><textarea rows="6" placeholder="Next month I'm going to... / I will probably... / I think it will be... / I'm not going to... / I'll definitely..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework12()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-12" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">🔮</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['will','vai (decisão espontânea)'],['going to','vai (plano / evidência)'],['plan','plano'],['future','futuro'],['promise','promessa'],['prediction','previsão'],['decision','decisão'],['intention','intenção'],['schedule','agenda / horário'],['appointment','compromisso'],['deadline','prazo final'],['goal','meta / objetivo'],['dream','sonho'],['ambition','ambição'],['hope','esperança'],['expect','esperar / prever'],['prepare','preparar'],['achieve','alcançar / conquistar'],['succeed','ter sucesso'],['fail','falhar / não conseguir'],['try','tentar'],['improve','melhorar'],['change','mudar'],['grow','crescer'],['develop','desenvolver'],['reach','alcançar'],['complete','completar'],['start','começar'],['finish','terminar'],['progress','progresso'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"I'll be right back!",meaning:'Já volto! / Volto já!',example:'"Wait here — I\'ll be right back! I just need to grab my jacket from inside, it\'ll take 30 seconds!"',use:'Avisar que vai se ausentar por um momento muito curto.'},{phrase:"Things will get better!",meaning:'As coisas vão melhorar! / Vai ficar tudo bem!',example:'"I know this week has been hard, but things will get better — keep going and trust the process!"',use:'Oferecer esperança ou conforto sobre uma situação difícil.'},{phrase:"I'm going to work hard!",meaning:'Vou trabalhar duro! / Vou me dedicar muito!',example:'"Next year I\'m going to work hard, study every day, and finally become fluent. I already made a plan!"',use:'Declarar intenção firme com plano de ação já decidido.'},{phrase:"What are you going to do?",meaning:'O que você vai fazer? / Qual é o plano?',example:'"The exam is tomorrow and you haven\'t studied yet — what are you going to do? Do you have a plan?"',use:'Perguntar sobre planos específicos ou reação a uma situação.'},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'"The phone is ringing! — ___ get it!" (decisão espontânea)',opts:["I'll","I'm going to","I would","I going to"],ans:0},
+  {q:'"She ___ study medicine — she\'s already enrolled." (plano decidido)',opts:["is going to","will","would","is"],ans:0},
+  {q:'Forma negativa de WILL:',opts:["won't","willn't","wouldn't","not will"],ans:0},
+  {q:'"Look! The baby ___ cry — see his face?" (evidência visível)',opts:["is going to","will","would","is"],ans:0},
+  {q:'"I ___ always be here for you, I promise." (promessa)',opts:["will","am going to","would","shall"],ans:0},
+  {q:'Qual está CORRETO?',opts:["She will come tomorrow.","She will comes tomorrow.","She wills come.","She going to come."],ans:0},
+  {q:'"They ___ (go) to the beach — it\'s planned for weeks." (going to)',opts:["are going to go","will go","going to go","are will go"],ans:0},
+  {q:'"I\'ll be right back!" quer dizer:',opts:["Volto já!","Adeus!","Preciso de ajuda","Não volto"],ans:0},
+  {q:'"It ___ be a great year — I can feel it!" (previsão/esperança)',opts:["will","is going to","would","shall"],ans:0},
+  {q:'Qual está CORRETO?',opts:["I'm going to call him tomorrow.","I going to call him.","I will to call him.","I going call him."],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["I'll be right back — I just need to grab my notebook, it will only take a minute!","Things will get better — keep studying every day and you will see amazing progress!","I'm going to work hard this month — I already scheduled 30 minutes of English every morning.","What are you going to do this weekend? I think I'll stay home and practice speaking.","Look at those clouds — it's going to rain tonight! Let's finish the walk before it starts.","I won't give up on my goals — I will keep going no matter how hard it gets!","She's going to move to another city next year — she already found an apartment and signed the lease.","I'll help you with the homework — I just decided! We'll work on it together right now.",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO12_DATA=[
+  {s:"I'm going to study every morning because I want to improve my English fast",w:["I'm","going","to","study","every","morning","because","I","want","to","improve","my","English","fast"]},
+  {s:"Things will get better if you keep practicing and don't give up on your goals",w:['Things','will','get','better','if','you','keep','practicing','and',"don't",'give','up','on','your','goals']},
+  {s:"She is going to move to London next year — she already booked her flight",w:['She','is','going','to','move','to','London','next','year','—','she','already','booked','her','flight']},
+];
+function hwShuffle12(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo12=WO12_DATA.map(d=>({ans:[],bank:hwShuffle12(d.w),orig:d.w}));
+function wo12Render(){const c=document.getElementById('wo12-container');c.innerHTML='';WO12_DATA.forEach((d,si)=>{const st=wo12[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo12-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo12Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo12-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo12Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo12Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo12Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo12-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo12Move(fromBank,si,wi){const st=wo12[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo12Render();}
+function wo12Check(si){const st=wo12[si];const fb=document.getElementById('wo12-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO12_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again!`;fb.classList.remove('hidden');}
+function wo12Reset(si){wo12[si].bank=hwShuffle12(WO12_DATA[si].orig);wo12[si].ans=[];document.getElementById('wo12-fb-'+si).classList.add('hidden');wo12Render();}
+wo12Render();
+const MP12=[{l:'Decisão espontânea',r:'WILL'},{l:'Plano já decidido',r:'GOING TO'},{l:'Evidência visível',r:'GOING TO'},{l:'Promessa',r:'WILL'},{l:'Oferta imediata',r:'WILL'},{l:'Intenção firme com plano',r:'GOING TO'},];
+function mpShuffle12(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp12R=mpShuffle12(MP12.map((p,i)=>({label:p.r,pid:i})));
+let mp12SelL=null;const mp12Done=new Set();
+function mp12Render(){document.getElementById('mp12-left').innerHTML=MP12.map((p,i)=>`<button onclick="mp12ClickL(${i})" id="mp12L-${i}" class="mp-btn w-full ${mp12Done.has(i)?'matched':''}" ${mp12Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp12-right').innerHTML=mp12R.map((p,i)=>`<button onclick="mp12ClickR(${i})" id="mp12R-${i}" class="mp-btn w-full ${mp12Done.has(p.pid)?'matched':''}" ${mp12Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp12ClickL(i){if(mp12Done.has(i))return;mp12SelL=i;document.querySelectorAll('#mp12-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp12Done.has(j)));}
+function mp12ClickR(ri){if(mp12SelL===null)return;const item=mp12R[ri];if(item.pid===mp12SelL){mp12Done.add(mp12SelL);mp12SelL=null;mp12Render();if(mp12Done.size===MP12.length)document.getElementById('mp12-done-msg').classList.remove('hidden');}else{[document.getElementById('mp12R-'+ri),document.getElementById('mp12L-'+mp12SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp12SelL=null;document.querySelectorAll('#mp12-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp12Render();
+const ERR12=[{wrong:'"I will to call her tomorrow — I already wrote it in my calendar."',check:v=>v.includes("i'm going to call")||v.includes('i am going to call'),hint:'will to call → will call (WILL + verbo base, sem TO) ou, melhor: I\'m going to call (plano já decidido)'},{wrong:'"I going to study tonight — it\'s planned since last week."',check:v=>v.includes("i'm going to study")||v.includes('i am going to study'),hint:"I going to → I'm going to (precisa do verbo TO BE: I AM going to)"},{wrong:'"She wills help us — she just said so right now, spontaneously."',check:v=>v.includes('she will help'),hint:'wills → will (WILL não ganha -S na 3ª pessoa!)'},];
+const ec=document.getElementById('err12-container');
+ERR12.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err12-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr12(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err12-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr12(i){const v=document.getElementById('err12-inp-'+i).value.toLowerCase().replace(/[?.!,—']/g,'').trim();const fb=document.getElementById('err12-fb-'+i);fb.className='text-xs font-bold '+(ERR12[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR12[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR12[i].hint;fb.classList.remove('hidden');}
+const FILL12=[{before:"A: Someone's knocking! B:",blank:"I'll",after:"get it! (decisão agora)",ans:"i'll"},{before:'She',blank:"'s going to",after:'start a new job next month — she signed the contract! (plano)',ans:"'s going to"},{before:'Look at the sky — it',blank:"'s going to",after:'rain. I can already feel the wind. (evidência)',ans:"'s going to"},{before:'I promise I',blank:"won't",after:'be late again — I set three alarms! (negativa de will)',ans:"won't"},{before:'I think you',blank:"'ll",after:'love this place — it\'s exactly your style! (previsão)',ans:"'ll"},];
+const fc=document.getElementById('fill12-container');
+FILL12.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill12-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill12(){FILL12.forEach((f,i)=>{const inp=document.getElementById('fill12-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework12(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework12()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_13.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 13 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework12=submitHomework12;
+</script>
+</body>
+</html>

@@ -15,7 +15,13 @@ const Store = {
         planType: 'free',       // 'free' | 'plus' | 'pro'
         aiUsageToday: 0,        // resets daily
         aiUsageLimit: 3,        // 3=free, 15=plus, 50=pro
-        aiCreditsExtra: 0       // top-up credits (one-time purchase)
+        aiCreditsExtra: 0,      // top-up credits (one-time purchase)
+        // ── User profile / personalization ────────────────────────
+        englishLevel: null,           // 'beginner'|'elementary'|'intermediate'|'advanced'
+        goals: [],                    // ['travel','work','entertainment',...]
+        interests: [],                // ['music','sports','food',...]
+        dailyGoalMinutes: 10,         // 5|10|20|30
+        onboardingComplete: false
     },
     
     init() {

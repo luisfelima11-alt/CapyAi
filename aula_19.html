@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 19 — Health &amp; Body | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">🏥</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">💊</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🩺</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">💪</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">❤️</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_18.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_20.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🏥 Aula 19 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Health &amp;<br><span class="text-emerald-300">Body</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Da consulta médica à farmácia — aprenda o vocabulário essencial de saúde e corpo para se comunicar em qualquer situação médica em inglês!</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Vocabulário de saúde e corpo. Clique para virar!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões de saúde do dia a dia.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Descrevendo sintomas — frases no médico.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-2 text-emerald-100">Describing Symptoms</p>
+        <div class="space-y-2 text-sm font-black">
+          <div class="bg-white/20 rounded-xl px-4 py-2">🤒 <strong>I have</strong> a headache / a fever / a cold / a sore throat</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">😣 <strong>I feel</strong> sick / dizzy / tired / nauseous / weak</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">😖 <strong>My ... hurts</strong> → My back hurts. / My head hurts.</div>
+          <div class="bg-white/20 rounded-xl px-4 py-2">⏱️ <strong>Since / For</strong> → I've had a fever <strong>since</strong> Monday / <strong>for</strong> two days</div>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6" id="grammar-acc"></div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🩺 Clínica de Nano Banana — Capy vai ao médico!</p></div>
+      <div class="bg-white rounded-2xl border-2 border-slate-100 p-6 space-y-4 mb-6" id="dialogue-box"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Dialogue studied! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice</h2><p class="text-slate-500 text-sm">Teste seu conhecimento!</p></div>
+      <div id="quiz-area" class="space-y-6 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4">
+        <p class="text-2xl font-black text-emerald-700 mb-1" id="quiz-score-text"></p>
+        <p class="text-slate-500 text-sm">Keep practising!</p>
+      </div>
+      <button onclick="submitQuiz()" id="quiz-submit-btn" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">Check Answers +50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Pratique pronúncia em voz alta!</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I practised speaking! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📋 Homework</h2><p class="text-slate-500 text-sm">Complete todas as tarefas para ganhar +75 XP!</p></div>
+      <div class="space-y-8">
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6"><p class="font-black text-navy mb-1">1. Word Order</p><p class="text-slate-500 text-sm mb-4">Arrange the words to make correct sentences.</p><div class="space-y-5" id="wo19-container"></div></div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6"><p class="font-black text-navy mb-1">2. Match the Pairs</p><p class="text-slate-500 text-sm mb-4">Connect each health word to its Portuguese meaning.</p><div class="grid grid-cols-2 gap-3" id="mp19-area"></div><p class="text-xs text-slate-400 mt-3 font-bold" id="mp19-feedback"></p></div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6"><p class="font-black text-navy mb-1">3. Error Correction</p><p class="text-slate-500 text-sm mb-4">Find and fix the mistake in each sentence.</p><div class="space-y-4" id="err19-container"></div></div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6"><p class="font-black text-navy mb-1">4. Fill in the Blank</p><p class="text-slate-500 text-sm mb-3">Complete with the correct health word or symptom phrase.</p><div class="space-y-4" id="fill19-container"></div><button onclick="checkFill19()" class="mt-4 bg-emerald-500 text-white font-black px-6 py-2 rounded-xl hover:scale-105 transition-all text-sm">Check ✓</button></div>
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6"><p class="font-black text-navy mb-2">5. Free Writing ✍️</p><p class="text-slate-500 text-sm mb-3">Describe the last time you were sick or went to the doctor. Use at least 5 health words. Write 3–5 sentences.</p><textarea id="hw19-free" rows="5" placeholder="e.g. Last month I had a terrible cold. I had a sore throat and a fever for three days. I went to the doctor and she prescribed some medicine..." class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400"></textarea></div>
+      </div>
+      <button onclick="submitHomework19()" class="mt-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">Submit Homework +75 XP 🎉</button>
+      <div id="hw19-done" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><p class="text-emerald-700 font-black text-lg">🎉 Homework complete! +75 XP earned!</p><p class="text-slate-500 text-sm mt-1">Chapter 1 complete — você é incrível! 🌟</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+const VOCAB19=[
+  {w:'headache',t:'dor de cabeça'},{w:'fever',t:'febre'},
+  {w:'cold',t:'resfriado'},{w:'cough',t:'tosse'},
+  {w:'sore throat',t:'dor de garganta'},{w:'nausea',t:'náusea / enjoo'},
+  {w:'dizzy',t:'tonto(a) / com vertigem'},{w:'tired',t:'cansado(a)'},
+  {w:'pain',t:'dor'},{w:'ache',t:'dor (contínua e leve)'},
+  {w:'symptom',t:'sintoma'},{w:'diagnosis',t:'diagnóstico'},
+  {w:'doctor',t:'médico(a)'},{w:'nurse',t:'enfermeiro(a)'},
+  {w:'prescription',t:'receita médica'},{w:'medicine',t:'medicamento'},
+  {w:'pill',t:'comprimido'},{w:'dose',t:'dose'},
+  {w:'allergy',t:'alergia'},{w:'surgery',t:'cirurgia'},
+  {w:'emergency',t:'emergência'},{w:'appointment',t:'consulta / agendamento'},
+  {w:'recovery',t:'recuperação'},{w:'rest',t:'descanso'},
+  {w:'blood pressure',t:'pressão arterial'},{w:'heart rate',t:'frequência cardíaca'},
+  {w:'healthy',t:'saudável'},{w:'fit',t:'em boa forma'},
+  {w:'injury',t:'lesão / ferimento'},{w:'wound',t:'ferida'}
+];
+
+const EXPRESSIONS19=[
+  {expr:"I'm under the weather.",mean:"Estou me sentindo mal / indisposto(a).",ex:"I can't come to work today — I'm a bit under the weather.",tip:"Uma expressão suave para dizer que está doente. Mais gentil do que 'I'm sick'."},
+  {expr:"Take it easy.",mean:"Descanse / Não se esforce demais.",ex:"The doctor said: take it easy for a week and rest.",tip:"Usada para aconselhar alguém a não se esforçar muito. Também: 'Take care of yourself.'"},
+  {expr:"I've been feeling off.",mean:"Tenho me sentido estranha / sem estar bem.",ex:"I haven't been sleeping well — I've been feeling a bit off lately.",tip:"'Off' = fora do normal. 'Feeling off' = não estar 100%."},
+  {expr:"Better safe than sorry.",mean:"É melhor prevenir do que remediar.",ex:"Go to the doctor even if it's just a cold — better safe than sorry!",tip:"Clássico provérbio em inglês. Usado para justificar ações preventivas."}
+];
+
+const GRAMMAR_ACC19=[
+  {icon:'🤒',title:'HAVE a + symptom',body:'<b>I have</b> a headache / a fever / a cold / a cough / a sore throat / an allergy.<br>Note: "a sore throat" — not "throat pain" (very formal).<br>❌ "I have headache" (need the article A/AN before symptom)'},
+  {icon:'😣',title:'FEEL + adjective',body:'<b>I feel</b> sick / dizzy / tired / weak / nauseous / better / worse.<br>"How do you feel?" → "I feel terrible." / "I feel much better today."<br>Note: FEEL takes an adjective, not an adverb: "I feel BAD" not "I feel badly."'},
+  {icon:'⏱️',title:'SINCE vs FOR (duration)',body:'<b>FOR</b> = period of time: "I\'ve had a fever <b>for</b> two days."<br><b>SINCE</b> = starting point: "I\'ve had a fever <b>since</b> Monday."<br>Both used with Present Perfect: "I <b>have had</b> a cold for/since..."'}
+];
+
+const DIALOGUE19=[
+  {who:'Doctor 👩‍⚕️',msg:"Good morning! What seems to be the problem?"},
+  {who:'Capy 🦫',msg:"Hello, Doctor. I've been feeling under the weather for a few days."},
+  {who:'Doctor 👩‍⚕️',msg:"I see. What are your symptoms?"},
+  {who:'Capy 🦫',msg:"I have a bad headache and a sore throat. I've also been feeling dizzy since Monday."},
+  {who:'Doctor 👩‍⚕️',msg:"Do you have a fever?"},
+  {who:'Capy 🦫',msg:"Yes — 38.5°C since yesterday. And I have a cough too."},
+  {who:'Doctor 👩‍⚕️',msg:"How long have you had these symptoms?"},
+  {who:'Capy 🦫',msg:"For about three days. I've been resting but it's not getting better."},
+  {who:'Doctor 👩‍⚕️',msg:"It sounds like a viral infection. I'll write you a prescription for medicine."},
+  {who:'Capy 🦫',msg:"Should I take it easy this week?"},
+  {who:'Doctor 👩‍⚕️',msg:"Yes — rest, drink lots of water, and take one pill three times a day."},
+  {who:'Capy 🦫',msg:"Thank you, Doctor. Better safe than sorry — I'm glad I came!"}
+];
+
+const QUIZ19=[
+  {q:"'I have a ___.' (dor de cabeça)",opts:["headpain","headache","head hurt","headhurt"],ans:1},
+  {q:"'I feel ___.' (tonto)",opts:["dizzy","dizzily","dizziness","dizzying"],ans:0},
+  {q:"'I've had a cold ___ Monday.' (desde)",opts:["for","during","since","from"],ans:2},
+  {q:"What does 'under the weather' mean?",opts:["Com calor","Se sentindo mal","Debaixo da chuva","Com medo"],ans:1},
+  {q:"What does a doctor give you to buy medicine?",opts:["A diagnosis","A symptom","A prescription","A dose"],ans:2},
+  {q:"'I feel ___' — which is correct?",opts:["I feel badly","I feel bad","I feel badly ill","I feel much badly"],ans:1}
+];
+
+const SPEAK19=[
+  {ph:"I'm under the weather.",pt:"Estou me sentindo mal."},
+  {ph:"I have a headache and a sore throat.",pt:"Tenho dor de cabeça e dor de garganta."},
+  {ph:"I've had a fever since Monday.",pt:"Tenho febre desde segunda-feira."},
+  {ph:"How long have you had these symptoms?",pt:"Há quanto tempo você tem esses sintomas?"},
+  {ph:"The doctor prescribed some medicine.",pt:"O médico receitou um medicamento."},
+  {ph:"Take it easy this week.",pt:"Descanse esta semana."},
+  {ph:"Better safe than sorry.",pt:"É melhor prevenir do que remediar."},
+  {ph:"I feel much better today.",pt:"Estou me sentindo muito melhor hoje."}
+];
+
+const wo19=[
+  {words:["I","have","had","a","fever","since","Monday"],ans:"I have had a fever since Monday"},
+  {words:["She","feels","dizzy","and","tired"],ans:"She feels dizzy and tired"},
+  {words:["Take","one","pill","three","times","a","day"],ans:"Take one pill three times a day"},
+  {words:["I've","been","feeling","under","the","weather"],ans:"I've been feeling under the weather"}
+];
+
+const mp19={
+  left:["fever","prescription","symptom","dizzy","recovery","appointment"],
+  right:["febre","receita médica","sintoma","tonto(a)","recuperação","consulta"],
+  pairs:{0:0,1:1,2:2,3:3,4:4,5:5}
+};
+
+const err19=[
+  {wrong:"I have headache and feel badly.",hint:"(1) Artigo faltando: 'have A headache'. (2) Adjetivo, não advérbio: 'feel BAD'",check:s=>s.toLowerCase().includes('a headache')&&(s.toLowerCase().includes('feel bad ')&&!s.toLowerCase().includes('badly'))},
+  {wrong:"I've had this pain since three days.",hint:"'Three days' é período de tempo → use FOR, não SINCE: 'for three days'",check:s=>s.toLowerCase().includes('for three days')},
+  {wrong:"The doctor gived me a prescription.",hint:"'Give' é irregular no passado: 'gived' → 'gave'",check:s=>s.toLowerCase().includes('gave')}
+];
+
+const fill19=[
+  {sent:"I don't feel well. I have a ___ throat and a fever.",ans:["sore"]},
+  {sent:"My head ___. Can I have some medicine?",ans:["hurts"]},
+  {sent:"I've been feeling dizzy ___ Monday.",ans:["since"]},
+  {sent:"The doctor wrote a ___ for antibiotics.",ans:["prescription"]},
+  {sent:"___ safe than sorry — always see a doctor.",ans:["better"]}
+];
+
+const sections=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+const done={};let quizAnswers={};
+let mp19State={selLeft:null,selRight:null,matched:new Set()};
+
+function renderDots(){const c=document.getElementById('hero-dots');c.innerHTML=sections.map(s=>`<div class="prog-dot${done[s]?' done':''}" title="${s}"></div>`).join('');document.getElementById('hero-label').textContent=`${Object.keys(done).length} / 7 sections done`;}
+function xpPop(xp){const el=document.createElement('div');el.className='xp-pop';el.textContent=`+${xp} XP!`;el.style.cssText=`top:${window.innerHeight/2}px;left:${window.innerWidth/2-30}px`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+function markSection(s){if(done[s])return;done[s]=true;Store.addXP(20);xpPop(20);renderDots();}
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=btn.dataset.tab;document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));document.getElementById('tab-'+t).classList.remove('hidden');});});
+(function(){const g=document.getElementById('vocab-grid');VOCAB19.forEach(v=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front text-white font-black text-sm">${v.w}</div><div class="flip-back text-white font-bold text-xs">${v.t}</div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));g.appendChild(d);});})();
+(function(){const c=document.getElementById('expr-list');EXPRESSIONS19.forEach(e=>{c.innerHTML+=`<div class="expr-card bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left" onclick="this.closest('.expr-card').classList.toggle('open')"><div><span class="font-black text-navy">"${e.expr}"</span> <span class="text-slate-500 text-sm ml-2">— ${e.mean}</span></div><span class="expr-chevron text-slate-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-1"><p class="text-sm text-slate-600 italic">"${e.ex}"</p><p class="text-xs text-emerald-600 font-bold mt-1">💡 ${e.tip}</p></div></div>`;});})();
+(function(){const c=document.getElementById('grammar-acc');GRAMMAR_ACC19.forEach(a=>{c.innerHTML+=`<div class="acc-item bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left font-black text-navy" onclick="this.closest('.acc-item').classList.toggle('open')"><span>${a.icon} ${a.title}</span><i class="acc-icon not-italic text-xl text-slate-400">+</i></button><div class="acc-body px-5 pb-4 text-sm text-slate-600 leading-relaxed">${a.body}</div></div>`;});})();
+(function(){const c=document.getElementById('dialogue-box');DIALOGUE19.forEach(l=>{const isD=l.who.startsWith('D');const emoji=isD?'👩‍⚕️':'🦫';c.innerHTML+=`<div class="flex ${isD?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${isD?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${isD?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
+(function(){const c=document.getElementById('quiz-area');QUIZ19.forEach((q,i)=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl p-5"><p class="font-black text-navy mb-3">${i+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,j)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-sm font-bold text-left text-slate-700" onclick="selectOpt(${i},${j},this)">${o}</button>`).join('')}</div></div>`;});})();
+function selectOpt(qi,oi,el){if(el.disabled)return;document.querySelectorAll(`#quiz-area > div:nth-child(${qi+1}) .opt-btn`).forEach(b=>b.classList.remove('selected'));el.classList.add('selected');quizAnswers[qi]=oi;}
+function submitQuiz(){let score=0;QUIZ19.forEach((q,i)=>{document.querySelectorAll(`#quiz-area > div:nth-child(${i+1}) .opt-btn`).forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(quizAnswers[i]===j)b.classList.add('wrong');});if(quizAnswers[i]===q.ans)score++;});document.getElementById('quiz-score-text').textContent=`You got ${score}/${QUIZ19.length} correct!`;document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-submit-btn').disabled=true;if(!done['practice']){done['practice']=true;Store.addXP(50);xpPop(50);renderDots();}}
+(function(){const c=document.getElementById('speak-list');SPEAK19.forEach(s=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl px-5 py-4 flex items-center justify-between gap-3"><div><p class="font-black text-navy">${s.ph}</p><p class="text-sm text-slate-500">${s.pt}</p></div><button onclick="speak('${s.ph.replace(/'/g,"\\'")}',this)" class="flex-shrink-0 bg-emerald-100 text-emerald-700 font-black text-xs px-3 py-2 rounded-xl hover:bg-emerald-200 transition-all">🔊 Listen</button></div>`;});})();
+function speak(text,btn){const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=0.9;window.speechSynthesis.speak(u);btn.textContent='🔊 Playing...';setTimeout(()=>btn.textContent='🔊 Listen',2000);}
+(function(){const c=document.getElementById('wo19-container');wo19.forEach((p,i)=>{const shuffled=[...p.words].sort(()=>Math.random()-.5);c.innerHTML+=`<div class="mb-2"><p class="text-xs font-black text-slate-400 uppercase mb-2">Sentence ${i+1}</p><div class="wo-ans mb-2" id="wo19-ans-${i}" onclick="wo19ReturnTile(event,${i})"></div><div class="wo-bank" id="wo19-bank-${i}">${shuffled.map(w=>`<span class="wo-tile" onclick="wo19MoveTile(this,${i})">${w}</span>`).join('')}</div><p class="text-xs mt-1 font-bold hidden" id="wo19-fb-${i}"></p></div>`;});})();
+function wo19MoveTile(el,i){document.getElementById('wo19-ans-'+i).appendChild(el);wo19Check(i);}
+function wo19ReturnTile(e,i){if(e.target.classList.contains('wo-tile')){document.getElementById('wo19-bank-'+i).appendChild(e.target);wo19Check(i);}}
+function wo19Check(i){const tiles=[...document.getElementById('wo19-ans-'+i).querySelectorAll('.wo-tile')];const s=tiles.map(t=>t.textContent).join(' ');const fb=document.getElementById('wo19-fb-'+i);if(tiles.length===wo19[i].words.length){const ok=s.toLowerCase()===wo19[i].ans.toLowerCase();fb.classList.remove('hidden');fb.textContent=ok?'✅ Correct!':'❌ Not quite — try again!';fb.className=`text-xs mt-1 font-bold ${ok?'text-emerald-600':'text-red-500'}`;}else fb.classList.add('hidden');}
+(function(){const c=document.getElementById('mp19-area');const rs=[...mp19.right].sort(()=>Math.random()-.5);c.innerHTML='<div class="space-y-2 col-span-1">'+mp19.left.map((l,i)=>`<button class="mp-btn w-full" id="mp19-L-${i}" onclick="mp19Sel('L',${i})">${l}</button>`).join('')+'</div>'+'<div class="space-y-2 col-span-1">'+rs.map((r,i)=>{const ri=mp19.right.indexOf(r);return`<button class="mp-btn w-full" id="mp19-R-${ri}" onclick="mp19Sel('R',${ri})">${r}</button>`}).join('')+'</div>';})();
+function mp19Sel(side,idx){if(mp19State.matched.has((side==='L'?'L':'R')+idx))return;const btn=document.getElementById(`mp19-${side}-${idx}`);if(side==='L'){if(mp19State.selLeft!==null)document.getElementById(`mp19-L-${mp19State.selLeft}`)?.classList.remove('selected');mp19State.selLeft=idx;btn.classList.add('selected');}else{if(mp19State.selRight!==null)document.getElementById(`mp19-R-${mp19State.selRight}`)?.classList.remove('selected');mp19State.selRight=idx;btn.classList.add('selected');}if(mp19State.selLeft!==null&&mp19State.selRight!==null){const lI=mp19State.selLeft,rI=mp19State.selRight;const ok=mp19.pairs[lI]===rI;const lb=document.getElementById(`mp19-L-${lI}`),rb=document.getElementById(`mp19-R-${rI}`);if(ok){lb.classList.add('matched');rb.classList.add('matched');lb.disabled=true;rb.disabled=true;mp19State.matched.add('L'+lI);mp19State.matched.add('R'+rI);if(mp19State.matched.size===mp19.left.length*2)document.getElementById('mp19-feedback').textContent='🎉 All matched!';}else{lb.classList.add('wrong-flash');rb.classList.add('wrong-flash');setTimeout(()=>{lb.classList.remove('wrong-flash','selected');rb.classList.remove('wrong-flash','selected');},700);}mp19State.selLeft=null;mp19State.selRight=null;lb.classList.remove('selected');rb.classList.remove('selected');}}
+(function(){const c=document.getElementById('err19-container');err19.forEach((e,i)=>{c.innerHTML+=`<div class="space-y-2"><p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2">❌ ${e.wrong}</p><input type="text" placeholder="Write the corrected sentence..." class="fill-inp w-full" id="err19-inp-${i}" style="width:100%;text-align:left"/><p class="text-xs text-slate-400 font-bold">💡 Hint: ${e.hint}</p><button onclick="checkErr19(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button><p class="text-xs font-bold hidden" id="err19-fb-${i}"></p></div>`;});})();
+function checkErr19(i){const inp=document.getElementById(`err19-inp-${i}`);const fb=document.getElementById(`err19-fb-${i}`);const ok=err19[i].check(inp.value);inp.className=`fill-inp w-full ${ok?'ok':'err'}`;fb.classList.remove('hidden');fb.textContent=ok?'✅ Correct!':'❌ Check the hint and try again!';fb.className=`text-xs font-bold ${ok?'text-emerald-600':'text-red-500'}`;}
+(function(){const c=document.getElementById('fill19-container');fill19.forEach((f,i)=>{const parts=f.sent.split('___');c.innerHTML+=`<div class="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-700"><span>${parts[0]}</span><input type="text" class="fill-inp" id="fill19-${i}" style="width:120px"/><span>${parts[1]||''}</span></div>`;});})();
+function checkFill19(){fill19.forEach((f,i)=>{const inp=document.getElementById(`fill19-${i}`);const ok=f.ans.some(a=>inp.value.trim().toLowerCase()===a.toLowerCase());inp.className=`fill-inp ${ok?'ok':'err'}`;});}
+function submitHomework19(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework19()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_20.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 20 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+renderDots();
+</script>
+</body>
+</html>

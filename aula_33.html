@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -15,7 +15,7 @@
 *{font-family:'Plus Jakarta Sans',sans-serif}
 @keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
 .float-emoji{animation:floatEmoji 3s ease-in-out infinite}
-.flip-card{perspective:800px;cursor:pointer}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
 .flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
 .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
@@ -51,9 +51,11 @@
     <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:28%;animation-delay:1s">⚡</span>
   </div>
   <div class="relative max-w-5xl mx-auto px-6 py-12">
-    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-    </a>
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+      <a href="aula_44.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+      <a href="aula_34.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+    </div>
     <div class="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-400/30 rounded-full px-4 py-1 text-sm font-black text-amber-300 mb-3">Aula 33</div>
     <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">📋 Going to<br><span class="text-amber-300">& Get Phrasal Verbs</span></h1>
     <p class="text-white/60 text-base mb-5 max-w-lg">Express decided plans, use informal GONNA, and master 5 essential GET phrasal verbs like a native speaker.</p>
@@ -325,7 +327,7 @@
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -724,11 +726,15 @@ function checkFill33(){
 }
 
 function submitHomework33(){
-  const btn=event.target;
-  btn.disabled=true;btn.textContent='✓ Submitted!';btn.classList.add('opacity-75');
-  document.getElementById('hw-done-33').classList.remove('hidden');
-  markSection();
-  if(typeof Store!=='undefined') Store.addXP(75);
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework33()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_34.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 34 →';
+  btn.insertAdjacentElement('afterend', a);
 }
 </script>
 </body>

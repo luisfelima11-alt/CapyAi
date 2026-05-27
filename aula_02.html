@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 2 — To Go, Do, Say & See | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center}
+.flip-front{background:linear-gradient(135deg,#10b981,#14b8a6)}.flip-back{background:linear-gradient(135deg,#059669,#10b981);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">🚶</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">👁️</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">💬</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🌿</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">✅</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_01.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_03.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🚶 Aula 2 · Beginner</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">To Go, Do,<br><span class="text-emerald-300">Say & See</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Os verbos de ação mais usados no inglês — para falar sobre sua rotina, planos e o que você observa no dia a dia.</p>
+      <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
+    </div>
+  </div>
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Vocabulary</h2><p class="text-slate-500 text-sm">Verbos de ação e movimento. Clique para virar.</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these words! +20 XP</button>
+    </div>
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Expressões do dia a dia. Clique para ver mais.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Got the expressions! +20 XP</button>
+    </div>
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">GO, DO, SAY & SEE — usos e collocations.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">Verbos de Ação</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm font-black">
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">GO 🚶</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">DO ✅</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">SAY 💬</span>
+          <span class="bg-white/20 rounded-xl px-3 py-2 text-center">SEE 👁️</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🚶 GO — Ir / Se mover</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>go</strong> | He/She/It <strong>goes</strong></p>
+            <p>✅ <strong>I go to school every day.</strong> → Vou à escola todos os dias.</p>
+            <p>✅ <strong>She goes to the gym on Mondays.</strong> → Ela vai à academia nas segundas.</p>
+            <p>✅ <strong>Let's go!</strong> → Vamos!</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs">💡 GO + -ING: <strong>go swimming, go shopping, go running</strong></p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>✅ DO — Fazer / Realizar</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>do</strong> | He/She/It <strong>does</strong></p>
+            <p>✅ <strong>I do my homework every night.</strong> → Faço minha lição toda noite.</p>
+            <p>✅ <strong>She does yoga in the morning.</strong> → Ela faz yoga de manhã.</p>
+            <p>✅ <strong>What do you do?</strong> → O que você faz? (profissão)</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>💬 SAY — Dizer / Falar (algo)</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>say</strong> | He/She/It <strong>says</strong></p>
+            <p>✅ <strong>What did you say?</strong> → O que você disse?</p>
+            <p>✅ <strong>She says hello to everyone.</strong> → Ela diz olá para todos.</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs">💡 SAY + something. TELL + someone: <em>I say "hello." / I tell you a secret.</em></p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>👁️ SEE — Ver / Enxergar / Entender</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-emerald-50 rounded-xl p-3">I/You/We/They <strong>see</strong> | He/She/It <strong>sees</strong></p>
+            <p>✅ <strong>I see what you mean.</strong> → Entendo o que você quer dizer.</p>
+            <p>✅ <strong>Can you see the sign?</strong> → Você consegue ver a placa?</p>
+            <p>✅ <strong>See you later!</strong> → Até mais!</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+    </div>
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🌿 Floresta de Nano Banana. Leia em voz alta.</p></div>
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🌿 Floresta de Nano Banana. Leo e Yara exploram a floresta e planejam o dia deles juntos.</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">Leo, look! Do you <strong class="text-emerald-700">see</strong> that beautiful waterfall? I <strong class="text-emerald-700">go</strong> there every morning!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Wow! I <strong class="text-emerald-700">see</strong> it! It's amazing! What do you <strong class="text-emerald-700">do</strong> there?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">do</strong> my morning exercises and practice English. I <strong class="text-emerald-700">say</strong> new words out loud — it really helps!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">That's a great idea! What do you <strong class="text-emerald-700">say</strong> exactly? How does it work?</p></div>
+        <div class="bg-emerald-50 border-l-4 border-emerald-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-emerald-700 mb-1">🦫 Capy Yara</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">say</strong> the word, the translation, and then a sentence. Then I <strong class="text-emerald-700">go</strong> to the next word. It's simple but powerful!</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">I <strong class="text-emerald-700">see</strong> what you mean! Let's <strong class="text-emerald-700">go</strong> together tomorrow — I want to <strong class="text-emerald-700">do</strong> this too! 🌊</p></div>
+      </div>
+      <button onclick="markSection('dialogue'); if(typeof Store!=='undefined') Store.addXP(20); spawnXP('+20 XP');" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
+    </div>
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questões sobre Go, Do, Say & See.</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center mb-4"><div class="text-4xl mb-2">🏆</div><p class="font-black text-emerald-700 text-lg" id="quiz-score-text"></p><p class="text-emerald-600 text-sm mt-1">+50 XP earned!</p></div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Check Answers &nbsp;+50 XP</button>
+    </div>
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Leia em voz alta. Marque quando terminar.</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ All sentences practiced! +20 XP</button>
+    </div>
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3"><div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Aula 2 — To Go, Do, Say & See</p></div><div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div></div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Organize as palavras na ordem correta.</p></div></div><div id="wo2-container" class="space-y-6"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-teal-100 text-teal-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Verbs</h3><p class="text-slate-500 text-sm mt-1">Conecte cada verbo ao seu significado.</p></div></div><div class="grid grid-cols-2 gap-3"><div id="mp2-left" class="space-y-2"></div><div id="mp2-right" class="space-y-2"></div></div><p id="mp2-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados!</p></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Error Correction</h3><p class="text-slate-500 text-sm mt-1">Corrija o erro em cada frase.</p></div></div><div class="space-y-4" id="err2-container"></div></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Complete com: <strong>go / goes / do / does / say / see</strong>.</p></div></div><div class="space-y-4" id="fill2-container"></div><button onclick="checkFill2()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button></div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6"><div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-black text-sm flex items-center justify-center flex-shrink-0">5</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Escreva 5 frases sobre sua rotina usando GO, DO, SAY e SEE.</p></div></div><textarea rows="6" placeholder="Every morning I go... I do... I usually say... I can see... She goes... He does..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-400 resize-none"></textarea></div>
+      </div>
+      <button onclick="submitHomework2()" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">✓ Submit Homework &nbsp;+75 XP</button>
+      <div id="hw-done-2" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center"><div class="text-3xl mb-2">🚶</div><p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p></div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script><script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+const VOCAB=[['go','ir / se mover'],['do','fazer / realizar'],['say','dizer / falar'],['see','ver / enxergar'],['watch','assistir / observar'],['look','olhar / parecer'],['visit','visitar'],['travel','viajar'],['walk','caminhar / andar'],['run','correr'],['drive','dirigir'],['ride','andar de (bicicleta/moto)'],['fly','voar'],['swim','nadar'],['play','jogar / brincar / tocar'],['work','trabalhar'],['study','estudar'],['read','ler'],['write','escrever'],['listen','ouvir / escutar'],['speak','falar (idioma)'],['talk','conversar / falar'],['meet','encontrar / conhecer'],['join','entrar / se juntar'],['attend','participar / comparecer'],['leave','sair / deixar'],['arrive','chegar'],['return','retornar / voltar'],['stay','ficar / permanecer'],['move','se mover / se mudar'],];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,pt])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+const EXPRS=[{phrase:"Let's go!",meaning:'Vamos! / Vamos lá!',example:'"The movie starts in 10 minutes — let\'s go!"',use:"Convite ou incentivo para fazer algo agora. Muito comum e natural."},{phrase:"What do you do?",meaning:'O que você faz? / Qual é sua profissão?',example:'"Nice to meet you! What do you do?" — "I\'m an English teacher."',use:"Pergunta sobre profissão ou ocupação. Sempre com auxiliary DO."},{phrase:"I see what you mean.",meaning:'Entendo o que você quer dizer.',example:'"Practice every day — it\'s the only way." — "I see what you mean!"',use:"Confirmar que você entendeu a mensagem da outra pessoa."},{phrase:"Say it again!",meaning:'Fala de novo! / Repete!',example:'"Could you say it again? I didn\'t catch the last word."',use:"Pedir para alguém repetir algo que você não entendeu bem."},];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-emerald-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-emerald-50 rounded-xl p-3 italic">${e.example}</p><p>${e.use}</p></div>`;el.appendChild(d);});
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+const QUIZ=[
+  {q:'Complete: "She ___ to the gym three times a week."',opts:['goes','go','does','sees'],ans:0},
+  {q:'Complete: "What do you ___ in the morning?"',opts:['do','does','go','say'],ans:0},
+  {q:'Complete: "I ___ what you mean — that makes sense!"',opts:['see','look','watch','view'],ans:0},
+  {q:'Complete: "He always ___ thank you after class."',opts:['says','say','does','tells'],ans:0},
+  {q:'Qual collocation com GO está correta?',opts:['go swimming','go a walk','do swimming','make a swim'],ans:0},
+  {q:'Complete: "Let\'s ___ to the park — the weather is perfect!"',opts:['go','do','see','say'],ans:0},
+  {q:'Qual forma está CORRETA?',opts:['She does yoga every day.','She do yoga every day.','She is do yoga.','She doing yoga every day.'],ans:0},
+  {q:'Complete: "I can ___ the mountains from my window!"',opts:['see','look','watch','view'],ans:0},
+  {q:'SAY vs TELL: qual frase está correta?',opts:['She said hello to me.','She told hello to me.','She say me hello.','She says to me hello.'],ans:0},
+  {q:'Complete: "He ___ his homework before watching TV."',opts:['does','do','goes','says'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-emerald-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#10b981';btn.style.background='#ecfdf5';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+const SPEAK=["Every morning I go for a walk and I do some exercises in the park.","She goes to the supermarket on Fridays and does all the shopping for the week.","I see what you mean — if you say it out loud, you remember it much better.","Let's go! The class starts in 5 minutes and we don't want to be late.","He does his best every day — that's why he sees great results in English.","What do you do in the evenings? I usually go for a run and then read.","She says 'good morning' to everyone — it's a small thing that makes a big difference.","I can see the progress I'm making — and it motivates me to keep going!",];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center font-black text-emerald-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+const WO2_DATA=[
+  {s:'She goes to the park and does yoga every morning',w:['She','goes','to','the','park','and','does','yoga','every','morning']},
+  {s:'I see what you mean and I want to do the same',w:['I','see','what','you','mean','and','I','want','to','do','the','same']},
+  {s:'What does he say when he sees something amazing',w:['What','does','he','say','when','he','sees','something','amazing']},
+];
+function hwShuffle2(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo2=WO2_DATA.map(d=>({ans:[],bank:hwShuffle2(d.w),orig:d.w}));
+function wo2Render(){const c=document.getElementById('wo2-container');c.innerHTML='';WO2_DATA.forEach((d,si)=>{const st=wo2[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo2-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo2Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo2-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo2Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo2Check(${si})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo2Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo2-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo2Move(fromBank,si,wi){const st=wo2[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo2Render();}
+function wo2Check(si){const st=wo2[si];const fb=document.getElementById('wo2-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO2_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-emerald-600':'text-red-500');fb.textContent=ok?'✅ Correct!':`❌ Try again! (${WO2_DATA[si].s})`;fb.classList.remove('hidden');}
+function wo2Reset(si){wo2[si].bank=hwShuffle2(WO2_DATA[si].orig);wo2[si].ans=[];document.getElementById('wo2-fb-'+si).classList.add('hidden');wo2Render();}
+wo2Render();
+const MP2=[{l:'GO 🚶',r:'Ir / Se mover'},{l:'DO ✅',r:'Fazer / Realizar'},{l:'SAY 💬',r:'Dizer / Falar algo'},{l:'SEE 👁️',r:'Ver / Enxergar / Entender'},];
+function mpShuffle2(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp2R=mpShuffle2(MP2.map((p,i)=>({label:p.r,pid:i})));
+let mp2SelL=null;const mp2Done=new Set();
+function mp2Render(){document.getElementById('mp2-left').innerHTML=MP2.map((p,i)=>`<button onclick="mp2ClickL(${i})" id="mp2L-${i}" class="mp-btn w-full ${mp2Done.has(i)?'matched':''}" ${mp2Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp2-right').innerHTML=mp2R.map((p,i)=>`<button onclick="mp2ClickR(${i})" id="mp2R-${i}" class="mp-btn w-full ${mp2Done.has(p.pid)?'matched':''}" ${mp2Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp2ClickL(i){if(mp2Done.has(i))return;mp2SelL=i;document.querySelectorAll('#mp2-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp2Done.has(j)));}
+function mp2ClickR(ri){if(mp2SelL===null)return;const item=mp2R[ri];if(item.pid===mp2SelL){mp2Done.add(mp2SelL);mp2SelL=null;mp2Render();if(mp2Done.size===MP2.length)document.getElementById('mp2-done-msg').classList.remove('hidden');}else{[document.getElementById('mp2R-'+ri),document.getElementById('mp2L-'+mp2SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp2SelL=null;document.querySelectorAll('#mp2-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp2Render();
+const ERR2=[{wrong:'"She go to school by bus and do her homework on the way."',check:v=>v.includes('goes')&&v.includes('does'),hint:'go → goes / do → does (he/she/it + -S)'},{wrong:'"I says hello to everyone but they not see me."',check:v=>v.includes('say hello')&&(v.includes("don't see")||v.includes("do not see")),hint:"says → say / not see → don't see (I + say; negativa: don't)"},{wrong:'"What he does in the weekend? He go to the beach."',check:v=>v.includes('does he do')&&v.includes('goes'),hint:'What he does → What does he do? / go → goes'},];
+const ec=document.getElementById('err2-container');
+ERR2.forEach((e,i)=>{const d=document.createElement('div');d.className='space-y-2';d.innerHTML=`<p class="text-sm font-bold text-red-600 bg-red-50 rounded-xl px-3 py-2 line-through">${e.wrong}</p><input type="text" id="err2-inp-${i}" placeholder="Write the correct sentence..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400"/><div class="flex gap-2"><button onclick="checkErr2(${i})" class="bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button></div><p id="err2-fb-${i}" class="text-xs font-bold hidden"></p>`;ec.appendChild(d);});
+function checkErr2(i){const v=document.getElementById('err2-inp-'+i).value.toLowerCase().replace(/[?.!,]/g,'').trim();const fb=document.getElementById('err2-fb-'+i);fb.className='text-xs font-bold '+(ERR2[i].check(v)?'text-emerald-600':'text-red-500');fb.textContent=ERR2[i].check(v)?'✅ Correto!':'❌ Dica: '+ERR2[i].hint;fb.classList.remove('hidden');}
+const FILL2=[{before:'She',blank:'goes',after:'to the market every Saturday morning.',ans:'goes'},{before:'What do you',blank:'do',after:'when you feel stressed? I go for a walk.',ans:'do'},{before:'I',blank:'see',after:'a rainbow! It is so beautiful after the rain.',ans:'see'},{before:'He always',blank:'says',after:'"good morning" with a big smile.',ans:'says'},{before:'Let\'s',blank:'go',after:'— the concert starts in 30 minutes!',ans:'go'},];
+const fc=document.getElementById('fill2-container');
+FILL2.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`<span>${f.before}</span><input type="text" id="fill2-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/><span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill2(){FILL2.forEach((f,i)=>{const inp=document.getElementById('fill2-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+function submitHomework2(){
+  markSection('homework', 75);
+  const btn = document.querySelector('[onclick="submitHomework2()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_03.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 03 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+window.submitHomework2=submitHomework2;
+</script>
+</body>
+</html>

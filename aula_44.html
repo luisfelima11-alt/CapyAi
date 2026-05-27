@@ -1,0 +1,700 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aula 44 — Tell Me About Yourself | Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#10b981;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#10b981,#14b8a6);border-radius:99px;transition:width .25s}.tab-btn.active{color:#10b981}.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}.prog-dot.done{background:linear-gradient(135deg,#10b981,#14b8a6)}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.opt-btn.correct{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;animation:correct-pulse .3s ease}@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#10b981;background:#ecfdf5}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #6ee7b7;border-radius:1rem;background:#f0fdf4}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#10b981;background:#ecfdf5}.mp-btn.selected{border-color:#10b981;background:#d1fae5}.mp-btn.matched{border-color:#10b981!important;background:#d1fae5!important;color:#065f46!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#10b981}.fill-inp.ok{border-color:#10b981;background:#d1fae5;color:#065f46}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.chunk-detail{display:none}.chunk-card.open .chunk-detail{display:block}.chunk-card.open .chunk-chevron{transform:rotate(180deg)}.chunk-chevron{transition:transform .25s}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- HERO -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-teal-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%">💼</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🎤</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">📋</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🤝</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">⭐</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_43.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_33.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🎤 Aula 44 · Communicative</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Tell Me About<br><span class="text-emerald-300">Yourself</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Yara está numa entrevista de emprego em inglês — Present Perfect para experiências, Will e Going To para planos futuros em um contexto real e profissional!</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 6 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS NAV -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="situation">🎬 Situation</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">💬 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="chunks">🔑 Chunks</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- TAB 1: SITUATION -->
+    <div id="tab-situation" class="fade-in">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🎬 The Situation</h2>
+        <p class="text-slate-500 text-sm">Read the context, then go to the dialogue tab.</p>
+      </div>
+
+      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 mb-5">
+        <div class="flex items-start gap-4">
+          <span class="text-4xl">💼</span>
+          <div>
+            <h3 class="font-black text-navy text-lg mb-1">A Job Interview in English</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">Yara is interviewing for a <strong>Marketing Coordinator</strong> role at an international company in São Paulo. The interview is conducted in English. She needs to talk about her past experience (Present Perfect), and her future plans and goals (Will / Going To).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 text-center">
+          <div class="text-5xl mb-2">🦁</div>
+          <div class="font-black text-navy text-base">Yara</div>
+          <div class="text-slate-400 text-xs mt-1">Candidate — Marketing professional</div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 text-center">
+          <div class="text-5xl mb-2">👔</div>
+          <div class="font-black text-navy text-base">Mr. Silva</div>
+          <div class="text-slate-400 text-xs mt-1">Interviewer — Senior Manager</div>
+        </div>
+      </div>
+
+      <div class="bg-navy rounded-2xl p-5 text-white mb-6">
+        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Grammar in this dialogue</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">PRESENT PERFECT</div>
+            <div class="text-white/70 text-xs">Experiences &amp; recent achievements</div>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">WILL</div>
+            <div class="text-white/70 text-xs">Promises, offers &amp; spontaneous plans</div>
+          </div>
+          <div class="bg-white/10 rounded-xl p-3 text-center">
+            <div class="font-black text-sm mb-1">GOING TO</div>
+            <div class="text-white/70 text-xs">Intentions &amp; future goals</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="markSection('situation')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Ready — show me the interview! +20 XP</button>
+    </div>
+
+    <!-- TAB 2: DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">💬 The Dialogue</h2>
+        <p class="text-slate-500 text-sm mb-1">Read the interview. Cores mostram a gramática: <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-teal-600 font-bold">expressões formais</span></p>
+      </div>
+      <div class="bg-slate-50 rounded-2xl p-5 mb-6" id="dialogue44-grid"></div>
+      <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the interview! +20 XP</button>
+    </div>
+
+    <!-- TAB 3: CHUNKS -->
+    <div id="tab-chunks" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🔑 Key Chunks</h2>
+        <p class="text-slate-500 text-sm">Expressões essenciais para entrevistas em inglês. Clique para expandir e ouça cada uma!</p>
+      </div>
+      <div id="chunks44-grid" class="space-y-3 mb-6"></div>
+      <div id="chunks44-mark-wrap" class="hidden">
+        <button onclick="markSection('chunks')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I know these chunks! +20 XP</button>
+      </div>
+    </div>
+
+    <!-- TAB 4: PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">✏️ Practice</h2>
+        <p class="text-slate-500 text-sm">Duas partes: MCQ e fill-in-the-blank.</p>
+      </div>
+
+      <!-- Part A: MCQ -->
+      <div class="bg-white rounded-2xl border-2 border-slate-100 p-5 mb-5">
+        <h3 class="font-black text-navy mb-1">Part A — Present Perfect, Will, or Going To?</h3>
+        <p class="text-slate-500 text-xs mb-4">Choose the correct option for each interview sentence.</p>
+        <div id="prac44-mcq" class="space-y-5"></div>
+      </div>
+
+      <!-- Part B: Fill in the blank -->
+      <div class="bg-white rounded-2xl border-2 border-slate-100 p-5 mb-5">
+        <h3 class="font-black text-navy mb-1">Part B — Fill in the Blank</h3>
+        <p class="text-slate-500 text-xs mb-4">Type the missing word to complete each sentence.</p>
+        <div id="prac44-fill" class="space-y-4"></div>
+        <button onclick="checkFill44()" class="mt-4 bg-emerald-500 text-white font-black px-6 py-2 rounded-xl hover:scale-105 transition-all text-sm">Check ✓</button>
+      </div>
+
+      <button onclick="markSection('practice')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Practice done! +20 XP</button>
+    </div>
+
+    <!-- TAB 5: SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2>
+        <p class="text-slate-500 text-sm">Roleplay — você é a Yara! Responda cada pergunta do Mr. Silva em voz alta.</p>
+      </div>
+      <div id="speak44-list" class="space-y-4 mb-6"></div>
+      <button onclick="markSection('speak')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I practised speaking! +20 XP</button>
+    </div>
+
+    <!-- TAB 6: HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-navy mb-1">📋 Homework</h2>
+        <p class="text-slate-500 text-sm">Complete todas as tarefas para ganhar +75 XP!</p>
+      </div>
+      <div class="space-y-6">
+
+        <!-- Task 1: Word Order -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <h3 class="font-black text-navy mb-1">1. Word Order</h3>
+          <p class="text-slate-500 text-xs mb-4">Arrange the words to make correct sentences.</p>
+          <div class="space-y-6" id="wo44-wrap"></div>
+        </div>
+
+        <!-- Task 2: Match Pairs -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <h3 class="font-black text-navy mb-1">2. Match the Pairs</h3>
+          <p class="text-slate-500 text-xs mb-4">Connect each English expression to its Portuguese meaning.</p>
+          <div class="grid grid-cols-2 gap-3" id="mp44-wrap"></div>
+          <p class="text-xs text-slate-400 mt-3 font-bold" id="mp44-feedback"></p>
+        </div>
+
+        <!-- Task 3: Error Correction -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <h3 class="font-black text-navy mb-1">3. Error Correction</h3>
+          <p class="text-slate-500 text-xs mb-4">Find and fix the grammar mistake in each sentence.</p>
+          <div class="space-y-5">
+            <div>
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2 mb-2">❌ "I have worked there since three years."</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp" id="err44-1" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold mt-1">💡 Hint: since → for (use "for" with periods of time: for three years, for months)</p>
+              <button onclick="checkErr44(1)" class="mt-2 bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden mt-1" id="err44fb1"></p>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2 mb-2">❌ "Have you ever went to an international conference?"</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp" id="err44-2" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold mt-1">💡 Hint: went → gone (irregular Past Participle of go: go → went → gone)</p>
+              <button onclick="checkErr44(2)" class="mt-2 bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden mt-1" id="err44fb2"></p>
+            </div>
+            <div>
+              <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2 mb-2">❌ "I'm going to brought new ideas to the team."</p>
+              <input type="text" placeholder="Write the corrected sentence..." class="fill-inp" id="err44-3" style="width:100%;text-align:left"/>
+              <p class="text-xs text-slate-400 font-bold mt-1">💡 Hint: going to brought → going to bring (going to + bare infinitive, not past tense)</p>
+              <button onclick="checkErr44(3)" class="mt-2 bg-emerald-500 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check</button>
+              <p class="text-xs font-bold hidden mt-1" id="err44fb3"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task 4: Free Writing -->
+        <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
+          <h3 class="font-black text-navy mb-2">4. Free Writing ✍️</h3>
+          <p class="text-slate-500 text-sm mb-3">Imagine você está em uma entrevista de emprego em inglês. Escreva 4–5 frases falando sobre sua experiência (Present Perfect) e seus planos futuros (Will / Going To).</p>
+          <textarea id="hw44-free" rows="5" placeholder="I have worked at… for… years. I've always… Have you ever…? I'm going to… I will bring… It's been a great experience…" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm font-medium resize-none focus:outline-none focus:border-emerald-400 transition"></textarea>
+        </div>
+
+      </div>
+
+      <button onclick="submitHomework44()" id="hw44-submit-btn" class="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black py-4 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm text-lg">🎉 Submit Homework +75 XP</button>
+    </div>
+
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+// ── Components ────────────────────────────────────────────────────
+if (typeof Components !== 'undefined') {
+  Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+}
+
+// ── Sections & Progress ───────────────────────────────────────────
+const SECTIONS44 = ['situation','dialogue','chunks','practice','speak','homework'];
+const _done44 = new Set();
+
+function markSection(s) {
+  if (_done44.has(s)) return;
+  _done44.add(s);
+  if (typeof Store !== 'undefined') Store.addXP(20);
+  showXP('+20 XP 🔥');
+  updateDots44();
+  if (_done44.size === SECTIONS44.length) {
+    if (typeof Store !== 'undefined') {
+      Store.addXP(30);
+      const st = Store.get();
+      if (!st.completedLessons.includes(44)) { st.completedLessons.push(44); Store._save(st); }
+    }
+  }
+}
+
+function updateDots44() {
+  const dots = document.getElementById('hero-dots');
+  const lbl = document.getElementById('hero-label');
+  if (!dots) return;
+  dots.innerHTML = SECTIONS44.map(s => `<div class="prog-dot ${_done44.has(s) ? 'done' : ''}"></div>`).join('');
+  if (lbl) lbl.textContent = `${_done44.size} / ${SECTIONS44.length} sections done`;
+}
+
+function showXP(msg) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.style.cssText = 'left:50%;top:40%;transform:translateX(-50%)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────
+const TABS44 = ['situation','dialogue','chunks','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS44.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── Dialogue ──────────────────────────────────────────────────────
+const DIALOGUE44 = [
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`Good morning, Yara. Please, have a seat. Thank you for coming in today.`, plain:`Good morning, Yara. Please, have a seat. Thank you for coming in today.` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`Good morning, Mr. Silva. Thank you for this opportunity — I<strong class='text-blue-600'>'ve been</strong> looking forward to it!`, plain:`Good morning, Mr. Silva. Thank you for this opportunity — I've been looking forward to it!` },
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`<strong class='text-blue-600'>Have you</strong> ever worked in marketing before, Yara?`, plain:`Have you ever worked in marketing before, Yara?` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`Yes, I have. I<strong class='text-blue-600'>'ve worked</strong> at a digital agency for three years, and I<strong class='text-blue-600'>'ve managed</strong> several campaigns.`, plain:`Yes, I have. I've worked at a digital agency for three years, and I've managed several campaigns.` },
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`Impressive. <strong class='text-blue-600'>Have</strong> you ever worked with international clients?`, plain:`Impressive. Have you ever worked with international clients?` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`Yes! I<strong class='text-blue-600'>'ve worked</strong> with clients from the US and Portugal. It<strong class='text-blue-600'>'s been</strong> a great experience.`, plain:`Yes! I've worked with clients from the US and Portugal. It's been a great experience.` },
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`Where do you see yourself in five years?`, plain:`Where do you see yourself in five years?` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`I<strong class='text-emerald-600'>'m going to</strong> keep developing my leadership skills. I<strong class='text-emerald-600'>'d love</strong> to lead a creative team.`, plain:`I'm going to keep developing my leadership skills. I'd love to lead a creative team.` },
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`And what <strong class='text-emerald-600'>will</strong> you bring to this role specifically?`, plain:`And what will you bring to this role specifically?` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`I<strong class='text-emerald-600'>'ll bring</strong> creativity and commitment. I<strong class='text-blue-600'>'ve always believed</strong> that results come from consistency and hard work.`, plain:`I'll bring creativity and commitment. I've always believed that results come from consistency and hard work.` },
+  { speaker:`Mr. Silva 👔`, side:`left`,  text:`Very good, Yara. We<strong class='text-emerald-600'>'ll be in touch</strong> by the end of the week.`, plain:`Very good, Yara. We'll be in touch by the end of the week.` },
+  { speaker:`Yara 🦁`,      side:`right`, text:`Thank you so much, Mr. Silva. I <strong class='text-teal-600'>look forward to</strong> hearing from you! 🤝`, plain:`Thank you so much, Mr. Silva. I look forward to hearing from you!` },
+];
+
+function buildDialogue44() {
+  const grid = document.getElementById('dialogue44-grid');
+  if (!grid) return;
+  grid.innerHTML = DIALOGUE44.map((l, i) => {
+    const isRight = l.side === 'right';
+    return `<div class="flex ${isRight ? 'flex-row-reverse' : 'flex-row'} items-start gap-3 mb-4">
+      <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-xs font-black text-white shadow">${l.speaker.split(' ')[0][0]}</div>
+      <div class="max-w-sm ${isRight ? 'items-end' : 'items-start'} flex flex-col gap-1">
+        <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider ${isRight ? 'text-right' : ''}">${l.speaker}</div>
+        <div class="bg-white border-2 ${isRight ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'} rounded-2xl px-4 py-3 text-sm text-navy font-semibold leading-relaxed shadow-sm">${l.text}</div>
+        <button onclick="speakLine44(${i})" class="text-[10px] text-slate-400 hover:text-emerald-600 font-bold flex items-center gap-1 transition-colors ${isRight ? 'self-end' : ''}">🔊 Listen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function speakLine44(i) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(DIALOGUE44[i].plain);
+  u.lang = 'en-US'; u.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── Chunks ────────────────────────────────────────────────────────
+const CHUNKS44 = [
+  { expr:`I've worked at… for… years`,   pt:`Trabalhei / Tenho trabalhado em… por… anos`,      use:`Describing ongoing or recent work experience`,          ex:`I've worked at this company for five years.`              },
+  { expr:`Have you ever…?`,              pt:`Você já…? / Você alguma vez…?`,                   use:`Asking about past experiences in interviews`,           ex:`Have you ever managed a cross-functional team?`          },
+  { expr:`I haven't… yet`,               pt:`Ainda não…`,                                       use:`Admitting you lack experience — but staying positive`,  ex:`I haven't led a full team yet, but I've led projects.`   },
+  { expr:`I'll bring…`,                  pt:`Vou trazer / Trarei…`,                             use:`Promising what you will contribute to the role`,        ex:`I'll bring creativity, energy and dedication.`           },
+  { expr:`I'm going to…`,                pt:`Vou… (intenção já decidida)`,                     use:`Describing your future plans and goals`,                ex:`I'm going to continue developing my leadership skills.`  },
+  { expr:`It's been a great experience`, pt:`Foi / Tem sido uma ótima experiência`,             use:`Talking about a past period that still matters`,        ex:`Working internationally — it's been a great experience.` },
+  { expr:`I look forward to…`,           pt:`Aguardo ansiosamente… / Espero com ansiedade…`,   use:`Professional way to express anticipation`,             ex:`I look forward to hearing from you.`                     },
+  { expr:`We'll be in touch`,            pt:`Entraremos em contato`,                            use:`Standard phrase to end an interview politely`,         ex:`Thank you, Yara — we'll be in touch by Friday.`         },
+];
+
+let _chunks44Spoken = new Set();
+
+function buildChunks44() {
+  const grid = document.getElementById('chunks44-grid');
+  if (!grid) return;
+  grid.innerHTML = CHUNKS44.map((c, i) => `
+    <div class="chunk-card bg-white border-2 border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+      <button onclick="this.closest('.chunk-card').classList.toggle('open')" class="w-full flex items-center justify-between px-5 py-4 text-left">
+        <div>
+          <span class="font-black text-navy">"${c.expr}"</span>
+          <span class="text-slate-500 text-sm ml-2">— ${c.pt}</span>
+        </div>
+        <span class="chunk-chevron text-slate-400 text-xl">▾</span>
+      </button>
+      <div class="chunk-detail px-5 pb-4 space-y-2">
+        <p class="text-xs font-black text-emerald-600 uppercase tracking-wider">${c.use}</p>
+        <p class="text-sm text-slate-600 italic">"${c.ex}"</p>
+        <button onclick="speakChunk44(${i})" class="text-xs bg-emerald-100 text-emerald-700 font-black px-3 py-1.5 rounded-xl hover:bg-emerald-200 transition-all">🔊 Listen to example</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function speakChunk44(i) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(CHUNKS44[i].ex);
+  u.lang = 'en-US'; u.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  _chunks44Spoken.add(i);
+  if (_chunks44Spoken.size >= 4) {
+    const wrap = document.getElementById('chunks44-mark-wrap');
+    if (wrap) wrap.classList.remove('hidden');
+  }
+}
+
+// ── Practice: MCQ ─────────────────────────────────────────────────
+const PRAC44 = [
+  { q:`"_____ you ever worked with international clients?"`,                       opts:[`Have`,`Did`],          a:`Have`,        rule:`Asking about life experience → Present Perfect (Have you ever…?)` },
+  { q:`"I _____ three years at a digital agency — I know the industry well."`,    opts:[`spent`,`have spent`],  a:`have spent`,  rule:`Experience still relevant today → Present Perfect (have + past participle)` },
+  { q:`"Where _____ you see yourself in five years?"`,                             opts:[`will`,`do`],           a:`do`,          rule:`Standard interview question — simple present "do you see yourself"` },
+  { q:`"I _____ bring creativity and commitment to this team."`,                   opts:[`will`,`am going to`],  a:`will`,        rule:`Promise / spontaneous commitment in an interview → will` },
+];
+
+function buildPrac44() {
+  const container = document.getElementById('prac44-mcq');
+  if (!container) return;
+  container.innerHTML = PRAC44.map((item, qi) => `
+    <div class="bg-slate-50 rounded-2xl p-4">
+      <p class="font-black text-navy text-sm mb-3">${qi + 1}. ${item.q}</p>
+      <div class="flex flex-wrap gap-2 mb-2">
+        ${item.opts.map(opt => `<button class="opt-btn rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700" onclick="answerPrac44(this, '${opt.replace(/'/g,"\\'")}', '${item.a.replace(/'/g,"\\'")}', '${item.rule.replace(/'/g,"\\'")}')">${opt}</button>`).join('')}
+      </div>
+      <p class="text-xs text-slate-400 font-bold hidden prac44-rule-${qi}"></p>
+    </div>
+  `).join('');
+}
+
+function answerPrac44(btn, chosen, correct, rule) {
+  if (btn.disabled) return;
+  const group = btn.closest('.bg-slate-50');
+  group.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    group.querySelectorAll('.opt-btn').forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+  }
+  const ruleEl = group.querySelector('[class*="prac44-rule"]');
+  if (ruleEl) { ruleEl.textContent = '💡 ' + rule; ruleEl.classList.remove('hidden'); }
+}
+
+// ── Practice: Fill in the Blank ───────────────────────────────────
+const FILL44 = [
+  { before:`I've `,   blank:`worked`, after:` at two companies in five years.`,    hint:`Present Perfect: I've ___ (work)`,       answer:`worked` },
+  { before:`It `,     blank:`has`,    after:`'s been an incredible experience.`,    hint:`Present Perfect: It ___ been…`,          answer:`has`    },
+  { before:`I `,      blank:`look`,   after:` forward to hearing from you.`,        hint:`Formal expression: I ___ forward to…`,   answer:`look`   },
+  { before:`We'll `,  blank:`be`,     after:` in touch by the end of the week.`,    hint:`Standard closing: We'll ___ in touch`,   answer:`be`     },
+];
+
+function buildFill44() {
+  const container = document.getElementById('prac44-fill');
+  if (!container) return;
+  container.innerHTML = FILL44.map((f, i) => `
+    <div class="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-700 bg-slate-50 rounded-xl p-3">
+      <span>${f.before}</span>
+      <input type="text" class="fill-inp" id="fill44-${i}" placeholder="?"/>
+      <span>${f.after}</span>
+      <span class="w-full text-xs text-slate-400 font-bold mt-1">💡 ${f.hint}</span>
+    </div>
+  `).join('');
+}
+
+function checkFill44() {
+  FILL44.forEach((f, i) => {
+    const inp = document.getElementById(`fill44-${i}`);
+    if (!inp) return;
+    const ok = inp.value.trim().toLowerCase() === f.answer.toLowerCase();
+    inp.className = `fill-inp ${ok ? 'ok' : 'err'}`;
+  });
+}
+
+// ── Speak ─────────────────────────────────────────────────────────
+const SPEAK44 = [
+  { prompt:`Mr. Silva asks: "Have you ever worked in marketing before?"`,           hint:`Use Present Perfect to describe your experience. Be specific — mention years, companies or projects.`,                                      example:`Yes, I have. I've worked at a digital agency for three years and I've managed several social media campaigns.` },
+  { prompt:`Mr. Silva asks: "Have you ever worked with international clients?"`,   hint:`Answer with Present Perfect. If yes, give details! If no, use "I haven't… yet" and show enthusiasm.`,                                     example:`Yes! I've worked with clients from the US and Portugal. It's been a great experience — it really improved my communication skills.` },
+  { prompt:`Mr. Silva asks: "Where do you see yourself in five years?"`,           hint:`Use 'I'm going to…' for your intentions. Sound ambitious but realistic!`,                                                                    example:`I'm going to keep developing my leadership skills. My goal is to lead a creative team and contribute to international campaigns.` },
+  { prompt:`Mr. Silva asks: "What will you bring to this role?"`,                  hint:`Use 'I'll bring…' — make a promise! Think of 2-3 qualities or skills.`,                                                                     example:`I'll bring creativity, consistency and a strong results-focused mindset. I've always believed that good work speaks for itself.` },
+  { prompt:`End the interview gracefully — thank Mr. Silva and express interest.`, hint:`Use 'I look forward to…' — it's professional and impressive!`,                                                                              example:`Thank you so much for your time, Mr. Silva. I look forward to hearing from you and I'm very excited about this opportunity.` },
+];
+
+function buildSpeak44() {
+  const list = document.getElementById('speak44-list');
+  if (!list) return;
+  list.innerHTML = SPEAK44.map((item, i) => `
+    <div class="bg-white border-2 border-slate-100 rounded-2xl p-5 shadow-sm">
+      <div class="flex items-start gap-3 mb-3">
+        <span class="w-8 h-8 rounded-full bg-navy text-white font-black flex-shrink-0 flex items-center justify-center text-sm">${i + 1}</span>
+        <div>
+          <p class="font-black text-navy text-sm mb-1">${item.prompt}</p>
+          <p class="text-xs text-slate-500">${item.hint}</p>
+        </div>
+      </div>
+      <button onclick="toggleSpeak44(${i})" class="text-xs bg-emerald-100 text-emerald-700 font-black px-4 py-2 rounded-xl hover:bg-emerald-200 transition-all">👁 Show example answer</button>
+      <div id="speak44-ex-${i}" class="hidden mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+        <p class="text-sm font-bold text-emerald-800 italic">"${item.example}"</p>
+        <button onclick="speakEx44(${i})" class="mt-2 text-xs text-emerald-600 hover:text-emerald-800 font-bold">🔊 Listen</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSpeak44(i) {
+  const el = document.getElementById(`speak44-ex-${i}`);
+  if (el) el.classList.toggle('hidden');
+}
+
+function speakEx44(i) {
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(SPEAK44[i].example);
+  u.lang = 'en-US'; u.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+// ── Homework: Word Order ──────────────────────────────────────────
+const WO44_DATA = [
+  { s: `I have worked at a digital agency for three years`,     w: [`I`,`have`,`worked`,`at`,`a`,`digital`,`agency`,`for`,`three`,`years`] },
+  { s: `Have you ever managed a team of more than five people`, w: [`Have`,`you`,`ever`,`managed`,`a`,`team`,`of`,`more`,`than`,`five`,`people`] },
+  { s: `I will bring creativity and commitment to this role`,   w: [`I`,`will`,`bring`,`creativity`,`and`,`commitment`,`to`,`this`,`role`] },
+];
+const _wo44States = WO44_DATA.map(d => ({ bank: [...d.w.map((_,i)=>i)].sort(() => Math.random() - .5), ans: [] }));
+
+function wo44Render() {
+  const wrap = document.getElementById('wo44-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = WO44_DATA.map((d, si) => `
+    <div>
+      <p class="text-xs font-black text-slate-400 uppercase mb-2">Sentence ${si + 1}</p>
+      <div class="wo-ans mb-2" id="wo44-ans-${si}" onclick="wo44ReturnTile(event,${si})"></div>
+      <div class="wo-bank" id="wo44-bank-${si}"></div>
+      <p class="text-xs mt-1 font-bold hidden" id="wo44-fb-${si}"></p>
+    </div>
+  `).join('');
+  WO44_DATA.forEach((d, si) => wo44RenderTiles(si));
+}
+
+function wo44RenderTiles(si) {
+  const bankEl = document.getElementById(`wo44-bank-${si}`);
+  const ansEl = document.getElementById(`wo44-ans-${si}`);
+  if (!bankEl || !ansEl) return;
+  const state = _wo44States[si];
+  bankEl.innerHTML = state.bank.map(wi => `<span class="wo-tile" onclick="wo44MoveTile(${si},${wi})">${WO44_DATA[si].w[wi]}</span>`).join('');
+  ansEl.innerHTML = state.ans.map(wi => `<span class="wo-tile" onclick="wo44ReturnTileIdx(${si},${wi})">${WO44_DATA[si].w[wi]}</span>`).join('');
+  const formed = state.ans.map(wi => WO44_DATA[si].w[wi]).join(' ');
+  const fb = document.getElementById(`wo44-fb-${si}`);
+  if (state.ans.length === WO44_DATA[si].w.length) {
+    const ok = formed.toLowerCase() === WO44_DATA[si].s.toLowerCase();
+    fb.classList.remove('hidden');
+    fb.textContent = ok ? '✅ Correct!' : '❌ Not quite — try again!';
+    fb.className = `text-xs mt-1 font-bold ${ok ? 'text-emerald-600' : 'text-red-500'}`;
+  } else {
+    fb.classList.add('hidden');
+  }
+}
+
+function wo44MoveTile(si, wi) {
+  const state = _wo44States[si];
+  state.bank = state.bank.filter(x => x !== wi);
+  state.ans.push(wi);
+  wo44RenderTiles(si);
+}
+
+function wo44ReturnTileIdx(si, wi) {
+  const state = _wo44States[si];
+  state.ans = state.ans.filter(x => x !== wi);
+  state.bank.push(wi);
+  wo44RenderTiles(si);
+}
+
+function wo44ReturnTile(e, si) {
+  if (e.target.classList.contains('wo-tile')) {
+    const wi = parseInt(e.target.getAttribute('onclick').match(/\d+$/)[0]);
+    wo44ReturnTileIdx(si, wi);
+  }
+}
+
+// ── Homework: Match Pairs ─────────────────────────────────────────
+const MP44 = [
+  { l:`I've worked… 💼`,          r:`Trabalhei / Tenho trabalhado` },
+  { l:`Have you ever…? 🌍`,        r:`Você já…?` },
+  { l:`I haven't… yet ⏳`,         r:`Ainda não…` },
+  { l:`I look forward to… 📬`,     r:`Aguardo ansiosamente…` },
+  { l:`We'll be in touch 📞`,       r:`Entraremos em contato` },
+];
+
+let _mp44Sel = null;
+let _mp44Matched = {};
+
+function mp44Render() {
+  const wrap = document.getElementById('mp44-wrap');
+  if (!wrap) return;
+  const rightItems = MP44.map((item, i) => ({ text: item.r, origIdx: i })).sort(() => Math.random() - .5);
+  const leftCol = document.createElement('div'); leftCol.className = 'flex flex-col gap-2';
+  const rightCol = document.createElement('div'); rightCol.className = 'flex flex-col gap-2';
+  MP44.forEach((item, i) => {
+    const b = document.createElement('button');
+    b.className = 'mp-btn' + (_mp44Matched[i] !== undefined ? ' matched' : '');
+    b.textContent = item.l; b.id = 'mp44-L' + i; b.disabled = _mp44Matched[i] !== undefined;
+    b.onclick = () => mp44Sel('L', i);
+    leftCol.appendChild(b);
+  });
+  rightItems.forEach(item => {
+    const b = document.createElement('button');
+    b.className = 'mp-btn' + (Object.values(_mp44Matched).includes(item.origIdx) ? ' matched' : '');
+    b.textContent = item.text; b.id = 'mp44-R' + item.origIdx; b.disabled = Object.values(_mp44Matched).includes(item.origIdx);
+    b.onclick = () => mp44Sel('R', item.origIdx);
+    rightCol.appendChild(b);
+  });
+  wrap.innerHTML = '';
+  wrap.appendChild(leftCol);
+  wrap.appendChild(rightCol);
+}
+
+function mp44Sel(side, idx) {
+  if (!_mp44Sel) {
+    _mp44Sel = { side, idx };
+    const btn = document.getElementById(`mp44-${side}${idx}`);
+    if (btn) btn.classList.add('selected');
+    return;
+  }
+  if (_mp44Sel.side === side) {
+    const prev = document.getElementById(`mp44-${_mp44Sel.side}${_mp44Sel.idx}`);
+    if (prev) prev.classList.remove('selected');
+    _mp44Sel = { side, idx };
+    const btn = document.getElementById(`mp44-${side}${idx}`);
+    if (btn) btn.classList.add('selected');
+    return;
+  }
+  const L = side === 'L' ? idx : _mp44Sel.idx;
+  const R = side === 'R' ? idx : _mp44Sel.idx;
+  if (L === R) {
+    _mp44Matched[L] = R;
+    _mp44Sel = null;
+    mp44Render();
+    if (Object.keys(_mp44Matched).length === MP44.length) {
+      const fb = document.getElementById('mp44-feedback');
+      if (fb) { fb.textContent = '🎉 All matched! Great work!'; }
+    }
+  } else {
+    const lb = document.getElementById(`mp44-L${L}`);
+    const rb = document.getElementById(`mp44-R${R}`);
+    if (lb) lb.classList.add('wrong-flash');
+    if (rb) rb.classList.add('wrong-flash');
+    setTimeout(() => {
+      if (lb) lb.classList.remove('wrong-flash', 'selected');
+      if (rb) rb.classList.remove('wrong-flash', 'selected');
+    }, 700);
+    _mp44Sel = null;
+  }
+}
+
+// ── Homework: Error Correction ────────────────────────────────────
+const ERR44_CHECKS = [
+  v => v.includes('for three years') && !v.includes('since three years'),
+  v => v.includes('ever gone') && !v.includes('ever went'),
+  v => v.includes('going to bring') && !v.includes('going to brought'),
+];
+const ERR44_HINTS = [
+  'since → for (use "for" with periods of time: for three years, for months)',
+  'went → gone (irregular Past Participle of go: go → went → gone)',
+  'going to brought → going to bring (going to + bare infinitive, not past tense)',
+];
+
+function checkErr44(n) {
+  const inp = document.getElementById(`err44-${n}`);
+  const fb = document.getElementById(`err44fb${n}`);
+  if (!inp || !fb) return;
+  const val = inp.value.trim().toLowerCase();
+  const ok = ERR44_CHECKS[n - 1](val);
+  inp.className = `fill-inp ${ok ? 'ok' : 'err'}`;
+  fb.classList.remove('hidden');
+  fb.textContent = ok ? '✅ Correct!' : `❌ Check the hint: ${ERR44_HINTS[n - 1]}`;
+  fb.className = `text-xs font-bold mt-1 ${ok ? 'text-emerald-600' : 'text-red-500'}`;
+}
+
+// ── Submit Homework ───────────────────────────────────────────────
+function submitHomework44() {
+  if (_done44.has('homework')) return;
+  _done44.add('homework');
+  if (typeof Store !== 'undefined') {
+    Store.addXP(75);
+    const st = Store.get();
+    if (!st.completedLessons.includes(44)) { st.completedLessons.push(44); Store._save(st); }
+  }
+  showXP('+75 XP 🎉');
+  updateDots44();
+  const btn = document.getElementById('hw44-submit-btn');
+  if (!btn) return;
+  btn.textContent = '🎉 Course Complete! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_33.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 35 →';
+  btn.insertAdjacentElement('afterend', a);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  updateDots44();
+  buildDialogue44();
+  buildChunks44();
+  buildPrac44();
+  buildFill44();
+  buildSpeak44();
+  wo44Render();
+  mp44Render();
+});
+</script>
+</body>
+</html>

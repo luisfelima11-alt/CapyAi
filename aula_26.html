@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -25,6 +25,8 @@
 .tab-btn.active{color:#6366f1;font-weight:800}
 .tab-btn.active::after{transform:scaleX(1)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.correct{animation:correct-pulse .3s ease}
 .shake{animation:shake .35s ease}
 @keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
 .xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
@@ -51,9 +53,11 @@
       <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:4%;animation-delay:.2s">✨</span>
     </div>
     <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-      </a>
+      <div class="flex items-center gap-3 flex-wrap mb-4">
+        <a href="classes.html" class="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+        <a href="aula_25.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+        <a href="aula_27.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+      </div>
       <div class="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-400/30 rounded-full px-4 py-1 text-sm font-black text-indigo-300 mb-3">Aula 26</div>
       <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🔮 The Future<br><span class="text-indigo-300">with WILL</span></h1>
       <p class="text-white/60 text-base mb-5">Learn the 4 key uses of WILL for predictions, promises, spontaneous decisions and offers — plus rich future vocabulary.</p>
@@ -208,7 +212,7 @@
       </div>
       <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
       <div id="practice-area"></div>
-      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
           <div class="text-6xl mb-3" id="result-emoji">🎉</div>
           <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -344,7 +348,7 @@
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script src="lesson-engine.js"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -512,13 +516,20 @@ function checkErrors26() {
 }
 
 function submitHomework(lessonId) {
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '✓ Submitted!';
-  btn.classList.add('opacity-75');
-  document.getElementById('hw-done-' + lessonId).classList.remove('hidden');
   markSection();
   if (typeof Store !== 'undefined') Store.addXP(75);
+  const btn = document.querySelector('[onclick="submitHomework(\'' + lessonId + '\')"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const nextMap = {'26':'27','27':'28'};
+  const next = nextMap[lessonId];
+  if (next) {
+    const a = document.createElement('a');
+    a.href = 'aula_' + next + '.html';
+    a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+    a.textContent = 'Continue to Aula ' + next + ' →';
+    btn.insertAdjacentElement('afterend', a);
+  }
 }
 window.submitHomework = submitHomework;
 

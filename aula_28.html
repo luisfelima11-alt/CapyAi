@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -73,9 +73,11 @@
     <div class="relative max-w-5xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center gap-8">
       <div class="flex-1">
         <!-- Back link -->
-        <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-          <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-        </a>
+        <div class="flex items-center gap-3 flex-wrap mb-4">
+          <a href="classes.html" class="inline-flex items-center gap-1 text-white/50 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+          <a href="aula_27.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+          <a href="aula_29.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+        </div>
         <div class="inline-flex items-center gap-2 bg-pink-500/20 border border-pink-400/30 rounded-full px-4 py-1 text-sm font-black text-pink-300 mb-3">
           Aula 28
         </div>
@@ -286,7 +288,7 @@
       </div>
       <div id="practice-area"></div>
       <!-- Result overlay (hidden by default) -->
-      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
           <div class="text-6xl mb-3" id="result-emoji">🎉</div>
           <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -419,7 +421,7 @@
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -850,12 +852,17 @@ function checkErrors28() {
   });
 }
 
-function submitHomework28() {
-  const btn = event.target;
-  btn.disabled = true; btn.textContent = '✓ Submitted!'; btn.classList.add('opacity-75');
-  document.getElementById('hw-done-28').classList.remove('hidden');
+function submitHomework28(){
   markSection();
   if (typeof Store !== 'undefined') Store.addXP(75);
+  const btn = document.querySelector('[onclick="submitHomework28()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  const a = document.createElement('a');
+  a.href = 'aula_29.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = 'Continue to Aula 29 →';
+  btn.insertAdjacentElement('afterend', a);
 }
 
 // ── TABS ─────────────────────────────────────────────────────────────────────
