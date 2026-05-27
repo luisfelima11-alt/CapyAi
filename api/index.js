@@ -692,13 +692,13 @@ Rules:
     }
 
     // ── ElevenLabs TTS ───────────────────────────────────────────────────────
-    // GET /api/tts?text=bonjour  → streams audio/mpeg from ElevenLabs
+    // GET /api/tts?text=bonjour&voice=VOICE_ID  → streams audio/mpeg from ElevenLabs
     if (req.method === 'GET' && url === '/api/tts') {
         const EL_KEY   = process.env.ELEVENLABS_KEY;
-        const VOICE_ID = 'XB0fDUnXU5powFXDhCwa'; // Charlotte — warm, elegant, multilingual
         const MODEL    = 'eleven_multilingual_v2';
         if (!EL_KEY) { res.status(503).json({ error: 'ELEVENLABS_KEY not set' }); return; }
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
+        const VOICE_ID = qs2.get('voice') || 'cgSgspJ2msm6clMCkdW9'; // default: Jessica
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
         const body = JSON.stringify({
@@ -724,7 +724,7 @@ Rules:
                 return;
             }
             res.setHeader('Content-Type', 'audio/mpeg');
-            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.setHeader('Cache-Control', 'public, max-age=86400');
             res.setHeader('Access-Control-Allow-Origin', '*');
             elRes.pipe(res);
         });

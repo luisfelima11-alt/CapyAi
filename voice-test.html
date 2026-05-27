@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🎙️ Teste de Vozes — Capy Yara</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>*{font-family:'Plus Jakarta Sans',sans-serif}</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-violet-50 min-h-screen p-6">
+
+<div class="max-w-2xl mx-auto">
+  <div class="text-center mb-10">
+    <div class="text-5xl mb-3">🎙️</div>
+    <h1 class="text-3xl font-black text-navy mb-2">Teste de Vozes</h1>
+    <p class="text-slate-500">Clique em <strong>▶ Ouvir</strong> em cada voz e escolha a sua favorita para o site todo.</p>
+  </div>
+
+  <!-- Sample text selector -->
+  <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 mb-6">
+    <p class="text-xs font-black text-slate-500 uppercase tracking-wider mb-2">Frase de teste</p>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="setSample(0)" id="s0" class="sample-btn active bg-violet-600 text-white font-bold text-sm px-4 py-1.5 rounded-full transition-all">Inglês</button>
+      <button onclick="setSample(1)" id="s1" class="sample-btn bg-slate-100 text-slate-600 font-bold text-sm px-4 py-1.5 rounded-full transition-all hover:bg-slate-200">Francês</button>
+      <button onclick="setSample(2)" id="s2" class="sample-btn bg-slate-100 text-slate-600 font-bold text-sm px-4 py-1.5 rounded-full transition-all hover:bg-slate-200">Yara AI</button>
+    </div>
+    <p id="sample-text" class="mt-3 text-sm font-semibold text-slate-700 bg-slate-50 rounded-xl px-4 py-2 italic"></p>
+  </div>
+
+  <!-- Voices -->
+  <div class="space-y-4" id="voices-container"></div>
+
+  <!-- Winner banner -->
+  <div id="winner-banner" class="hidden mt-8 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 text-white text-center">
+    <div class="text-3xl mb-2">🏆</div>
+    <p class="font-black text-lg">Você escolheu: <span id="winner-name"></span></p>
+    <p class="text-white/70 text-sm mt-1">Me diga aqui no chat que escolheu essa voz e eu configuro no site inteiro!</p>
+  </div>
+</div>
+
+<script>
+const SAMPLES = [
+  "Hello! I'm Yara, your English teacher. Today we're going to learn some amazing new words together! Are you ready to explore?",
+  "Bonjour! Je m'appelle Yara. Aujourd'hui nous allons apprendre les salutations en français. Répétez après moi: bonjour, bonsoir, au revoir!",
+  "Great job! You got that right! I'm so proud of you — keep going, you're doing amazing! Just a few more questions and you'll complete the lesson!"
+];
+
+const VOICES = [
+  { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica', tag: '⭐ Recomendada', desc: 'Alegre, Brilhante, Calorosa', color: 'violet' },
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah',   tag: '',              desc: 'Madura, Confiante',          color: 'blue' },
+  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura',   tag: '',              desc: 'Entusiasmada, Personalidade', color: 'pink' },
+  { id: 'hpp4J3VqNfWAUOO0d1Us', name: 'Bella',   tag: '',              desc: 'Profissional, Calorosa',      color: 'emerald' },
+];
+
+let currentSample = 0;
+let currentAudio = null;
+
+function setSample(i) {
+  currentSample = i;
+  document.querySelectorAll('.sample-btn').forEach((b, j) => {
+    b.className = j === i
+      ? 'sample-btn bg-violet-600 text-white font-bold text-sm px-4 py-1.5 rounded-full transition-all'
+      : 'sample-btn bg-slate-100 text-slate-600 font-bold text-sm px-4 py-1.5 rounded-full transition-all hover:bg-slate-200';
+  });
+  document.getElementById('sample-text').textContent = '"' + SAMPLES[i] + '"';
+  // Stop any playing audio
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  resetAllButtons();
+}
+
+function resetAllButtons() {
+  VOICES.forEach(v => {
+    const btn = document.getElementById('play-' + v.id);
+    if (btn) { btn.textContent = '▶ Ouvir'; btn.disabled = false; }
+  });
+}
+
+async function playVoice(voiceId, btn) {
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  resetAllButtons();
+
+  btn.textContent = '⏳ Carregando...';
+  btn.disabled = true;
+
+  const text = encodeURIComponent(SAMPLES[currentSample]);
+  const url = `/api/tts?text=${text}&voice=${voiceId}`;
+
+  try {
+    const audio = new Audio(url);
+    currentAudio = audio;
+    audio.onended = () => { btn.textContent = '▶ Ouvir'; btn.disabled = false; currentAudio = null; };
+    audio.onerror = () => { btn.textContent = '❌ Erro'; btn.disabled = false; };
+    btn.textContent = '⏹ Parar';
+    btn.disabled = false;
+    btn.onclick = () => { audio.pause(); btn.textContent = '▶ Ouvir'; btn.disabled = false; currentAudio = null; btn.onclick = () => playVoice(voiceId, btn); };
+    await audio.play();
+  } catch(e) {
+    btn.textContent = '❌ Erro';
+    btn.disabled = false;
+    console.error(e);
+  }
+}
+
+function chooseVoice(voiceId, voiceName) {
+  document.getElementById('winner-name').textContent = voiceName;
+  document.getElementById('winner-banner').classList.remove('hidden');
+  document.getElementById('winner-banner').scrollIntoView({ behavior: 'smooth' });
+  // Highlight chosen card
+  VOICES.forEach(v => {
+    document.getElementById('card-' + v.id).classList.toggle('ring-4 ring-violet-500 ring-offset-2', v.id === voiceId);
+  });
+}
+
+// Build cards
+const container = document.getElementById('voices-container');
+VOICES.forEach(v => {
+  const card = document.createElement('div');
+  card.id = 'card-' + v.id;
+  card.className = 'bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 transition-all hover:border-violet-300 hover:shadow-md';
+  card.innerHTML = `
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-0.5">
+        <h3 class="font-black text-navy text-lg">${v.name}</h3>
+        ${v.tag ? `<span class="bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wide">${v.tag}</span>` : ''}
+      </div>
+      <p class="text-slate-500 text-sm">${v.desc} · Americano · Feminino</p>
+    </div>
+    <div class="flex gap-2 flex-shrink-0">
+      <button id="play-${v.id}" onclick="playVoice('${v.id}', this)"
+        class="bg-violet-100 hover:bg-violet-200 text-violet-700 font-black text-sm px-5 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95">
+        ▶ Ouvir
+      </button>
+      <button onclick="chooseVoice('${v.id}', '${v.name}')"
+        class="bg-slate-100 hover:bg-emerald-100 hover:text-emerald-700 text-slate-600 font-black text-sm px-4 py-2.5 rounded-xl transition-all">
+        ✓ Escolher
+      </button>
+    </div>
+  `;
+  container.appendChild(card);
+});
+
+// Init sample text
+setSample(0);
+</script>
+</body>
+</html>
