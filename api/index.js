@@ -691,6 +691,49 @@ Rules:
         return;
     }
 
+    // ── ElevenLabs TTS ───────────────────────────────────────────────────────
+    // GET /api/tts?text=bonjour  → streams audio/mpeg from ElevenLabs
+    if (req.method === 'GET' && url === '/api/tts') {
+        const EL_KEY   = process.env.ELEVENLABS_KEY;
+        const VOICE_ID = 'XB0fDUnXU5powFXDhCwa'; // Charlotte — warm, elegant, multilingual
+        const MODEL    = 'eleven_multilingual_v2';
+        if (!EL_KEY) { res.status(503).json({ error: 'ELEVENLABS_KEY not set' }); return; }
+        const qs2 = new URL(req.url, 'http://localhost').searchParams;
+        const text = (qs2.get('text') || '').slice(0, 500);
+        if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
+        const body = JSON.stringify({
+            text,
+            model_id: MODEL,
+            voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+        });
+        const elReq = https.request({
+            hostname: 'api.elevenlabs.io',
+            path: `/v1/text-to-speech/${VOICE_ID}`,
+            method: 'POST',
+            headers: {
+                'xi-api-key':   EL_KEY,
+                'Content-Type': 'application/json',
+                'Accept':       'audio/mpeg',
+                'Content-Length': Buffer.byteLength(body),
+            },
+        }, elRes => {
+            if (elRes.statusCode !== 200) {
+                let d = '';
+                elRes.on('data', c => d += c);
+                elRes.on('end', () => res.status(502).json({ error: 'ElevenLabs error', detail: d.slice(0, 200) }));
+                return;
+            }
+            res.setHeader('Content-Type', 'audio/mpeg');
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            elRes.pipe(res);
+        });
+        elReq.on('error', e => res.status(502).json({ error: e.message }));
+        elReq.write(body);
+        elReq.end();
+        return;
+    }
+
     // ── Homework Submissions ──────────────────────────────────────────────────
 
     // POST /api/homework → save a student homework submission to Supabase
