@@ -252,7 +252,8 @@ Rules:
   }
 
   // ── Events ───────────────────────────────────────────────────────────────────
-  fab.addEventListener('click', () => {
+  fab.addEventListener('click', e => {
+    e.stopPropagation();
     isOpen = !isOpen;
     panel.classList.toggle('open', isOpen);
     if (isOpen && msgArea.children.length === 0) {
@@ -264,10 +265,14 @@ Rules:
     if (pulse) pulse.style.display = 'none';
   });
 
-  closeBtn.addEventListener('click', () => {
+  closeBtn.addEventListener('click', e => {
+    e.stopPropagation();
     isOpen = false;
     panel.classList.remove('open');
   });
+
+  // Prevent panel clicks from bubbling to document close handler
+  panel.addEventListener('click', e => e.stopPropagation());
 
   sendBtn.addEventListener('click', send);
 
