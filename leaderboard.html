@@ -82,7 +82,7 @@ tailwind.config = {
   <!-- Your stat pill -->
   <div id="your-pill" class="hidden mb-8 fade-up">
     <div class="flex items-center justify-center gap-3 bg-pink-500/15 border border-pink-500/30 rounded-full px-6 py-3 w-fit mx-auto">
-      <span class="text-2xl" id="your-avatar">🦫</span>
+      <span class="text-2xl" id="your-avatar">🐾</span>
       <span class="font-label font-bold text-pink-300 text-sm" id="your-name">You</span>
       <span class="text-white/30">·</span>
       <span class="material-symbols-outlined text-yellow-400 text-sm">star</span>
@@ -187,12 +187,12 @@ tailwind.config = {
     try {
       const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
       const name = sess?.name || Store.state.playerName || 'You';
-      const avatar = sess?.avatar || '🦫';
+      const avatar = sess?.avatar || '🐾';
       const xp = Store.state.xp || 0;
       const badges = (Store.state.badges || []).length;
       return { id: '__local__', name, avatar, xp, badgesCount: badges, isYou: true };
     } catch(e) {
-      return { id: '__local__', name: 'You', avatar: '🦫', xp: 0, badgesCount: 0, isYou: true };
+      return { id: '__local__', name: 'You', avatar: '🐾', xp: 0, badgesCount: 0, isYou: true };
     }
   }
 

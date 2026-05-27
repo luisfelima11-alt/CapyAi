@@ -446,7 +446,7 @@ Rules: keep every reply under 2 sentences; use simple English words only; always
             board.push({
                 id: act.id,
                 name: act.name,
-                avatar: set.avatar || act.avatar || '🦫',
+                avatar: set.avatar || act.avatar || '🐾',
                 xp: st.xp || 0,
                 badgesCount: (st.badges || []).length
             });

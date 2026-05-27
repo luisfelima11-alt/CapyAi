@@ -139,7 +139,7 @@
                 <!-- Result State -->
                 <div id="result-state" class="hidden flex-col h-full">
                     <div class="flex items-center gap-4 mb-8">
-                        <div id="rep-avatar" class="text-5xl w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border-4 border-pink-500/20 shadow-lg shadow-pink-500/10">🦫</div>
+                        <div id="rep-avatar" class="text-5xl w-20 h-20 rounded-full bg-white/5 flex items-center justify-center border-4 border-pink-500/20 shadow-lg shadow-pink-500/10">🐾</div>
                         <div>
                             <h2 id="rep-title" class="font-headline text-3xl font-black text-white">Progress Report</h2>
                             <p class="font-body text-slate-400 text-sm mt-1">Generated dynamically by OpenAI</p>
@@ -252,7 +252,7 @@ function renderAccountList() {
     list.innerHTML = allAccounts.map(acc => `
         <button onclick="selectChild('${acc.id}')" class="acc-btn w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-pink-500/30 transition-all text-left group">
             <div class="text-2xl w-12 h-12 flex items-center justify-center rounded-full bg-slate-800 border border-slate-600 group-hover:bg-pink-900/50 group-hover:border-pink-500 transition-colors">
-                ${acc.avatar || '🦫'}
+                ${acc.avatar || '🐾'}
             </div>
             <div class="flex-1 min-w-0">
                 <p class="font-headline font-bold text-white text-base truncate">${acc.name}</p>
@@ -297,7 +297,7 @@ async function selectChild(userId) {
         const report = await aiRes.json();
         
         // Populate Result State
-        document.getElementById('rep-avatar').textContent = acc.avatar || '🦫';
+        document.getElementById('rep-avatar').textContent = acc.avatar || '🐾';
         document.getElementById('rep-title').textContent = report.title || `${acc.name}'s Report`;
         document.getElementById('stat-xp').textContent = xp;
         document.getElementById('stat-badges').textContent = badges.length;

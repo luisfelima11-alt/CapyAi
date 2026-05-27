@@ -10,10 +10,10 @@ const Components = {
     renderTopNav(activeTab) {
         const { streakDays } = Store.state;
         let sessionName   = '';
-        let sessionAvatar = '🦫';
+        let sessionAvatar = '🐾';
         try {
             const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
-            if (sess) { sessionName = sess.name || ''; sessionAvatar = sess.avatar || '🦫'; }
+            if (sess) { sessionName = sess.name || ''; sessionAvatar = sess.avatar || '🐾'; }
         } catch(e) {}
 
         return `
@@ -24,7 +24,7 @@ const Components = {
                 <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
                     <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-pink-400/60 shadow-md flex-shrink-0 bg-pink-100 flex items-center justify-center">
                         <img src="yara-avatar.png?v=1" alt="Yara" class="w-full h-full object-cover"
-                             onerror="this.style.display='none';this.parentElement.innerHTML='🦫'"/>
+                             onerror="this.style.display='none';this.parentElement.innerHTML='🐾'"/>
                     </div>
                     <span class="text-xl font-black tracking-tight text-navy dark:text-blue-100">Yara's Forest</span>
                 </div>
@@ -291,7 +291,7 @@ const Components = {
         return `
             <footer class="w-full rounded-t-[3rem] mt-20 bg-emerald-900 dark:bg-emerald-950">
                 <div class="flex flex-col md:flex-row justify-between items-center p-12 gap-6 w-full max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] text-xs font-medium">
-                <div class="text-lg font-black text-pink-400">Yara's Forest 🦫</div>
+                <div class="text-lg font-black text-pink-400">Yara's Forest 🐾</div>
                 <div class="flex flex-wrap justify-center gap-8">
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="#">Privacy</a>
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="#">Terms</a>

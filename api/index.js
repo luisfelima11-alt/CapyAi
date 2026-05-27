@@ -185,7 +185,7 @@ module.exports = async (req, res) => {
         const stateMap = {};
         (states || []).forEach(s => { stateMap[s.user_id] = s.data || {}; });
         const board = (accounts || []).map(a => ({
-            id: a.id, name: a.name, avatar: a.avatar || '🦫',
+            id: a.id, name: a.name, avatar: a.avatar || '🐾',
             xp: stateMap[a.id]?.xp || 0,
             badgesCount: (stateMap[a.id]?.badges || []).length,
         })).sort((a, b) => b.xp - a.xp).slice(0, 20);

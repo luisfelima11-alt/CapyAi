@@ -6,7 +6,7 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Tic-Tac-Toe with Yara 🦫</title>
+<title>Tic-Tac-Toe with Yara 🐾</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -234,7 +234,7 @@
 <!-- Score bar -->
 <div id="scorebar">
   <div class="score-pill">😊 You: <span class="pill-val" id="score-you">0</span></div>
-  <div class="score-pill">🦫 Yara: <span class="pill-val" id="score-yara">0</span></div>
+  <div class="score-pill">🐾 Yara: <span class="pill-val" id="score-yara">0</span></div>
   <div class="score-pill">🤝 Tie: <span class="pill-val" id="score-tie">0</span></div>
 </div>
 
@@ -254,7 +254,7 @@
   </div>
   <div class="vs-badge">VS</div>
   <div class="player-tag">
-    <div class="player-avatar yara">🦫</div>
+    <div class="player-avatar yara">🐾</div>
     <span class="player-label">YARA</span>
     <span class="player-symbol o-sym">○</span>
   </div>
@@ -558,8 +558,8 @@ function endGame(result) {
   } else if (result.winner === 'O') {
     scoreYara++;
     highlightWin(result.combo);
-    emoji = '🦫'; msg = 'Yara Wins!'; sub = 'Good effort! See if you can get the English challenge right.';
-    setStatus('🦫 Yara wins this round!', '#f87171');
+    emoji = '🐾'; msg = 'Yara Wins!'; sub = 'Good effort! See if you can get the English challenge right.';
+    setStatus('🐾 Yara wins this round!', '#f87171');
     awardXP(5);
   } else {
     scoreTie++;

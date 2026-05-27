@@ -220,17 +220,17 @@ const GRAMMAR_ACC14 = [
 ];
 
 const DIALOGUE14 = [
-  {who:'Capy 🦫',msg:"Leo, have you seen the new AI robot in the lab?"},
+  {who:'Capy 🐾',msg:"Leo, have you seen the new AI robot in the lab?"},
   {who:'Leo 🦁',msg:"Yes! I tried to log in but I forgot my password."},
-  {who:'Capy 🦫',msg:"Classic! Turn it off and turn it on again — that always works!"},
+  {who:'Capy 🐾',msg:"Classic! Turn it off and turn it on again — that always works!"},
   {who:'Leo 🦁',msg:"Haha! Actually I set up a new account. Now I'm in. This robot can stream videos and answer messages!"},
-  {who:'Capy 🦫',msg:"Amazing! Can it browse the internet too?"},
+  {who:'Capy 🐾',msg:"Amazing! Can it browse the internet too?"},
   {who:'Leo 🦁',msg:"Yes, and it never crashes. But the Wi-Fi is slow — everything is buffering."},
-  {who:'Capy 🦫',msg:"I need to update the router. I'll back up the settings first."},
+  {who:'Capy 🐾',msg:"I need to update the router. I'll back up the settings first."},
   {who:'Leo 🦁',msg:"Good idea! Oh — my phone says low battery. I need to charge it."},
-  {who:'Capy 🦫',msg:"Ha! A robot that needs the internet and a capybara with a dead phone. The future is now!"},
+  {who:'Capy 🐾',msg:"Ha! A robot that needs the internet and a capybara with a dead phone. The future is now!"},
   {who:'Leo 🦁',msg:"Don't post that on social media!"},
-  {who:'Capy 🦫',msg:"Too late — it's already going viral! 😂"}
+  {who:'Capy 🐾',msg:"Too late — it's already going viral! 😂"}
 ];
 
 const QUIZ14 = [
@@ -367,7 +367,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   DIALOGUE14.forEach(l=>{
     const isCapy=l.who.startsWith('C');
     c.innerHTML+=`<div class="flex ${isCapy?'':'flex-row-reverse'} items-end gap-2">
-      <div class="text-2xl">${isCapy?'🦫':'🦁'}</div>
+      <div class="text-2xl">${isCapy?'🐾':'🦁'}</div>
       <div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${isCapy?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}">
         <span class="block text-[10px] font-black mb-1 ${isCapy?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}
       </div>

@@ -206,15 +206,15 @@ const GRAMMAR_ACC15 = [
 
 const DIALOGUE15 = [
   {who:'Yara 🦦',msg:"Capy! My passport is ready and my suitcase is packed. Let's go!"},
-  {who:'Capy 🦫',msg:"Wait — do you have your boarding pass?"},
+  {who:'Capy 🐾',msg:"Wait — do you have your boarding pass?"},
   {who:'Yara 🦦',msg:"Of course! I checked in online. Our departure is at 3 PM."},
-  {who:'Capy 🦫',msg:"Perfect. I made a reservation at a hotel near the city centre."},
+  {who:'Capy 🐾',msg:"Perfect. I made a reservation at a hotel near the city centre."},
   {who:'Yara 🦦',msg:"Amazing! What's our destination?"},
-  {who:'Capy 🦫',msg:"Coconut Island — famous for sightseeing and adventure tours!"},
+  {who:'Capy 🐾',msg:"Coconut Island — famous for sightseeing and adventure tours!"},
   {who:'Yara 🦦',msg:"Oh no — the screen says our flight is delayed by one hour!"},
-  {who:'Capy 🦫',msg:"That's okay. Let's exchange some currency and buy souvenirs for Leo."},
+  {who:'Capy 🐾',msg:"That's okay. Let's exchange some currency and buy souvenirs for Leo."},
   {who:'Yara 🦦',msg:"Good idea! Is this your first time on a plane, Capy?"},
-  {who:'Capy 🦫',msg:"Yes! I usually travel by boat. Flying is a new adventure!"},
+  {who:'Capy 🐾',msg:"Yes! I usually travel by boat. Flying is a new adventure!"},
   {who:'Yara 🦦',msg:"Have a safe trip then! And don't forget — no swimming with your luggage!"}
 ];
 
@@ -337,7 +337,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   DIALOGUE15.forEach(l=>{
     const isYara=l.who.startsWith('Y');
     c.innerHTML+=`<div class="flex ${isYara?'':'flex-row-reverse'} items-end gap-2">
-      <div class="text-2xl">${isYara?'🦦':'🦫'}</div>
+      <div class="text-2xl">${isYara?'🦦':'🐾'}</div>
       <div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${isYara?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}">
         <span class="block text-[10px] font-black mb-1 ${isYara?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}
       </div>

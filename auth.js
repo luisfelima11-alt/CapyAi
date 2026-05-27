@@ -54,7 +54,7 @@ const Auth = {
     },
 
     /* ── sign up ─────────────────────────────────────── */
-    async signUp(name, email, password, avatar = '🦫') {
+    async signUp(name, email, password, avatar = '🐾') {
         const users = await this._getUsers();
         const norm  = email.toLowerCase().trim();
 

@@ -196,7 +196,7 @@ tailwind.config = {
       Account
     </h2>
     <div id="account-info" class="flex items-center gap-4 mb-5 p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
-      <div id="acc-avatar" class="text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/10 rounded-full">🦫</div>
+      <div id="acc-avatar" class="text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/10 rounded-full">🐾</div>
       <div class="flex-1 min-w-0">
         <p id="acc-name"  class="font-label font-bold text-slate-900 dark:text-white text-base truncate">Explorer</p>
         <p id="acc-email" class="font-body text-slate-400 text-xs mt-0.5 truncate">Guest session</p>
@@ -279,20 +279,20 @@ tailwind.config = {
 
 <script>
 // ── Avatars ───────────────────────────────────────────────────────────────────
-const AVATARS = ['🦫','🐱','🐶','🦊','🐸','🐼','🐨','🦁','🐯','🐻'];
-let selectedAvatar = '🦫';
+const AVATARS = ['🐾','🐱','🐶','🦊','🐸','🐼','🐨','🦁','🐯','🐻'];
+let selectedAvatar = '🐾';
 let settings = {};
 
 // ── Load ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('capySettings');
-  settings = saved ? JSON.parse(saved) : { sfx:true, tts:true, ai:true, difficulty:'medium', avatar:'🦫', darkMode:false };
+  settings = saved ? JSON.parse(saved) : { sfx:true, tts:true, ai:true, difficulty:'medium', avatar:'🐾', darkMode:false };
 
   // Name
   document.getElementById('name-input').value = Store.state.playerName || '';
 
   // Avatar
-  selectedAvatar = settings.avatar || '🦫';
+  selectedAvatar = settings.avatar || '🐾';
   renderAvatars();
 
   // Toggles
@@ -397,7 +397,7 @@ function saveAll() {
 function loadAccountInfo() {
   const sess = Auth.getSession();
   if (!sess) return;
-  document.getElementById('acc-avatar').textContent = sess.avatar || '🦫';
+  document.getElementById('acc-avatar').textContent = sess.avatar || '🐾';
   document.getElementById('acc-name').textContent   = sess.name  || 'Explorer';
   document.getElementById('acc-email').textContent  = sess.email || 'Guest session';
   const badge = document.getElementById('acc-badge');

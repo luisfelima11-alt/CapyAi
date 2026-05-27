@@ -202,16 +202,16 @@ const GRAMMAR_ACC39=[
 
 const DIALOGUE39=[
   {who:'Yara 🦦',msg:"Welcome to the Dream Island of Nano Banana! Today's game: what would you do if you could do anything?"},
-  {who:'Capy 🦫',msg:"Oh, I love this! If I could fly, I would visit every country in the world."},
+  {who:'Capy 🐾',msg:"Oh, I love this! If I could fly, I would visit every country in the world."},
   {who:'Leo 🦁',msg:"If I were invisible, I would go to any football match for free!"},
   {who:'Yara 🦦',msg:"Ha! If I had a superpower, I would choose the ability to speak every language."},
-  {who:'Capy 🦫',msg:"That's amazing! What would you do if you were incredibly wealthy?"},
+  {who:'Capy 🐾',msg:"That's amazing! What would you do if you were incredibly wealthy?"},
   {who:'Leo 🦁',msg:"If I were rich, I would build a giant football stadium right here in Nano Banana."},
   {who:'Yara 🦦',msg:"And if I were you, I would also build a school — education first!"},
   {who:'Leo 🦁',msg:"You're right. In an ideal world, everyone would have access to good education."},
-  {who:'Capy 🦫',msg:"If I could change one thing about the world, I would make everyone kinder."},
+  {who:'Capy 🐾',msg:"If I could change one thing about the world, I would make everyone kinder."},
   {who:'Yara 🦦',msg:"That's beautiful, Capy. What would you do if you had just one day left on this island?"},
-  {who:'Capy 🦫',msg:"I would swim in the ocean, eat coconuts, and tell you both how much I appreciate you!"},
+  {who:'Capy 🐾',msg:"I would swim in the ocean, eat coconuts, and tell you both how much I appreciate you!"},
   {who:'Leo 🦁',msg:"I wish this island were real! I would never leave!"}
 ];
 
@@ -274,7 +274,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click'
 (function(){const g=document.getElementById('vocab-grid');VOCAB39.forEach(v=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front text-white font-black text-sm">${v.w}</div><div class="flip-back text-white font-bold text-xs">${v.t}</div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));g.appendChild(d);});})();
 (function(){const c=document.getElementById('expr-list');EXPRESSIONS39.forEach(e=>{c.innerHTML+=`<div class="expr-card bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left" onclick="this.closest('.expr-card').classList.toggle('open')"><div><span class="font-black text-navy">"${e.expr}"</span><span class="text-slate-500 text-sm ml-2">— ${e.mean}</span></div><span class="expr-chevron text-slate-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-1"><p class="text-sm text-slate-600 italic">"${e.ex}"</p><p class="text-xs text-emerald-600 font-bold mt-1">💡 ${e.tip}</p></div></div>`;});})();
 (function(){const c=document.getElementById('grammar-acc');GRAMMAR_ACC39.forEach(a=>{c.innerHTML+=`<div class="acc-item bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left font-black text-navy" onclick="this.closest('.acc-item').classList.toggle('open')"><span>${a.icon} ${a.title}</span><i class="acc-icon not-italic text-xl text-slate-400">+</i></button><div class="acc-body px-5 pb-4 text-sm text-slate-600 leading-relaxed">${a.body}</div></div>`;});})();
-(function(){const c=document.getElementById('dialogue-box');DIALOGUE39.forEach(l=>{const isYara=l.who.startsWith('Y');const isLeo=l.who.startsWith('L');const emoji=isYara?'🦦':isLeo?'🦁':'🦫';const left=isYara||isLeo;c.innerHTML+=`<div class="flex ${left?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${left?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${left?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
+(function(){const c=document.getElementById('dialogue-box');DIALOGUE39.forEach(l=>{const isYara=l.who.startsWith('Y');const isLeo=l.who.startsWith('L');const emoji=isYara?'🦦':isLeo?'🦁':'🐾';const left=isYara||isLeo;c.innerHTML+=`<div class="flex ${left?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${left?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${left?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
 (function(){const c=document.getElementById('quiz-area');QUIZ39.forEach((q,i)=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl p-5"><p class="font-black text-navy mb-3">${i+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,j)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-sm font-bold text-left text-slate-700" onclick="selectOpt(${i},${j},this)">${o}</button>`).join('')}</div></div>`;});})();
 
 function selectOpt(qi,oi,el){if(el.disabled)return;document.querySelectorAll(`#quiz-area > div:nth-child(${qi+1}) .opt-btn`).forEach(b=>b.classList.remove('selected'));el.classList.add('selected');quizAnswers[qi]=oi;}

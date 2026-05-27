@@ -180,16 +180,16 @@ const GRAMMAR_ACC40=[
 
 const DIALOGUE40=[
   {who:'Leo 🦁',msg:"Capy! You've been coming to the gym every day. Do you enjoy working out?"},
-  {who:'Capy 🦫',msg:"Actually, I didn't at first. But now I've decided to make fitness a priority."},
+  {who:'Capy 🐾',msg:"Actually, I didn't at first. But now I've decided to make fitness a priority."},
   {who:'Leo 🦁',msg:"That's great! I keep forgetting to come. I need to be more disciplined."},
-  {who:'Capy 🦫',msg:"You should consider joining a class. I started doing yoga and I love it!"},
+  {who:'Capy 🐾',msg:"You should consider joining a class. I started doing yoga and I love it!"},
   {who:'Yara 🦦',msg:"Same here! I hope to run a marathon next year. I've been practising running every morning."},
   {who:'Leo 🦁',msg:"A marathon? I'd avoid doing that — I hate running for a long time!"},
-  {who:'Capy 🦫',msg:"Ha! There's no point in avoiding exercise completely, Leo. It's worth trying something you enjoy."},
+  {who:'Capy 🐾',msg:"Ha! There's no point in avoiding exercise completely, Leo. It's worth trying something you enjoy."},
   {who:'Leo 🦁',msg:"I admit not being very active lately. I keep postponing going to the gym."},
   {who:'Yara 🦦',msg:"Stop making excuses and start moving! Remember to stretch before you exercise."},
   {who:'Leo 🦁',msg:"You're right. I promise to come three times a week. I can't help admiring your dedication!"},
-  {who:'Capy 🦫',msg:"I look forward to training with you! Let's begin by doing something you actually enjoy."}
+  {who:'Capy 🐾',msg:"I look forward to training with you! Let's begin by doing something you actually enjoy."}
 ];
 
 const QUIZ40=[
@@ -250,7 +250,7 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click'
 (function(){const g=document.getElementById('vocab-grid');VOCAB40.forEach(v=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front text-white font-black text-sm">${v.w}</div><div class="flip-back text-white font-bold text-xs">${v.t}</div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));g.appendChild(d);});})();
 (function(){const c=document.getElementById('expr-list');EXPRESSIONS40.forEach(e=>{c.innerHTML+=`<div class="expr-card bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left" onclick="this.closest('.expr-card').classList.toggle('open')"><div><span class="font-black text-navy">"${e.expr}"</span><span class="text-slate-500 text-sm ml-2">— ${e.mean}</span></div><span class="expr-chevron text-slate-400 text-xl">▾</span></button><div class="expr-detail px-5 pb-4 space-y-1"><p class="text-sm text-slate-600 italic">"${e.ex}"</p><p class="text-xs text-emerald-600 font-bold mt-1">💡 ${e.tip}</p></div></div>`;});})();
 (function(){const c=document.getElementById('grammar-acc');GRAMMAR_ACC40.forEach(a=>{c.innerHTML+=`<div class="acc-item bg-white border-2 border-slate-100 rounded-2xl overflow-hidden"><button class="w-full flex items-center justify-between px-5 py-4 text-left font-black text-navy" onclick="this.closest('.acc-item').classList.toggle('open')"><span>${a.icon} ${a.title}</span><i class="acc-icon not-italic text-xl text-slate-400">+</i></button><div class="acc-body px-5 pb-4 text-sm text-slate-600 leading-relaxed">${a.body}</div></div>`;});})();
-(function(){const c=document.getElementById('dialogue-box');DIALOGUE40.forEach(l=>{const isLeo=l.who.startsWith('L');const isYara=l.who.startsWith('Y');const emoji=isLeo?'🦁':isYara?'🦦':'🦫';const left=isLeo||isYara;c.innerHTML+=`<div class="flex ${left?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${left?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${left?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
+(function(){const c=document.getElementById('dialogue-box');DIALOGUE40.forEach(l=>{const isLeo=l.who.startsWith('L');const isYara=l.who.startsWith('Y');const emoji=isLeo?'🦁':isYara?'🦦':'🐾';const left=isLeo||isYara;c.innerHTML+=`<div class="flex ${left?'':'flex-row-reverse'} items-end gap-2"><div class="text-2xl">${emoji}</div><div class="max-w-[78%] px-4 py-3 rounded-2xl text-sm font-medium ${left?'bg-emerald-50 text-emerald-900 rounded-bl-sm':'bg-navy text-white rounded-br-sm'}"><span class="block text-[10px] font-black mb-1 ${left?'text-emerald-500':'text-white/50'}">${l.who}</span>${l.msg}</div></div>`;});})();
 (function(){const c=document.getElementById('quiz-area');QUIZ40.forEach((q,i)=>{c.innerHTML+=`<div class="bg-white border-2 border-slate-100 rounded-2xl p-5"><p class="font-black text-navy mb-3">${i+1}. ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,j)=>`<button class="opt-btn rounded-xl px-4 py-2.5 text-sm font-bold text-left text-slate-700" onclick="selectOpt(${i},${j},this)">${o}</button>`).join('')}</div></div>`;});})();
 function selectOpt(qi,oi,el){if(el.disabled)return;document.querySelectorAll(`#quiz-area > div:nth-child(${qi+1}) .opt-btn`).forEach(b=>b.classList.remove('selected'));el.classList.add('selected');quizAnswers[qi]=oi;}
 function submitQuiz(){let score=0;QUIZ40.forEach((q,i)=>{document.querySelectorAll(`#quiz-area > div:nth-child(${i+1}) .opt-btn`).forEach((b,j)=>{b.disabled=true;if(j===q.ans)b.classList.add('correct');else if(quizAnswers[i]===j)b.classList.add('wrong');});if(quizAnswers[i]===q.ans)score++;});document.getElementById('quiz-score-text').textContent=`You got ${score}/${QUIZ40.length} correct!`;document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-submit-btn').disabled=true;if(!done['practice']){done['practice']=true;Store.addXP(50);xpPop(50);renderDots();}}
