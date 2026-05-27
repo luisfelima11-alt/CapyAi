@@ -29,6 +29,9 @@
     <p id="sample-text" class="mt-3 text-sm font-semibold text-slate-700 bg-slate-50 rounded-xl px-4 py-2 italic"></p>
   </div>
 
+  <!-- Error box -->
+  <div id="error-box" style="display:none" class="bg-red-50 border border-red-200 text-red-700 text-sm font-semibold rounded-xl px-4 py-3 mb-4"></div>
+
   <!-- Voices -->
   <div class="space-y-4" id="voices-container"></div>
 
@@ -48,10 +51,10 @@ const SAMPLES = [
 ];
 
 const VOICES = [
-  { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica', tag: '⭐ Recomendada', desc: 'Alegre, Brilhante, Calorosa', color: 'violet' },
-  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah',   tag: '',              desc: 'Madura, Confiante',          color: 'blue' },
-  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura',   tag: '',              desc: 'Entusiasmada, Personalidade', color: 'pink' },
-  { id: 'hpp4J3VqNfWAUOO0d1Us', name: 'Bella',   tag: '',              desc: 'Profissional, Calorosa',      color: 'emerald' },
+  { id: '21m00Tcm4TlvDq8ikWAM', name: 'Rachel', tag: '⭐ Recomendada', desc: 'Calma, Clara, Neutra',         color: 'violet' },
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Bella',  tag: '',              desc: 'Suave, Amigável',              color: 'blue' },
+  { id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli',   tag: '',              desc: 'Jovem, Energética',            color: 'pink' },
+  { id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi',   tag: '',              desc: 'Forte, Confiante',             color: 'emerald' },
 ];
 
 let currentSample = 0;
@@ -88,6 +91,21 @@ async function playVoice(voiceId, btn) {
   const url = `/api/tts?text=${text}&voice=${voiceId}`;
 
   try {
+    // Pre-check: fetch to see if server returns audio or an error JSON
+    const probe = await fetch(url);
+    if (!probe.ok || !probe.headers.get('content-type')?.includes('audio')) {
+      const errText = await probe.text();
+      let detail = '';
+      try { detail = JSON.parse(errText)?.error || errText; } catch { detail = errText; }
+      btn.textContent = '❌ Erro';
+      btn.disabled = false;
+      document.getElementById('error-box').textContent = `Erro (${probe.status}): ${detail}`;
+      document.getElementById('error-box').style.display = 'block';
+      console.error('TTS error:', detail);
+      return;
+    }
+    document.getElementById('error-box').style.display = 'none';
+
     const audio = new Audio(url);
     currentAudio = audio;
     audio.onended = () => { btn.textContent = '▶ Ouvir'; btn.disabled = false; currentAudio = null; };
@@ -99,6 +117,8 @@ async function playVoice(voiceId, btn) {
   } catch(e) {
     btn.textContent = '❌ Erro';
     btn.disabled = false;
+    document.getElementById('error-box').textContent = `Erro: ${e.message}`;
+    document.getElementById('error-box').style.display = 'block';
     console.error(e);
   }
 }

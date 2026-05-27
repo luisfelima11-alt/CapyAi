@@ -698,7 +698,7 @@ Rules:
         const MODEL    = 'eleven_multilingual_v2';
         if (!EL_KEY) { res.status(503).json({ error: 'ELEVENLABS_KEY not set' }); return; }
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
-        const VOICE_ID = qs2.get('voice') || 'cgSgspJ2msm6clMCkdW9'; // default: Jessica
+        const VOICE_ID = qs2.get('voice') || '21m00Tcm4TlvDq8ikWAM'; // default: Rachel (ElevenLabs premade)
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
         const body = JSON.stringify({
