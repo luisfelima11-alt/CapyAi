@@ -96,7 +96,7 @@ async function playVoice(voiceId, btn) {
     if (!probe.ok || !probe.headers.get('content-type')?.includes('audio')) {
       const errText = await probe.text();
       let detail = '';
-      try { detail = JSON.parse(errText)?.error || errText; } catch { detail = errText; }
+      try { const p = JSON.parse(errText); detail = p?.detail || p?.error || errText; } catch { detail = errText; }
       btn.textContent = '❌ Erro';
       btn.disabled = false;
       document.getElementById('error-box').textContent = `Erro (${probe.status}): ${detail}`;

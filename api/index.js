@@ -720,7 +720,11 @@ Rules:
             if (elRes.statusCode !== 200) {
                 let d = '';
                 elRes.on('data', c => d += c);
-                elRes.on('end', () => res.status(502).json({ error: 'ElevenLabs error', detail: d.slice(0, 200) }));
+                elRes.on('end', () => {
+                    let detail = d;
+                    try { detail = JSON.parse(d)?.detail?.message || JSON.parse(d)?.detail || d; } catch {}
+                    res.status(502).json({ error: 'ElevenLabs error', detail: String(detail).slice(0, 400), status: elRes.statusCode });
+                });
                 return;
             }
             res.setHeader('Content-Type', 'audio/mpeg');
