@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Leçon 5 — Être & Avoir | Français avec Yara</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;flex-direction:column;gap:4px}
+.flip-front{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
+.flip-back{background:linear-gradient(135deg,#1e40af,#3730a3);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#4f46e5);border-radius:99px;transition:width .25s}
+.tab-btn.active{color:#1d4ed8}
+.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.prog-dot.done{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}
+.opt-btn.correct{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#1d4ed8;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}.mp-btn.selected{border-color:#1d4ed8;background:#dbeafe}.mp-btn.matched{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#1d4ed8}.fill-inp.ok{border-color:#1d4ed8;background:#dbeafe;color:#1e3a8a}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.btn-blue{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;font-weight:900;border-radius:1rem;transition:all .15s}
+.btn-blue:hover{transform:scale(1.05)}.btn-blue:active{transform:scale(.95)}
+.conj-table{border-collapse:collapse;width:100%}
+.conj-table td,.conj-table th{border:1px solid #e2e8f0;padding:.5rem .75rem;text-align:left;font-size:.85rem}
+.conj-table th{background:#eff6ff;font-weight:900;color:#1d4ed8}
+.conj-table tr:nth-child(even) td{background:#f8fafc}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">✨</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🇫🇷</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">💼</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🌍</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🦫</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="fr_aula_04.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Leçon 4</a>
+        <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Cours de Français</a>
+        <a href="fr_aula_06.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next Lesson →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🇫🇷 Leçon 5 · Débutant</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Être &amp; Avoir<br><span class="text-blue-300">To Be &amp; To Have</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Master the two most important French verbs! Être (to be) and Avoir (to have) are the foundation of everything in French.</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">✨ Conjugations</h2><p class="text-slate-500 text-sm">Flip each card — front shows the pronoun + English, back shows the French conjugation!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="btn-blue px-8 py-3">✓ I know these conjugations! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Key phrases using être and avoir. Click to expand.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="btn-blue px-8 py-3">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Full conjugation tables + when to use each verb.</p></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
+          <p class="font-black text-lg mb-3">ÊTRE — To Be</p>
+          <table class="conj-table text-white text-sm">
+            <tr><td class="font-black bg-white/20">je suis</td><td>I am</td></tr>
+            <tr><td class="font-black bg-white/20">tu es</td><td>you are</td></tr>
+            <tr><td class="font-black bg-white/20">il/elle est</td><td>he/she is</td></tr>
+            <tr><td class="font-black bg-white/20">nous sommes</td><td>we are</td></tr>
+            <tr><td class="font-black bg-white/20">vous êtes</td><td>you are (formal/pl)</td></tr>
+            <tr><td class="font-black bg-white/20">ils/elles sont</td><td>they are</td></tr>
+          </table>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-5 text-white">
+          <p class="font-black text-lg mb-3">AVOIR — To Have</p>
+          <table class="conj-table text-white text-sm">
+            <tr><td class="font-black bg-white/20">j'ai</td><td>I have</td></tr>
+            <tr><td class="font-black bg-white/20">tu as</td><td>you have</td></tr>
+            <tr><td class="font-black bg-white/20">il/elle a</td><td>he/she has</td></tr>
+            <tr><td class="font-black bg-white/20">nous avons</td><td>we have</td></tr>
+            <tr><td class="font-black bg-white/20">vous avez</td><td>you have (formal/pl)</td></tr>
+            <tr><td class="font-black bg-white/20">ils/elles ont</td><td>they have</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🧠 ÊTRE — What it's used for</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">Use ÊTRE for: identity, nationality, profession, origin, characteristics</p>
+            <p>✅ <strong>Je suis</strong> brésilien(ne). — I am Brazilian.</p>
+            <p>✅ <strong>Elle est</strong> médecin. — She is a doctor.</p>
+            <p>✅ <strong>Nous sommes</strong> étudiants. — We are students.</p>
+            <p>✅ <strong>Il est</strong> de Paris. — He is from Paris.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>💪 AVOIR — What it's used for</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">Use AVOIR for: possession, age, physical sensations</p>
+            <p>✅ <strong>J'ai</strong> vingt ans. — I am 20 years old. (lit. "I have 20 years")</p>
+            <p>✅ <strong>Tu as</strong> faim? — Are you hungry? (lit. "Do you have hunger?")</p>
+            <p>✅ <strong>Elle a</strong> une voiture rouge. — She has a red car.</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 In French you "have" hunger, thirst, cold, hot — not "are"!</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⚠️ Common Avoir Expressions</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">These use AVOIR where English uses "to be":</p>
+            <p>✅ <strong>avoir faim</strong> = to be hungry (lit. have hunger)</p>
+            <p>✅ <strong>avoir soif</strong> = to be thirsty (lit. have thirst)</p>
+            <p>✅ <strong>avoir froid/chaud</strong> = to be cold/hot</p>
+            <p>✅ <strong>avoir peur</strong> = to be afraid (lit. have fear)</p>
+            <p>✅ <strong>avoir raison</strong> = to be right</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔡 Pronunciation: Liaison!</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">With AVOIR, the "s" links to the next vowel:</p>
+            <p>✅ <strong>nous avons</strong> → [noo-ZAH-von] (the S links)</p>
+            <p>✅ <strong>vous avez</strong> → [voo-ZAH-vay]</p>
+            <p>✅ <strong>ils ont</strong> → [eel-ZON]</p>
+            <p>✅ <strong>j'ai</strong> → [ZHAY] (je + ai = j'ai, never "je ai")</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="btn-blue px-8 py-3">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🌍 Yara introduces herself at a networking event. Read aloud!</p></div>
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🌍 At a Paris networking event, Yara meets Sophie. Notice how être and avoir are used throughout!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">👩 Sophie</p><p class="text-slate-700 text-sm">Bonsoir! Je <strong class="text-blue-700">suis</strong> Sophie. Je <strong class="text-blue-700">suis</strong> étudiante en médecine. Et vous?</p><p class="text-xs text-slate-400 mt-1 italic">Good evening! I am Sophie. I am a medical student. And you?</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">Bonsoir Sophie! Je <strong class="text-blue-700">suis</strong> Yara. Je <strong class="text-blue-700">suis</strong> brésilienne, mais j'habite à Paris.</p><p class="text-xs text-slate-400 mt-1 italic">Good evening Sophie! I am Yara. I am Brazilian, but I live in Paris.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">👩 Sophie</p><p class="text-slate-700 text-sm">Super! Quel âge <strong class="text-blue-700">avez</strong>-vous?</p><p class="text-xs text-slate-400 mt-1 italic">Great! How old are you?</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">J'<strong class="text-blue-700">ai</strong> dix-neuf ans. Et vous?</p><p class="text-xs text-slate-400 mt-1 italic">I am 19 years old. And you?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">👩 Sophie</p><p class="text-slate-700 text-sm">J'<strong class="text-blue-700">ai</strong> vingt-deux ans. Vous <strong class="text-blue-700">avez</strong> faim? Il y a des croissants là-bas!</p><p class="text-xs text-slate-400 mt-1 italic">I am 22 years old. Are you hungry? There are croissants over there!</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">Oui, j'<strong class="text-blue-700">ai</strong> très faim! Et j'<strong class="text-blue-700">ai</strong> aussi soif. Nous <strong class="text-blue-700">avons</strong> de la chance!</p><p class="text-xs text-slate-400 mt-1 italic">Yes, I am very hungry! And I am also thirsty. We are lucky!</p></div>
+      </div>
+      <button onclick="markSection('dialogue');if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');" class="btn-blue px-8 py-3">✓ I read the dialogue! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questions on être and avoir conjugations!</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <p class="font-black text-blue-700 text-lg" id="quiz-score-text"></p>
+        <p class="text-blue-600 text-sm mt-1">+50 XP earned! Magnifique!</p>
+      </div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full btn-blue py-4 text-base">✓ Check Answers +50 XP</button>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Practice these sentences aloud — focus on the liaison sounds!</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="btn-blue px-8 py-3">✓ All phrases practiced! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Leçon 5 — Être &amp; Avoir</p></div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Arrange the words to form correct sentences.</p></div></div>
+          <div id="wo1-container" class="space-y-6"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Conjugation</h3><p class="text-slate-500 text-sm mt-1">Match each French form to its English meaning.</p></div></div>
+          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
+          <p id="mp1-done-msg" class="hidden mt-3 text-blue-600 font-black text-sm">✅ All pairs matched! Parfait!</p>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Fill with the correct form of <strong>être</strong> or <strong>avoir</strong>.</p></div></div>
+          <div class="space-y-4" id="fill1-container"></div>
+          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Write a short self-introduction (4–6 sentences) using BOTH être and avoir. Include: name, nationality, age, something you have, how you feel right now.</p></div></div>
+          <textarea rows="5" placeholder="Je suis... Je suis... J'ai... ans. J'ai... J'ai faim/soif/..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
+        </div>
+      </div>
+      <button onclick="submitHomework()" class="mt-6 w-full btn-blue py-4 text-base">✓ Submit Homework +75 XP</button>
+      <div id="hw-done" class="hidden mt-4 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">✨</div>
+        <p class="font-black text-blue-700">Homework complete! +75 XP — Très bien!</p>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+
+const VOCAB=[
+  ['I am (être)','je suis [zhuh SWEE]'],
+  ['you are','tu es [tü EH]'],
+  ['he/she is','il/elle est [eel/el EH]'],
+  ['we are','nous sommes [noo SOM]'],
+  ['you are (formal)','vous êtes [voo-ZET]'],
+  ['they are','ils/elles sont [eel/el SON]'],
+  ['I have (avoir)','j\'ai [ZHAY]'],
+  ['you have','tu as [tü AH]'],
+  ['he/she has','il/elle a [eel/el AH]'],
+  ['we have','nous avons [noo-ZAH-von]'],
+  ['you have (formal)','vous avez [voo-ZAH-vay]'],
+  ['they have','ils/elles ont [eel/el-ZON]'],
+];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,fr])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-xs text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${fr}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+
+const EXPRS=[
+  {phrase:'Je suis de... / Je suis...',meaning:'I am from... / I am... (nationality)',example:'"Je suis de São Paulo. Je suis brésilienne et je suis étudiante."',use:'Use ÊTRE for origin (je suis DE + city) and nationality/profession. Note: In French, you don\'t use "un/une" before professions — not "je suis UNE étudiante" but just "je suis étudiante."'},
+  {phrase:'Avoir faim / Avoir soif',meaning:'To be hungry / thirsty',example:'"Tu as faim? — Oui, j\'ai très faim! J\'ai aussi soif."',use:'Essential expressions! French uses AVOIR (have) where English uses BE. "Tu as faim?" literally means "You have hunger?" Other: avoir froid (cold), avoir chaud (hot), avoir peur (afraid).'},
+  {phrase:'Il y a / Il n\'y a pas',meaning:'There is/are / There is/are not',example:'"Il y a un café ici? — Non, il n\'y a pas de café."',use:'Il y a uses AVOIR. To negate: il N\'y a PAS. The "y" means "there" and can\'t be dropped. Works for singular and plural: il y a un café / il y a des cafés.'},
+  {phrase:'C\'est vs Il est',meaning:'It\'s / He/She is',example:'"C\'est mon ami. Il est étudiant. C\'est un étudiant brillant!"',use:'Both use ÊTRE but differently. C\'EST + noun/name ("C\'est Marie"). IL/ELLE EST + adjective/profession without article ("Il est médecin"). Beginners often confuse these!'},
+];
+const exList=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-blue-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-blue-50 rounded-xl p-3 italic">"${e.example}"</p><p>${e.use}</p></div>`;exList.appendChild(d);});
+
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+
+const QUIZ=[
+  {q:'"I am Brazilian." — Which is correct?',opts:['Je suis brésilienne.','J\'ai brésilienne.','Je suis une brésilienne.','J\'être brésilienne.'],ans:0},
+  {q:'How do you say "She has a cat"?',opts:['Elle a un chat.','Elle est un chat.','Elle avoir un chat.','Elle as un chat.'],ans:0},
+  {q:'"We are students." — Choose the correct form of être:',opts:['Nous sommes étudiants.','Nous avons étudiants.','Nous êtes étudiants.','Nous sont étudiants.'],ans:0},
+  {q:'In French, "I am 25 years old" uses which verb?',opts:['Avoir (j\'ai 25 ans)','Être (je suis 25 ans)','Either verb is fine','No verb needed'],ans:0},
+  {q:'"Vous _____ faim?" — Fill in the blank:',opts:['avez','êtes','avons','sont'],ans:0},
+  {q:'What does "ils ont" mean?',opts:['They have','They are','He has','You have'],ans:0},
+  {q:'"Nous _____ de France." — Fill in with être:',opts:['sommes','avons','êtes','sont'],ans:0},
+  {q:'"Avoir peur" means:',opts:['To be afraid','To be cold','To be right','To be hungry'],ans:0},
+  {q:'"C\'est" is used before:',opts:['A name or noun: C\'est Marie','An adjective: C\'est grand','A profession alone: C\'est médecin','A nationality: C\'est français'],ans:0},
+  {q:'How do you say "They are (feminine) from Paris"?',opts:['Elles sont de Paris.','Elles ont de Paris.','Ils sont de Paris.','Elles sommes de Paris.'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-blue-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#1d4ed8';btn.style.background='#eff6ff';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+
+const SPEAK=[
+  'Je suis brésilienne et j\'habite à Paris.',
+  'J\'ai vingt ans. Et vous, vous avez quel âge?',
+  'Nous sommes étudiants à l\'université.',
+  'Tu as faim? — Oui, j\'ai très faim!',
+  'Il est médecin. Elle est avocate.',
+  'Ils sont de Lyon. Elles ont une maison là-bas.',
+  'Vous avez raison! C\'est parfait.',
+  'Il y a un café ici? J\'ai soif!',
+];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+
+const WO1_DATA=[
+  {s:'Je suis étudiante à Paris',w:['Je','suis','étudiante','à','Paris']},
+  {s:'Nous avons faim et soif',w:['Nous','avons','faim','et','soif']},
+  {s:'Elle est de Lyon et elle a vingt ans',w:['Elle','est','de','Lyon','et','elle','a','vingt','ans']},
+];
+function hwShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle(d.w),orig:d.w}));
+function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
+function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-blue-600':'text-red-500');fb.textContent=ok?'✅ Correct! Parfait!':'❌ Try again! Answer: '+WO1_DATA[si].s;fb.classList.remove('hidden');}
+function wo1Reset(si){wo1[si].bank=hwShuffle(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+wo1Render();
+
+const MP1=[{l:'je suis',r:'I am'},{l:'nous avons',r:'We have'},{l:'ils sont',r:'They are'},{l:'tu as',r:'You have'},{l:'elle est',r:'She is'},];
+function mpShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp1R=mpShuffle(MP1.map((p,i)=>({label:p.r,pid:i})));
+let mp1SelL=null;const mp1Done=new Set();
+function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
+function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp1Render();
+
+const FILL1=[
+  {before:'Je',blank:'suis',after:'française. (I am French — être)',ans:'suis'},
+  {before:'Il',blank:'a',after:'faim. (He is hungry — avoir)',ans:'a'},
+  {before:'Nous',blank:'sommes',after:'étudiants. (We are students — être)',ans:'sommes'},
+  {before:'Vous',blank:'avez',after:'raison! (You are right — avoir)',ans:'avez'},
+  {before:'Elles',blank:'sont',after:'de Paris. (They are from Paris — être)',ans:'sont'},
+];
+const fc=document.getElementById('fill1-container');
+FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`${f.before?`<span>${f.before}</span>`:''}  <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+
+function submitHomework(){
+  markSection('homework');
+  if(typeof Store!=='undefined')Store.addXP(55);
+  spawnXP('+75 XP');
+  const btn=document.querySelector('[onclick="submitHomework()"]');
+  btn.textContent='🎉 Homework submitted! +75 XP — Magnifique!';
+  btn.disabled=true;
+  const a=document.createElement('a');
+  a.href='fr_aula_06.html';
+  a.className='block text-center mt-3 bg-white border-2 border-blue-300 text-blue-700 font-black py-3 rounded-2xl hover:bg-blue-50 transition-all text-sm';
+  a.textContent='Continue to Leçon 06 — La Nourriture →';
+  btn.insertAdjacentElement('afterend',a);
+}
+</script>
+</body>
+</html>

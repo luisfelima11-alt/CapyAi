@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Leçon 2 — Les Chiffres | Français avec Yara</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.fade-in{animation:fadeIn .4s ease both}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;flex-direction:column;gap:4px}
+.flip-front{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
+.flip-back{background:linear-gradient(135deg,#1e40af,#3730a3);transform:rotateY(180deg)}
+.tab-btn{position:relative;font-weight:700;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#4f46e5);border-radius:99px;transition:width .25s}
+.tab-btn.active{color:#1d4ed8}
+.tab-btn.active::after{width:80%}
+.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
+.prog-dot.done{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
+.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
+.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
+.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}
+.opt-btn.correct{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;animation:correct-pulse .3s ease}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#1d4ed8;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}.mp-btn.selected{border-color:#1d4ed8;background:#dbeafe}.mp-btn.matched{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:140px;text-align:center}.fill-inp:focus{border-color:#1d4ed8}.fill-inp.ok{border-color:#1d4ed8;background:#dbeafe;color:#1e3a8a}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.btn-blue{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;font-weight:900;border-radius:1rem;transition:all .15s}
+.btn-blue:hover{transform:scale(1.05)}.btn-blue:active{transform:scale(.95)}
+.num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.75rem}
+.num-card{background:linear-gradient(135deg,#1d4ed8,#4f46e5);border-radius:1rem;padding:1rem;text-align:center;color:#fff}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">🔢</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🇫🇷</span>
+      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">📞</span>
+      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🎂</span>
+      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🦫</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="flex items-center gap-3 flex-wrap mb-5">
+        <a href="fr_aula_01.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Leçon 1</a>
+        <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Cours de Français</a>
+        <a href="fr_aula_03.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next Lesson →</a>
+      </div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🇫🇷 Leçon 2 · Débutant</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Les Chiffres<br><span class="text-blue-300">Numbers 1–20</span></h1>
+      <p class="text-white/70 mb-6 max-w-lg">Count like a Parisian! Learn numbers 1 to 20, understand phone numbers, ages, and prices in French.</p>
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="hero-dots" class="flex gap-2"></div>
+        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
+    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- VOCAB -->
+    <div id="tab-vocab" class="fade-in">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📖 Numbers</h2><p class="text-slate-500 text-sm">Flip each card to see the French number. Click again to flip back!</p></div>
+      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
+      <button onclick="markSection('vocab')" class="btn-blue px-8 py-3">✓ I know these numbers! +20 XP</button>
+    </div>
+
+    <!-- EXPRESSIONS -->
+    <div id="tab-expressions" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Everyday French phrases using numbers. Click to expand.</p></div>
+      <div id="expr-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('expressions')" class="btn-blue px-8 py-3">✓ Got the expressions! +20 XP</button>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div id="tab-grammar" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">How French numbers work — patterns and pronunciation secrets.</p></div>
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 mb-4 text-white">
+        <p class="text-xs font-black uppercase tracking-widest mb-3 text-blue-100">Numbers at a Glance</p>
+        <div class="num-grid text-sm font-black">
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">0 — zéro</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">1 — un/une</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">2 — deux</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">3 — trois</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">4 — quatre</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">5 — cinq</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">6 — six</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">7 — sept</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">8 — huit</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">9 — neuf</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">10 — dix</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">11 — onze</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">12 — douze</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">13 — treize</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">14 — quatorze</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">15 — quinze</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">16 — seize</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">17 — dix-sept</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">18 — dix-huit</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">19 — dix-neuf</span>
+          <span class="bg-white/20 rounded-xl px-2 py-2 text-center">20 — vingt</span>
+        </div>
+      </div>
+      <div class="space-y-3 mb-6">
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔢 11–16: The "-ze" Pattern</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">Numbers 11–16 follow a unique pattern ending in <strong>-ze</strong>:</p>
+            <p>✅ onze [ONZ], douze [DOOZ], treize [TREZ], quatorze [ka-TORZ], quinze [KANZ], seize [SEZ]</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 These must be memorized — they don't follow a simple pattern like in English (eleven, twelve...).</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>➕ 17–19: Compound Numbers</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">17, 18, 19 are <strong>10 + 7, 10 + 8, 10 + 9</strong>:</p>
+            <p>✅ <strong>dix-sept</strong> = dix (10) + sept (7) = 17</p>
+            <p>✅ <strong>dix-huit</strong> = dix (10) + huit (8) = 18</p>
+            <p>✅ <strong>dix-neuf</strong> = dix (10) + neuf (9) = 19</p>
+            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 This compound pattern continues: 70 = soixante-dix (60+10), 80 = quatre-vingts (4×20)!</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>👦 Un vs Une — Gender Matters!</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">The number 1 changes based on gender:</p>
+            <p>✅ <strong>un</strong> chien (one dog — masculine)</p>
+            <p>✅ <strong>une</strong> chatte (one cat — feminine)</p>
+            <p>✅ All other numbers stay the same regardless of gender.</p>
+          </div>
+        </div>
+        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
+          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🔊 Silent Letters in Numbers</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
+          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
+            <p class="bg-blue-50 rounded-xl p-3">Some numbers have tricky pronunciation:</p>
+            <p>✅ <strong>cinq</strong> [SANK] — the "q" is silent</p>
+            <p>✅ <strong>six</strong> [SEES] alone, but [SIS] before consonant, [SEE-Z] before vowel</p>
+            <p>✅ <strong>dix</strong> [DEES] alone, but [DIZ] before vowels</p>
+            <p>✅ <strong>vingt</strong> [VAN] — the "gt" is silent</p>
+          </div>
+        </div>
+      </div>
+      <button onclick="markSection('grammar')" class="btn-blue px-8 py-3">✓ Grammar understood! +20 XP</button>
+    </div>
+
+    <!-- DIALOGUE -->
+    <div id="tab-dialogue" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">📞 Échanging phone numbers and ages. Read aloud!</p></div>
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">📞 Yara and Leo exchange contact info after their café meeting. Listen for the numbers!</div>
+      <div class="space-y-3 mb-6">
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">Leo, quel est ton numéro de téléphone?</p><p class="text-xs text-slate-400 mt-1 italic">Leo, what is your phone number?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">C'est le <strong class="text-blue-700">zéro six, douze, quinze, vingt, onze</strong>.</p><p class="text-xs text-slate-400 mt-1 italic">It's 06 12 15 20 11.</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">Parfait! Et quel âge as-tu?</p><p class="text-xs text-slate-400 mt-1 italic">Perfect! And how old are you?</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">J'ai <strong class="text-blue-700">vingt</strong> ans. Et toi, Yara?</p><p class="text-xs text-slate-400 mt-1 italic">I am 20 years old. And you, Yara?</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">J'ai <strong class="text-blue-700">dix-neuf</strong> ans! Je suis plus jeune que toi.</p><p class="text-xs text-slate-400 mt-1 italic">I am 19 years old! I am younger than you.</p></div>
+        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Haha! Combien coûte le café? Je paye!</p><p class="text-xs text-slate-400 mt-1 italic">Haha! How much is the coffee? I'll pay!</p></div>
+        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🦫 Yara</p><p class="text-slate-700 text-sm">C'est <strong class="text-blue-700">deux</strong> euros. Merci, Leo!</p><p class="text-xs text-slate-400 mt-1 italic">It's 2 euros. Thank you, Leo!</p></div>
+      </div>
+      <button onclick="markSection('dialogue');if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');" class="btn-blue px-8 py-3">✓ I read the dialogue! +20 XP</button>
+    </div>
+
+    <!-- PRACTICE -->
+    <div id="tab-practice" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questions on French numbers. Bonne chance!</p></div>
+      <div id="quiz-container" class="space-y-5 mb-6"></div>
+      <div id="quiz-result" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-center mb-4">
+        <div class="text-4xl mb-2">🏆</div>
+        <p class="font-black text-blue-700 text-lg" id="quiz-score-text"></p>
+        <p class="text-blue-600 text-sm mt-1">+50 XP earned! Magnifique!</p>
+      </div>
+      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full btn-blue py-4 text-base">✓ Check Answers +50 XP</button>
+    </div>
+
+    <!-- SPEAK -->
+    <div id="tab-speak" class="fade-in hidden">
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Read each number phrase aloud. Say them clearly and at a natural pace!</p></div>
+      <div id="speak-list" class="space-y-3 mb-6"></div>
+      <button onclick="markSection('speak')" class="btn-blue px-8 py-3">✓ All phrases practiced! +20 XP</button>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="tab-homework" class="fade-in hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Leçon 2 — Les Chiffres</p></div>
+          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+        </div>
+      </div>
+      <div class="space-y-5">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Arrange the words to form correct French sentences.</p></div></div>
+          <div id="wo1-container" class="space-y-6"></div>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Number</h3><p class="text-slate-500 text-sm mt-1">Match each French word to its numeral.</p></div></div>
+          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
+          <p id="mp1-done-msg" class="hidden mt-3 text-blue-600 font-black text-sm">✅ All pairs matched! Parfait!</p>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Write the French number word.</p></div></div>
+          <div class="space-y-4" id="fill1-container"></div>
+          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
+        </div>
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Write out your phone number digit by digit in French, then write your age in a sentence: "J'ai ___ ans."</p></div></div>
+          <textarea rows="4" placeholder="Mon numéro: zéro six, ..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
+        </div>
+      </div>
+      <button onclick="submitHomework()" class="mt-6 w-full btn-blue py-4 text-base">✓ Submit Homework +75 XP</button>
+      <div id="hw-done" class="hidden mt-4 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center">
+        <div class="text-3xl mb-2">🔢</div>
+        <p class="font-black text-blue-700">Homework complete! +75 XP — Très bien!</p>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
+function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
+buildHeroDots();
+function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
+function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
+const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
+
+const VOCAB=[
+  ['0','zéro [ZAY-roh]'],
+  ['1','un [UHN]'],
+  ['2','deux [DUH]'],
+  ['3','trois [TWAH]'],
+  ['4','quatre [KAT-ruh]'],
+  ['5','cinq [SANK]'],
+  ['6','six [SEES]'],
+  ['7','sept [SET]'],
+  ['8','huit [WEET]'],
+  ['9','neuf [NUF]'],
+  ['10','dix [DEES]'],
+  ['11','onze [ONZ]'],
+  ['12','douze [DOOZ]'],
+  ['15','quinze [KANZ]'],
+  ['20','vingt [VAN]'],
+];
+const vg=document.getElementById('vocab-grid');
+VOCAB.forEach(([en,fr])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-2xl text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${fr}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+
+const EXPRS=[
+  {phrase:'Quel âge as-tu?',meaning:'How old are you? (informal)',example:'"Quel âge as-tu?" — "J\'ai vingt ans."',use:'Use "as-tu" (informal) with friends. Formal: "Quel âge avez-vous?" The verb is AVOIR (to have). In French, you "have" years, not "are" years old!'},
+  {phrase:'Ça coûte combien?',meaning:'How much does it cost?',example:'"Ça coûte combien, ce croissant?" — "Deux euros, s\'il vous plaît."',use:'Essential for shopping! Combien = how much/many. Use this at markets, cafés, shops. Short form: "C\'est combien?"'},
+  {phrase:'Mon numéro c\'est le...',meaning:'My number is...',example:'"Mon numéro c\'est le zéro six, douze, quinze, seize, vingt."',use:'French phone numbers are always said in pairs of 2 digits. Mobile numbers start with 06 or 07. Always say each pair together.'},
+  {phrase:'Il y a... personnes',meaning:'There are... people',example:'"Il y a quinze étudiants dans la classe."',use:'Il y a = there is / there are. Essential phrase! Works for counting anything: "Il y a deux cafés ici." (There are two cafés here.)'},
+];
+const el=document.getElementById('expr-list');
+EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-blue-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-blue-50 rounded-xl p-3 italic">"${e.example}"</p><p>${e.use}</p></div>`;el.appendChild(d);});
+
+function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+
+const QUIZ=[
+  {q:'How do you say the number 5 in French?',opts:['cinq','sept','neuf','quinze'],ans:0},
+  {q:'What number is "douze"?',opts:['12','11','13','20'],ans:0},
+  {q:'How do you say your age in French? "I am 20 years old."',opts:['J\'ai vingt ans.','Je suis vingt.','J\'ai vingt.','Vingt ans j\'ai.'],ans:0},
+  {q:'Which number is "dix-sept"?',opts:['17','16','18','15'],ans:0},
+  {q:'"Ça coûte combien?" means:',opts:['How much does it cost?','How old are you?','What is your number?','Where is the café?'],ans:0},
+  {q:'How do you say 0 in French?',opts:['zéro','nul','vide','blanc'],ans:0},
+  {q:'What is 10 + 5 in French words?',opts:['quinze','dix-cinq','vingt','treize'],ans:0},
+  {q:'"Il y a trois personnes" means:',opts:['There are 3 people','I have 3 people','3 people here','3 is the number'],ans:0},
+  {q:'How do you say 8 in French?',opts:['huit','neuf','sept','six'],ans:0},
+  {q:'Which is correct for "I am 15 years old"?',opts:['J\'ai quinze ans.','Je suis quinze ans.','J\'ai quinze.','Quinze ans suis.'],ans:0},
+];
+let quizSubmitted=false;
+const qc=document.getElementById('quiz-container');
+QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-blue-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
+const selected={};
+function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#1d4ed8';btn.style.background='#eff6ff';selected[qi]=parseInt(btn.dataset.oi);}
+function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+
+const SPEAK=[
+  'Un, deux, trois, quatre, cinq!',
+  'Six, sept, huit, neuf, dix!',
+  'Onze, douze, treize, quatorze, quinze!',
+  'Seize, dix-sept, dix-huit, dix-neuf, vingt!',
+  'J\'ai dix-neuf ans.',
+  'Ça coûte deux euros, s\'il vous plaît.',
+  'Mon numéro c\'est le zéro six, douze, quinze.',
+  'Il y a vingt étudiants dans la classe.',
+];
+const sl=document.getElementById('speak-list');
+SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+
+const WO1_DATA=[
+  {s:'J\'ai quinze ans',w:['J\'ai','quinze','ans']},
+  {s:'Ça coûte combien s\'il vous plaît',w:['Ça','coûte','combien','s\'il','vous','plaît']},
+  {s:'Il y a vingt personnes ici',w:['Il','y','a','vingt','personnes','ici']},
+];
+function hwShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle(d.w),orig:d.w}));
+function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
+function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
+function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-blue-600':'text-red-500');fb.textContent=ok?'✅ Correct! Parfait!':'❌ Try again! Answer: '+WO1_DATA[si].s;fb.classList.remove('hidden');}
+function wo1Reset(si){wo1[si].bank=hwShuffle(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+wo1Render();
+
+const MP1=[{l:'cinq 5️⃣',r:'5'},{l:'douze 🕛',r:'12'},{l:'vingt 2️⃣0️⃣',r:'20'},{l:'neuf 9️⃣',r:'9'},{l:'quinze 🕒',r:'15'},];
+function mpShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const mp1R=mpShuffle(MP1.map((p,i)=>({label:p.r,pid:i})));
+let mp1SelL=null;const mp1Done=new Set();
+function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
+function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
+function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+mp1Render();
+
+const FILL1=[
+  {before:'',blank:'vingt',after:'ans (I am 20 years old → J\'ai ___ ans)',ans:'vingt'},
+  {before:'Il y a',blank:'quinze',after:'étudiants. (15 students)',ans:'quinze'},
+  {before:'Ça coûte',blank:'deux',after:'euros. (2 euros)',ans:'deux'},
+  {before:'',blank:'zéro',after:'six (starts every French mobile number)',ans:'zéro'},
+  {before:'',blank:'dix',after:'plus cinq font quinze. (10 + 5 = 15)',ans:'dix'},
+];
+const fc=document.getElementById('fill1-container');
+FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`${f.before?`<span>${f.before}</span>`:''}  <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;fc.appendChild(d);});
+function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+
+function submitHomework(){
+  markSection('homework');
+  if(typeof Store!=='undefined')Store.addXP(55);
+  spawnXP('+75 XP');
+  const btn=document.querySelector('[onclick="submitHomework()"]');
+  btn.textContent='🎉 Homework submitted! +75 XP — Magnifique!';
+  btn.disabled=true;
+  const a=document.createElement('a');
+  a.href='fr_aula_03.html';
+  a.className='block text-center mt-3 bg-white border-2 border-blue-300 text-blue-700 font-black py-3 rounded-2xl hover:bg-blue-50 transition-all text-sm';
+  a.textContent='Continue to Leçon 03 — Les Couleurs →';
+  btn.insertAdjacentElement('afterend',a);
+}
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -53,12 +53,14 @@
         <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
           📚 English<br><span class="text-violet-300">Classes</span>
         </h1>
-        <p class="text-white/70 text-lg mb-6 max-w-lg">37 real lessons from Jadson's course — transformed into interactive experiences. Study vocab, grammar, expressions and practise speaking.</p>
+        <p class="text-white/70 text-lg mb-6 max-w-lg">44 real lessons from Jadson's course — transformed into interactive experiences. Study vocab, grammar, expressions and practise speaking.</p>
         <!-- Progress bar -->
-        <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden">
-          <div class="h-full rounded-full bg-gradient-to-r from-violet-400 to-pink-400" style="width:32.4%"></div>
+        <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden relative">
+          <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-pink-400 to-violet-400 relative" style="width:100%">
+            <span class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-lg shadow-amber-300/60 animate-pulse"></span>
+          </div>
         </div>
-        <p class="text-white/50 text-sm">12 of 37 lessons available · More coming soon</p>
+        <p class="text-white/50 text-sm">🎉 44 of 44 lessons available · Course complete!</p>
       </div>
     </div>
   </div>
@@ -76,14 +78,43 @@
         <span class="inline-flex items-center gap-1.5 bg-violet-100 text-violet-700 font-bold px-3 py-1.5 rounded-full">
           <span class="w-2 h-2 rounded-full bg-violet-500"></span> Available
         </span>
-        <span class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 font-bold px-3 py-1.5 rounded-full">
-          <span class="w-2 h-2 rounded-full bg-slate-400"></span> Soon
+        <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Completed
         </span>
       </div>
     </div>
 
     <!-- Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="lessons-grid">
+    </div>
+
+    <!-- More Courses -->
+    <div class="mt-12">
+      <h2 class="text-2xl font-black text-navy mb-1">Mais Cursos</h2>
+      <p class="text-slate-500 text-sm mb-6">Expanda seus horizontes com outros idiomas</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div onclick="window.location.href='classes_fr.html'" class="cursor-pointer group rounded-2xl overflow-hidden border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 hover:border-blue-400 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-200/50">
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-2xl shadow-lg shadow-blue-300/40">🇫🇷</div>
+              <div>
+                <div class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-0.5">Novo Curso</div>
+                <h3 class="font-black text-navy text-base leading-tight">Cours de Français</h3>
+              </div>
+            </div>
+            <p class="text-slate-500 text-sm mb-4">Do zero ao básico sólido em 7 aulas interativas. English → French.</p>
+            <div class="flex items-center gap-2 flex-wrap mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Débutant</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">7 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">EN → FR</span>
+            </div>
+            <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm py-2.5 rounded-xl group-hover:scale-105 active:scale-95 transition-all shadow-sm">
+              Commencer →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400"></div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -92,7 +123,7 @@
 <div id="footer-placeholder"></div>
 
 <script src="store.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -100,25 +131,25 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 Components.mount('footer-placeholder', Components.renderFooter());
 
 const LESSONS = [
-  {n:1,  emoji:'💬', title:'To Have, Want, Need & Like',       tags:['Verbs','Present Simple']},
-  {n:2,  emoji:'🚶', title:'To Go, Do, Say & See',              tags:['Verbs','Daily Life']},
-  {n:3,  emoji:'🧠', title:'To Get, Make, Know & Take',         tags:['Verbs','Actions']},
-  {n:4,  emoji:'👀', title:'To Come, Think, Look & Give',       tags:['Verbs','Expressions']},
-  {n:5,  emoji:'✉️', title:'To Tell, Work, Feel & Leave',       tags:['Verbs','Feelings']},
-  {n:6,  emoji:'⚡', title:'Modal Verbs: Can, Could & Should',  tags:['Modals','Permission']},
-  {n:7,  emoji:'⏪', title:'Past Simple — Regular Verbs',        tags:['Past Tense','Actions']},
-  {n:8,  emoji:'🔄', title:'Past Simple — Irregular Verbs',     tags:['Past Tense','Irregular']},
-  {n:9,  emoji:'📍', title:'Prepositions of Place',              tags:['Prepositions','Space']},
-  {n:10, emoji:'🔢', title:'Quantifiers: Many, Much & More',    tags:['Quantifiers','Nouns']},
-  {n:11, emoji:'📊', title:'Adjectives & Comparatives',         tags:['Adjectives','Comparison']},
-  {n:12, emoji:'🔮', title:'Future: Will & Going To',            tags:['Future Tense','Plans']},
-  {n:13, emoji:'💼', title:'Work & Career',                      tags:['Vocabulary','Professional']},
-  {n:14, emoji:'💻', title:'Technology & Digital Life',          tags:['Vocabulary','Tech']},
-  {n:15, emoji:'✈️', title:'Travel & Tourism',                   tags:['Vocabulary','Travel']},
-  {n:16, emoji:'🏠', title:'Home & Daily Routines',              tags:['Vocabulary','Daily Life']},
-  {n:17, emoji:'🍽️', title:'Food, Drinks & Restaurants',        tags:['Vocabulary','Food']},
-  {n:18, emoji:'🛒', title:'Shopping & Money',                   tags:['Vocabulary','Shopping']},
-  {n:19, emoji:'🏥', title:'Health & Body',                      tags:['Vocabulary','Health']},
+  {n:1,  emoji:'💬', title:'To Have, Want, Need & Like',       tags:['Verbs','Present Simple'],  available:true, href:'aula_01.html'},
+  {n:2,  emoji:'🚶', title:'To Go, Do, Say & See',              tags:['Verbs','Daily Life'],       available:true, href:'aula_02.html'},
+  {n:3,  emoji:'🧠', title:'To Get, Make, Know & Take',         tags:['Verbs','Actions'],          available:true, href:'aula_03.html'},
+  {n:4,  emoji:'👀', title:'To Come, Think, Look & Give',       tags:['Verbs','Expressions'],      available:true, href:'aula_04.html'},
+  {n:5,  emoji:'✉️', title:'To Tell, Work, Feel & Leave',       tags:['Verbs','Feelings'],         available:true, href:'aula_05.html'},
+  {n:6,  emoji:'⚡', title:'Modal Verbs: Can, Could & Should',  tags:['Modals','Permission'],      available:true, href:'aula_06.html'},
+  {n:7,  emoji:'⏪', title:'Past Simple — Regular Verbs',        tags:['Past Tense','Actions'],     available:true, href:'aula_07.html'},
+  {n:8,  emoji:'🔄', title:'Past Simple — Irregular Verbs',     tags:['Past Tense','Irregular'],   available:true, href:'aula_08.html'},
+  {n:9,  emoji:'📍', title:'Prepositions of Place',              tags:['Prepositions','Space'],     available:true, href:'aula_09.html'},
+  {n:10, emoji:'🔢', title:'Quantifiers: Many, Much & More',    tags:['Quantifiers','Nouns'],      available:true, href:'aula_10.html'},
+  {n:11, emoji:'📊', title:'Adjectives & Comparatives',         tags:['Adjectives','Comparison'],    available:true, href:'aula_11.html'},
+  {n:12, emoji:'🔮', title:'Future: Will & Going To',            tags:['Future Tense','Plans'],       available:true, href:'aula_12.html'},
+  {n:13, emoji:'💼', title:'Work & Career',                      tags:['Vocabulary','Professional'],  available:true, href:'aula_13.html'},
+  {n:14, emoji:'💻', title:'Technology & Digital Life',          tags:['Vocabulary','Tech'],          available:true, href:'aula_14.html'},
+  {n:15, emoji:'✈️', title:'Travel & Tourism',                   tags:['Vocabulary','Travel'],        available:true, href:'aula_15.html'},
+  {n:16, emoji:'🏠', title:'Home & Daily Routines',              tags:['Vocabulary','Daily Life'],    available:true, href:'aula_16.html'},
+  {n:17, emoji:'🍽️', title:'Food, Drinks & Restaurants',        tags:['Vocabulary','Food'],          available:true, href:'aula_17.html'},
+  {n:18, emoji:'🛒', title:'Shopping & Money',                   tags:['Vocabulary','Shopping'],      available:true, href:'aula_18.html'},
+  {n:19, emoji:'🏥', title:'Health & Body',                      tags:['Vocabulary','Health'],        available:true, href:'aula_19.html'},
   {n:20, emoji:'🏆', title:'Achievements & Challenges',          tags:['Vocabulary','Grammar'], available:true, href:'aula_20.html'},
   {n:21, emoji:'📊', title:'Comparatives',                       tags:['Grammar','Adjectives'],  available:true, href:'aula_21.html'},
   {n:22, emoji:'🥇', title:'The Concept of MOST',                tags:['Grammar','Superlatives'],available:true, href:'aula_22.html'},
@@ -132,11 +163,18 @@ const LESSONS = [
   {n:30, emoji:'📣', title:'Reported Speech',                    tags:['Grammar','Reporting'],      available:true, href:'aula_30.html'},
   {n:31, emoji:'🔀', title:'Passive Voice',                      tags:['Grammar','Passive'],        available:true, href:'aula_31.html'},
   {n:32, emoji:'😬', title:'Awkward Situations & Apologies',     tags:['Vocabulary','Social'],      available:true, href:'aula_32.html'},
-  {n:33, emoji:'📋', title:'Going to & Get Phrasal Verbs',        tags:['Grammar','Planning'],    available:true, href:'aula_33.html'},
-  {n:34, emoji:'🎯', title:'Expressing Opinions & Debating',     tags:['Expressions','Debate'],  available:true, href:'aula_34.html'},
-  {n:35, emoji:'🌟', title:'Future with Will — Advanced',        tags:['Grammar','Future'],      available:true, href:'aula_35.html'},
-  {n:36, emoji:'🏆', title:'Advanced Vocabulary & Collocations', tags:['Vocabulary','Advanced']},
-  {n:37, emoji:'🎓', title:'Final Review & Real Conversations',  tags:['Review','Speaking']},
+  {n:33, emoji:'🗓️', title:"Let's Make Plans!",                  tags:['Speaking','Communicative'], available:true, href:'aula_43.html'},
+  {n:34, emoji:'🎤', title:'Tell Me About Yourself',              tags:['Speaking','Communicative'], available:true, href:'aula_44.html'},
+  {n:35, emoji:'📋', title:'Going to & Get Phrasal Verbs',        tags:['Grammar','Planning'],    available:true, href:'aula_33.html'},
+  {n:36, emoji:'🎯', title:'Expressing Opinions & Debating',     tags:['Expressions','Debate'],  available:true, href:'aula_34.html'},
+  {n:37, emoji:'🌟', title:'Future with Will — Advanced',        tags:['Grammar','Future'],      available:true, href:'aula_35.html'},
+  {n:38, emoji:'🎵', title:'Music & TO GET Advanced',            tags:['Vocabulary','Expression'], available:true, href:'aula_36.html'},
+  {n:39, emoji:'📜', title:'Modal Verbs: Could, Should, Must, Might', tags:['Grammar','Modals'], available:true, href:'aula_37.html'},
+  {n:40, emoji:'🎲', title:'1st Conditional',        tags:['Grammar','Conditionals'],   available:true, href:'aula_38.html'},
+  {n:41, emoji:'🌀', title:'2nd Conditional',        tags:['Grammar','Conditionals'],   available:true, href:'aula_39.html'},
+  {n:42, emoji:'⚙️', title:'Gerunds & Infinitives',  tags:['Grammar','Verbs'],          available:true, href:'aula_40.html'},
+  {n:43, emoji:'🔗', title:'Relative Clauses',       tags:['Grammar','Clauses'],        available:true, href:'aula_41.html'},
+  {n:44, emoji:'🧩', title:'Linking Words',          tags:['Grammar','Connectors'],     available:true, href:'aula_42.html'},
 ];
 
 const grid = document.getElementById('lessons-grid');
@@ -184,6 +222,17 @@ LESSONS.forEach((l, i) => {
     </div>
     ${l.available ? '<div class="h-1 shine bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400"></div>' : ''}
   `;
+
+  // Completion indicator
+  try {
+    const state = Store.get();
+    if (state && state.completedLessons && state.completedLessons.includes(l.n)) {
+      const check = document.createElement('div');
+      check.className = 'absolute top-3 left-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-emerald-300/50 z-10';
+      check.textContent = '✓';
+      card.querySelector('.relative').appendChild(check);
+    }
+  } catch(e) {}
 
   grid.appendChild(card);
 });

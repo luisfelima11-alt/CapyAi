@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cours de Français — Capy Yara Adventures</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.float{animation:floatUp 3s ease-in-out infinite}
+.card-in{animation:fadeIn .4s ease both}
+.lesson-card{transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+.lesson-card:hover{transform:translateY(-4px)}
+.available-card{background:linear-gradient(135deg,#fff 0%,#eff6ff 100%)}
+.available-card:hover{box-shadow:0 20px 40px -8px rgba(29,78,216,.2)}
+.shine{background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);background-size:200% 100%;animation:shine 2.5s infinite}
+</style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-8">
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">🇫🇷</span>
+      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.6s">🗼</span>
+      <span class="absolute text-6xl float" style="top:60%;left:8%;animation-delay:1.2s">☕</span>
+      <span class="absolute text-5xl float" style="top:10%;right:20%;animation-delay:.3s">🥐</span>
+      <span class="absolute text-7xl float" style="top:50%;right:8%;animation-delay:.9s">🦫</span>
+      <span class="absolute text-5xl float" style="top:75%;right:25%;animation-delay:1.5s">🎨</span>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 py-14">
+      <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors mb-6">← Todos os Cursos</a>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-bold mb-4">
+        🇫🇷 Cours de Français pour Débutants
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
+        🇫🇷 Français<br><span class="text-blue-300">avec Yara</span>
+      </h1>
+      <p class="text-white/70 text-lg mb-6 max-w-lg">7 interactive lessons from absolute zero — greetings, numbers, colors, family, verbs, food, and dates. All in English → French.</p>
+      <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden">
+        <div id="progress-bar" class="h-full rounded-full bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 transition-all" style="width:0%"></div>
+      </div>
+      <p id="progress-label" class="text-white/50 text-sm">0 of 7 lessons completed</p>
+    </div>
+  </div>
+
+  <!-- Lesson Grid -->
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-black text-navy">All 7 Lessons</h2>
+        <p class="text-slate-500 text-sm mt-0.5">Débutant · English → French · Click to start</p>
+      </div>
+      <div class="flex items-center gap-2 text-sm">
+        <span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 font-bold px-3 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span> Available
+        </span>
+        <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Completed
+        </span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10" id="lessons-grid"></div>
+
+    <!-- Coming Soon Section -->
+    <div class="mt-4">
+      <h3 class="text-lg font-black text-navy mb-4">🔜 Coming Soon — More French!</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 opacity-60">
+          <div class="text-2xl mb-2">🛍️</div>
+          <div class="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-1">Leçon 08</div>
+          <h4 class="font-black text-sm text-navy">Les Vêtements</h4>
+          <p class="text-xs text-slate-400 mt-1">Clothing & Shopping</p>
+          <button disabled class="mt-3 w-full bg-slate-200 text-slate-400 font-black text-xs py-2 rounded-xl cursor-not-allowed">Coming Soon</button>
+        </div>
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 opacity-60">
+          <div class="text-2xl mb-2">🏙️</div>
+          <div class="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-1">Leçon 09</div>
+          <h4 class="font-black text-sm text-navy">La Ville</h4>
+          <p class="text-xs text-slate-400 mt-1">The City & Directions</p>
+          <button disabled class="mt-3 w-full bg-slate-200 text-slate-400 font-black text-xs py-2 rounded-xl cursor-not-allowed">Coming Soon</button>
+        </div>
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 opacity-60">
+          <div class="text-2xl mb-2">🌦️</div>
+          <div class="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-1">Leçon 10</div>
+          <h4 class="font-black text-sm text-navy">La Météo</h4>
+          <p class="text-xs text-slate-400 mt-1">Weather & Seasons</p>
+          <button disabled class="mt-3 w-full bg-slate-200 text-slate-400 font-black text-xs py-2 rounded-xl cursor-not-allowed">Coming Soon</button>
+        </div>
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 opacity-60">
+          <div class="text-2xl mb-2">🏠</div>
+          <div class="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-1">Leçon 11</div>
+          <h4 class="font-black text-sm text-navy">La Maison</h4>
+          <p class="text-xs text-slate-400 mt-1">Home & Furniture</p>
+          <button disabled class="mt-3 w-full bg-slate-200 text-slate-400 font-black text-xs py-2 rounded-xl cursor-not-allowed">Coming Soon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="store.js"></script>
+<script src="components.js?v=6"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+const LESSONS = [
+  {n:1, emoji:'👋', title:'Les Salutations',   subtitle:'Greetings & Introductions', href:'fr_aula_01.html'},
+  {n:2, emoji:'🔢', title:'Les Chiffres',       subtitle:'Numbers 1–20',              href:'fr_aula_02.html'},
+  {n:3, emoji:'🎨', title:'Les Couleurs',       subtitle:'Colors & Adjectives',       href:'fr_aula_03.html'},
+  {n:4, emoji:'👨‍👩‍👧‍👦', title:'La Famille',     subtitle:'Family & Possessives',      href:'fr_aula_04.html'},
+  {n:5, emoji:'✨', title:'Être & Avoir',        subtitle:'To Be & To Have',           href:'fr_aula_05.html'},
+  {n:6, emoji:'🥐', title:'La Nourriture',      subtitle:'Food & Partitive Articles', href:'fr_aula_06.html'},
+  {n:7, emoji:'📅', title:'Les Jours et les Mois', subtitle:'Days, Months & Dates',  href:'fr_aula_07.html'},
+];
+
+// Track completed French lessons separately
+const FR_KEY = 'capyFrCompleted';
+function getFrCompleted() {
+  try { return JSON.parse(localStorage.getItem(FR_KEY) || '[]'); } catch(e) { return []; }
+}
+
+const completed = getFrCompleted();
+const total = LESSONS.length;
+const doneCount = completed.filter(n => LESSONS.some(l => l.n === n)).length;
+document.getElementById('progress-bar').style.width = `${Math.round(doneCount/total*100)}%`;
+document.getElementById('progress-label').textContent = `${doneCount} of ${total} lessons completed`;
+
+const grid = document.getElementById('lessons-grid');
+LESSONS.forEach((l, i) => {
+  const isDone = completed.includes(l.n);
+  const card = document.createElement('div');
+  card.className = `card-in lesson-card available-card rounded-2xl border-2 border-blue-200 overflow-hidden cursor-pointer`;
+  card.style.animationDelay = `${i * 0.06}s`;
+  card.onclick = () => window.location.href = l.href;
+
+  card.innerHTML = `
+    <div class="relative p-5">
+      ${isDone
+        ? `<div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-black shadow-sm shadow-emerald-300/50">✓</div>`
+        : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Start</div>`
+      }
+      <div class="flex items-start gap-3 mb-3 pr-16">
+        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl">${l.emoji}</div>
+        <div>
+          <div class="text-[10px] font-black tracking-widest uppercase text-blue-400">Leçon ${String(l.n).padStart(2,'0')}</div>
+          <h3 class="font-black text-sm text-navy leading-snug mt-0.5">${l.title}</h3>
+          <p class="text-[11px] text-slate-500 mt-0.5">${l.subtitle}</p>
+        </div>
+      </div>
+      <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ${isDone ? 'Review Lesson →' : 'Start Lesson →'}
+      </button>
+    </div>
+    <div class="h-1 shine bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400"></div>
+  `;
+
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
