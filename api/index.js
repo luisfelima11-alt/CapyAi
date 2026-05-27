@@ -691,50 +691,51 @@ Rules:
         return;
     }
 
-    // ── ElevenLabs TTS ───────────────────────────────────────────────────────
-    // GET /api/tts?text=bonjour&voice=VOICE_ID  → streams audio/mpeg from ElevenLabs
+    // ── Google Cloud TTS ─────────────────────────────────────────────────────
+    // GET /api/tts?text=hello&voice=en-US-Neural2-F  → streams MP3 from Google TTS
     if (req.method === 'GET' && url === '/api/tts') {
-        const EL_KEY   = process.env.ELEVENLABS_KEY;
-        const MODEL    = 'eleven_multilingual_v2';
-        if (!EL_KEY) { res.status(503).json({ error: 'ELEVENLABS_KEY not set' }); return; }
+        const GOOGLE_KEY = process.env.GOOGLE_TTS_KEY;
+        if (!GOOGLE_KEY) { res.status(503).json({ error: 'GOOGLE_TTS_KEY not set' }); return; }
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
-        const VOICE_ID = qs2.get('voice') || '21m00Tcm4TlvDq8ikWAM'; // default: Rachel (ElevenLabs premade)
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
+        const voice = qs2.get('voice') || 'en-US-Neural2-F';
+        // Derive language code from voice name (e.g. "en-US-Neural2-F" → "en-US")
+        const langCode = voice.slice(0, 5);
         const body = JSON.stringify({
-            text,
-            model_id: MODEL,
-            voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+            input: { text },
+            voice: { languageCode: langCode, name: voice },
+            audioConfig: { audioEncoding: 'MP3', speakingRate: 0.95, pitch: 0 },
         });
-        const elReq = https.request({
-            hostname: 'api.elevenlabs.io',
-            path: `/v1/text-to-speech/${VOICE_ID}`,
+        const gReq = https.request({
+            hostname: 'texttospeech.googleapis.com',
+            path: `/v1/text:synthesize?key=${GOOGLE_KEY}`,
             method: 'POST',
-            headers: {
-                'xi-api-key':   EL_KEY,
-                'Content-Type': 'application/json',
-                'Accept':       'audio/mpeg',
-                'Content-Length': Buffer.byteLength(body),
-            },
-        }, elRes => {
-            if (elRes.statusCode !== 200) {
-                let d = '';
-                elRes.on('data', c => d += c);
-                elRes.on('end', () => {
-                    let detail = d;
-                    try { detail = JSON.parse(d)?.detail?.message || JSON.parse(d)?.detail || d; } catch {}
-                    res.status(502).json({ error: 'ElevenLabs error', detail: String(detail).slice(0, 400), status: elRes.statusCode });
-                });
-                return;
-            }
-            res.setHeader('Content-Type', 'audio/mpeg');
-            res.setHeader('Cache-Control', 'public, max-age=86400');
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            elRes.pipe(res);
+            headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+        }, gRes => {
+            let data = '';
+            gRes.on('data', c => data += c);
+            gRes.on('end', () => {
+                if (gRes.statusCode !== 200) {
+                    let detail = data;
+                    try { detail = JSON.parse(data)?.error?.message || data; } catch {}
+                    res.status(502).json({ error: 'Google TTS error', detail: String(detail).slice(0, 400), status: gRes.statusCode });
+                    return;
+                }
+                try {
+                    const audioBuffer = Buffer.from(JSON.parse(data).audioContent, 'base64');
+                    res.setHeader('Content-Type', 'audio/mpeg');
+                    res.setHeader('Cache-Control', 'public, max-age=86400');
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                    res.end(audioBuffer);
+                } catch(e) {
+                    res.status(500).json({ error: 'Failed to decode Google TTS response' });
+                }
+            });
         });
-        elReq.on('error', e => res.status(502).json({ error: e.message }));
-        elReq.write(body);
-        elReq.end();
+        gReq.on('error', e => res.status(502).json({ error: e.message }));
+        gReq.write(body);
+        gReq.end();
         return;
     }
 
