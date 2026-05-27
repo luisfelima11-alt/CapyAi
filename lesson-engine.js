@@ -188,8 +188,7 @@ function renderQuestion() {
         <p class="text-lg font-bold text-navy">${q.q}</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        ${opts.map(o => `<button onclick='answerPrac(${JSON.stringify(o)},${JSON.stringify(q.a)},this)'
-          class="opt-btn text-left bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-700 hover:border-violet-400 hover:bg-violet-50 transition-all active:scale-95">${o}</button>`).join('')}
+        ${opts.map(o => { const safeO = JSON.stringify(o).replace(/'/g,"&#39;"); const safeA = JSON.stringify(q.a).replace(/'/g,"&#39;"); return `<button onclick='answerPrac(${safeO},${safeA},this)' class="opt-btn text-left bg-white border-2 border-slate-200 rounded-2xl px-5 py-4 font-bold text-slate-700 hover:border-violet-400 hover:bg-violet-50 transition-all active:scale-95">${o}</button>`; }).join('')}
       </div>
       <div id="prac-feedback" class="mt-4 hidden"></div>
     </div>`;
@@ -201,6 +200,7 @@ function answerPrac(chosen, correct, btn) {
   const fb = document.getElementById('prac-feedback');
   if (ok) {
     btn.className = btn.className.replace('border-slate-200', 'border-emerald-400') + ' bg-emerald-50 text-emerald-700';
+    btn.classList.add('correct');
     _pracScore++; _pracStreak++;
     _showXpPop();
     if (fb) fb.innerHTML = `<div class="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-2 font-bold text-sm">✅ Correct! ${_shuffledQs[_pracIdx].rule}</div>`;
@@ -292,6 +292,41 @@ function initTabs(tabNames) {
   });
 }
 window.initTabs = initTabs;
+
+// ── HOMEWORK SAVE ─────────────────────────────────────────────────────────────
+/**
+ * saveHomework(lessonId, lessonTitle, xp)
+ * Collects all input/textarea values inside #tab-homework and POSTs to /api/homework.
+ * Call this inside each lesson's submitHomeworkXX() before the local UI updates.
+ */
+async function saveHomework(lessonId, lessonTitle, xp) {
+  const hwTab = document.getElementById('tab-homework');
+  const answers = {};
+  if (hwTab) {
+    hwTab.querySelectorAll('input[type="text"], textarea').forEach((el, i) => {
+      const key = el.id || el.placeholder?.slice(0, 30) || `field_${i}`;
+      answers[key] = el.value || '';
+    });
+  }
+  let userId = 'guest', studentName = 'Estudante';
+  try {
+    const s = JSON.parse(localStorage.getItem('capySession') || '{}');
+    userId = s.id || 'guest';
+    studentName = s.name || s.playerName || 'Estudante';
+  } catch(e) {}
+  // Also check Store for name
+  if (studentName === 'Estudante' && typeof Store !== 'undefined') {
+    try { studentName = Store.state?.playerName || studentName; } catch(e) {}
+  }
+  try {
+    await fetch('/api/homework', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, studentName, lessonId: String(lessonId), lessonTitle: lessonTitle || '', answers, xp: xp || 0 }),
+    });
+  } catch(e) { console.warn('[homework] save failed:', e); }
+}
+window.saveHomework = saveHomework;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 function initLesson(config) {

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>📋 Tarefas dos Alunos — Capy Yara</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+.answer-card{border-left:4px solid #8b5cf6}
+.fade-in{animation:fadeIn .3s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<!-- Login Screen -->
+<div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl border-2 border-slate-200 shadow-xl p-8 w-full max-w-sm text-center">
+    <div class="text-5xl mb-4">🦫</div>
+    <h1 class="text-2xl font-black text-navy mb-1">Professor Dashboard</h1>
+    <p class="text-slate-500 text-sm mb-6">Visualize as tarefas dos seus alunos</p>
+    <input id="teacher-key-input" type="password" placeholder="Senha do professor"
+      class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-400 mb-3 text-navy"
+      onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button onclick="doLogin()"
+      class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black py-3 rounded-xl hover:scale-105 transition-all shadow text-sm">
+      Entrar →
+    </button>
+    <p id="login-err" class="text-red-500 text-xs mt-3 hidden">Senha incorreta.</p>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="hidden">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-violet-800 to-indigo-800 text-white px-6 py-5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <h1 class="text-2xl font-black">📋 Tarefas dos Alunos</h1>
+        <p class="text-violet-200 text-sm">Capy Yara Adventures — Painel do Professor</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="total-badge" class="bg-white/20 rounded-full px-4 py-1.5 text-sm font-black">0 entregas</span>
+        <button onclick="logout()" class="bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-4 py-1.5 text-sm font-bold transition-colors">Sair</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="max-w-6xl mx-auto px-4 py-5">
+    <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 mb-6 flex flex-wrap gap-3 items-end">
+      <div class="flex-1 min-w-40">
+        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Filtrar por Aula</label>
+        <input id="filter-lesson" type="text" placeholder="ex: 32" onchange="applyFilters()"
+          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-violet-400"/>
+      </div>
+      <div class="flex-1 min-w-40">
+        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Filtrar por Aluno</label>
+        <input id="filter-student" type="text" placeholder="Nome ou ID" oninput="applyFilters()"
+          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-violet-400"/>
+      </div>
+      <div class="flex-1 min-w-40">
+        <label class="block text-xs font-black text-slate-500 uppercase tracking-wider mb-1.5">Ordenar por</label>
+        <select id="sort-by" onchange="applyFilters()"
+          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-violet-400 bg-white">
+          <option value="newest">Mais recente</option>
+          <option value="oldest">Mais antigo</option>
+          <option value="student">Nome do aluno</option>
+          <option value="lesson">Número da aula</option>
+        </select>
+      </div>
+      <button onclick="loadSubmissions()" class="bg-violet-600 text-white font-black px-5 py-2 rounded-xl text-sm hover:bg-violet-700 transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">refresh</span>Atualizar
+      </button>
+    </div>
+
+    <!-- Stats Row -->
+    <div id="stats-row" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 hidden">
+      <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 text-center">
+        <div id="stat-total" class="text-3xl font-black text-violet-600">0</div>
+        <div class="text-xs font-black text-slate-500 mt-1">Total entregas</div>
+      </div>
+      <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 text-center">
+        <div id="stat-students" class="text-3xl font-black text-blue-600">0</div>
+        <div class="text-xs font-black text-slate-500 mt-1">Alunos únicos</div>
+      </div>
+      <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 text-center">
+        <div id="stat-lessons" class="text-3xl font-black text-emerald-600">0</div>
+        <div class="text-xs font-black text-slate-500 mt-1">Aulas diferentes</div>
+      </div>
+      <div class="bg-white rounded-2xl border-2 border-slate-200 p-4 text-center">
+        <div id="stat-today" class="text-3xl font-black text-amber-600">0</div>
+        <div class="text-xs font-black text-slate-500 mt-1">Hoje</div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-area"></div>
+  </div>
+</div>
+
+<script>
+const TEACHER_KEY_LS = 'capyTeacherKey';
+let _allSubmissions = [];
+let _teacherKey = '';
+
+function doLogin() {
+  const k = document.getElementById('teacher-key-input').value.trim();
+  if (!k) return;
+  // Try to validate against API
+  _teacherKey = k;
+  localStorage.setItem(TEACHER_KEY_LS, k);
+  document.getElementById('login-err').classList.add('hidden');
+  loadSubmissions();
+}
+
+function logout() {
+  localStorage.removeItem(TEACHER_KEY_LS);
+  _teacherKey = '';
+  _allSubmissions = [];
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('teacher-key-input').value = '';
+}
+
+async function loadSubmissions() {
+  if (!_teacherKey) return;
+  const area = document.getElementById('results-area');
+  area.innerHTML = `<div class="text-center py-12 text-slate-400">
+    <div class="text-4xl mb-3 animate-spin inline-block">⟳</div>
+    <p class="font-bold">Carregando entregas…</p>
+  </div>`;
+
+  try {
+    const res = await fetch(`/api/homework?key=${encodeURIComponent(_teacherKey)}`);
+    if (res.status === 401) {
+      document.getElementById('login-err').textContent = 'Senha incorreta.';
+      document.getElementById('login-err').classList.remove('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+      return;
+    }
+    if (!res.ok) throw new Error('API error ' + res.status);
+    _allSubmissions = await res.json();
+
+    // Show dashboard
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+
+    applyFilters();
+  } catch(e) {
+    area.innerHTML = `<div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6 text-center text-red-700">
+      <div class="text-3xl mb-2">⚠️</div>
+      <p class="font-black">Erro ao carregar: ${e.message}</p>
+      <p class="text-sm mt-1">Verifique a conexão e tente novamente.</p>
+    </div>`;
+  }
+}
+
+function applyFilters() {
+  const lessonFilter  = document.getElementById('filter-lesson').value.trim().toLowerCase();
+  const studentFilter = document.getElementById('filter-student').value.trim().toLowerCase();
+  const sortBy        = document.getElementById('sort-by').value;
+
+  let data = [..._allSubmissions];
+
+  if (lessonFilter)  data = data.filter(s => String(s.lesson_id).toLowerCase().includes(lessonFilter));
+  if (studentFilter) data = data.filter(s =>
+    (s.student_name || '').toLowerCase().includes(studentFilter) ||
+    (s.user_id || '').toLowerCase().includes(studentFilter)
+  );
+
+  if (sortBy === 'newest')  data.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
+  if (sortBy === 'oldest')  data.sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
+  if (sortBy === 'student') data.sort((a, b) => (a.student_name || '').localeCompare(b.student_name || ''));
+  if (sortBy === 'lesson')  data.sort((a, b) => Number(a.lesson_id) - Number(b.lesson_id));
+
+  renderSubmissions(data);
+}
+
+function renderSubmissions(data) {
+  // Update stats
+  const today = new Date().toISOString().slice(0, 10);
+  const uniqueStudents = new Set(_allSubmissions.map(s => s.user_id)).size;
+  const uniqueLessons  = new Set(_allSubmissions.map(s => s.lesson_id)).size;
+  const todayCount     = _allSubmissions.filter(s => s.submitted_at?.startsWith(today)).length;
+
+  document.getElementById('stat-total').textContent    = _allSubmissions.length;
+  document.getElementById('stat-students').textContent = uniqueStudents;
+  document.getElementById('stat-lessons').textContent  = uniqueLessons;
+  document.getElementById('stat-today').textContent    = todayCount;
+  document.getElementById('stats-row').classList.remove('hidden');
+  document.getElementById('total-badge').textContent   = `${_allSubmissions.length} entregas`;
+
+  const area = document.getElementById('results-area');
+
+  if (!data.length) {
+    area.innerHTML = `<div class="bg-white border-2 border-slate-200 rounded-2xl p-10 text-center text-slate-400">
+      <div class="text-5xl mb-3">📭</div>
+      <p class="font-black text-lg text-slate-600">Nenhuma entrega encontrada</p>
+      <p class="text-sm mt-1">Tente ajustar os filtros ou aguarde o aluno enviar a tarefa.</p>
+    </div>`;
+    return;
+  }
+
+  area.innerHTML = data.map((s, i) => {
+    const date = new Date(s.submitted_at);
+    const dateStr = date.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const answers = s.answers || {};
+    const answerEntries = Object.entries(answers).filter(([k, v]) => v && String(v).trim());
+
+    return `
+    <div class="fade-in bg-white border-2 border-slate-200 rounded-2xl overflow-hidden mb-4 shadow-sm hover:border-violet-200 transition-colors"
+         style="animation-delay:${i * 0.04}s">
+      <!-- Card Header -->
+      <div class="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-violet-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">
+            ${(s.student_name || '?').charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h3 class="font-black text-navy text-base">${escHtml(s.student_name || 'Sem nome')}</h3>
+            <p class="text-xs text-slate-500">ID: ${escHtml(s.user_id || '—')}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="bg-violet-100 text-violet-700 font-black text-xs px-3 py-1 rounded-full">Aula ${escHtml(s.lesson_id)}</span>
+          ${s.lesson_title ? `<span class="bg-slate-100 text-slate-600 font-bold text-xs px-3 py-1 rounded-full">${escHtml(s.lesson_title)}</span>` : ''}
+          <span class="bg-amber-100 text-amber-700 font-black text-xs px-3 py-1 rounded-full">+${s.xp_earned || 0} XP</span>
+          <span class="bg-slate-100 text-slate-500 font-bold text-xs px-3 py-1 rounded-full">🕐 ${dateStr}</span>
+        </div>
+      </div>
+
+      <!-- Answers -->
+      <div class="px-6 py-4">
+        ${answerEntries.length === 0
+          ? `<p class="text-slate-400 text-sm italic">Nenhuma resposta escrita registrada.</p>`
+          : `<div class="space-y-3">
+              ${answerEntries.map(([k, v]) => `
+                <div class="answer-card bg-slate-50 rounded-xl px-4 py-3">
+                  <div class="text-[10px] font-black uppercase tracking-wider text-violet-400 mb-1">${escHtml(k)}</div>
+                  <p class="text-sm text-navy leading-relaxed whitespace-pre-wrap">${escHtml(String(v))}</p>
+                </div>
+              `).join('')}
+            </div>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Auto-login if key is stored
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem(TEACHER_KEY_LS);
+  if (saved) {
+    _teacherKey = saved;
+    loadSubmissions();
+  }
+});
+</script>
+</body>
+</html>

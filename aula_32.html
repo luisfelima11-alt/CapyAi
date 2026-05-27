@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -15,7 +15,7 @@
 *{font-family:'Plus Jakarta Sans',sans-serif}
 @keyframes floatEmoji{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .float-emoji{animation:floatEmoji 3s ease-in-out infinite}
-.flip-card{perspective:800px;cursor:pointer}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
 .flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
 .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
@@ -25,6 +25,8 @@
 .tab-btn.active{color:#f97316;font-weight:800}
 .tab-btn.active::after{transform:scaleX(1)}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.opt-btn.correct{animation:correct-pulse .3s ease}
 .shake{animation:shake .35s ease}
 @keyframes xpPop{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-50px)}}
 .xp-pop{animation:xpPop .8s ease forwards;pointer-events:none}
@@ -52,9 +54,11 @@
     <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:30%;animation-delay:.2s">✨</span>
   </div>
   <div class="relative max-w-5xl mx-auto px-6 py-12">
-    <a href="classes.html" class="inline-flex items-center gap-1.5 text-white/50 hover:text-white text-sm font-bold mb-4 transition-colors">
-      <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Classes
-    </a>
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Classes</a>
+      <a href="aula_31.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
+      <a href="aula_43.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
+    </div>
     <div class="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-4 py-1 text-sm font-black text-orange-300 mb-3">Aula 32</div>
     <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎬 Movies &amp;<br><span class="text-orange-300">TV Shows</span></h1>
     <p class="text-white/60 text-base mb-5 max-w-lg">Learn how to recommend, describe and give opinions about movies and series in English.</p>
@@ -80,6 +84,7 @@
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="challenge">🎯 Challenge</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
     </div>
   </div>
 </div>
@@ -161,7 +166,7 @@
     </div>
     <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full transition-all duration-500" style="width:0%"></div></div>
     <div id="practice-area"></div>
-    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
       <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
         <div class="text-6xl mb-3" id="result-emoji">🎉</div>
         <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
@@ -248,13 +253,80 @@
     </div>
   </div>
 
+  <!-- HOMEWORK -->
+  <div id="tab-homework" class="fade-in hidden">
+    <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 text-white">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-2xl font-black mb-1">📋 Homework</h2>
+          <p class="text-white/80 text-sm">Aula 32 — Movies &amp; TV Shows</p>
+        </div>
+        <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+      </div>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-9 h-9 rounded-full bg-violet-100 text-violet-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div>
+          <div><h3 class="font-black text-navy text-base">🔀 Coloque as palavras na ordem certa</h3><p class="text-slate-500 text-sm mt-1">Toque nas palavras para montar a frase!</p></div>
+        </div>
+        <div id="wo32-wrap"></div>
+      </div>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-9 h-9 rounded-full bg-pink-100 text-pink-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div>
+          <div><h3 class="font-black text-navy text-base">🔗 Conecte: cinema ↔ tradução</h3><p class="text-slate-500 text-sm mt-1">Clique numa palavra em inglês e depois na tradução correta.</p></div>
+        </div>
+        <div id="mp32-wrap"></div>
+      </div>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-9 h-9 rounded-full bg-red-100 text-red-700 font-black text-sm flex items-center justify-center flex-shrink-0">3</div>
+          <div><h3 class="font-black text-navy text-base">❌ Corrija o erro gramatical</h3><p class="text-slate-500 text-sm mt-1">Cada frase tem um erro. Reescreva corretamente.</p></div>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <p class="text-xs font-bold text-red-400 mb-1.5">✗ "I really enjoyed to watch that movie last night."</p>
+            <input type="text" id="err32-1" placeholder="I really enjoyed …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+            <p id="err32fb1" class="text-xs font-black mt-1 hidden"></p>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-red-400 mb-1.5">✗ "The film was very bored, I fell asleep."</p>
+            <input type="text" id="err32-2" placeholder="The film was very …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+            <p id="err32fb2" class="text-xs font-black mt-1 hidden"></p>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-red-400 mb-1.5">✗ "She recommended me a good series to watch."</p>
+            <input type="text" id="err32-3" placeholder="She recommended …" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 text-navy"/>
+            <p id="err32fb3" class="text-xs font-black mt-1 hidden"></p>
+          </div>
+          <button onclick="checkErrors32()" class="bg-red-50 border-2 border-red-200 text-red-700 font-black px-5 py-2.5 rounded-xl text-sm hover:bg-red-100 transition-all">Verificar respostas ✓</button>
+        </div>
+      </div>
+      <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div>
+          <div><h3 class="font-black text-navy text-base">✍️ Review do meu filme/série favorito</h3><p class="text-slate-500 text-sm mt-1">Escreva uma resenha curta em inglês do seu filme ou série favorito. Use pelo menos 4 palavras do vocabulário da aula.</p></div>
+        </div>
+        <textarea rows="6" placeholder="My favourite movie/series is… The plot is about… The main character… The director did a great job of… I would highly recommend it to anyone who… The special effects were… The ending was…" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 resize-none"></textarea>
+      </div>
+    </div>
+    <button onclick="submitHomework32()" class="mt-6 w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black py-4 rounded-2xl hover:scale-105 transition-all shadow-sm text-base">
+      ✓ Submit Homework &nbsp;+75 XP
+    </button>
+    <div id="hw-done-32" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+      <div class="text-3xl mb-2">🏆</div>
+      <p class="font-black text-emerald-700">Homework complete! +75 XP earned!</p>
+    </div>
+  </div>
+
 </div>
 </main>
 <div id="mobile-nav-placeholder"></div>
 
 <script src="store.js"></script>
 <script src="lesson-engine.js"></script>
-<script src="components.js?v=3"></script>
+<script src="components.js?v=6"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -325,9 +397,116 @@ function toggleAccordion(id) {
   if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
 }
 
+// ── HOMEWORK INTERACTIVE EXERCISES — AULA 32 ─────────────────────────────────
+function hwShuffle32(a) { return [...a].sort(() => Math.random() - 0.5); }
+const WO32_DATA = [
+  { s: 'I have watched every single episode of that series',             w: ['I','have','watched','every','single','episode','of','that','series'] },
+  { s: 'The special effects in that movie were absolutely breathtaking',  w: ['The','special','effects','in','that','movie','were','absolutely','breathtaking'] },
+  { s: 'I would highly recommend this film to anyone who enjoys drama',   w: ['I','would','highly','recommend','this','film','to','anyone','who','enjoys','drama'] },
+];
+const wo32 = WO32_DATA.map(d => ({ ans: [], bank: hwShuffle32(d.w) }));
+function wo32Render() {
+  const c = document.getElementById('wo32-wrap'); if (!c) return;
+  c.innerHTML = WO32_DATA.map((d,i) => {
+    const st = wo32[i];
+    return `<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 ${i < WO32_DATA.length-1 ? 'mb-4':''}">
+      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Frase ${i+1} de ${WO32_DATA.length}</p>
+      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
+        ${st.ans.length ? st.ans.map((w,j)=>`<span onclick="wo32Move(1,${i},${j})" class="cursor-pointer select-none bg-violet-100 text-violet-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-violet-200 active:scale-95 transition-all">${w}</span>`).join('') : '<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
+      </div>
+      <div class="flex flex-wrap gap-2 min-h-10">
+        ${st.bank.map((w,j)=>`<span onclick="wo32Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-violet-400 hover:bg-violet-50 active:scale-95 transition-all">${w}</span>`).join('')}
+      </div>
+      <div class="flex items-center gap-2 mt-3">
+        <button onclick="wo32Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80 transition-all">Verificar ✓</button>
+        <button onclick="wo32Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300 transition-all">↺ Reset</button>
+        <span id="wo32fb${i}" class="text-xs font-black"></span>
+      </div></div>`;
+  }).join('');
+}
+function wo32Move(fromBank, si, wi) {
+  if (fromBank) wo32[si].bank.push(wo32[si].ans.splice(wi,1)[0]);
+  else          wo32[si].ans.push(wo32[si].bank.splice(wi,1)[0]);
+  wo32Render();
+}
+function wo32Check(i) {
+  const fb = document.getElementById('wo32fb'+i); if (!fb) return;
+  if (wo32[i].ans.join(' ').toLowerCase() === WO32_DATA[i].s.toLowerCase()) {
+    fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600';
+  } else { fb.textContent='❌ Tente novamente!'; fb.className='text-xs font-black text-red-500'; }
+}
+function wo32Reset(i) {
+  wo32[i] = { ans:[], bank: hwShuffle32(WO32_DATA[i].w) };
+  const fb = document.getElementById('wo32fb'+i); if (fb) fb.textContent='';
+  wo32Render();
+}
+wo32Render();
+const MP32 = [
+  { l:'Plot 📖',         r:'Enredo' },
+  { l:'Character 🎭',    r:'Personagem' },
+  { l:'Director 🎬',     r:'Diretor(a)' },
+  { l:'Genre 🎞️',        r:'Gênero' },
+  { l:'Sequel 2️⃣',       r:'Sequência' },
+];
+const mp32R = hwShuffle32(MP32.map((p,i)=>({label:p.r, pid:i})));
+let mp32SelL = null; const mp32Done = new Set();
+function mp32Render() {
+  const c = document.getElementById('mp32-wrap'); if (!c) return;
+  c.innerHTML = `<div class="grid grid-cols-2 gap-2">
+    <div class="space-y-2">${MP32.map((p,i)=>`<div id="mp32L${i}" onclick="mp32ClickL(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp32Done.has(i)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':mp32SelL===i?'border-violet-500 bg-violet-100 text-violet-800':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${p.l}</div>`).join('')}</div>
+    <div class="space-y-2">${mp32R.map((r,i)=>`<div id="mp32R${i}" onclick="mp32ClickR(${i})"
+      class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all
+      ${mp32Done.has(r.pid)?'border-emerald-400 bg-emerald-50 text-emerald-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-violet-300 hover:bg-violet-50'}">${r.label}</div>`).join('')}</div>
+  </div>${mp32Done.size===MP32.length?'<p class="mt-3 text-center text-emerald-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;
+}
+function mp32ClickL(i) { if(mp32Done.has(i))return; mp32SelL=(mp32SelL===i)?null:i; mp32Render(); }
+function mp32ClickR(i) {
+  if(mp32SelL===null)return; const r=mp32R[i]; if(mp32Done.has(r.pid))return;
+  if(r.pid===mp32SelL){ mp32Done.add(mp32SelL); mp32SelL=null; mp32Render(); }
+  else {
+    const lEl=document.getElementById('mp32L'+mp32SelL), rEl=document.getElementById('mp32R'+i);
+    [lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));
+    setTimeout(()=>{ mp32SelL=null; mp32Render(); },700);
+  }
+}
+mp32Render();
+const ERR32_CHECKS = [
+  v => v.includes('enjoyed watching') && !v.includes('enjoyed to watch'),
+  v => v.includes('boring') && !v.includes('bored'),
+  v => (v.includes('recommended a good series to me') || v.includes('recommended a good series for me')) && !v.includes('recommended me'),
+];
+const ERR32_HINTS = ['enjoyed to watch → enjoyed watching (enjoy + verb-ing, not to + verb)', 'bored → boring (the film causes boredom = boring; bored describes how you feel)', 'recommended me a series → recommended a series to me (recommend + object + to + person)'];
+function checkErrors32() {
+  ERR32_CHECKS.forEach((check,i) => {
+    const inp=document.getElementById('err32-'+(i+1)), fb=document.getElementById('err32fb'+(i+1));
+    if(!inp||!fb)return;
+    const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
+    if(!v){ fb.classList.add('hidden'); return; }
+    fb.classList.remove('hidden');
+    if(check(v)){ fb.textContent='✅ Correto!'; fb.className='text-xs font-black text-emerald-600 mt-1'; }
+    else { fb.textContent=`❌ Dica: "${ERR32_HINTS[i]}"`; fb.className='text-xs font-black text-red-500 mt-1'; }
+  });
+}
+function submitHomework32(){
+  markSection();
+  if (typeof Store !== 'undefined') Store.addXP(75);
+  const btn = document.querySelector('[onclick="submitHomework32()"]');
+  btn.textContent = '🎉 Homework submitted! +75 XP';
+  btn.disabled = true;
+  // Save to Supabase for teacher review
+  saveHomework(32, 'Aula 32 — Movies & TV Shows', 75);
+  const a = document.createElement('a');
+  a.href = 'aula_43.html';
+  a.className = 'block text-center mt-3 bg-white border-2 border-emerald-300 text-emerald-700 font-black py-3 rounded-2xl hover:bg-emerald-50 transition-all text-sm';
+  a.textContent = "Continue — Let's Make Plans! →";
+  btn.insertAdjacentElement('afterend', a);
+}
+
 initLesson({
-  tabs: ['vocab','expressions','grammar','practice','speak','challenge'],
-  totalSections: 6,
+  tabs: ['vocab','expressions','grammar','practice','speak','challenge','homework'],
+  totalSections: 7,
   accentColor: 'orange',
   vocab: VOCAB,
   expressions: EXPRESSIONS,

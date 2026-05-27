@@ -86,12 +86,25 @@ module.exports = async (req, res) => {
     const url = req.url.split('?')[0];
 
     if (req.method === 'POST' && url === '/api/chat') {
-        const { history, message, systemOverride } = await readBody(req);
-        const systemPrompt = systemOverride || `You are Yara, a friendly and cheerful capybara who teaches English to young children aged 5-8.\nRules:\n- Always respond in very simple English (A1 level).\n- Keep every reply to 1-3 short sentences maximum.\n- Be warm, playful and encouraging. Use 1-2 emojis per reply.\n- If the child makes a grammar mistake, gently correct it once, then continue.\n- If the child writes in another language, reply in English and kindly ask them to try in English.\n- Never discuss anything outside English learning or child-friendly topics.\n- Always end with a simple question or encouragement to keep the conversation going.`;
+        const { history, message, systemOverride, userId } = await readBody(req);
+
+        // Fetch user profile to personalize Yara's responses
+        let profileContext = '';
+        if (userId && userId !== 'guest') {
+            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
+            const p = rows?.[0];
+            if (p) {
+                const detail = p.interests_detail ? `\n- Favorite specifics: ${p.interests_detail}` : '';
+                profileContext = `\n\nStudent profile:\n- English level: ${p.english_level || 'beginner'}\n- Learning goals: ${(p.goals || []).join(', ') || 'general'}\n- Interests: ${(p.interests || []).join(', ') || 'various'}${detail}\n- Daily study goal: ${p.daily_goal_minutes || 10} minutes\nTailor your language complexity and vocabulary to their level. When relevant, reference their specific favorites naturally in examples or conversation.`;
+            }
+        }
+
+        const basePrompt = `You are Yara, a friendly and cheerful capybara who teaches English to Brazilian students.\nRules:\n- Adapt your English level to the student's profile (default: A1 simple if unknown).\n- Keep every reply to 1-3 short sentences maximum.\n- Be warm, playful and encouraging. Use 1-2 emojis per reply.\n- If the student makes a grammar mistake, gently correct it once, then continue.\n- If the student writes in Portuguese, reply in English and kindly encourage them to try in English.\n- Never discuss anything outside English learning or friendly topics.\n- Always end with a simple question or encouragement to keep the conversation going.`;
+        const systemPrompt = systemOverride || (basePrompt + profileContext);
         const messages = [{ role: 'system', content: systemPrompt }];
         (history || []).forEach(m => messages.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.text }));
         messages.push({ role: 'user', content: message });
-        callOpenAI(messages, 120, 0.85, res); return;
+        callOpenAI(messages, 150, 0.85, res); return;
     }
 
     if (req.method === 'POST' && url === '/api/quiz') {
@@ -226,6 +239,495 @@ module.exports = async (req, res) => {
             });
         }
         res.status(200).json({ success: true }); return;
+    }
+
+    // ── User Profile ──────────────────────────────────────────────────────────
+
+    // GET /api/profile?userId=xxx → returns user_profiles row
+    if (req.method === 'GET' && url.startsWith('/api/profile')) {
+        const qs = new URL(req.url, 'http://localhost').searchParams;
+        const userId = qs.get('userId');
+        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
+        const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
+        res.status(200).json(rows?.[0] || null); return;
+    }
+
+    // POST /api/profile → upserts user_profiles row
+    if (req.method === 'POST' && url === '/api/profile') {
+        const { userId, ...profileData } = await readBody(req);
+        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
+        await sb('/user_profiles', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify({ id: userId, ...profileData, updated_at: new Date().toISOString() }),
+        });
+        res.status(200).json({ success: true }); return;
+    }
+
+    // ── YouTube Learning Lab ───────────────────────────────────────────────────
+
+    // POST /api/youtube → fetch transcript + generate learning content
+    if (req.method === 'POST' && url === '/api/youtube') {
+        const { videoUrl, userId } = await readBody(req);
+
+        // Extract video ID
+        const videoIdMatch = (videoUrl || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+        if (!videoIdMatch) {
+            res.status(400).json({ error: 'URL do YouTube inválida. Verifique o link e tente novamente.' }); return;
+        }
+        const videoId = videoIdMatch[1];
+
+        // ── httpsFetch: uses native https module (avoids fetch availability issues) ──
+        function httpsFetch(urlStr, opts = {}) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const u = new URL(urlStr);
+                    const reqOpts = {
+                        hostname: u.hostname,
+                        path: u.pathname + u.search,
+                        method: opts.method || 'GET',
+                        headers: { 'Accept-Encoding': 'identity', ...(opts.headers || {}) },
+                        timeout: 8000,
+                    };
+                    const req = https.request(reqOpts, r => {
+                        const chunks = [];
+                        r.on('data', c => chunks.push(c));
+                        r.on('end', () => {
+                            const body = Buffer.concat(chunks).toString('utf8');
+                            resolve({ ok: r.statusCode >= 200 && r.statusCode < 300, status: r.statusCode,
+                                text: () => body, json: () => JSON.parse(body) });
+                        });
+                    });
+                    req.on('error', reject);
+                    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+                    if (opts.body) req.write(opts.body);
+                    req.end();
+                } catch(e) { reject(e); }
+            });
+        }
+
+        function parseCaptionEvents(data) {
+            try {
+                const obj = typeof data === 'string' ? JSON.parse(data) : data;
+                return (obj.events || [])
+                    .filter(e => e.segs?.length)
+                    .map(e => e.segs.map(s => s.utf8 || '').join(''))
+                    .join(' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+            } catch(e) { return null; }
+        }
+
+        async function fetchCaptionUrl(baseUrl) {
+            try {
+                const url = baseUrl.replace(/\\u0026/g, '&') + '&fmt=json3';
+                const r = await httpsFetch(url);
+                if (r.ok) return parseCaptionEvents(r.json());
+            } catch(e) {}
+            return null;
+        }
+
+        async function tryInnerTube(clientName, clientVersion, extraCtx = {}) {
+            try {
+                const body = JSON.stringify({
+                    context: { client: { clientName, clientVersion, hl: 'en', gl: 'US', ...extraCtx } },
+                    videoId
+                });
+                const r = await httpsFetch('https://www.youtube.com/youtubei/v1/player', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Youtube-Client-Name': clientName === 'ANDROID' ? '3' : clientName === 'IOS' ? '5' : '1', 'X-Youtube-Client-Version': clientVersion },
+                    body
+                });
+                if (!r.ok) return null;
+                const data = r.json();
+                const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks || [];
+                const track = tracks.find(t => t.languageCode === 'en' && !t.kind)
+                           || tracks.find(t => t.languageCode === 'en')
+                           || tracks.find(t => t.languageCode?.startsWith('en'))
+                           || tracks[0];
+                if (track?.baseUrl) return fetchCaptionUrl(track.baseUrl);
+            } catch(e) { console.error('[YT InnerTube]', clientName, e.message); }
+            return null;
+        }
+
+        // Fetch transcript — try 4 strategies in order
+        let transcript = null;
+
+        // Strategy 1: ANDROID client (least restricted by YouTube)
+        if (!transcript) transcript = await tryInnerTube('ANDROID', '19.09.37', {
+            androidSdkVersion: 30,
+            userAgent: 'com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip'
+        });
+
+        // Strategy 2: IOS client
+        if (!transcript) transcript = await tryInnerTube('IOS', '19.09.3', {
+            deviceModel: 'iPhone16,2',
+            userAgent: 'com.google.ios.youtube/19.09.3 (iPhone16,2; U; CPU iOS 17_1_2 like Mac OS X;)'
+        });
+
+        // Strategy 3: WEB client
+        if (!transcript) transcript = await tryInnerTube('WEB', '2.20240101.00.00', {
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
+        });
+
+        // Strategy 4: HTML scraping
+        if (!transcript || transcript.length < 50) {
+            try {
+                const r = await httpsFetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        'Accept': 'text/html,application/xhtml+xml',
+                    }
+                });
+                if (r.ok) {
+                    const html = r.text();
+                    const match = html.match(/"captionTracks":(\[[\s\S]+?\])/);
+                    if (match) {
+                        const tracks = JSON.parse(match[1].replace(/\\u0026/g, '&'));
+                        const track = tracks.find(t => t.languageCode === 'en' || t.languageCode?.startsWith('en')) || tracks[0];
+                        if (track?.baseUrl) transcript = await fetchCaptionUrl(track.baseUrl);
+                    }
+                }
+            } catch(e) { console.error('[YT scrape]', e.message); }
+        }
+
+        if (!transcript || transcript.length < 50) {
+            res.status(422).json({ error: 'Não consegui encontrar legendas para este vídeo. Tente um vídeo em inglês com legendas automáticas ativadas.' }); return;
+        }
+
+        // Limit transcript to ~3000 chars for the AI call
+        const transcriptSnippet = transcript.length > 3000 ? transcript.slice(0, 3000) + '...' : transcript;
+
+        // Call OpenAI to generate learning content
+        const prompt = `You are an English teacher. Analyze this YouTube video transcript and create learning material for a Brazilian student.
+
+Transcript: "${transcriptSnippet}"
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "vocabulary": [
+    {"word": "example", "phonetic": "/ɪɡˈzæmpəl/", "definition": "Simple definition in English", "ptTranslation": "Tradução em português", "example": "A short example sentence."}
+  ],
+  "questions": [
+    {"question": "Comprehension question?", "options": ["A", "B", "C", "D"], "correct": "A", "explanation": "Why A is correct."}
+  ],
+  "summary": "A 2-3 sentence summary of the video in English.",
+  "summaryPt": "Resumo em 2-3 frases em português.",
+  "conversationStarter": "An engaging question Yara would ask the student about this video."
+}
+
+Rules:
+- vocabulary: exactly 8 useful words/phrases from the transcript, sorted easiest to hardest
+- questions: exactly 5 multiple choice questions with 4 options each
+- Keep everything appropriate for language learning`;
+
+        if (!API_KEY) {
+            res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return;
+        }
+
+        const aiBody = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1800, temperature: 0.3, response_format: { type: 'json_object' } });
+        const aiOptions = {
+            hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(aiBody) }
+        };
+
+        const aiReq = https.request(aiOptions, aiRes => {
+            let data = '';
+            aiRes.on('data', c => data += c);
+            aiRes.on('end', () => {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Content-Type', 'application/json');
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed?.choices?.[0]?.message?.content || '{}';
+                    const learning = JSON.parse(content);
+                    res.status(200).json({ videoId, transcript: transcriptSnippet, ...learning });
+                } catch(e) {
+                    res.status(500).json({ error: 'Erro ao processar o conteúdo do vídeo.' });
+                }
+            });
+        });
+        aiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
+        aiReq.write(aiBody);
+        aiReq.end();
+        return;
+    }
+
+    // ── Personalized Lesson Tab ───────────────────────────────────────────────
+
+    // POST /api/personalize → AI mini-lesson themed around user interests
+    if (req.method === 'POST' && url === '/api/personalize') {
+        const { topic, vocab, userId } = await readBody(req);
+
+        let interests = 'various topics', detail = '', level = 'beginner';
+        if (userId && userId !== 'guest') {
+            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
+            const p = rows?.[0];
+            if (p) {
+                interests = (p.interests || []).join(', ') || interests;
+                detail    = p.interests_detail || '';
+                level     = p.english_level    || level;
+            }
+        }
+
+        const favorites = detail ? `Their specific favorites: ${detail}.` : '';
+        const prompt = `You are Yara, a friendly capybara English teacher for Brazilian students. Create a short personalized bonus lesson.
+
+Lesson topic: "${topic}"
+Key vocabulary from today's lesson: ${(vocab || []).join(', ')}
+Student interests: ${interests}
+${favorites}
+Student English level: ${level}
+
+Create 4-6 example sentences that use TODAY'S vocabulary BUT are themed around the student's actual interests.
+Example: if they like BTS and the lesson teaches HAVE/WANT/NEED/LIKE → "BTS have millions of fans worldwide. I want to go to their concert someday!"
+
+Rules:
+- Use the lesson vocabulary naturally in the examples (bold the key word concept in your mind)
+- Theme the examples around the student's specific interests (music artists, teams, shows, etc.)
+- Keep sentences appropriate for the student's level (${level})
+- The mini_quiz must use the lesson's vocabulary in interest-themed sentences
+- Respond ONLY with valid JSON (no markdown, no code blocks):
+
+{
+  "intro": "Uma frase curta e animada sobre o que você vai personalizar, ex: 'Já que você ama [interesse], aqui vão seus exemplos especiais!'",
+  "examples": [
+    {"en": "sentence in English", "pt": "tradução em português", "highlight": "key_vocab_word_used"}
+  ],
+  "mini_quiz": [
+    {"q": "Fill-in sentence with ___ blank", "opts": ["option1", "option2", "option3"], "ans": 0}
+  ],
+  "tip": "One short practical grammar tip based on these examples, in Portuguese."
+}`;
+
+        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
+
+        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 700, temperature: 0.85, response_format: { type: 'json_object' } });
+        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
+        const apiReq = https.request(opts, apiRes => {
+            let data = '';
+            apiRes.on('data', c => data += c);
+            apiRes.on('end', () => {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Content-Type', 'application/json');
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed?.choices?.[0]?.message?.content || '{}';
+                    res.status(200).json(JSON.parse(content));
+                } catch(e) { res.status(500).json({ error: 'Erro ao gerar aula personalizada.' }); }
+            });
+        });
+        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
+        apiReq.write(body); apiReq.end(); return;
+    }
+
+    // ── Study Plan ────────────────────────────────────────────────────────────
+
+    // POST /api/study-plan → AI-generated weekly study schedule
+    if (req.method === 'POST' && url === '/api/study-plan') {
+        const { userId, currentLesson, dailyGoalMinutes, interests, level } = await readBody(req);
+
+        const mins    = dailyGoalMinutes || 10;
+        const intList = (interests || []).join(', ') || 'various';
+        const lvl     = level || 'beginner';
+        const lesson  = currentLesson || 1;
+
+        const prompt = `You are an expert English study planner for Brazilian learners. Create a 7-day personalized weekly study schedule.
+
+Student profile:
+- Level: ${lvl}
+- Daily goal: ${mins} minutes
+- Interests: ${intList}
+- Next lesson in sequence: aula_${String(lesson).padStart(2,'0')}.html
+
+Activity types to mix:
+- "aula": structured lessons from the course (aula_01.html through aula_44.html in order)
+- "youtube": YouTube Lab sessions (youtube_lab.html) — suggest a YouTube search topic related to their interests
+- "music": Music Lab sessions (music_lab.html) — suggest a specific artist/song related to their interests
+- "review": Review of previous lesson concepts (link to the previous aula)
+
+Rules:
+- Each day's total activity duration must NOT exceed ${mins} minutes
+- On rest days (suggest 1-2 per week), use light activities only (music or review, max 5 min)
+- Vary the activity types across the week
+- Include specific YouTube topic suggestions and music artist suggestions based on their interests
+- Lesson days: use sequential aula files starting from aula_${String(lesson).padStart(2,'0')}.html
+- Respond ONLY with valid JSON (no markdown, no code blocks):
+
+{
+  "weeklyGoal": "Short motivational message about the week's goal in Portuguese",
+  "weeklyPlan": [
+    {
+      "day": "Segunda",
+      "dayEn": "Monday",
+      "isRestDay": false,
+      "activities": [
+        {"type": "aula", "title": "Aula XX — Topic Name", "duration": 15, "link": "aula_XX.html", "icon": "📖", "description": "Short description in Portuguese"},
+        {"type": "music", "title": "Música: Artist Name — Song", "duration": 5, "link": "music_lab.html", "icon": "🎵", "description": "Cole a letra desta música no Music Lab"}
+      ]
+    }
+  ]
+}`;
+
+        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
+
+        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.75, response_format: { type: 'json_object' } });
+        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
+        const apiReq = https.request(opts, apiRes => {
+            let data = '';
+            apiRes.on('data', c => data += c);
+            apiRes.on('end', () => {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Content-Type', 'application/json');
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed?.choices?.[0]?.message?.content || '{}';
+                    res.status(200).json(JSON.parse(content));
+                } catch(e) { res.status(500).json({ error: 'Erro ao gerar cronograma.' }); }
+            });
+        });
+        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
+        apiReq.write(body); apiReq.end(); return;
+    }
+
+    // ── Music Lab ─────────────────────────────────────────────────────────────
+
+    // POST /api/music → analyze song lyrics, generate vocab/chunks/quiz
+    if (req.method === 'POST' && url === '/api/music') {
+        const { lyrics, artist, userId } = await readBody(req);
+
+        let level = 'beginner';
+        if (userId && userId !== 'guest') {
+            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=english_level`);
+            level = rows?.[0]?.english_level || level;
+        }
+
+        const snippet = (lyrics || '').slice(0, 1000);
+        if (snippet.length < 20) { res.status(400).json({ error: 'Cole a letra da música antes de analisar!' }); return; }
+
+        const prompt = `You are Yara, a friendly capybara English teacher. Analyze these song lyrics and create a music-based English lesson for a Brazilian ${level}-level student.
+
+Artist: ${artist || 'Unknown Artist'}
+Lyrics:
+"""
+${snippet}
+"""
+
+Rules:
+- Find 5-7 useful vocabulary words OR natural expressions from the lyrics
+- For each vocab item, explain simply in Portuguese and give the lyric line as example
+- Find 2-3 interesting "chunks" (natural phrases, idioms, or expressions worth learning)
+- Create 3 quiz questions about the lyrics (comprehension or vocabulary)
+- Keep everything positive and encouraging
+- Respond ONLY with valid JSON (no markdown, no code blocks):
+
+{
+  "artistNote": "One fun fact or context about this artist/song in Portuguese (1 sentence)",
+  "vocab": [
+    {"word": "dream", "phonetic": "/driːm/", "pt": "sonho", "example": "The exact lyric line using this word", "tip": "Dica rápida em português sobre como usar esta palavra"}
+  ],
+  "chunks": [
+    {"phrase": "I can't stop the feeling", "meaning": "Explicação em português do que significa e como usar", "type": "expressão", "example": "How to use it in a new sentence"}
+  ],
+  "quiz": [
+    {"q": "Question about the lyrics?", "opts": ["option A", "option B", "option C"], "ans": 0, "explain": "Explicação em português da resposta"}
+  ]
+}`;
+
+        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
+
+        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1400, temperature: 0.75, response_format: { type: 'json_object' } });
+        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
+        const apiReq = https.request(opts, apiRes => {
+            let data = '';
+            apiRes.on('data', c => data += c);
+            apiRes.on('end', () => {
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Content-Type', 'application/json');
+                try {
+                    const parsed = JSON.parse(data);
+                    const content = parsed?.choices?.[0]?.message?.content || '{}';
+                    res.status(200).json(JSON.parse(content));
+                } catch(e) { res.status(500).json({ error: 'Erro ao analisar a letra.' }); }
+            });
+        });
+        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
+        apiReq.write(body); apiReq.end(); return;
+    }
+
+    // ── Lyrics Proxy ──────────────────────────────────────────────────────────
+    // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
+    if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
+        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+        if (!q) { res.status(400).json({ error: 'q required' }); return; }
+        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
+        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
+            let d = '';
+            r.on('data', c => d += c);
+            r.on('end', () => {
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.status(r.statusCode).end(d);
+            });
+        }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
+        return;
+    }
+
+    // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
+    if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
+        const p = new URL(`https://x.com${req.url}`).searchParams;
+        const artist = p.get('artist') || '';
+        const title  = p.get('title')  || '';
+        if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
+        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
+        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
+            let d = '';
+            r.on('data', c => d += c);
+            r.on('end', () => {
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.status(r.statusCode).end(d);
+            });
+        }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
+        return;
+    }
+
+    // ── Homework Submissions ──────────────────────────────────────────────────
+
+    // POST /api/homework → save a student homework submission to Supabase
+    if (req.method === 'POST' && url === '/api/homework') {
+        const { userId, studentName, lessonId, lessonTitle, answers, xp } = await readBody(req);
+        if (!userId || !lessonId) { res.status(400).json({ error: 'userId and lessonId required' }); return; }
+        const result = await sb('/homework_submissions', {
+            method: 'POST',
+            headers: { 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                user_id:       userId,
+                student_name:  studentName || 'Unknown',
+                lesson_id:     String(lessonId),
+                lesson_title:  lessonTitle || '',
+                answers:       answers || {},
+                xp_earned:     xp || 0,
+                submitted_at:  new Date().toISOString(),
+            }),
+        });
+        res.status(200).json({ success: true, id: result?.[0]?.id || null }); return;
+    }
+
+    // GET /api/homework?key=TEACHER_KEY → list all submissions (teacher only)
+    // GET /api/homework?key=TEACHER_KEY&lessonId=32 → filter by lesson
+    // GET /api/homework?key=TEACHER_KEY&userId=xxx → filter by student
+    if (req.method === 'GET' && url.startsWith('/api/homework')) {
+        const p = new URL(`https://x.com${req.url}`).searchParams;
+        const key      = p.get('key') || '';
+        const expected = process.env.TEACHER_KEY || 'capyteacher2025';
+        if (key !== expected) { res.status(401).json({ error: 'Unauthorized' }); return; }
+        const lessonId = p.get('lessonId');
+        const userId   = p.get('userId');
+        let filter = '';
+        if (lessonId) filter += `&lesson_id=eq.${encodeURIComponent(lessonId)}`;
+        if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
+        const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc${filter}`);
+        res.status(200).json(rows || []); return;
     }
 
     res.status(404).json({ error: 'Not found' });
