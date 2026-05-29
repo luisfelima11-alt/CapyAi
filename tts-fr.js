@@ -1,52 +1,21 @@
 /**
- * tts-fr.js — OpenAI TTS override for French course pages
- * Uses OpenAI nova voice (speaks French natively). Fallback to browser Speech Synthesis.
+ * tts-fr.js — Browser Speech Synthesis for French course pages
+ * Uses the system's fr-FR voice (Chrome/Edge/Safari have good native French voices).
  * Include AFTER lesson-engine.js so it overrides window.speak.
  */
 (function () {
-  let _currentAudio = null;
-
-  async function speakFr(text) {
-    if (!text || !text.trim()) return;
-    // Strip HTML tags just in case
+  function speakFr(text) {
+    if (!text || !window.speechSynthesis) return;
     const clean = text.replace(/<[^>]+>/g, '').trim();
     if (!clean) return;
-
-    // Stop any currently playing audio
-    if (_currentAudio) {
-      _currentAudio.pause();
-      _currentAudio.src = '';
-      _currentAudio = null;
-    }
-
-    try {
-      const url = '/api/tts?text=' + encodeURIComponent(clean) + '&voice=nova&lang=fr';
-      const audio = new Audio(url);
-      _currentAudio = audio;
-      audio.onended = () => { _currentAudio = null; };
-      audio.onerror = () => {
-        // Fallback to browser TTS if ElevenLabs fails
-        if (window.speechSynthesis) {
-          const u = new SpeechSynthesisUtterance(clean);
-          u.lang = 'fr-FR'; u.rate = 0.85;
-          speechSynthesis.cancel();
-          speechSynthesis.speak(u);
-        }
-        _currentAudio = null;
-      };
-      await audio.play();
-    } catch (e) {
-      // Fallback
-      if (window.speechSynthesis) {
-        const u = new SpeechSynthesisUtterance(clean);
-        u.lang = 'fr-FR'; u.rate = 0.85;
-        speechSynthesis.cancel();
-        speechSynthesis.speak(u);
-      }
-    }
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    u.pitch = 1.05;
+    speechSynthesis.speak(u);
   }
 
-  // Override speak globally on French pages
-  window.speak    = speakFr;
-  window.speakFr  = speakFr;
+  window.speak   = speakFr;
+  window.speakFr = speakFr;
 })();
