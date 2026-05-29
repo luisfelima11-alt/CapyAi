@@ -20,7 +20,7 @@
     }
 
     try {
-      const url = '/api/tts?text=' + encodeURIComponent(clean) + '&voice=nova';
+      const url = '/api/tts?text=' + encodeURIComponent(clean) + '&voice=nova&lang=fr';
       const audio = new Audio(url);
       _currentAudio = audio;
       audio.onended = () => { _currentAudio = null; };

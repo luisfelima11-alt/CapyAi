@@ -692,15 +692,25 @@ Rules:
     }
 
     // ── OpenAI TTS ───────────────────────────────────────────────────────────
-    // GET /api/tts?text=hello&voice=nova  → streams MP3 from OpenAI TTS
-    // Voices: alloy, echo, fable, onyx, nova, shimmer
+    // GET /api/tts?text=hello&voice=nova&lang=en  → streams MP3 from OpenAI TTS
+    // lang=fr uses gpt-4o-mini-tts with native French accent instructions
     if (req.method === 'GET' && url === '/api/tts') {
         if (!API_KEY) { res.status(503).json({ error: 'OPENAI_API_KEY not set' }); return; }
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
         const voice = qs2.get('voice') || 'nova';
-        const body = JSON.stringify({ model: 'tts-1', input: text, voice, response_format: 'mp3' });
+        const lang  = qs2.get('lang')  || 'en';
+
+        // French: use gpt-4o-mini-tts with native accent instructions
+        const isFr = lang === 'fr';
+        const ttsModel = isFr ? 'gpt-4o-mini-tts' : 'tts-1';
+        const bodyObj = { model: ttsModel, input: text, voice, response_format: 'mp3' };
+        if (isFr) {
+            bodyObj.instructions = 'You are a native French speaker. Pronounce every word with a perfect, authentic French accent — no English influence. Speak clearly and naturally like a French teacher.';
+        }
+        const body = JSON.stringify(bodyObj);
+
         const ttsReq = https.request({
             hostname: 'api.openai.com',
             path: '/v1/audio/speech',
