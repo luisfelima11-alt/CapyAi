@@ -1,6 +1,6 @@
 /**
- * tts-fr.js — Google Cloud TTS override for French course pages
- * Uses fr-FR-Neural2-A (Google Neural2). Fallback to browser Speech Synthesis.
+ * tts-fr.js — OpenAI TTS override for French course pages
+ * Uses OpenAI nova voice (speaks French natively). Fallback to browser Speech Synthesis.
  * Include AFTER lesson-engine.js so it overrides window.speak.
  */
 (function () {
@@ -20,7 +20,7 @@
     }
 
     try {
-      const url = '/api/tts?text=' + encodeURIComponent(clean) + '&voice=fr-FR-Neural2-A';
+      const url = '/api/tts?text=' + encodeURIComponent(clean) + '&voice=nova';
       const audio = new Audio(url);
       _currentAudio = audio;
       audio.onended = () => { _currentAudio = null; };

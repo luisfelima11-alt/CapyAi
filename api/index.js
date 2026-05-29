@@ -691,51 +691,44 @@ Rules:
         return;
     }
 
-    // ── Google Cloud TTS ─────────────────────────────────────────────────────
-    // GET /api/tts?text=hello&voice=en-US-Neural2-F  → streams MP3 from Google TTS
+    // ── OpenAI TTS ───────────────────────────────────────────────────────────
+    // GET /api/tts?text=hello&voice=nova  → streams MP3 from OpenAI TTS
+    // Voices: alloy, echo, fable, onyx, nova, shimmer
     if (req.method === 'GET' && url === '/api/tts') {
-        const GOOGLE_KEY = process.env.GOOGLE_TTS_KEY;
-        if (!GOOGLE_KEY) { res.status(503).json({ error: 'GOOGLE_TTS_KEY not set' }); return; }
+        if (!API_KEY) { res.status(503).json({ error: 'OPENAI_API_KEY not set' }); return; }
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
-        const voice = qs2.get('voice') || 'en-US-Neural2-F';
-        // Derive language code from voice name (e.g. "en-US-Neural2-F" → "en-US")
-        const langCode = voice.slice(0, 5);
-        const body = JSON.stringify({
-            input: { text },
-            voice: { languageCode: langCode, name: voice },
-            audioConfig: { audioEncoding: 'MP3', speakingRate: 0.95, pitch: 0 },
-        });
-        const gReq = https.request({
-            hostname: 'texttospeech.googleapis.com',
-            path: `/v1/text:synthesize?key=${GOOGLE_KEY}`,
+        const voice = qs2.get('voice') || 'nova';
+        const body = JSON.stringify({ model: 'tts-1', input: text, voice, response_format: 'mp3' });
+        const ttsReq = https.request({
+            hostname: 'api.openai.com',
+            path: '/v1/audio/speech',
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-        }, gRes => {
-            let data = '';
-            gRes.on('data', c => data += c);
-            gRes.on('end', () => {
-                if (gRes.statusCode !== 200) {
-                    let detail = data;
-                    try { detail = JSON.parse(data)?.error?.message || data; } catch {}
-                    res.status(502).json({ error: 'Google TTS error', detail: String(detail).slice(0, 400), status: gRes.statusCode });
-                    return;
-                }
-                try {
-                    const audioBuffer = Buffer.from(JSON.parse(data).audioContent, 'base64');
-                    res.setHeader('Content-Type', 'audio/mpeg');
-                    res.setHeader('Cache-Control', 'public, max-age=86400');
-                    res.setHeader('Access-Control-Allow-Origin', '*');
-                    res.end(audioBuffer);
-                } catch(e) {
-                    res.status(500).json({ error: 'Failed to decode Google TTS response' });
-                }
-            });
+            headers: {
+                'Authorization': `Bearer ${API_KEY}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body),
+            },
+        }, ttsRes => {
+            if (ttsRes.statusCode !== 200) {
+                let d = '';
+                ttsRes.on('data', c => d += c);
+                ttsRes.on('end', () => {
+                    let detail = d;
+                    try { detail = JSON.parse(d)?.error?.message || d; } catch {}
+                    res.status(502).json({ error: 'OpenAI TTS error', detail: String(detail).slice(0, 400) });
+                });
+                return;
+            }
+            res.setHeader('Content-Type', 'audio/mpeg');
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            ttsRes.pipe(res);
         });
-        gReq.on('error', e => res.status(502).json({ error: e.message }));
-        gReq.write(body);
-        gReq.end();
+        ttsReq.on('error', e => res.status(502).json({ error: e.message }));
+        ttsReq.write(body);
+        ttsReq.end();
         return;
     }
 
