@@ -257,75 +257,161 @@
      PRICING
 ═══════════════════════════════════════════════════════════════════ -->
 <section class="py-24 px-6 relative reveal" id="pricing">
-  <div class="blob bg-pink-600 w-[500px] h-[500px] opacity-15 top-0 left-1/2 -translate-x-1/2"></div>
-  <div class="max-w-4xl mx-auto relative">
-    <div class="text-center mb-12">
-      <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Escolha seu plano</p>
+  <div class="blob bg-orange-500 w-[500px] h-[500px] opacity-10 top-0 left-1/2 -translate-x-1/2"></div>
+  <div class="max-w-5xl mx-auto relative">
+    <div class="text-center mb-10">
+      <p class="text-[#FF9F1C] font-black text-sm uppercase tracking-widest mb-3">Escolha seu plano</p>
       <h2 class="font-black text-4xl text-white">Comece grátis. Evolua quando quiser.</h2>
+      <p class="text-slate-400 mt-3">Sem contrato. Cancele a qualquer hora.</p>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-6">
-      <!-- Free card -->
-      <div class="bg-white/4 border border-white/10 rounded-3xl p-8">
-        <div class="flex items-start justify-between mb-6">
+    <!-- Mensal / Anual toggle -->
+    <div class="flex items-center justify-center gap-4 mb-10">
+      <span id="lbl-monthly" class="text-white font-black text-sm">Mensal</span>
+      <button id="billing-toggle" onclick="toggleBilling()"
+        class="relative w-14 h-7 rounded-full bg-[#FF9F1C] transition-colors focus:outline-none">
+        <span id="toggle-knob" class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300"></span>
+      </button>
+      <span id="lbl-annual" class="text-slate-400 font-black text-sm">Anual <span class="bg-[#2EC4B6]/20 text-[#2EC4B6] text-xs px-2 py-0.5 rounded-full ml-1">-30%</span></span>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- ── GRÁTIS ── -->
+      <div class="bg-white/4 border border-white/10 rounded-3xl p-7 flex flex-col">
+        <div class="flex items-start justify-between mb-5">
           <div>
-            <p class="font-black text-2xl text-white">Grátis</p>
-            <p class="text-slate-400 text-sm mt-1">Para começar agora</p>
+            <p class="font-black text-xl text-white">Grátis 🌱</p>
+            <p class="text-slate-400 text-sm mt-1">Para dar o primeiro passo</p>
           </div>
-          <div class="text-4xl">🌱</div>
         </div>
-        <div class="mb-8">
+        <div class="mb-6">
           <p class="font-black text-5xl text-white">R$0</p>
           <p class="text-slate-500 text-sm mt-1">Para sempre</p>
         </div>
-        <ul class="space-y-3 mb-8">
-          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> Capítulo 1 completo (5 lições)</li>
-          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> 20 mini-aulas de 12 min</li>
-          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> 3 conversas com Yara por dia</li>
-          <li class="flex items-center gap-3 text-sm text-slate-300"><span class="check text-lg">✓</span> XP, streaks e badges</li>
-          <li class="flex items-center gap-3 text-sm text-slate-400"><span class="cross text-lg">✗</span> <span class="line-through opacity-50">Capítulos 2–4 (19 lições)</span></li>
-          <li class="flex items-center gap-3 text-sm text-slate-400"><span class="cross text-lg">✗</span> <span class="line-through opacity-50">Criador de lições</span></li>
+        <ul class="space-y-2.5 mb-8 flex-1">
+          <li class="flex items-start gap-2.5 text-sm text-slate-300"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> 5 primeiras aulas de inglês</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-300"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Voz do browser (TTS)</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Yara AI Chat</span></li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Music Lab</span></li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Voz Nova TTS</span></li>
         </ul>
-        <a href="learn.html"
-           class="block w-full text-center bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black py-4 rounded-2xl transition-all text-base active:scale-95">
+        <a href="classes.html"
+           class="block w-full text-center bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black py-3.5 rounded-2xl transition-all text-sm active:scale-95">
           Começar grátis →
         </a>
       </div>
 
-      <!-- Plus card -->
-      <div class="plus-card bg-gradient-to-br from-[#0d1f40] to-[#001229] border border-pink-500/30 rounded-3xl p-8 relative overflow-hidden">
-        <!-- Popular badge -->
-        <div class="absolute top-6 right-6 bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black text-xs px-3 py-1.5 rounded-full">
+      <!-- ── PRO ── -->
+      <div class="bg-gradient-to-br from-[#1a2d47] to-[#0d1e35] border border-[#FF9F1C]/40 rounded-3xl p-7 relative overflow-hidden flex flex-col shadow-2xl shadow-orange-500/10">
+        <div class="absolute top-5 right-5 bg-[#FF9F1C] text-[#0d1e35] font-black text-xs px-3 py-1 rounded-full">
           Mais popular
         </div>
-        <div class="flex items-start justify-between mb-6">
+        <div class="flex items-start justify-between mb-5">
           <div>
-            <p class="font-black text-2xl grad-pink">Plus ✨</p>
-            <p class="text-slate-400 text-sm mt-1">Para quem quer fluência</p>
+            <p class="font-black text-xl text-[#FF9F1C]">Pro ⚡</p>
+            <p class="text-slate-400 text-sm mt-1">Para quem quer resultado</p>
           </div>
-          <div class="text-4xl">🌿</div>
         </div>
-        <div class="mb-8">
-          <p class="font-black text-5xl text-white">R$19,90</p>
-          <p class="text-slate-500 text-sm mt-1">/mês · Cancele quando quiser</p>
+        <div class="mb-6">
+          <p class="font-black text-5xl text-white">
+            <span class="pro-price-monthly">R$47</span>
+            <span class="pro-price-annual hidden">R$397</span>
+          </p>
+          <p class="text-slate-500 text-sm mt-1">
+            <span class="pro-period-monthly">/mês · Cancele quando quiser</span>
+            <span class="pro-period-annual hidden">/ano · Economia de R$167</span>
+          </p>
         </div>
-        <ul class="space-y-3 mb-8">
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> <strong>Todas as 24 lições</strong> (96 mini-aulas)</li>
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> <strong>15 conversas com Yara por dia</strong></li>
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> Criador de lições personalizadas</li>
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> AI Quick-Fill no criador</li>
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> XP, streaks, badges e ranking</li>
-          <li class="flex items-center gap-3 text-sm text-slate-200"><span class="check text-lg">✓</span> Suporte prioritário</li>
+        <ul class="space-y-2.5 mb-8 flex-1">
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> <strong>44 aulas de inglês + 7 de francês</strong></li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> Voz Nova TTS em todas as lições</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> Yara AI Chat em todas as lições</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> Plano de estudos personalizado</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> Music Lab + Homework tracker</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Conversa de voz com Yara</span></li>
         </ul>
-        <a href="https://pay.kiwify.com.br/SEU-LINK-PLUS" target="_blank"
-           class="block w-full text-center bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black py-4 rounded-2xl text-base shadow-xl shadow-pink-500/25 hover:opacity-90 active:scale-95 transition-all">
-          Assinar por R$19,90/mês →
+        <a id="pro-btn-monthly" href="https://pay.kiwify.com.br/7HYhJgk" target="_blank"
+           class="block w-full text-center bg-[#FF9F1C] hover:bg-[#e8901a] text-[#0d1e35] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
+          Assinar Pro Mensal →
         </a>
-        <p class="text-slate-600 text-xs text-center mt-3">Pagamento seguro via Kiwify · Cartão ou Pix</p>
+        <a id="pro-btn-annual" href="https://pay.kiwify.com.br/gfRhn8u" target="_blank"
+           class="hidden block w-full text-center bg-[#FF9F1C] hover:bg-[#e8901a] text-[#0d1e35] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
+          Assinar Pro Anual →
+        </a>
+        <p class="text-slate-600 text-xs text-center mt-3">Pagamento via Kiwify · Cartão ou Pix</p>
       </div>
-    </div>
+
+      <!-- ── SUPER ── -->
+      <div class="bg-gradient-to-br from-[#0e2a2a] to-[#071a1a] border border-[#2EC4B6]/40 rounded-3xl p-7 relative overflow-hidden flex flex-col shadow-2xl shadow-teal-500/10">
+        <div class="flex items-start justify-between mb-5">
+          <div>
+            <p class="font-black text-xl text-[#2EC4B6]">Super 🚀</p>
+            <p class="text-slate-400 text-sm mt-1">Para acelerar de verdade</p>
+          </div>
+        </div>
+        <div class="mb-6">
+          <p class="font-black text-5xl text-white">
+            <span class="super-price-monthly">R$97</span>
+            <span class="super-price-annual hidden">R$797</span>
+          </p>
+          <p class="text-slate-500 text-sm mt-1">
+            <span class="super-period-monthly">/mês · Cancele quando quiser</span>
+            <span class="super-period-annual hidden">/ano · Economia de R$367</span>
+          </p>
+        </div>
+        <ul class="space-y-2.5 mb-8 flex-1">
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> <strong>Tudo do Pro</strong></li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> <strong>10 min/mês de voz com Yara AI</strong></li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Correção de pronúncia</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Relatório de progresso semanal</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Acesso prioritário a novas lições</li>
+          <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Suporte VIP por WhatsApp</li>
+        </ul>
+        <a id="super-btn-monthly" href="https://pay.kiwify.com.br/lIBOlgZ" target="_blank"
+           class="block w-full text-center bg-[#2EC4B6] hover:bg-[#26b0a3] text-[#071a1a] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-teal-500/25 active:scale-95 transition-all">
+          Assinar Super Mensal →
+        </a>
+        <a id="super-btn-annual" href="https://pay.kiwify.com.br/hlqrYma" target="_blank"
+           class="hidden block w-full text-center bg-[#2EC4B6] hover:bg-[#26b0a3] text-[#071a1a] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-teal-500/25 active:scale-95 transition-all">
+          Assinar Super Anual →
+        </a>
+        <p class="text-slate-600 text-xs text-center mt-3">Pagamento via Kiwify · Cartão ou Pix</p>
+      </div>
+
+    </div><!-- /grid -->
   </div>
 </section>
+
+<script>
+// Pricing toggle
+let isAnnual = false;
+function toggleBilling() {
+  isAnnual = !isAnnual;
+  const knob = document.getElementById('toggle-knob');
+  const lblM = document.getElementById('lbl-monthly');
+  const lblA = document.getElementById('lbl-annual');
+  knob.style.transform = isAnnual ? 'translateX(28px)' : 'translateX(0)';
+  lblM.className = isAnnual ? 'text-slate-400 font-black text-sm' : 'text-white font-black text-sm';
+  lblA.className = isAnnual ? 'text-white font-black text-sm' : 'text-slate-400 font-black text-sm';
+
+  const show = (cls, show) => document.querySelectorAll(cls).forEach(el => {
+    el.classList.toggle('hidden', !show);
+  });
+  show('.pro-price-monthly', !isAnnual);
+  show('.pro-price-annual', isAnnual);
+  show('.pro-period-monthly', !isAnnual);
+  show('.pro-period-annual', isAnnual);
+  show('.super-price-monthly', !isAnnual);
+  show('.super-price-annual', isAnnual);
+  show('.super-period-monthly', !isAnnual);
+  show('.super-period-annual', isAnnual);
+  document.getElementById('pro-btn-monthly').classList.toggle('hidden', isAnnual);
+  document.getElementById('pro-btn-annual').classList.toggle('hidden', !isAnnual);
+  document.getElementById('super-btn-monthly').classList.toggle('hidden', isAnnual);
+  document.getElementById('super-btn-annual').classList.toggle('hidden', !isAnnual);
+}
+</script>
 
 <!-- ══════════════════════════════════════════════════════════════════
      PRIVATE LESSONS CTA
