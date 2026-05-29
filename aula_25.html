@@ -504,10 +504,11 @@ const VOCAB = [
 
 const vg = document.getElementById('vocab-grid');
 VOCAB.forEach(([en, pt]) => {
+  const enC = en.replace(/'/g,"&#39;");
   const d = document.createElement('div');
   d.className = 'flip-card';
   d.innerHTML = `<div class="flip-card-inner">
-    <div class="flip-front"><p class="text-white font-black text-sm">${en}</p></div>
+    <div class="flip-front"><p class="text-white font-black text-sm">${en}</p><button onclick="event.stopPropagation();speak('${enC}')" class="mt-1 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div>
     <div class="flip-back"><p class="text-white font-bold text-sm text-center">${pt}</p></div>
   </div>`;
   d.addEventListener('click', () => d.classList.toggle('flipped'));
@@ -860,5 +861,6 @@ function submitHomework25(){
 }
 window.submitHomework25 = submitHomework25;
 </script>
+<script src="tts-en.js"></script>
 </body>
 </html>

@@ -263,9 +263,10 @@ const VOCAB = [
 ];
 const grid = document.getElementById('vocab-grid');
 VOCAB.forEach(([w,d]) => {
+  const wC = w.replace(/'/g,"&#39;");
   const c = document.createElement('div');
   c.className = 'flip-card';
-  c.innerHTML = `<div class="flip-card-inner"><div class="flip-front text-white font-black text-base">${w}</div><div class="flip-back text-white font-bold text-xs">${d}</div></div>`;
+  c.innerHTML = `<div class="flip-card-inner"><div class="flip-front text-white font-black text-base flex flex-col items-center justify-center gap-1">${w}<button onclick="event.stopPropagation();speak('${wC}')" class="mt-1 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div><div class="flip-back text-white font-bold text-xs">${d}</div></div>`;
   c.addEventListener('click', () => c.classList.toggle('flipped'));
   grid.appendChild(c);
 });
@@ -546,5 +547,6 @@ function submitHomework41(){
   btn.insertAdjacentElement('afterend', a);
 }
 </script>
+<script src="tts-en.js"></script>
 </body>
 </html>
