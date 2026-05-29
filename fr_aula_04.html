@@ -256,7 +256,7 @@ const VOCAB=[
   ['Aunt','la tante [tont]'],
 ];
 const vg=document.getElementById('vocab-grid');
-VOCAB.forEach(([en,fr])=>{const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${fr}</p></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+VOCAB.forEach(([en,fr])=>{const frC=fr.replace(/\s*\[.*?\]/g,'').trim().replace(/'/g,"&#39;");const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${fr}</p><button onclick="event.stopPropagation();speak('${frC}')" class="mt-2 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
 
 const EXPRS=[
   {phrase:'J\'ai... frères et... sœurs.',meaning:'I have... brothers and... sisters.',example:'"J\'ai deux frères et une sœur. Et toi, tu as des frères?"',use:'Use J\'AI (I have) for talking about family. Add numbers directly before the noun. Un frère = 1 brother. Des frères = some brothers (plural).'},
@@ -299,7 +299,7 @@ const SPEAK=[
   'Mes parents sont brésiliens.',
 ];
 const sl=document.getElementById('speak-list');
-SPEAK.forEach((s,i)=>{const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><label for="sp${i}" class="cursor-pointer"><div class="flex items-center gap-4 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all"><div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center font-black text-blue-700 text-sm">${i+1}</div><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl">☐</span></div></label>`;sl.appendChild(d);});
+SPEAK.forEach((s,i)=>{const sC=s.replace(/'/g,"&#39;");const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><div class="flex items-center gap-3 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all hover:border-blue-200"><button onclick="event.stopPropagation();speak('${sC}')" class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-base transition-all" title="Ouvir">🔊</button><label for="sp${i}" class="cursor-pointer flex-1 flex items-center gap-3 min-w-0"><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl flex-shrink-0">☐</span></label></div>`;sl.appendChild(d);});
 function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
 
 const WO1_DATA=[
