@@ -1,58 +1,32 @@
-const CACHE_NAME = 'capy-yara-v1';
-const ASSETS_TO_CACHE = [
-    '/',
-    '/4_Login_Capy_Yara_Welcomes_You.html',
-    '/6_Home_Forest_Expedition.html',
-    '/shop.html',
-    '/store.js',
-    '/components.js',
-    '/auth.js',
-    '/yara.png',
-    '/manifest.json'
-];
+// ════════════════════════════════════════════════════════════════════════════
+// SELF-DESTRUCTING SERVICE WORKER
+// ════════════════════════════════════════════════════════════════════════════
+// The previous SW used cache-first strategy, which caused stale JS/HTML to
+// be served indefinitely. To fix existing installs that still have it cached,
+// this SW takes over, deletes all caches, unregisters itself, and reloads.
+// After this runs once per visitor, the SW is gone for good.
+// ════════════════════════════════════════════════════════════════════════════
 
-// Install Event
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-        .then(cache => {
-            console.log('Opened cache');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
 });
 
-// Activate Event
-self.addEventListener('activate', event => {
-    const cacheAllowlist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheAllowlist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
-    );
+self.addEventListener('activate', (event) => {
+    event.waitUntil((async () => {
+        // 1. Delete every cache this origin ever stored
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+
+        // 2. Unregister self
+        await self.registration.unregister();
+
+        // 3. Force all open tabs to reload from network (fresh content)
+        const clientList = await self.clients.matchAll({ type: 'window' });
+        clientList.forEach(client => client.navigate(client.url));
+    })());
 });
 
-// Fetch Event
-self.addEventListener('fetch', event => {
-    // Ignore API calls so they go to network
-    if (event.request.url.includes('/api/')) {
-        return;
-    }
-    
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            })
-    );
+// While alive (briefly), don't intercept any fetch — pass through to network.
+self.addEventListener('fetch', (event) => {
+    // intentionally empty: no respondWith() means browser handles request normally
 });
