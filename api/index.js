@@ -1,4 +1,36 @@
 const https = require('https');
+const crypto = require('crypto');
+
+// ── Kiwify product → plan mapping ──────────────────────────────────────────
+// Product IDs come from Kiwify webhook payload (`Product.product_id`).
+// Filled in by reading the Kiwify dashboard "Configurações" → "Geral" of each product.
+// While unset, we infer plan from the product NAME ("Pro" or "Super") as fallback.
+const KIWIFY_PRODUCT_TO_PLAN = {
+    // Pro: monthly + annual
+    // 'PRODUCT_ID_PRO_MONTHLY': 'pro',
+    // 'PRODUCT_ID_PRO_ANNUAL': 'pro',
+    // Super: monthly + annual
+    // 'PRODUCT_ID_SUPER_MONTHLY': 'super',
+    // 'PRODUCT_ID_SUPER_ANNUAL': 'super',
+};
+
+function planFromKiwifyProduct({ productId, productName }) {
+    if (productId && KIWIFY_PRODUCT_TO_PLAN[productId]) return KIWIFY_PRODUCT_TO_PLAN[productId];
+    const name = (productName || '').toLowerCase();
+    if (name.includes('super')) return 'super';
+    if (name.includes('pro'))   return 'pro';
+    return null;
+}
+
+// Read raw body (needed for HMAC validation — readBody() parses JSON).
+function readRawBody(req) {
+    return new Promise((resolve, reject) => {
+        let chunks = [];
+        req.on('data', c => chunks.push(Buffer.from(c)));
+        req.on('end',  () => resolve(Buffer.concat(chunks).toString('utf8')));
+        req.on('error', reject);
+    });
+}
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
 const SB_URL = process.env.SUPABASE_URL;   // https://xxxx.supabase.co
@@ -77,13 +109,126 @@ function readBody(req) {
 
 
 module.exports = async (req, res) => {
-    // CORS
+    const url = req.url.split('?')[0];
+
+    // ── Kiwify webhook (must be handled BEFORE CORS / body parsing) ──────────
+    // POST /api/kiwify-webhook?signature=<hmac>
+    // Kiwify sends order.approved, subscription.canceled, subscription.expired,
+    // subscription.renewed events. Each contains Customer.email + Product info.
+    // Maps Customer.email → accounts.id → user_profiles.plan.
+    if (req.method === 'POST' && url === '/api/kiwify-webhook') {
+        try {
+            const rawBody = await readRawBody(req);
+            const qs = new URL(req.url, 'http://localhost').searchParams;
+            const signature = qs.get('signature') || req.headers['x-kiwify-signature'] || '';
+            const secret = process.env.KIWIFY_WEBHOOK_SECRET || '';
+            // Validate signature (HMAC-SHA1 per Kiwify docs)
+            if (!secret) {
+                console.error('[kiwify-webhook] KIWIFY_WEBHOOK_SECRET not set');
+                res.status(503).end('webhook secret not configured');
+                return;
+            }
+            const expected = crypto.createHmac('sha1', secret).update(rawBody).digest('hex');
+            if (signature !== expected) {
+                console.error('[kiwify-webhook] invalid signature');
+                res.status(401).end('invalid signature');
+                return;
+            }
+            let payload;
+            try { payload = JSON.parse(rawBody); }
+            catch (e) { res.status(400).end('bad json'); return; }
+
+            const event = payload.webhook_event_type || payload.event || '';
+            const email = (payload.Customer?.email || payload.customer?.email || '').toLowerCase().trim();
+            const productId   = payload.Product?.product_id || payload.product_id || '';
+            const productName = payload.Product?.product_name || payload.product_name || '';
+            const subscriptionId = payload.Subscription?.id || payload.subscription_id
+                                || payload.order_id || payload.order_ref || null;
+
+            console.log(`[kiwify-webhook] event=${event} email=${email} product=${productName} sub=${subscriptionId}`);
+
+            if (!email) {
+                res.status(400).end('missing customer email');
+                return;
+            }
+
+            // Determine the new plan based on event type
+            let newPlan = null;
+            let expiresAt = null;
+            if (event.includes('approved') || event.includes('paid') || event.includes('renewed')) {
+                newPlan = planFromKiwifyProduct({ productId, productName });
+                if (!newPlan) { res.status(400).end('unknown product'); return; }
+                // Set expiry: +35 days monthly buffer, +400 days annual buffer (loose; refreshed on renewal)
+                const isAnnual = /anual|annual|ano|year/i.test(productName);
+                expiresAt = new Date(Date.now() + (isAnnual ? 400 : 35) * 24 * 60 * 60 * 1000).toISOString();
+            } else if (event.includes('canceled') || event.includes('expired') || event.includes('refunded') || event.includes('chargeback')) {
+                newPlan = 'free';
+                expiresAt = null;
+            } else {
+                // Unhandled event type — log and 200 OK so Kiwify doesn't retry
+                console.log(`[kiwify-webhook] ignoring event: ${event}`);
+                res.status(200).end('ignored');
+                return;
+            }
+
+            // Find user by email
+            let accountRows = await sb(`/accounts?email=eq.${encodeURIComponent(email)}&select=id,name`);
+            let userId;
+            if (accountRows && accountRows.length > 0) {
+                userId = accountRows[0].id;
+            } else {
+                // Create pending account (user hasn't signed up yet — will claim it later via email magic link)
+                const newAccount = {
+                    name: payload.Customer?.first_name || payload.Customer?.full_name || email.split('@')[0],
+                    email,
+                    password: '__pending__' + crypto.randomBytes(8).toString('hex'),
+                    avatar: '🐾',
+                    pending_setup: true,
+                    created_at: new Date().toISOString(),
+                };
+                const created = await sb('/accounts', {
+                    method: 'POST',
+                    headers: { 'Prefer': 'return=representation' },
+                    body: JSON.stringify(newAccount),
+                });
+                userId = created?.[0]?.id;
+                console.log(`[kiwify-webhook] created pending account for ${email} → ${userId}`);
+            }
+
+            if (!userId) {
+                console.error('[kiwify-webhook] failed to resolve userId');
+                res.status(500).end('user resolution failed');
+                return;
+            }
+
+            // Upsert user_profiles row with plan
+            await sb('/user_profiles', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({
+                    id: userId,
+                    plan: newPlan,
+                    plan_expires_at: expiresAt,
+                    kiwify_subscription_id: subscriptionId,
+                    updated_at: new Date().toISOString(),
+                }),
+            });
+
+            console.log(`[kiwify-webhook] ✅ ${email} → plan=${newPlan}, expires=${expiresAt}`);
+            res.status(200).end('ok');
+            return;
+        } catch (e) {
+            console.error('[kiwify-webhook] error:', e.message);
+            res.status(500).end('internal error');
+            return;
+        }
+    }
+
+    // CORS (only for non-webhook routes)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') { res.status(204).end(); return; }
-
-    const url = req.url.split('?')[0];
 
     if (req.method === 'POST' && url === '/api/chat') {
         const { history, message, systemOverride, userId } = await readBody(req);
