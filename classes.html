@@ -179,39 +179,59 @@ const LESSONS = [
 
 const grid = document.getElementById('lessons-grid');
 
+// Plan gating: lessons 1-5 are FREE, lessons 6+ require Pro or Super.
+const FREE_LESSON_LIMIT = 5;
+function isPro() { return typeof Store !== 'undefined' && (Store.state?.planType === 'pro' || Store.state?.planType === 'super'); }
+
 LESSONS.forEach((l, i) => {
+  const requiresPro = l.n > FREE_LESSON_LIMIT;
+  const locked = requiresPro && !isPro();
   const card = document.createElement('div');
-  card.className = `card-in lesson-card rounded-2xl border-2 overflow-hidden ${l.available
+  card.className = `card-in lesson-card rounded-2xl border-2 overflow-hidden ${l.available && !locked
     ? 'available-card border-violet-300 cursor-pointer'
-    : 'bg-slate-50 border-slate-200 opacity-75'}`;
+    : locked
+      ? 'border-amber-200 bg-amber-50/40 cursor-pointer'
+      : 'bg-slate-50 border-slate-200 opacity-75'}`;
   card.style.animationDelay = `${i * 0.04}s`;
 
-  if (l.available) {
+  if (locked) {
+    card.onclick = () => showPaywall(l);
+  } else if (l.available) {
     card.onclick = () => window.location.href = l.href;
   }
 
+  const badge = locked
+    ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">🔒 Pro</div>`
+    : l.available
+      ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Available</div>`
+      : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-100 text-slate-400 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Soon</div>`;
+
   card.innerHTML = `
     <div class="relative p-5">
-      ${l.available ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Available</div>` : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-100 text-slate-400 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Soon</div>`}
+      ${badge}
 
       <!-- Number + Emoji -->
       <div class="flex items-start gap-3 mb-3 pr-16">
-        <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl ${l.available ? 'bg-violet-100' : 'bg-slate-100'}">
+        <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl ${locked ? 'bg-orange-100 grayscale-[40%]' : l.available ? 'bg-violet-100' : 'bg-slate-100'}">
           ${l.emoji}
         </div>
         <div>
-          <div class="text-[10px] font-black tracking-widest uppercase ${l.available ? 'text-violet-400' : 'text-slate-400'}">Aula ${String(l.n).padStart(2,'0')}</div>
-          <h3 class="font-black text-sm text-navy leading-snug mt-0.5">${l.title}</h3>
+          <div class="text-[10px] font-black tracking-widest uppercase ${locked ? 'text-orange-500' : l.available ? 'text-violet-400' : 'text-slate-400'}">Aula ${String(l.n).padStart(2,'0')}</div>
+          <h3 class="font-black text-sm text-navy leading-snug mt-0.5 ${locked ? 'opacity-80' : ''}">${l.title}</h3>
         </div>
       </div>
 
       <!-- Tags -->
       <div class="flex flex-wrap gap-1 mb-4">
-        ${l.tags.map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${l.available ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-500'}">${t}</span>`).join('')}
+        ${l.tags.map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${locked ? 'bg-orange-100/60 text-orange-700' : l.available ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-500'}">${t}</span>`).join('')}
       </div>
 
       <!-- Button -->
-      ${l.available
+      ${locked
+        ? `<button class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+            🔓 Desbloquear com Pro
+           </button>`
+        : l.available
         ? `<button class="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
             Start Lesson →
            </button>`
@@ -220,12 +240,12 @@ LESSONS.forEach((l, i) => {
            </button>`
       }
     </div>
-    ${l.available ? '<div class="h-1 shine bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400"></div>' : ''}
+    ${l.available && !locked ? '<div class="h-1 shine bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400"></div>' : ''}
   `;
 
   // Completion indicator
   try {
-    const state = Store.get();
+    const state = Store.state || Store.get?.();
     if (state && state.completedLessons && state.completedLessons.includes(l.n)) {
       const check = document.createElement('div');
       check.className = 'absolute top-3 left-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-emerald-300/50 z-10';
@@ -235,6 +255,55 @@ LESSONS.forEach((l, i) => {
   } catch(e) {}
 
   grid.appendChild(card);
+});
+
+// ── Paywall modal ───────────────────────────────────────────────────────────
+function showPaywall(lesson) {
+  let modal = document.getElementById('paywall-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'paywall-modal';
+    modal.className = 'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm';
+    modal.innerHTML = `
+      <div class="bg-white rounded-3xl max-w-md w-full p-7 shadow-2xl relative">
+        <button onclick="document.getElementById('paywall-modal').remove()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 font-black">×</button>
+        <div class="text-5xl mb-3 text-center">🔒</div>
+        <h2 class="font-black text-2xl text-navy text-center mb-2">Aula bloqueada</h2>
+        <p class="text-center text-slate-600 mb-1">
+          <strong>Aula ${String(lesson.n).padStart(2,'0')} — ${lesson.title}</strong>
+        </p>
+        <p class="text-center text-slate-500 text-sm mb-6">
+          As 5 primeiras aulas são grátis. Para acessar todas as 44 aulas + francês + Yara AI Chat + Music Lab, assine o plano <strong class="text-orange-500">Pro</strong>.
+        </p>
+        <div class="space-y-2.5">
+          <a href="https://pay.kiwify.com.br/7HYhJgk" target="_blank"
+             class="block w-full text-center bg-gradient-to-r from-orange-500 to-orange-400 text-white font-black py-3.5 rounded-2xl shadow-lg shadow-orange-500/25 hover:scale-[1.02] active:scale-95 transition-all">
+            ⚡ Assinar Pro · R$47/mês
+          </a>
+          <a href="https://pay.kiwify.com.br/lIBOlgZ" target="_blank"
+             class="block w-full text-center bg-gradient-to-r from-teal-500 to-teal-400 text-white font-black py-3 rounded-2xl shadow hover:scale-[1.02] active:scale-95 transition-all text-sm">
+            🚀 Ou Super · R$97/mês (com voz da Yara)
+          </a>
+          <a href="landing.html#pricing"
+             class="block w-full text-center text-slate-500 font-bold py-2 hover:text-navy transition-colors text-sm">
+            Comparar planos →
+          </a>
+        </div>
+        <p class="text-center text-slate-400 text-xs mt-4">Pagamento via Kiwify · Cartão ou Pix · Cancele quando quiser</p>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+  }
+}
+
+// Re-render grid when plan changes (e.g. after returning from Kiwify checkout with ?refresh=1)
+document.addEventListener('planChanged', () => {
+  grid.innerHTML = '';
+  LESSONS.forEach((l, i) => {
+    // Trigger re-render by re-running the loop logic
+    // (simpler approach: location.reload())
+  });
+  location.reload();
 });
 </script>
 </body>
