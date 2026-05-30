@@ -32,6 +32,43 @@ const Store = {
             this.save();
         }
         this.checkDailyReset();
+        // Background-sync plan from /api/me (fresh after Kiwify webhook updates it).
+        // Forces immediate sync if URL has ?refresh=1 (used after Kiwify checkout return).
+        const forceSync = new URLSearchParams(window.location.search).get('refresh') === '1';
+        this.syncPlanFromServer({ force: forceSync });
+    },
+
+    // ── Plan helpers ───────────────────────────────────────────────────────────
+    isPro()   { return this.state.planType === 'pro' || this.state.planType === 'super'; },
+    isSuper() { return this.state.planType === 'super'; },
+    isFree()  { return !this.isPro(); },
+
+    // Fetch /api/me and merge plan/planExpiresAt into state.
+    // Throttled: only re-fetches if last sync > 1h ago (unless force=true).
+    async syncPlanFromServer({ force = false } = {}) {
+        try {
+            const session = JSON.parse(localStorage.getItem('capySession') || 'null');
+            if (!session || !session.id || session.id === 'guest') return;
+            const lastSync = parseInt(localStorage.getItem('capyPlanSyncedAt') || '0', 10);
+            const oneHour = 60 * 60 * 1000;
+            if (!force && (Date.now() - lastSync) < oneHour) return;
+            const r = await fetch('/api/me?userId=' + encodeURIComponent(session.id));
+            if (!r.ok) return;
+            const data = await r.json();
+            const before = this.state.planType;
+            this.state.planType = data.plan || 'free';
+            this.state.planExpiresAt = data.planExpiresAt || null;
+            this.state.kiwifySubscriptionId = data.kiwifySubscriptionId || null;
+            // Update AI usage limit to match new plan
+            this.state.aiUsageLimit = data.plan === 'super' ? 500 : data.plan === 'pro' ? 200 : 3;
+            localStorage.setItem('capyPlanSyncedAt', String(Date.now()));
+            this.save();
+            if (before !== this.state.planType) {
+                document.dispatchEvent(new CustomEvent('planChanged', {
+                    detail: { from: before, to: this.state.planType }
+                }));
+            }
+        } catch (e) { /* offline / api down — keep cached plan */ }
     },
 
     checkDailyReset() {

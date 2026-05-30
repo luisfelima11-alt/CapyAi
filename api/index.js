@@ -264,6 +264,31 @@ module.exports = async (req, res) => {
         res.status(200).json({ success: true }); return;
     }
 
+    // GET /api/me?userId=xxx → returns subscription/plan info
+    // Used by frontend to gate Pro/Super features in real time.
+    // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
+    if (req.method === 'GET' && url.startsWith('/api/me')) {
+        const qs = new URL(req.url, 'http://localhost').searchParams;
+        const userId = qs.get('userId');
+        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
+        const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=plan,plan_expires_at,kiwify_subscription_id`);
+        const row = rows?.[0] || {};
+        // Default to 'free' if no row or plan column doesn't exist yet
+        const plan = (row.plan === 'pro' || row.plan === 'super') ? row.plan : 'free';
+        // If plan expired, downgrade to free
+        let effectivePlan = plan;
+        if (plan !== 'free' && row.plan_expires_at) {
+            if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
+        }
+        res.setHeader('Cache-Control', 'private, max-age=60');
+        res.status(200).json({
+            plan: effectivePlan,
+            planExpiresAt: row.plan_expires_at || null,
+            kiwifySubscriptionId: row.kiwify_subscription_id || null,
+        });
+        return;
+    }
+
     // ── YouTube Learning Lab ───────────────────────────────────────────────────
 
     // POST /api/youtube → fetch transcript + generate learning content
