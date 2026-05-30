@@ -111,7 +111,7 @@
       </a>
       <a href="#pricing"
          class="bg-white/8 border border-white/20 text-white font-bold px-8 py-4 rounded-2xl text-lg hover:bg-white/15 transition-all">
-        Ver plano Plus ✨
+        Ver planos ⚡
       </a>
     </div>
 
@@ -235,15 +235,19 @@
     <!-- Table -->
     <div class="bg-white/4 rounded-3xl border border-white/10 overflow-hidden">
       <!-- Header -->
-      <div class="grid grid-cols-3 bg-white/5 border-b border-white/10 px-6 py-4">
+      <div class="grid grid-cols-4 bg-white/5 border-b border-white/10 px-6 py-4 gap-2">
         <div class="text-slate-400 font-black text-sm uppercase tracking-wider">Funcionalidade</div>
         <div class="text-center">
-          <p class="font-black text-white text-sm">Grátis</p>
+          <p class="font-black text-white text-sm">Grátis 🌱</p>
           <p class="text-slate-500 text-xs">R$0/mês</p>
         </div>
         <div class="text-center">
-          <p class="font-black grad-pink text-sm">Plus ✨</p>
-          <p class="text-pink-400/70 text-xs">R$19,90/mês</p>
+          <p class="font-black text-[#FF9F1C] text-sm">Pro ⚡</p>
+          <p class="text-[#FF9F1C]/70 text-xs">R$47/mês</p>
+        </div>
+        <div class="text-center">
+          <p class="font-black text-[#2EC4B6] text-sm">Super 🚀</p>
+          <p class="text-[#2EC4B6]/70 text-xs">R$97/mês</p>
         </div>
       </div>
 
@@ -469,28 +473,32 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ── Feature table ──────────────────────────────────────────────────
 const FEATURES = [
-  { label:'Capítulo 1 (5 lições)',       free:true,  plus:true  },
-  { label:'Mini-aulas (4 por lição)',     free:'20',  plus:'96'  },
-  { label:'Capítulos 2–4 (19 lições)',   free:false, plus:true  },
-  { label:'Conversas com Yara / dia',    free:'3',   plus:'15'  },
-  { label:'XP, Streaks e Badges',        free:true,  plus:true  },
-  { label:'Progresso e histórico',       free:true,  plus:true  },
-  { label:'Criador de lições',           free:false, plus:true  },
-  { label:'AI Quick-Fill (criador)',      free:false, plus:true  },
-  { label:'Suporte prioritário',         free:false, plus:true  },
+  { label:'Aulas de inglês',              free:'5',   pro:'44',   super:'44'  },
+  { label:'Aulas de francês',             free:false, pro:'7',    super:'7'   },
+  { label:'Voz Nova TTS (OpenAI)',        free:false, pro:true,   super:true  },
+  { label:'Yara AI Chat',                 free:false, pro:true,   super:true  },
+  { label:'Plano de estudos personalizado', free:false, pro:true, super:true  },
+  { label:'Music Lab',                    free:false, pro:true,   super:true  },
+  { label:'Homework tracker',             free:false, pro:true,   super:true  },
+  { label:'Conversa de voz com Yara AI',  free:false, pro:false,  super:'10 min/mês' },
+  { label:'Correção de pronúncia',        free:false, pro:false,  super:true  },
+  { label:'Relatório semanal por e-mail', free:false, pro:false,  super:true  },
+  { label:'Acesso prioritário a novidades', free:false, pro:false, super:true },
+  { label:'Suporte VIP por WhatsApp',     free:false, pro:false,  super:true  },
 ];
 
-function renderCheck(val) {
-  if (val === true)  return `<span class="check font-black text-xl">✓</span>`;
-  if (val === false) return `<span class="cross text-xl">✗</span>`;
-  return `<span class="text-white font-black text-sm">${val}</span>`;
+function renderCheck(val, color) {
+  if (val === true)  return `<span class="font-black text-xl" style="color:${color}">✓</span>`;
+  if (val === false) return `<span class="text-xl text-slate-600">✗</span>`;
+  return `<span class="text-white font-black text-xs">${val}</span>`;
 }
 
 const rowsHtml = FEATURES.map((f, i) => `
-  <div class="grid grid-cols-3 px-6 py-4 border-b border-white/5 ${i % 2 === 0 ? '' : 'bg-white/2'} hover:bg-white/4 transition-all">
+  <div class="grid grid-cols-4 px-6 py-4 border-b border-white/5 gap-2 ${i % 2 === 0 ? '' : 'bg-white/2'} hover:bg-white/4 transition-all">
     <div class="text-slate-300 text-sm font-bold flex items-center">${f.label}</div>
-    <div class="flex items-center justify-center">${renderCheck(f.free)}</div>
-    <div class="flex items-center justify-center">${renderCheck(f.plus)}</div>
+    <div class="flex items-center justify-center">${renderCheck(f.free, '#94a3b8')}</div>
+    <div class="flex items-center justify-center">${renderCheck(f.pro, '#FF9F1C')}</div>
+    <div class="flex items-center justify-center">${renderCheck(f.super, '#2EC4B6')}</div>
   </div>`).join('');
 document.getElementById('feature-rows').innerHTML = rowsHtml;
 
