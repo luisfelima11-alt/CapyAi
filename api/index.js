@@ -45,6 +45,102 @@ function readRawBody(req) {
     });
 }
 
+// ── Rate limiting ───────────────────────────────────────────────────────────
+const RATE_LIMITS = {
+    chat:         { free:  20, pro: 200, super: 500 },  // per day
+    music:        { free:   3, pro:  50, super: 150 },
+    'study-plan': { free:   2, pro:  20, super:  60 },
+    personalize:  { free:   2, pro:  30, super:  90 },
+    youtube:      { free:   3, pro:  30, super:  90 },
+    lyrics:       { free:  10, pro: 100, super: 300 },
+    tts:          { free: 200, pro:1000, super:2000 },
+};
+
+async function getUserPlan(userId) {
+    if (!userId) return 'free';
+    const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=plan,plan_expires_at`);
+    const row = rows?.[0];
+    if (!row) return 'free';
+    if (row.plan_expires_at && new Date(row.plan_expires_at) < new Date()) return 'free';
+    return (row.plan === 'pro' || row.plan === 'super') ? row.plan : 'free';
+}
+
+async function checkRateLimit(req, key, userId) {
+    const today = new Date().toISOString().slice(0, 10);
+    const ipHdr = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+    const ip = String(ipHdr).split(',')[0].trim();
+    const identity = userId ? ('u:' + userId) : ('ip:' + ip);
+    const bucket = `${identity}|${key}|${today}`;
+    const plan = await getUserPlan(userId);
+    const limit = (RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10;
+
+    const existing = await sb(`/rate_limit_log?bucket=eq.${encodeURIComponent(bucket)}&select=count`);
+    const used = existing?.[0]?.count || 0;
+    if (used >= limit) {
+        const now = new Date();
+        const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+        return { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used, plan };
+    }
+    await sb('/rate_limit_log', {
+        method: 'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ bucket, count: used + 1, updated_at: new Date().toISOString() }),
+    });
+    return { ok: true, limit, used: used + 1, plan };
+}
+
+function rateLimitedResponse(res, info) {
+    res.setHeader('Retry-After', String(info.retryAfter));
+    res.setHeader('X-RateLimit-Limit', String(info.limit));
+    res.setHeader('X-RateLimit-Used',  String(info.used));
+    res.setHeader('X-RateLimit-Plan',  info.plan);
+    res.status(429).json({
+        error: 'rate_limited',
+        message: info.plan === 'free'
+            ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
+            : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
+        limit: info.limit, used: info.used, plan: info.plan, retryAfter: info.retryAfter,
+    });
+}
+
+// ── In-memory metrics (per cold start) + debounced persist ──────────────────
+const _metrics = {}; // key: 'YYYY-MM-DD|/api/chat' → { requests, errors, total_ms }
+let _persistTimer = null;
+function bumpMetrics(url, status, ms) {
+    const day = new Date().toISOString().slice(0, 10);
+    const key = `${day}|${url}`;
+    const m = _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+    m.requests++;
+    if (status >= 500) m.errors++;
+    m.total_ms += ms;
+    if (!_persistTimer) _persistTimer = setTimeout(persistMetrics, 60000);
+}
+async function persistMetrics() {
+    _persistTimer = null;
+    const snapshot = Object.entries(_metrics).map(([k, v]) => {
+        const [day, endpoint] = k.split('|');
+        return { day, endpoint, ...v };
+    });
+    for (const row of snapshot) {
+        try {
+            const existing = await sb(`/api_metrics_daily?day=eq.${row.day}&endpoint=eq.${encodeURIComponent(row.endpoint)}&select=*`);
+            const prev = existing?.[0];
+            const merged = prev ? {
+                day: row.day, endpoint: row.endpoint,
+                requests: prev.requests + row.requests,
+                errors:   prev.errors   + row.errors,
+                total_ms: prev.total_ms + row.total_ms,
+            } : row;
+            await sb('/api_metrics_daily', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify(merged),
+            });
+        } catch (e) { /* swallow — metrics are best-effort */ }
+    }
+    Object.keys(_metrics).forEach(k => delete _metrics[k]);
+}
+
 // ── Supabase ──────────────────────────────────────────────────────────────────
 const SB_URL = process.env.SUPABASE_URL;   // https://xxxx.supabase.co
 const SB_KEY = process.env.SUPABASE_KEY;   // service role key (server-side only)
@@ -123,6 +219,24 @@ function readBody(req) {
 
 module.exports = async (req, res) => {
     const url = req.url.split('?')[0];
+
+    // ── Logging middleware ────────────────────────────────────────────────
+    const _t0 = Date.now();
+    const _origStatus = res.status.bind(res);
+    let _capturedStatus = 200;
+    res.status = (code) => { _capturedStatus = code; return _origStatus(code); };
+    const _logRequest = () => {
+        if (res._capyLogged) return; res._capyLogged = true;
+        const ms = Date.now() - _t0;
+        let user = '-';
+        try {
+            user = (new URL(req.url, 'http://localhost').searchParams.get('userId') || '').slice(0, 12) || '-';
+        } catch (e) {}
+        console.log(`[${new Date().toISOString()}] ${req.method} ${url} ${_capturedStatus} ${ms}ms user=${user}`);
+        if (url.startsWith('/api/')) bumpMetrics(url, _capturedStatus, ms);
+    };
+    res.on('finish', _logRequest);
+    res.on('close',  _logRequest);
 
     // ── Kiwify webhook (must be handled BEFORE CORS / body parsing) ──────────
     // POST /api/kiwify-webhook?signature=<hmac>
@@ -245,6 +359,8 @@ module.exports = async (req, res) => {
 
     if (req.method === 'POST' && url === '/api/chat') {
         const { history, message, systemOverride, userId } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'chat', userId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         // Fetch user profile to personalize Yara's responses
         let profileContext = '';
@@ -452,6 +568,8 @@ module.exports = async (req, res) => {
     // POST /api/youtube → fetch transcript + generate learning content
     if (req.method === 'POST' && url === '/api/youtube') {
         const { videoUrl, userId } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'youtube', userId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         // Extract video ID
         const videoIdMatch = (videoUrl || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
@@ -640,6 +758,8 @@ Rules:
     // POST /api/personalize → AI mini-lesson themed around user interests
     if (req.method === 'POST' && url === '/api/personalize') {
         const { topic, vocab, userId } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'personalize', userId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         let interests = 'various topics', detail = '', level = 'beginner';
         if (userId && userId !== 'guest') {
@@ -708,6 +828,8 @@ Rules:
     // POST /api/study-plan → AI-generated weekly study schedule
     if (req.method === 'POST' && url === '/api/study-plan') {
         const { userId, currentLesson, dailyGoalMinutes, interests, level } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'study-plan', userId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         const mins    = dailyGoalMinutes || 10;
         const intList = (interests || []).join(', ') || 'various';
@@ -777,6 +899,8 @@ Rules:
     // POST /api/music → analyze song lyrics, generate vocab/chunks/quiz
     if (req.method === 'POST' && url === '/api/music') {
         const { lyrics, artist, userId } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'music', userId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         let level = 'beginner';
         if (userId && userId !== 'guest') {
@@ -884,6 +1008,9 @@ Rules:
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
         const voice = qs2.get('voice') || 'nova';
         const lang  = qs2.get('lang')  || 'en';
+        const _ttsUserId = qs2.get('userId');
+        const _rl = await checkRateLimit(req, 'tts', _ttsUserId);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         // French: use gpt-4o-mini-tts with native accent instructions
         const isFr = lang === 'fr';
@@ -962,6 +1089,27 @@ Rules:
         if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
         const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc${filter}`);
         res.status(200).json(rows || []); return;
+    }
+
+    // ── Admin stats ───────────────────────────────────────────────────────────
+    // GET /api/admin/stats?key=TEACHER_KEY → metrics for /admin.html dashboard
+    if (req.method === 'GET' && url === '/api/admin/stats') {
+        const qs = new URL(req.url, 'http://localhost').searchParams;
+        const key = qs.get('key') || '';
+        const expected = process.env.TEACHER_KEY || 'capyteacher2025';
+        if (key !== expected) { res.status(403).json({ error: 'forbidden' }); return; }
+        const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+        const metrics = await sb(`/api_metrics_daily?day=gte.${since}&order=day.desc,requests.desc&limit=200`);
+        res.setHeader('Cache-Control', 'no-cache');
+        res.status(200).json({
+            metrics: metrics || [],
+            live: Object.entries(_metrics).map(([k, v]) => {
+                const [day, endpoint] = k.split('|');
+                return { day, endpoint, ...v, note: 'in-memory (not yet persisted)' };
+            }),
+            generatedAt: new Date().toISOString(),
+        });
+        return;
     }
 
     res.status(404).json({ error: 'Not found' });
