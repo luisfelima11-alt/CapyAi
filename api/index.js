@@ -2,24 +2,37 @@ const https = require('https');
 const crypto = require('crypto');
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
-// Product IDs come from Kiwify webhook payload (`Product.product_id`).
-// Filled in by reading the Kiwify dashboard "Configurações" → "Geral" of each product.
-// While unset, we infer plan from the product NAME ("Pro" or "Super") as fallback.
+// Product IDs from Kiwify dashboard URLs (.../products/edit/<UUID>).
 const KIWIFY_PRODUCT_TO_PLAN = {
-    // Pro: monthly + annual
-    // 'PRODUCT_ID_PRO_MONTHLY': 'pro',
-    // 'PRODUCT_ID_PRO_ANNUAL': 'pro',
-    // Super: monthly + annual
-    // 'PRODUCT_ID_SUPER_MONTHLY': 'super',
-    // 'PRODUCT_ID_SUPER_ANNUAL': 'super',
+    '5c8bbc90-5b7c-11f1-a87a-a7adeb9e851c': 'pro',    // Capy English Pro
+    'fcdb2a50-5b7c-11f1-9be1-a7a72938329d': 'super',  // Capy English Super
 };
 
 function planFromKiwifyProduct({ productId, productName }) {
     if (productId && KIWIFY_PRODUCT_TO_PLAN[productId]) return KIWIFY_PRODUCT_TO_PLAN[productId];
+    // Fallback: regex on product NAME ("Pro" or "Super") — covers test webhooks
+    // and any future product whose ID isn't yet mapped.
     const name = (productName || '').toLowerCase();
     if (name.includes('super')) return 'super';
     if (name.includes('pro'))   return 'pro';
     return null;
+}
+
+// Detect if subscription is annual (so we set plan_expires_at +400d vs +35d).
+// Kiwify payload exposes plan info in Subscription.plan or similar field.
+function isAnnualSubscription(payload) {
+    const candidates = [
+        payload.Subscription?.plan?.name,
+        payload.Subscription?.plan?.frequency,
+        payload.Subscription?.charge_frequency,
+        payload.Subscription?.frequency,
+        payload.Subscription?.next_payment,  // long gap suggests annual
+        payload.subscription_plan,
+        payload.plan_name,
+        payload.charge_frequency,
+        payload.Product?.product_name, // last-resort: name "Anual" in some setups
+    ].filter(Boolean).map(String).join(' ').toLowerCase();
+    return /anual|annual|yearly|ano(?!\w)|year/i.test(candidates);
 }
 
 // Read raw body (needed for HMAC validation — readBody() parses JSON).
@@ -159,7 +172,7 @@ module.exports = async (req, res) => {
                 newPlan = planFromKiwifyProduct({ productId, productName });
                 if (!newPlan) { res.status(400).end('unknown product'); return; }
                 // Set expiry: +35 days monthly buffer, +400 days annual buffer (loose; refreshed on renewal)
-                const isAnnual = /anual|annual|ano|year/i.test(productName);
+                const isAnnual = isAnnualSubscription(payload);
                 expiresAt = new Date(Date.now() + (isAnnual ? 400 : 35) * 24 * 60 * 60 * 1000).toISOString();
             } else if (event.includes('canceled') || event.includes('expired') || event.includes('refunded') || event.includes('chargeback')) {
                 newPlan = 'free';
