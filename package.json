@@ -1,5 +1,13 @@
 {
   "name": "capy-yara-adventures",
   "version": "1.0.0",
-  "description": "Capy Yara Adventures — local dev: node scripts/dev-server.js"
+  "description": "Capy Yara Adventures — local dev: node scripts/dev-server.js",
+  "scripts": {
+    "audit": "node scripts/audit-lessons.js",
+    "audit:local": "node scripts/audit-lessons.js --base=http://localhost:8765",
+    "audit:debug": "node scripts/audit-lessons.js --headless=false"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
+  }
 }
