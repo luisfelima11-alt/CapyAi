@@ -57,6 +57,9 @@ const Components = {
                                 <p class="font-black text-sm text-navy dark:text-white truncate">${sessionName}</p>
                                 <p class="text-xs text-slate-400 mt-0.5">Explorer</p>
                             </div>` : ''}
+                            <a href="account.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
+                                <span class="material-symbols-outlined text-orange-500 text-base" style="font-variation-settings:'FILL' 1;">workspace_premium</span> Minha conta
+                            </a>
                             <a href="progress.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
                                 <span class="material-symbols-outlined text-emerald-500 text-base" style="font-variation-settings:'FILL' 1;">military_tech</span> My Progress
                             </a>
