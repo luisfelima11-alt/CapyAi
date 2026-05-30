@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Capy English · Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f',brand:{orange:'#FF9F1C',teal:'#2EC4B6'}},fontFamily:{sans:['Plus Jakarta Sans','sans-serif'],mono:['JetBrains Mono','monospace']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease both}
+.skel{background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200% 100%;animation:skel 1.4s linear infinite;border-radius:.5rem;color:transparent}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<header class="bg-navy text-white">
+  <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#FF9F1C]" style="font-variation-settings:'FILL' 1">admin_panel_settings</span>
+      <h1 class="font-black text-xl">Capy English · Admin</h1>
+    </div>
+    <div class="hidden md:flex items-center gap-3 text-xs text-white/60">
+      <span>🔒 Uso interno apenas</span>
+      <span>•</span>
+      <span class="mono">admin@capyenglish.com.br</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-5 py-6">
+
+  <!-- ── Auth bar ────────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-5 flex flex-col md:flex-row md:items-center gap-3 fade-up">
+    <label class="font-black text-sm text-navy whitespace-nowrap">Admin key:</label>
+    <input id="admin-key" type="password" placeholder="Sua TEACHER_KEY..." class="mono text-sm flex-1 px-3 py-2 rounded-lg border-2 border-slate-200 focus:border-[#FF9F1C] outline-none">
+    <button id="load-btn" class="bg-[#FF9F1C] hover:bg-[#e8901a] text-white font-black px-5 py-2 rounded-lg text-sm transition-colors">Carregar stats</button>
+    <button id="refresh-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black px-4 py-2 rounded-lg text-sm transition-colors" disabled>↻ Refresh</button>
+    <label class="flex items-center gap-2 text-xs text-slate-500 font-bold">
+      <input id="auto-refresh" type="checkbox" class="w-4 h-4"> Auto-refresh 60s
+    </label>
+  </div>
+
+  <!-- ── Status banner ───────────────────────────────────────────────────── -->
+  <div id="status" class="hidden mb-5 rounded-2xl p-4 fade-up font-bold text-sm"></div>
+
+  <!-- ── Stat cards (today) ──────────────────────────────────────────────── -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-up">
+      <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Requests hoje</p>
+      <p id="stat-requests" class="font-black text-3xl text-navy mono">—</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-up" style="animation-delay:.05s">
+      <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Erros 5xx</p>
+      <p id="stat-errors" class="font-black text-3xl mono">—</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-up" style="animation-delay:.1s">
+      <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Latência média</p>
+      <p id="stat-latency" class="font-black text-3xl text-navy mono">—</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 fade-up" style="animation-delay:.15s">
+      <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">Endpoints ativos</p>
+      <p id="stat-endpoints" class="font-black text-3xl text-navy mono">—</p>
+    </div>
+  </div>
+
+  <!-- ── Chart ───────────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 mb-6 fade-up" style="animation-delay:.2s">
+    <div class="flex items-center justify-between mb-3">
+      <p class="font-black text-sm uppercase tracking-widest text-slate-500">Requests por endpoint (últimos 7 dias)</p>
+      <span id="chart-empty" class="hidden text-xs text-slate-400 font-bold italic">Sem dados ainda</span>
+    </div>
+    <div class="h-64"><canvas id="reqs-chart"></canvas></div>
+  </div>
+
+  <!-- ── Table ───────────────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-6 fade-up" style="animation-delay:.25s">
+    <div class="p-5 border-b border-slate-100">
+      <p class="font-black text-sm uppercase tracking-widest text-slate-500">Tabela detalhada</p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-black tracking-widest">
+          <tr>
+            <th class="text-left px-5 py-3 cursor-pointer" onclick="sortBy('day')">Dia ↕</th>
+            <th class="text-left px-5 py-3 cursor-pointer" onclick="sortBy('endpoint')">Endpoint ↕</th>
+            <th class="text-right px-5 py-3 cursor-pointer" onclick="sortBy('requests')">Reqs ↕</th>
+            <th class="text-right px-5 py-3 cursor-pointer" onclick="sortBy('errors')">Erros ↕</th>
+            <th class="text-right px-5 py-3 cursor-pointer" onclick="sortBy('avg')">Avg ms ↕</th>
+          </tr>
+        </thead>
+        <tbody id="rows" class="font-bold"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Live (in-memory) ────────────────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl border border-amber-200 bg-amber-50/40 p-5 mb-6 fade-up" style="animation-delay:.3s">
+    <p class="font-black text-sm uppercase tracking-widest text-amber-700 mb-2">⚡ Live (ainda não persistido)</p>
+    <p class="text-xs text-amber-600/70 mb-3">Contadores em memória da função serverless atual. Persistidos a cada 60s.</p>
+    <pre id="live-pre" class="mono text-xs text-slate-700 bg-white rounded-lg p-3 overflow-x-auto">—</pre>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <div class="text-center text-xs text-slate-400 font-bold mt-6">
+    <p>Generated at <span id="gen-at" class="mono">—</span></p>
+    <p class="mt-1">Capy English · admin v1</p>
+  </div>
+
+</main>
+
+<script>
+const KEY_STORAGE = 'capyAdminKey';
+const keyInput = document.getElementById('admin-key');
+const statusEl = document.getElementById('status');
+const refreshBtn = document.getElementById('refresh-btn');
+const autoRefreshCb = document.getElementById('auto-refresh');
+
+keyInput.value = localStorage.getItem(KEY_STORAGE) || '';
+
+let data = null;
+let chart = null;
+let sortKey = 'day';
+let sortDir = -1; // desc by default
+
+function showStatus(text, kind) {
+  statusEl.textContent = text;
+  statusEl.className = 'mb-5 rounded-2xl p-4 fade-up font-bold text-sm ' +
+    (kind === 'error' ? 'bg-red-50 text-red-700 border border-red-200' :
+     kind === 'warn'  ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                       'bg-emerald-50 text-emerald-700 border border-emerald-200');
+}
+
+async function loadStats() {
+  const key = keyInput.value.trim();
+  if (!key) { showStatus('Digite a admin key acima.', 'warn'); return; }
+  localStorage.setItem(KEY_STORAGE, key);
+  try {
+    const r = await fetch('/api/admin/stats?key=' + encodeURIComponent(key));
+    if (r.status === 403) { showStatus('Key inválida. Verifique TEACHER_KEY.', 'error'); refreshBtn.disabled = true; return; }
+    if (r.status === 404) { showStatus('Endpoint /api/admin/stats não encontrado. Backend ainda não deployado.', 'warn'); refreshBtn.disabled = true; return; }
+    if (!r.ok) { showStatus('Erro ' + r.status + ' ao buscar stats.', 'error'); return; }
+    data = await r.json();
+    statusEl.classList.add('hidden');
+    refreshBtn.disabled = false;
+    render();
+  } catch (e) {
+    showStatus('Falha de rede: ' + e.message, 'error');
+  }
+}
+
+function render() {
+  if (!data) return;
+  const today = new Date().toISOString().slice(0,10);
+  const todayRows = (data.metrics || []).filter(m => m.day === today);
+  const todayReqs = todayRows.reduce((s,m) => s + (m.requests || 0), 0);
+  const todayErrs = todayRows.reduce((s,m) => s + (m.errors || 0), 0);
+  const todayMs   = todayRows.reduce((s,m) => s + (m.total_ms || 0), 0);
+  const avgLat    = todayReqs ? Math.round(todayMs / todayReqs) : 0;
+  const endpointsToday = new Set(todayRows.map(m => m.endpoint)).size;
+
+  document.getElementById('stat-requests').textContent  = todayReqs.toLocaleString('pt-BR');
+  const errEl = document.getElementById('stat-errors');
+  errEl.textContent = todayErrs.toLocaleString('pt-BR');
+  errEl.className = 'font-black text-3xl mono ' + (todayErrs > 0 ? 'text-red-500' : 'text-emerald-500');
+  document.getElementById('stat-latency').textContent   = avgLat + ' ms';
+  document.getElementById('stat-endpoints').textContent = String(endpointsToday);
+
+  renderChart();
+  renderTable();
+  renderLive();
+  document.getElementById('gen-at').textContent = data.generatedAt || '—';
+}
+
+function renderChart() {
+  const metrics = data.metrics || [];
+  const empty = metrics.length === 0;
+  document.getElementById('chart-empty').classList.toggle('hidden', !empty);
+  if (empty) {
+    if (chart) { chart.destroy(); chart = null; }
+    return;
+  }
+  // Aggregate by endpoint over the 7-day window
+  const byEp = {};
+  metrics.forEach(m => {
+    if (!byEp[m.endpoint]) byEp[m.endpoint] = { ok: 0, err: 0 };
+    byEp[m.endpoint].ok  += (m.requests || 0) - (m.errors || 0);
+    byEp[m.endpoint].err += (m.errors || 0);
+  });
+  const endpoints = Object.keys(byEp).sort((a,b) => (byEp[b].ok + byEp[b].err) - (byEp[a].ok + byEp[a].err));
+  const okData = endpoints.map(e => byEp[e].ok);
+  const errData = endpoints.map(e => byEp[e].err);
+
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('reqs-chart'), {
+    type: 'bar',
+    data: {
+      labels: endpoints,
+      datasets: [
+        { label: 'OK', data: okData, backgroundColor: '#2EC4B6', borderRadius: 4 },
+        { label: 'Errors', data: errData, backgroundColor: '#ef4444', borderRadius: 4 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+      plugins: { legend: { position: 'top' } },
+    },
+  });
+}
+
+function sortBy(k) {
+  if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = -1; }
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('rows');
+  const rows = (data.metrics || []).map(m => ({
+    ...m, avg: m.requests ? Math.round(m.total_ms / m.requests) : 0
+  }));
+  rows.sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'number') return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 italic">Sem dados ainda — esperando primeiras requests</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(r => `
+    <tr class="border-b border-slate-100 hover:bg-slate-50">
+      <td class="px-5 py-2.5 mono text-xs text-slate-500">${r.day}</td>
+      <td class="px-5 py-2.5 mono text-xs"><span class="bg-slate-100 px-2 py-0.5 rounded">${r.endpoint}</span></td>
+      <td class="px-5 py-2.5 text-right mono">${r.requests.toLocaleString('pt-BR')}</td>
+      <td class="px-5 py-2.5 text-right mono ${r.errors > 0 ? 'text-red-500 font-black' : 'text-slate-400'}">${r.errors}</td>
+      <td class="px-5 py-2.5 text-right mono text-slate-600">${r.avg}</td>
+    </tr>
+  `).join('');
+}
+
+function renderLive() {
+  const live = data.live || [];
+  document.getElementById('live-pre').textContent = live.length
+    ? JSON.stringify(live, null, 2)
+    : '— nenhum contador em memória no momento (cold start ou tudo foi persistido) —';
+}
+
+document.getElementById('load-btn').addEventListener('click', loadStats);
+refreshBtn.addEventListener('click', loadStats);
+keyInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadStats(); });
+
+// Auto-refresh
+let _autoTimer = null;
+autoRefreshCb.addEventListener('change', e => {
+  if (e.target.checked) {
+    _autoTimer = setInterval(loadStats, 60000);
+    showStatus('Auto-refresh ativado (a cada 60s).', 'success');
+  } else {
+    clearInterval(_autoTimer);
+    _autoTimer = null;
+    statusEl.classList.add('hidden');
+  }
+});
+
+// Auto-load if key was already saved
+if (keyInput.value.trim()) loadStats();
+</script>
+
+</body>
+</html>
