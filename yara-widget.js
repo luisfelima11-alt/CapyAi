@@ -11,6 +11,36 @@
   const LESSON_NUM   = cfg.lessonNum   || '';
   const IS_FR        = LANG === 'fr';
 
+  // ── Plan gating ──────────────────────────────────────────────────────────────
+  // Yara AI Chat is a Pro/Super feature. Free users see a locked stub that
+  // opens the paywall. We re-evaluate on every FAB click in case the plan
+  // sync from /api/me happens after the widget initially loads.
+  function isPro() {
+    try { return typeof Store !== 'undefined' && (Store.state?.planType === 'pro' || Store.state?.planType === 'super'); }
+    catch (e) { return false; }
+  }
+
+  function showYaraPaywall() {
+    if (document.getElementById('yw-paywall')) return;
+    const modal = document.createElement('div');
+    modal.id = 'yw-paywall';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);font-family:system-ui,sans-serif;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:24px;max-width:400px;width:100%;padding:28px;box-shadow:0 12px 60px rgba(0,0,0,.3);position:relative;">
+        <button onclick="document.getElementById('yw-paywall').remove()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#f1f5f9;border:none;color:#64748b;font-weight:900;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;font-size:56px;margin-bottom:8px;">🔒</div>
+        <h2 style="text-align:center;font-weight:900;font-size:22px;color:#0f172a;margin:0 0 6px;">Yara AI Chat é Pro!</h2>
+        <p style="text-align:center;color:#64748b;font-size:14px;margin:0 0 22px;line-height:1.5;">
+          Converse com a Yara sobre qualquer aula, peça correções, exemplos e explicações em português. Disponível no plano <strong style="color:#f59e0b;">Pro</strong>.
+        </p>
+        <a href="https://pay.kiwify.com.br/7HYhJgk" target="_blank" style="display:block;text-align:center;background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;font-weight:900;padding:14px;border-radius:16px;text-decoration:none;margin-bottom:8px;box-shadow:0 6px 24px rgba(249,115,22,.35);">⚡ Assinar Pro · R$47/mês</a>
+        <a href="https://pay.kiwify.com.br/lIBOlgZ" target="_blank" style="display:block;text-align:center;background:linear-gradient(135deg,#14b8a6,#2dd4bf);color:#fff;font-weight:900;padding:12px;border-radius:16px;text-decoration:none;font-size:14px;">🚀 Ou Super · R$97/mês</a>
+        <p style="text-align:center;color:#94a3b8;font-size:11px;margin:12px 0 0;">Pagamento via Kiwify · Cartão ou Pix · Cancele quando quiser</p>
+      </div>`;
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+  }
+
   // ── Styles ──────────────────────────────────────────────────────────────────
   const style = document.createElement('style');
   style.textContent = `
@@ -254,6 +284,11 @@ Rules:
   // ── Events ───────────────────────────────────────────────────────────────────
   fab.addEventListener('click', e => {
     e.stopPropagation();
+    // Gate: free users see paywall instead of the chat panel
+    if (!isPro()) {
+      showYaraPaywall();
+      return;
+    }
     isOpen = !isOpen;
     panel.classList.toggle('open', isOpen);
     if (isOpen && msgArea.children.length === 0) {
