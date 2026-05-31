@@ -54,6 +54,7 @@ const RATE_LIMITS = {
     youtube:      { free:   3, pro:  30, super:  90 },
     lyrics:       { free:  10, pro: 100, super: 300 },
     tts:          { free: 200, pro:1000, super:2000 },
+    'magic-link': { free:   5, pro:  10, super:  20 },  // per IP/email per day (abuse prevention)
 };
 
 async function getUserPlan(userId) {
@@ -536,6 +537,130 @@ module.exports = async (req, res) => {
             body: JSON.stringify({ id: userId, ...profileData, updated_at: new Date().toISOString() }),
         });
         res.status(200).json({ success: true }); return;
+    }
+
+    // ── Magic Link Auth ──────────────────────────────────────────────────────
+    // POST /api/auth/magic-link  body: { email }
+    // Creates account if needed, generates 15-min token, sends email via Resend.
+    if (req.method === 'POST' && url === '/api/auth/magic-link') {
+        const { email } = await readBody(req);
+        const norm = (email || '').toLowerCase().trim();
+        if (!norm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) {
+            res.status(400).json({ error: 'invalid_email' }); return;
+        }
+        // Abuse limit (5/day for free, scales with plan)
+        const _rl = await checkRateLimit(req, 'magic-link', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+
+        // Find or create account
+        const found = await sb(`/accounts?email=eq.${encodeURIComponent(norm)}&select=id,name`);
+        let userId   = found?.[0]?.id;
+        let userName = found?.[0]?.name;
+        let isNewUser = false;
+        if (!userId) {
+            userId   = 'magic-' + crypto.randomBytes(8).toString('hex');
+            userName = norm.split('@')[0];
+            await sb('/accounts', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({
+                    id: userId, name: userName, email: norm,
+                    password: '__magic__' + crypto.randomBytes(8).toString('hex'),
+                    avatar: '🐾', pending_setup: false,
+                    created_at: new Date().toISOString(),
+                }),
+            });
+            isNewUser = true;
+        }
+
+        // Generate token (15-min expiry)
+        const token = crypto.randomBytes(24).toString('base64url');
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        await sb('/magic_link_tokens', {
+            method: 'POST',
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ token, email: norm, user_id: userId, expires_at: expiresAt }),
+        });
+
+        const verifyUrl = `https://www.capyenglish.com.br/verify.html?token=${token}`;
+        const RESEND_KEY = process.env.RESEND_API_KEY;
+
+        // Dev mode: no Resend key → return link directly so testing still works
+        if (!RESEND_KEY) {
+            console.warn('[magic-link] RESEND_API_KEY not set — returning link in response (dev mode)');
+            res.status(200).json({
+                ok: true, isNewUser, devLink: verifyUrl,
+                warning: 'RESEND_API_KEY not configured. Showing link directly (dev mode only).',
+            });
+            return;
+        }
+
+        // Send email via Resend
+        const html = `<!DOCTYPE html><html lang="pt-BR"><body style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;margin:0">
+<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,.06)">
+  <div style="text-align:center;font-size:48px;margin-bottom:8px">🦫</div>
+  <h1 style="color:#001f3f;font-weight:900;font-size:22px;margin:0 0 12px;text-align:center">Seu link de acesso</h1>
+  <p style="font-size:15px;color:#475569;line-height:1.6;text-align:center;margin:0 0 24px">Olá, <strong>${userName}</strong>! Clique no botão abaixo para entrar na Capy English. O link expira em 15 minutos.</p>
+  <div style="text-align:center;margin:28px 0">
+    <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg,#FF9F1C,#fb923c);color:#fff;font-weight:900;padding:15px 32px;border-radius:14px;text-decoration:none;font-size:15px;box-shadow:0 8px 20px rgba(249,115,22,.3)">⚡ Entrar agora</a>
+  </div>
+  <p style="font-size:12px;color:#94a3b8;line-height:1.6;text-align:center;margin:24px 0 8px">Se você não solicitou esse link, é só ignorar.</p>
+  <p style="font-size:11px;color:#cbd5e1;line-height:1.5;text-align:center;word-break:break-all;margin:0">Ou copie e cole no navegador:<br>${verifyUrl}</p>
+  <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0">
+  <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">Capy English · Aprenda inglês com a Yara 🌿</p>
+</div></body></html>`;
+
+        try {
+            const sendRes = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + RESEND_KEY,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    from: process.env.EMAIL_FROM || 'Capy English <onboarding@resend.dev>',
+                    to: [norm],
+                    subject: '🦫 Seu link de acesso · Capy English',
+                    html,
+                }),
+            });
+            if (!sendRes.ok) {
+                const errText = await sendRes.text();
+                console.error('[magic-link] Resend error:', sendRes.status, errText.slice(0, 300));
+                res.status(502).json({ error: 'email_send_failed', details: errText.slice(0, 200) });
+                return;
+            }
+            console.log(`[magic-link] ✅ sent to ${norm} (new=${isNewUser})`);
+            res.status(200).json({ ok: true, isNewUser });
+            return;
+        } catch (e) {
+            console.error('[magic-link] fetch error:', e.message);
+            res.status(500).json({ error: 'email_send_failed', details: e.message });
+            return;
+        }
+    }
+
+    // POST /api/auth/verify  body: { token }
+    // Validates token, marks used, returns user object for client to save as session.
+    if (req.method === 'POST' && url === '/api/auth/verify') {
+        const { token } = await readBody(req);
+        if (!token) { res.status(400).json({ error: 'token_required' }); return; }
+        const rows = await sb(`/magic_link_tokens?token=eq.${encodeURIComponent(token)}&select=email,user_id,expires_at,used_at`);
+        const row = rows?.[0];
+        if (!row) { res.status(404).json({ error: 'token_not_found' }); return; }
+        if (row.used_at) { res.status(410).json({ error: 'token_used' }); return; }
+        if (new Date(row.expires_at) < new Date()) { res.status(410).json({ error: 'token_expired' }); return; }
+        // Mark used
+        await sb(`/magic_link_tokens?token=eq.${encodeURIComponent(token)}`, {
+            method: 'PATCH',
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ used_at: new Date().toISOString() }),
+        });
+        // Fetch user for session
+        const acc = await sb(`/accounts?id=eq.${encodeURIComponent(row.user_id)}&select=id,name,email,avatar`);
+        if (!acc?.[0]) { res.status(404).json({ error: 'user_not_found' }); return; }
+        res.status(200).json({ ok: true, user: acc[0] });
+        return;
     }
 
     // GET /api/me?userId=xxx → returns subscription/plan info

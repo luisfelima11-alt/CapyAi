@@ -267,7 +267,7 @@ tailwind.config = {
           <div class="flex flex-col gap-1.5">
             <div class="flex justify-between items-center">
               <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Password</label>
-              <button onclick="forgotPassword()" class="font-label text-xs text-pink-brand hover:underline">Forgot password?</button>
+              <button onclick="forgotPassword()" class="font-label text-xs text-pink-brand hover:underline">Entrar com link no e-mail</button>
             </div>
             <div class="input-wrap">
               <span class="material-symbols-outlined icon text-slate-400 text-xl">lock</span>
@@ -662,21 +662,81 @@ function handleGuest() {
   showSuccess('Explorer', false);
 }
 
-/* ── forgot password ────────────────────────────── */
-function forgotPassword() {
+/* ── forgot password → magic link via email ────────────────────── */
+async function forgotPassword() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) {
-    showError('login-email', 'Enter your email above first.');
+    showError('login-email', 'Digite seu e-mail acima primeiro.');
     return;
   }
-  // In a real app this would send an email. Here we just show a friendly message.
-  const users = JSON.parse(localStorage.getItem('capyUsers') || '[]');
-  const user  = users.find(u => u.email === email.toLowerCase());
-  if (!user) {
-    showError('login-email', 'No account found with that email.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showError('login-email', 'E-mail inválido.');
     return;
   }
-  alert(`🌿 Password recovery:\n\nIn a real app, a reset link would be sent to ${email}.\n\nFor this prototype, check your browser's localStorage.`);
+
+  // Build the modal once
+  let modal = document.getElementById('magic-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'magic-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);font-family:Plus Jakarta Sans,sans-serif';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:24px;max-width:420px;width:100%;padding:32px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.25);position:relative">
+      <div style="font-size:48px;margin-bottom:12px">🦫</div>
+      <h2 style="font-weight:900;font-size:20px;color:#001f3f;margin:0 0 8px">Enviando link de acesso...</h2>
+      <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 20px">Para <strong>${email}</strong></p>
+      <div style="width:40px;height:40px;border:4px solid #fde68a;border-top-color:#FF9F1C;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>`;
+
+  try {
+    const r = await fetch('/api/auth/magic-link', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await r.json();
+
+    if (r.status === 429) {
+      modal.innerHTML = renderMagicModal('⏳', 'Muitas tentativas', 'Aguarde algumas horas e tente de novo. (Limite anti-spam.)');
+      return;
+    }
+    if (!r.ok && !data.devLink) {
+      modal.innerHTML = renderMagicModal('⚠️', 'Não conseguimos enviar', data.details || 'Tente novamente em alguns minutos.');
+      return;
+    }
+
+    // Dev mode (no Resend key set yet): show the link directly
+    if (data.devLink) {
+      modal.innerHTML = `
+        <div style="background:#fff;border-radius:24px;max-width:520px;width:100%;padding:32px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.25)">
+          <button onclick="document.getElementById('magic-modal').remove()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#f1f5f9;border:none;font-weight:900;cursor:pointer">×</button>
+          <div style="font-size:48px;margin-bottom:12px">⚙️</div>
+          <h2 style="font-weight:900;font-size:18px;color:#001f3f;margin:0 0 8px">Modo dev — sem e-mail configurado</h2>
+          <p style="color:#94a3b8;font-size:12px;line-height:1.5;margin:0 0 16px">${data.warning || ''}</p>
+          <p style="color:#475569;font-size:13px;margin:0 0 16px">Clique no link abaixo pra entrar:</p>
+          <a href="${data.devLink}" style="display:block;background:#FF9F1C;color:#fff;font-weight:900;padding:14px;border-radius:14px;text-decoration:none;word-break:break-all;font-size:13px">${data.devLink}</a>
+        </div>`;
+      return;
+    }
+
+    // Normal: success
+    modal.innerHTML = renderMagicModal('✉️', 'Check seu e-mail!', `Mandamos um link de acesso pra <strong>${email}</strong>. O link expira em 15 minutos.<br><br><span style="font-size:12px;color:#94a3b8">Não chegou? Verifique a caixa de spam.</span>`);
+  } catch (e) {
+    modal.innerHTML = renderMagicModal('⚠️', 'Falha de rede', 'Verifique sua conexão e tente novamente.');
+  }
+
+  function renderMagicModal(emoji, title, msg) {
+    return `
+      <div style="background:#fff;border-radius:24px;max-width:420px;width:100%;padding:32px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.25);position:relative">
+        <button onclick="document.getElementById('magic-modal').remove()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#f1f5f9;border:none;font-weight:900;cursor:pointer">×</button>
+        <div style="font-size:56px;margin-bottom:12px">${emoji}</div>
+        <h2 style="font-weight:900;font-size:20px;color:#001f3f;margin:0 0 10px">${title}</h2>
+        <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0">${msg}</p>
+      </div>`;
+  }
 }
 
 /* ── particles ──────────────────────────────────── */
