@@ -149,7 +149,11 @@ async function loadStats() {
     if (r.status === 404) { showStatus('Endpoint /api/admin/stats não encontrado. Backend ainda não deployado.', 'warn'); refreshBtn.disabled = true; return; }
     if (!r.ok) { showStatus('Erro ' + r.status + ' ao buscar stats.', 'error'); return; }
     data = await r.json();
-    statusEl.classList.add('hidden');
+    if (data.warning) {
+      showStatus('⚠️ ' + data.warning, 'warn');
+    } else {
+      statusEl.classList.add('hidden');
+    }
     refreshBtn.disabled = false;
     render();
   } catch (e) {
@@ -160,7 +164,7 @@ async function loadStats() {
 function render() {
   if (!data) return;
   const today = new Date().toISOString().slice(0,10);
-  const todayRows = (data.metrics || []).filter(m => m.day === today);
+  const todayRows = (Array.isArray(data.metrics) ? data.metrics : []).filter(m => m.day === today);
   const todayReqs = todayRows.reduce((s,m) => s + (m.requests || 0), 0);
   const todayErrs = todayRows.reduce((s,m) => s + (m.errors || 0), 0);
   const todayMs   = todayRows.reduce((s,m) => s + (m.total_ms || 0), 0);
@@ -224,7 +228,7 @@ function sortBy(k) {
 
 function renderTable() {
   const tbody = document.getElementById('rows');
-  const rows = (data.metrics || []).map(m => ({
+  const rows = (Array.isArray(data.metrics) ? data.metrics : []).map(m => ({
     ...m, avg: m.requests ? Math.round(m.total_ms / m.requests) : 0
   }));
   rows.sort((a, b) => {
@@ -248,7 +252,7 @@ function renderTable() {
 }
 
 function renderLive() {
-  const live = data.live || [];
+  const live = Array.isArray(data.live) ? data.live : [];
   document.getElementById('live-pre').textContent = live.length
     ? JSON.stringify(live, null, 2)
     : '— nenhum contador em memória no momento (cold start ou tudo foi persistido) —';

@@ -1099,15 +1099,21 @@ Rules:
         const expected = process.env.TEACHER_KEY || 'capyteacher2025';
         if (key !== expected) { res.status(403).json({ error: 'forbidden' }); return; }
         const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-        const metrics = await sb(`/api_metrics_daily?day=gte.${since}&order=day.desc,requests.desc&limit=200`);
+        const metricsRaw = await sb(`/api_metrics_daily?day=gte.${since}&order=day.desc,requests.desc&limit=200`);
+        // sb() returns Supabase error object if table doesn't exist — coerce to array
+        const metrics = Array.isArray(metricsRaw) ? metricsRaw : [];
+        const tableMissing = metricsRaw && !Array.isArray(metricsRaw);
         res.setHeader('Cache-Control', 'no-cache');
         res.status(200).json({
-            metrics: metrics || [],
+            metrics,
             live: Object.entries(_metrics).map(([k, v]) => {
                 const [day, endpoint] = k.split('|');
                 return { day, endpoint, ...v, note: 'in-memory (not yet persisted)' };
             }),
             generatedAt: new Date().toISOString(),
+            warning: tableMissing
+                ? 'api_metrics_daily table not found in Supabase — run the SQL migration to start persisting metrics.'
+                : undefined,
         });
         return;
     }
