@@ -3,6 +3,7 @@ const Store = {
         xp: 0,
         streakActive: false,
         streakDays: 0,
+        lastStreakDate: '',
         badges: [],
         completedActivities: {},
         completedLessons: [],
@@ -75,8 +76,19 @@ const Store = {
         const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
         if (this.state.lastQuestDate !== today) {
             this.state.completedActivities = {};   // clear ALL daily activities
-            this.state.streakActive = false;
             this.state.aiUsageToday = 0;           // reset AI counter daily
+
+            // Break the streak if the last active day wasn't yesterday
+            if (this.state.lastStreakDate) {
+                const last = new Date(this.state.lastStreakDate + 'T00:00:00Z');
+                const cur  = new Date(today + 'T00:00:00Z');
+                const diffDays = Math.round((cur - last) / 86400000);
+                if (diffDays > 1) {
+                    this.state.streakDays = 0;
+                }
+            }
+
+            this.state.streakActive = false;
             this.state.lastQuestDate = today;
             this.save();
         }
@@ -126,6 +138,7 @@ const Store = {
         if (!this.state.streakActive) {
             this.state.streakActive = true;
             this.state.streakDays += 1;
+            this.state.lastStreakDate = new Date().toISOString().slice(0, 10);
             this.save();
             this.checkStreakMilestone();
         }
