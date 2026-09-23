@@ -916,6 +916,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            'Your FIRST reply sets the scene: say where you both are (the check-in desk, the hotel reception...) and speak as the other person there.',
             'Anchor every reply in a real travel situation, and give them the exact phrase they would need there.',
         ],
     },
@@ -938,6 +939,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            'Your FIRST reply sets the scene: say where you both are (a meeting, a call with a client...) and speak as the colleague or client.',
             'Anchor every reply in a real work situation, and show the polite professional wording when theirs would sound blunt.',
         ],
     },
@@ -967,6 +969,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            'Your FIRST reply sets the scene: say where you both are (the field, the workshop, a supplier visit...) and speak as the technician or supplier.',
             'Anchor every reply in a real field situation, and give them the exact phrase they would need there.',
         ],
     },
@@ -983,6 +986,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            'Open the call already in role: introduce yourself as the patient and say what brought you in. Never ask how THEY feel — you are not the doctor.',
             'Stay in the patient role. Answer their questions, get confused sometimes, and let them lead the consultation.',
             'Keep every reply under two short sentences. If they ask something you would not understand as a patient, say so plainly.',
             'Only step out of the role if they clearly ask for help, and go straight back in afterwards.',
@@ -991,7 +995,8 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
-            'Play the patient here too: answer in plain everyday words, never clinical ones, and let them practise asking.',
+            'Your FIRST reply opens the scene: introduce yourself as the patient who just walked in and say, in plain words, what brought you. Do not ask how THEY feel — you are not the doctor.',
+            'After that, stay the patient: answer in plain everyday words, never clinical ones, and let them lead the consultation.',
         ],
     },
 
@@ -1099,6 +1104,14 @@ const PERSONAS = {
 function personaDe(id) {
     const chave = String(id == null ? '' : id);
     return Object.prototype.hasOwnProperty.call(PERSONAS, chave) ? PERSONAS[chave] : PERSONAS.conversa;
+}
+
+// Codigo de idioma -> o nome que vai no prompt. UMA regra so, para os dois
+// canais. A voz tinha a dela inline e o chat escrito tinha 'English' CRAVADO:
+// a capivara francesa falava frances na ligacao e respondia em ingles por
+// escrito. Pego em producao, na primeira verificacao da Fase 5.
+function idiomaDe(lang) {
+    return lang === 'fr' ? 'French' : lang === 'tr' ? 'Turkish' : 'English';
 }
 
 // O que o navegador pode ver. NUNCA os prompts — o menu so precisa do rotulo,
@@ -1657,7 +1670,7 @@ module.exports = async (req, res) => {
         const persona = personaDe(body.cenario);
         const requestedLang = String(persona.lang || body.lang || 'en').toLowerCase();
         const lang = ['en', 'fr', 'tr'].includes(requestedLang) ? requestedLang : 'en';
-        const idioma = lang === 'fr' ? 'French' : lang === 'tr' ? 'Turkish' : 'English';
+        const idioma = idiomaDe(lang);
         const tema = textoParaPrompt(body.lessonTopic, 120);
         // Passa pelo mesmo textoParaPrompt do resto: `String(v).slice()` deixava
         // o aluno escrever qualquer coisa direto dentro das instrucoes do modelo.
@@ -2169,7 +2182,7 @@ module.exports = async (req, res) => {
             nivelDoAluno(userId),
             palavrasFracas(userId, 8),
         ]);
-        const ctxChat = { idioma: 'English', faixa: faixaChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
+        const ctxChat = { idioma: idiomaDe(persona.lang), faixa: faixaChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
         const systemPrompt = [...persona.nucleo(ctxChat), ...persona.texto_modo(ctxChat)]
             .filter(Boolean).join(' ') + profileContext;
         const messages = [{ role: 'system', content: systemPrompt }];

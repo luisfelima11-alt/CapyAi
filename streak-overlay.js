@@ -44,8 +44,8 @@
         el.innerHTML = `
           <div id="streak-card">
             <video id="streak-video" class="streak-media" loop muted playsinline
-                   poster="yara-streak.png" style="display:none"></video>
-            <img id="streak-img" class="streak-media" src="yara-streak.png" alt="Yara celebrando"/>
+                   poster="yara-streak.jpg" style="display:none"></video>
+            <img id="streak-img" class="streak-media" src="yara-streak.jpg" alt="Yara celebrando"/>
             <div id="streak-info">
               <div id="streak-days">🔥 0</div>
               <div id="streak-msg"></div>
@@ -54,16 +54,27 @@
           </div>`;
         document.body.appendChild(el);
 
-        // Usa o vídeo se ele existir no servidor; senão fica na imagem
-        fetch('yara-streak.mp4', { method: 'HEAD' }).then(r => {
-            if (r.ok) {
-                const vid = document.getElementById('streak-video');
-                vid.src = 'yara-streak.mp4';
-                vid.style.display = 'block';
-                document.getElementById('streak-img').style.display = 'none';
-                hasVideo = true;
-            }
-        }).catch(() => {});
+        // Vídeo só quando a conexão aguenta. Ele tem 5,7MB, e este overlay
+        // aparece para aluno que quase sempre está no celular, muitas vezes no
+        // 4G. A imagem (72KB) já entrega a comemoração; o vídeo é o luxo.
+        //
+        // `saveData` é o aluno pedindo explicitamente para economizar dados —
+        // respeitar isso não é opcional. `effectiveType` cobre 2g/3g, onde
+        // baixar 5,7MB deixaria o cartão parado esperando.
+        const rede = navigator.connection || {};
+        const conexaoBoa = !rede.saveData && !/(^|-)2g$|^3g$/.test(rede.effectiveType || '');
+
+        if (conexaoBoa) {
+            fetch('yara-streak.mp4', { method: 'HEAD' }).then(r => {
+                if (r.ok) {
+                    const vid = document.getElementById('streak-video');
+                    vid.src = 'yara-streak.mp4';
+                    vid.style.display = 'block';
+                    document.getElementById('streak-img').style.display = 'none';
+                    hasVideo = true;
+                }
+            }).catch(() => {});
+        }
 
         el.querySelector('#streak-btn').addEventListener('click', () => {
             el.classList.remove('show');

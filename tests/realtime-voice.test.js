@@ -252,7 +252,7 @@ function tokenHarness(options = {}) {
     const j = source.indexOf('function sanitizeStoredJson(', i);
     assert.ok(i > 0 && j > i, 'persona catalogue must remain present');
     return new Function(source.slice(i, j) +
-      '\nreturn { PERSONAS, personaDe, personasPublicas, aberturaTexto, REGRAS_TEXTO };')();
+      '\nreturn { PERSONAS, personaDe, personasPublicas, aberturaTexto, REGRAS_TEXTO, idiomaDe };')();
   })();
   const context = vm.createContext({
     ...catalogoPersonas,
@@ -645,7 +645,7 @@ function catalogoReal() {
   const j = fonte.indexOf('function sanitizeStoredJson(', i);
   assert.ok(i > 0 && j > i, 'persona catalogue must remain present');
   return new Function(fonte.slice(i, j) +
-    '\nreturn { PERSONAS, personaDe, personasPublicas, aberturaTexto, REGRAS_TEXTO };')();
+    '\nreturn { PERSONAS, personaDe, personasPublicas, aberturaTexto, REGRAS_TEXTO, idiomaDe };')();
 }
 
 test('cada persona de conversa tem voz, rotulo e os dois modos de canal', () => {
@@ -795,4 +795,87 @@ test("todo cartao de IA nas paginas de curso abre uma persona que existe", () =>
     }
   }
   assert.ok(cartoes >= 7, "sumiram cartoes de IA das paginas de curso (achei " + cartoes + ")");
+});
+
+// ── O chat de texto ─────────────────────────────────────────────────────────
+// Ate a Fase 5 so a VOZ tinha teste. O chat escrito tinha idioma 'English'
+// cravado e ninguem viu: a capivara francesa falava frances na ligacao e
+// respondia em ingles por escrito. Foi pego em producao. Este harness recorta
+// a rota /api/chat do mesmo jeito que o tokenHarness recorta a de voz, e
+// captura as mensagens exatas que iriam para o modelo.
+function chatHarness(options = {}) {
+  const Security = require('../api/security');
+  const source = fs.readFileSync(path.join(ROOT, 'api/index.js'), 'utf8');
+  const start = source.indexOf("    if (req.method === 'POST' && url === '/api/chat') {");
+  const end = source.indexOf("    if (req.method === 'POST' && url === '/api/quiz') {", start);
+  assert.ok(start > 0 && end > start, 'a rota /api/chat precisa continuar existindo');
+  const enviadas = [];
+  const req = { method: 'POST', headers: {} };
+  const res = { statusCode: 200, body: null, status(c) { this.statusCode = c; return this; }, json(b) { this.body = b; return this; } };
+  const context = vm.createContext({
+    ...catalogoReal(),
+    console: { error() {} }, Buffer, Number, JSON, String, Array, Promise, Object, req, res,
+    url: '/api/chat',
+    readBody: async () => options.body || {},
+    assertOrigin: () => {}, parseCookies: () => ({}), COOKIE_NAMES: Security.COOKIE_NAMES,
+    resolveSecurityIdentity: async () => {}, HttpError: Security.HttpError,
+    checkRateLimit: async () => ({ ok: true }), rateLimitedResponse: () => {},
+    sbUser: async () => [],
+    nivelDoAluno: async () => options.nivel || 'desconhecido',
+    palavrasFracas: async () => options.fracas || [],
+    callOpenAI: mensagens => { enviadas.push(mensagens); },
+  });
+  vm.runInContext('async function runRoute() {\n' + source.slice(start, end) + '\n}', context);
+  return { run: () => context.runRoute(), enviadas, res };
+}
+const sistemaDo = h => (h.enviadas[0] || []).find(m => m.role === 'system').content;
+
+test('no chat escrito a capivara do curso de idioma tambem fala o idioma do curso', async () => {
+  for (const [persona, nome] of [['francais', 'French'], ['turkish', 'Turkish']]) {
+    const h = chatHarness({ body: { message: 'Hello', persona } });
+    await h.run();
+    const s = sistemaDo(h);
+    assert.match(s, new RegExp(nome), persona + ' no texto nao fala ' + nome);
+    assert.doesNotMatch(s, /teaches English/, persona + ' no texto ainda ensina ingles');
+  }
+  const h = chatHarness({ body: { message: 'Hello', persona: 'agro' } });
+  await h.run();
+  assert.match(sistemaDo(h), /English/);
+});
+
+test('no chat escrito a capivara da saude abre a cena como PACIENTE', async () => {
+  const h = chatHarness({ body: { message: 'Hello! Can we practise?', persona: 'med' } });
+  await h.run();
+  const s = sistemaDo(h);
+  assert.match(s, /FIRST reply opens the scene/);
+  assert.match(s, /you are not the doctor/);
+});
+
+test('o chat escrito usa a persona pedida e cai na Yara padrao com id invalido', async () => {
+  const viagem = chatHarness({ body: { message: 'Hi', persona: 'travel' } });
+  await viagem.run();
+  assert.match(sistemaDo(viagem), /survive a trip/);
+  for (const lixo of ['__proto__', 'constructor', 'naoexiste', undefined]) {
+    const h = chatHarness({ body: { message: 'Hi', persona: lixo } });
+    await h.run();
+    assert.match(sistemaDo(h), /warm and patient capybara/, String(lixo) + ' tinha que cair na Yara padrao');
+  }
+});
+
+test('o chat escrito entrega o historico ao modelo, com o papel certo de cada fala', async () => {
+  // A regressao que a Fase 1 corrigiu: `m.text` em vez de `content` jogava fora
+  // TODO o historico, e 'assistant' voltava rotulado como 'user'.
+  const h = chatHarness({ body: { message: 'What is my name?', history: [
+    { role: 'user', content: 'My name is Ana.' },
+    { role: 'assistant', content: 'Nice to meet you, Ana!' },
+    { role: 'model', text: 'formato antigo do lessons.html' },
+  ] } });
+  await h.run();
+  // JSON de ida e volta: o array nasceu dentro do sandbox vm, com outro
+  // Array.prototype, e o deepEqual estrito recusa mesmo com o mesmo conteudo.
+  const m = JSON.parse(JSON.stringify(h.enviadas[0]));
+  assert.deepEqual(m.slice(1).map(x => x.role), ['user', 'assistant', 'assistant', 'user']);
+  assert.equal(m[1].content, 'My name is Ana.');
+  assert.equal(m[2].content, 'Nice to meet you, Ana!');
+  assert.equal(m[3].content, 'formato antigo do lessons.html');
 });
