@@ -1,0 +1,142 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Aulas online — Capy English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0b1020; }
+
+  /* A arte é sempre 1080 de largura. A ALTURA muda entre feed e stories, e a
+     diferença é absorvida pelo espaço entre os blocos (justify-content), não
+     por escala — assim a tipografia tem o mesmo peso nos dois formatos. */
+  .arte {
+    width: 1080px;
+    background:
+      radial-gradient(900px 620px at 82% -6%,  rgba(236,72,153,.30), transparent 62%),
+      radial-gradient(760px 560px at 6% 102%, rgba(46,196,182,.24), transparent 60%),
+      #001f3f;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: #fff; position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .arte.feed    { height: 1350px; padding: 84px 76px 72px; }
+  /* Stories: o Instagram cobre ~250px embaixo com a barra de resposta e ~160px
+     em cima com o cabeçalho do perfil. O respiro grande nas pontas não é
+     desperdício — é zona de segurança. O miolo é que precisa preencher. */
+  .arte.stories { height: 1920px; padding: 210px 76px 300px; }
+  .arte.stories h1 { font-size: 104px; }
+  .arte.stories .sub { font-size: 32px; margin-top: 26px; }
+  .arte.stories .num { font-size: 122px; }
+  .arte.stories .horas { font-size: 28px; }
+  .arte.stories .item span { font-size: 37px; }
+  .arte.stories .check { width: 54px; height: 54px; font-size: 28px; }
+
+  /* Textura de pontos: impede que o fundo chapado vire faixas de banding
+     quando o Instagram recomprime. */
+  .arte::after {
+    content: ''; position: absolute; inset: 0; opacity: .05; pointer-events: none;
+    background-image: radial-gradient(#fff 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .topo { display: flex; align-items: center; gap: 14px; }
+  .marca { font-size: 21px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.62); }
+  .pata { font-size: 30px; }
+
+  h1 { margin-top: 26px; font-size: 88px; font-weight: 800; line-height: .98; letter-spacing: -.035em; }
+  h1 em { font-style: normal; color: #FF9F1C; }
+  .sub { margin-top: 20px; font-size: 28px; font-weight: 500; color: rgba(255,255,255,.68); line-height: 1.4; }
+
+  .planos { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 56px; }
+  .arte.stories .planos { margin-top: 88px; }
+
+  .plano {
+    background: rgba(255,255,255,.055);
+    border: 2px solid rgba(255,255,255,.12);
+    border-radius: 34px; padding: 40px 34px 36px;
+    position: relative;
+  }
+  /* O de 8h é o que se quer vender: cor da marca e selo. */
+  .plano.destaque {
+    background: linear-gradient(165deg, rgba(236,72,153,.20), rgba(236,72,153,.05));
+    border-color: rgba(236,72,153,.65);
+    box-shadow: 0 26px 70px rgba(236,72,153,.24);
+  }
+  .selo {
+    position: absolute; top: -17px; left: 34px;
+    background: #ec4899; color: #fff;
+    font-size: 15px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    padding: 9px 18px; border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(236,72,153,.45);
+  }
+  .horas { font-size: 25px; font-weight: 800; color: #2EC4B6; letter-spacing: .04em; }
+  .plano.destaque .horas { color: #FFC4DE; }
+  .valor { margin-top: 14px; display: flex; align-items: baseline; gap: 8px; }
+  .cifrao { font-size: 36px; font-weight: 700; color: rgba(255,255,255,.72); }
+  .num { font-size: 106px; font-weight: 800; letter-spacing: -.05em; line-height: .9; }
+  .mes { margin-top: 12px; font-size: 21px; font-weight: 500; color: rgba(255,255,255,.55); }
+
+  /* `margin` automática em cima E embaixo: o espaço que sobra se divide nos
+     dois lados em vez de cair todo no rodapé. Sem isso a arte fica pesada em
+     cima com um vazio embaixo — que foi como saiu na primeira exportação. */
+  .beneficios {
+    margin-top: auto; margin-bottom: auto;
+    display: flex; flex-direction: column; gap: 30px;
+    padding: 8px 0;
+  }
+  .arte.stories .beneficios { gap: 44px; }
+  .item { display: flex; align-items: center; gap: 20px; }
+  .check {
+    width: 46px; height: 46px; flex: none; border-radius: 50%;
+    background: rgba(46,196,182,.16); border: 2px solid rgba(46,196,182,.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: #2EC4B6;
+  }
+  .item span { font-size: 31px; font-weight: 700; letter-spacing: -.01em; }
+
+  .rodape {
+    margin-top: auto; padding-top: 40px;
+    border-top: 2px solid rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site { font-size: 27px; font-weight: 800; color: #FF9F1C; letter-spacing: -.01em; }
+  .prof { font-size: 21px; font-weight: 500; color: rgba(255,255,255,.5); text-align: right; line-height: 1.35; }
+</style>
+
+<!-- O exportador troca a classe (feed / stories) antes de tirar o print. -->
+<div class="arte feed" id="arte">
+  <div class="topo">
+    <span class="pata">🐾</span>
+    <span class="marca">Capy English</span>
+  </div>
+
+  <h1>Aulas <em>online</em><br>com professor</h1>
+  <p class="sub">Aula particular ao vivo, no seu ritmo —<br>com a plataforma inteira incluída.</p>
+
+  <div class="planos">
+    <div class="plano destaque">
+      <div class="selo">Mais escolhido</div>
+      <div class="horas">8 horas / mês</div>
+      <div class="valor"><span class="cifrao">R$</span><span class="num">399</span></div>
+      <div class="mes">por mês</div>
+    </div>
+    <div class="plano">
+      <div class="horas">4 horas / mês</div>
+      <div class="valor"><span class="cifrao">R$</span><span class="num">289</span></div>
+      <div class="mes">por mês</div>
+    </div>
+  </div>
+
+  <div class="beneficios">
+    <div class="item"><div class="check">✓</div><span>60 minutos por aula</span></div>
+    <div class="item"><div class="check">✓</div><span>Curso 100% personalizado</span></div>
+    <div class="item"><div class="check">✓</div><span>Acesso completo ao site e à IA da Capy</span></div>
+  </div>
+
+  <div class="rodape">
+    <div class="site">capyenglish.com.br</div>
+    <div class="prof">Professor Luis Felipe<br>aulas particulares de inglês</div>
+  </div>
+</div>

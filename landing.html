@@ -6,120 +6,132 @@
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yara's Forest — Aprenda Inglês Conversando</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Capy English — Aprenda inglês conversando com a Yara</title>
+  <meta name="description" content="Trilha diária gamificada, 6 cursos e conversação real com a Yara, sua professora de IA que corrige até suas redações. Comece de graça, sem cartão."/>
+  <link rel="canonical" href="https://www.capyenglish.com.br/"/>
+
+  <!-- Card de compartilhamento (WhatsApp, Instagram, X). og-cover.png?v=og2 é gerado
+       por scripts/make-og.js — regere de lá se a marca mudar. -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Capy English"/>
+  <meta property="og:locale" content="pt_BR"/>
+  <meta property="og:url" content="https://www.capyenglish.com.br/"/>
+  <meta property="og:title" content="Capy English — Aprenda inglês conversando com a Yara"/>
+  <meta property="og:description" content="Trilha diária gamificada, 6 cursos e conversação real com uma professora de IA. Comece de graça, sem cartão."/>
+  <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+  <meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Capy English — Aprenda inglês conversando com a Yara"/>
+  <meta name="twitter:description" content="Trilha diária gamificada, 6 cursos e conversação real com uma professora de IA. Comece de graça, sem cartão."/>
+  <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+
+  <!-- Dados estruturados: ajudam o Google a entender que isto é uma escola de
+       idiomas com cursos e planos, e habilitam resultados enriquecidos. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "EducationalOrganization",
+        "@id": "https://www.capyenglish.com.br/#org",
+        "name": "Capy English",
+        "url": "https://www.capyenglish.com.br/",
+        "logo": "https://www.capyenglish.com.br/icon-512.png",
+        "image": "https://www.capyenglish.com.br/og-cover.png?v=og2",
+        "description": "Plataforma brasileira de inglês com trilha diária gamificada, 6 cursos e conversação com uma professora de IA.",
+        "areaServed": "BR",
+        "inLanguage": "pt-BR"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.capyenglish.com.br/#site",
+        "url": "https://www.capyenglish.com.br/",
+        "name": "Capy English",
+        "publisher": { "@id": "https://www.capyenglish.com.br/#org" },
+        "inLanguage": "pt-BR"
+      },
+      {
+        "@type": "Course",
+        "name": "Curso de Inglês Capy English",
+        "description": "Mais de 112 aulas em 6 cursos: iniciante, intermediário, avançado, business, viagem e francês. Trilha diária, jogos e conversação com IA.",
+        "url": "https://www.capyenglish.com.br/classes.html",
+        "inLanguage": "pt-BR",
+        "teaches": "Inglês",
+        "provider": { "@id": "https://www.capyenglish.com.br/#org" },
+        "hasCourseInstance": {
+          "@type": "CourseInstance",
+          "courseMode": "online",
+          "courseWorkload": "PT15M"
+        },
+        "offers": [
+          { "@type": "Offer", "name": "Grátis", "price": "0", "priceCurrency": "BRL", "category": "free" },
+          { "@type": "Offer", "name": "Pro Mensal", "price": "47", "priceCurrency": "BRL" },
+          { "@type": "Offer", "name": "Super Mensal", "price": "97", "priceCurrency": "BRL" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="assets/css/landing-utilities.css?v=20260906"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-  <script>
-    tailwind.config = {
-      theme: { extend: {
-        colors: { navy:'#001229', 'navy-mid':'#001f3f', 'pink-brand':'#ec4899', 'teal-brand':'#14b8a6' },
-        fontFamily: { sans:['Plus Jakarta Sans','sans-serif'] }
-      }}
-    };
-  </script>
-  <style>
-    * { font-family:'Plus Jakarta Sans',sans-serif; }
-
-    /* Animated blobs */
-    @keyframes blobFloat {
-      0%,100% { transform:translate(0,0) scale(1); }
-      33%      { transform:translate(30px,-20px) scale(1.08); }
-      66%      { transform:translate(-20px,15px) scale(0.95); }
-    }
-    .blob { position:absolute; border-radius:9999px; filter:blur(80px); opacity:0.25; animation:blobFloat 12s ease-in-out infinite; pointer-events:none; }
-    .blob-2 { animation-delay:-4s; }
-    .blob-3 { animation-delay:-8s; }
-
-    /* Fade up on scroll */
-    .reveal { opacity:0; transform:translateY(28px); transition:opacity .55s ease, transform .55s ease; }
-    .reveal.visible { opacity:1; transform:none; }
-
-    /* Chat demo */
-    @keyframes chatIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
-    .chat-bubble { opacity:0; }
-    .chat-bubble.show { animation:chatIn .4s ease forwards; }
-
-    /* Gradient text */
-    .grad-pink { background:linear-gradient(135deg,#f472b6,#ec4899,#db2777); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .grad-teal { background:linear-gradient(135deg,#2dd4bf,#14b8a6,#0d9488); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-
-    /* Check / cross for table */
-    .check { color:#34d399; }
-    .cross { color:#475569; }
-
-    /* Pricing card glow */
-    .plus-card { box-shadow:0 0 0 1px rgba(236,72,153,.3), 0 30px 80px rgba(236,72,153,.15); }
-
-    /* Scroll-snap for mobile steps */
-    .steps-scroll { scroll-snap-type:x mandatory; overflow-x:auto; scrollbar-width:none; }
-    .steps-scroll::-webkit-scrollbar { display:none; }
-    .step-snap { scroll-snap-align:start; }
-  </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+  <link rel="stylesheet" href="assets/css/landing.css?v=20260906"/>
 </head>
-<body class="bg-[#001229] text-white overflow-x-hidden">
+<body class="capy-landing bg-[#001229] text-white overflow-x-hidden">
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
 
 <!-- ══════════════════════════════════════════════════════════════════
      TOP NAV
 ═══════════════════════════════════════════════════════════════════ -->
-<nav class="fixed top-0 left-0 right-0 z-50 border-b border-white/5" style="background:rgba(0,18,41,.85);backdrop-filter:blur(16px)">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
-      <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-pink-400/60 shadow-md bg-pink-100 flex items-center justify-center text-xl">🐾</div>
-      <span class="text-xl font-black tracking-tight">Yara's Forest</span>
+<header class="landing-header">
+  <nav class="landing-nav landing-wrap" aria-label="Navegação principal" translate="no">
+    <a class="landing-brand" href="/" aria-label="Capy English — início">
+      <img src="yara.png?v=3" alt="" width="44" height="44"/>
+      <span>Capy<span class="brand-second">English</span></span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="#how-it-works">Como funciona</a>
+      <a href="#features">O que você aprende</a>
+      <a href="#pricing">Planos</a>
     </div>
-    <div class="flex items-center gap-3">
-      <a href="learn.html" class="hidden sm:block text-slate-400 hover:text-white text-sm font-bold transition-colors">Open App →</a>
-      <a href="#pricing" class="bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black px-5 py-2.5 rounded-full text-sm hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-pink-500/25">
-        Ver Planos
-      </a>
-    </div>
-  </div>
-</nav>
+    <a id="nav-session-link" class="landing-login" href="4_Login_Capy_Yara_Welcomes_You.html">Entrar <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<main id="main">
 
 <!-- ══════════════════════════════════════════════════════════════════
      HERO
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="relative min-h-screen flex items-center pt-24 pb-20 overflow-hidden">
-
-  <!-- Background blobs -->
-  <div class="blob bg-pink-500   w-[600px] h-[600px] top-[-100px]  left-[-200px]"  style="animation-duration:14s"></div>
-  <div class="blob bg-violet-500 w-[500px] h-[500px] bottom-[-80px] right-[-150px]" style="animation-duration:10s;animation-delay:-3s"></div>
-  <div class="blob bg-teal-500   w-[300px] h-[300px] top-[40%]      left-[50%]"    style="animation-duration:18s;animation-delay:-6s"></div>
-
-  <div class="relative max-w-4xl mx-auto px-6 text-center">
-    <!-- Badge -->
-    <div class="inline-flex items-center gap-2 bg-white/8 border border-white/15 rounded-full px-4 py-2 text-sm font-bold text-slate-300 mb-6">
-      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-      Aprenda inglês conversando com IA — de graça
+<section class="landing-hero" aria-labelledby="hero-heading">
+  <div class="landing-wrap hero-grid">
+    <div class="hero-copy">
+      <p class="landing-eyebrow"><span aria-hidden="true">✦</span> Seu inglês tem um novo caminho</p>
+      <h1 id="hero-heading">Um pouco hoje.<br>Mais inglês<br><span>para a vida.</span></h1>
+      <p class="hero-description">Aprenda no seu ritmo com aulas, jogos e a companhia da Yara. Uma trilha de inglês feita para brasileiros — com espaço para tentar, errar e aprender.</p>
+      <div class="hero-actions">
+        <a id="hero-cta" class="landing-button landing-button-primary" href="learn.html">Começar de graça <span aria-hidden="true">→</span></a>
+        <a class="landing-text-link" href="#how-it-works">Conhecer a trilha <span aria-hidden="true">↓</span></a>
+      </div>
+      <p class="hero-reassurance"><span aria-hidden="true">✓</span> Primeiras aulas grátis <span aria-hidden="true">·</span> Sem cartão</p>
+      <p class="hero-returning">Já faz parte da Capy? <a href="4_Login_Capy_Yara_Welcomes_You.html">Entre na sua conta</a></p>
     </div>
-
-    <!-- Headline -->
-    <h1 class="font-black text-5xl sm:text-6xl md:text-7xl leading-[1.05] mb-6">
-      Fale inglês<br>
-      <span class="grad-pink">do jeito certo.</span>
-    </h1>
-    <p class="text-slate-400 text-lg sm:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
-      24 lições organizadas em trilha, mini-aulas de 12 minutos e conversação real com a Yara — sua professora de IA.
-    </p>
-
-    <!-- CTAs -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="learn.html"
-         class="bg-gradient-to-r from-pink-600 to-pink-500 text-white font-black px-10 py-4 rounded-2xl text-lg shadow-xl shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all">
-        Começar de graça →
-      </a>
-      <a href="#pricing"
-         class="bg-white/8 border border-white/20 text-white font-bold px-8 py-4 rounded-2xl text-lg hover:bg-white/15 transition-all">
-        Ver planos ⚡
-      </a>
-    </div>
-
-    <!-- Social proof mini -->
-    <div class="flex flex-wrap justify-center gap-6 mt-12 text-slate-500 text-sm font-bold">
-      <span>✅ Grátis para começar</span>
-      <span>🔒 Sem cartão necessário</span>
-      <span>🎓 Feito para brasileiros</span>
+    <div class="hero-world">
+      <div class="hero-art">
+        <img src="yara-welcome.png" alt="Yara, a capivara de chapéu rosa, dá boas-vindas em uma trilha de floresta iluminada." width="896" height="1200" fetchpriority="high"/>
+        <div class="hero-art-caption"><span class="hero-dot" aria-hidden="true"></span> Conheça sua companhia de estudos</div>
+      </div>
+      <div class="yara-note"><span lang="en">Hi, I'm Yara!</span><span>Vamos aprender juntos? 🐾</span></div>
+      <div class="lesson-preview">
+        <span class="lesson-preview-icon" aria-hidden="true">✦</span>
+        <div><p>Sua jornada começa aqui</p><strong>Uma aula. Uma nova descoberta.</strong><span>Aprenda → pratique → continue</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -127,24 +139,24 @@
 <!-- ══════════════════════════════════════════════════════════════════
      STATS BAR
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="border-y border-white/8 py-10 bg-white/3 reveal">
+<section class="landing-highlights border-y border-white/8 py-10 bg-white/3 reveal" aria-label="Um jeito completo de praticar">
   <div class="max-w-4xl mx-auto px-6">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
       <div>
-        <p class="font-black text-4xl text-white mb-1">24</p>
-        <p class="text-slate-400 text-sm font-bold">Lições completas</p>
+        <p class="font-black text-4xl text-white mb-1">Aprenda</p>
+        <p class="text-slate-400 text-sm font-bold">Aulas no seu ritmo</p>
       </div>
       <div>
-        <p class="font-black text-4xl text-white mb-1">96</p>
-        <p class="text-slate-400 text-sm font-bold">Mini-aulas de 12 min</p>
+        <p class="font-black text-4xl text-white mb-1">Pratique</p>
+        <p class="text-slate-400 text-sm font-bold">Inglês do dia a dia</p>
       </div>
       <div>
-        <p class="font-black text-4xl text-white mb-1">6</p>
-        <p class="text-slate-400 text-sm font-bold">Atividades por lição</p>
+        <p class="font-black text-4xl text-white mb-1">Divirta-se</p>
+        <p class="text-slate-400 text-sm font-bold">Jogos e desafios</p>
       </div>
       <div>
-        <p class="font-black text-4xl grad-pink mb-1">∞</p>
-        <p class="text-slate-400 text-sm font-bold">Conversas com Yara IA</p>
+        <p class="font-black text-4xl text-white mb-1">Continue</p>
+        <p class="text-slate-400 text-sm font-bold">Sua evolução, passo a passo</p>
       </div>
     </div>
   </div>
@@ -153,11 +165,11 @@
 <!-- ══════════════════════════════════════════════════════════════════
      HOW IT WORKS
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="py-24 px-6 reveal">
+<section class="landing-journey py-24 px-6 reveal" id="how-it-works">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-14">
       <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Como funciona</p>
-      <h2 class="font-black text-4xl text-white">Aprenda em 3 passos simples</h2>
+      <h2 class="font-black text-4xl text-white">Pequenos passos.<br>Um inglês cada vez mais seu.</h2>
     </div>
     <div class="steps-scroll md:grid md:grid-cols-3 gap-6 flex">
       <!-- Step 1 -->
@@ -165,14 +177,14 @@
         <div class="w-12 h-12 rounded-2xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-2xl mb-5">🗺️</div>
         <span class="text-pink-400 font-black text-xs uppercase tracking-widest">Passo 1</span>
         <h3 class="font-black text-xl text-white mt-2 mb-3">Siga a trilha</h3>
-        <p class="text-slate-400 text-sm leading-relaxed">24 lições divididas em 4 mini-aulas cada. Cada dia tem um foco: Ouvir, Jogo, Praticar ou Conversar.</p>
+        <p class="text-slate-400 text-sm leading-relaxed">Encontre seu ponto de partida e siga uma sequência de aulas. Estude no seu ritmo, com um próximo passo sempre à vista.</p>
       </div>
       <!-- Step 2 -->
       <div class="step-snap min-w-[280px] md:min-w-0 bg-white/5 border border-white/10 rounded-3xl p-7 flex-shrink-0">
-        <div class="w-12 h-12 rounded-2xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-2xl mb-5">🐾</div>
+        <img src="yara.png?v=3" alt="Yara" class="w-12 h-12 rounded-2xl object-cover border border-violet-500/30 mb-5"/>
         <span class="text-violet-400 font-black text-xs uppercase tracking-widest">Passo 2</span>
-        <h3 class="font-black text-xl text-white mt-2 mb-3">Converse com Yara</h3>
-        <p class="text-slate-400 text-sm leading-relaxed">Yara é sua professora de IA. Ela corrige, elogia e te desafia a praticar inglês real — sem julgamento.</p>
+        <h3 class="font-black text-xl text-white mt-2 mb-3">Pratique com a Yara</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Coloque o inglês em uso. Nos planos pagos, converse com a professora de IA e receba ajuda para entender seus erros.</p>
       </div>
       <!-- Step 3 -->
       <div class="step-snap min-w-[280px] md:min-w-0 bg-white/5 border border-white/10 rounded-3xl p-7 flex-shrink-0">
@@ -188,35 +200,36 @@
 <!-- ══════════════════════════════════════════════════════════════════
      CHAT DEMO (animated)
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="py-20 px-6 reveal" id="demo-section">
+<section class="landing-demo py-20 px-6 reveal" id="demo-section">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-12">
-      <p class="text-teal-400 font-black text-sm uppercase tracking-widest mb-3">Conversação real com IA</p>
-      <h2 class="font-black text-4xl text-white">Fale. Yara responde. Você aprende.</h2>
-      <p class="text-slate-400 mt-3 text-base max-w-lg mx-auto">É assim que a fluência acontece: praticando, não decorando.</p>
+      <p class="text-teal-400 font-black text-sm uppercase tracking-widest mb-3">Inglês com companhia</p>
+      <h2 class="font-black text-4xl text-white">Pode tentar.<br>A Yara está com você.</h2>
+      <p class="text-slate-400 mt-3 text-base max-w-lg mx-auto">Uma conversa para colocar a aula em prática. Uma explicação em português para entender o que melhorar.</p>
+      <a class="landing-button landing-button-light" href="#pricing">Conhecer os planos com IA <span aria-hidden="true">→</span></a>
     </div>
 
     <div class="max-w-sm mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
       <!-- Chat header -->
       <div class="bg-gradient-to-r from-pink-500 to-violet-500 px-5 py-4 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl flex-shrink-0">🐾</div>
+        <img src="yara.png?v=3" alt="Yara" class="w-10 h-10 rounded-full object-cover border-2 border-white/40 flex-shrink-0"/>
         <div>
           <p class="text-white font-black text-base leading-tight">Yara</p>
-          <p class="text-white/70 text-xs">Professora de IA · Online</p>
+          <p class="text-white/70 text-xs">Professora de IA</p>
         </div>
         <div class="ml-auto flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          <span class="text-white/70 text-xs font-bold">ao vivo</span>
+          <span class="text-white/70 text-xs font-bold">Exemplo</span>
         </div>
       </div>
       <!-- Chat messages -->
       <div id="chat-demo-msgs" class="p-5 space-y-4 min-h-[260px] bg-slate-50/50">
-        <!-- injected by JS -->
+        <div class="demo-message demo-message-yara"><p lang="en">Hi! What did you do yesterday?</p></div>
+        <div class="demo-message demo-message-student"><p lang="en">I go to the park yesterday.</p></div>
+        <div class="demo-message demo-message-yara"><p>Boa tentativa! Como aconteceu ontem, usamos <strong lang="en">went</strong>, o passado de <strong lang="en">go</strong>.</p><p lang="en">“I went to the park yesterday.”</p></div>
       </div>
       <!-- Input mock -->
       <div class="border-t border-slate-100 px-4 py-3 bg-white flex gap-2 items-center">
-        <div class="flex-1 bg-slate-100 rounded-xl px-4 py-2 text-slate-400 text-sm">Type your answer…</div>
-        <div class="w-9 h-9 rounded-xl bg-pink-500 flex items-center justify-center text-white text-sm font-black flex-shrink-0">→</div>
+        <p class="demo-disclaimer">Conversa ilustrativa · Chat disponível nos planos Pro e Super</p>
       </div>
     </div>
   </div>
@@ -225,34 +238,47 @@
 <!-- ══════════════════════════════════════════════════════════════════
      FEATURE COMPARISON
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="py-24 px-6 reveal" id="features">
-  <div class="max-w-3xl mx-auto">
-    <div class="text-center mb-14">
-      <p class="text-pink-400 font-black text-sm uppercase tracking-widest mb-3">Planos</p>
-      <h2 class="font-black text-4xl text-white">O que está incluído</h2>
+<section class="landing-courses" id="features" aria-labelledby="courses-heading">
+  <div>
+    <p class="landing-eyebrow">O que você aprende</p>
+    <h2 id="courses-heading">Inglês para onde<br>você quer chegar.</h2>
+    <p class="course-intro">Comece pela base ou explore um objetivo novo. Conheça as trilhas e confira o acesso de cada plano abaixo.</p>
+    <div class="course-grid">
+      <a class="course-link" href="classes.html"><span><strong>Primeiros passos</strong><small>A base para começar seu inglês</small></span><span aria-hidden="true">↗</span></a>
+      <a class="course-link" href="classes_intermediate.html"><span><strong>Intermediário</strong><small>Mais vocabulário, novas conversas</small></span><span aria-hidden="true">↗</span></a>
+      <a class="course-link" href="classes_advanced.html"><span><strong>Avançado</strong><small>Vá além do inglês do dia a dia</small></span><span aria-hidden="true">↗</span></a>
+      <a class="course-link" href="classes_business.html"><span><strong>Inglês para o trabalho</strong><small>Reuniões, negócios e carreira</small></span><span aria-hidden="true">↗</span></a>
+      <a class="course-link" href="classes_travel.html"><span><strong>Inglês para viajar</strong><small>Do aeroporto à próxima descoberta</small></span><span aria-hidden="true">↗</span></a>
+      <a class="course-link" href="classes_fr.html"><span><strong>E também: francês</strong><small>Um novo idioma com a Yara</small></span><span aria-hidden="true">↗</span></a>
     </div>
+  </div>
+</section>
 
-    <!-- Table -->
-    <div class="bg-white/4 rounded-3xl border border-white/10 overflow-hidden">
-      <!-- Header -->
-      <div class="grid grid-cols-4 bg-white/5 border-b border-white/10 px-6 py-4 gap-2">
-        <div class="text-slate-400 font-black text-sm uppercase tracking-wider">Funcionalidade</div>
-        <div class="text-center">
-          <p class="font-black text-white text-sm">Grátis 🌱</p>
-          <p class="text-slate-500 text-xs">R$0/mês</p>
-        </div>
-        <div class="text-center">
-          <p class="font-black text-[#FF9F1C] text-sm">Pro ⚡</p>
-          <p class="text-[#FF9F1C]/70 text-xs">R$47/mês</p>
-        </div>
-        <div class="text-center">
-          <p class="font-black text-[#2EC4B6] text-sm">Super 🚀</p>
-          <p class="text-[#2EC4B6]/70 text-xs">R$97/mês</p>
-        </div>
+<!-- ══════════════════════════════════════════════════════════════════
+     POR QUE A CAPY (social proof)
+═══════════════════════════════════════════════════════════════════ -->
+<section class="landing-benefits py-20 px-6 reveal">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-12">
+      <p class="text-violet-400 font-black text-sm uppercase tracking-widest mb-3">Por que a Capy?</p>
+      <h2 class="font-black text-4xl text-white">Diferente de decorar. Igual a aprender.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7">
+        <div class="text-3xl mb-4">✍️</div>
+        <h3 class="font-black text-lg text-white mb-2">Sua escrita, corrigida de verdade</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Pratique a escrita e aprenda com as correções da Yara. Explicações em português ajudam você a entender o que pode melhorar.</p>
       </div>
-
-      <!-- Rows -->
-      <div id="feature-rows"></div>
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7">
+        <div class="text-3xl mb-4">🇧🇷</div>
+        <h3 class="font-black text-lg text-white mb-2">Feito pra quem travou no inglês</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Explicações em português, exemplos do dia a dia brasileiro e uma professora que não julga. Do zero absoluto ao C1.</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7">
+        <div class="text-3xl mb-4">🎮</div>
+        <h3 class="font-black text-lg text-white mb-2">Vira hábito, não obrigação</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Ganhe XP, mantenha sua sequência e desbloqueie conquistas. Jogos e desafios trazem novos jeitos de praticar o que você aprendeu.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -267,12 +293,13 @@
       <p class="text-[#FF9F1C] font-black text-sm uppercase tracking-widest mb-3">Escolha seu plano</p>
       <h2 class="font-black text-4xl text-white">Comece grátis. Evolua quando quiser.</h2>
       <p class="text-slate-400 mt-3">Sem contrato. Cancele a qualquer hora.</p>
+      <p class="text-slate-500 text-sm mt-2 inline-flex items-center gap-2">🔒 Pagamento seguro via Kiwify · ✅ 7 dias de garantia — devolução integral (CDC art. 49)</p>
     </div>
 
     <!-- Mensal / Anual toggle -->
     <div class="flex items-center justify-center gap-4 mb-10">
       <span id="lbl-monthly" class="text-white font-black text-sm">Mensal</span>
-      <button id="billing-toggle" onclick="toggleBilling()"
+      <button id="billing-toggle" type="button" role="switch" aria-checked="false" aria-label="Cobrança anual" onclick="toggleBilling()"
         class="relative w-14 h-7 rounded-full bg-[#FF9F1C] transition-colors focus:outline-none">
         <span id="toggle-knob" class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300"></span>
       </button>
@@ -300,7 +327,7 @@
           <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Music Lab</span></li>
           <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Voz Nova TTS</span></li>
         </ul>
-        <a href="classes.html"
+        <a href="learn.html"
            class="block w-full text-center bg-white/10 hover:bg-white/15 border border-white/15 text-white font-black py-3.5 rounded-2xl transition-all text-sm active:scale-95">
           Começar grátis →
         </a>
@@ -309,7 +336,7 @@
       <!-- ── PRO ── -->
       <div class="bg-gradient-to-br from-[#1a2d47] to-[#0d1e35] border border-[#FF9F1C]/40 rounded-3xl p-7 relative overflow-hidden flex flex-col shadow-2xl shadow-orange-500/10">
         <div class="absolute top-5 right-5 bg-[#FF9F1C] text-[#0d1e35] font-black text-xs px-3 py-1 rounded-full">
-          Mais popular
+          Com Yara AI
         </div>
         <div class="flex items-start justify-between mb-5">
           <div>
@@ -335,11 +362,11 @@
           <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#FF9F1C] font-black mt-0.5">✓</span> Music Lab + Homework tracker</li>
           <li class="flex items-start gap-2.5 text-sm text-slate-400 opacity-50"><span class="font-black mt-0.5">✗</span> <span class="line-through">Conversa de voz com Yara</span></li>
         </ul>
-        <a id="pro-btn-monthly" href="https://pay.kiwify.com.br/7HYhJgk" target="_blank"
+        <a id="pro-btn-monthly" href="https://pay.kiwify.com.br/7HYhJgk" target="_blank" rel="noopener noreferrer"
            class="block w-full text-center bg-[#FF9F1C] hover:bg-[#e8901a] text-[#0d1e35] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
           Assinar Pro Mensal →
         </a>
-        <a id="pro-btn-annual" href="https://pay.kiwify.com.br/gfRhn8u" target="_blank"
+        <a id="pro-btn-annual" href="https://pay.kiwify.com.br/gfRhn8u" target="_blank" rel="noopener noreferrer"
            class="hidden block w-full text-center bg-[#FF9F1C] hover:bg-[#e8901a] text-[#0d1e35] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-orange-500/25 active:scale-95 transition-all">
           Assinar Pro Anual →
         </a>
@@ -372,11 +399,11 @@
           <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Acesso prioritário a novas lições</li>
           <li class="flex items-start gap-2.5 text-sm text-slate-200"><span class="text-[#2EC4B6] font-black mt-0.5">✓</span> Suporte VIP por WhatsApp</li>
         </ul>
-        <a id="super-btn-monthly" href="https://pay.kiwify.com.br/lIBOlgZ" target="_blank"
+        <a id="super-btn-monthly" href="https://pay.kiwify.com.br/lIBOlgZ" target="_blank" rel="noopener noreferrer"
            class="block w-full text-center bg-[#2EC4B6] hover:bg-[#26b0a3] text-[#071a1a] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-teal-500/25 active:scale-95 transition-all">
           Assinar Super Mensal →
         </a>
-        <a id="super-btn-annual" href="https://pay.kiwify.com.br/hlqrYma" target="_blank"
+        <a id="super-btn-annual" href="https://pay.kiwify.com.br/hlqrYma" target="_blank" rel="noopener noreferrer"
            class="hidden block w-full text-center bg-[#2EC4B6] hover:bg-[#26b0a3] text-[#071a1a] font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-teal-500/25 active:scale-95 transition-all">
           Assinar Super Anual →
         </a>
@@ -392,6 +419,7 @@
 let isAnnual = false;
 function toggleBilling() {
   isAnnual = !isAnnual;
+  document.getElementById('billing-toggle').setAttribute('aria-checked', String(isAnnual));
   const knob = document.getElementById('toggle-knob');
   const lblM = document.getElementById('lbl-monthly');
   const lblA = document.getElementById('lbl-annual');
@@ -420,7 +448,7 @@ function toggleBilling() {
 <!-- ══════════════════════════════════════════════════════════════════
      PRIVATE LESSONS CTA
 ═══════════════════════════════════════════════════════════════════ -->
-<section class="py-20 px-6 reveal">
+<section class="landing-private py-20 px-6 reveal">
   <div class="max-w-2xl mx-auto">
     <div class="bg-gradient-to-br from-teal-900/40 to-teal-800/20 border border-teal-500/25 rounded-3xl p-10 text-center">
       <div class="text-5xl mb-4">👨‍🏫</div>
@@ -428,8 +456,8 @@ function toggleBilling() {
       <p class="text-slate-400 text-base leading-relaxed mb-8 max-w-md mx-auto">
         Quer acelerar ainda mais com aulas ao vivo? Fale com o professor diretamente pelo WhatsApp e monte um plano personalizado pra você.
       </p>
-      <a href="https://wa.me/55SEUNUMERO?text=Olá!%20Tenho%20interesse%20nas%20aulas%20particulares%20de%20inglês%20da%20Yara's%20Forest%20🐾"
-         target="_blank"
+      <a href="https://wa.me/5567998667499?text=Olá!%20Tenho%20interesse%20nas%20aulas%20particulares%20de%20inglês%20da%20Capy%20English%20🐾"
+         target="_blank" rel="noopener noreferrer"
          class="inline-flex items-center gap-3 bg-[#25D366] hover:bg-[#1eb858] text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all">
         <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.196.593 4.25 1.627 6.015L.057 23.882a.5.5 0 0 0 .612.612l5.867-1.57A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.882a9.874 9.874 0 0 1-5.031-1.38l-.36-.214-3.732.979.999-3.648-.235-.375A9.862 9.862 0 0 1 2.118 12C2.118 6.48 6.48 2.118 12 2.118S21.882 6.48 21.882 12 17.52 21.882 12 21.882z"/></svg>
         Falar com o Professor
@@ -442,122 +470,77 @@ function toggleBilling() {
 <!-- ══════════════════════════════════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════════════════════════════════ -->
+<section class="landing-faq" id="faq" aria-labelledby="faq-heading">
+  <div class="landing-wrap faq-grid">
+    <div><p class="landing-eyebrow">Antes de começar</p><h2 id="faq-heading">Ficou alguma dúvida?</h2><p>Seu próximo passo pode ser simples.</p></div>
+    <div class="faq-items">
+      <details><summary>Já tenho conta. Por onde entro?</summary><p>Use o botão <a href="4_Login_Capy_Yara_Welcomes_You.html">Entrar</a>, no topo da página. Ele fica sempre disponível, também no celular.</p></details>
+      <details><summary>Posso começar sem pagar?</summary><p>Sim. O plano grátis inclui as 5 primeiras aulas de inglês, sem cartão. Você pode conhecer a trilha antes de escolher um plano pago.</p></details>
+      <details><summary>Qual a diferença entre Pro e Super?</summary><p>O Pro inclui Yara AI Chat nas lições, voz Nova TTS e os recursos listados no plano. O Super inclui tudo do Pro e acrescenta 10 minutos por mês de conversa de voz com a Yara, correção de pronúncia e os demais benefícios apresentados acima.</p></details>
+      <details><summary>Como acesso depois de assinar?</summary><p>Use na sua conta Capy o mesmo e-mail informado na compra pela Kiwify. Assim, o plano pode ser associado à sua conta.</p></details>
+      <details><summary>Tem aulas com professor de verdade?</summary><p>Sim. As aulas particulares são combinadas separadamente com o professor pelo WhatsApp. O formato e o valor são definidos na conversa.</p></details>
+    </div>
+  </div>
+</section>
+</main>
 <footer class="border-t border-white/8 py-12 px-6">
   <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
     <div class="flex items-center gap-2.5">
-      <span class="text-2xl">🐾</span>
-      <span class="font-black text-lg">Yara's Forest</span>
+      <img src="yara.png?v=3" alt="Yara" class="w-8 h-8 rounded-full object-cover"/>
+      <span class="font-black text-lg">Capy English</span>
     </div>
     <div class="flex gap-6 text-slate-500 text-sm font-bold">
       <a href="learn.html"            class="hover:text-white transition-colors">Trilha</a>
-      <a href="6_Home_Forest_Expedition.html" class="hover:text-white transition-colors">Home</a>
+      <a href="6_Home_Forest_Expedition.html" class="hover:text-white transition-colors">Início</a>
       <a href="#pricing"              class="hover:text-white transition-colors">Planos</a>
+      <a href="termos.html"           class="hover:text-white transition-colors">Termos</a>
+      <a href="privacidade.html" class="hover:text-white transition-colors">Privacidade</a>
     </div>
-    <p class="text-slate-600 text-xs">© 2025 Yara's Forest · Feito com 🐾 para brasileiros</p>
+    <p class="text-slate-600 text-xs">© 2026 Capy English · Feito com 🐾 para brasileiros</p>
   </div>
 </footer>
 
 <!-- ══════════════════════════════════════════════════════════════════
      SCRIPTS
 ═══════════════════════════════════════════════════════════════════ -->
+<!-- The example conversation is static: no auto-playing messages or hidden content. -->
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SESSÃO — a landing agora é a raiz do domínio, então quem já é aluno
+     também cai aqui. Só o CTA de estudo muda; Entrar sempre abre o login.
+     O HTML nasce no estado de visitante pra não piscar "Continuar"
+     pra quem não tem conta.
+═══════════════════════════════════════════════════════════════════ -->
+<script src="auth-secure.js?v=auth20260918"></script>
 <script>
-// ── Scroll reveal ──────────────────────────────────────────────────
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-    }
-  });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// ── Feature table ──────────────────────────────────────────────────
-const FEATURES = [
-  { label:'Aulas de inglês',              free:'5',   pro:'44',   super:'44'  },
-  { label:'Aulas de francês',             free:false, pro:'7',    super:'7'   },
-  { label:'Voz Nova TTS (OpenAI)',        free:false, pro:true,   super:true  },
-  { label:'Yara AI Chat',                 free:false, pro:true,   super:true  },
-  { label:'Plano de estudos personalizado', free:false, pro:true, super:true  },
-  { label:'Music Lab',                    free:false, pro:true,   super:true  },
-  { label:'Homework tracker',             free:false, pro:true,   super:true  },
-  { label:'Conversa de voz com Yara AI',  free:false, pro:false,  super:'10 min/mês' },
-  { label:'Correção de pronúncia',        free:false, pro:false,  super:true  },
-  { label:'Relatório semanal por e-mail', free:false, pro:false,  super:true  },
-  { label:'Acesso prioritário a novidades', free:false, pro:false, super:true },
-  { label:'Suporte VIP por WhatsApp',     free:false, pro:false,  super:true  },
-];
-
-function renderCheck(val, color) {
-  if (val === true)  return `<span class="font-black text-xl" style="color:${color}">✓</span>`;
-  if (val === false) return `<span class="text-xl text-slate-600">✗</span>`;
-  return `<span class="text-white font-black text-xs">${val}</span>`;
-}
-
-const rowsHtml = FEATURES.map((f, i) => `
-  <div class="grid grid-cols-4 px-6 py-4 border-b border-white/5 gap-2 ${i % 2 === 0 ? '' : 'bg-white/2'} hover:bg-white/4 transition-all">
-    <div class="text-slate-300 text-sm font-bold flex items-center">${f.label}</div>
-    <div class="flex items-center justify-center">${renderCheck(f.free, '#94a3b8')}</div>
-    <div class="flex items-center justify-center">${renderCheck(f.pro, '#FF9F1C')}</div>
-    <div class="flex items-center justify-center">${renderCheck(f.super, '#2EC4B6')}</div>
-  </div>`).join('');
-document.getElementById('feature-rows').innerHTML = rowsHtml;
-
-// ── Animated chat demo ─────────────────────────────────────────────
-const DEMO_CHAT = [
-  { who:'yara',    text:'Great job with today\'s lesson! 🌟 Can you use the word "appointment" in a sentence?' },
-  { who:'student', text:'I have an appointment at the doctor tomorrow.' },
-  { who:'yara',    text:'Perfect! That\'s exactly right 🎉 Very natural English. Now try: how would you cancel that appointment?' },
-  { who:'student', text:'I need to cancel my appointment because I\'m sick.' },
-  { who:'yara',    text:'Excellent! You\'re using complex sentences now. That\'s real fluency! 🐾✨' },
-];
-
-const msgEl = document.getElementById('chat-demo-msgs');
-
-function makeBubble(item) {
-  const div = document.createElement('div');
-  div.className = `chat-bubble flex gap-2 items-start ${item.who === 'student' ? 'justify-end' : ''}`;
-  if (item.who === 'yara') {
-    div.innerHTML = `
-      <span class="text-xl mt-0.5 flex-shrink-0">🐾</span>
-      <div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[75%] leading-relaxed">${item.text}</div>`;
-  } else {
-    div.innerHTML = `
-      <div class="bg-pink-500 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[75%] leading-relaxed">${item.text}</div>`;
-  }
-  return div;
-}
-
-let demoIdx = 0;
-let demoTimer = null;
-
-function showNextBubble() {
-  if (demoIdx >= DEMO_CHAT.length) {
-    // Restart after pause
-    demoTimer = setTimeout(() => {
-      msgEl.innerHTML = '';
-      demoIdx = 0;
-      demoTimer = setTimeout(showNextBubble, 600);
-    }, 4000);
-    return;
-  }
-  const b = makeBubble(DEMO_CHAT[demoIdx]);
-  msgEl.appendChild(b);
-  msgEl.scrollTop = msgEl.scrollHeight;
-  setTimeout(() => b.classList.add('show'), 20);
-  demoIdx++;
-  const delay = DEMO_CHAT[demoIdx - 1].who === 'yara' ? 1800 : 1200;
-  demoTimer = setTimeout(showNextBubble, delay);
-}
-
-// Start demo when section is visible
-const demoSection = document.getElementById('demo-section');
-const demoObserver = new IntersectionObserver(entries => {
-  if (entries[0].isIntersecting && demoIdx === 0) {
-    setTimeout(showNextBubble, 600);
-  }
-}, { threshold: 0.3 });
-demoObserver.observe(demoSection);
+(async () => {
+  try {
+    const user = await Auth.ready();
+    if (!user || user.role === 'guest') return;
+    const hero = document.getElementById('hero-cta');
+    if (hero) { hero.textContent = 'Continuar minha trilha →'; hero.href = 'learn.html'; }
+  } catch (e) { /* sem sessão ou rede fora: mantém o estado de visitante */ }
+})();
 </script>
 
+
+<!-- SEO:indice-cursos -->
+<nav aria-label="Cursos e trilhas" class="max-w-6xl mx-auto px-6 pb-10">
+  <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-3">Cursos e trilhas</p>
+  <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-1.5 text-xs">
+    <li><a href="classes.html" class="text-slate-400 hover:text-white underline decoration-dotted">Inglês — todos os cursos</a></li>
+    <li><a href="classes_intermediate.html" class="text-slate-400 hover:text-white underline decoration-dotted">Inglês Intermediate</a></li>
+    <li><a href="classes_advanced.html" class="text-slate-400 hover:text-white underline decoration-dotted">Inglês Advanced</a></li>
+    <li><a href="classes_business.html" class="text-slate-400 hover:text-white underline decoration-dotted">Inglês para Business</a></li>
+    <li><a href="classes_travel.html" class="text-slate-400 hover:text-white underline decoration-dotted">Inglês para Viagem</a></li>
+    <li><a href="classes_fr.html" class="text-slate-400 hover:text-white underline decoration-dotted">Francês com a Yara</a></li>
+    <li><a href="classes_gpstronic.html" class="text-slate-400 hover:text-white underline decoration-dotted">GPS Tronic (turma fechada)</a></li>
+    <li><a href="learn.html" class="text-slate-400 hover:text-white underline decoration-dotted">Trilha Diária de Inglês</a></li>
+    <li><a href="learn_fr.html" class="text-slate-400 hover:text-white underline decoration-dotted">Trilha Diária de Francês</a></li>
+    <li><a href="learn_intermediate.html" class="text-slate-400 hover:text-white underline decoration-dotted">Trilha Diária Intermediate</a></li>
+    <li><a href="learn_gpstronic.html" class="text-slate-400 hover:text-white underline decoration-dotted">Trilha Diária GPS Tronic</a></li>
+    <li><a href="placement_test.html" class="text-slate-400 hover:text-white underline decoration-dotted">Teste de Nível</a></li>
+  </ul>
+</nav>
 </body>
 </html>

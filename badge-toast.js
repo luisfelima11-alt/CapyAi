@@ -76,7 +76,7 @@
             toast.className = 'badge-toast';
             toast.innerHTML = `
                 <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid ${meta.color}60;animation:badge-icon-pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.15s both;">
-                    <img src="Hello Yara profile pic 002.png" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
+                    <img src="yara-avatar.png?v=3" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
                 </div>
                 <div class="badge-toast-text">
                     <span class="badge-toast-title" style="color:${meta.color};">🏅 Badge Unlocked!</span>
@@ -114,7 +114,7 @@
         toast.className = 'badge-toast';
         toast.innerHTML = `
             <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(249,115,22,0.6);animation:badge-icon-pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.15s both;">
-                <img src="Hello Yara profile pic 002.png" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
+                <img src="yara-avatar.png?v=3" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
             </div>
             <div class="badge-toast-text">
                 <span class="badge-toast-title" style="color:#fb923c;">🔥 ${days}-Day Streak!</span>

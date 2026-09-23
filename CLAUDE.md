@@ -4,7 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Capy Yara Adventures is a gamified English-learning platform for Brazilian students, centered on a capybara mascot named Yara 🦫. Built with vanilla HTML/CSS/JS (Tailwind CDN) + a Node.js dev server with OpenAI integration. No build step — all files are static except the API layer.
+Capy Yara Adventures is a gamified English-learning platform for Brazilian students, centered on a capybara mascot named Yara 🐾. Built with vanilla HTML/CSS/JS (Tailwind CDN) + a Node.js dev server with OpenAI integration. No build step — all files are static except the API layer.
+
+## Antes de investigar um bug: leia BUGS-APRENDIDOS.md
+
+`BUGS-APRENDIDOS.md` guarda cada bug já consertado neste projeto, com a **causa raiz**
+e um **comando que denuncia o mesmo defeito em 5 segundos**. Vários bugs daqui já
+voltaram por não terem sido registrados. Consulte antes de diagnosticar, e registre
+depois de corrigir.
+
+O ciclo: **capy-bughunter** acha o sintoma → **capy-debugger** prova a causa raiz →
+**capy-fixer** corrige e escreve a lição de volta no arquivo.
+
+## Jogo novo? Registre no game-celebra.js
+
+O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
+que envolve a função de fim de cada jogo listada no `MAPA` dele (`finishGame`,
+`showGameOver`, `showFinished`...). **Jogo que não está no mapa não comemora — em silêncio.**
+Ao criar um jogo: (1) acrescente `pagina: { fn: 'nomeDaFuncaoDeFim' }` no `MAPA`;
+(2) a função tem que ser uma declaração `function` global (não `const`/`let`, e não dentro de IIFE);
+(3) carregue `celebration.js` e depois `game-celebra.js` imediatamente antes de `</body>`.
+Confira no console da página: `window.__capyGameCelebra.instalado` tem que ser `true`.
+O `flappy_yara` fica fora de propósito (a partida termina numa colisão seguida de quiz).
 
 ## Dev Server
 
@@ -23,7 +44,7 @@ The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
 
 ## Deployment
 
-Vercel (project: `capy-yara-adventures`). Production URL: **https://capy-yara-adventures.vercel.app**
+Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**
 
 ```bash
 npx vercel --prod --force   # always use --force to bypass cache
@@ -217,6 +238,97 @@ CSS used by communicative aulas: copy `.opt-btn`, `.fill-inp`, `.wo-tile`, `.wo-
 
 ---
 
+#### Template 4 — Verb-Enhanced (Travel 06+, Business 06+, Intermediate 01–04)
+
+8-tab pattern. Identical to Template 1 (new/standard) but adds a dedicated **Verbs** tab between Vocab and Expressions. Use for all new lessons going forward.
+
+```
+Tabs: vocab → verbs → expressions → grammar → dialogue → practice → speak → homework
+SECTIONS = ['vocab','verbs','expressions','grammar','dialogue','practice','speak','homework']
+8 × +20 XP + +75 homework = 235 XP total
+```
+
+**Tab Verbs content:**
+- 3–5 key verbs from the lesson topic
+- Conjugation table per verb (6 forms): Present · Past · Past Continuous · Present Perfect · Past Perfect · Future
+- 3 real-life example sentences per tense form
+- Mini conjugation quiz: 5–8 fill-in-blank inputs (`data-ans` attribute) + "Check Answers" button
+- `markSection('verbs')` + `Store.addXP(20)` when student completes the quiz
+
+```js
+// Verbs tab mini-quiz pattern:
+function checkVerbQuiz() {
+  const inputs = document.querySelectorAll('.verb-check');
+  let correct = 0;
+  inputs.forEach(inp => {
+    const ok = inp.value.toLowerCase().trim() === inp.dataset.ans;
+    inp.classList.toggle('!border-emerald-400', ok);
+    inp.classList.toggle('!border-red-400', !ok);
+    if (ok) correct++;
+  });
+  document.getElementById('verb-result').textContent = `${correct}/${inputs.length} correct`;
+  if (correct >= Math.floor(inputs.length * 0.7)) markSection('verbs'); // ≥70% to pass
+}
+```
+
+**Reference files:** `travel_aula_06.html`, `business_aula_06.html`, `intermediate_aula_01.html`
+
+**Intermediate course specifics:** Verbs tab shows 4–5 verbs with ALL 6 tenses (because verb mastery is the course focus). Quiz has 8 fill-in-blank. `markSection('verbs')` requires ≥6/8 correct.
+
+---
+
+#### Template 5 — Conversation (Intermediate conversation lessons)
+
+6-tab pattern focused on real-world listening, reading, and free production. NO flip cards, NO grammar accordion.
+
+```
+Tabs: reading → listening → questions → speaking → writing → homework
+SECTIONS = ['reading','listening','questions','speaking','writing','homework']
+6 × +20 XP + +75 homework = 195 XP total
+```
+
+| Tab | Content |
+|-----|---------|
+| 📖 Reading | Long text (350–400 words), keywords bolded in accent color, expandable glossary (8 words) |
+| 🎧 Listening | Audio via browser `speechSynthesis` (rate 0.85), NO transcript shown; textarea "write what you heard"; word counter; "Reveal Transcript" button appears at ≥20 words |
+| ❓ Questions | 10 questions: 3 comprehension (radio Y/N + feedback), 4 open-ended (textarea), 3 personal opinion (textarea) |
+| 🗣️ Speaking | 5 roleplay prompts, each with toggle-reveal model answer + TTS button |
+| ✏️ Writing | Textarea + tense checklist (student marks which tenses they used); `markSection('writing')` when ≥2 tenses checked |
+| 📋 Homework | Word Order (3) + Error Correction (3) + Free Writing paragraph (8–10 sentences, 3+ tenses) |
+
+**Listening pattern — critical details:**
+```js
+// Different text from Reading tab (oral, shorter ~150 words)
+const LISTEN_TEXT = `...`;
+let listenPlayed = false;
+
+function playListening() {
+  const u = new SpeechSynthesisUtterance(LISTEN_TEXT);
+  u.lang = 'en-US'; u.rate = 0.85;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  listenPlayed = true;
+  document.getElementById('listen-field').classList.remove('hidden');
+}
+
+function checkReveal() {
+  const words = document.getElementById('listen-textarea').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('word-count').textContent = `${words} words`;
+  if (words >= 20) document.getElementById('reveal-btn').classList.remove('hidden');
+}
+
+function revealTranscript() {
+  document.getElementById('transcript').classList.remove('hidden');
+  document.getElementById('reveal-btn').disabled = true;
+  markSection('listening');
+  Store.addXP(20);
+}
+```
+
+**Reference file:** `intermediate_aula_05.html`
+
+---
+
 **Template pattern** (use `aula_33.html` or `aula_28.html` as reference):
 ```html
 <div id="top-nav-placeholder"></div>
@@ -281,6 +393,136 @@ function markSection(s) { if (_done.has(s)) return; _done.add(s); Store.addXP(20
 ```
 Added to: aula_20–24, 26–27, 29–32, 34.
 
+## Escuta sem texto: a resposta certa SEMPRE aparece escrita
+
+**Regra do Luis, 13/set/2026. Vale para o site inteiro, daqui em diante.**
+
+Em toda atividade que é **só de escutar** — o aluno ouve um áudio e não há
+nada escrito na tela — assim que ele responde, **a resposta certa tem que
+aparecer por escrito**. Vale tanto quando acerta quanto quando erra; quem
+errou é justamente quem mais precisa ver como se escreve.
+
+**Por quê:** uma atividade que cobra escuta e nunca devolve a grafia ensina o
+aluno a reconhecer o som e a continuar sem saber escrever a palavra. Ele
+termina o exercício com 100% de acerto e sem ter aprendido a forma escrita.
+
+**Onde isso já vale (verificado):**
+
+| Atividade | Situação |
+|---|---|
+| `lessons.html` → `renderListen()` / `answerListen()` | **corrigido em 13/set.** O `<p id="listen-reveal">` embaixo do botão de áudio troca "Toque para ouvir" pela palavra ouvida + a tradução. O avanço automático subiu de 700/1200ms para **1600/2400ms**, senão não dá tempo de ler. |
+| `listening-lab.js` (ditado das aulas de curso) | já cumpria: o `pintar()` revela a frase-alvo inteira, palavra a palavra, depois do "Conferir". |
+
+**Ao criar atividade de escuta nova, o checklist é:**
+1. Depois da resposta, a palavra/frase **ouvida** aparece escrita — não só a opção que o aluno clicou.
+2. Aparece também no erro.
+3. O tempo até avançar dá para ler (≥1,5s; no erro, mais).
+4. Use `textContent`, não `innerHTML`, para escrever a palavra revelada.
+
+⚠️ **Armadilha ao mexer nisso:** a linha
+`if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();`
+aparece **5 vezes** no `lessons.html`, em funções diferentes (`answerReview`,
+`answerQuiz`, `answerListen`…). Um replace pela primeira ocorrência cai na
+função errada e o código não roda — aconteceu aqui. Ancore pelo
+`function answerListen(` antes de substituir.
+
+## Confirmação de acerto e de erro (regra do Luis, 13/set/2026)
+
+Toda atividade tem que dizer **em texto** o que aconteceu. Cor sozinha não serve:
+daltônico não enxerga verde/vermelho, e quem errou precisa **ler qual era a certa**.
+
+| Onde | Acerto | Erro |
+|---|---|---|
+| `answerQuiz` (trilha) | `✅ Isso!` | `💡 Quase — a resposta é X` + o `why`, se a lição tiver |
+| `answerListen` (trilha) | `✅ Isso!` + a grafia | `💡 Quase — você ouviu:` + a grafia |
+| `buildCheck` (trilha) | `✨ Correto!` | `🔄 Tente novamente!`; **na 3ª tentativa revela a frase** |
+| aula de curso (`answerQ`) | `✅ Correct!` + `q.rule` | `❌ Not quite.` + `q.rule` |
+
+Os tempos de avanço subiram para dar tempo de LER: quiz 1100/2600ms,
+listen 1600/2400ms (antes 600/1200 e 700/1200).
+
+**Campo `why` no quiz da trilha:** opcional, uma linha dizendo por que aquela é a
+certa. As 218 lições que já existem **não têm** — por isso a caixa degrada sozinha
+para só a resposta. Lição nova deve trazer `why`.
+
+## O dia 2 da trilha usa o vocabulário da lição (13/set/2026)
+
+`showGameStep()` roteia o mini 2 para **speed / scramble / typing** in-page
+(`id % 3`), todos montados de `currentLesson.vocab`. Antes ele abria um jogo
+standalone com lista de palavras própria — nenhum dos jogos lê parâmetro de URL
+ou sabe qual é a lição, então o dia 2 era desconexo por construção.
+
+Se for mexer: **não crie jogo novo**. Os painéis que já leem o vocabulário da
+lição são `panel-listen`, `panel-typing`, `panel-speed`, `panel-scramble` e
+`panel-build`.
+
+## Quiz de IA do modo guiado (corrigido 14/set/2026)
+
+No modo guiado (trilha diaria), `loadAIQuiz()` substitui o quiz estatico da licao
+por 5 perguntas geradas pela IA via `POST /api/lesson-quiz`. Tinha quatro defeitos,
+todos medidos:
+
+| Defeito | Efeito |
+|---|---|
+| o prompt dizia **"for children"** | perguntas infantis para tecnicos de GPS adultos e para candidato a vaga |
+| o cliente mandava **`level: 'beginner'` fixo** | licao B1 do curso de entrevista recebia pergunta de iniciante |
+| o exemplo de JSON usava **`opts: ["A","B","C","D"]`** | o modelo copiava literal e o aluno lia *"a resposta e A"* |
+| o prompt pedia **`explain`** e o cliente jogava fora | a explicacao existia e nunca chegava ao aluno |
+
+**Hoje:** o nivel vem de `nivelDaLicao(lesson)` (derivado da faixa de id, que e o
+curso), a gramatica da licao vai junto, o prompt proibe opcoes "A"/"B"/"C"/"D" e diz
+que os alunos sao **adultos brasileiros**. O `explain` alimenta a caixa de feedback.
+
+A chave de cache virou `capyAIQuiz_v2_<id>_<data>` — sem isso as perguntas ruins
+ficariam salvas no navegador do aluno ate o dia virar.
+
+🟡 **Limitação que fica:** mesmo pedindo "at least 2 of the 5 questions must test
+the grammar point", o modelo em geral gera perguntas sobre o TEMA, nao sobre a
+gramatica. Verificado em producao na licao 605. Se isso incomodar, o caminho e
+misturar: manter 2-3 perguntas estaticas (escritas a mao, que testam gramatica) e
+deixar a IA gerar so as outras 2-3.
+
+⚠️ Existem outros tres prompts com "for children aged 5-8" em `api/index.js`
+(`/api/quiz`, `/api/flashcard-deck`, `/api/dialogue-scene`). **Nao foram tocados** —
+a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
+defeito vale para eles.
+
+## Custo da ligacao por voz: calculado e guardado (14/set/2026)
+
+**O que existia:** o `conversa-core.js` ja contava os tokens reais de cada
+resposta (descontando cache), e o `aoDesligar` entregava `{ uso, transcricao,
+duracaoMs }`. A `conversa.html` mostrava o custo na tela e **esquecia ao fechar a
+aba**; a `entrevista.html` recebia os tokens e **jogava fora**. Resultado: nunca
+houve um numero medido de quanto custa um minuto de ligacao.
+
+**O que passa a existir:** a `entrevista.html` manda `uso` + `duracaoMs` junto com
+a transcricao para `POST /api/conversa-feedback`. O servidor calcula com a tabela
+de precos **dele** e grava o custo na linha que ja existia
+(`conversa_<userId>_<dia>` em `user_state`), alem de devolver em `custo` na
+resposta.
+
+```js
+// api/index.js — a tabela mora no SERVIDOR: preco e regra de negocio, e o numero
+// que vira relatorio nao pode depender do que o navegador mandou.
+const PRECO_VOZ = { audioIn: 10, audioOut: 20, cache: 0.30, textoIn: 0.60, textoOut: 2.40 }; // USD / 1M tokens
+```
+
+Os tokens vem do cliente (o `usage` da OpenAI chega pelo canal de dados WebRTC),
+entao sao **sanitizados com teto** antes de entrar na conta.
+
+🟡 **O numero real ainda nao existe.** A estimativa de papel escrita no codigo era
+**~R$0,06/min**. Um teste com tokens inventados (24k audio in / 18k out em 5 min)
+deu R$0,62/min — o que so prova que a conta roda, nao quanto custa. **Basta uma
+ligacao real de 2 minutos para o numero medido aparecer gravado.**
+
+⚠️ **Armadilha que me pegou aqui:** a linha
+`const cargo = sanitizeStoredJson(String(body.cargo || '').slice(0, 60)) || '';`
+existe em **dois** handlers (`/api/realtime-token` e `/api/conversa-feedback`).
+Um `String.replace` com ela como ancora cai no primeiro — foi o que fiz, e o bloco
+do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declaracao
+(TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
+linha que pode se repetir.
+
 ## Design System
 
 Full spec in `1_Design_System.md`. Key constraints:
@@ -308,7 +550,6 @@ Chapter accent colors (hero gradients):
 
 Present: `aula_01` – `aula_44` (**44 lessons total**). All lessons are available and linked in `classes.html`.
 
-Missing file (no HTML): `aula_25` — there is no aula_25.html. The grid skips it by going from display #25 → `aula_25.html` which doesn't exist; check `classes.html` LESSONS array if needed.
 
 **Homework status (all aulas now have homework):**
 - aulas 01–19: always had homework (new template)

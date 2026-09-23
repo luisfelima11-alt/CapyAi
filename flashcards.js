@@ -117,6 +117,144 @@ const DECKS = {
             { word:'Surprised',  pronunciation:'/səˈpraɪzd/',    icon:'back_hand',      image:'https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?auto=format&fit=crop&q=80&w=400&h=400' },
             { word:'Brave',      pronunciation:'/breɪv/',         icon:'shield',         image:'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&q=80&w=400&h=400' },
         ]
+    },
+    family: {
+        id: 'family',
+        label: 'My Family',
+        emoji: '👨‍👩‍👧',
+        badgeId: 'explorer',
+        cards: [
+            { word:'Mother',   pronunciation:'/ˈmʌð.ər/',      icon:'woman',            image:'', aiEmoji:'👩' },
+            { word:'Father',   pronunciation:'/ˈfɑː.ðər/',     icon:'man',              image:'', aiEmoji:'👨' },
+            { word:'Sister',   pronunciation:'/ˈsɪs.tər/',     icon:'girl',             image:'', aiEmoji:'👧' },
+            { word:'Brother',  pronunciation:'/ˈbrʌð.ər/',     icon:'boy',              image:'', aiEmoji:'👦' },
+            { word:'Baby',     pronunciation:'/ˈbeɪ.bi/',       icon:'child_care',       image:'', aiEmoji:'👶' },
+            { word:'Grandma',  pronunciation:'/ˈɡræn.mɑː/',    icon:'elderly_woman',    image:'', aiEmoji:'👵' },
+            { word:'Grandpa',  pronunciation:'/ˈɡræn.pɑː/',    icon:'elderly',          image:'', aiEmoji:'👴' },
+            { word:'Family',   pronunciation:'/ˈfæm.əl.i/',    icon:'family_restroom',  image:'', aiEmoji:'👨‍👩‍👧' },
+        ]
+    },
+    jobs: {
+        id: 'jobs',
+        label: 'Jobs & Work',
+        emoji: '👷',
+        badgeId: 'explorer',
+        cards: [
+            { word:'Doctor',      pronunciation:'/ˈdɒk.tər/',       icon:'medical_services',      image:'', aiEmoji:'🧑‍⚕️' },
+            { word:'Teacher',     pronunciation:'/ˈtiː.tʃər/',      icon:'school',                image:'', aiEmoji:'🧑‍🏫' },
+            { word:'Farmer',      pronunciation:'/ˈfɑːr.mər/',      icon:'agriculture',           image:'', aiEmoji:'🧑‍🌾' },
+            { word:'Chef',        pronunciation:'/ʃef/',             icon:'restaurant',            image:'', aiEmoji:'🧑‍🍳' },
+            { word:'Pilot',       pronunciation:'/ˈpaɪ.lət/',       icon:'flight',                image:'', aiEmoji:'🧑‍✈️' },
+            { word:'Nurse',       pronunciation:'/nɜːrs/',           icon:'health_and_safety',     image:'', aiEmoji:'💉' },
+            { word:'Artist',      pronunciation:'/ˈɑːr.tɪst/',      icon:'palette',               image:'', aiEmoji:'🧑‍🎨' },
+            { word:'Firefighter', pronunciation:'/ˈfaɪərˌfaɪ.tər/', icon:'local_fire_department', image:'', aiEmoji:'🧑‍🚒' },
+        ]
+    },
+    house: {
+        id: 'house',
+        label: 'House & Home',
+        emoji: '🏠',
+        badgeId: 'explorer',
+        cards: [
+            { word:'House',  pronunciation:'/haʊs/',        icon:'home',              image:'', aiEmoji:'🏠' },
+            { word:'Door',   pronunciation:'/dɔːr/',         icon:'door_front',        image:'', aiEmoji:'🚪' },
+            { word:'Window', pronunciation:'/ˈwɪn.dəʊ/',    icon:'window',            image:'', aiEmoji:'🪟' },
+            { word:'Bed',    pronunciation:'/bed/',           icon:'bed',               image:'', aiEmoji:'🛏️' },
+            { word:'Chair',  pronunciation:'/tʃeər/',        icon:'chair',             image:'', aiEmoji:'🪑' },
+            { word:'Table',  pronunciation:'/ˈteɪ.bəl/',     icon:'table_restaurant',  image:'', aiEmoji:'🪑' },
+            { word:'Lamp',   pronunciation:'/læmp/',          icon:'light',             image:'', aiEmoji:'💡' },
+            { word:'Key',    pronunciation:'/kiː/',           icon:'key',               image:'', aiEmoji:'🔑' },
+        ]
+    },
+    actions: {
+        id: 'actions',
+        label: 'Actions & Verbs',
+        emoji: '🏃',
+        badgeId: 'explorer',
+        cards: [
+            { word:'Run',   pronunciation:'/rʌn/',     icon:'directions_run',       image:'', aiEmoji:'🏃' },
+            { word:'Jump',  pronunciation:'/dʒʌmp/',   icon:'sports_martial_arts',  image:'', aiEmoji:'🤸' },
+            { word:'Eat',   pronunciation:'/iːt/',      icon:'restaurant',           image:'', aiEmoji:'🍽️' },
+            { word:'Sleep', pronunciation:'/sliːp/',    icon:'bedtime',              image:'', aiEmoji:'😴' },
+            { word:'Read',  pronunciation:'/riːd/',     icon:'menu_book',            image:'', aiEmoji:'📖' },
+            { word:'Write', pronunciation:'/raɪt/',     icon:'edit',                 image:'', aiEmoji:'✍️' },
+            { word:'Play',  pronunciation:'/pleɪ/',     icon:'sports_soccer',        image:'', aiEmoji:'⚽' },
+            { word:'Swim',  pronunciation:'/swɪm/',     icon:'pool',                 image:'', aiEmoji:'🏊' },
+        ]
+    },
+    town: {
+        id: 'town',
+        label: 'Around Town',
+        emoji: '🏙️',
+        badgeId: 'explorer',
+        cards: [
+            { word:'City',     pronunciation:'/ˈsɪt.i/',        icon:'location_city',        image:'', aiEmoji:'🏙️' },
+            { word:'Street',   pronunciation:'/striːt/',         icon:'add_road',             image:'', aiEmoji:'🛣️' },
+            { word:'Park',     pronunciation:'/pɑːrk/',          icon:'park',                 image:'', aiEmoji:'🌳' },
+            { word:'Shop',     pronunciation:'/ʃɒp/',            icon:'storefront',           image:'', aiEmoji:'🏪' },
+            { word:'Market',   pronunciation:'/ˈmɑːr.kɪt/',     icon:'local_grocery_store',  image:'', aiEmoji:'🧺' },
+            { word:'Hospital', pronunciation:'/ˈhɒs.pɪ.təl/',   icon:'local_hospital',       image:'', aiEmoji:'🏥' },
+            { word:'Library',  pronunciation:'/ˈlaɪ.brer.i/',   icon:'local_library',        image:'', aiEmoji:'📚' },
+            { word:'Bridge',   pronunciation:'/brɪdʒ/',          icon:'route',                image:'', aiEmoji:'🌉' },
+        ]
+    },
+    time: {
+        id: 'time',
+        label: 'Time & Days',
+        emoji: '🕐',
+        badgeId: 'explorer',
+        cards: [
+            { word:'Day',      pronunciation:'/deɪ/',           icon:'light_mode',       image:'', aiEmoji:'☀️' },
+            { word:'Night',    pronunciation:'/naɪt/',          icon:'dark_mode',        image:'', aiEmoji:'🌙' },
+            { word:'Morning',  pronunciation:'/ˈmɔːr.nɪŋ/',    icon:'wb_twilight',      image:'', aiEmoji:'🌅' },
+            { word:'Today',    pronunciation:'/təˈdeɪ/',        icon:'today',            image:'', aiEmoji:'📅' },
+            { word:'Tomorrow', pronunciation:'/təˈmɒr.əʊ/',    icon:'event_upcoming',   image:'', aiEmoji:'⏭️' },
+            { word:'Week',     pronunciation:'/wiːk/',           icon:'date_range',       image:'', aiEmoji:'🗓️' },
+            { word:'Month',    pronunciation:'/mʌnθ/',           icon:'calendar_month',   image:'', aiEmoji:'📆' },
+            { word:'Year',     pronunciation:'/jɪər/',           icon:'event',            image:'', aiEmoji:'🎊' },
+        ]
+    },
+    travel: {
+        id:'travel', label:'Travel Ready', emoji:'✈️', badgeId:'explorer', cards:[
+            {word:'Passport',pronunciation:'/ˈpɑːs.pɔːrt/',icon:'badge',image:'',aiEmoji:'🛂'},
+            {word:'Airport',pronunciation:'/ˈeə.pɔːrt/',icon:'flight',image:'',aiEmoji:'🛫'},
+            {word:'Ticket',pronunciation:'/ˈtɪk.ɪt/',icon:'confirmation_number',image:'',aiEmoji:'🎫'},
+            {word:'Suitcase',pronunciation:'/ˈsuːt.keɪs/',icon:'luggage',image:'',aiEmoji:'🧳'},
+            {word:'Hotel',pronunciation:'/həʊˈtel/',icon:'hotel',image:'',aiEmoji:'🏨'},
+            {word:'Map',pronunciation:'/mæp/',icon:'map',image:'',aiEmoji:'🗺️'},
+            {word:'Train',pronunciation:'/treɪn/',icon:'train',image:'',aiEmoji:'🚆'},
+            {word:'Beach',pronunciation:'/biːtʃ/',icon:'beach_access',image:'',aiEmoji:'🏖️'},
+            {word:'Journey',pronunciation:'/ˈdʒɜː.ni/',icon:'route',image:'',aiEmoji:'🧭'},
+            {word:'Arrival',pronunciation:'/əˈraɪ.vəl/',icon:'flight_land',image:'',aiEmoji:'📍'}
+        ]
+    },
+    school: {
+        id:'school', label:'School Day', emoji:'🎒', badgeId:'explorer', cards:[
+            {word:'Backpack',pronunciation:'/ˈbæk.pæk/',icon:'backpack',image:'',aiEmoji:'🎒'},
+            {word:'Pencil',pronunciation:'/ˈpen.səl/',icon:'edit',image:'',aiEmoji:'✏️'},
+            {word:'Notebook',pronunciation:'/ˈnəʊt.bʊk/',icon:'menu_book',image:'',aiEmoji:'📓'},
+            {word:'Classroom',pronunciation:'/ˈklɑːs.ruːm/',icon:'school',image:'',aiEmoji:'🏫'},
+            {word:'Homework',pronunciation:'/ˈhəʊm.wɜːk/',icon:'assignment',image:'',aiEmoji:'📝'},
+            {word:'Question',pronunciation:'/ˈkwes.tʃən/',icon:'help',image:'',aiEmoji:'❓'},
+            {word:'Answer',pronunciation:'/ˈɑːn.sər/',icon:'check_circle',image:'',aiEmoji:'✅'},
+            {word:'Lesson',pronunciation:'/ˈles.ən/',icon:'auto_stories',image:'',aiEmoji:'📖'},
+            {word:'Learn',pronunciation:'/lɜːn/',icon:'psychology',image:'',aiEmoji:'🧠'},
+            {word:'Practice',pronunciation:'/ˈpræk.tɪs/',icon:'fitness_center',image:'',aiEmoji:'🎯'}
+        ]
+    },
+    conversation: {
+        id:'conversation', label:'Everyday Phrases', emoji:'💬', badgeId:'chat_master', cards:[
+            {word:'Hello!',pronunciation:'/həˈləʊ/',icon:'waving_hand',image:'',aiEmoji:'👋'},
+            {word:'Please',pronunciation:'/pliːz/',icon:'volunteer_activism',image:'',aiEmoji:'🙏'},
+            {word:'Thank you',pronunciation:'/θæŋk juː/',icon:'favorite',image:'',aiEmoji:'💛'},
+            {word:'Excuse me',pronunciation:'/ɪkˈskjuːz miː/',icon:'record_voice_over',image:'',aiEmoji:'🙋'},
+            {word:'How are you?',pronunciation:'/haʊ ɑː juː/',icon:'sentiment_satisfied',image:'',aiEmoji:'😊'},
+            {word:'I am fine',pronunciation:'/aɪ æm faɪn/',icon:'thumb_up',image:'',aiEmoji:'👍'},
+            {word:'I need help',pronunciation:'/aɪ niːd help/',icon:'support',image:'',aiEmoji:'🆘'},
+            {word:'Where is it?',pronunciation:'/weər ɪz ɪt/',icon:'location_on',image:'',aiEmoji:'📍'},
+            {word:'See you soon',pronunciation:'/siː juː suːn/',icon:'waving_hand',image:'',aiEmoji:'👋'},
+            {word:'Have a good day!',pronunciation:'/hæv ə ɡʊd deɪ/',icon:'light_mode',image:'',aiEmoji:'☀️'}
+        ]
     }
 };
 
@@ -187,6 +325,7 @@ function updateFlashcard() {
     // Reset flip
     const container = document.getElementById('card-container');
     if (container) container.classList.remove('flipped');
+    updateFavoriteButton();
 }
 
 function nextCard() {
@@ -199,6 +338,98 @@ function nextCard() {
     }
 }
 
+function flashcardKey(card) {
+    return `${activeDeckId}:${card.word}`;
+}
+
+function getFlashcardRatings() {
+    try { return JSON.parse(localStorage.getItem('capyFlashcardRatings') || '{}'); }
+    catch (e) { return {}; }
+}
+
+function getFavoriteCards() {
+    try { return JSON.parse(localStorage.getItem('capyFlashcardFavorites') || '{}'); }
+    catch (e) { return {}; }
+}
+
+function toggleFavoriteCard() {
+    const card = getActiveDeck().cards[currentCardIndex];
+    const favorites = getFavoriteCards();
+    const key = flashcardKey(card);
+    if (favorites[key]) delete favorites[key]; else favorites[key] = { deckId:activeDeckId, word:card.word };
+    localStorage.setItem('capyFlashcardFavorites', JSON.stringify(favorites));
+    updateFavoriteButton();
+    updateMasterySummary();
+}
+
+function updateFavoriteButton() {
+    const btn = document.getElementById('favorite-card-btn');
+    if (!btn) return;
+    const card = getActiveDeck().cards[currentCardIndex];
+    const active = !!getFavoriteCards()[flashcardKey(card)];
+    btn.textContent = active ? '★ Favoritado' : '☆ Favoritar';
+    btn.setAttribute('aria-pressed', String(active));
+}
+
+function shuffleActiveDeck() {
+    const deck = getActiveDeck();
+    deck.cards = [...deck.cards].sort(() => Math.random() - .5);
+    currentCardIndex = 0;
+    updateFlashcard();
+}
+
+function startQuickSession() {
+    const source = getActiveDeck();
+    const cards = [...source.cards].sort(() => Math.random() - .5).slice(0, 5);
+    const id = `quick_${source.id}`;
+    DECKS[id] = { id, label:'Quick 5', emoji:'⚡', badgeId:'explorer', cards };
+    switchDeck(id);
+}
+
+function reviewFavoriteCards() {
+    const favorites = getFavoriteCards();
+    const cards = [];
+    Object.values(DECKS).forEach(deck => deck.cards.forEach(card => {
+        if (favorites[`${deck.id}:${card.word}`] && !cards.some(item => item.word === card.word)) cards.push(card);
+    }));
+    if (!cards.length) return;
+    DECKS.favorites = { id:'favorites', label:'Favorites', emoji:'⭐', badgeId:'explorer', cards };
+    switchDeck('favorites');
+}
+
+function rateCard(status) {
+    const card = getActiveDeck().cards[currentCardIndex];
+    const ratings = getFlashcardRatings();
+    ratings[flashcardKey(card)] = status;
+    localStorage.setItem('capyFlashcardRatings', JSON.stringify(ratings));
+    updateMasterySummary();
+    nextCard();
+}
+
+function reviewLearningCards() {
+    const ratings = getFlashcardRatings();
+    const cards = getActiveDeck().cards.filter(card => ratings[flashcardKey(card)] === 'learning');
+    if (!cards.length) return;
+    const reviewId = `review_${activeDeckId}`;
+    DECKS[reviewId] = { id:reviewId, label:'Review Queue', emoji:'🧠', badgeId:'explorer', cards };
+    switchDeck(reviewId);
+}
+
+function updateMasterySummary() {
+    const el = document.getElementById('mastery-summary');
+    if (!el) return;
+    const ratings = getFlashcardRatings();
+    const deck = getActiveDeck();
+    const known = deck.cards.filter(card => ratings[flashcardKey(card)] === 'known').length;
+    const learning = deck.cards.filter(card => ratings[flashcardKey(card)] === 'learning').length;
+    const favoriteCount = Object.keys(getFavoriteCards()).length;
+    el.innerHTML = `<span class="text-emerald-300">✓ ${known} já sei</span><span class="text-amber-300">↻ ${learning} revisando</span><span class="text-pink-300">★ ${favoriteCount} favoritos</span>`;
+    const reviewBtn = document.getElementById('review-learning-btn');
+    if (reviewBtn) reviewBtn.disabled = learning === 0;
+    const favoriteBtn = document.getElementById('review-favorites-btn');
+    if (favoriteBtn) favoriteBtn.disabled = favoriteCount === 0;
+}
+
 function finishDeck() {
     const deck = getActiveDeck();
     if (window.Store) {
@@ -207,6 +438,13 @@ function finishDeck() {
         Store.unlockBadge(deck.badgeId || 'explorer');
         Store.completeActivity('flashcards');
     }
+    // Per-day flag read by the "Flashcards do Dia" node on the daily trail
+    // (learn.html) to show its done state — same convention as newsline,
+    // historyline and music_lab.
+    try {
+        const today = capyHojeBR();
+        localStorage.setItem('capyFlashXpDone_' + today, '1');
+    } catch (e) { /* storage unavailable — the deck still counts, just no badge on the trail */ }
     showDeckComplete();
 }
 
@@ -287,6 +525,7 @@ function updateDeckPicker() {
                     ${active ? '<span class="material-symbols-outlined text-sm" style="font-variation-settings:\'FILL\' 1;">check_circle</span>' : ''}
                 </button>`;
     }).join('');
+    updateMasterySummary();
 }
 
 // ── AI Topic Discovery ────────────────────────────────────────────────────────
@@ -301,6 +540,16 @@ const AI_TOPICS = [
     { id: 'garden',    label: 'Garden',    emoji: '🌻' },
     { id: 'ocean',     label: 'Ocean',     emoji: '🌊' },
     { id: 'music',     label: 'Music',     emoji: '🎵' },
+    { id: 'technology',label: 'Technology',emoji: '💻' },
+    { id: 'travel',    label: 'Travel',    emoji: '✈️' },
+    { id: 'health',    label: 'Health',    emoji: '🩺' },
+    { id: 'shopping',  label: 'Shopping',  emoji: '🛒' },
+    { id: 'birthday',  label: 'Birthday',  emoji: '🎂' },
+    { id: 'camping',   label: 'Camping',   emoji: '⛺' },
+    { id: 'farm',      label: 'Farm',      emoji: '🚜' },
+    { id: 'restaurant',label: 'Restaurant',emoji: '🍽️' },
+    { id: 'toys',      label: 'Toys',      emoji: '🧸' },
+    { id: 'insects',   label: 'Insects',   emoji: '🐞' },
 ];
 
 let aiDeckLoading = false;
@@ -334,7 +583,7 @@ async function loadAIDeck(topicId) {
     const topic = AI_TOPICS.find(t => t.id === topicId);
     if (!topic) return;
 
-    const today    = new Date().toISOString().slice(0, 10);
+    const today    = capyHojeBR();
     const cacheKey = `capyAIDeck_${topicId}_${today}`;
     const statusEl = document.getElementById('ai-deck-status');
 

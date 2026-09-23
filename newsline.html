@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Newsline | Capy Yara English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f','pink-brand':'#ec4899'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .4s ease both}
+.nl-chip{transition:all .15s;-webkit-tap-highlight-color:transparent}
+.nl-chip.selected{background:#001f3f;color:#fff;border-color:#001f3f}
+.nl-lvl-btn{transition:all .15s}
+.nl-lvl-btn.selected{background:#ec4899;color:#fff;border-color:#ec4899}
+.nl-lang-btn{transition:all .15s}
+.nl-lang-btn.selected{background:#fdf2f8;border-color:#ec4899;box-shadow:0 0 0 2px rgba(236,72,153,.25)}
+.nl-word{cursor:pointer;border-radius:5px;transition:background .12s}
+.nl-word:hover{background:#fce7f3}
+.nl-word.nl-learned{text-decoration:underline;text-decoration-color:#f9a8d4;text-decoration-style:dotted;text-underline-offset:2px}
+#nl-tooltip{display:none;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.35}
+.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:16px}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/newsline.html"/>
+<meta property="og:title" content="Newsline | Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Newsline | Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-pink-50/30 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+  <!-- Hero -->
+  <div class="relative overflow-hidden bg-gradient-to-br from-navy via-pink-950 to-pink-900 text-white">
+    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+      <span class="absolute text-7xl" style="top:10%;left:6%">📰</span>
+      <span class="absolute text-5xl" style="top:55%;right:10%">🌍</span>
+      <span class="absolute text-6xl" style="top:18%;right:22%">🗞️</span>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-6 py-12">
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">📰 Newsline</div>
+      <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">Aprenda com<br><span class="text-pink-300">notícias de verdade</span></h1>
+      <p class="text-white/70 max-w-lg">Escolha um tema, escolha o idioma, e a Yara traz notícias atuais adaptadas pro seu nível. Clique em qualquer palavra pra ver a tradução!</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- Controls card -->
+    <div id="input-section" class="fade-in">
+      <div class="bg-white rounded-3xl border-2 border-slate-100 p-6 mb-6">
+
+        <!-- Language toggle -->
+        <p class="font-black text-navy text-sm mb-2">Idioma</p>
+        <div class="flex gap-3 mb-5">
+          <button id="nl-lang-en" onclick="setNewsLang('en')" class="nl-lang-btn selected flex-1 border-2 border-slate-200 rounded-2xl py-3 font-black text-sm flex items-center justify-center gap-2">🇬🇧 Inglês</button>
+          <button id="nl-lang-fr" onclick="setNewsLang('fr')" class="nl-lang-btn flex-1 border-2 border-slate-200 rounded-2xl py-3 font-black text-sm flex items-center justify-center gap-2">🇫🇷 Francês</button>
+        </div>
+
+        <!-- Topic input -->
+        <p class="font-black text-navy text-sm mb-2">Sobre o que você quer ler?</p>
+        <input id="nl-topic-input" type="text" placeholder="Ex: futebol, tecnologia, Brasil..."
+               class="w-full border-2 border-slate-200 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-pink-400 transition-colors mb-3"
+               onkeydown="if(event.key==='Enter') searchNews()"/>
+
+        <!-- Quick chips -->
+        <div class="flex flex-wrap gap-2 mb-5">
+          <button class="nl-chip border-2 border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-600" onclick="pickChip('Brasil')">🇧🇷 Brasil</button>
+          <button class="nl-chip border-2 border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-600" onclick="pickChip('Tecnologia')">💻 Tecnologia</button>
+          <button class="nl-chip border-2 border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-600" onclick="pickChip('Esportes')">⚽ Esportes</button>
+          <button class="nl-chip border-2 border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-600" onclick="pickChip('Música')">🎵 Música</button>
+          <button class="nl-chip border-2 border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-600" onclick="pickChip('Ciência')">🔬 Ciência</button>
+        </div>
+
+        <!-- Level -->
+        <p class="font-black text-navy text-sm mb-2">Nível</p>
+        <div class="flex gap-3 mb-6">
+          <button id="nl-lvl-easy" onclick="setNewsLevel('easy')" class="nl-lvl-btn selected flex-1 border-2 border-slate-200 rounded-2xl py-3 font-black text-sm">🌱 Fácil</button>
+          <button id="nl-lvl-medium" onclick="setNewsLevel('medium')" class="nl-lvl-btn flex-1 border-2 border-slate-200 rounded-2xl py-3 font-black text-sm">🌳 Médio</button>
+        </div>
+
+        <button id="nl-search-btn" onclick="searchNews()"
+                class="w-full bg-gradient-to-r from-pink-500 to-navy text-white font-black py-4 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-sm text-base">
+          🔍 Buscar notícias
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="nl-loading" class="hidden flex flex-col gap-5">
+      <div class="skeleton h-8 w-52"></div>
+      <div class="bg-white border-2 border-slate-100 rounded-3xl p-6 flex flex-col gap-3">
+        <div class="skeleton h-5 w-full"></div>
+        <div class="skeleton h-5 w-5/6"></div>
+        <div class="skeleton h-5 w-full"></div>
+        <div class="skeleton h-5 w-4/5"></div>
+      </div>
+      <div class="bg-white border-2 border-slate-100 rounded-3xl p-6 flex flex-col gap-3">
+        <div class="skeleton h-5 w-full"></div>
+        <div class="skeleton h-5 w-5/6"></div>
+        <div class="skeleton h-5 w-full"></div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="nl-error" class="hidden bg-red-50 border-2 border-red-100 rounded-3xl p-6 text-center">
+      <div class="text-4xl mb-3">😅</div>
+      <p class="font-black text-red-700 mb-2">Ops, algo deu errado</p>
+      <p id="nl-error-msg" class="text-red-500 text-sm mb-4"></p>
+      <button onclick="resetNews()" class="bg-red-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all">Tentar novamente</button>
+    </div>
+
+    <!-- Empty (no articles found) -->
+    <div id="nl-empty" class="hidden bg-slate-50 border-2 border-slate-100 rounded-3xl p-8 text-center">
+      <div class="text-4xl mb-3">🔍</div>
+      <p class="font-black text-navy mb-1">Nenhuma notícia encontrada</p>
+      <p class="text-slate-400 text-sm mb-4">Tente um tema diferente ou mais genérico.</p>
+      <button onclick="resetNews()" class="bg-navy text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all">Nova busca</button>
+    </div>
+
+    <!-- Results -->
+    <div id="nl-results" class="hidden fade-in">
+      <div class="flex items-center justify-between gap-4 flex-wrap mb-5">
+        <div>
+          <p class="text-pink-500 text-xs font-black uppercase tracking-widest mb-0.5">📰 Newsline</p>
+          <p class="font-black text-xl text-navy" id="nl-results-title"></p>
+        </div>
+        <button onclick="resetNews()" class="bg-slate-100 hover:bg-slate-200 text-navy font-bold text-sm px-4 py-2 rounded-full transition-all flex-shrink-0">
+          ← Nova busca
+        </button>
+      </div>
+      <p class="text-slate-400 text-xs mb-5">💡 Clique em qualquer palavra pra ver a tradução em português!</p>
+      <div id="nl-articles" class="flex flex-col gap-5"></div>
+    </div>
+
+  </div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<!-- Translation tooltip (single reusable element) -->
+<div id="nl-tooltip" class="fixed z-[999] bg-navy text-white text-xs font-bold rounded-2xl px-4 py-3 shadow-2xl max-w-[240px]"></div>
+
+<!-- Paywall modal (padrão do site) -->
+<div id="nl-paywall-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4" style="background:rgba(0,0,0,.65);backdrop-filter:blur(8px)">
+  <div class="bg-[#001a35] border border-white/10 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+    <div class="text-5xl mb-4">🐾</div>
+    <h2 class="font-black text-2xl text-white mb-2">Yara needs a break!</h2>
+    <p class="text-slate-400 text-sm mb-6">Você usou todas as suas buscas de IA por hoje.<br>Volte amanhã ou libere mais agora.</p>
+
+    <div class="bg-white/5 rounded-2xl p-4 mb-3 text-left">
+      <p class="text-white font-bold text-sm">⏰ Espere até amanhã</p>
+      <p class="text-slate-500 text-xs mt-0.5">Seus créditos de IA renovam à meia-noite.</p>
+    </div>
+
+    <a href="https://pay.kiwify.com.br/SEU-LINK-CREDITOS" target="_blank"
+       class="block bg-amber-500/20 border border-amber-500/40 rounded-2xl p-4 mb-3 text-left hover:bg-amber-500/30 transition-all cursor-pointer">
+      <p class="text-amber-300 font-bold text-sm">⚡ Comprar +10 créditos de IA — R$4,90</p>
+      <p class="text-slate-500 text-xs mt-0.5">Pagamento único, sem assinatura.</p>
+    </a>
+
+    <a href="landing.html"
+       class="block bg-gradient-to-r from-pink-600 to-pink-500 rounded-2xl p-4 text-left hover:opacity-90 transition-all cursor-pointer">
+      <p class="text-white font-black text-sm">✨ Upgrade pra Plus — R$19,90/mês</p>
+      <p class="text-pink-200 text-xs mt-0.5">Mais créditos de IA por dia + todas as aulas.</p>
+    </a>
+
+    <button onclick="document.getElementById('nl-paywall-modal').classList.add('hidden')"
+      class="mt-5 text-slate-500 text-xs underline hover:text-slate-400 transition-colors">Talvez depois</button>
+  </div>
+</div>
+
+<script src="auth-secure.js?v=auth20260918"></script>
+    <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="levelup-overlay.js?v=c52d7db"></script>
+<script src="badge-toast.js?v=c52d7db"></script>
+<script src="components.js?v=push2"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('newsline'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('newsline'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('newsline'));
+
+// ── State ────────────────────────────────────────────────────────────────────
+let newsLang  = 'en';
+let newsLevel = 'easy';
+let newsArticles = [];
+
+function setNewsLang(lang) {
+  newsLang = lang;
+  document.getElementById('nl-lang-en').classList.toggle('selected', lang === 'en');
+  document.getElementById('nl-lang-fr').classList.toggle('selected', lang === 'fr');
+}
+
+function setNewsLevel(lvl) {
+  newsLevel = lvl;
+  document.getElementById('nl-lvl-easy').classList.toggle('selected', lvl === 'easy');
+  document.getElementById('nl-lvl-medium').classList.toggle('selected', lvl === 'medium');
+}
+
+function pickChip(label) {
+  document.getElementById('nl-topic-input').value = label;
+  document.querySelectorAll('.nl-chip').forEach(c => c.classList.toggle('selected', c.textContent.trim().includes(label)));
+}
+
+// ── Search ───────────────────────────────────────────────────────────────────
+async function searchNews() {
+  const topic = document.getElementById('nl-topic-input').value.trim();
+  if (!topic) { document.getElementById('nl-topic-input').focus(); return; }
+
+  // ── AI gate ──
+  if (window.Store && !Store.consumeAI()) {
+    document.getElementById('nl-paywall-modal').classList.remove('hidden');
+    return;
+  }
+
+  showState('loading');
+
+  try {
+    const session = JSON.parse(localStorage.getItem('capySession') || '{}');
+    const userId  = session?.id || 'guest';
+
+    const res = await fetch('/api/newsline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, lang: newsLang, level: newsLevel, userId })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    newsArticles = data.articles || [];
+    if (!newsArticles.length) { showState('empty'); return; }
+
+    renderArticles(topic);
+    showState('results');
+    // Analytics: successful news search (skip on error/empty)
+    if (window.capyTrack) capyTrack('newsline_search');
+    grantFirstSearchXP();
+  } catch (err) {
+    document.getElementById('nl-error-msg').textContent = err.message || 'Tente novamente em instantes.';
+    showState('error');
+  }
+}
+
+function grantFirstSearchXP() {
+  const today = capyHojeBR();
+  const key = `capyNewsXpDone_${today}`;
+  if (!localStorage.getItem(key) && window.Store) {
+    localStorage.setItem(key, '1');
+    Store.addXP(5);
+  }
+}
+
+const NL_STATE_IDS = { 'input-section': 'input-section', loading: 'nl-loading', error: 'nl-error', empty: 'nl-empty', results: 'nl-results' };
+function showState(state) {
+  Object.keys(NL_STATE_IDS).forEach(s => {
+    document.getElementById(NL_STATE_IDS[s]).classList.toggle('hidden', s !== state);
+  });
+}
+
+function resetNews() {
+  newsArticles = [];
+  document.getElementById('input-section').classList.remove('hidden');
+  document.getElementById('nl-loading').classList.add('hidden');
+  document.getElementById('nl-error').classList.add('hidden');
+  document.getElementById('nl-empty').classList.add('hidden');
+  document.getElementById('nl-results').classList.add('hidden');
+}
+
+// ── Tokenize text into clickable word spans, preserving punctuation/spacing ──
+function tokenize(text) {
+  return (text || '').match(/[\p{L}\p{M}]+(?:['’-][\p{L}\p{M}]+)*|[^\p{L}\p{M}]+/gu) || [];
+}
+
+function escapeHtml(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function renderClickable(text) {
+  const tokens = tokenize(text);
+  const ctx = (text || '').slice(0, 300).replace(/"/g, '&quot;');
+  return tokens.map(tok => {
+    if (/\p{L}/u.test(tok)) {
+      const w = tok.toLowerCase();
+      return `<span class="nl-word" data-word="${escapeHtml(w)}" data-context="${escapeHtml(ctx)}" onclick="onWordClick(this)">${escapeHtml(tok)}</span>`;
+    }
+    return escapeHtml(tok);
+  }).join('');
+}
+
+function renderArticles(topic) {
+  document.getElementById('nl-results-title').textContent = `Resultados para "${topic}"`;
+  document.getElementById('nl-articles').innerHTML = newsArticles.map(a => `
+    <div class="bg-white border-2 border-slate-100 rounded-3xl p-6">
+      <div class="flex items-center gap-2 mb-3 text-xs font-bold text-slate-400">
+        <span class="bg-pink-50 text-pink-600 px-2.5 py-1 rounded-full">${escapeHtml(a.source || 'News')}</span>
+        ${a.published ? `<span>· ${escapeHtml(formatPubDate(a.published))}</span>` : ''}
+      </div>
+      <h3 class="font-black text-navy text-xl mb-3 leading-snug">${renderClickable(a.title)}</h3>
+      <p class="text-slate-600 text-sm leading-relaxed mb-4">${renderClickable(a.body)}</p>
+      ${a.link ? `<a href="${a.link}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-pink-500 font-bold text-xs hover:underline">Ler a notícia original ↗</a>` : ''}
+    </div>`).join('');
+}
+
+function formatPubDate(raw) {
+  try {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  } catch (e) { return raw; }
+}
+
+// ── Translation cache (localStorage, FIFO cap ~500 per language) ────────────
+function getCacheObj(lang) {
+  try { return JSON.parse(localStorage.getItem('capyNewsTrans_' + lang) || '{"order":[],"map":{}}'); }
+  catch (e) { return { order: [], map: {} }; }
+}
+function getCachedTranslation(lang, word) {
+  return getCacheObj(lang).map[word];
+}
+function setCachedTranslation(lang, word, translation) {
+  const c = getCacheObj(lang);
+  if (!(word in c.map)) {
+    c.order.push(word);
+    if (c.order.length > 500) { const old = c.order.shift(); delete c.map[old]; }
+  }
+  c.map[word] = translation;
+  localStorage.setItem('capyNewsTrans_' + lang, JSON.stringify(c));
+}
+
+// ── Weak word integration (compatible with learn.html / lessons.html review) ─
+// Uses a synthetic numeric lesson id (9001) so gatherWeakWords()'s parseInt()
+// still works and removeWeakWord() round-trips correctly during review mode.
+const NEWSLINE_PROGRESS_KEY = 'lessonProgress_j9001';
+function recordNewsWeakWord(word, translation) {
+  let p;
+  try { p = JSON.parse(localStorage.getItem(NEWSLINE_PROGRESS_KEY)); } catch (e) { p = null; }
+  if (!p) p = { tools: {}, stars: {}, xpEarned: 0, weakWords: [], lastActivity: '' };
+  if (!p.weakWords) p.weakWords = [];
+  if (!p.weakWords.find(w => w.en === word)) {
+    p.weakWords.push({ en: word, pt: translation, source: 'newsline' });
+  }
+  p.lastActivity = capyHojeBR();
+  localStorage.setItem(NEWSLINE_PROGRESS_KEY, JSON.stringify(p));
+}
+
+// ── Word click → tooltip with translation ────────────────────────────────────
+function positionTooltip(tip, span) {
+  const rect = span.getBoundingClientRect();
+  tip.style.display = 'block';
+  const left = Math.max(8, Math.min(window.innerWidth - 248, rect.left));
+  const top  = Math.max(8, rect.top - 8 - tip.offsetHeight);
+  tip.style.left = left + 'px';
+  tip.style.top  = (top > 0 ? top : rect.bottom + 8) + 'px';
+}
+
+async function onWordClick(span) {
+  const word = span.dataset.word;
+  const context = span.dataset.context || '';
+  const tip = document.getElementById('nl-tooltip');
+  tip.innerHTML = '<span class="opacity-70">…</span>';
+  positionTooltip(tip, span);
+
+  const targetLangLabel = 'Portuguese (Brazil)';
+  const cached = getCachedTranslation(newsLang, word);
+  if (cached) {
+    tip.innerHTML = `<p class="text-sm">${escapeHtml(word)}</p><p class="text-pink-300">${escapeHtml(cached)}</p>`;
+    positionTooltip(tip, span);
+    span.classList.add('nl-learned');
+    recordNewsWeakWord(word, cached);
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, targetLang: targetLangLabel, context })
+    });
+    const data = await res.json();
+    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const clean = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const obj = JSON.parse(clean);
+    const translation = obj.translation || '—';
+    setCachedTranslation(newsLang, word, translation);
+    tip.innerHTML = `<p class="text-sm">${escapeHtml(word)}</p><p class="text-pink-300">${escapeHtml(translation)}</p>`;
+    positionTooltip(tip, span);
+    span.classList.add('nl-learned');
+    recordNewsWeakWord(word, translation);
+  } catch (e) {
+    tip.innerHTML = '<span>⚠️ Tradução indisponível</span>';
+    positionTooltip(tip, span);
+  }
+}
+
+// Close tooltip when clicking outside a word / the tooltip itself
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nl-word') && !e.target.closest('#nl-tooltip')) {
+    document.getElementById('nl-tooltip').style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

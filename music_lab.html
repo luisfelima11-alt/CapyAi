@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Music Lab | Capy Yara Adventures</title>
+<title>Music Lab | Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -23,6 +23,24 @@
 .result-card{cursor:pointer;transition:all .15s}
 .result-card:hover{background:#faf5ff}
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/music_lab.html"/>
+<meta property="og:title" content="Music Lab | Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Music Lab | Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-purple-50/30 min-h-screen">
 <div id="top-nav-placeholder"></div>
@@ -179,9 +197,10 @@
   </div>
 </main>
 <div id="mobile-nav-placeholder"></div>
-<script src="store.js?v=c52d7db"></script>
-<script src="auth.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="components.js?v=push2"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('music'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('music'));
@@ -219,12 +238,35 @@ async function searchSongs(query) {
   try {
     const res = await fetch(`/api/lyrics-search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
+    // 429 = limite do plano acabou. Antes isso caía no "Nenhuma música
+    // encontrada" e o aluno achava que a música não existia.
+    if (res.status === 429 || data.error === 'rate_limited') {
+      mostrarLimite(data);
+      return;
+    }
     renderSearchResults(data.data || []);
   } catch(e) {
     renderSearchResults([]);
   } finally {
     document.getElementById('search-loading').classList.add('hidden');
   }
+}
+
+// Explica o motivo real quando o limite diário acaba, e mostra a saída.
+function mostrarLimite(data) {
+  const box = document.getElementById('search-results');
+  const plano = (data && data.plan) === 'free' ? 'grátis' : ((data && data.plan) || 'atual');
+  const quanto = (data && data.limit) ? ` (${data.used || data.limit}/${data.limit} hoje)` : '';
+  box.innerHTML = `
+    <div class="p-5 bg-amber-50 border-2 border-amber-200 rounded-2xl">
+      <p class="font-black text-amber-800 text-sm mb-1">🎵 Seu limite de músicas de hoje acabou${quanto}</p>
+      <p class="text-amber-700 text-xs mb-3">Não é a música que está faltando — é o limite do plano ${plano}. Ele volta amanhã.</p>
+      <div class="flex gap-2 flex-wrap">
+        <a href="landing.html#pricing" class="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs px-4 py-2 rounded-xl">Ver planos</a>
+        <a href="4_Login_Capy_Yara_Welcomes_You.html?next=music_lab.html" class="bg-white border-2 border-amber-300 text-amber-700 font-black text-xs px-4 py-2 rounded-xl">Entrar na conta</a>
+      </div>
+    </div>`;
+  box.classList.remove('hidden');
 }
 
 function renderSearchResults(tracks) {
@@ -286,6 +328,14 @@ async function selectSong(artist, title, cover, album) {
   try {
     const res = await fetch(`/api/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
     const data = await res.json();
+    // Limite do plano não é "letra inexistente" — dizer isso confunde o aluno.
+    if (res.status === 429 || data.error === 'rate_limited') {
+      document.getElementById('lyrics-loading').classList.add('hidden');
+      document.getElementById('lyrics-err').textContent = '⏳ Limite diário atingido — volta amanhã';
+      document.getElementById('lyrics-err').classList.remove('hidden');
+      document.getElementById('analyze-btn').disabled = true;
+      return;
+    }
     if (data.lyrics && data.lyrics.length > 20) {
       selectedLyrics = data.lyrics;
       document.getElementById('lyrics-loading').classList.add('hidden');
@@ -330,11 +380,24 @@ async function analyzeLyrics() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     renderResults(data);
+    grantFirstAnalysisXP();
   } catch(err) {
     document.getElementById('lab-loading').classList.add('hidden');
     document.getElementById('lab-error').classList.remove('hidden');
     document.getElementById('lab-error-msg').textContent = err.message || 'Tente novamente.';
     document.getElementById('input-section').classList.remove('hidden');
+  }
+}
+
+// Mirrors newsline/historyline: +5 XP the first time the student analyses a
+// song each day. The per-day flag is also what the trail's "Música do Dia"
+// discovery node reads to show its done state.
+function grantFirstAnalysisXP() {
+  const today = capyHojeBR();
+  const key = `capyMusicXpDone_${today}`;
+  if (!localStorage.getItem(key) && window.Store) {
+    localStorage.setItem(key, '1');
+    Store.addXP(5);
   }
 }
 

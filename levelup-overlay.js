@@ -20,24 +20,24 @@
                 <!-- Yara avatar with crown -->
                 <div class="relative z-10">
                     <div class="w-28 h-28 rounded-full overflow-hidden border-4 border-pink-500/80 shadow-2xl shadow-pink-500/40">
-                        <img src="Hello Yara profile pic 002.png" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
+                        <img src="yara-avatar.png?v=3" alt="Yara" style="width:100%;height:100%;object-fit:cover;"/>
                     </div>
                     <!-- Crown -->
                     <div class="absolute -top-4 left-1/2 -translate-x-1/2 text-4xl select-none">👑</div>
                 </div>
                 <div class="relative z-10 text-center">
-                    <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">✨ Level Up! ✨</p>
+                    <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">✨ Subiu de nível! ✨</p>
                     <h2 id="levelup-title"
                         class="font-headline text-7xl font-black text-white leading-none mb-2">5</h2>
                     <p id="levelup-sub"
-                       class="font-body text-slate-300 text-lg">You're now a <span class="text-green-400 font-bold">Level 5 Explorer</span>!</p>
-                    <p class="font-label text-pink-300 text-sm mt-2">Yara is so proud of you! 🌿</p>
+                       class="font-body text-slate-300 text-lg">Você agora é <span class="text-green-400 font-bold">Explorador nível 5</span>!</p>
+                    <p class="font-label text-pink-300 text-sm mt-2">A Yara está orgulhosa de você! 🌿</p>
                 </div>
                 <button onclick="LevelUpOverlay.dismiss()"
                         class="relative z-10 mt-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400
                                text-white font-label font-bold px-10 py-4 rounded-full text-lg active:scale-95 transition-all
                                shadow-lg shadow-pink-500/40">
-                    Keep Exploring! 🎉
+                    Continuar explorando! 🎉
                 </button>
             </div>
         </div>
@@ -102,7 +102,7 @@
             if (!overlay) return;
 
             title.textContent = level;
-            sub.innerHTML = `You reached <span class="text-green-400 font-bold">Level ${level}</span> — keep going, Explorer!`;
+            sub.innerHTML = `Você chegou ao <span class="text-green-400 font-bold">nível ${level}</span> — continue assim, explorador!`;
 
             overlay.classList.remove('hidden-overlay');
             spawnSparks();

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar · Capy English</title>
+<!-- Sem preview: impede que o robô do WhatsApp/Telegram monte cartão com a URL -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#001f3f; --laranja:#FF9F1C; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:linear-gradient(135deg,#f8fafc,#eef2ff);
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif;
+    color:var(--navy);
+  }
+  .cartao {
+    width:100%; max-width:420px; background:#fff; border-radius:24px; padding:36px 28px;
+    box-shadow:0 12px 40px rgba(0,31,63,.10); text-align:center;
+  }
+  .pata { font-size:52px; line-height:1; margin-bottom:10px; }
+  h1 { font-size:22px; font-weight:900; margin:0 0 10px; }
+  p { font-size:15px; line-height:1.6; color:#475569; margin:0 0 26px; }
+  .botao {
+    display:block; width:100%; border:0; cursor:pointer;
+    background:linear-gradient(135deg,var(--laranja),#fb923c); color:#fff;
+    font-family:inherit; font-weight:900; font-size:16px; padding:16px 24px; border-radius:16px;
+    box-shadow:0 8px 20px rgba(249,115,22,.32); transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .botao:hover { transform:translateY(-1px); box-shadow:0 10px 26px rgba(249,115,22,.4); }
+  .botao:disabled { opacity:.6; cursor:default; transform:none; }
+  .aviso { font-size:12px; color:#94a3b8; margin:20px 0 0; line-height:1.5; }
+  .erro { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c;
+          border-radius:14px; padding:16px; font-size:14px; line-height:1.6; text-align:left; }
+  .erro strong { display:block; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<div class="cartao">
+  <div class="pata">🐾</div>
+  <h1 id="titulo">Seu acesso está pronto</h1>
+  <p id="texto">Toque no botão abaixo para entrar na Capy English.</p>
+  <div id="area"></div>
+  <p class="aviso" id="rodape">Este acesso é de uso único. Se não funcionar, peça um link novo ao professor.</p>
+</div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════════════════
+// Por que esta página existe
+// ════════════════════════════════════════════════════════════════════════════
+// O link de acesso do Supabase é de USO ÚNICO: a primeira requisição ao
+// /api/auth/callback consome o token. Aplicativos de mensagem (WhatsApp,
+// Telegram, Outlook) ABREM a URL sozinhos para montar a pré-visualização do
+// link — e isso queima o token antes de o aluno tocar nele. O aluno então vê
+// `otp_expired` num link que nunca usou. Foi exatamente o que aconteceu com o
+// Luan em 19/set/2026.
+//
+// A solução é separar as duas coisas: esta página é inofensiva de abrir
+// (nada é consumido), e só o CLIQUE navega para o callback. Robô de preview
+// não clica em botão.
+// ════════════════════════════════════════════════════════════════════════════
+
+(function () {
+  var params = new URLSearchParams(location.search);
+  var t = params.get('t') || '';
+  var area = document.getElementById('area');
+
+  // O hash do Supabase é hexadecimal. Validar aqui evita montar uma URL com
+  // lixo vindo da query string.
+  if (!/^[a-f0-9]{20,128}$/i.test(t)) {
+    document.getElementById('titulo').textContent = 'Link incompleto';
+    document.getElementById('texto').textContent = '';
+    document.getElementById('rodape').textContent = '';
+    area.innerHTML = '<div class="erro"><strong>Faltou uma parte do endereço.</strong>'
+      + 'Isso costuma acontecer quando o link é copiado pela metade. '
+      + 'Peça o link novo ao professor e toque nele direto na conversa.</div>';
+    return;
+  }
+
+  var destino = '/api/auth/callback?token_hash=' + encodeURIComponent(t)
+              + '&type=magiclink&next=' + encodeURIComponent('/learn.html');
+
+  var botao = document.createElement('button');
+  botao.className = 'botao';
+  botao.type = 'button';
+  botao.textContent = '⚡ Entrar agora';
+  botao.addEventListener('click', function () {
+    botao.disabled = true;
+    botao.textContent = 'Entrando…';
+    location.href = destino;
+  });
+  area.appendChild(botao);
+})();
+</script>
+</body>
+</html>

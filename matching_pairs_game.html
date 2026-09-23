@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Matching Pairs — Capy Yara Adventures</title>
+<title>Matching Pairs — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -59,6 +59,24 @@ tailwind.config = {
   /* Progress bar */
   #prog-fill { transition: width 0.5s ease; }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/matching_pairs_game.html"/>
+<meta property="og:title" content="Matching Pairs — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Matching Pairs — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-primary font-body text-white min-h-screen flex flex-col">
 
@@ -70,7 +88,7 @@ tailwind.config = {
   </button>
   <div>
     <p class="font-label text-xs text-cyan-400 uppercase tracking-widest font-bold">Matching Pairs</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Find the matches! 🃏</h1>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Encontre os pares! 🃏</h1>
   </div>
   <div class="ml-auto flex items-center gap-4">
     <!-- Timer ring -->
@@ -94,7 +112,7 @@ tailwind.config = {
 
 <!-- Round label -->
 <div class="text-center py-4 fade-up">
-  <p class="font-label text-cyan-400 text-sm font-bold uppercase tracking-widest" id="round-lbl">Round 1 — Match the word to the emoji!</p>
+  <p class="font-label text-cyan-400 text-sm font-bold uppercase tracking-widest" id="round-lbl">Rodada 1 — Combine a palavra com o emoji!</p>
 </div>
 
 <!-- Card grid -->
@@ -104,7 +122,9 @@ tailwind.config = {
   </div>
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
@@ -119,9 +139,9 @@ const ALL_PAIRS = [
 ];
 
 const ROUNDS = [
-  { pairs: 4, time: 60, label: 'Round 1 — Match the word to the emoji!' },
-  { pairs: 6, time: 75, label: 'Round 2 — More pairs, can you find them?' },
-  { pairs: 8, time: 90, label: 'Round 3 — Expert level! 💪' },
+  { pairs: 4, time: 60, label: 'Rodada 1 — Combine a palavra com o emoji!' },
+  { pairs: 6, time: 75, label: 'Rodada 2 — Mais pares, você consegue achar?' },
+  { pairs: 8, time: 90, label: 'Rodada 3 — Nível expert! 💪' },
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -272,7 +292,7 @@ function showRoundEnd(success) {
 
   if (success && !isLastRound) {
     // Brief success toast, advance
-    showToast(`✅ Round ${round+1} complete! +bonus 🎉`, '#10b981');
+    showToast(`✅ Rodada ${round+1} completa! +bônus 🎉`, '#10b981');
     round++;
     setTimeout(startRound, 1500);
     return;
@@ -298,20 +318,20 @@ function showRoundEnd(success) {
       <div class="text-7xl">${success ? '🏆' : '⏰'}</div>
       <div>
         <p class="font-label text-cyan-400 font-bold text-sm uppercase tracking-widest mb-1">
-          ${success ? 'All Matched!' : "Time's Up!"}
+          ${success ? 'Tudo Combinado!' : "Tempo Esgotado!"}
         </p>
         <h2 class="font-headline text-5xl font-black text-white mb-1">+${xpEarned} XP</h2>
-        <p class="font-body text-slate-300">Score: ${score} pts · ${matchedCount}/${ROUNDS[round].pairs} pairs found</p>
+        <p class="font-body text-slate-300">Pontuação: ${score} pts · ${matchedCount}/${ROUNDS[round].pairs} pares encontrados</p>
       </div>
       <div class="flex gap-1">
         ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
              style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
       </div>
-      ${stars===3?'<div class="bg-cyan-500/20 border border-cyan-500/40 rounded-xl px-4 py-2 text-cyan-300 font-label font-bold text-sm">🏅 Game Hero badge unlocked!</div>':''}
+      ${stars===3?'<div class="bg-cyan-500/20 border border-cyan-500/40 rounded-xl px-4 py-2 text-cyan-300 font-label font-bold text-sm">🏅 Medalha Herói do Jogo desbloqueada!</div>':''}
       <div class="flex gap-3 flex-wrap justify-center">
-        <button onclick="restartGame()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again 🔄</button>
+        <button onclick="restartGame()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Jogar de novo 🔄</button>
         <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-cyan-500 hover:bg-cyan-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-cyan-500/30">Games 🌿</button>
+                class="bg-cyan-500 hover:bg-cyan-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-cyan-500/30">Jogos 🌿</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -358,5 +378,7 @@ function launchSparksAt(el) {
   }
 }
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

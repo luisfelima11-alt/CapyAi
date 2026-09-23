@@ -1,20 +1,34 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Learning Path — Yara's Forest</title>
+  <title>Trilha Diária de Inglês — Capy English</title>
+<meta name="description" content="Uma lição de inglês por dia, com jogos, flashcards e conversação. Ganhe XP, mantenha a sequência e evolua sem travar. Comece de graça."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/learn.html"/>
+<meta property="og:title" content="Trilha Diária de Inglês — Capy English"/>
+<meta property="og:description" content="Uma lição de inglês por dia, com jogos, flashcards e conversação. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-  <script src="auth.js?v=c52d7db"></script>
-  <script src="store.js?v=c52d7db"></script>
+  <script src="auth-secure.js?v=auth20260918"></script>
+  <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
   <script src="badge-toast.js?v=c52d7db"></script>
   <script src="levelup-overlay.js?v=c52d7db"></script>
-  <script src="components.js?v=c52d7db"></script>
+  <script src="components.js?v=push2"></script>
+  <script src="lessons_tr_data.js?v=tr2"></script>
   <script>
     tailwind.config = {
       darkMode:'class',
@@ -29,6 +43,19 @@
       100% { box-shadow:0 0 0 0 rgba(236,72,153,0); }
     }
     .node-current { animation:pulse-ring 1.8s ease-out infinite; }
+    @media (prefers-reduced-motion: reduce) {
+      .node-current { animation:none; box-shadow:0 0 0 4px rgba(236,72,153,.35); }
+      .node-balloon { animation:none !important; }
+      .boss-pulse { animation:none !important; box-shadow:0 0 0 4px rgba(217,70,239,.4); }
+    }
+    @keyframes bossPulse {
+      0%   { box-shadow:0 0 0 0 rgba(217,70,239,.6); }
+      70%  { box-shadow:0 0 0 16px rgba(217,70,239,0); }
+      100% { box-shadow:0 0 0 0 rgba(217,70,239,0); }
+    }
+    .boss-pulse { animation:bossPulse 1.8s ease-out infinite; }
+    @keyframes balloonFloat { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-4px)} }
+    .node-balloon { animation:balloonFloat 1.6s ease-in-out infinite; position:absolute; left:50%; top:-34px; white-space:nowrap; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
     .fade-up { animation:fadeUp .4s ease forwards; }
     .lesson-node { transition:transform .18s cubic-bezier(0.34,1.56,0.64,1), box-shadow .18s; }
@@ -38,8 +65,12 @@
     .filter-btn { transition:all .18s; }
     .filter-btn.active { background:rgba(236,72,153,.2); border-color:#ec4899; color:#f9a8d4; }
   </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
 </head>
-<body class="bg-[#001229] text-white min-h-screen">
+<body class="bg-navy text-white min-h-screen">
 
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
@@ -51,27 +82,97 @@
     <!-- Level badge -->
     <div class="flex items-center gap-3 mb-5">
       <div id="level-badge" class="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-2 rounded-full">
-        <span id="level-emoji" class="text-xl">🌱</span>
+        <span id="level-emoji" class="text-xl inline-flex items-center">🌱</span>
         <span id="level-name" class="font-black text-sm text-white">Starter Level</span>
       </div>
       <a href="placement_test.html" class="text-slate-500 hover:text-slate-300 text-xs underline">Retake test →</a>
     </div>
 
-    <!-- Continue CTA -->
-    <div id="continue-card" class="hidden bg-gradient-to-r from-pink-600 to-pink-500 rounded-2xl p-5 mb-6 flex items-center justify-between shadow-xl shadow-pink-500/20">
-      <div>
-        <p class="text-pink-100 text-xs font-bold uppercase tracking-wider mb-1">Continue where you left off</p>
-        <p id="continue-title" class="text-white font-black text-lg"></p>
-        <p id="continue-step"  class="text-pink-200 text-xs mt-0.5"></p>
+    <!-- Continue CTA / Hero -->
+    <div id="continue-card" class="hidden relative overflow-hidden bg-gradient-to-br from-navy via-[#0d2240] to-pink-900/40 border border-pink-500/20 rounded-3xl p-5 md:p-6 mb-8 shadow-2xl shadow-pink-500/10">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <p id="continue-eyebrow" class="relative text-pink-300 text-[11px] font-black uppercase tracking-wider mb-2">Continue where you left off</p>
+      <div class="relative flex items-center gap-4">
+        <div id="continue-emoji" class="text-4xl md:text-5xl bg-white/10 rounded-2xl w-16 h-16 flex items-center justify-center flex-shrink-0">🌱</div>
+        <div class="min-w-0 flex-1">
+          <p id="continue-title" class="text-white font-black text-lg md:text-xl leading-tight truncate"></p>
+          <p id="continue-step"  class="text-pink-200 text-xs mt-0.5"></p>
+          <p id="continue-xp"    class="text-yellow-400 text-xs font-bold mt-1"></p>
+        </div>
       </div>
-      <button id="continue-btn" onclick="" class="bg-white text-pink-600 font-black px-5 py-3 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all text-sm flex-shrink-0">
-        Continue →
+      <div class="relative mt-4">
+        <div class="flex items-center justify-between mb-1">
+          <span id="continue-chapter-label" class="text-slate-400 text-[10px] font-bold uppercase tracking-wide"></span>
+          <span id="continue-chapter-count" class="text-slate-400 text-[10px] font-bold"></span>
+        </div>
+        <div class="bg-white/10 rounded-full h-2 overflow-hidden">
+          <div id="continue-chapter-bar" class="h-full bg-gradient-to-r from-emerald-400 to-pink-400 rounded-full transition-all" style="width:0%"></div>
+        </div>
+      </div>
+      <button id="continue-btn" onclick="" class="relative mt-4 w-full bg-pink-500 hover:bg-pink-400 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-pink-500/30 hover:scale-[1.02] active:scale-95 transition-all min-h-[44px]">
+        ▶ Continue
       </button>
     </div>
 
+    <!-- ── Review ("Revisão da Yara") card — shown only if ≥4 weak words ──── -->
+    <div id="review-card" class="hidden bg-gradient-to-r from-violet-500/20 to-pink-500/20 rounded-3xl p-5 mb-4 fade-up">
+      <div class="flex items-center gap-4">
+        <div class="text-4xl flex-shrink-0">🔁</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-black text-white text-sm">Revisão da Yara</p>
+          <p id="review-card-count" class="text-white/70 text-xs mt-0.5"></p>
+        </div>
+        <button onclick="window.location.href='lessons.html?review=1'" class="flex-shrink-0 bg-pink-500 hover:bg-pink-400 text-white font-black px-4 py-3 rounded-2xl text-sm transition-all active:scale-95 min-h-[44px]">
+          Revisar
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Streak em risco ──────────────────────────────────────
+         Até aqui a única fricção de perda chegava por push às 19h — para quem
+         tem push, que é 1 em 8 alunos. Dentro do app, nenhuma tela dizia que a
+         streak morria hoje. -->
+    <div id="streak-risco" class="hidden mb-4 fade-up rounded-3xl p-4 bg-gradient-to-r from-orange-500/15 to-pink-500/15 border border-orange-400/30">
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="text-2xl leading-none" id="streak-risco-icone">🔥</span>
+        <div class="flex-1 min-w-[180px]">
+          <p id="streak-risco-titulo" class="font-black text-white text-sm leading-snug"></p>
+          <p id="streak-risco-sub" class="text-white/60 text-[11px] font-bold mt-0.5"></p>
+        </div>
+        <button id="streak-risco-btn" class="flex-shrink-0 bg-orange-500 hover:bg-orange-400 text-white font-black px-4 py-3 rounded-2xl text-sm transition-all active:scale-95 min-h-[44px]">
+          Praticar agora
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Daily Quests card ─────────────────────────────────── -->
+    <div id="quests-card" class="bg-white/5 rounded-3xl p-5 mb-4 fade-up">
+      <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <h3 class="font-black text-white text-sm flex items-center gap-2">🎯 Missões de Hoje</h3>
+        <div class="flex items-center gap-2">
+          <span id="freeze-chip" class="bg-cyan-500/15 text-cyan-300 text-[11px] font-black px-3 py-1.5 rounded-full flex items-center gap-1 min-h-[28px]">🧊 x0</span>
+          <button id="freeze-buy-btn" onclick="buyFreeze()" class="hidden bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-[10px] font-black px-2.5 py-1.5 rounded-full transition-all min-h-[28px]">
+            Comprar 80🫐
+          </button>
+        </div>
+      </div>
+      <p id="freeze-protected-msg" class="hidden text-cyan-300 text-[11px] font-bold bg-cyan-500/10 rounded-xl px-3 py-2 mb-3">🧊 Sua streak foi protegida ontem!</p>
+      <div id="quests-list" class="flex flex-col gap-3"></div>
+    </div>
+
     <div class="flex items-end justify-between mb-1">
-      <h1 class="font-black text-2xl text-white">Your Learning Path</h1>
+      <div class="flex items-center gap-3">
+        <img src="yara.png?v=3" alt="Yara" class="w-12 h-12 rounded-full object-cover border-2 border-pink-400/60 shadow-lg shadow-pink-500/20"/>
+        <h1 class="font-black text-2xl text-white">Your Learning Path</h1>
+      </div>
       <span id="trail-progress-label" class="text-slate-500 text-xs font-bold">0 / 24 done</span>
+    </div>
+
+    <!-- Language toggle -->
+    <div id="trail-lang-toggle" class="inline-flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1 mb-3">
+      <button data-lang="en" onclick="setTrailLang('en')" class="bg-pink-500 text-white font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇬🇧 English</button>
+      <button data-lang="fr" onclick="setTrailLang('fr')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇫🇷 Français</button>
+      <button data-lang="tr" onclick="setTrailLang('tr')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇹🇷 Türkçe</button>
     </div>
     <!-- Free plan banner -->
     <div id="free-plan-banner" class="hidden flex items-center justify-between bg-pink-500/10 border border-pink-500/25 rounded-xl px-4 py-2.5 mb-3">
@@ -121,44 +222,1453 @@
 <div id="mobile-nav-placeholder"></div>
 
 <script>
-// ── Trail data (22 lessons from Jadson course) ────────────────────────────────
+// ── Trail data (static lesson list; count grows as courses are added — do not hardcode a number here) ────────────────────────────────
 const TRAIL = [
-  // Chapter 1 — Beginner (Core Verbs)
-  { id:1,  emoji:'💬', title:'To Have, Want, Need, Like',   chapter:1, game:'word_match_game.html',        xp:30 },
-  { id:2,  emoji:'🚶', title:'To Go, Do, Say, See',          chapter:1, game:'fill_blank_game.html',        xp:30 },
-  { id:3,  emoji:'🧠', title:'To Get, Make, Know, Take',     chapter:1, game:'grammar_lab.html',            xp:35 },
-  { id:4,  emoji:'👀', title:'To Come, Think, Look, Give',   chapter:1, game:'matching_pairs_game.html',    xp:35 },
-  { id:5,  emoji:'✉️', title:'To Tell, Work, Feel, Leave',   chapter:1, game:'sentence_builder_game.html',  xp:40 },
-  // Chapter 2 — Elementary (Grammar Foundations)
-  { id:6,  emoji:'⚡', title:'Modal Verbs: Can, Could, Should', chapter:2, game:'spelling_bee_game.html',   xp:40 },
-  { id:7,  emoji:'⏪', title:'Past Simple — Regular Verbs',   chapter:2, game:'word_scramble_game.html',    xp:45 },
-  { id:8,  emoji:'🔄', title:'Past Simple — Irregular Verbs', chapter:2, game:'word_search_game.html',      xp:45 },
-  { id:9,  emoji:'📍', title:'Prepositions of Place',         chapter:2, game:'fill_blank_game.html',       xp:45 },
-  { id:10, emoji:'🔢', title:'Quantifiers: Many, Much, More', chapter:2, game:'berry_math_game.html',       xp:50 },
-  { id:11, emoji:'📊', title:'Adjectives & Comparatives',     chapter:2, game:'hangman_game.html',           xp:50 },
-  { id:12, emoji:'🔮', title:'Future: Will & Going to',       chapter:2, game:'grammar_lab.html',           xp:55 },
-  // Chapter 3 — Pre-Intermediate (Real World Topics)
-  { id:13, emoji:'💼', title:'Work & Career',                 chapter:3, game:'word_match_game.html',       xp:55 },
-  { id:14, emoji:'💻', title:'Technology & Digital Life',     chapter:3, game:'word_search_game.html',      xp:55 },
-  { id:15, emoji:'✈️', title:'Travel & Tourism',              chapter:3, game:'word_scramble_game.html',    xp:60 },
-  { id:16, emoji:'🏥', title:'Health & Wellness',             chapter:3, game:'hangman_game.html',           xp:60 },
-  { id:17, emoji:'🏠', title:'My Home — There is / There are',chapter:3, game:'matching_pairs_game.html',   xp:60 },
-  { id:18, emoji:'🎬', title:'Past Continuous',               chapter:3, game:'fill_blank_game.html',       xp:65 },
-  // Chapter 4 — Intermediate (Advanced Grammar)
-  { id:19, emoji:'🏆', title:'Superlatives',                  chapter:4, game:'word_scramble_game.html',    xp:65 },
-  { id:20, emoji:'📊', title:'MOST — Quantifier & Reference', chapter:4, game:'flappy_yara_game.html',      xp:70 },
-  { id:21, emoji:'🎯', title:'Can, Could & Would',            chapter:4, game:'spelling_bee_game.html',     xp:70 },
-  { id:22, emoji:'🚀', title:'Future with WILL & WON\'T',     chapter:4, game:'color_catch_game.html',      xp:75 },
-  { id:23, emoji:'😊', title:'Personalities & Moods',         chapter:4, game:'word_scramble_game.html',    xp:80 },
-  { id:24, emoji:'⏳', title:'Still vs. Yet & Possessives',   chapter:4, game:'daily_challenge.html',       xp:100 },
+  {
+    "id": 1,
+    "emoji": "💬",
+    "title": "To Have, Want, Need, Like",
+    "chapter": 1,
+    "game": "word_match_game.html",
+    "xp": 30
+  },
+  {
+    "id": 2,
+    "emoji": "🚶",
+    "title": "To Go, Do, Say, See",
+    "chapter": 1,
+    "game": "fill_blank_game.html",
+    "xp": 30
+  },
+  {
+    "id": 3,
+    "emoji": "🧠",
+    "title": "To Get, Make, Know, Take",
+    "chapter": 1,
+    "game": "grammar_lab.html",
+    "xp": 35
+  },
+  {
+    "id": 4,
+    "emoji": "👀",
+    "title": "To Come, Think, Look, Give",
+    "chapter": 1,
+    "game": "matching_pairs_game.html",
+    "xp": 35
+  },
+  {
+    "id": 5,
+    "emoji": "✉️",
+    "title": "To Tell, Work, Feel, Leave",
+    "chapter": 1,
+    "game": "sentence_builder_game.html",
+    "xp": 40
+  },
+  {
+    "id": 6,
+    "emoji": "⚡",
+    "title": "Modal Verbs: Can, Could, Should",
+    "chapter": 2,
+    "game": "spelling_bee_game.html",
+    "xp": 40
+  },
+  {
+    "id": 7,
+    "emoji": "⏪",
+    "title": "Past Simple — Regular Verbs",
+    "chapter": 2,
+    "game": "word_scramble_game.html",
+    "xp": 45
+  },
+  {
+    "id": 8,
+    "emoji": "🔄",
+    "title": "Past Simple — Irregular Verbs",
+    "chapter": 2,
+    "game": "word_search_game.html",
+    "xp": 45
+  },
+  {
+    "id": 9,
+    "emoji": "📍",
+    "title": "Prepositions of Place",
+    "chapter": 2,
+    "game": "fill_blank_game.html",
+    "xp": 45
+  },
+  {
+    "id": 10,
+    "emoji": "🔢",
+    "title": "Quantifiers: Many, Much, More",
+    "chapter": 2,
+    "game": "berry_math_game.html",
+    "xp": 50
+  },
+  {
+    "id": 11,
+    "emoji": "📊",
+    "title": "Adjectives & Comparatives",
+    "chapter": 2,
+    "game": "hangman_game.html",
+    "xp": 50
+  },
+  {
+    "id": 12,
+    "emoji": "🔮",
+    "title": "Future: Will & Going to",
+    "chapter": 2,
+    "game": "grammar_lab.html",
+    "xp": 55
+  },
+  {
+    "id": 13,
+    "emoji": "💼",
+    "title": "Work & Career",
+    "chapter": 3,
+    "game": "word_match_game.html",
+    "xp": 55
+  },
+  {
+    "id": 14,
+    "emoji": "💻",
+    "title": "Technology & Digital Life",
+    "chapter": 3,
+    "game": "word_search_game.html",
+    "xp": 55
+  },
+  {
+    "id": 15,
+    "emoji": "✈️",
+    "title": "Travel & Tourism",
+    "chapter": 3,
+    "game": "word_scramble_game.html",
+    "xp": 60
+  },
+  {
+    "id": 16,
+    "emoji": "🏥",
+    "title": "Health & Wellness",
+    "chapter": 3,
+    "game": "hangman_game.html",
+    "xp": 60
+  },
+  {
+    "id": 17,
+    "emoji": "🏠",
+    "title": "My Home — There is / There are",
+    "chapter": 3,
+    "game": "matching_pairs_game.html",
+    "xp": 60
+  },
+  {
+    "id": 18,
+    "emoji": "🎬",
+    "title": "Past Continuous",
+    "chapter": 3,
+    "game": "fill_blank_game.html",
+    "xp": 65
+  },
+  {
+    "id": 19,
+    "emoji": "🏆",
+    "title": "Superlatives",
+    "chapter": 4,
+    "game": "word_scramble_game.html",
+    "xp": 65
+  },
+  {
+    "id": 20,
+    "emoji": "📊",
+    "title": "MOST — Quantifier & Reference",
+    "chapter": 4,
+    "game": "flappy_yara_game.html",
+    "xp": 70
+  },
+  {
+    "id": 21,
+    "emoji": "🎯",
+    "title": "Can, Could & Would",
+    "chapter": 4,
+    "game": "spelling_bee_game.html",
+    "xp": 70
+  },
+  {
+    "id": 22,
+    "emoji": "🚀",
+    "title": "Future with WILL & WON'T",
+    "chapter": 4,
+    "game": "color_catch_game.html",
+    "xp": 75
+  },
+  {
+    "id": 23,
+    "emoji": "😊",
+    "title": "Personalities & Moods",
+    "chapter": 4,
+    "game": "word_scramble_game.html",
+    "xp": 80
+  },
+  {
+    "id": 24,
+    "emoji": "⏳",
+    "title": "Still vs. Yet & Possessives",
+    "chapter": 4,
+    "game": "daily_challenge.html",
+    "xp": 100
+  },
+  {
+    "id": 25,
+    "emoji": "👕",
+    "title": "Clothes",
+    "chapter": 7,
+    "game": "word_match_game.html",
+    "xp": 70
+  },
+  {
+    "id": 26,
+    "emoji": "💼",
+    "title": "Jobs & Work",
+    "chapter": 7,
+    "game": "fill_blank_game.html",
+    "xp": 70
+  },
+  {
+    "id": 27,
+    "emoji": "🏙️",
+    "title": "Places in Town",
+    "chapter": 7,
+    "game": "matching_pairs_game.html",
+    "xp": 75
+  },
+  {
+    "id": 28,
+    "emoji": "⏰",
+    "title": "Daily Routine",
+    "chapter": 7,
+    "game": "spelling_bee_game.html",
+    "xp": 75
+  },
+  {
+    "id": 29,
+    "emoji": "🛍️",
+    "title": "Shopping",
+    "chapter": 7,
+    "game": "berry_math_game.html",
+    "xp": 80
+  },
+  {
+    "id": 30,
+    "emoji": "🎨",
+    "title": "Hobbies & Free Time",
+    "chapter": 8,
+    "game": "word_scramble_game.html",
+    "xp": 80
+  },
+  {
+    "id": 31,
+    "emoji": "📅",
+    "title": "Months & Seasons",
+    "chapter": 8,
+    "game": "word_search_game.html",
+    "xp": 85
+  },
+  {
+    "id": 32,
+    "emoji": "🍽️",
+    "title": "At the Restaurant",
+    "chapter": 8,
+    "game": "hangman_game.html",
+    "xp": 85
+  },
+  {
+    "id": 33,
+    "emoji": "⚽",
+    "title": "Sports",
+    "chapter": 8,
+    "game": "grammar_lab.html",
+    "xp": 90
+  },
+  {
+    "id": 34,
+    "emoji": "✈️",
+    "title": "Travel & Vacation",
+    "chapter": 8,
+    "game": "sentence_builder_game.html",
+    "xp": 95
+  },
+  {
+    "id": 35,
+    "emoji": "🩺",
+    "title": "At the Doctor",
+    "chapter": 9,
+    "game": "word_match_game.html",
+    "xp": 90
+  },
+  {
+    "id": 36,
+    "emoji": "📱",
+    "title": "Technology & Phones",
+    "chapter": 9,
+    "game": "fill_blank_game.html",
+    "xp": 90
+  },
+  {
+    "id": 37,
+    "emoji": "💰",
+    "title": "Money & Banking",
+    "chapter": 9,
+    "game": "berry_math_game.html",
+    "xp": 95
+  },
+  {
+    "id": 38,
+    "emoji": "🎉",
+    "title": "Celebrations & Parties",
+    "chapter": 9,
+    "game": "matching_pairs_game.html",
+    "xp": 95
+  },
+  {
+    "id": 39,
+    "emoji": "🚨",
+    "title": "Emergencies & Help",
+    "chapter": 9,
+    "game": "daily_challenge.html",
+    "xp": 100
+  },
+  {
+    "id": 40,
+    "emoji": "🧭",
+    "title": "Directions in the City",
+    "chapter": 10,
+    "game": "word_scramble_game.html",
+    "xp": 100
+  },
+  {
+    "id": 41,
+    "emoji": "🌍",
+    "title": "The Environment",
+    "chapter": 10,
+    "game": "word_search_game.html",
+    "xp": 100
+  },
+  {
+    "id": 42,
+    "emoji": "📰",
+    "title": "News & Media",
+    "chapter": 10,
+    "game": "hangman_game.html",
+    "xp": 105
+  },
+  {
+    "id": 43,
+    "emoji": "📅",
+    "title": "Making Plans with Friends",
+    "chapter": 10,
+    "game": "grammar_lab.html",
+    "xp": 105
+  },
+  {
+    "id": 44,
+    "emoji": "🌠",
+    "title": "Dreams & Goals",
+    "chapter": 10,
+    "game": "sentence_builder_game.html",
+    "xp": 110
+  },
+  {
+    "id": 45,
+    "emoji": "💼",
+    "title": "Job Interview",
+    "chapter": 11,
+    "game": "word_match_game.html",
+    "xp": 110
+  },
+  {
+    "id": 46,
+    "emoji": "🏢",
+    "title": "At the Office",
+    "chapter": 11,
+    "game": "fill_blank_game.html",
+    "xp": 115
+  },
+  {
+    "id": 47,
+    "emoji": "📧",
+    "title": "Emails & Meetings",
+    "chapter": 11,
+    "game": "grammar_lab.html",
+    "xp": 115
+  },
+  {
+    "id": 48,
+    "emoji": "⚠️",
+    "title": "Problems at Work",
+    "chapter": 11,
+    "game": "matching_pairs_game.html",
+    "xp": 120
+  },
+  {
+    "id": 49,
+    "emoji": "🚀",
+    "title": "Career Change",
+    "chapter": 11,
+    "game": "daily_challenge.html",
+    "xp": 120
+  },
+  {
+    "id": 50,
+    "emoji": "🎬",
+    "title": "Movies & Series",
+    "chapter": 12,
+    "game": "word_scramble_game.html",
+    "xp": 125
+  },
+  {
+    "id": 51,
+    "emoji": "🎤",
+    "title": "Music & Concerts",
+    "chapter": 12,
+    "game": "word_search_game.html",
+    "xp": 125
+  },
+  {
+    "id": 52,
+    "emoji": "📚",
+    "title": "Books & Stories",
+    "chapter": 12,
+    "game": "hangman_game.html",
+    "xp": 130
+  },
+  {
+    "id": 53,
+    "emoji": "📲",
+    "title": "Social Media",
+    "chapter": 12,
+    "game": "spelling_bee_game.html",
+    "xp": 130
+  },
+  {
+    "id": 54,
+    "emoji": "🇧🇷",
+    "title": "Talking About Brazil",
+    "chapter": 12,
+    "game": "sentence_builder_game.html",
+    "xp": 135
+  },
+  {
+    "id": 55,
+    "emoji": "🤗",
+    "title": "Feelings & Empathy",
+    "chapter": 13,
+    "game": "word_match_game.html",
+    "xp": 135
+  },
+  {
+    "id": 56,
+    "emoji": "🤝",
+    "title": "Agreeing & Disagreeing",
+    "chapter": 13,
+    "game": "fill_blank_game.html",
+    "xp": 135
+  },
+  {
+    "id": 57,
+    "emoji": "📖",
+    "title": "Telling Stories",
+    "chapter": 13,
+    "game": "sentence_builder_game.html",
+    "xp": 140
+  },
+  {
+    "id": 58,
+    "emoji": "🧩",
+    "title": "Explaining Problems",
+    "chapter": 13,
+    "game": "grammar_lab.html",
+    "xp": 140
+  },
+  {
+    "id": 59,
+    "emoji": "🎤",
+    "title": "Giving a Presentation",
+    "chapter": 13,
+    "game": "word_scramble_game.html",
+    "xp": 145
+  },
+  {
+    "id": 60,
+    "emoji": "🍳",
+    "title": "Cooking & Recipes",
+    "chapter": 14,
+    "game": "word_search_game.html",
+    "xp": 145
+  },
+  {
+    "id": 61,
+    "emoji": "🏋️",
+    "title": "Fitness & Gym",
+    "chapter": 14,
+    "game": "hangman_game.html",
+    "xp": 150
+  },
+  {
+    "id": 62,
+    "emoji": "🏘️",
+    "title": "Renting a Home",
+    "chapter": 14,
+    "game": "grammar_lab.html",
+    "xp": 150
+  },
+  {
+    "id": 63,
+    "emoji": "🚗",
+    "title": "Driving & Traffic",
+    "chapter": 14,
+    "game": "matching_pairs_game.html",
+    "xp": 155
+  },
+  {
+    "id": 64,
+    "emoji": "📦",
+    "title": "Online Shopping & Deliveries",
+    "chapter": 14,
+    "game": "daily_challenge.html",
+    "xp": 160
+  },
+  {
+    "id": 65,
+    "emoji": "📲",
+    "title": "Apps & Productivity",
+    "chapter": 15,
+    "game": "word_match_game.html",
+    "xp": 165
+  },
+  {
+    "id": 66,
+    "emoji": "🍿",
+    "title": "Streaming & Entertainment",
+    "chapter": 15,
+    "game": "fill_blank_game.html",
+    "xp": 165
+  },
+  {
+    "id": 67,
+    "emoji": "🎓",
+    "title": "Online Learning",
+    "chapter": 15,
+    "game": "sentence_builder_game.html",
+    "xp": 170
+  },
+  {
+    "id": 68,
+    "emoji": "🔒",
+    "title": "Digital Privacy",
+    "chapter": 15,
+    "game": "grammar_lab.html",
+    "xp": 170
+  },
+  {
+    "id": 69,
+    "emoji": "🏡",
+    "title": "Working From Home",
+    "chapter": 15,
+    "game": "daily_challenge.html",
+    "xp": 175
+  },
+  {
+    "id": 70,
+    "emoji": "🎭",
+    "title": "Describing Personality",
+    "chapter": 16,
+    "game": "word_scramble_game.html",
+    "xp": 175
+  },
+  {
+    "id": 71,
+    "emoji": "🤝",
+    "title": "Friendship & Trust",
+    "chapter": 16,
+    "game": "word_search_game.html",
+    "xp": 180
+  },
+  {
+    "id": 72,
+    "emoji": "💍",
+    "title": "Dating & Family Life",
+    "chapter": 16,
+    "game": "hangman_game.html",
+    "xp": 180
+  },
+  {
+    "id": 73,
+    "emoji": "🕊️",
+    "title": "Conflicts & Apologies",
+    "chapter": 16,
+    "game": "matching_pairs_game.html",
+    "xp": 185
+  },
+  {
+    "id": 74,
+    "emoji": "🎊",
+    "title": "Celebrations Around the World",
+    "chapter": 16,
+    "game": "daily_challenge.html",
+    "xp": 190
+  },
+  {
+    "id": 75,
+    "emoji": "🧠",
+    "title": "Mental Health & Stress",
+    "chapter": 17,
+    "game": "word_match_game.html",
+    "xp": 195
+  },
+  {
+    "id": 76,
+    "emoji": "😴",
+    "title": "Sleep & Energy",
+    "chapter": 17,
+    "game": "fill_blank_game.html",
+    "xp": 200
+  },
+  {
+    "id": 77,
+    "emoji": "🥗",
+    "title": "Nutrition & Diet",
+    "chapter": 17,
+    "game": "sentence_builder_game.html",
+    "xp": 205
+  },
+  {
+    "id": 78,
+    "emoji": "🎯",
+    "title": "Habits & Discipline",
+    "chapter": 17,
+    "game": "grammar_lab.html",
+    "xp": 210
+  },
+  {
+    "id": 79,
+    "emoji": "💊",
+    "title": "At the Pharmacy",
+    "chapter": 17,
+    "game": "daily_challenge.html",
+    "xp": 215
+  },
+  {
+    "id": 80,
+    "emoji": "🤝",
+    "title": "Negotiating",
+    "chapter": 18,
+    "game": "word_scramble_game.html",
+    "xp": 220
+  },
+  {
+    "id": 81,
+    "emoji": "🎧",
+    "title": "Customer Service",
+    "chapter": 18,
+    "game": "word_search_game.html",
+    "xp": 225
+  },
+  {
+    "id": 82,
+    "emoji": "🧑‍💼",
+    "title": "Leadership & Teams",
+    "chapter": 18,
+    "game": "hangman_game.html",
+    "xp": 230
+  },
+  {
+    "id": 83,
+    "emoji": "💰",
+    "title": "Money Talk",
+    "chapter": 18,
+    "game": "matching_pairs_game.html",
+    "xp": 235
+  },
+  {
+    "id": 84,
+    "emoji": "🧑‍💻",
+    "title": "Side Hustles & Freelancing",
+    "chapter": 18,
+    "game": "daily_challenge.html",
+    "xp": 240
+  },
+  {
+    "id": 85,
+    "emoji": "🔬",
+    "title": "Science & Discoveries",
+    "chapter": 19,
+    "game": "word_match_game.html",
+    "xp": 245
+  },
+  {
+    "id": 86,
+    "emoji": "🏛️",
+    "title": "History & Great Stories",
+    "chapter": 19,
+    "game": "fill_blank_game.html",
+    "xp": 250
+  },
+  {
+    "id": 87,
+    "emoji": "🎨",
+    "title": "Art & Creativity",
+    "chapter": 19,
+    "game": "sentence_builder_game.html",
+    "xp": 255
+  },
+  {
+    "id": 88,
+    "emoji": "🤖",
+    "title": "Technology & the Future",
+    "chapter": 19,
+    "game": "grammar_lab.html",
+    "xp": 260
+  },
+  {
+    "id": 89,
+    "emoji": "🌌",
+    "title": "Space & the Universe",
+    "chapter": 19,
+    "game": "daily_challenge.html",
+    "xp": 265
+  },
+  {
+    "id": 90,
+    "emoji": "🎒",
+    "title": "Solo Travel",
+    "chapter": 20,
+    "game": "word_scramble_game.html",
+    "xp": 270
+  },
+  {
+    "id": 91,
+    "emoji": "🧳",
+    "title": "Problems Abroad",
+    "chapter": 20,
+    "game": "word_search_game.html",
+    "xp": 275
+  },
+  {
+    "id": 92,
+    "emoji": "🍜",
+    "title": "Local Food Adventures",
+    "chapter": 20,
+    "game": "hangman_game.html",
+    "xp": 280
+  },
+  {
+    "id": 93,
+    "emoji": "🗣️",
+    "title": "Making Friends Abroad",
+    "chapter": 20,
+    "game": "matching_pairs_game.html",
+    "xp": 285
+  },
+  {
+    "id": 94,
+    "emoji": "🏡",
+    "title": "Living in Another Country",
+    "chapter": 20,
+    "game": "daily_challenge.html",
+    "xp": 290
+  },
+  {
+    "id": 95,
+    "emoji": "🗯️",
+    "title": "Debating an Opinion",
+    "chapter": 21,
+    "game": "grammar_lab.html",
+    "xp": 295
+  },
+  {
+    "id": 96,
+    "emoji": "😂",
+    "title": "Telling Jokes & Humor",
+    "chapter": 21,
+    "game": "word_scramble_game.html",
+    "xp": 300
+  },
+  {
+    "id": 97,
+    "emoji": "💬",
+    "title": "Idioms in Real Life",
+    "chapter": 21,
+    "game": "matching_pairs_game.html",
+    "xp": 305
+  },
+  {
+    "id": 98,
+    "emoji": "😎",
+    "title": "Slang & Informal English",
+    "chapter": 21,
+    "game": "word_match_game.html",
+    "xp": 310
+  },
+  {
+    "id": 99,
+    "emoji": "💼",
+    "title": "Job Interview Advanced",
+    "chapter": 21,
+    "game": "sentence_builder_game.html",
+    "xp": 315
+  },
+  {
+    "id": 100,
+    "emoji": "🎓",
+    "title": "Your English Journey",
+    "chapter": 21,
+    "game": "daily_challenge.html",
+    "xp": 350
+  },
+  {
+    "id": 201,
+    "emoji": "👋",
+    "title": "Les Salutations",
+    "chapter": 6,
+    "game": "word_match_game.html",
+    "xp": 30
+  },
+  {
+    "id": 202,
+    "emoji": "🔢",
+    "title": "Les Chiffres",
+    "chapter": 6,
+    "game": "berry_math_game.html",
+    "xp": 30
+  },
+  {
+    "id": 203,
+    "emoji": "🎨",
+    "title": "Les Couleurs",
+    "chapter": 6,
+    "game": "color_catch_game.html",
+    "xp": 30
+  },
+  {
+    "id": 204,
+    "emoji": "👨‍👩‍👧‍👦",
+    "title": "La Famille",
+    "chapter": 6,
+    "game": "matching_pairs_game.html",
+    "xp": 30
+  },
+  {
+    "id": 205,
+    "emoji": "✨",
+    "title": "Être & Avoir",
+    "chapter": 6,
+    "game": "sentence_builder_game.html",
+    "xp": 30
+  },
+  {
+    "id": 206,
+    "emoji": "🥐",
+    "title": "La Nourriture",
+    "chapter": 6,
+    "game": "word_match_game.html",
+    "xp": 30
+  },
+  {
+    "id": 207,
+    "emoji": "📅",
+    "title": "Les Jours et les Mois",
+    "chapter": 6,
+    "game": "fill_blank_game.html",
+    "xp": 30
+  },
+  {
+    "id": 208,
+    "emoji": "⏰",
+    "title": "L'Heure",
+    "chapter": 6,
+    "game": "word_search_game.html",
+    "xp": 30
+  },
+  {
+    "id": 209,
+    "emoji": "🌦️",
+    "title": "La Météo",
+    "chapter": 6,
+    "game": "word_match_game.html",
+    "xp": 30
+  },
+  {
+    "id": 210,
+    "emoji": "🧭",
+    "title": "Les Directions",
+    "chapter": 6,
+    "game": "matching_pairs_game.html",
+    "xp": 30
+  },
+  {
+    "id": 211,
+    "emoji": "🛍️",
+    "title": "Les Vêtements",
+    "chapter": 6,
+    "game": "word_scramble_game.html",
+    "xp": 30
+  },
+  {
+    "id": 212,
+    "emoji": "⏪",
+    "title": "Le Passé Composé",
+    "chapter": 6,
+    "game": "fill_blank_game.html",
+    "xp": 30
+  },
+  {
+    "id": 101,
+    "emoji": "📝",
+    "title": "Academic English & Essay Writing",
+    "chapter": 22,
+    "game": "fill_blank_game.html",
+    "xp": 320
+  },
+  {
+    "id": 102,
+    "emoji": "⚖️",
+    "title": "Legal English for Everyday Life",
+    "chapter": 22,
+    "game": "hangman_game.html",
+    "xp": 325
+  },
+  {
+    "id": 103,
+    "emoji": "🎤",
+    "title": "Persuasive Business Presentations",
+    "chapter": 23,
+    "game": "word_search_game.html",
+    "xp": 330
+  },
+  {
+    "id": 104,
+    "emoji": "🤝",
+    "title": "Diplomatic Emails & Negotiation Language",
+    "chapter": 23,
+    "game": "sound_seekers_game.html",
+    "xp": 335
+  },
+  {
+    "id": 105,
+    "emoji": "🏅",
+    "title": "IELTS & TOEFL Vocabulary Power-Up",
+    "chapter": 33,
+    "game": "grammar_lab.html",
+    "xp": 340
+  },
+  {
+    "id": 106,
+    "emoji": "🗣️",
+    "title": "IELTS & TOEFL Speaking & Writing Skills",
+    "chapter": 33,
+    "game": "reading_room.html",
+    "xp": 345
+  },
+  {
+    "id": 107,
+    "emoji": "📹",
+    "title": "Content Creation & Influencer English",
+    "chapter": 34,
+    "game": "word_search_game.html",
+    "xp": 350
+  },
+  {
+    "id": 108,
+    "emoji": "🎙️",
+    "title": "Podcasting & Video Scripts",
+    "chapter": 34,
+    "game": "grammar_lab.html",
+    "xp": 355
+  },
+  {
+    "id": 109,
+    "emoji": "😏",
+    "title": "Irony, Sarcasm & Saying One Thing, Meaning Another",
+    "chapter": 35,
+    "game": "word_scramble_game.html",
+    "xp": 360
+  },
+  {
+    "id": 110,
+    "emoji": "🧵",
+    "title": "Storytelling Techniques: Foreshadowing, Flashbacks & Twists",
+    "chapter": 35,
+    "game": "sentence_builder_game.html",
+    "xp": 365
+  }
 ];
 
+// Turkish course IDs live in their own range and reuse the same four-day
+// mini-lesson engine without sharing progress with English or French.
+if (window.LESSONS_TR) {
+  const games = ['word_match_game.html','sound_seekers_game.html','sentence_builder_game.html','number_quest.html'];
+  TRAIL.push(...window.LESSONS_TR.map((lesson, index) => ({
+    id: lesson.id,
+    emoji: lesson.emoji,
+    title: lesson.title,
+    chapter: 24 + Math.floor(index / 4),
+    game: games[index % games.length],
+    xp: 40
+  })));
+}
+
 const CHAPTERS = [
-  { id:1, name:'Beginner',         color:'from-emerald-600 to-emerald-500', icon:'🌱', lessons:[1,2,3,4,5]   },
-  { id:2, name:'Elementary',       color:'from-blue-600 to-blue-500',       icon:'🌿', lessons:[6,7,8,9,10,11]},
-  { id:3, name:'Pre-Intermediate', color:'from-violet-600 to-violet-500',   icon:'🌳', lessons:[12,13,14,15,16]},
-  { id:4, name:'Intermediate',     color:'from-amber-600 to-amber-500',     icon:'🌲', lessons:[17,18,19,20,21,22,23,24]},
+  {
+    "id": 1,
+    "name": "Beginner",
+    "color": "from-emerald-600 to-emerald-500",
+    "icon": "🌱",
+    "iconKey": "sprout",
+    "lessons": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Elementary",
+    "color": "from-blue-600 to-blue-500",
+    "icon": "🌿",
+    "iconKey": "seedling",
+    "lessons": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Pre-Intermediate",
+    "color": "from-violet-600 to-violet-500",
+    "icon": "🌳",
+    "iconKey": "sapling",
+    "lessons": [
+      12,
+      13,
+      14,
+      15,
+      16
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Intermediate",
+    "color": "from-amber-600 to-amber-500",
+    "icon": "🌲",
+    "iconKey": "tree",
+    "lessons": [
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Everyday Life",
+    "color": "from-cyan-600 to-cyan-500",
+    "icon": "🏙️",
+    "iconKey": "building",
+    "lessons": [
+      25,
+      26,
+      27,
+      28,
+      29
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Out & About",
+    "color": "from-rose-600 to-rose-500",
+    "icon": "🧭",
+    "iconKey": "compass",
+    "lessons": [
+      30,
+      31,
+      32,
+      33,
+      34
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Health & Life",
+    "color": "from-sky-600 to-cyan-500",
+    "icon": "🩺",
+    "iconKey": "stethoscope",
+    "lessons": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ]
+  },
+  {
+    "id": 10,
+    "name": "The Wider World",
+    "color": "from-fuchsia-600 to-pink-500",
+    "icon": "🌍",
+    "iconKey": "globe",
+    "lessons": [
+      40,
+      41,
+      42,
+      43,
+      44
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Work Life",
+    "color": "from-orange-600 to-amber-500",
+    "icon": "💼",
+    "iconKey": "briefcase",
+    "lessons": [
+      45,
+      46,
+      47,
+      48,
+      49
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Culture & Fun",
+    "color": "from-teal-600 to-cyan-500",
+    "icon": "🎬",
+    "iconKey": "clapperboard",
+    "lessons": [
+      50,
+      51,
+      52,
+      53,
+      54
+    ]
+  },
+  {
+    "id": 13,
+    "name": "Deeper Conversations",
+    "color": "from-indigo-600 to-purple-500",
+    "icon": "🗣️",
+    "iconKey": "message-circle",
+    "lessons": [
+      55,
+      56,
+      57,
+      58,
+      59
+    ]
+  },
+  {
+    "id": 14,
+    "name": "Practical Life",
+    "color": "from-lime-600 to-green-500",
+    "icon": "🛠️",
+    "iconKey": "wrench",
+    "lessons": [
+      60,
+      61,
+      62,
+      63,
+      64
+    ]
+  },
+  {
+    "id": 15,
+    "name": "Modern Life",
+    "color": "from-blue-600 to-cyan-500",
+    "icon": "📱",
+    "iconKey": "smartphone",
+    "lessons": [
+      65,
+      66,
+      67,
+      68,
+      69
+    ]
+  },
+  {
+    "id": 16,
+    "name": "People & Relationships",
+    "color": "from-pink-600 to-rose-500",
+    "icon": "💞",
+    "iconKey": "heart-handshake",
+    "lessons": [
+      70,
+      71,
+      72,
+      73,
+      74
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Health & Mind",
+    "color": "from-emerald-600 to-teal-500",
+    "icon": "🧠",
+    "iconKey": "brain",
+    "lessons": [
+      75,
+      76,
+      77,
+      78,
+      79
+    ]
+  },
+  {
+    "id": 18,
+    "name": "The Working World",
+    "color": "from-slate-600 to-blue-500",
+    "icon": "🏢",
+    "iconKey": "presentation",
+    "lessons": [
+      80,
+      81,
+      82,
+      83,
+      84
+    ]
+  },
+  {
+    "id": 19,
+    "name": "Big Ideas",
+    "color": "from-violet-600 to-fuchsia-500",
+    "icon": "💡",
+    "iconKey": "lightbulb",
+    "lessons": [
+      85,
+      86,
+      87,
+      88,
+      89
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Travel Deeper",
+    "color": "from-teal-600 to-emerald-500",
+    "icon": "🌎",
+    "iconKey": "globe",
+    "lessons": [
+      90,
+      91,
+      92,
+      93,
+      94
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Mastery",
+    "color": "from-amber-500 to-yellow-400",
+    "icon": "🏔️",
+    "iconKey": "mountain",
+    "lessons": [
+      95,
+      96,
+      97,
+      98,
+      99,
+      100
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Français 🇫🇷",
+    "color": "from-blue-600 to-indigo-500",
+    "icon": "🇫🇷",
+    "lessons": [
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212
+    ],
+    "lang": "fr"
+  },
+  {
+    "id": 22,
+    "name": "Academic & Legal English",
+    "color": "from-rose-600 to-pink-500",
+    "icon": "📜",
+    "iconKey": "scroll-text",
+    "lessons": [
+      101,
+      102
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Boardroom English",
+    "color": "from-teal-600 to-cyan-500",
+    "icon": "💼",
+    "iconKey": "briefcase",
+    "lessons": [
+      103,
+      104
+    ]
+  },
+  {
+    "id": 33,
+    "name": "Exam-Ready English",
+    "color": "from-yellow-600 to-orange-500",
+    "icon": "🎯",
+    "iconKey": "target",
+    "lessons": [
+      105,
+      106
+    ]
+  },
+  {
+    "id": 34,
+    "name": "Digital Storytelling & Media",
+    "color": "from-purple-600 to-pink-500",
+    "icon": "🎙️",
+    "iconKey": "mic",
+    "lessons": [
+      107,
+      108
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Nuance & Wit",
+    "color": "from-fuchsia-600 to-indigo-600",
+    "icon": "🎭",
+    "iconKey": "drama",
+    "lessons": [
+      109,
+      110
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Türkçe Başlangıç · Primeiros Passos",
+    "color": "from-red-600 to-rose-500",
+    "icon": "🇹🇷",
+    "lessons": [301, 302, 303, 304],
+    "lang": "tr"
+  },
+  {
+    "id": 25,
+    "name": "Türkçe Günlük Hayat · Vida Diária",
+    "color": "from-rose-600 to-orange-500",
+    "icon": "☕",
+    "iconKey": "coffee",
+    "lessons": [305, 306, 307, 308],
+    "lang": "tr"
+  },
+  {
+    "id": 26,
+    "name": "Türkçe Yolculuk · Viagem",
+    "color": "from-orange-600 to-red-500",
+    "icon": "✈️",
+    "iconKey": "plane",
+    "lessons": [309, 310, 311, 312],
+    "lang": "tr"
+  },
+  {
+    "id": 27,
+    "name": "Türkçe Günlük Yaşam · Cotidiano",
+    "color": "from-sky-600 to-cyan-500",
+    "icon": "🏠",
+    "iconKey": "home",
+    "lessons": [313, 314, 315, 316],
+    "lang": "tr"
+  },
+  {
+    "id": 28,
+    "name": "Türkçe Zamanlar · Passado e Futuro",
+    "color": "from-violet-600 to-fuchsia-500",
+    "icon": "🕰️",
+    "iconKey": "clock",
+    "lessons": [317, 318, 319, 320],
+    "lang": "tr"
+  },
+  {
+    "id": 29,
+    "name": "Türkçe Gerçek Hayat · Vida Real",
+    "color": "from-emerald-600 to-teal-500",
+    "icon": "🧿",
+    "iconKey": "eye",
+    "lessons": [321, 322, 323, 324],
+    "lang": "tr"
+  },
+  {
+    "id": 30,
+    "name": "Türkçe A2 · Deneyim ve Koşul",
+    "color": "from-indigo-600 to-blue-500",
+    "icon": "🌍",
+    "iconKey": "globe",
+    "lessons": [325, 326, 327, 328],
+    "lang": "tr"
+  },
+  {
+    "id": 31,
+    "name": "Türkçe A2 · Alışkanlık ve İş",
+    "color": "from-fuchsia-600 to-violet-500",
+    "icon": "💼",
+    "iconKey": "briefcase",
+    "lessons": [329, 330, 331, 332],
+    "lang": "tr"
+  },
+  {
+    "id": 32,
+    "name": "Türkçe A2 · Fikir ve Dünya",
+    "color": "from-teal-600 to-cyan-500",
+    "icon": "🎓",
+    "iconKey": "graduation-cap",
+    "lessons": [333, 334, 335, 336],
+    "lang": "tr"
+  }
 ];
+
+// ── Discovery activities (News / History / Music) ─────────────────────────────
+// "Detour" nodes placed on the trail path after each chapter's boss. They don't
+// gate progress (every node is unlocked anyway) — they resurface the daily AI
+// activities as part of the journey. Done-state reuses the per-day flag each
+// page already writes when it grants its daily XP.
+const DISCOVERY_ACTIVITIES = [
+  { key:'news',    emoji:'📰', title:'Notícia do Dia',  sub:'Leia uma notícia real',  page:'newsline.html',    flag:'capyNewsXpDone_',    color:'from-cyan-500 to-teal-500',    ring:'border-cyan-300',    text:'text-cyan-300'    },
+  { key:'history', emoji:'🏛️', title:'História do Dia', sub:'Descubra o passado',     page:'historyline.html', flag:'capyHistoryXpDone_', color:'from-amber-500 to-orange-500', ring:'border-amber-300',   text:'text-amber-300'   },
+  { key:'music',   emoji:'🎵', title:'Música do Dia',   sub:'Aprenda com uma canção', page:'music_lab.html',   flag:'capyMusicXpDone_',   color:'from-fuchsia-500 to-pink-500', ring:'border-fuchsia-300', text:'text-fuchsia-300' },
+  { key:'flashcards', emoji:'🃏', title:'Flashcards do Dia', sub:'Treine seu vocabulário', page:'2_Flashcard_Journey_Expedition_Edition.html', flag:'capyFlashXpDone_', color:'from-violet-500 to-indigo-500', ring:'border-violet-300', text:'text-violet-300' },
+];
+
+function isDiscoveryDoneToday(activity) {
+  try {
+    const today = capyHojeBR();
+    return !!localStorage.getItem(activity.flag + today);
+  } catch (e) { return false; }
+}
+
+function openDiscovery(key) {
+  const a = DISCOVERY_ACTIVITIES.find(x => x.key === key);
+  if (a) window.location.href = a.page + '?from=trail';
+}
 
 // ── Dynamic "My Lessons" chapter from custom lessons ──────────────────────────
 (function() {
@@ -185,11 +1695,21 @@ const completedLessons = Store.state.completedLessons || [];
 const startLesson      = parseInt(localStorage.getItem('capyStartLesson') || '1');
 const playerLevel      = localStorage.getItem('capyPlayerLevel') || 'starter';
 
+// ── Trail language (English default; French is chapter 6) ──────────────────────
+const requestedTrailLang = new URLSearchParams(location.search).get('lang');
+let currentTrailLang = ['en','fr','tr'].includes(requestedTrailLang)
+  ? requestedTrailLang
+  : (localStorage.getItem('capyTrailLang') || 'en');
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getStepProgress(lessonId) {
   return parseInt(localStorage.getItem('capyGuidedStep_' + lessonId) || '0');
 }
-function isDone(id)      { return completedLessons.includes(id) || completedLessons.includes('j' + id); }
+function isDone(id) {
+  if (window.Store && Store.isLessonDone) return Store.isLessonDone(id, currentTrailLang);
+  const key = currentTrailLang === 'en' ? id : `${currentTrailLang}:${id}`;
+  return completedLessons.includes(key) || (currentTrailLang === 'en' && completedLessons.includes('j' + id));
+}
 function isUnlocked(id)  {
   return true; // All lessons unlocked — free navigation
 }
@@ -217,7 +1737,7 @@ const MINI_TRAIL = TRAIL.flatMap(lesson =>
 function isMiniDone(lessonId, miniNum) {
   // Backward compat: if lesson was fully completed in old full-mode, all minis count as done
   if (isDone(lessonId)) return true;
-  return window.Store ? Store.isMiniDone(lessonId, miniNum) : false;
+  return window.Store ? Store.isMiniDone(lessonId, miniNum, currentTrailLang) : false;
 }
 function isMiniUnlocked(lessonId, miniNum) {
   return true; // All lessons unlocked — free navigation
@@ -226,15 +1746,19 @@ function isMiniCurrent(lessonId, miniNum) {
   return !isMiniDone(lessonId, miniNum) && isMiniUnlocked(lessonId, miniNum);
 }
 function getMiniStepProgress(lessonId, miniNum) {
-  return parseInt(localStorage.getItem(`capyGuidedStep_${lessonId}_m${miniNum}`) || '0');
+  return parseInt(localStorage.getItem(`capyGuidedStep_${lessonId}_${currentTrailLang}_m${miniNum}`) || '0');
 }
 
 // ── Build trail HTML ──────────────────────────────────────────────────────────
-function buildTrail() {
+function renderTrail() {
   const container = document.getElementById('trail-container');
   let html = '';
 
-  CHAPTERS.forEach((ch, ci) => {
+  // Only chapters matching the current language (missing lang === 'en')
+  const visibleChapters = CHAPTERS.filter(ch => (ch.lang || 'en') === currentTrailLang);
+  const nextTarget = computeNextMini(currentTrailLang);
+
+  visibleChapters.forEach((ch, ci) => {
     const chMinis      = MINI_TRAIL.filter(m => m.chapter === ch.id);
     const chLessons    = TRAIL.filter(l => l.chapter === ch.id);
     const allDone      = chMinis.every(m => isMiniDone(m.lessonId, m.miniNum));
@@ -242,7 +1766,7 @@ function buildTrail() {
 
     // Between-chapter connector (skip for first chapter)
     if (ci > 0) {
-      const prevChMinis = MINI_TRAIL.filter(m => m.chapter === CHAPTERS[ci - 1].id);
+      const prevChMinis = MINI_TRAIL.filter(m => m.chapter === visibleChapters[ci - 1].id);
       const lastPrev    = prevChMinis[prevChMinis.length - 1];
       const firstCurr   = chMinis[0];
       const lastDone    = isMiniDone(lastPrev.lessonId, lastPrev.miniNum);
@@ -267,10 +1791,10 @@ function buildTrail() {
         <!-- Chapter header -->
         <div class="flex items-center gap-3 mb-4">
           <div class="bg-gradient-to-r ${ch.color} rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
-            <span class="text-xl">${ch.icon}</span>
+            <span class="text-xl w-5 h-5 flex items-center justify-center">${Components.icon(ch.iconKey, 'w-5 h-5') || ch.icon}</span>
             <div>
               <p class="font-black text-white text-sm">${ch.name}</p>
-              <p class="text-white/70 text-[10px]">${chLessons.length} lessons · ${chLessons.length * 4} days</p>
+              <p class="text-white/70 text-[10px]">${ch.id === 6 ? `${chLessons.length} leçons` : `${chLessons.length} lessons · ${chLessons.length * 4} days`}</p>
             </div>
           </div>
           ${allDone      ? '<span class="text-green-400 font-bold text-sm">✅ Complete!</span>' : ''}
@@ -288,6 +1812,7 @@ function buildTrail() {
       const current      = isMiniCurrent(mini.lessonId, mini.miniNum);
       const step         = getMiniStepProgress(mini.lessonId, mini.miniNum);
       const isLeft       = i % 2 === 0;
+      const isTarget     = !!nextTarget && mini.lessonId === nextTarget.lessonId && mini.miniNum === nextTarget.miniNum;
       const hasNext      = i < chMinis.length - 1;
       const nextDone     = hasNext ? isMiniDone(chMinis[i+1].lessonId, chMinis[i+1].miniNum) : false;
       const nextUnlocked = hasNext ? isMiniUnlocked(chMinis[i+1].lessonId, chMinis[i+1].miniNum) : false;
@@ -300,11 +1825,11 @@ function buildTrail() {
 
       let nodeClass = 'lesson-node w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center relative shadow-xl select-none ';
       if (done)         nodeClass += 'bg-gradient-to-br from-green-400 to-emerald-600 border-4 border-green-300 cursor-pointer';
-      else if (current) nodeClass += 'bg-gradient-to-br from-pink-500 to-rose-600 border-4 border-pink-300 node-current cursor-pointer';
+      else if (current) nodeClass += 'bg-gradient-to-br from-pink-500 to-rose-600 border-4 border-pink-300 cursor-pointer' + (isTarget ? ' node-current' : '');
       else if (unlocked)nodeClass += 'bg-white/10 border-2 border-white/25 hover:bg-white/18 cursor-pointer';
       else              nodeClass += 'bg-white/4 border border-white/8 opacity-50 cursor-pointer hover:opacity-70 transition-opacity';
 
-      const miniStepCount = MINI_STEP_INDICES[mini.miniNum].length;
+      const miniStepCount = (MINI_STEP_INDICES[mini.miniNum] || []).length;
       const stepDots = (step > 0 && !done) ? `
         <div class="absolute -bottom-2.5 flex gap-[3px]">
           ${Array.from({length: miniStepCount}, (_, s) =>
@@ -332,20 +1857,29 @@ function buildTrail() {
           <p class="text-[8px] ${subtitleColor}">${statusLine}</p>
         </div>`;
 
+      const balloon = isTarget ? `
+        <div class="node-balloon bg-pink-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full shadow-lg shadow-pink-500/40 z-10">
+          ${step > 0 ? 'CONTINUE' : 'START'}
+          <div style="position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #ec4899;"></div>
+        </div>` : '';
+
       const nodeInner = `
         <span class="text-[24px] leading-none">${done ? '✓' : !unlocked ? '🔒' : mini.emoji}</span>
         ${done    ? '<span class="text-[10px] text-white font-black mt-0.5">Done</span>' : ''}
         ${current ? '<span class="text-[9px] text-white font-black mt-0.5">▶ Go</span>'  : ''}
-        ${dayBadge}${stepDots}`;
+        ${dayBadge}${stepDots}${balloon}`;
+
+      const nodeOnclick = `openPopup(${mini.lessonId},${mini.miniNum})`;
+      const nodeIdAttr  = `id="mini-node-${mini.lessonId}-${mini.miniNum}"`;
 
       html += isLeft
         ? `<div class="flex items-center pl-5">
-             <div class="${nodeClass}" onclick="openPopup(${mini.lessonId},${mini.miniNum})">${nodeInner}</div>
+             <div ${nodeIdAttr} class="${nodeClass}" onclick="${nodeOnclick}">${nodeInner}</div>
              ${labelLeft}
            </div>`
         : `<div class="flex items-center justify-end pr-5">
              ${labelRight}
-             <div class="${nodeClass}" onclick="openPopup(${mini.lessonId},${mini.miniNum})">${nodeInner}</div>
+             <div ${nodeIdAttr} class="${nodeClass}" onclick="${nodeOnclick}">${nodeInner}</div>
            </div>`;
 
       if (hasNext) {
@@ -358,12 +1892,91 @@ function buildTrail() {
                <div style="${boxStyle}border-top:3px dashed ${lineColor};border-left:3px dashed ${lineColor};border-top-left-radius:30px;"></div>
              </div>`;
       }
+
+      // ── Chest node: every 5 minis in this chapter ──────────────
+      if ((i + 1) % 5 === 0) {
+        const chestIdx = Math.floor((i + 1) / 5);
+        const key = chestKey(ch.id, chestIdx);
+        const opened = window.Store ? Store.isChestOpened(key) : false;
+        const prevMinis = chMinis.slice(0, i + 1);
+        const available = !opened && prevMinis.every(m => isMiniDone(m.lessonId, m.miniNum));
+        const chestClickable = available;
+        const chestEmoji = opened ? '📭' : available ? '🎁' : '🔒';
+        const chestCls = opened
+          ? 'bg-white/5 opacity-40'
+          : available
+            ? 'bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg shadow-amber-500/30 cursor-pointer hover:scale-110'
+            : 'bg-white/5 opacity-50';
+        html += `
+          <div class="flex items-center justify-center my-2" style="height:56px;pointer-events:none">
+            <div class="${chestCls} rounded-2xl w-12 h-12 flex items-center justify-center text-2xl transition-transform"
+                 style="pointer-events:auto" ${chestClickable ? `onclick="openChestNode(${ch.id},${chestIdx})"` : ''}>
+              ${chestEmoji}
+            </div>
+          </div>`;
+      }
     });
+
+    // ── Boss node: "Desafio da Yara" at the end of each EN chapter ──
+    // (skip French chapter 6 and "My Lessons" chapter 5)
+    if (ch.id !== 6 && ch.id !== 5) {
+      html += renderBossNode(ch, chMinis);
+      // Discovery detour after the boss — rotates News → History → Music
+      html += renderDiscoveryNode(DISCOVERY_ACTIVITIES[ci % DISCOVERY_ACTIVITIES.length]);
+    }
 
     html += `</div></div>`;
   });
 
   container.innerHTML = html;
+}
+
+// ── Boss node ("Desafio da Yara") ──────────────────────────────────────────
+function renderBossNode(ch, chMinis) {
+  const allDone = chMinis.every(m => isMiniDone(m.lessonId, m.miniNum));
+  const beaten  = window.Store ? (Store.state.bossesBeaten || []).includes(ch.id) : false;
+  const available = allDone && !beaten;
+  const bossCls = beaten
+    ? 'bg-gradient-to-br from-yellow-300 to-amber-500 border-4 border-yellow-200 shadow-xl shadow-amber-500/30'
+    : available
+      ? 'bg-gradient-to-br from-purple-500 to-fuchsia-600 border-4 border-fuchsia-300 shadow-xl shadow-fuchsia-500/30 cursor-pointer hover:scale-105 boss-pulse'
+      : 'bg-white/5 border-2 border-white/10 opacity-60';
+  const emoji  = beaten ? '👑' : available ? '👑' : '🔒';
+  const label  = beaten ? 'Vencido!' : available ? 'Desafio da Yara' : 'Complete o capítulo';
+  const sub    = beaten ? '✅ Coroa conquistada' : available ? 'Fale com a Yara!' : 'Termine todas as lições';
+  const lessonIds = ch.lessons.join(',');
+  const onclick = available ? `onclick="startBoss(${ch.id},'${lessonIds}')"` : '';
+  const titleColor = beaten ? 'text-yellow-300' : available ? 'text-fuchsia-300' : 'text-white/30';
+  return `
+    <div class="flex flex-col items-center justify-center my-4" style="pointer-events:none">
+      <div class="${bossCls} rounded-3xl w-20 h-20 flex flex-col items-center justify-center relative transition-transform"
+           style="pointer-events:auto" ${onclick} title="${sub}">
+        <span class="text-3xl leading-none">${emoji}</span>
+        ${beaten ? '<span class="text-[9px] text-white font-black mt-0.5">✓</span>' : ''}
+      </div>
+      <p class="text-[11px] font-black ${titleColor} mt-1.5">${label}</p>
+    </div>`;
+}
+
+// ── Discovery node (Notícia / História / Música) ─────────────────────────────
+// Always clickable — even once done today, the student can go read another one.
+function renderDiscoveryNode(activity) {
+  const done = isDiscoveryDoneToday(activity);
+  const cls = `bg-gradient-to-br ${activity.color} border-4 ${activity.ring} `
+            + (done ? 'opacity-70' : 'shadow-xl') + ' cursor-pointer hover:scale-105';
+  return `
+    <div class="flex flex-col items-center justify-center my-4" style="pointer-events:none">
+      <div class="${cls} rounded-3xl w-16 h-16 flex flex-col items-center justify-center relative transition-transform"
+           style="pointer-events:auto" onclick="openDiscovery('${activity.key}')" title="${activity.sub}">
+        <span class="text-2xl leading-none">${activity.emoji}</span>
+        ${done ? '<span class="text-[9px] text-white font-black mt-0.5">✓</span>' : ''}
+      </div>
+      <p class="text-[11px] font-black ${done ? 'text-green-300' : activity.text} mt-1.5">${done ? 'Feito hoje!' : activity.title}</p>
+    </div>`;
+}
+
+function startBoss(chapterId, lessonIds) {
+  window.location.href = `lessons.html?boss=${chapterId}&lessons=${lessonIds}`;
 }
 
 // ── Popup ─────────────────────────────────────────────────────────────────────
@@ -379,7 +1992,7 @@ function openPopup(lessonId, miniNum) {
   const ch       = CHAPTERS.find(c => c.id === lesson.chapter) || CHAPTERS[0];
   const xpVal    = Math.ceil(lesson.xp / 4);
 
-  document.getElementById('popup-emoji').textContent   = done ? '✅' : !unlocked ? '🔒' : lesson.emoji;
+  document.getElementById('popup-emoji').innerHTML     = done ? '✅' : !unlocked ? '🔒' : (Components.icon(ch.iconKey, 'w-12 h-12 mx-auto') || lesson.emoji);
   document.getElementById('popup-title').textContent   = lesson.title;
   document.getElementById('popup-chapter').textContent = `${ch.name} · Lesson ${lessonId} — Day ${miniNum} of 4`;
   document.getElementById('popup-xp').textContent      = done
@@ -446,7 +2059,7 @@ function openPopup(lessonId, miniNum) {
     replayBtn.classList.remove('hidden');
     replayBtn.textContent = 'Redo Day';
     replayBtn.onclick     = () => {
-      localStorage.removeItem(`capyGuidedStep_${lessonId}_m${miniNum}`);
+      localStorage.removeItem(`capyGuidedStep_${lessonId}_${currentTrailLang}_m${miniNum}`);
       window.location.href = url;
     };
   } else if (step > 0) {
@@ -456,7 +2069,7 @@ function openPopup(lessonId, miniNum) {
     replayBtn.classList.remove('hidden');
     replayBtn.textContent = 'Restart Day';
     replayBtn.onclick     = () => {
-      localStorage.removeItem(`capyGuidedStep_${lessonId}_m${miniNum}`);
+      localStorage.removeItem(`capyGuidedStep_${lessonId}_${currentTrailLang}_m${miniNum}`);
       window.location.href = url;
     };
   } else {
@@ -476,40 +2089,112 @@ document.getElementById('lesson-popup').addEventListener('click', e => {
   if (e.target === document.getElementById('lesson-popup')) closePopup();
 });
 
-// ── Continue card ─────────────────────────────────────────────────────────────
-function buildContinueCard() {
-  // Find the first unlocked + not-done mini-node
-  let target = null;
-  for (const mini of MINI_TRAIL) {
-    if (!isMiniDone(mini.lessonId, mini.miniNum) && isMiniUnlocked(mini.lessonId, mini.miniNum)) {
-      target = mini;
-      break;
+// ── Next mini computation ────────────────────────────────────────────────────
+// Pure-ish: relies on module-level MINI_TRAIL/CHAPTERS + the isMiniDone/getMiniStepProgress
+// helpers (both already defensive against missing Store). Kept side-effect free
+// (only reads localStorage) so it can be exercised in isolation for testing.
+function computeNextMini(lang) {
+  const chapterIds = CHAPTERS.filter(ch => (ch.lang || 'en') === lang).map(ch => ch.id);
+  const minis = MINI_TRAIL.filter(m => chapterIds.includes(m.chapter));
+  if (minis.length === 0) return null;
+
+  // (a) Explicit resume — user just opened a mini in lessons.html
+  try {
+    const last = JSON.parse(localStorage.getItem('capyLastMini_' + lang) || (lang === 'en' ? localStorage.getItem('capyLastMini') : 'null') || 'null');
+    if (last && typeof last.lessonId !== 'undefined') {
+      const m = minis.find(x => x.lessonId === last.lessonId && x.miniNum === last.miniNum);
+      if (m && !isMiniDone(m.lessonId, m.miniNum)) return m;
     }
+  } catch (e) { /* ignore malformed value */ }
+
+  // (a2) Any mini already started mid-way (step progress > 0) but not finished
+  for (const m of minis) {
+    if (!isMiniDone(m.lessonId, m.miniNum) && getMiniStepProgress(m.lessonId, m.miniNum) > 0) return m;
   }
-  if (!target) return;
+
+  // (b) First not-done mini in trail order
+  for (const m of minis) {
+    if (!isMiniDone(m.lessonId, m.miniNum)) return m;
+  }
+
+  // (c) Everything done
+  return null;
+}
+
+function hasStartedTrail(lang) {
+  const chapterIds = CHAPTERS.filter(ch => (ch.lang || 'en') === lang).map(ch => ch.id);
+  const minis = MINI_TRAIL.filter(m => chapterIds.includes(m.chapter));
+  if (minis.some(m => isMiniDone(m.lessonId, m.miniNum))) return true;
+  if (minis.some(m => getMiniStepProgress(m.lessonId, m.miniNum) > 0)) return true;
+  try { if (localStorage.getItem('capyLastMini_' + lang) || (lang === 'en' && localStorage.getItem('capyLastMini'))) return true; } catch (e) {}
+  return false;
+}
+
+// ── Continue card (hero) ─────────────────────────────────────────────────────
+function buildContinueCard() {
+  const card = document.getElementById('continue-card');
+  const target = computeNextMini(currentTrailLang);
+  const started = hasStartedTrail(currentTrailLang);
+
+  if (!target) {
+    // (c) Trail complete → congrats state
+    document.getElementById('continue-eyebrow').textContent = 'Trail complete! 🎉';
+    document.getElementById('continue-emoji').innerHTML     = '🏆';
+    document.getElementById('continue-title').textContent   = 'You finished this trail!';
+    document.getElementById('continue-step').textContent    = 'Ready for a new challenge?';
+    document.getElementById('continue-xp').textContent      = '';
+    document.getElementById('continue-chapter-label').textContent = '';
+    document.getElementById('continue-chapter-count').textContent = '';
+    document.getElementById('continue-chapter-bar').style.width = '100%';
+    const btn = document.getElementById('continue-btn');
+    btn.textContent = 'Explore other courses →';
+    btn.onclick = () => window.location.href = 'classes.html';
+    card.classList.remove('hidden');
+    return;
+  }
 
   const step = getMiniStepProgress(target.lessonId, target.miniNum);
-  const card = document.getElementById('continue-card');
   const url  = `lessons.html?lesson=${target.lessonId}&mini=${target.miniNum}&guided=1`;
+  const chMinis = MINI_TRAIL.filter(m => m.chapter === target.chapter);
+  const chDone  = chMinis.filter(m => isMiniDone(m.lessonId, m.miniNum)).length;
+  const ch      = CHAPTERS.find(c => c.id === target.chapter);
 
-  document.getElementById('continue-title').textContent = `${target.emoji} ${target.title}`;
-  document.getElementById('continue-step').textContent  = step > 0
+  document.getElementById('continue-eyebrow').textContent = started ? 'Continue where you left off' : 'Ready to begin?';
+  document.getElementById('continue-emoji').innerHTML     = Components.icon(ch && ch.iconKey, 'w-8 h-8') || target.emoji;
+  document.getElementById('continue-title').textContent   = started ? target.title : 'Start the Trail 🌱';
+  document.getElementById('continue-step').textContent    = step > 0
     ? `Day ${target.miniNum} · Step ${step + 1} of ${MINI_STEP_INDICES[target.miniNum].length} — ${STEP_LABELS[MINI_STEP_INDICES[target.miniNum][step]] || ''}`
     : `Day ${target.miniNum} — ${DAY_SUBTITLES[target.miniNum - 1]}`;
+  document.getElementById('continue-xp').textContent      = `🏆 +${target.xp} XP`;
+  document.getElementById('continue-chapter-label').textContent = ch ? ch.name : '';
+  document.getElementById('continue-chapter-count').textContent = `${chDone} / ${chMinis.length} days`;
+  document.getElementById('continue-chapter-bar').style.width   = chMinis.length ? `${Math.round((chDone / chMinis.length) * 100)}%` : '0%';
+  document.getElementById('continue-btn').textContent = step > 0 ? '▶ Continuar' : '▶ Começar';
   document.getElementById('continue-btn').onclick = () => window.location.href = url;
   card.classList.remove('hidden');
+}
+
+// ── Auto-scroll to the "next mini" node (Duolingo-style resume) ─────────────
+function scrollToNextMini() {
+  if (currentTrailLang === 'fr') return; // French retains its legacy non-guided behavior
+  const target = computeNextMini(currentTrailLang);
+  if (!target) return;
+  setTimeout(() => {
+    const el = document.getElementById(`mini-node-${target.lessonId}-${target.miniNum}`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 400);
 }
 
 // ── Level badge ───────────────────────────────────────────────────────────────
 function setLevelBadge() {
   const map = {
-    'starter': { name:'Starter', emoji:'🌱' },
-    'elementary': { name:'Elementary', emoji:'🌿' },
-    'pre-intermediate': { name:'Pre-Intermediate', emoji:'🌳' },
-    'intermediate': { name:'Intermediate', emoji:'🌲' },
+    'starter': { name:'Starter', emoji:'🌱', iconKey:'sprout' },
+    'elementary': { name:'Elementary', emoji:'🌿', iconKey:'seedling' },
+    'pre-intermediate': { name:'Pre-Intermediate', emoji:'🌳', iconKey:'sapling' },
+    'intermediate': { name:'Intermediate', emoji:'🌲', iconKey:'tree' },
   };
   const l = map[playerLevel] || map['starter'];
-  document.getElementById('level-emoji').textContent = l.emoji;
+  document.getElementById('level-emoji').innerHTML = Components.icon(l.iconKey, 'w-5 h-5') || l.emoji;
   document.getElementById('level-name').textContent  = l.name + ' Level';
 }
 
@@ -531,22 +2216,196 @@ Components.mount('side-nav-placeholder',   Components.renderSideNav('lessons'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('lessons'));
 Components.mount('footer-placeholder',     Components.renderFooter());
 
+// ── Language toggle ───────────────────────────────────────────────────────────
+function syncTrailLangButtons(lang) {
+  document.querySelectorAll('#trail-lang-toggle [data-lang]').forEach(b => {
+    const on = b.getAttribute('data-lang') === lang;
+    b.classList.toggle('bg-pink-500', on);
+    b.classList.toggle('text-white', on);
+    b.classList.toggle('text-slate-300', !on);
+    b.classList.toggle('bg-white/10', !on);
+  });
+}
+
+function setTrailLang(lang) {
+  currentTrailLang = lang;
+  localStorage.setItem('capyTrailLang', lang);
+  syncTrailLangButtons(lang);
+  // French retains its legacy non-guided behavior; Turkish uses the shared guided runner.
+  const continueCard = document.getElementById('continue-card');
+  if (lang === 'fr') {
+    if (continueCard) continueCard.style.display = 'none';
+  } else {
+    if (continueCard) continueCard.style.display = '';
+  }
+  renderTrail();
+  updateTrailCounter();
+  if (lang !== 'fr') buildContinueCard();
+}
+
+// ── Overall progress / completion counter (per language) ──────────────────────
+function updateTrailCounter() {
+  const bar = document.getElementById('trail-progress-bar');
+  const lbl = document.getElementById('trail-progress-label');
+  const langLessons = TRAIL.filter(l => {
+    const ch = CHAPTERS.find(c => c.id === l.chapter);
+    return ((ch && ch.lang) || 'en') === currentTrailLang;
+  });
+  const total = langLessons.length;
+  const done  = langLessons.filter(l => isDone(l.id)).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = `${done} / ${total} done`;
+}
+
+// ── Review ("Revisão da Yara") card — counts DUE weak words across lessons ──
+// SRS: a weak word without w.srs is due immediately (streak 0). Once srs
+// exists, it's due only when nextDue <= now (mirrors lessons.html).
+function isWeakWordDue(w) {
+  if (!w.srs) return true;
+  return w.srs.nextDue <= Date.now();
+}
+function countWeakWords() {
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith('lessonProgress_j')) continue;
+    try {
+      const data = JSON.parse(localStorage.getItem(key));
+      total += (data.weakWords || []).filter(isWeakWordDue).length;
+    } catch (e) { /* ignore malformed entries */ }
+  }
+  return total;
+}
+function renderReviewCard() {
+  const card = document.getElementById('review-card');
+  const countLabel = document.getElementById('review-card-count');
+  if (!card) return;
+  const count = countWeakWords();
+  if (count >= 4) {
+    card.classList.remove('hidden');
+    if (countLabel) countLabel.textContent = `${count} palavras para revisar hoje`;
+  } else {
+    card.classList.add('hidden');
+  }
+}
+
+// ── Daily Quests / Streak Freeze UI ──────────────────────────────────────────
+function renderQuestsCard() {
+  const list = document.getElementById('quests-list');
+  if (!list || !window.Store) return;
+  const dq = Store.state.dailyQuests;
+  const quests = (dq && dq.quests) || [];
+  list.innerHTML = quests.map(q => {
+    const pct = q.target ? Math.min(100, Math.round((q.progress / q.target) * 100)) : 0;
+    return `
+      <div class="flex items-center gap-3">
+        <span class="text-xl flex-shrink-0">${q.done ? '✅' : q.icon}</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold ${q.done ? 'text-green-300' : 'text-white/85'} truncate">${q.label}</p>
+          <div class="bg-white/10 rounded-full h-1.5 mt-1 overflow-hidden">
+            <div class="h-full ${q.done ? 'bg-green-400' : 'bg-gradient-to-r from-pink-500 to-pink-400'} rounded-full transition-all" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <span class="text-[10px] font-bold ${q.done ? 'text-green-400' : 'text-slate-400'} flex-shrink-0">${q.progress}/${q.target}</span>
+      </div>`;
+  }).join('');
+
+  // Streak freeze chip
+  const freezes = Store.state.streakFreezes || 0;
+  const chip = document.getElementById('freeze-chip');
+  if (chip) chip.textContent = `🧊 x${freezes}`;
+  const buyBtn = document.getElementById('freeze-buy-btn');
+  if (buyBtn) buyBtn.classList.toggle('hidden', freezes >= 2);
+  const today = capyHojeBR();
+  const msg = document.getElementById('freeze-protected-msg');
+  if (msg) msg.classList.toggle('hidden', Store.state.lastFreezeUsed !== today);
+}
+
+function buyFreeze() {
+  if (!window.Store) return;
+  const freezes = Store.state.streakFreezes || 0;
+  if (freezes >= 2) return;
+  if (!confirm('Comprar Streak Freeze por 80 🫐? Protege sua streak se você faltar um dia.')) return;
+  const ok = Store.buyStreakFreeze();
+  if (ok) {
+    if (window.CapySound) CapySound.correct();
+  } else {
+    alert('Berries insuficientes! Você precisa de 80 🫐.');
+  }
+}
+
+// ── Chests (every 5 minis in a chapter) ──────────────────────────────────────
+function chestKey(chapterId, idx) { return `${chapterId}_${idx}`; }
+
+function openChestNode(chapterId, idx) {
+  if (!window.Store) return;
+  const key = chestKey(chapterId, idx);
+  if (Store.isChestOpened(key)) return;
+  const opened = Store.openChest(key);
+  if (!opened) return;
+  if (window.CapySound) CapySound.correct();
+  if (window.CapyJuice) CapyJuice.celebrate();
+  renderTrail();
+  scrollToNextMini();
+  setTimeout(() => alert('🎁 Baú aberto! +25 🫐 berries!'), 200);
+}
+
+// ── Aviso de streak em risco ────────────────────────────────────────────────
+// Só aparece para quem TEM o que perder: streak viva e ainda sem praticar hoje.
+// O prazo é real — meia-noite de Brasília, agora que o dia do aluno é o daqui.
+function renderStreakRisco() {
+  const el = document.getElementById('streak-risco');
+  if (!el || typeof Store === 'undefined') return;
+  const dias = Store.state.streakDays || 0;
+  const praticouHoje = Store.state.lastPracticeDate === capyHojeBR();
+
+  if (dias < 1 || praticouHoje) { el.classList.add('hidden'); return; }
+
+  // Horas até a virada do dia EM BRASÍLIA — não a meia-noite do relógio do
+  // aparelho, que pode estar em outro fuso (aluno viajando, notebook errado).
+  const agoraBR = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+  const faltaMs = (24 - agoraBR.getHours()) * 36e5 - agoraBR.getMinutes() * 6e4;
+  const horas = Math.max(0, Math.floor(faltaMs / 36e5));
+  const minutos = Math.max(0, Math.round((faltaMs % 36e5) / 6e4));
+  const prazo = horas >= 1 ? `${horas}h` : `${minutos}min`;
+
+  const freezes = Store.state.streakFreezes || 0;
+  document.getElementById('streak-risco-icone').textContent = freezes > 0 ? '🧊' : '🔥';
+  document.getElementById('streak-risco-titulo').textContent =
+    `Sua streak de ${dias} ${dias === 1 ? 'dia' : 'dias'} acaba em ${prazo}`;
+  document.getElementById('streak-risco-sub').textContent = freezes > 0
+    ? `Você tem ${freezes} 🧊 — se faltar hoje, um deles te protege. Melhor não gastar.`
+    : 'Qualquer atividade de hoje já mantém ela viva.';
+
+  const btn = document.getElementById('streak-risco-btn');
+  const lang = (typeof currentTrailLang !== 'undefined' && currentTrailLang) || 'en';
+  const proximo = computeNextMini(lang);
+  btn.onclick = () => {
+    // Mesma URL do card "Continue" — o &guided=1 é o que abre o mini no modo
+    // guiado; sem ele a lição abre de outro jeito.
+    window.location.href = proximo
+      ? `lessons.html?lesson=${proximo.lessonId}&mini=${proximo.miniNum}&guided=1`
+      : 'lessons.html';
+  };
+  el.classList.remove('hidden');
+}
+
+document.addEventListener('stateChanged', () => { renderQuestsCard(); renderStreakRisco(); });
+
 setLevelBadge();
 buildContinueCard();
-buildTrail();
+renderQuestsCard();
+renderStreakRisco();
+renderReviewCard();
 
 // ── Free plan banner disabled — all content open ──────────────
 
-// Overall progress bar
-(function() {
-  const total = TRAIL.length;
-  const done  = TRAIL.filter(l => isDone(l.id)).length;
-  const pct   = Math.round((done / total) * 100);
-  const bar   = document.getElementById('trail-progress-bar');
-  const lbl   = document.getElementById('trail-progress-label');
-  if (bar) bar.style.width = pct + '%';
-  if (lbl) lbl.textContent = `${done} / ${total} done`;
-})();
+// Apply persisted language on load: toggle state, trail render, counter.
+setTrailLang(currentTrailLang);
+scrollToNextMini();
 </script>
+<script>window.YARA_WIDGET = { lang: currentTrailLang, lessonTitle: 'Trilha Diária', lessonNum: '' };</script>
+<script src="yara-widget.js?v=yw5"></script>
 </body>
 </html>

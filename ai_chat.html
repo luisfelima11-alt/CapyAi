@@ -1,289 +1,784 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Yara AI — Capy Yara Adventures</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<title>Yara AI — Capy Yara English</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-* { font-family: 'Plus Jakarta Sans', sans-serif; }
-html, body { height: 100%; overflow: hidden; background: #000; }
+  /* Esta página não carrega Tailwind nem Material Symbols de propósito. Ela
+     baixava 4,29 MB antes do primeiro clique (o clipe inteiro de 3,8 MB por
+     `autoplay` sem `preload`, mais um yara-avatar.png de 385 KB que estava
+     `hidden` — `display:none` não impede download), e é o destino do botão
+     "Yara AI" de 201 páginas. Cada request a menos aqui vale por 201. */
+  :root{
+    --fundo:#050c18; --navy:#001f3f; --rosa:#ec4899; --teal:#2EC4B6;
+    --laranja:#FF9F1C; --vidro:rgba(255,255,255,.12); --borda:rgba(255,255,255,.16);
+    /* Usado como MASCARA na marca das falas de voz. Sem esta variavel o
+       -webkit-mask cai e sobra um quadrado solido em cada linha falada. */
+    --icone-mic: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z%27/%3E%3Cpath d=%27M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.07A7 7 0 0 0 19 11Z%27/%3E%3C/svg%3E");
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{height:100%}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--fundo);color:#fff;
+       /* Coluna flex em vez de tudo `position:fixed`: com o compositor no fluxo
+          normal, o teclado do iOS empurra a página em vez de cobrir a caixa. */
+       display:flex;flex-direction:column;height:100dvh;overflow:hidden;
+       -webkit-font-smoothing:antialiased}
+  button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  :focus-visible{outline:3px solid var(--rosa);outline-offset:3px}
 
-/* Speech bubble tail */
-#speech-bubble::before {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 20px;
-  width: 0; height: 0;
-  border-left: 12px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 13px solid rgba(255,255,255,.95);
-}
+  /* ── Palco: a capivara ao fundo ─────────────────────────────────────────── */
+  #palco{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--navy)}
+  /* Fundo: a propria arte, ampliada e borrada, preenchendo o que sobra. */
+  .fundo{position:absolute;inset:-8%;background-size:cover;background-position:center;
+         filter:blur(44px) saturate(1.35);transform:scale(1.12);opacity:.72}
+  .retrato{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+           object-position:center 46%;display:block;animation:respira 9s ease-in-out infinite}
+  @keyframes respira{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  /* Enquanto ela fala, o clipe assume e a respiração sai da frente. */
+  #palco[data-estado="ia_falando"] .retrato{animation:none}
+  /* O texto vive por cima da imagem: sem este véu, fala branca sobre fundo
+     claro some. Mais forte em cima e embaixo, onde ficam barra e compositor. */
+  #palco::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(5,12,24,.78) 0%,rgba(5,12,24,.30) 22%,
+                                      rgba(5,12,24,.55) 58%,rgba(5,12,24,.94) 100%)}
 
-#speech-bubble { transition: opacity .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1); }
+  /* Cada estado tem movimento próprio. Antes, "você falando" e "ela falando"
+     eram a mesma tela parada com uma bolinha de outra cor. */
+  .anel,.halo{position:absolute;z-index:2;inset:0;pointer-events:none;opacity:0;transition:opacity .35s}
+  #palco[data-estado="microfone"] .anel,
+  #palco[data-estado="conectando"] .anel{opacity:1}
+  .anel::before,.anel::after{content:'';position:absolute;inset:0;
+    border:2px solid rgba(46,196,182,.55);animation:anelCresce 2s ease-out infinite}
+  .anel::after{animation-delay:1s}
+  @keyframes anelCresce{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.04);opacity:0}}
+  .halo{box-shadow:inset 0 0 0 3px rgba(236,72,153,.5),inset 0 0 60px 8px rgba(236,72,153,.12)}
+  #palco[data-estado="ia_falando"] .halo{opacity:1;animation:haloPulsa 1.8s ease-in-out infinite}
+  @keyframes haloPulsa{0%,100%{box-shadow:inset 0 0 0 3px rgba(236,72,153,.5),inset 0 0 60px 8px rgba(236,72,153,.12)}
+                       50%{box-shadow:inset 0 0 0 5px rgba(236,72,153,.9),inset 0 0 110px 20px rgba(236,72,153,.28)}}
 
-/* Typing dots */
-@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
-.dot { width:7px; height:7px; border-radius:50%; background:#cbd5e1; display:inline-block; }
-.dot:nth-child(1){ animation:bounce .9s ease infinite 0s }
-.dot:nth-child(2){ animation:bounce .9s ease infinite .15s }
-.dot:nth-child(3){ animation:bounce .9s ease infinite .3s }
+  /* Medidor de voz: AnalyserNode sobre o microfone de verdade. É o único
+     movimento honesto da tela — ele para quando a pessoa para de falar. */
+  .medidor{position:absolute;z-index:3;left:50%;top:5.2rem;transform:translateX(-50%);
+           display:flex;align-items:flex-end;gap:4px;height:26px;opacity:0;transition:opacity .25s;
+           padding:.35rem .6rem;border-radius:999px;background:rgba(5,12,24,.5);
+           border:1px solid var(--borda);box-sizing:content-box}
+  #palco[data-estado="ouvindo"] .medidor{opacity:.5}
+  #palco[data-estado="falando"] .medidor{opacity:1}
+  .medidor i{width:5px;height:100%;border-radius:99px;transform:scaleY(.1);transform-origin:bottom;
+             background:linear-gradient(180deg,#5eead4,var(--teal));transition:transform .08s linear}
+  .pontinhos{position:absolute;z-index:3;left:50%;top:5.6rem;transform:translateX(-50%);display:none;gap:6px}
+  #palco[data-estado="pensando"] .pontinhos{display:flex}
+  .pontinhos i{width:8px;height:8px;border-radius:50%;background:#f9a8d4;
+               animation:saltinho 1.1s ease-in-out infinite}
+  .pontinhos i:nth-child(2){animation-delay:.14s}
+  .pontinhos i:nth-child(3){animation-delay:.28s}
+  @keyframes saltinho{0%,62%,100%{transform:translateY(0);opacity:.45}31%{transform:translateY(-7px);opacity:1}}
 
-/* Mic wave */
-@keyframes wave { 0%,100%{height:5px} 50%{height:18px} }
-.wave-bar { width:3px; border-radius:99px; background:white; animation:wave .5s ease-in-out infinite; }
+  /* ── Barra de cima ──────────────────────────────────────────────────────── */
+  .coluna{max-width:44rem;margin-inline:auto;padding-inline:1rem}
+  #topo{position:relative;z-index:3;flex:none;display:flex;align-items:center;justify-content:space-between;
+        gap:.6rem;padding:.7rem 1rem calc(.6rem);}
+  .redondo{width:36px;height:36px;border-radius:50%;background:var(--vidro);
+           backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;
+           flex:none;transition:transform .15s}
+  .redondo:active{transform:scale(.9)}
+  #cracha{display:flex;align-items:center;gap:.5rem;background:rgba(5,12,24,.45);
+          backdrop-filter:blur(10px);border:1px solid var(--borda);border-radius:999px;
+          padding:.35rem .75rem;min-width:0}
+  #cracha img{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none}
+  #titulo{font-size:.8rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #estado{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.55);white-space:nowrap;flex:none}
+  #cron{font-variant-numeric:tabular-nums;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);flex:none}
+  #cron:empty{display:none}
+  #cota{font-size:.68rem;font-weight:700;color:#FFC48A;flex:none}
+  #cota:empty{display:none}
 
-/* Pill entrance */
-@keyframes pillIn { from{opacity:0;transform:translateY(8px) scale(.94)} to{opacity:1;transform:none} }
-.pill-in { animation: pillIn .22s ease forwards; }
+  /* ── O fio: uma lista só, voz e texto juntos ────────────────────────────── */
+  /* Duas listas fariam a fala dela sumir quando o aluno voltasse a digitar, que
+     é o contrário do que a fusão existe para fazer. */
+  #fio{position:relative;z-index:1;flex:1;overflow-y:auto;overscroll-behavior:contain;
+       padding:.5rem 0 1rem;-webkit-overflow-scrolling:touch}
+  #fio .coluna{display:flex;flex-direction:column;gap:.6rem}
+  #fio p{max-width:min(85%,34rem);padding:.65rem .9rem;border-radius:1.1rem;
+         font-size:.95rem;line-height:1.5;font-weight:600;
+         backdrop-filter:blur(10px);word-wrap:break-word;overflow-wrap:anywhere;
+         animation:falaEntra .25s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes falaEntra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  #fio p[data-quem="ia"]{align-self:flex-start;background:rgba(255,255,255,.93);color:var(--navy);
+                         border-bottom-left-radius:.3rem}
+  #fio p[data-quem="eu"]{align-self:flex-end;background:rgba(236,72,153,.92);color:#fff;
+                         border-bottom-right-radius:.3rem}
+  /* Marca quem veio da ligação, para o aluno distinguir o que ele falou do que
+     ele escreveu sem precisar de duas listas. */
+  #fio p[data-canal="voz"]::before{content:'';display:inline-block;width:.7em;height:.7em;
+    margin-right:.4em;vertical-align:-.05em;opacity:.55;background:currentColor;
+    -webkit-mask:var(--icone-mic) center/contain no-repeat;mask:var(--icone-mic) center/contain no-repeat}
+  #fio p.viva::after{content:'';display:inline-block;width:.45ch;height:.95em;
+    margin-left:.12em;vertical-align:-.12em;background:currentColor;border-radius:1px;
+    animation:cursorPisca 1s steps(2,start) infinite}
+  @keyframes cursorPisca{0%,100%{opacity:1}50%{opacity:0}}
+  #fio .novo{animation:pedacoEntra .26s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes pedacoEntra{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
+  #fio .digitando{display:inline-flex;gap:4px;align-items:center}
+  #fio .digitando i{width:6px;height:6px;border-radius:50%;background:#94a3b8;
+                    animation:saltinho 1.1s ease-in-out infinite}
+  #fio .digitando i:nth-child(2){animation-delay:.14s}
+  #fio .digitando i:nth-child(3){animation-delay:.28s}
 
-/* Input */
-#chat-input:focus { outline: none; }
-#chat-input { background: transparent; }
-#chat-input::placeholder { color: rgba(255,255,255,.45); }
+  /* ── Compositor ─────────────────────────────────────────────────────────── */
+  #compositor{position:relative;z-index:3;flex:none;
+              padding:0 1rem calc(.8rem + env(safe-area-inset-bottom,0px))}
+  .caixa{max-width:44rem;margin-inline:auto;background:rgba(255,255,255,.1);
+         backdrop-filter:blur(16px);border:1px solid var(--borda);
+         border-radius:1.5rem;padding:.65rem .75rem;transition:border-color .2s}
+  .caixa:focus-within{border-color:rgba(236,72,153,.6)}
+  #entrada{width:100%;background:transparent;border:none;color:#fff;font:inherit;
+           font-size:1rem;font-weight:600;line-height:1.45;resize:none;outline:none;
+           max-height:9rem;overflow-y:auto;padding:.2rem .25rem}
+  #entrada::placeholder{color:rgba(255,255,255,.45);font-weight:500}
+  .acoes{display:flex;align-items:center;gap:.5rem;margin-top:.45rem}
+  .cresce{flex:1}
+  #btn-persona{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);
+               border:1px solid var(--borda);border-radius:999px;padding:.35rem .7rem;
+               font-size:.78rem;font-weight:800;max-width:60%;transition:background .15s}
+  #btn-persona:hover{background:rgba(255,255,255,.18)}
+  #btn-persona span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #btn-persona svg{flex:none;transition:transform .2s}
+  #btn-persona[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .acao{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+        justify-content:center;flex:none;transition:transform .15s,background .15s}
+  .acao:not(:disabled):active{transform:scale(.9)}
+  #ligar{background:rgba(255,255,255,.14)}
+  #silenciar{background:rgba(255,255,255,.14)}
+  #silenciar[hidden]{display:none}
+  #ligar.desligar{background:linear-gradient(135deg,#e11d48,#f43f5e)}
+  #btn-enviar{background:var(--rosa)}
+  .dica{max-width:44rem;margin:.5rem auto 0;font-size:.7rem;font-weight:600;
+        color:rgba(255,255,255,.42);text-align:center;line-height:1.4}
+
+  /* ── Menu de personas ───────────────────────────────────────────────────── */
+  #veu{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);
+       backdrop-filter:blur(2px);opacity:0;transition:opacity .2s}
+  #veu[hidden]{display:none}
+  #veu.aberto{opacity:1}
+  /* Com as IAs dos cursos o menu passou de 5 para 10 opções (~600px). Sem
+     teto de altura, num celular de 667px as primeiras ficavam fora da tela e
+     sem como rolar até elas. */
+  #menu-persona{position:fixed;z-index:41;background:#0d1626;border:1px solid var(--borda);
+                box-shadow:0 20px 60px rgba(0,0,0,.5);
+                max-height:min(34rem,calc(100dvh - 7rem));overflow-y:auto;overscroll-behavior:contain}
+  #menu-persona[hidden]{display:none}
+  /* Celular: folha subindo de baixo, onde o polegar alcança. */
+  @media(max-width:767px){
+    #menu-persona{left:0;right:0;bottom:0;border-radius:1.4rem 1.4rem 0 0;
+                  padding:.6rem .6rem calc(.6rem + env(safe-area-inset-bottom,0px));
+                  animation:folhaSobe .24s cubic-bezier(.34,1.3,.64,1) both}
+    @keyframes folhaSobe{from{transform:translateY(100%)}to{transform:none}}
+    #menu-persona::before{content:'';display:block;width:36px;height:4px;border-radius:99px;
+      background:rgba(255,255,255,.25);margin:.2rem auto .6rem}
+  }
+  /* Desktop: popover ancorado acima da pílula. */
+  @media(min-width:768px){
+    #menu-persona{left:50%;bottom:6.2rem;transform:translateX(-50%);width:min(24rem,calc(100vw - 2rem));
+                  border-radius:1.1rem;padding:.4rem;
+                  animation:popEntra .18s cubic-bezier(.34,1.3,.64,1) both}
+    @keyframes popEntra{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
+  }
+  .opcao{display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;
+         padding:.7rem .75rem;border-radius:.9rem;transition:background .15s}
+  .opcao:hover{background:rgba(255,255,255,.07)}
+  .opcao[aria-selected="true"]{background:rgba(236,72,153,.16)}
+  .opcao .mini{width:38px;height:38px;border-radius:50%;flex:none;object-fit:cover;
+               background:rgba(255,255,255,.1)}
+  .opcao .txt{min-width:0;flex:1}
+  .opcao b{display:block;font-size:.88rem;font-weight:800}
+  .opcao small{display:block;font-size:.73rem;font-weight:600;color:rgba(255,255,255,.5);
+               line-height:1.35;margin-top:.1rem}
+  .opcao .seta{flex:none;opacity:.45}
+
+  /* ── Aviso e toast ──────────────────────────────────────────────────────── */
+  #aviso{position:relative;z-index:3;flex:none;max-width:44rem;margin:0 auto .5rem;
+         padding:.6rem .9rem;border-radius:.9rem;font-size:.8rem;font-weight:700;line-height:1.4;
+         background:rgba(255,159,28,.16);border:1px solid rgba(255,159,28,.35);color:#FFD9A8}
+  #aviso[hidden]{display:none}
+  #aviso.erro{background:rgba(225,29,72,.18);border-color:rgba(244,63,94,.45);color:#FFC9D3}
+  #toast{position:fixed;left:50%;bottom:7.5rem;transform:translateX(-50%);z-index:50;
+         background:rgba(0,0,0,.85);backdrop-filter:blur(12px);color:#fff;
+         font-size:.78rem;font-weight:800;padding:.5rem 1rem;border-radius:999px}
+  #toast[hidden]{display:none}
+
+  @media(max-width:480px){
+    #fio p{font-size:.9rem;max-width:90%}
+    #entrada{font-size:1rem}   /* nunca abaixo de 16px: o iOS dá zoom no foco */
+    .dica{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/ai_chat.html"/>
+<meta property="og:title" content="Yara AI — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Yara AI — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body>
 
-<!-- ── FULL SCREEN VIDEO ─────────────────────────────────────────────────────── -->
-<video id="yara-video" autoplay loop muted playsinline
-       class="fixed inset-0 w-full h-full object-cover object-top z-0">
-  <source src="yara-chat.mp4" type="video/mp4"/>
-</video>
+<div id="palco" data-estado="desconectado">
+  <div class="fundo" id="fundo" aria-hidden="true"></div>
+  <video class="retrato" id="yara-video" poster="yara-quadrado-v1.jpg"
+         muted loop playsinline preload="none" aria-hidden="true"></video>
+  <div class="anel" aria-hidden="true"></div>
+  <div class="halo" aria-hidden="true"></div>
+  <div class="medidor" id="medidor" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="pontinhos" aria-hidden="true"><i></i><i></i><i></i></div>
+</div>
 
-<!-- Fallback image -->
-<img id="yara-fallback" src="yara-avatar.png" alt="Yara"
-     class="fixed inset-0 w-full h-full object-cover object-top z-0 hidden"
-     onerror="this.src='yara.svg'"/>
-
-<!-- ── TOP GRADIENT ──────────────────────────────────────────────────────────── -->
-<div class="fixed top-0 left-0 right-0 h-28 z-10 pointer-events-none"
-     style="background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 100%)"></div>
-
-<!-- ── TOP BAR ───────────────────────────────────────────────────────────────── -->
-<div class="fixed top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-3 pb-2">
-  <button onclick="history.length>1?history.back():location.href='6_Home_Forest_Expedition.html'"
-          class="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-all">
-    <span class="material-symbols-outlined text-white" style="font-size:18px">arrow_back</span>
+<header id="topo">
+  <button class="redondo" type="button" onclick="capyVoltar()" aria-label="Voltar">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
-
-  <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 py-1.5">
-    <div class="relative">
-      <img src="yara-avatar.png" alt="Yara" class="w-6 h-6 rounded-full object-cover" onerror="this.src='yara.svg'"/>
-      <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border border-black/30"></span>
-    </div>
-    <p class="text-white font-black text-xs">Yara AI</p>
-    <span class="text-emerald-300 text-[10px] font-bold">• online</span>
+  <div id="cracha">
+    <img id="cracha-arte" src="yara-quadrado-v1.jpg" alt=""/>
+    <span id="titulo">Yara AI</span>
+    <span id="estado" role="status" aria-live="polite">online</span>
+    <span id="cron"></span>
+    <span id="cota"></span>
   </div>
+  <div style="width:36px;flex:none"></div>
+</header>
 
-  <div class="w-8"></div>
-</div>
+<main id="fio" role="log" aria-live="polite" aria-label="Conversa com a Yara">
+  <div class="coluna" id="fio-coluna"></div>
+</main>
 
-<!-- ── SPEECH BUBBLE ─────────────────────────────────────────────────────────── -->
-<div id="speech-bubble" class="fixed left-4 right-4 z-20 opacity-0 scale-95 pointer-events-none"
-     style="bottom:140px; max-width:300px;">
-  <div class="relative bg-white/95 backdrop-blur-md rounded-2xl rounded-bl-sm shadow-2xl px-4 py-3">
-    <div id="typing-dots" class="flex items-center gap-1.5 py-0.5 hidden">
-      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-    </div>
-    <p id="bubble-text" class="text-navy font-semibold text-sm leading-relaxed hidden"></p>
-  </div>
-</div>
+<div id="aviso" role="status" aria-live="polite" hidden></div>
 
-<!-- ── USER PILL ─────────────────────────────────────────────────────────────── -->
-<div id="user-pill" class="fixed right-4 z-20 hidden" style="bottom:140px;">
-  <div class="bg-pink-500/90 backdrop-blur-md text-white rounded-2xl rounded-br-sm px-4 py-2.5 text-sm font-bold shadow-xl max-w-[220px]">
-    <p id="user-pill-text" class="leading-snug"></p>
-  </div>
-</div>
-
-<!-- ── MIC OVERLAY ───────────────────────────────────────────────────────────── -->
-<div id="mic-wave" class="fixed inset-0 z-30 items-center justify-center hidden" style="background:rgba(0,0,0,.5);">
-  <div class="bg-black/70 backdrop-blur-xl rounded-3xl px-10 py-8 flex flex-col items-center gap-4 border border-white/10">
-    <div class="flex items-end gap-1.5 h-8">
-      <div class="wave-bar" style="animation-delay:0s"></div>
-      <div class="wave-bar" style="animation-delay:.1s"></div>
-      <div class="wave-bar" style="animation-delay:.2s"></div>
-      <div class="wave-bar" style="animation-delay:.05s"></div>
-      <div class="wave-bar" style="animation-delay:.15s"></div>
-    </div>
-    <p class="text-white font-black text-sm">Ouvindo...</p>
-    <button onclick="stopMic()" class="mt-2 w-12 h-12 bg-red-500 rounded-full flex items-center justify-center active:scale-90 transition-all">
-      <span class="material-symbols-outlined text-white" style="font-size:22px">mic_off</span>
-    </button>
-  </div>
-</div>
-
-<!-- ── BOTTOM GRADIENT ───────────────────────────────────────────────────────── -->
-<div class="fixed bottom-0 left-0 right-0 h-48 z-10 pointer-events-none"
-     style="background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.3) 50%,transparent 100%)"></div>
-
-<!-- ── BOTTOM BAR ────────────────────────────────────────────────────────────── -->
-<div class="fixed bottom-0 left-0 right-0 z-20 px-4 pb-8 pt-2">
-  <!-- Action row: mic + input + send + call -->
-  <div class="flex items-center gap-2.5">
-
-    <!-- Mic button -->
-    <button id="mic-btn" onclick="startMic()"
-            class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-all flex-shrink-0">
-      <span class="material-symbols-outlined text-white" style="font-size:20px;font-variation-settings:'FILL' 1">mic</span>
-    </button>
-
-    <!-- Text input -->
-    <div class="flex-1 flex items-center bg-white/15 backdrop-blur-md rounded-full px-4 py-2.5 gap-2">
-      <input id="chat-input" type="text" placeholder="Escreva para Yara..."
-             class="flex-1 text-white text-sm font-medium min-w-0"
-             onkeydown="if(event.key==='Enter')sendMessage()"/>
-      <button onclick="sendMessage()"
-              class="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center active:scale-90 transition-all flex-shrink-0">
-        <span class="material-symbols-outlined text-white" style="font-size:15px;font-variation-settings:'FILL' 1">arrow_upward</span>
+<form id="compositor" autocomplete="off">
+  <div class="caixa">
+    <textarea id="entrada" rows="1" maxlength="2000"
+              placeholder="Escreva ou toque no microfone…"
+              aria-label="Escreva uma mensagem para a Yara"></textarea>
+    <div class="acoes">
+      <button id="btn-persona" type="button" aria-haspopup="listbox"
+              aria-expanded="false" aria-controls="menu-persona">
+        <span id="btn-persona-rotulo">Yara</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <span class="cresce"></span>
+      <button id="silenciar" class="acao" type="button" aria-pressed="false"
+              aria-label="Silenciar o microfone" title="Silenciar" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 3l18 18"/><path d="M9 5a3 3 0 0 1 6 0v5"/><path d="M5 11a7 7 0 0 0 10.6 6"/><path d="M19 11a7 7 0 0 1-.6 2.8"/><path d="M12 19v3"/></svg>
+      </button>
+      <button id="ligar" class="acao" type="button" aria-label="Ligar para a Yara" title="Ligar">
+        <svg id="icone-ligar" width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.07A7 7 0 0 0 19 11Z"/></svg>
+      </button>
+      <button id="btn-enviar" class="acao" type="submit" aria-label="Enviar" disabled>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
       </button>
     </div>
-
-    <!-- Call button -->
-    <button onclick="startCall()"
-            class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center active:scale-90 transition-all flex-shrink-0">
-      <span class="material-symbols-outlined text-white" style="font-size:20px;font-variation-settings:'FILL' 1">call</span>
-    </button>
-
   </div>
-</div>
+  <p class="dica">Enter envia · Shift+Enter quebra a linha</p>
+</form>
 
-<!-- ── TOAST ─────────────────────────────────────────────────────────────────── -->
-<div id="toast" class="fixed bottom-36 left-1/2 -translate-x-1/2 z-50 hidden">
-  <div class="bg-black/80 backdrop-blur-xl text-white text-xs font-bold px-4 py-2 rounded-full">
-    <span id="toast-msg"></span>
-  </div>
-</div>
+<div id="veu" hidden></div>
+<div id="menu-persona" role="listbox" aria-label="Com quem você quer falar" hidden></div>
+<div id="toast" role="status" hidden></div>
 
-<script src="store.js?v=c52d7db"></script>
-<script src="auth.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="conversa-core.js?v=palco20260920"></script>
 <script>
-// ── Helpers ────────────────────────────────────────────────────────────────────
-function showBubble(text, isTyping) {
-  const bubble = document.getElementById('speech-bubble');
-  const dots   = document.getElementById('typing-dots');
-  const txt    = document.getElementById('bubble-text');
-  const pill   = document.getElementById('user-pill');
-  pill.classList.add('hidden');
-  if (isTyping) {
-    dots.classList.remove('hidden'); txt.classList.add('hidden');
-  } else {
-    dots.classList.add('hidden'); txt.classList.remove('hidden');
-    txt.textContent = text;
-  }
-  bubble.style.opacity = '0'; bubble.style.transform = 'scale(.95)';
-  bubble.classList.remove('hidden');
-  requestAnimationFrame(() => {
-    bubble.style.opacity = '1'; bubble.style.transform = 'scale(1)';
-  });
+'use strict';
+const $ = id => document.getElementById(id);
+const CLIPE = 'yara-chat.mp4';
+const ARTE_PADRAO = 'yara-quadrado-v1.jpg';
+
+const ROTULOS = {
+  microfone:   'pedindo o microfone…',
+  conectando:  'chamando…',
+  ouvindo:     'te ouvindo',
+  falando:     'você falando',
+  pensando:    'pensando',
+  ia_falando:  'falando',
+  desconectado:'online',
+};
+
+const semMovimento = () => {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) { return false; }
+};
+const mmss = ms => Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0');
+
+function avisar(txt, erro) {
+  const a = $('aviso');
+  if (!txt) { a.hidden = true; return; }
+  a.textContent = txt;
+  a.className = erro ? 'erro' : '';
+  a.hidden = false;
+}
+function toast(msg, dur) {
+  const t = $('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(window._toast);
+  window._toast = setTimeout(() => { t.hidden = true; }, dur || 2500);
 }
 
-function hideBubble() {
-  const bubble = document.getElementById('speech-bubble');
-  bubble.style.opacity = '0'; bubble.style.transform = 'scale(.95)';
+// ── O fio ────────────────────────────────────────────────────────────────────
+// Uma lista só para voz e texto. As falas da ligação usam a mesma maquinaria de
+// "linha viva" da conversa.html: os deltas chegam palavra a palavra e a linha
+// CRESCE; quando o turno fecha ela é finalizada, em vez de virar uma segunda
+// linha. Sem isso o texto apareceria duas vezes.
+const falas = new Map();
+const noFim = () => { const t = $('fio'); return t.scrollHeight - t.scrollTop - t.clientHeight < 60; };
+const rolar = () => { const t = $('fio'); t.scrollTop = t.scrollHeight; };
+
+function linhaDe(quem, canal, id) {
+  let reg = id ? falas.get(id) : null;
+  if (reg) return reg;
+  const p = document.createElement('p');
+  p.dataset.quem = quem === 'eu' ? 'eu' : 'ia';
+  p.dataset.canal = canal;
+  if (canal === 'voz') p.classList.add('viva');
+  const corpo = document.createElement('span');
+  p.appendChild(corpo);
+  $('fio-coluna').appendChild(p);
+  reg = { p, corpo, texto: '' };
+  if (id) falas.set(id, reg);
+  return reg;
 }
 
-function showUserPill(text) {
-  hideBubble();
-  const pill = document.getElementById('user-pill');
-  document.getElementById('user-pill-text').textContent = text;
-  pill.classList.remove('hidden');
-  pill.classList.add('pill-in');
-  setTimeout(() => pill.classList.remove('pill-in'), 300);
+// Só acrescenta o sufixo novo. Reescrever a linha inteira a cada delta faria o
+// texto piscar e mataria a animação de entrada de cada pedaço.
+function escrever(reg, texto) {
+  if (texto.indexOf(reg.texto) !== 0) { reg.corpo.textContent = ''; reg.texto = ''; }
+  const novo = texto.slice(reg.texto.length);
+  if (!novo) return;
+  const s = document.createElement('span');
+  s.className = 'novo';
+  s.textContent = novo;   // textContent, nunca innerHTML: é fala transcrita.
+  reg.corpo.appendChild(s);
+  reg.texto = texto;
 }
 
-function showToast(msg, dur = 2500) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.classList.remove('hidden');
-  clearTimeout(window._toastTimer);
-  window._toastTimer = setTimeout(() => t.classList.add('hidden'), dur);
+function dizer(quem, canal, texto) {
+  const colado = noFim();
+  const reg = linhaDe(quem, canal, null);
+  escrever(reg, texto);
+  reg.p.classList.remove('viva');
+  if (colado) rolar();
+  return reg;
 }
 
-// ── Video fallback ─────────────────────────────────────────────────────────────
-const vid = document.getElementById('yara-video');
-vid.addEventListener('error', () => {
-  vid.classList.add('hidden');
-  document.getElementById('yara-fallback').classList.remove('hidden');
-});
+function pensando(liga) {
+  const velho = $('fio-coluna').querySelector('p[data-pensando]');
+  if (velho) velho.remove();
+  if (!liga) return;
+  const p = document.createElement('p');
+  p.dataset.quem = 'ia'; p.dataset.canal = 'texto'; p.dataset.pensando = '1';
+  const d = document.createElement('span');
+  d.className = 'digitando';
+  d.appendChild(document.createElement('i'));
+  d.appendChild(document.createElement('i'));
+  d.appendChild(document.createElement('i'));
+  p.appendChild(d);
+  $('fio-coluna').appendChild(p);
+  rolar();
+}
 
-// ── Session / user ─────────────────────────────────────────────────────────────
-const session = JSON.parse(localStorage.getItem('capySession') || '{}');
-const userId  = session?.id || 'guest';
-const userName = session?.name || 'Explorer';
+// ── Personas ─────────────────────────────────────────────────────────────────
+// O cliente NÃO tem lista embutida: ela vem do /api/personas. É isso que faz uma
+// IA de curso nova aparecer aqui sem tocar neste arquivo. Se o GET falhar, a
+// página funciona com a Yara padrão e o menu simplesmente não abre — fallback
+// com lista seria a segunda lista.
+let PERSONAS = [];
+let personaAtual = 'conversa';
 
-// ── Chat history ───────────────────────────────────────────────────────────────
-const history = [];
-
-// ── Greeting ───────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    showBubble(`Olá, ${userName}! 🐾 I'm Yara — ask me anything in English!`, false);
-  }, 600);
-});
-
-// ── Send message ───────────────────────────────────────────────────────────────
-async function sendMessage() {
-  const input = document.getElementById('chat-input');
-  const text  = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  showUserPill(text);
-  history.push({ role: 'user', content: text });
-  setTimeout(() => showBubble('', true), 400);
-
+function personaInicial() {
   try {
-    const res  = await fetch('/api/chat', {
+    const daUrl = new URLSearchParams(location.search).get('persona');
+    if (daUrl) return daUrl;
+  } catch (_) {}
+  try {
+    if (window.Store && Store.state && Store.state.aiPersona) return Store.state.aiPersona;
+  } catch (_) {}
+  return 'conversa';
+}
+
+function dadosDaPersona(id) {
+  return PERSONAS.find(p => p.id === id) || null;
+}
+
+function aplicarPersona(id, comHistoria) {
+  const p = dadosDaPersona(id);
+  // `destino` é a persona que não é conversada aqui: o menu navega para a página
+  // que já tem a simulação inteira (recrutador, devolutiva, clipe).
+  if (p && p.destino) { location.href = p.destino; return; }
+  personaAtual = p ? p.id : 'conversa';
+  $('btn-persona-rotulo').textContent = p ? p.rotulo : 'Yara';
+  const arte = (p && p.arte) || ARTE_PADRAO;
+  $('yara-video').poster = arte;
+  $('cracha-arte').src = arte;
+  $('fundo').style.backgroundImage = 'url("' + arte + '")';
+  $('titulo').textContent = p ? p.rotulo : 'Yara AI';
+  if (comHistoria) {
+    try {
+      const u = new URL(location.href);
+      if (personaAtual === 'conversa') u.searchParams.delete('persona');
+      else u.searchParams.set('persona', personaAtual);
+      // replaceState: trocar de capivara não pode empilhar uma entrada de
+      // histórico a cada clique, senão o botão voltar vira um labirinto.
+      history.replaceState(null, '', u.pathname + u.search);
+    } catch (_) {}
+  }
+  try {
+    if (window.Store && Store.state) { Store.state.aiPersona = personaAtual; Store.save(); }
+  } catch (_) {}
+}
+
+function montarMenu() {
+  const m = $('menu-persona');
+  m.textContent = '';
+  for (const p of PERSONAS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'opcao';
+    b.setAttribute('role', 'option');
+    b.setAttribute('aria-selected', String(p.id === personaAtual));
+    b.dataset.id = p.id;
+    const img = document.createElement('img');
+    img.className = 'mini'; img.alt = ''; img.loading = 'lazy';
+    img.src = p.arte || ARTE_PADRAO;
+    const txt = document.createElement('div');
+    txt.className = 'txt';
+    const nome = document.createElement('b');
+    nome.textContent = p.rotulo;
+    const leg = document.createElement('small');
+    leg.textContent = p.legenda || '';
+    txt.appendChild(nome); txt.appendChild(leg);
+    b.appendChild(img); b.appendChild(txt);
+    if (p.destino) {
+      const seta = document.createElement('span');
+      seta.className = 'seta';
+      seta.textContent = '↗';
+      b.appendChild(seta);
+    }
+    b.addEventListener('click', () => { fecharMenu(); aplicarPersona(p.id, true); });
+    m.appendChild(b);
+  }
+}
+
+function abrirMenu() {
+  if (!PERSONAS.length) return;
+  montarMenu();
+  $('menu-persona').hidden = false;
+  $('veu').hidden = false;
+  requestAnimationFrame(() => $('veu').classList.add('aberto'));
+  $('btn-persona').setAttribute('aria-expanded', 'true');
+  const sel = $('menu-persona').querySelector('[aria-selected="true"]') || $('menu-persona').firstElementChild;
+  if (sel) sel.focus();
+}
+function fecharMenu() {
+  $('menu-persona').hidden = true;
+  $('veu').hidden = true;
+  $('veu').classList.remove('aberto');
+  $('btn-persona').setAttribute('aria-expanded', 'false');
+}
+$('btn-persona').addEventListener('click', () => {
+  $('btn-persona').getAttribute('aria-expanded') === 'true' ? fecharMenu() : abrirMenu();
+});
+$('veu').addEventListener('click', fecharMenu);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('menu-persona').hidden) { fecharMenu(); $('btn-persona').focus(); }
+});
+
+// ── O vídeo ──────────────────────────────────────────────────────────────────
+// Só entra na rede quando a chamada CONECTA, nunca no load da página: com
+// `autoplay` e sem `preload` esta página baixava 3,8 MB antes do primeiro
+// clique. Some em silêncio (fica o poster) se o arquivo não responder 200, e
+// com movimento reduzido nem carrega — vídeo em loop é exatamente o que essa
+// preferência pede para parar.
+function ligarVideo() {
+  const v = $('yara-video');
+  // O clipe é da Yara padrão. Persona com arte própria fica no retrato parado
+  // com a animação `respira`: tocar a Yara de sempre por baixo de uma capivara
+  // de mala na mão é pior do que não tocar nada.
+  const p = dadosDaPersona(personaAtual);
+  if (p && p.arte && p.arte !== ARTE_PADRAO) return;
+  if (!v || v.dataset.pronto === '1' || semMovimento()) return;
+  v.dataset.pronto = '1';
+  fetch(CLIPE, { method: 'HEAD' }).then(r => {
+    if (!r.ok) throw 0;
+    v.src = CLIPE;
+    try { v.load(); } catch (_) {}
+  }).catch(() => {});
+}
+function tocarVideo(tocar) {
+  const v = $('yara-video');
+  if (!v || !v.getAttribute('src')) return;
+  if (!tocar) { try { v.pause(); } catch (_) {} return; }
+  const p = v.play();
+  if (p && p.catch) p.catch(() => {});
+}
+// O navegador não inicia mídia em aba oculta: o play() resolve e o vídeo fica
+// parado. Quem troca de aba no meio da ligação voltava e a achava congelada.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && $('palco').dataset.estado === 'ia_falando') tocarVideo(true);
+});
+
+// ── Medidor de voz ───────────────────────────────────────────────────────────
+let ctxAudio = null, analisador = null, quadroVoz = 0;
+function ligarMedidor() {
+  if (analisador || semMovimento()) return;
+  const fluxo = chamada.fluxo && chamada.fluxo();
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!fluxo || !AC) return;
+  try {
+    ctxAudio = new AC();
+    if (ctxAudio.state === 'suspended') { try { ctxAudio.resume(); } catch (_) {} }
+    const fonte = ctxAudio.createMediaStreamSource(fluxo);
+    analisador = ctxAudio.createAnalyser();
+    analisador.fftSize = 256;
+    analisador.smoothingTimeConstant = .72;
+    fonte.connect(analisador);
+    const dados = new Uint8Array(analisador.frequencyBinCount);
+    const barras = Array.prototype.slice.call($('medidor').children);
+    const porBarra = Math.max(1, Math.floor((dados.length * 0.6) / barras.length));
+    const passo = () => {
+      if (!analisador) return;
+      analisador.getByteFrequencyData(dados);
+      for (let i = 0; i < barras.length; i++) {
+        let soma = 0;
+        for (let k = i * porBarra; k < (i + 1) * porBarra; k++) soma += dados[k];
+        const nivel = Math.min(1, (soma / porBarra) / 130);
+        barras[i].style.transform = 'scaleY(' + (0.1 + nivel * 0.9).toFixed(3) + ')';
+      }
+      quadroVoz = requestAnimationFrame(passo);
+    };
+    passo();
+  } catch (_) { analisador = null; }
+}
+function desligarMedidor() {
+  cancelAnimationFrame(quadroVoz);
+  analisador = null;
+  if (ctxAudio) { try { ctxAudio.close(); } catch (_) {} ctxAudio = null; }
+  Array.prototype.forEach.call($('medidor').children, b => { b.style.transform = ''; });
+}
+
+// ── Sessão e histórico ───────────────────────────────────────────────────────
+const sessao = (() => { try { return JSON.parse(localStorage.getItem('capySession') || '{}'); } catch (_) { return {}; } })();
+const userId = (sessao && sessao.id) || 'guest';
+const userName = (sessao && sessao.name) || 'Explorer';
+
+// A ligação e o chat escrito compartilham o MESMO histórico: o aluno desliga,
+// digita "como se escreve isso?" e ela sabe do que ele está falando.
+const historia = [];
+
+// ── A ligação ────────────────────────────────────────────────────────────────
+const chamada = CapyChamada({
+  aoEstado(e) {
+    $('estado').textContent = ROTULOS[e] || e;
+    $('palco').dataset.estado = e;
+    tocarVideo(e === 'ia_falando');
+    if (e === 'ouvindo') { ligarMedidor(); ligarVideo(); }
+    else if (e === 'desconectado') desligarMedidor();
+    controles();
+  },
+  aoCota(minutos) {
+    const c = $('cota');
+    if (minutos == null) { c.textContent = ''; return; }
+    const m = Math.max(0, Math.round(minutos));
+    c.textContent = m + ' min';
+    if (m <= 3) avisar('Você tem ' + m + ' min de voz neste mês. A chamada encerra sozinha quando acabar.');
+  },
+  aoFalaParcial(quem, texto, id) {
+    const colado = noFim();
+    escrever(linhaDe(quem, 'voz', id), texto);
+    if (colado) rolar();
+  },
+  aoFala(quem, texto, id) {
+    const colado = noFim();
+    const reg = linhaDe(quem, 'voz', id);
+    escrever(reg, texto);
+    reg.p.classList.remove('viva');
+    if (id) falas.delete(id);
+    // Entra no histórico do chat escrito: é o que faz a conversa continuar
+    // depois de desligar.
+    historia.push({ role: quem === 'eu' ? 'user' : 'assistant', content: texto });
+    if (colado) rolar();
+  },
+  aoUso() { $('cron').textContent = chamada.ligado() ? mmss(chamada.decorridoMs()) : ''; },
+  aoErro(msg) { avisar(msg, true); controles(); },
+  aoDesligar(motivo, dados) {
+    registrarUso(dados.uso, dados.duracaoMs);
+    controles();
+    $('cron').textContent = '';
+    if (motivo === 'silencio') avisar('Encerrei depois de 3 minutos de silêncio.');
+    else if (motivo === 'tempo') avisar('Encerrei no limite de 15 minutos.');
+  },
+});
+
+// O custo é gravado SEMPRE, em todo desligamento, e por sendBeacon — que
+// sobrevive ao unload. Até aqui só a entrevista.html gravava: uma conversa de
+// voz comum queimava cota e não deixava rastro, então o teto mensal só enxergava
+// metade do gasto real.
+function registrarUso(uso, duracaoMs) {
+  try {
+    const corpo = JSON.stringify({ cenario: personaAtual, uso, duracaoMs });
+    const blob = new Blob([corpo], { type: 'application/json' });
+    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/conversa-uso', blob))) {
+      fetch('/api/conversa-uso', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: corpo, keepalive: true,
+      }).catch(() => {});
+    }
+  } catch (_) { /* medir é bônus: nunca atrapalha o aluno */ }
+}
+
+// ── Controles ────────────────────────────────────────────────────────────────
+function controles() {
+  const ligado = chamada.ligado(), pendente = chamada.pendente();
+  const b = $('ligar');
+  b.className = 'acao' + (ligado || pendente ? ' desligar' : '');
+  b.setAttribute('aria-label', ligado || pendente ? 'Encerrar a chamada' : 'Ligar para a Yara');
+  b.title = ligado || pendente ? 'Encerrar' : 'Ligar';
+  // Digitar no meio de uma ligação de voz não tem semântica: a sessão Realtime
+  // não recebe o texto. Desabilitar é mais honesto que aceitar e engolir.
+  $('entrada').disabled = ligado || pendente;
+  $('btn-enviar').disabled = ligado || pendente || !$('entrada').value.trim();
+  $('btn-persona').disabled = ligado || pendente;
+  const mudo = $('silenciar');
+  mudo.hidden = !ligado;
+  mudo.setAttribute('aria-pressed', String(chamada.mudo()));
+  mudo.className = 'acao' + (chamada.mudo() ? ' desligar' : '');
+  mudo.title = chamada.mudo() ? 'Ativar o microfone' : 'Silenciar';
+}
+
+$('silenciar').addEventListener('click', () => { chamada.silenciar(!chamada.mudo()); controles(); });
+
+$('ligar').addEventListener('click', async () => {
+  if (chamada.ligado() || chamada.pendente()) { chamada.desligar(); return; }
+  avisar('');
+  fecharMenu();
+  controles();
+  const ok = await chamada.ligar({ cenario: personaAtual, lang: 'en' });
+  controles();
+  if (ok) avisar('Você está falando com uma IA. Fale no seu ritmo — toque de novo para encerrar.');
+});
+
+// ── Enviar texto ─────────────────────────────────────────────────────────────
+const entrada = $('entrada');
+function ajustarAltura() {
+  entrada.style.height = 'auto';
+  entrada.style.height = Math.min(entrada.scrollHeight, 144) + 'px';
+}
+entrada.addEventListener('input', () => { ajustarAltura(); controles(); });
+entrada.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('compositor').requestSubmit(); }
+});
+$('compositor').addEventListener('submit', e => { e.preventDefault(); enviar(); });
+
+async function enviar() {
+  const texto = entrada.value.trim();
+  if (!texto || chamada.ligado() || chamada.pendente()) return;
+  entrada.value = '';
+  ajustarAltura();
+  controles();
+  dizer('eu', 'texto', texto);
+  historia.push({ role: 'user', content: texto });
+  pensando(true);
+  try {
+    const r = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, userId, history: history.slice(-8) })
+      credentials: 'same-origin',
+      body: JSON.stringify({ message: texto, userId, persona: personaAtual, history: historia.slice(-10) }),
     });
-    const data = await res.json();
-    const reply = data.reply || data.message || '...';
-    history.push({ role: 'assistant', content: reply });
-    showBubble(reply, false);
-  } catch {
-    showBubble('Ops! Tente novamente. 😅', false);
+    const d = await r.json();
+    const resposta = d.reply || d.message
+      || (d.candidates && d.candidates[0] && d.candidates[0].content
+          && d.candidates[0].content.parts && d.candidates[0].content.parts[0]
+          && d.candidates[0].content.parts[0].text)
+      || 'Ops! Não consegui responder agora. 😅';
+    pensando(false);
+    dizer('ia', 'texto', resposta);
+    historia.push({ role: 'assistant', content: resposta });
+  } catch (_) {
+    pensando(false);
+    dizer('ia', 'texto', 'Ops! Tente novamente. 😅');
   }
 }
 
-// ── Mic ────────────────────────────────────────────────────────────────────────
-let mediaRecorder, audioChunks = [];
+// ── Início ───────────────────────────────────────────────────────────────────
+(async function iniciar() {
+  aplicarPersona(personaInicial(), false);
+  controles();
 
-async function startMic() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
-    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      document.getElementById('mic-wave').style.display = 'none';
-      showToast('🎙️ Processando áudio...');
-      // Transcription would go here via /api/transcribe
-      showBubble('Funcionalidade de voz em breve! 🎤', false);
-    };
-    mediaRecorder.start();
-    document.getElementById('mic-wave').style.display = 'flex';
-  } catch {
-    showToast('⚠️ Microfone não disponível');
+    const r = await fetch('/api/personas', { credentials: 'same-origin' });
+    if (r.ok) {
+      const d = await r.json();
+      if (Array.isArray(d.personas) && d.personas.length) {
+        PERSONAS = d.personas;
+        aplicarPersona(personaInicial(), false);
+      }
+    }
+  } catch (_) { /* sem menu, mas a página funciona */ }
+
+  // Mensagem escrita na home, entregue por sessionStorage. Consumida na leitura
+  // (removeItem antes de usar): recarregar não reenvia a mesma frase.
+  let primeira = '';
+  try {
+    primeira = sessionStorage.getItem('capyPrimeiraMensagem') || '';
+    sessionStorage.removeItem('capyPrimeiraMensagem');
+  } catch (_) { primeira = ''; }
+
+  dizer('ia', 'texto', 'Olá, ' + userName + '! 🐾 Escreva em inglês, ou toque no microfone para ligar.');
+
+  if (primeira) {
+    entrada.value = primeira.slice(0, 300);
+    ajustarAltura(); controles();
+    setTimeout(enviar, 500);
   }
-}
+})();
+</script>
 
-function stopMic() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-  document.getElementById('mic-wave').style.display = 'none';
-}
-
-// ── Call ───────────────────────────────────────────────────────────────────────
-function startCall() {
-  showToast('📞 Chamada de voz em breve!');
+<script>
+// Volta para a página anterior sem depender do estado do history.
+// history.length pode vir 0, e a guarda de login reempurra a pessoa pra frente
+// quando o back cai numa página protegida.
+function capyVoltar() {
+  var casa = '6_Home_Forest_Expedition.html';
+  var inicio = location.href;
+  var destino = casa;
+  try {
+    var ref = document.referrer;
+    if (ref && new URL(ref).origin === location.origin && ref !== inicio) destino = ref;
+  } catch (e) {}
+  if (history.length > 1) {
+    history.back();
+    setTimeout(function () { if (location.href === inicio) location.href = destino; }, 400);
+  } else {
+    location.href = destino;
+  }
 }
 </script>
 </body>

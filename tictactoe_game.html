@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
@@ -110,7 +110,7 @@
   .cell.pop { animation: cellPop .22s cubic-bezier(0.34,1.56,0.64,1) forwards; }
   @keyframes cellPop { from{ transform:scale(0.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
 
-  /* Yara is thinking indicator */
+  /* Yara está pensando indicator */
   #thinking-dots {
     display: none; text-align: center; color: #a78bfa;
     font-size: 0.82rem; font-weight: 600; letter-spacing: .08em;
@@ -226,30 +226,48 @@
     background: rgba(139,92,246,0.25); border-color: #a78bfa; color: #c4b5fd;
   }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/tictactoe_game.html"/>
+<meta property="og:title" content="Tic-Tac-Toe with Yara 🐾"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Tic-Tac-Toe with Yara 🐾"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body>
 
-<button id="back-btn" onclick="history.back()">← Back</button>
+<button id="back-btn" onclick="capyVoltar()">← Voltar</button>
 
 <!-- Score bar -->
 <div id="scorebar">
-  <div class="score-pill">😊 You: <span class="pill-val" id="score-you">0</span></div>
+  <div class="score-pill">😊 Você: <span class="pill-val" id="score-you">0</span></div>
   <div class="score-pill">🐾 Yara: <span class="pill-val" id="score-yara">0</span></div>
-  <div class="score-pill">🤝 Tie: <span class="pill-val" id="score-tie">0</span></div>
+  <div class="score-pill">🤝 Empate: <span class="pill-val" id="score-tie">0</span></div>
 </div>
 
 <!-- Difficulty -->
 <div id="mode-bar">
-  <button class="mode-btn active" id="btn-easy"   onclick="setMode('easy')">Easy</button>
-  <button class="mode-btn"        id="btn-medium" onclick="setMode('medium')">Medium</button>
-  <button class="mode-btn"        id="btn-hard"   onclick="setMode('hard')">Hard 🔥</button>
+  <button class="mode-btn active" id="btn-easy"   onclick="setMode('easy')">Fácil</button>
+  <button class="mode-btn"        id="btn-medium" onclick="setMode('medium')">Médio</button>
+  <button class="mode-btn"        id="btn-hard"   onclick="setMode('hard')">Difícil 🔥</button>
 </div>
 
 <!-- Player vs Yara row -->
 <div id="opponents-row">
   <div class="player-tag">
     <div class="player-avatar you">😊</div>
-    <span class="player-label">YOU</span>
+    <span class="player-label">VOCÊ</span>
     <span class="player-symbol x-sym">✕</span>
   </div>
   <div class="vs-badge">VS</div>
@@ -261,10 +279,10 @@
 </div>
 
 <!-- Turn status -->
-<div id="status-banner">Your turn — tap a square!</div>
+<div id="status-banner">Sua vez — toque num quadrado!</div>
 
 <!-- Yara thinking -->
-<div id="thinking-dots">Yara is thinking<span>.</span><span>.</span><span>.</span></div>
+<div id="thinking-dots">Yara está pensando<span>.</span><span>.</span><span>.</span></div>
 
 <!-- Board -->
 <div id="board">
@@ -280,7 +298,7 @@
 </div>
 
 <!-- Play Again -->
-<button id="play-again-btn" onclick="newGame()">▶ Play Again</button>
+<button id="play-again-btn" onclick="newGame()">▶ Jogar de novo</button>
 
 <!-- XP toast -->
 <div id="xp-toast">+10 XP 🌟</div>
@@ -295,17 +313,19 @@
     <hr id="quiz-divider"/>
 
     <!-- Quiz section -->
-    <div id="quiz-badge">ENGLISH CHALLENGE</div>
+    <div id="quiz-badge">DESAFIO DE INGLÊS</div>
     <div id="quiz-streak-bar"></div>
     <div id="quiz-prompt">What does this mean in Portuguese?</div>
     <div id="quiz-word">HELLO</div>
     <div id="quiz-choices"></div>
     <div id="quiz-feedback"></div>
-    <button id="quiz-continue" onclick="quizContinue()">▶ Play Again</button>
+    <button id="quiz-continue" onclick="quizContinue()">▶ Jogar de novo</button>
   </div>
 </div>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script>
 // ── Quiz words & phrases ──────────────────────────────────────────────────────
 const QUIZ_ITEMS = [
@@ -511,7 +531,7 @@ function yaraMove() {
   if (result) { endGame(result); return; }
 
   playerTurn = true;
-  setStatus('Your turn — tap a square!', '#fff');
+  setStatus('Sua vez — toque num quadrado!', '#fff');
 }
 
 function findWinOrBlock(mark) {
@@ -534,7 +554,7 @@ function playerMove(idx) {
   if (result) { endGame(result); return; }
 
   playerTurn = false;
-  setStatus('Yara is thinking…', '#a78bfa');
+  setStatus('Yara está pensando…', '#a78bfa');
   document.getElementById('thinking-dots').style.display = 'block';
 
   setTimeout(() => {
@@ -546,6 +566,7 @@ function playerMove(idx) {
 function endGame(result) {
   gameOver = true;
   playerTurn = false;
+  try { if (typeof Store !== 'undefined') Store.completeActivity('games'); } catch(e) {}
   document.getElementById('play-again-btn').style.display = 'none';
 
   let emoji, msg, sub;
@@ -581,7 +602,7 @@ function newGame() {
   renderBoard();
   document.getElementById('play-again-btn').style.display = 'none';
   document.getElementById('thinking-dots').style.display = 'none';
-  setStatus('Your turn — tap a square!', '#fff');
+  setStatus('Sua vez — toque num quadrado!', '#fff');
 }
 
 function setStatus(text, color) {
@@ -698,5 +719,29 @@ function quizContinue() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 newGame();
 </script>
+
+<script>
+// Volta para a página anterior sem depender do estado do history.
+// Ver o porquê no commit: history.length pode vir 0, e a guarda de login
+// reempurra a pessoa pra frente quando o back cai numa página protegida.
+function capyVoltar() {
+  var casa = '5_Game_Pavilion_Forest_Edition.html';
+  var inicio = location.href;
+  var destino = casa;
+  try {
+    var ref = document.referrer;
+    if (ref && new URL(ref).origin === location.origin && ref !== inicio) destino = ref;
+  } catch (e) {}
+  if (history.length > 1) {
+    history.back();
+    // rede de segurança: se o back não saiu do lugar, navega de fato
+    setTimeout(function () { if (location.href === inicio) location.href = destino; }, 400);
+  } else {
+    location.href = destino;
+  }
+}
+</script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

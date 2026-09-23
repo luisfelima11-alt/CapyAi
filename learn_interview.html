@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prática Diária — Entrevista de Emprego | Capy English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes nodePulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.5)}50%{box-shadow:0 0 0 12px rgba(99,102,241,0)}}
+.node-current{animation:nodePulse 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.node-current{animation:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card-in{animation:fadeIn .35s ease both}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/learn_interview.html"/>
+<meta property="og:title" content="Prática Diária — Entrevista de Emprego | Capy English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Prática Diária — Entrevista de Emprego | Capy English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/40 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-12 pt-20">
+  <div class="max-w-2xl mx-auto px-4">
+
+    <!-- Header -->
+    <a href="classes_interview.html" class="inline-flex items-center gap-1 text-slate-400 hover:text-indigo-600 text-sm font-bold transition-colors mb-4">← Voltar ao curso</a>
+    <div class="bg-gradient-to-br from-navy via-indigo-950 to-violet-900 text-white rounded-3xl p-6 mb-6 card-in">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-4xl">💼</span>
+        <div>
+          <h1 class="text-2xl font-black">Prática Diária — Entrevista de Emprego</h1>
+          <p class="text-indigo-200/80 text-sm font-bold">Treine todo dia o que você viu nas 8 aulas do curso</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 mt-4">
+        <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
+          <div id="iv-progress-bar" class="h-full bg-gradient-to-r from-indigo-400 to-violet-300 rounded-full transition-all" style="width:0%"></div>
+        </div>
+        <span id="iv-progress-label" class="text-xs font-black text-indigo-200">0 / 48</span>
+      </div>
+    </div>
+
+    <!-- Continue card -->
+    <div id="iv-continue" class="hidden card-in bg-white border-2 border-indigo-200 rounded-3xl p-5 mb-8 shadow-sm">
+      <p class="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-2">Continuar de onde parou</p>
+      <div class="flex items-center gap-3">
+        <span id="iv-cont-emoji" class="text-4xl">💼</span>
+        <div class="flex-1 min-w-0">
+          <p id="iv-cont-title" class="font-black text-navy truncate"></p>
+          <p id="iv-cont-sub" class="text-xs text-slate-400 font-bold"></p>
+        </div>
+        <button id="iv-cont-btn" class="bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all">▶ Continuar</button>
+      </div>
+    </div>
+
+    <!-- Trail -->
+    <div id="iv-trail" class="space-y-4"></div>
+
+    <!-- All done -->
+    <div id="iv-done" class="hidden card-in bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-3xl p-8 text-center mt-6">
+      <div class="text-5xl mb-3">🏆</div>
+      <p class="font-black text-xl mb-1">Prática completa!</p>
+      <p class="text-indigo-100 text-sm">Você treinou todo o conteúdo das aulas. Continue revisitando pra manter o inglês afiado!</p>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="components.js?v=push2"></script>
+<script src="yara-widget.js?v=yw5"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+// ── Trilha de Entrevista: 12 lições × 4 minis = 48 nós ─────────────────────
+const TRAIL_IV = [
+  { id:601, emoji:'🎧', title:'Before the Call' },
+  { id:602, emoji:'🙋', title:'Introducing Yourself' },
+  { id:603, emoji:'📋', title:'Your Work History' },
+  { id:604, emoji:'💪', title:'Your Strong Points' },
+  { id:605, emoji:'📈', title:'Areas to Improve' },
+  { id:606, emoji:'🤔', title:'What Would You Do?' },
+  { id:607, emoji:'🏠', title:'Your Room on Camera' },
+  { id:608, emoji:'📍', title:'Where Things Are' },
+  { id:609, emoji:'🙋‍♀️', title:'Questions You Ask' },
+  { id:610, emoji:'🏢', title:'About the Company' },
+  { id:611, emoji:'💰', title:'Money and Start Date' },
+  { id:612, emoji:'✉️', title:'After the Interview' },
+];
+const TOTAL_NODES = TRAIL_IV.length * 4;
+const DAY_SUBS = ['Listen & Quiz','Game','Build & Speak','Chat with Yara'];
+
+function miniDone(lessonId, miniNum) {
+  if (window.Store && Store.state.completedLessons && Store.state.completedLessons.includes(lessonId)) return true;
+  return window.Store ? Store.isMiniDone(lessonId, miniNum) : false;
+}
+
+function nextMini() {
+  for (const l of TRAIL_IV) for (let m = 1; m <= 4; m++)
+    if (!miniDone(l.id, m)) return { lesson: l, mini: m };
+  return null;
+}
+
+function openMini(lessonId, miniNum) {
+  window.location.href = `lessons.html?lesson=${lessonId}&mini=${miniNum}&guided=1`;
+}
+
+function render() {
+  const cont = document.getElementById('iv-trail');
+  const next = nextMini();
+  let done = 0, html = '';
+
+  TRAIL_IV.forEach(l => {
+    let rows = '';
+    for (let m = 1; m <= 4; m++) {
+      const isDone = miniDone(l.id, m);
+      if (isDone) done++;
+      const isCurrent = next && next.lesson.id === l.id && next.mini === m;
+      rows += `
+        <button onclick="openMini(${l.id},${m})"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all active:scale-[.98]
+            ${isDone ? 'bg-indigo-50 border-indigo-200' : isCurrent ? 'bg-white border-indigo-400 node-current' : 'bg-white border-slate-100 hover:border-indigo-200'}">
+          <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0
+            ${isDone ? 'bg-indigo-500 text-white' : isCurrent ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}">
+            ${isDone ? '✓' : 'D' + m}
+          </span>
+          <span class="flex-1 min-w-0">
+            <span class="block font-black text-sm ${isDone ? 'text-indigo-700' : 'text-navy'}">Day ${m} — ${DAY_SUBS[m-1]}</span>
+          </span>
+          ${isCurrent ? '<span class="text-[10px] font-black bg-indigo-500 text-white px-2.5 py-1 rounded-full flex-shrink-0">COMEÇAR</span>' : ''}
+        </button>`;
+    }
+    html += `
+      <div class="card-in bg-white/70 border border-indigo-100 rounded-3xl p-4">
+        <div class="flex items-center gap-2 mb-3 px-1">
+          <span class="text-2xl">${l.emoji}</span>
+          <span class="font-black text-navy">${l.title}</span>
+        </div>
+        <div class="space-y-2">${rows}</div>
+      </div>`;
+  });
+
+  cont.innerHTML = html;
+  document.getElementById('iv-progress-bar').style.width = Math.round(done / TOTAL_NODES * 100) + '%';
+  document.getElementById('iv-progress-label').textContent = done + ' / ' + TOTAL_NODES;
+
+  if (next) {
+    const c = document.getElementById('iv-continue');
+    c.classList.remove('hidden');
+    document.getElementById('iv-cont-emoji').textContent = next.lesson.emoji;
+    document.getElementById('iv-cont-title').textContent = next.lesson.title;
+    document.getElementById('iv-cont-sub').textContent = `Day ${next.mini} — ${DAY_SUBS[next.mini-1]}`;
+    document.getElementById('iv-cont-btn').onclick = () => openMini(next.lesson.id, next.mini);
+    if (done === 0) document.querySelector('#iv-continue p').textContent = 'Comece por aqui';
+  } else {
+    document.getElementById('iv-done').classList.remove('hidden');
+  }
+}
+
+render();
+document.addEventListener('stateChanged', render);
+</script>
+</body>
+</html>

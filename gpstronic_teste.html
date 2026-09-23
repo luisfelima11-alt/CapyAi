@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Questionário de Início de Curso — GPS Tronic | Capy English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/gpstronic_teste.html"/>
+<meta property="og:title" content="Questionário de Início de Curso — GPS Tronic | Capy English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Questionário de Início de Curso — GPS Tronic | Capy English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 min-h-screen">
+
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-emerald-950 to-green-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none opacity-10">
+    <span class="absolute text-6xl float-emoji" style="top:10%;left:5%;animation-delay:0s">🛰️</span>
+    <span class="absolute text-5xl float-emoji" style="top:60%;left:10%;animation-delay:.7s">🚜</span>
+    <span class="absolute text-6xl float-emoji" style="top:20%;right:8%;animation-delay:1.3s">📡</span>
+    <span class="absolute text-5xl float-emoji" style="top:70%;right:20%;animation-delay:.4s">🌾</span>
+  </div>
+  <div class="relative max-w-2xl mx-auto px-6 py-10 text-center">
+    <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-bold mb-3">🛰️ GPS Tronic · Capy English</div>
+    <h1 class="text-2xl md:text-3xl font-black leading-tight">📋 Questionário de Início de Curso</h1>
+  </div>
+</div>
+
+<main class="max-w-xl mx-auto px-4 md:px-6 py-10">
+
+  <!-- INTRO SCREEN -->
+  <div id="screen-intro" class="fade-in">
+    <div class="bg-white border-2 border-emerald-100 rounded-3xl p-6 md:p-8 shadow-sm">
+      <div class="text-5xl mb-4 text-center">🐾</div>
+      <p class="text-slate-600 text-base leading-relaxed mb-4 text-center">Antes da primeira aula, responda essas perguntas rápidas — não é prova, não tem nota, é só pra gente conhecer você!</p>
+      <p class="text-slate-500 text-sm leading-relaxed mb-6 text-center">Leva menos de 5 minutos. Vá no seu ritmo, sem pressa. 😊</p>
+      <label class="block text-sm font-black text-navy mb-2">Seu nome</label>
+      <input id="student-name" type="text" placeholder="Digite seu nome..." class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 text-base focus:border-emerald-400 focus:outline-none mb-2"/>
+      <p id="name-error" class="text-xs font-black text-red-500 mb-4 hidden">Por favor, digite seu nome para começar.</p>
+      <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black py-3.5 rounded-2xl transition-all hover:scale-105 active:scale-95">
+        Começar →
+      </button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz" class="hidden">
+    <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+      <div id="q-bar" class="h-full bg-gradient-to-r from-emerald-500 to-green-600 rounded-full transition-all duration-500" style="width:0%"></div>
+    </div>
+    <div id="q-area"></div>
+  </div>
+
+  <!-- THANK YOU SCREEN -->
+  <div id="screen-thanks" class="hidden fade-in text-center">
+    <div class="bg-white border-2 border-emerald-100 rounded-3xl p-8 shadow-sm">
+      <div class="text-6xl mb-4">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-2">Obrigado, <span id="thanks-name"></span>!</h2>
+      <p class="text-slate-500 text-base leading-relaxed mb-6">Suas respostas vão ajudar a Yara a personalizar suas aulas 🎉</p>
+      <a href="gpstronic_aula_01.html" class="inline-flex items-center justify-center w-full bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black py-3.5 rounded-2xl hover:scale-105 transition-all">
+        Ir para a Aula 01 →
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  // A1 (1-4)
+  {band:'A1', q:'I ___ a technician.', opts:['am','is','are','be'], a:0},
+  {band:'A1', q:'This is ___ tractor.', opts:['a','an','the','(no article)'], a:0},
+  {band:'A1', q:'There are ___ days in a week.', opts:['five','six','seven','eight'], a:2},
+  {band:'A1', q:'She ___ at GPS Tronic.', opts:['work','works','working','worked'], a:1},
+  // A2 (5-8)
+  {band:'A2', q:'He ___ speak English very well.', opts:["don't","isn't","doesn't","not"], a:2},
+  {band:'A2', q:'___ you have the tool box?', opts:['Do','Does','Are','Is'], a:0},
+  {band:'A2', q:'We ___ the antenna yesterday.', opts:['install','installs','installing','installed'], a:3},
+  {band:'A2', q:'I will call you ___ the morning.', opts:['in','on','at','for'], a:0},
+  // B1 (9-12)
+  {band:'B1', q:'She ___ to the farm last week.', opts:['goed','went','gone','going'], a:1},
+  {band:'B1', q:'I ___ that error before.', opts:['saw','did see','have seen','seen'], a:2},
+  {band:'B1', q:'This GPS receiver is ___ than the old one.', opts:['accurater','accurate','more accurate','most accurate'], a:2},
+  {band:'B1', q:'If the signal is weak, we ___ check the antenna.', opts:['would','will','are','did'], a:1},
+  // B2 (13-16)
+  {band:'B2', q:'We ___ on this tractor for two hours.', opts:['have worked','are working','have been working','worked'], a:2},
+  {band:'B2', q:'If I ___ more time, I would fix it today.', opts:['have','had','has','would have'], a:1},
+  {band:'B2', q:'The antenna is disconnected. Someone ___ unplugged it.', opts:['must have','should have','can have','might'], a:0},
+  {band:'B2', q:'The antenna ___ replaced yesterday.', opts:['has','is','was','were'], a:2},
+  // Reading (17-18)
+  {band:'reading', text:'A customer called about a tractor with a weak signal. The technician checked the antenna cable and found it was damaged. She ordered a new part and will install it tomorrow.', q:'What was the problem with the tractor?', opts:['The antenna cable was damaged','The tractor was stolen','The GPS was too expensive','The customer refused to pay'], a:0},
+  {band:'reading', text:'A customer called about a tractor with a weak signal. The technician checked the antenna cable and found it was damaged. She ordered a new part and will install it tomorrow.', q:'What will the technician do tomorrow?', opts:['Call the customer again','Install a new part','Order a tractor','Repair the engine'], a:1},
+];
+
+let studentName = '';
+let qIdx = 0;
+const answers = [];
+const correct = [];
+
+function startQuiz(){
+  const nameInput = document.getElementById('student-name');
+  const name = nameInput.value.trim();
+  if(!name){
+    document.getElementById('name-error').classList.remove('hidden');
+    return;
+  }
+  studentName = name;
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  if(qIdx >= QUESTIONS.length){
+    finishQuiz();
+    return;
+  }
+  const q = QUESTIONS[qIdx];
+  document.getElementById('q-bar').style.width = (qIdx/QUESTIONS.length*100)+'%';
+  const area = document.getElementById('q-area');
+  const textHtml = q.text ? `<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-navy leading-relaxed mb-4">${q.text}</div>` : '';
+  area.innerHTML = `<div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 fade-in">
+    <div class="text-xs font-black text-slate-400 mb-3">Pergunta ${qIdx+1} de ${QUESTIONS.length}</div>
+    ${textHtml}
+    <p class="font-black text-navy text-lg mb-5 leading-relaxed">${q.q}</p>
+    <div class="grid grid-cols-1 gap-3" id="opts"></div>
+  </div>`;
+  const opts = document.getElementById('opts');
+  q.opts.forEach((o,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3.5 text-base font-semibold text-navy hover:border-emerald-400 hover:bg-emerald-50 transition-all active:scale-95';
+    btn.textContent = o;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(i){
+  const q = QUESTIONS[qIdx];
+  answers.push(i);
+  correct.push(i === q.a);
+  document.querySelectorAll('#opts button').forEach(b=>b.disabled=true);
+  const opts = document.querySelectorAll('#opts button');
+  opts[i].classList.remove('border-slate-200','hover:border-emerald-400','hover:bg-emerald-50');
+  opts[i].classList.add('border-emerald-400','bg-emerald-50');
+  qIdx++;
+  setTimeout(renderQuestion, 350);
+}
+
+function finishQuiz(){
+  document.getElementById('q-bar').style.width = '100%';
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-thanks').classList.remove('hidden');
+  document.getElementById('thanks-name').textContent = studentName;
+
+  const score = correct.filter(Boolean).length;
+  const bandRange = (start,len) => correct.slice(start,start+len).filter(Boolean).length + '/' + len;
+  const byBand = {
+    A1: bandRange(0,4),
+    A2: bandRange(4,4),
+    B1: bandRange(8,4),
+    B2: bandRange(12,4),
+    reading: bandRange(16,2)
+  };
+
+  const slug = studentName.trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'_');
+
+  const payload = {
+    kind: 'gpstronic_placement',
+    name: studentName,
+    completedAt: new Date().toISOString(),
+    answers: answers,
+    correct: correct,
+    score: score,
+    byBand: byBand
+  };
+
+  try{
+    localStorage.setItem('capyGpstronicTest_'+slug, JSON.stringify(payload));
+  }catch(e){}
+
+  // Dedicated endpoint: the generic /api/db now requires a session + CSRF, which
+  // this test can't have (it runs before the student has an account).
+  fetch('/api/gpstronic-test', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name: studentName, slug: slug, payload: payload })
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>

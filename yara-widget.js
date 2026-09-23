@@ -55,6 +55,21 @@
       animation:yw-ping 2s ease-in-out infinite;}
     @keyframes yw-ping{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
 
+    /* Atalho da lousa, ao lado do chat da Yara. A posição exata é calculada em
+       tempo de execução a partir do próprio FAB (posicionarAtalho), porque
+       algumas páginas sobrescrevem o bottom/right padrão do widget. */
+    #yw-board{position:fixed;bottom:16px;right:86px;z-index:9999;width:50px;height:50px;border-radius:50%;
+      background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 4px 18px rgba(16,185,129,.45);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;
+      transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;border:none;outline:none;
+      text-decoration:none;}
+    #yw-board:hover{transform:scale(1.1);box-shadow:0 6px 26px rgba(16,185,129,.6);}
+    #yw-board .yw-board-tip{position:absolute;right:60px;top:50%;transform:translateY(-50%) scale(.9);
+      background:#001f3f;color:#fff;font:800 11px/1 system-ui,sans-serif;white-space:nowrap;
+      padding:7px 10px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
+    #yw-board:hover .yw-board-tip{opacity:1;transform:translateY(-50%) scale(1);}
+    @media (max-width:640px){#yw-board .yw-board-tip{display:none}}
+
     #yw-panel{position:fixed;bottom:96px;right:24px;z-index:9998;width:340px;max-height:520px;
       background:#fff;border-radius:24px;box-shadow:0 8px 40px rgba(0,0,0,.18);
       display:flex;flex-direction:column;overflow:hidden;
@@ -111,10 +126,13 @@
   document.head.appendChild(style);
 
   // ── HTML ────────────────────────────────────────────────────────────────────
-  const avatarSrc = 'yara-avatar.png?v=1';
+  const avatarSrc = 'yara-avatar.png?v=3';
   const greeting  = IS_FR
     ? `Bonjour! 👋 Je suis Yara, votre assistante française. Vous pouvez me demander de corriger vos phrases, expliquer une règle de grammaire, ou tout autre chose sur la leçon! 🗼`
     : `Hey! 👋 I'm Yara, your English assistant. Ask me to check your writing, explain grammar, or anything about the lesson!`;
+
+  // Na própria página do quadro o atalho não faz sentido.
+  const ON_BOARD_PAGE = /\/quadro\.html$/.test(location.pathname);
 
   const container = document.createElement('div');
   container.innerHTML = `
@@ -123,6 +141,11 @@
       <img src="${avatarSrc}" onerror="this.style.display='none';this.parentElement.innerHTML='🐾'"/>
       <span class="yw-pulse"></span>
     </button>
+
+    <!-- Atalho da lousa ao vivo (não aparece na própria página do quadro) -->
+    ${ON_BOARD_PAGE ? '' : `<a id="yw-board" href="quadro.html" title="Quadro branco ao vivo" aria-label="Abrir o quadro branco ao vivo">
+      📝<span class="yw-board-tip">Quadro ao vivo</span>
+    </a>`}
 
     <!-- Panel -->
     <div id="yw-panel" role="dialog" aria-label="Yara chat">
@@ -165,6 +188,93 @@
   const input    = document.getElementById('yw-input');
   const sendBtn  = document.getElementById('yw-send');
   const ctxPrev  = document.getElementById('yw-ctx-preview');
+
+  // ── Atalho da lousa: alinhar ao FAB ──────────────────────────────────────────
+  // Algumas páginas sobrescrevem o bottom/right do #yw-fab, então em vez de
+  // chutar um valor fixo a gente lê a posição real do FAB e encosta o atalho
+  // do lado dele, com os centros na mesma linha.
+  // ── Fugir da barra de navegação do celular ───────────────────────────────
+  // No celular o site tem um menu colado embaixo (Home · Cursos · Trilha ·
+  // Yara AI · Mais) com ~82px de altura. O FAB nascia em bottom:16px, ou seja,
+  // DENTRO dessa faixa — e como ele tem z-index 9999, os dois botões ficavam
+  // por cima dos itens da direita do menu e roubavam o toque.
+  //
+  // Em vez de chutar 82px, a gente MEDE a barra: assim continua certo se ela
+  // mudar de altura, e nas páginas que não têm menu nenhum os botões voltam
+  // para o canto de sempre.
+  const FOLGA = 16;
+
+  function alturaDoMenuDeBaixo() {
+    let maior = 0;
+    const candidatos = document.querySelectorAll('nav, footer, [class*="bottom-0"]');
+    for (const el of candidatos) {
+      if (el.id && el.id.indexOf('yw-') === 0) continue;      // nossos próprios botões
+      const s = getComputedStyle(el);
+      if (s.position !== 'fixed' || s.display === 'none' || s.visibility === 'hidden') continue;
+      const r = el.getBoundingClientRect();
+      if (r.height < 30 || r.width < innerWidth * 0.7) continue;   // não é barra
+      if (innerHeight - r.bottom > 4) continue;                    // não está colada embaixo
+      if (r.height > innerHeight * 0.4) continue;                  // é painel/folha, não barra
+      if (r.height > maior) maior = r.height;
+    }
+    return maior;
+  }
+
+  function posicionarFlutuantes() {
+    if (!fab) return;
+    fab.style.bottom = (FOLGA + alturaDoMenuDeBaixo()) + 'px';
+    posicionarAtalho();
+  }
+
+  function posicionarAtalho() {
+    const board = document.getElementById('yw-board');
+    if (!board || !fab) return;
+    const f = getComputedStyle(fab);
+    const fBottom = parseFloat(f.bottom) || 0;
+    const fRight  = parseFloat(f.right)  || 0;
+    const fW = fab.offsetWidth || 58;
+    const fH = fab.offsetHeight || 58;
+    const bH = board.offsetHeight || 50;
+    board.style.right  = (fRight + fW + 12) + 'px';
+    board.style.bottom = (fBottom + (fH - bH) / 2) + 'px';
+  }
+
+  posicionarFlutuantes();
+  window.addEventListener('resize', posicionarFlutuantes);
+  // O menu é injetado pelo components.js depois deste script; uma segunda
+  // passada garante que a medida pegue a barra já montada.
+  setTimeout(posicionarFlutuantes, 400);
+  setTimeout(posicionarFlutuantes, 1500);
+
+  // ── Sumir enquanto QUALQUER modal de tela cheia está aberto ──────────────
+  // Subir os botões resolveu a barra fixa, mas antes isto só vigiava a folha
+  // "Mais" por id fixo (#more-sheet-overlay) — qualquer outro modal do site
+  // (o popup "Day N of X" da trilha, result-overlay das aulas, a tela cheia
+  // do vocab-focus...) ficava com os FABs boiando por cima, porque o z-index
+  // deles (9999) vence o de qualquer modal comum (z-50/z-60).
+  // Generalizado: o projeto inteiro usa o MESMO padrão pra modal — classe
+  // `.fixed.inset-0`, alternando `.hidden` — então vigiar esse padrão cobre
+  // todo modal existente E os futuros, sem listar id por id.
+  function sincronizarComModal() {
+    // vf-overlay (tela cheia do vocab, vocab-focus.js) tem CSS próprio — não
+    // usa .fixed.inset-0/.hidden do Tailwind, então precisa de seletor à parte.
+    // #levelup-overlay (levelup-overlay.js) é a EXCEÇÃO ao padrão: fica
+    // display:flex o tempo todo por design (o cartão interno que é invisível
+    // via scale-0/opacity-0 até subir de nível) e usa a classe própria
+    // .hidden-overlay, não .hidden — sem excluir, ele casava sempre e os FABs
+    // ficavam escondidos pra sempre em qualquer página.
+    const aberto = !!document.querySelector('.fixed.inset-0:not(.hidden):not(#levelup-overlay), #vf-overlay.vf-aberto');
+    for (const id of ['yw-fab', 'yw-board']) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.style.opacity = aberto ? '0' : '';
+      el.style.pointerEvents = aberto ? 'none' : '';
+    }
+  }
+  new MutationObserver(sincronizarComModal)
+    .observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+  sincronizarComModal();
+  setTimeout(sincronizarComModal, 1500);   // o menu pode chegar depois
 
   // ── Context collector ────────────────────────────────────────────────────────
   function collectContext() {

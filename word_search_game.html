@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Word Search — Capy Yara Adventures</title>
+<title>Word Search — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -64,6 +64,24 @@ tailwind.config = {
   /* Timer ring */
   #timer-ring { transition:stroke-dashoffset 1s linear; }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/word_search_game.html"/>
+<meta property="og:title" content="Word Search — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Word Search — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-navy font-body text-white min-h-screen flex flex-col">
 
@@ -75,7 +93,7 @@ tailwind.config = {
   </button>
   <div class="flex-1">
     <p class="font-label text-xs text-teal-400 uppercase tracking-widest font-bold">Word Search</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Find the Words! 🔍</h1>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Encontre as palavras! 🔍</h1>
   </div>
   <!-- Timer -->
   <div class="relative w-12 h-12">
@@ -97,7 +115,7 @@ tailwind.config = {
   <!-- Round indicator -->
   <div class="flex items-center justify-between fade-up">
     <div class="flex gap-1.5" id="round-pips"></div>
-    <p class="font-label text-xs text-slate-400 font-bold uppercase tracking-widest" id="round-label">Round 1 of 3</p>
+    <p class="font-label text-xs text-slate-400 font-bold uppercase tracking-widest" id="round-label">Rodada 1 de 3</p>
   </div>
 
   <!-- Word chips -->
@@ -113,7 +131,9 @@ tailwind.config = {
 
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
@@ -139,6 +159,11 @@ let timeLeft      = TIMER_MAX;
 let timerInterval = null;
 let roundScores   = [];
 
+// Directions must exist before the first round builds its grid.
+const DIRS = [
+  [0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1] // 8 directions
+];
+
 // ── Boot ───────────────────────────────────────────────────────────────────────
 renderRoundPips();
 startRound(0);
@@ -153,7 +178,7 @@ function startRound(idx) {
 
   clearInterval(timerInterval);
 
-  document.getElementById('round-label').textContent = `Round ${idx + 1} of ${ROUNDS.length}`;
+  document.getElementById('round-label').textContent = `Rodada ${idx + 1} de ${ROUNDS.length}`;
   document.getElementById('found-count').textContent = 0;
   document.getElementById('total-count').textContent = ROUNDS[idx].words.length;
 
@@ -178,11 +203,15 @@ function updateRoundPips() {
 }
 
 // ── Grid building ──────────────────────────────────────────────────────────────
-const DIRS = [
-  [0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1] // 8 directions
-];
-
 function buildGrid(words) {
+  // Try to place every word; if any word fails, rebuild the whole grid.
+  // Guarantees placements[word] exists for all words (prevents markFound crash).
+  for (let gridAttempt = 0; gridAttempt < 50; gridAttempt++) {
+    if (tryBuildGrid(words)) break;
+  }
+}
+
+function tryBuildGrid(words) {
   // Empty grid
   grid = Array.from({length:GRID_SIZE}, () => Array(GRID_SIZE).fill(''));
   placements = {};
@@ -207,13 +236,16 @@ function buildGrid(words) {
         placed = true;
       }
     }
+    if (!placed) return false;  // bail → caller rebuilds the whole grid
   }
 
   // Fill remaining with random uppercase letters
-  const alpha = 'ABCDEFGHIJKLMNOPRSTUVWY';
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   for (let r = 0; r < GRID_SIZE; r++)
     for (let c = 0; c < GRID_SIZE; c++)
       if (!grid[r][c]) grid[r][c] = alpha[Math.floor(Math.random() * alpha.length)];
+
+  return true;
 }
 
 // ── Render ─────────────────────────────────────────────────────────────────────
@@ -388,7 +420,7 @@ function showRoundComplete(completed, onNext) {
     <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-teal-500/50
          rounded-[2.5rem] px-10 py-8 flex flex-col items-center gap-4 shadow-2xl text-center max-w-xs mx-4">
       <div class="text-6xl">${emoji}</div>
-      <h3 class="font-headline text-3xl font-black text-white">${completed ? 'Round Clear!' : 'Time\'s Up!'}</h3>
+      <h3 class="font-headline text-3xl font-black text-white">${completed ? 'Rodada concluída!' : 'Time\'s Up!'}</h3>
       <p class="font-body text-slate-300">${msg}</p>
       <button onclick="this.closest('.fixed').remove(); (${onNext.toString()})()"
               class="bg-teal-500 hover:bg-teal-400 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all mt-2">
@@ -463,5 +495,7 @@ function launchConfetti() {
   }
 }
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

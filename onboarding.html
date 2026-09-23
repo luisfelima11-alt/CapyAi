@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
@@ -24,11 +24,30 @@
     theme: { extend: { colors: { navy: '#0f172a' } } }
   }
 </script>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/onboarding.html"/>
+<meta property="og:title" content="Bem-vindo à Capy English! | Onboarding"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Bem-vindo à Capy English! | Onboarding"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-emerald-950 via-teal-900 to-navy overflow-x-hidden">
 
-<script src="auth.js?v=c52d7db"></script>
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 
 <!-- Guard: redirect to login if not authenticated -->
 <script>
@@ -40,6 +59,8 @@
   const session = Auth.getSession();
   if (session && session.id !== 'guest') {
     Auth.fetchProfile(session.id).then(p => {
+      // Already onboarded: send them home, not into a lesson — firstLessonUrl()
+      // reads profile.level, which is still empty this early in the page.
       if (p && p.onboarding_complete) window.location.href = '6_Home_Forest_Expedition.html';
     });
   }
@@ -59,7 +80,7 @@
     <!-- Yara + title -->
     <div class="text-center mb-8 slide-in">
       <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-emerald-400/60 shadow-2xl shadow-emerald-500/30 mx-auto mb-4 bg-emerald-900 flex items-center justify-center">
-        <img src="yara-avatar.png?v=1" alt="Yara" class="w-full h-full object-cover"
+        <img src="yara-avatar.png?v=3" alt="Yara" class="w-full h-full object-cover"
              onerror="this.style.display='none';this.parentElement.innerHTML='🐾'"/>
       </div>
       <h1 class="text-3xl font-black text-white mb-1">Oi! Eu sou a Yara! 🌿</h1>
@@ -441,6 +462,24 @@ function prevStep() {
   }
 }
 
+// ── Where to send the student when onboarding ends ─────────────
+// Activation matters more than choice here: the student has just told us their
+// level, so drop them straight into their first lesson instead of a home page
+// full of options. Starting lessons mirror the LEVELS table in placement_test.html
+// (starter→1, elementary→5, pre-intermediate→10, intermediate→16); the labels
+// differ between the two screens, so this bridges them.
+const FIRST_LESSON_BY_LEVEL = {
+  beginner: 1,
+  elementary: 5,
+  intermediate: 10,
+  advanced: 16,
+};
+
+function firstLessonUrl() {
+  const lesson = FIRST_LESSON_BY_LEVEL[profile.level] || 1;
+  return 'lessons.html?lesson=' + lesson + '&mini=1&guided=1&from=onboarding';
+}
+
 // ── Save profile ───────────────────────────────────────────────
 async function saveProfile() {
   // Capture detail text if still on last step
@@ -454,7 +493,7 @@ async function saveProfile() {
     const session = Auth.getSession();
     if (!session || session.id === 'guest') {
       localStorage.setItem('capyPlacementDone', '1');
-      window.location.href = '6_Home_Forest_Expedition.html';
+      window.location.href = firstLessonUrl();
       return;
     }
 
@@ -485,7 +524,7 @@ async function saveProfile() {
     btn.className = btn.className.replace('from-emerald-500 to-teal-400', 'from-green-500 to-emerald-400');
 
     setTimeout(() => {
-      window.location.href = '6_Home_Forest_Expedition.html';
+      window.location.href = firstLessonUrl();
     }, 1000);
 
   } catch(e) {

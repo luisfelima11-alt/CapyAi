@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Simulação de entrevista em inglês — Capy Yara English</title>
+<meta name="description" content="Treine uma entrevista de emprego em inglês por ligação, com um recrutador de IA. Ao desligar, você recebe uma devolutiva do que foi bem e do que treinar."/>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#001f3f;color:#fff;
+       min-height:100vh;min-height:100dvh;padding:24px 20px 40px}
+  .capa{max-width:640px;margin:0 auto}
+  .voltar{display:inline-flex;align-items:center;gap:.4rem;color:rgba(255,255,255,.55);
+          text-decoration:none;font-size:.85rem;font-weight:700;margin-bottom:1.5rem}
+  h1{font-size:1.9rem;font-weight:900;line-height:1.15;letter-spacing:-.02em;margin-bottom:.5rem}
+  h1 em{font-style:normal;color:#FF9F1C}
+  .sub{color:rgba(255,255,255,.65);font-size:.95rem;line-height:1.5;margin-bottom:1.75rem}
+
+  .cartao{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+          border-radius:1.4rem;padding:1.25rem;margin-bottom:1rem}
+  label{display:block;font-size:.78rem;font-weight:800;text-transform:uppercase;
+        letter-spacing:.08em;color:rgba(255,255,255,.5);margin-bottom:.5rem}
+  input{width:100%;padding:.9rem 1rem;border-radius:.9rem;border:2px solid rgba(255,255,255,.14);
+        background:rgba(0,0,0,.25);color:#fff;font-family:inherit;font-size:1rem;font-weight:600}
+  input:focus{outline:none;border-color:#FF9F1C}
+  input::placeholder{color:rgba(255,255,255,.3)}
+  .dica{font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.5rem}
+
+  button{font-family:inherit;font-weight:800;border:none;border-radius:999px;cursor:pointer;
+         transition:transform .15s,opacity .15s}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  #ligar{width:100%;padding:1.15rem;font-size:1.05rem;color:#001f3f;
+         background:linear-gradient(90deg,#FF9F1C,#fb923c);box-shadow:0 12px 30px rgba(255,159,28,.3)}
+  #ligar.desligar{background:linear-gradient(90deg,#e11d48,#f43f5e);color:#fff;
+                  box-shadow:0 12px 30px rgba(225,29,72,.3)}
+  #ligar:not(:disabled):hover{transform:scale(1.02)}
+
+  .estado{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:.92rem;margin-top:1rem}
+  .bolinha{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);flex:none}
+  .bolinha.on{background:#2EC4B6;animation:pulsa 1.4s ease-in-out infinite}
+  .bolinha.vermelha{background:#e11d48}
+  @keyframes pulsa{0%,100%{opacity:1}50%{opacity:.35}}
+  .tempo{margin-left:auto;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.55);font-weight:700}
+
+  /* ── Palco: a chamada de video ──────────────────────────────────────────
+     A pagina era uma pilha de cartoes; agora abre com o recrutador na tela.
+     O retrato e um RECORTE POR CSS da ilustracao que ja existe no curso
+     (assets/img/interview01-dialogue.jpg): a imagem e ampliada e deslocada
+     ate sobrar so a tela do notebook. Nenhum arquivo novo, e nada de um
+     video de 4 MB baixando antes do primeiro clique. */
+  .palco{margin:0 0 1.25rem}
+  .quadro{position:relative;overflow:hidden;border-radius:1.4rem;aspect-ratio:16/9;
+          background:#12243f;border:1px solid rgba(255,255,255,.12);
+          box-shadow:0 18px 50px rgba(0,0,0,.35);transition:filter .5s}
+  .palco[data-estado="desconectado"] .quadro{filter:saturate(.5) brightness(.78)}
+  /* O recorte virou arquivo (recrutador-retrato-v1.jpg): antes isto era uma
+     ampliacao de 283% com offset negativo para achar a tela do notebook
+     dentro da ilustracao inteira. A respiracao continua, e agora gira no
+     centro de verdade. */
+  .retrato{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+           animation:respira 8s ease-in-out infinite}
+  /* Enquanto ele fala, o clipe assume e a respiracao sai da frente. */
+  .palco[data-estado="ia_falando"] .retrato{animation:none}
+  @keyframes respira{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+  /* Escurece topo e base para o cracha e o medidor terem contraste. */
+  .quadro::after{content:'';position:absolute;z-index:1;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,20,42,.6) 0%,rgba(0,20,42,0) 30%,
+                                      rgba(0,20,42,0) 60%,rgba(0,20,42,.66) 100%)}
+
+  .cracha{position:absolute;z-index:3;top:.7rem;left:.7rem;right:.7rem;display:flex;
+          flex-wrap:wrap;align-items:center;gap:.5rem;font-size:.8rem;font-weight:800;
+          background:rgba(0,10,25,.55);border:1px solid rgba(255,255,255,.14);
+          border-radius:1.1rem;padding:.45rem .8rem;backdrop-filter:blur(8px)}
+  .cracha #estado{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cron{margin-left:auto;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.8);flex:none}
+  .cota{flex:none;width:100%;font-size:.7rem;font-weight:700;color:#FFC48A;letter-spacing:.02em}
+  .cota.pouco{color:#FF9F1C}
+  .cota:empty{display:none}
+
+  /* Cada estado tem um movimento proprio. Antes, 'Voce falando' e 'Ele
+     falando' eram a MESMA tela parada com uma bolinha de cor diferente. */
+  .anel,.halo{position:absolute;z-index:2;inset:0;border-radius:inherit;
+              pointer-events:none;opacity:0;transition:opacity .35s}
+  .palco[data-estado="microfone"] .anel,
+  .palco[data-estado="conectando"] .anel{opacity:1}
+  .anel::before,.anel::after{content:'';position:absolute;inset:0;border-radius:inherit;
+    border:2px solid rgba(46,196,182,.65);animation:anelCresce 1.9s ease-out infinite}
+  .anel::after{animation-delay:.95s}
+  @keyframes anelCresce{0%{transform:scale(.99);opacity:.75}100%{transform:scale(1.05);opacity:0}}
+
+  .halo{box-shadow:inset 0 0 0 3px rgba(255,159,28,.6),inset 0 0 34px 4px rgba(255,159,28,.14)}
+  .palco[data-estado="ia_falando"] .halo{opacity:1;animation:haloPulsa 1.7s ease-in-out infinite}
+  @keyframes haloPulsa{0%,100%{box-shadow:inset 0 0 0 3px rgba(255,159,28,.6),
+                                          inset 0 0 34px 4px rgba(255,159,28,.14)}
+                       50%{box-shadow:inset 0 0 0 5px rgba(255,159,28,.95),
+                                      inset 0 0 66px 14px rgba(255,159,28,.32)}}
+
+  /* Medidor de voz: 7 faixas do AnalyserNode sobre o microfone de verdade.
+     E o unico movimento honesto da tela — ele para quando a pessoa para. */
+  .medidor{position:absolute;z-index:3;left:50%;bottom:.9rem;transform:translateX(-50%);
+           padding:.35rem .6rem;border-radius:999px;background:rgba(0,10,25,.45);
+           border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);box-sizing:content-box;
+           display:flex;align-items:flex-end;gap:4px;height:30px;opacity:0;transition:opacity .25s}
+  .palco[data-estado="ouvindo"] .medidor{opacity:.5}
+  .palco[data-estado="falando"] .medidor{opacity:1}
+  .medidor i{width:5px;height:100%;border-radius:99px;transform:scaleY(.1);transform-origin:bottom;
+             background:linear-gradient(180deg,#5eead4,#2EC4B6);transition:transform .08s linear}
+
+  .pontinhos{position:absolute;z-index:3;left:50%;bottom:1.2rem;transform:translateX(-50%);display:none;gap:6px}
+  .palco[data-estado="pensando"] .pontinhos{display:flex}
+  .pontinhos i{width:8px;height:8px;border-radius:50%;background:#FFC48A;
+               animation:saltinho 1.1s ease-in-out infinite}
+  .pontinhos i:nth-child(2){animation-delay:.14s}
+  .pontinhos i:nth-child(3){animation-delay:.28s}
+  @keyframes saltinho{0%,62%,100%{transform:translateY(0);opacity:.45}
+                      31%{transform:translateY(-7px);opacity:1}}
+
+  /* Legenda: a fala do turno atual em tamanho de leitura, colada no
+     recrutador. O cartao 'O que foi dito' continua guardando o historico. */
+  .legenda{min-height:3.6rem;margin-top:.85rem;font-size:1.05rem;line-height:1.45;
+           font-weight:700;text-align:center;text-wrap:balance;color:#fff}
+  .legenda .quem{display:block;font-size:.68rem;font-weight:800;letter-spacing:.1em;
+                 text-transform:uppercase;margin-bottom:.3rem;color:rgba(255,255,255,.4)}
+  .legenda.eu{color:#9DECD8}
+  .legenda.ia{color:#FFDFB8}
+  .legenda:empty::before{content:'A transcrição aparece aqui enquanto vocês falam.';
+                         color:rgba(255,255,255,.28);font-weight:500;font-size:.9rem}
+
+  /* A pagina nao tinha NENHUMA media query, apesar de ja ter animacao infinita. */
+  @media(max-width:480px){
+    body{padding:16px 14px 32px}
+    h1{font-size:1.5rem}
+    .quadro{border-radius:1.1rem}
+    .cracha{font-size:.72rem;padding:.4rem .65rem;gap:.4rem;top:.5rem;left:.5rem;right:.5rem}
+    .legenda{font-size:.95rem;min-height:3rem}
+    .cartao{padding:1rem;border-radius:1.1rem}
+    #transcricao{max-height:220px}
+  }
+
+  .passos{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+  .passos li{display:flex;gap:.75rem;align-items:flex-start;font-size:.9rem;line-height:1.45;
+             color:rgba(255,255,255,.78)}
+  .passos > li > b{display:flex;align-items:center;justify-content:center;flex:none;
+            width:26px;height:26px;border-radius:50%;background:rgba(255,159,28,.18);
+            color:#FF9F1C;font-size:.75rem}
+  .passos span b{color:#FF9F1C;font-weight:900}
+
+  #transcricao{max-height:300px;overflow:auto;font-size:.9rem;line-height:1.55}
+  #transcricao p{margin-bottom:.6rem}
+  #transcricao .eu{color:#2EC4B6}
+  #transcricao .ia{color:#FFC48A}
+  .vazio{color:rgba(255,255,255,.3);font-style:italic}
+  /* Transcricao viva: cursor no turno em andamento e entrada suave de cada
+     pedaco novo. Sem isto o texto que cresce parece um salto, nao uma fala. */
+  #transcricao p.viva::after{content:'';display:inline-block;width:.45ch;height:.95em;
+    margin-left:.12em;vertical-align:-.12em;background:currentColor;border-radius:1px;
+    animation:cursorPisca 1s steps(2,start) infinite}
+  @keyframes cursorPisca{0%,100%{opacity:1}50%{opacity:0}}
+  #transcricao .novo{animation:pedacoEntra .26s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes pedacoEntra{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}
+
+  .aviso{border-radius:.9rem;padding:.8rem 1rem;font-size:.85rem;line-height:1.45;margin-bottom:1rem;
+         background:rgba(255,159,28,.12);border:1px solid rgba(255,159,28,.3);color:#FFD9A8}
+  .aviso.erro{background:rgba(225,29,72,.14);border-color:rgba(244,63,94,.4);color:#FFC9D3}
+  .aviso.hidden{display:none}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+  .rotulo{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+          color:rgba(255,255,255,.45);margin-bottom:.8rem}
+  .fb h3{font-size:.95rem;font-weight:900;margin:1rem 0 .5rem;color:#FF9F1C}
+  .fb ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+  .fb li{font-size:.9rem;line-height:1.5;color:rgba(255,255,255,.85);
+         padding-left:1rem;border-left:2px solid rgba(255,159,28,.35)}
+  .fb .frase{color:#fff;font-weight:700}
+  .fb .trad{color:rgba(255,255,255,.5);font-weight:500;font-size:.82rem}
+  .carregando{color:rgba(255,255,255,.5);font-size:.88rem}
+</style>
+</head>
+<body>
+<div class="capa">
+
+  <a href="6_Home_Forest_Expedition.html" class="voltar">← Voltar</a>
+
+  <h1>Simulação de <em>entrevista</em> <br>de emprego em inglês</h1>
+  <p class="sub">Você vai falar por telefone com um recrutador. Ele pergunta, você responde —
+  em inglês, sem correção no meio. No fim, a Yara te diz o que foi bem e o que treinar.</p>
+
+  <div class="palco" id="palco" data-estado="desconectado">
+    <div class="quadro">
+      <video class="retrato" id="recrutador-video" poster="recrutador-retrato-v1.jpg"
+             muted loop playsinline preload="none" aria-hidden="true"></video>
+      <div class="anel" aria-hidden="true"></div>
+      <div class="halo" aria-hidden="true"></div>
+      <div class="medidor" id="medidor" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pontinhos" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="cracha">
+        <span class="bolinha" id="bolinha"></span>
+        <span id="estado" role="status" aria-live="polite">Pronto para ligar</span>
+        <span class="cron" id="tempo"></span>
+        <span class="cota" id="cota"></span>
+      </div>
+    </div>
+    <p class="legenda" id="legenda" role="status" aria-live="polite"></p>
+  </div>
+
+  <p class="sub">Esta é uma simulação com IA. Ao clicar em começar e permitir o microfone, seu áudio será enviado à OpenAI. Ao encerrar, a transcrição poderá ser enviada para gerar a devolutiva. Você pode cancelar a conexão ou encerrar a entrevista a qualquer momento.</p>
+  <div class="aviso hidden" id="aviso" role="status" aria-live="polite"></div>
+
+  <div class="cartao" id="painel-antes">
+    <label for="cargo">Qual vaga você vai treinar?</label>
+    <input id="cargo" type="text" maxlength="60" autocomplete="off"
+           placeholder="ex.: desenvolvedor de software"/>
+    <p class="dica">Pode deixar em branco — aí ele começa perguntando.</p>
+  </div>
+
+  <div class="cartao">
+    <button id="ligar" type="button">📞 Começar a entrevista</button>
+    <button id="cancelar-conexao" type="button" hidden style="padding:12px 20px;margin-top:12px">Cancelar conexão</button>
+    <button id="silenciar" type="button" hidden aria-pressed="false" style="padding:12px 20px;margin-top:12px">Silenciar microfone</button>
+  </div>
+
+  <div class="cartao" id="painel-como">
+    <div class="rotulo">Como funciona</div>
+    <ul class="passos">
+      <li><b>1</b><span>Autorize o microfone quando o navegador pedir.</span></li>
+      <li><b>2</b><span>O recrutador cumprimenta e faz a primeira pergunta. Responda em inglês, com calma.</span></li>
+      <li><b>3</b><span>Ele <b>não corrige</b> durante a entrevista — de propósito, para parecer real.</span></li>
+      <li><b>4</b><span>Travou? Fale em português que ele ajuda e volta ao papel.</span></li>
+      <li><b>5</b><span>Ao desligar, sua devolutiva aparece aqui embaixo.</span></li>
+    </ul>
+  </div>
+
+  <div class="cartao">
+    <div class="rotulo">O que foi dito</div>
+    <div id="transcricao"><p class="vazio">A transcrição aparece aqui durante a entrevista.</p></div>
+  </div>
+
+  <div class="cartao hidden fb" id="painel-fb" style="display:none">
+    <div class="rotulo">Sua devolutiva</div>
+    <div id="fb-conteudo"></div>
+  </div>
+
+</div>
+
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="conversa-core.js?v=palco20260920"></script>
+<script>
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+
+function escapar(s) {
+  return String(s == null ? '' : s).replace(/[&<>'"]/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+  })[c]);
+}
+
+function mmss(ms) {
+  const s = Math.floor(ms / 1000);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+function avisar(txt, erro) {
+  const a = $('aviso');
+  a.textContent = txt;
+  a.className = 'aviso' + (erro ? ' erro' : '');
+}
+
+const ROTULOS = {
+  microfone:   ['Pedindo o microfone…', ''],
+  conectando:  ['Chamando o recrutador…', 'on'],
+  ouvindo:     ['Ele está te ouvindo', 'on'],
+  falando:     ['Você falando', 'vermelha'],
+  pensando:    ['Ele está pensando', 'on'],
+  ia_falando:  ['Ele falando', 'vermelha'],
+  desconectado:['Entrevista encerrada', ''],
+};
+
+let primeiraFala = true;
+
+// Transcricao que cresce enquanto a pessoa fala. Cada turno tem um <p> vivo,
+// chaveado pelo item_id que vem do nucleo; os deltas so acrescentam o pedaco
+// novo, e o fim do turno apenas FINALIZA a linha - nunca cria uma segunda.
+const falas = new Map();
+
+function linhaDe(quem, id) {
+  const t = $('transcricao');
+  if (primeiraFala) { t.innerHTML = ''; primeiraFala = false; }
+  let reg = id ? falas.get(id) : null;
+  if (reg) return reg;
+  const p = document.createElement('p');
+  p.className = (quem === 'eu' ? 'eu' : 'ia') + ' viva';
+  const rotulo = document.createElement('span');
+  rotulo.textContent = quem === 'eu' ? '🗣️ você: ' : '💼 recrutador: ';
+  const corpo = document.createElement('span');
+  p.appendChild(rotulo); p.appendChild(corpo);
+  t.appendChild(p);
+  reg = { p, corpo, texto: '' };
+  if (id) falas.set(id, reg);
+  return reg;
+}
+
+// Só acrescenta o sufixo novo. Reescrever a linha inteira a cada delta faria
+// o texto piscar e mataria a animação de entrada de cada pedaço.
+function escrever(reg, texto) {
+  if (texto.indexOf(reg.texto) !== 0) { reg.corpo.textContent = ''; reg.texto = ''; }
+  const novo = texto.slice(reg.texto.length);
+  if (!novo) return;
+  const s = document.createElement('span');
+  s.className = 'novo';
+  s.textContent = novo;   // textContent, não innerHTML: é fala humana transcrita.
+  reg.corpo.appendChild(s);
+  reg.texto = texto;
+}
+
+// Rola só se a pessoa já estava no fim. Se ela subiu para reler algo, puxar a
+// rolagem de volta tira da tela justamente o que ela foi ler.
+const noFim = t => t.scrollHeight - t.scrollTop - t.clientHeight < 40;
+
+// Medidor de voz: AnalyserNode sobre o proprio stream do microfone, que o
+// nucleo agora entrega em chamada.fluxo(). Reage a voz real, nao a um timer.
+let ctxAudio = null, analisador = null, quadroVoz = 0;
+const semMovimento = () => {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) { return false; }
+};
+
+function ligarMedidor() {
+  if (analisador || semMovimento()) return;
+  const fluxo = chamada.fluxo && chamada.fluxo();
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!fluxo || !AC) return;
+  try {
+    ctxAudio = new AC();
+    if (ctxAudio.state === 'suspended') { try { ctxAudio.resume(); } catch (_) {} }
+    const fonte = ctxAudio.createMediaStreamSource(fluxo);
+    analisador = ctxAudio.createAnalyser();
+    analisador.fftSize = 256;
+    analisador.smoothingTimeConstant = .72;
+    fonte.connect(analisador);
+    const dados = new Uint8Array(analisador.frequencyBinCount);
+    const barras = Array.prototype.slice.call($('medidor').children);
+    // Grave a esquerda, agudo a direita: a voz humana mexe mais no meio.
+    const porBarra = Math.max(1, Math.floor((dados.length * 0.6) / barras.length));
+    const passo = () => {
+      if (!analisador) return;
+      analisador.getByteFrequencyData(dados);
+      for (let i = 0; i < barras.length; i++) {
+        let soma = 0;
+        for (let k = i * porBarra; k < (i + 1) * porBarra; k++) soma += dados[k];
+        const nivel = Math.min(1, (soma / porBarra) / 130);
+        barras[i].style.transform = 'scaleY(' + (0.1 + nivel * 0.9).toFixed(3) + ')';
+      }
+      quadroVoz = requestAnimationFrame(passo);
+    };
+    passo();
+  } catch (_) { analisador = null; }
+}
+
+function desligarMedidor() {
+  cancelAnimationFrame(quadroVoz);
+  analisador = null;
+  if (ctxAudio) { try { ctxAudio.close(); } catch (_) {} ctxAudio = null; }
+  Array.prototype.forEach.call($('medidor').children, b => { b.style.transform = ''; });
+}
+
+// A legenda mostra so o turno atual, grande, perto do recrutador.
+function legendar(quem, texto) {
+  const l = $('legenda');
+  l.className = 'legenda ' + (quem === 'eu' ? 'eu' : 'ia');
+  l.textContent = '';
+  const r = document.createElement('span');
+  r.className = 'quem';
+  r.textContent = quem === 'eu' ? 'Voc\u00EA' : 'Recrutador';
+  const c = document.createElement('span');
+  c.textContent = texto;   // textContent, nunca innerHTML
+  l.appendChild(r); l.appendChild(c);
+}
+
+// O clipe do recrutador comeca a carregar quando a chamada CONECTA, nao no
+// load da pagina, e so TOCA quando ele esta falando — ver o recrutador mexer
+// a boca enquanto o aluno responde seria pior que a foto parada.
+//
+// Some em silencio (fica o poster) se o arquivo nao responder 200, e com
+// movimento reduzido nem carrega: video em loop e o que essa preferencia pede
+// para parar. O streak-overlay.js nao faz isso; nao repetir o erro aqui.
+const CLIPE = 'recrutador-fala-v1.mp4';
+function ligarVideo() {
+  const v = $('recrutador-video');
+  if (!v || v.dataset.pronto === '1' || semMovimento()) return;
+  v.dataset.pronto = '1';
+  fetch(CLIPE, { method: 'HEAD' }).then(r => {
+    if (!r.ok) throw 0;
+    v.src = CLIPE;
+    // preload="none" nao baixa nada ate alguem pedir. Aqui a chamada JA esta
+    // conectada e 72 KB nao competem com o audio, entao carregar agora e o que
+    // garante que o play() do primeiro 'ele falando' encontre dados prontos.
+    try { v.load(); } catch (_) {}
+  }).catch(() => {});
+}
+function tocarVideo(tocar) {
+  const v = $('recrutador-video');
+  if (!v || !v.getAttribute('src')) return;
+  if (!tocar) { try { v.pause(); } catch (_) {} return; }
+  const p = v.play();
+  // Em conexao lenta o play() pode chegar antes dos dados e rejeitar; um catch
+  // vazio deixaria o recrutador parado enquanto ele fala. Tenta de novo no
+  // 'canplay', e so se ele ainda estiver falando quando os dados chegarem.
+  if (p && p.catch) p.catch(() => {
+    v.addEventListener('canplay', function umaVez() {
+      v.removeEventListener('canplay', umaVez);
+      if ($('palco').dataset.estado !== 'ia_falando') return;
+      const q = v.play();
+      if (q && q.catch) q.catch(() => {});
+    });
+  });
+}
+
+// O navegador NAO inicia midia em aba oculta: o play() resolve e o video fica
+// parado. Quem troca de aba no meio da ligacao (o audio continua) voltava e
+// achava o recrutador congelado. Ao reaparecer, retoma se ele ainda fala.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if ($('palco').dataset.estado === 'ia_falando') tocarVideo(true);
+});
+
+const chamada = CapyChamada({
+  aoEstado(e) {
+    const [txt, cls] = ROTULOS[e] || [e, ''];
+    $('estado').textContent = txt;
+    $('bolinha').className = 'bolinha' + (cls ? ' ' + cls : '');
+    $('palco').dataset.estado = e;
+    tocarVideo(e === 'ia_falando');
+    if (e === 'ouvindo') { ligarMedidor(); ligarVideo(); }
+    else if (e === 'desconectado') desligarMedidor();
+  },
+  // A cota vinha na resposta do token e ninguem mostrava. Aluno cortado no
+  // meio sem aviso previo e aluno que pede reembolso.
+  aoCota(minutos) {
+    const c = $('cota');
+    if (minutos == null) { c.textContent = ''; c.className = 'cota'; return; }
+    const m = Math.max(0, Math.round(minutos));
+    c.textContent = m + ' min de voz restantes neste m\u00EAs';
+    c.className = 'cota' + (m <= 3 ? ' pouco' : '');
+    if (m <= 3) avisar('Voc\u00EA tem ' + m + ' min de voz neste m\u00EAs. A chamada encerra sozinha quando acabar.');
+  },
+  aoFalaParcial(quem, texto, id) {
+    const t = $('transcricao'), colado = noFim(t);
+    escrever(linhaDe(quem, id), texto);
+    legendar(quem, texto);
+    if (colado) t.scrollTop = t.scrollHeight;
+  },
+  aoFala(quem, texto, id) {
+    const t = $('transcricao'), colado = noFim(t);
+    const reg = linhaDe(quem, id);
+    escrever(reg, texto);
+    reg.p.classList.remove('viva');
+    legendar(quem, texto);
+    if (id) falas.delete(id);
+    if (colado) t.scrollTop = t.scrollHeight;
+  },
+  aoUso() { $('tempo').textContent = chamada.ligado() ? mmss(chamada.decorridoMs()) : ''; },
+  aoErro(msg) { avisar(msg, true); },
+  aoDesligar(motivo, dados) {
+    $('silenciar').hidden = true;
+    $('ligar').textContent = '📞 Começar de novo';
+    $('ligar').className = '';
+    $('ligar').disabled = false;
+    $('painel-antes').style.display = '';
+    if (motivo === 'silencio') avisar('Encerrei depois de 3 minutos de silêncio.');
+    else if (motivo === 'tempo') avisar('Encerrei no limite de 15 minutos.');
+    registrarUso(dados.uso, dados.duracaoMs);
+    pedirDevolutiva(dados.transcricao, dados.uso, dados.duracaoMs);
+  },
+});
+
+// O custo é gravado SEMPRE, em todo desligamento, e por sendBeacon — que
+// sobrevive ao unload. A devolutiva abaixo depende de a aba continuar viva e
+// de haver material; o custo não pode depender de nenhuma das duas coisas.
+// Era assim que fechar a aba no meio da entrevista perdia a medição.
+function registrarUso(uso, duracaoMs) {
+  try {
+    const corpo = JSON.stringify({ cenario: 'entrevista', uso, duracaoMs });
+    const blob = new Blob([corpo], { type: 'application/json' });
+    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/conversa-uso', blob))) {
+      // sendBeacon pode recusar (fila cheia, tipo bloqueado). keepalive é a rede.
+      fetch('/api/conversa-uso', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: corpo, keepalive: true,
+      }).catch(() => {});
+    }
+  } catch (e) { /* medir é bônus: nunca atrapalha o aluno */ }
+}
+
+async function pedirDevolutiva(transcricao, uso, duracaoMs) {
+  // Menos de duas falas não dá material para avaliar nada — e pedir devolutiva
+  // de uma entrevista que não aconteceu só gera texto genérico.
+  const minhas = transcricao.filter(t => t.quem === 'eu');
+  if (minhas.length < 2) {
+    avisar('A entrevista foi curta demais para uma devolutiva. Tente responder algumas perguntas.');
+    return;
+  }
+
+  const painel = $('painel-fb');
+  painel.style.display = '';
+  $('fb-conteudo').innerHTML = '<p class="carregando">A Yara está analisando sua entrevista…</p>';
+
+  try {
+    const r = await fetch('/api/conversa-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // uso + duracaoMs vao junto: o servidor calcula o custo com a tabela
+      // de precos dele e guarda. Sem isto os tokens morriam ao fechar a aba.
+      body: JSON.stringify({ cenario: 'entrevista', cargo: $('cargo').value.trim(), transcricao, uso, duracaoMs }),
+      keepalive: true,
+    });
+    const d = await r.json();
+    if (!r.ok || !d.ok) throw new Error(d.error || 'não consegui gerar');
+    pintarDevolutiva(d.feedback);
+  } catch (e) {
+    $('fb-conteudo').innerHTML = '<p class="carregando">Não consegui gerar a devolutiva agora. '
+      + 'A transcrição acima continua valendo — mostre para o professor.</p>';
+  }
+}
+
+function pintarDevolutiva(fb) {
+  if (!fb) { $('fb-conteudo').innerHTML = '<p class="carregando">Sem devolutiva.</p>'; return; }
+  // TODO o texto vem de um modelo. Nada entra por innerHTML sem escapar.
+  const lista = (arr) => (Array.isArray(arr) && arr.length)
+    ? '<ul>' + arr.map(x => '<li>' + escapar(x) + '</li>').join('') + '</ul>'
+    : '<p class="carregando">—</p>';
+
+  const frases = Array.isArray(fb.frases) && fb.frases.length
+    ? '<ul>' + fb.frases.map(f => '<li><span class="frase">' + escapar(f.en || f)
+        + '</span><br><span class="trad">' + escapar(f.pt || '') + '</span></li>').join('') + '</ul>'
+    : '<p class="carregando">—</p>';
+
+  $('fb-conteudo').innerHTML =
+      '<h3>✅ O que foi bem</h3>' + lista(fb.destaques)
+    + '<h3>⚠️ Onde você travou</h3>' + lista(fb.travou)
+    + '<h3>💬 Frases que ajudariam</h3>' + frases
+    + '<h3>🎯 Treine isto antes da entrevista real</h3>'
+    + (fb.proxima ? '<ul><li>' + escapar(fb.proxima) + '</li></ul>' : '<p class="carregando">—</p>');
+}
+
+$('ligar').addEventListener('click', async () => {
+  if (chamada.ligado()) { chamada.desligar(); return; }
+
+  $('ligar').disabled = true;
+  $('cancelar-conexao').hidden = false;
+  $('painel-fb').style.display = 'none';
+  $('transcricao').innerHTML = '<p class="vazio">A transcrição aparece aqui durante a entrevista.</p>';
+  primeiraFala = true;
+  falas.clear();
+  $('legenda').textContent = '';
+  $('legenda').className = 'legenda';
+  $('cota').textContent = '';
+  avisar('Autorize o microfone. O recrutador vai te cumprimentar em inglês.');
+
+  const ok = await chamada.ligar({
+    cenario: 'entrevista',
+    lang: 'en',
+    cargo: $('cargo').value.trim(),
+  });
+
+  $('ligar').disabled = false;
+  $('cancelar-conexao').hidden = true;
+  if (ok) {
+    $('silenciar').hidden = false;
+    $('silenciar').setAttribute('aria-pressed', 'false');
+    $('silenciar').textContent = 'Silenciar microfone';
+    $('ligar').textContent = '⏹ Encerrar entrevista';
+    $('ligar').className = 'desligar';
+    $('painel-antes').style.display = 'none';
+    avisar('Entrevista em andamento. Responda em inglês, com calma — ele espera você terminar.');
+  } else {
+    $('ligar').textContent = '📞 Começar a entrevista';
+  }
+});
+
+$('cancelar-conexao').addEventListener('click', () => {
+  chamada.desligar('manual');
+  $('cancelar-conexao').hidden = true;
+  avisar('Conexão cancelada. Você pode tentar novamente quando quiser.');
+});
+$('silenciar').addEventListener('click', () => {
+  const muted = chamada.silenciar(!chamada.mudo());
+  $('silenciar').setAttribute('aria-pressed', String(muted));
+  $('silenciar').textContent = muted ? 'Ativar microfone' : 'Silenciar microfone';
+});
+</script>
+</body>
+</html>

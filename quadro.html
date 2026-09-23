@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Quadro Branco ao Vivo | Capy English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+html,body{height:100%;overscroll-behavior:none}
+#board{touch-action:none;cursor:crosshair}
+.tool-btn{transition:all .15s cubic-bezier(.34,1.56,.64,1)}
+.tool-btn.active{box-shadow:0 0 0 3px rgba(16,185,129,.35)}
+.swatch{transition:transform .15s ease}
+.swatch.active{transform:scale(1.2);box-shadow:0 0 0 2px white,0 0 0 4px currentColor}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:pulseDot 1.4s ease-in-out infinite}
+#banner-locked{animation:fadeSlide .3s ease both}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/quadro.html"/>
+<meta property="og:title" content="Quadro Branco ao Vivo | Capy English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Quadro Branco ao Vivo | Capy English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="bg-slate-50 h-screen w-screen overflow-hidden flex flex-col">
+
+<!-- Top bar -->
+<header class="flex-shrink-0 bg-gradient-to-r from-navy via-emerald-950 to-green-900 text-white px-3 md:px-5 py-2.5 flex items-center gap-3 shadow-lg z-20">
+  <a id="btn-voltar" href="classes.html" class="flex items-center gap-1 text-white/70 hover:text-white text-xs md:text-sm font-bold transition-colors flex-shrink-0" style="min-height:44px;display:inline-flex;align-items:center">
+    ← <span class="hidden sm:inline">Voltar</span>
+  </a>
+  <div class="flex items-center gap-2 flex-1 min-w-0">
+    <span class="text-xl md:text-2xl flex-shrink-0">🖊️</span>
+    <h1 id="titulo-quadro" class="font-black text-sm md:text-base truncate">Quadro Branco ao Vivo</h1>
+  </div>
+  <div id="conn-status" class="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs font-bold flex-shrink-0" style="min-height:32px">
+    <span id="conn-dot" class="w-2 h-2 rounded-full bg-yellow-400 pulse"></span>
+    <span id="conn-label">Conectando…</span>
+  </div>
+</header>
+
+<!-- Warning banner (student, locked) -->
+<div id="banner-locked" class="hidden flex-shrink-0 bg-amber-100 border-b-2 border-amber-300 text-amber-800 text-center text-xs md:text-sm font-bold py-2 px-3 z-10">
+  ✏️ Somente o professor está escrevendo agora
+</div>
+
+<!-- Error banner (config/network failure) -->
+<div id="banner-error" class="hidden flex-shrink-0 bg-red-100 border-b-2 border-red-300 text-red-800 text-center text-xs md:text-sm font-bold py-2 px-3 z-10">
+  ⚠️ Não foi possível conectar ao quadro em tempo real. Você ainda pode ver esta tela, mas o desenho ao vivo está indisponível no momento.
+</div>
+
+<!-- Canvas area -->
+<main class="relative flex-1 min-h-0 bg-white">
+  <canvas id="board" class="absolute inset-0 w-full h-full"></canvas>
+  <!-- Campo flutuante da ferramenta de texto: aparece onde o professor clica.
+       Enter confirma, Esc cancela. O texto vira um item do quadro e é
+       transmitido pros alunos no mesmo canal dos traços. -->
+  <input id="text-input" type="text" class="hidden absolute z-30 bg-white/95 border-2 border-emerald-400 rounded-lg px-2 py-1 font-bold shadow-lg focus:outline-none" placeholder="Digite e aperte Enter…" autocomplete="off"/>
+</main>
+
+<!-- Toolbar (teacher only) -->
+<footer id="toolbar" class="hidden flex-shrink-0 bg-white border-t-2 border-emerald-100 px-2 md:px-4 py-2 z-20">
+  <div class="flex items-center gap-2 md:gap-3 overflow-x-auto">
+    <!-- Tools -->
+    <button id="tool-pen" class="tool-btn active flex-shrink-0 bg-emerald-50 border-2 border-emerald-300 rounded-xl flex items-center justify-center text-lg" style="min-width:44px;min-height:44px" title="Caneta">✏️</button>
+    <button id="tool-eraser" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-lg" style="min-width:44px;min-height:44px" title="Borracha">🧽</button>
+    <button id="tool-text" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-lg font-black text-navy" style="min-width:44px;min-height:44px" title="Texto — clique no quadro e digite">T</button>
+
+    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+
+    <!-- Thickness -->
+    <button data-w="2" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Fino">
+      <span class="rounded-full bg-navy" style="width:4px;height:4px"></span>
+    </button>
+    <button data-w="5" class="thick-btn active tool-btn flex-shrink-0 bg-emerald-50 border-2 border-emerald-300 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Médio">
+      <span class="rounded-full bg-navy" style="width:8px;height:8px"></span>
+    </button>
+    <button data-w="10" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Grosso">
+      <span class="rounded-full bg-navy" style="width:14px;height:14px"></span>
+    </button>
+
+    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+
+    <!-- Colors -->
+    <div id="color-row" class="flex items-center gap-2 flex-shrink-0"></div>
+
+    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+
+    <!-- Permission toggle -->
+    <button id="btn-permission" class="tool-btn flex-shrink-0 bg-emerald-600 text-white font-black text-xs md:text-sm px-3 md:px-4 rounded-xl flex items-center gap-1.5 whitespace-nowrap" style="min-height:44px">
+      🔒 Travar alunos
+    </button>
+
+    <!-- Clear -->
+    <button id="btn-clear" class="tool-btn flex-shrink-0 bg-red-50 border-2 border-red-200 text-red-600 font-black text-xs md:text-sm px-3 md:px-4 rounded-xl whitespace-nowrap" style="min-height:44px">
+      🗑️ Limpar tudo
+    </button>
+  </div>
+</footer>
+
+<script>
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────────────────────
+// ── Sala do quadro ──────────────────────────────────────────────────────────
+// O quadro era fixo no GPS Tronic: um único canal para todas as turmas, e o
+// cabeçalho dizia "GPS Tronic" mesmo numa aula de inglês. Agora cada turma tem
+// a sua sala via ?sala=<slug>; sem parâmetro, cai na sala geral.
+const SALAS = {
+  geral:        { nome: 'Quadro Branco ao Vivo',        voltar: 'classes.html' },
+  gpstronic:    { nome: 'Quadro — GPS Tronic',          voltar: 'classes_gpstronic.html' },
+  intermediate: { nome: 'Quadro — Intermediate',        voltar: 'classes_intermediate.html' },
+  frances:      { nome: 'Quadro — Français',            voltar: 'classes_fr.html' },
+  business:     { nome: 'Quadro — Business',            voltar: 'classes_business.html' },
+  advanced:     { nome: 'Quadro — Advanced',            voltar: 'classes_advanced.html' },
+  travel:       { nome: 'Quadro — Travel',              voltar: 'classes_travel.html' },
+};
+
+const SALA = (() => {
+  const bruto = (new URLSearchParams(location.search).get('sala') || 'geral').toLowerCase();
+  // slug conservador: o valor entra no nome do canal, então nada de caractere solto
+  return /^[a-z0-9_-]{1,24}$/.test(bruto) ? bruto : 'geral';
+})();
+
+const CHANNEL = 'realtime:quadro-' + SALA;
+
+(function aplicarSala() {
+  const cfg = SALAS[SALA] || { nome: 'Quadro — ' + SALA, voltar: 'classes.html' };
+  document.title = cfg.nome + ' | Capy English';
+  const t = document.getElementById('titulo-quadro');
+  if (t) t.textContent = cfg.nome;
+  const v = document.getElementById('btn-voltar');
+  if (v) v.href = cfg.voltar;
+})();
+const COLORS = ['#059669', '#dc2626', '#2563eb', '#f59e0b', '#111827']; // emerald, red, blue, amber, near-black
+const MAX_HISTORY = 2000;
+const BATCH_MS = 50;
+const HEARTBEAT_MS = 25000;
+const MAX_BACKOFF_MS = 15000;
+
+// ── State ────────────────────────────────────────────────────────────────
+let isTeacher = false;
+let canWrite = false;     // whether THIS client is currently allowed to draw
+let boardLocked = true;   // teacher's current lock state (broadcast to students)
+let ws = null;
+let wsUrl = '';
+let joinRef = 1;
+let msgRef = 1;
+let reconnectAttempts = 0;
+let reconnectTimer = null;
+let heartbeatTimer = null;
+let joined = false;
+
+let strokes = [];         // local history of all segments drawn { x1,y1,x2,y2,cor,espessura }
+let pendingBatch = [];     // segments waiting to be sent in the next batch
+let batchTimer = null;
+
+let currentTool = 'pen';   // 'pen' | 'eraser'
+let currentColor = COLORS[0];
+let currentWidth = 5;
+let myColor = '';          // color derived from this client's random id (students)
+let myId = '';
+
+let drawing = false;
+let lastPoint = null;
+
+const canvas = document.getElementById('board');
+const ctx = canvas.getContext('2d');
+
+// ── Utility: student identity + derived color ───────────────────────────────
+function getMyId() {
+  try {
+    let id = localStorage.getItem('capyQuadroId');
+    if (!id) {
+      id = 'stu_' + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem('capyQuadroId', id);
+    }
+    return id;
+  } catch (e) {
+    return 'stu_' + Math.random().toString(36).slice(2, 10);
+  }
+}
+
+function colorFromId(id) {
+  // Deterministic hash -> hue, keeps saturation/lightness fixed for readability.
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  const hue = hash % 360;
+  return `hsl(${hue}, 70%, 42%)`;
+}
+
+// ── Canvas sizing & redraw ───────────────────────────────────────────────────
+// CUIDADO: esta função grava style.width/height inline, que sobrescrevem as
+// classes "w-full h-full" do canvas. Se ela rodar num momento em que o layout
+// ainda não assentou (o <main> mede 0), o canvas fica preso em 0×0 PARA SEMPRE
+// e o quadro inteiro morre — nada desenha, o texto não posiciona. Por isso:
+// 1) medida 0 não é gravada; 2) um ResizeObserver re-sincroniza quando o
+// layout ganha tamanho de verdade.
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  if (rect.width < 1 || rect.height < 1) return false;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  redrawAll();
+  return true;
+}
+
+if (window.ResizeObserver) {
+  let ultimo = '';
+  new ResizeObserver(() => {
+    const r = canvas.parentElement.getBoundingClientRect();
+    const agora = Math.round(r.width) + 'x' + Math.round(r.height);
+    if (agora === ultimo) return;
+    ultimo = agora;
+    resizeCanvas();
+  }).observe(canvas.parentElement);
+} else {
+  // Sem ResizeObserver: tenta de novo até o layout assentar.
+  let tentativas = 0;
+  const timer = setInterval(() => {
+    if (resizeCanvas() || ++tentativas > 20) clearInterval(timer);
+  }, 150);
+}
+
+function drawSegment(seg) {
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+
+  // Item de texto: guarda posição e tamanho em fração do canvas, do mesmo jeito
+  // que os traços, pra sobreviver a resize e funcionar em telas diferentes.
+  if (seg.kind === 'text') {
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = seg.cor || '#111827';
+    ctx.font = `800 ${Math.max(10, (seg.fonte || 0.05) * h)}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(seg.texto || '', seg.x1 * w, seg.y1 * h);
+    ctx.restore();
+    return;
+  }
+
+  ctx.save();
+  if (seg.eraser) {
+    ctx.globalCompositeOperation = 'destination-out';
+  } else {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = seg.cor || '#111827';
+  }
+  ctx.lineWidth = seg.espessura || 5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(seg.x1 * w, seg.y1 * h);
+  ctx.lineTo(seg.x2 * w, seg.y2 * h);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function redrawAll() {
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  strokes.forEach(drawSegment);
+}
+
+function addSegment(seg) {
+  strokes.push(seg);
+  if (strokes.length > MAX_HISTORY) strokes.splice(0, strokes.length - MAX_HISTORY);
+  drawSegment(seg);
+}
+
+function clearBoard() {
+  strokes = [];
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+}
+
+window.addEventListener('resize', resizeCanvas);
+
+// ── Connection status UI ────────────────────────────────────────────────────
+function setConnStatus(state) {
+  const dot = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  dot.classList.remove('bg-yellow-400', 'bg-green-400', 'bg-red-500', 'pulse');
+  if (state === 'connected') {
+    dot.classList.add('bg-green-400');
+    label.textContent = '🟢 Conectado';
+  } else if (state === 'reconnecting') {
+    dot.classList.add('bg-yellow-400', 'pulse');
+    label.textContent = '🟡 Reconectando…';
+  } else {
+    dot.classList.add('bg-red-500');
+    label.textContent = '🔴 Offline';
+  }
+}
+
+function showError(show) {
+  document.getElementById('banner-error').classList.toggle('hidden', !show);
+}
+
+// ── Role detection (server-verified, never trust the client) ──────────────
+async function detectRole() {
+  try {
+    const resp = await fetch('/api/auth/session', { credentials: 'same-origin' });
+    if (resp.status === 200) {
+      const data = await resp.json();
+      return !!(data && data.user && data.user.role === 'admin');
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+// ── Realtime config ─────────────────────────────────────────────────────────
+async function fetchRealtimeConfig() {
+  const resp = await fetch('/api/realtime-config', { credentials: 'same-origin' });
+  if (!resp.ok) throw new Error('config_unavailable');
+  const data = await resp.json();
+  if (!data || !data.url || !data.key) throw new Error('config_incomplete');
+  return data;
+}
+
+// ── WebSocket / Phoenix Channels protocol ───────────────────────────────────
+function buildWsUrl(httpUrl, apikey) {
+  // Turn https://xxxx.supabase.co into wss://xxxx.supabase.co/realtime/v1/websocket
+  const host = httpUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  return `wss://${host}/realtime/v1/websocket?apikey=${encodeURIComponent(apikey)}&vsn=1.0.0`;
+}
+
+function send(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(obj));
+  }
+}
+
+function joinChannel() {
+  msgRef = 1;
+  send({
+    topic: CHANNEL,
+    event: 'phx_join',
+    payload: { config: { broadcast: { self: false } } },
+    ref: String(msgRef++),
+  });
+}
+
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeatTimer = setInterval(() => {
+    send({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: String(msgRef++) });
+  }, HEARTBEAT_MS);
+}
+
+function stopHeartbeat() {
+  if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+}
+
+function broadcastEvent(eventName, payload) {
+  send({
+    topic: CHANNEL,
+    event: 'broadcast',
+    payload: { type: 'broadcast', event: eventName, payload: payload },
+    ref: String(msgRef++),
+  });
+}
+
+function connectSocket() {
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  setConnStatus(reconnectAttempts > 0 ? 'reconnecting' : 'reconnecting');
+  showError(false);
+
+  try {
+    ws = new WebSocket(wsUrl);
+  } catch (e) {
+    scheduleReconnect();
+    return;
+  }
+
+  ws.onopen = () => {
+    joined = false;
+    joinChannel();
+  };
+
+  ws.onmessage = (ev) => {
+    let msg;
+    try { msg = JSON.parse(ev.data); } catch (e) { return; }
+    handleMessage(msg);
+  };
+
+  ws.onerror = () => {
+    // onclose will fire right after; reconnection is handled there.
+  };
+
+  ws.onclose = () => {
+    stopHeartbeat();
+    joined = false;
+    setConnStatus('reconnecting');
+    scheduleReconnect();
+  };
+}
+
+function scheduleReconnect() {
+  reconnectAttempts++;
+  const delay = Math.min(1000 * Math.pow(2, reconnectAttempts - 1), MAX_BACKOFF_MS);
+  setConnStatus('reconnecting');
+  reconnectTimer = setTimeout(connectSocket, delay);
+}
+
+function handleMessage(msg) {
+  if (!msg || typeof msg !== 'object') return;
+
+  // Join confirmation for our channel.
+  if (msg.topic === CHANNEL && msg.event === 'phx_reply') {
+    if (msg.payload && msg.payload.status === 'ok') {
+      joined = true;
+      reconnectAttempts = 0;
+      setConnStatus('connected');
+      showError(false);
+      startHeartbeat();
+      // Students announce themselves so the teacher can send a snapshot + current permission.
+      if (!isTeacher) {
+        broadcastEvent('hello', { id: myId });
+      }
+    }
+    return;
+  }
+
+  if (msg.topic !== CHANNEL || msg.event !== 'broadcast') return;
+  const inner = msg.payload && msg.payload.payload;
+  const kind = msg.payload && msg.payload.event;
+  if (!inner) return;
+
+  switch (kind) {
+    case 'stroke':
+      applyIncomingSegments(inner.segments || []);
+      break;
+    case 'clear':
+      clearBoard();
+      break;
+    case 'permission':
+      applyPermission(!!inner.locked);
+      break;
+    case 'hello':
+      if (isTeacher) {
+        // Reply with the current history (trimmed) and the current lock state.
+        broadcastEvent('snapshot', { segments: strokes.slice(-MAX_HISTORY) });
+        broadcastEvent('permission', { locked: boardLocked });
+      }
+      break;
+    case 'snapshot':
+      if (!isTeacher) {
+        strokes = (inner.segments || []).slice(-MAX_HISTORY);
+        redrawAll();
+      }
+      break;
+  }
+}
+
+function applyIncomingSegments(segments) {
+  segments.forEach(addSegment);
+}
+
+function applyPermission(locked) {
+  boardLocked = locked;
+  if (!isTeacher) {
+    canWrite = !locked;
+    document.getElementById('banner-locked').classList.toggle('hidden', canWrite);
+  }
+}
+
+// ── Drawing input (Pointer Events: mouse + touch + pen) ─────────────────────
+function canDrawNow() {
+  return isTeacher || canWrite;
+}
+
+function pointFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  return { x: Math.min(1, Math.max(0, x)), y: Math.min(1, Math.max(0, y)) };
+}
+
+function activeStrokeStyle() {
+  if (isTeacher) {
+    return { cor: currentTool === 'eraser' ? '#000000' : currentColor, espessura: currentTool === 'eraser' ? currentWidth * 3 : currentWidth, eraser: currentTool === 'eraser' };
+  }
+  return { cor: myColor, espessura: 5, eraser: false };
+}
+
+// ── Ferramenta de texto ─────────────────────────────────────────────────────
+// Tamanho da fonte (fração da altura do canvas) derivado da espessura escolhida,
+// pra reaproveitar os mesmos três botões de tamanho da caneta.
+const TEXT_SIZES = { 2: 0.035, 5: 0.055, 10: 0.09 };
+let textAnchor = null;   // ponto normalizado onde o texto vai ser escrito
+
+function textFontFraction() {
+  return TEXT_SIZES[currentWidth] || 0.055;
+}
+
+// CUIDADO: focar o campo AQUI DENTRO não funciona. O clique ainda vai executar
+// a ação padrão do mousedown logo depois, que tira o foco do input e dispara o
+// blur — que fecharia o campo na hora. Por isso o foco vai para o próximo tique
+// e existe a trava `abrindoCampo`, que faz o blur imediato ser ignorado.
+let abrindoCampo = false;
+
+function openTextInput(p) {
+  const input = document.getElementById('text-input');
+  const rect = canvas.getBoundingClientRect();
+  if (rect.height < 1) return;                 // canvas ainda sem tamanho
+  const px = Math.round(textFontFraction() * rect.height);
+  textAnchor = p;
+  input.value = '';
+  input.style.left = Math.round(p.x * rect.width) + 'px';
+  input.style.top = Math.max(0, Math.round(p.y * rect.height - px * 0.9)) + 'px';
+  input.style.fontSize = Math.max(14, px) + 'px';
+  input.style.color = currentColor;
+  input.style.maxWidth = Math.max(140, rect.width - p.x * rect.width - 12) + 'px';
+  input.classList.remove('hidden');
+
+  abrindoCampo = true;
+  setTimeout(() => { input.focus(); input.select(); abrindoCampo = false; }, 0);
+}
+
+function closeTextInput() {
+  document.getElementById('text-input').classList.add('hidden');
+  textAnchor = null;
+}
+
+function commitTextInput() {
+  const input = document.getElementById('text-input');
+  const texto = input.value.trim();
+  const anchor = textAnchor;
+  closeTextInput();
+  if (!texto || !anchor) return;
+  const item = {
+    kind: 'text', texto,
+    x1: anchor.x, y1: anchor.y,
+    cor: isTeacher ? currentColor : myColor,
+    fonte: textFontFraction(),
+  };
+  addSegment(item);
+  pendingBatch.push(item);
+}
+
+function onPointerDown(e) {
+  if (!canDrawNow()) return;
+  if (currentTool === 'text' && isTeacher) {
+    e.preventDefault();                        // senão o mousedown rouba o foco
+    // Se já havia um campo aberto, o clique novo confirma o texto anterior.
+    if (textAnchor) commitTextInput();
+    openTextInput(pointFromEvent(e));
+    return;
+  }
+  drawing = true;
+  lastPoint = pointFromEvent(e);
+  canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+}
+
+function onPointerMove(e) {
+  if (!drawing || !canDrawNow()) return;
+  const p = pointFromEvent(e);
+  const style = activeStrokeStyle();
+  const seg = { x1: lastPoint.x, y1: lastPoint.y, x2: p.x, y2: p.y, cor: style.cor, espessura: style.espessura, eraser: style.eraser };
+  addSegment(seg);
+  pendingBatch.push(seg);
+  lastPoint = p;
+}
+
+function onPointerUp() {
+  drawing = false;
+  lastPoint = null;
+}
+
+document.getElementById('text-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); commitTextInput(); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeTextInput(); }
+});
+document.getElementById('text-input').addEventListener('blur', () => {
+  if (abrindoCampo) return;                    // blur da própria abertura
+  if (!textAnchor) return;
+  const input = document.getElementById('text-input');
+  if (!input.value.trim()) { closeTextInput(); return; }  // vazio: só fecha
+  commitTextInput();
+});
+
+canvas.addEventListener('pointerdown', onPointerDown);
+canvas.addEventListener('pointermove', onPointerMove);
+canvas.addEventListener('pointerup', onPointerUp);
+canvas.addEventListener('pointerleave', onPointerUp);
+canvas.addEventListener('pointercancel', onPointerUp);
+
+// Batch flush: send accumulated segments every ~50ms instead of per-move.
+batchTimer = setInterval(() => {
+  if (pendingBatch.length === 0) return;
+  const toSend = pendingBatch;
+  pendingBatch = [];
+  broadcastEvent('stroke', { segments: toSend });
+}, BATCH_MS);
+
+// ── Toolbar wiring (teacher only) ───────────────────────────────────────────
+function buildColorRow() {
+  const row = document.getElementById('color-row');
+  row.innerHTML = '';
+  COLORS.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = `swatch tool-btn flex-shrink-0 rounded-full border-2 border-white ${i === 0 ? 'active' : ''}`;
+    btn.style.background = c;
+    btn.style.color = c;
+    btn.style.width = '32px';
+    btn.style.height = '32px';
+    btn.style.minWidth = '44px';
+    btn.style.minHeight = '44px';
+    btn.title = 'Cor';
+    btn.addEventListener('click', () => {
+      currentColor = c;
+      row.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      // Trocar de cor não deve tirar o professor do modo texto.
+      if (currentTool !== 'text') setTool('pen');
+    });
+    row.appendChild(btn);
+  });
+}
+
+function setTool(tool) {
+  if (tool !== 'text' && textAnchor) commitTextInput();
+  currentTool = tool;
+  document.getElementById('tool-pen').classList.toggle('active', tool === 'pen');
+  document.getElementById('tool-eraser').classList.toggle('active', tool === 'eraser');
+  const t = document.getElementById('tool-text');
+  if (t) t.classList.toggle('active', tool === 'text');
+  canvas.style.cursor = tool === 'text' ? 'text' : '';
+}
+
+function setupTeacherToolbar() {
+  document.getElementById('toolbar').classList.remove('hidden');
+  buildColorRow();
+
+  document.getElementById('tool-pen').addEventListener('click', () => setTool('pen'));
+  document.getElementById('tool-eraser').addEventListener('click', () => setTool('eraser'));
+  document.getElementById('tool-text').addEventListener('click', () => setTool('text'));
+
+  document.querySelectorAll('.thick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentWidth = Number(btn.dataset.w);
+      document.querySelectorAll('.thick-btn').forEach(b => {
+        b.classList.remove('active', 'bg-emerald-50', 'border-emerald-300');
+        b.classList.add('bg-slate-50', 'border-slate-200');
+      });
+      btn.classList.add('active', 'bg-emerald-50', 'border-emerald-300');
+      btn.classList.remove('bg-slate-50', 'border-slate-200');
+    });
+  });
+
+  const permBtn = document.getElementById('btn-permission');
+  permBtn.addEventListener('click', () => {
+    boardLocked = !boardLocked;
+    updatePermissionButton();
+    broadcastEvent('permission', { locked: boardLocked });
+  });
+  updatePermissionButton();
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    const ok = window.confirm('Tem certeza que quer apagar todo o quadro para todo mundo?');
+    if (!ok) return;
+    clearBoard();
+    broadcastEvent('clear', {});
+  });
+}
+
+function updatePermissionButton() {
+  const btn = document.getElementById('btn-permission');
+  if (boardLocked) {
+    btn.textContent = '🔓 Liberar alunos';
+    btn.classList.remove('bg-slate-500');
+    btn.classList.add('bg-emerald-600');
+  } else {
+    btn.textContent = '🔒 Travar alunos';
+    btn.classList.remove('bg-emerald-600');
+    btn.classList.add('bg-slate-500');
+  }
+}
+
+// ── Boot sequence ────────────────────────────────────────────────────────────
+async function boot() {
+  myId = getMyId();
+  myColor = colorFromId(myId);
+  resizeCanvas();
+
+  isTeacher = await detectRole();
+
+  if (isTeacher) {
+    boardLocked = true; // students start locked by default until the teacher liberates them
+    canWrite = true;
+    setupTeacherToolbar();
+  } else {
+    canWrite = false;
+    document.getElementById('banner-locked').classList.remove('hidden');
+  }
+
+  try {
+    const cfg = await fetchRealtimeConfig();
+    wsUrl = buildWsUrl(cfg.url, cfg.key);
+    connectSocket();
+  } catch (e) {
+    setConnStatus('offline');
+    showError(true);
+  }
+}
+
+boot();
+</script>
+</body>
+</html>

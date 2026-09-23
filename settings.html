@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Settings — Capy Yara Adventures</title>
+<title>Ajustes — Capy English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -37,6 +37,24 @@ tailwind.config = {
   .avatar-opt.selected { border-color:#ec4899; box-shadow:0 0 0 3px rgba(236,72,153,0.3); transform:scale(1.1); }
   .avatar-opt:hover:not(.selected) { transform:scale(1.05); }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/settings.html"/>
+<meta property="og:title" content="Ajustes — Capy English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Ajustes — Capy English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-slate-50 dark:bg-[#001f3f] font-body text-slate-900 dark:text-white min-h-screen transition-colors duration-300">
 
@@ -51,12 +69,12 @@ tailwind.config = {
       <span class="material-symbols-outlined text-slate-500 dark:text-slate-300 text-2xl" style="font-variation-settings:'FILL' 1;">settings</span>
     </div>
     <div class="flex-1">
-      <h1 class="font-headline text-3xl font-extrabold text-navy dark:text-white">Settings</h1>
-      <p class="font-body text-slate-500 dark:text-slate-400 text-sm mt-0.5">Manage your profile, sounds, and preferences.</p>
+      <h1 class="font-headline text-3xl font-extrabold text-navy dark:text-white">Ajustes</h1>
+      <p class="font-body text-slate-500 dark:text-slate-400 text-sm mt-0.5">Gerencie seu perfil, sons e preferências.</p>
     </div>
     <button onclick="saveAll()" id="save-btn"
             class="bg-emerald-500 hover:bg-emerald-400 text-white font-label font-bold px-6 py-2.5 rounded-full active:scale-95 transition-all shadow-lg shadow-emerald-500/20 flex-shrink-0">
-      Save
+      Salvar
     </button>
   </div>
 
@@ -66,29 +84,57 @@ tailwind.config = {
     <!-- Profile header with Yara image -->
     <div class="flex items-center gap-4 mb-5">
       <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-pink-400/50 flex-shrink-0 shadow-lg">
-        <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+        <img src="yara-avatar.png?v=3" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
       </div>
       <div>
         <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg flex items-center gap-2">
           <span class="material-symbols-outlined text-pink-500" style="font-variation-settings:'FILL' 1;">person</span>
-          Your Profile
+          Seu perfil
         </h2>
-        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Customize your explorer identity</p>
+        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Personalize sua identidade de explorador</p>
       </div>
     </div>
 
     <!-- Name -->
     <label class="block mb-4">
-      <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Explorer Name</span>
+      <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-2">Nome de explorador</span>
       <input id="name-input" type="text" maxlength="20"
              class="w-full bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl px-5 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/30 font-label font-bold focus:outline-none focus:ring-2 focus:ring-pink-500/50 transition-all"
              placeholder="Enter your name…"/>
     </label>
 
     <!-- Avatar picker -->
-    <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-3">Choose Avatar</span>
+    <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-3">Escolha o avatar</span>
     <div class="flex gap-3 flex-wrap" id="avatar-grid">
       <!-- injected by JS -->
+    </div>
+  </section>
+
+  <!-- Lembretes diários ─────────────────────────────────────────────────────
+       Até aqui não existia NENHUM controle de lembretes no site: quem negava a
+       permissão uma vez ficava sem caminho de volta, e quem aceitava não tinha
+       como desligar a não ser bloqueando o site no navegador. -->
+  <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.06s">
+    <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
+      <span class="material-symbols-outlined text-pink-500" style="font-variation-settings:'FILL' 1;">notifications_active</span>
+      Lembrete diário
+    </h2>
+
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <p class="font-label font-bold text-slate-800 dark:text-white text-sm" id="push-titulo">Verificando…</p>
+        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5" id="push-sub">A Yara te lembra de praticar às 19h.</p>
+      </div>
+      <div class="toggle-track" id="push-toggle" role="switch" aria-checked="false" tabindex="0">
+        <div class="toggle-thumb"></div>
+      </div>
+    </div>
+
+    <!-- Só aparece quando há algo a explicar: bloqueio no navegador, instrução
+         de instalação no iPhone, ou aviso de que precisa entrar na conta. -->
+    <div id="push-ajuda" class="hidden mt-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-4">
+      <p class="font-body text-slate-600 dark:text-slate-300 text-xs leading-relaxed" id="push-ajuda-texto"></p>
+      <button id="push-recheck" class="hidden mt-3 bg-pink-500 text-white font-label font-bold text-xs px-4 py-2 rounded-lg">Já liberei — testar de novo</button>
     </div>
   </section>
 
@@ -96,14 +142,14 @@ tailwind.config = {
   <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.08s">
     <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
       <span class="material-symbols-outlined text-emerald-500" style="font-variation-settings:'FILL' 1;">volume_up</span>
-      Sound & Speech
+      Som e voz
     </h2>
 
     <div class="space-y-5">
       <div class="flex items-center justify-between">
         <div>
-          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Sound Effects</p>
-          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Play sounds during games</p>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Efeitos sonoros</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Tocar sons durante os jogos</p>
         </div>
         <div class="toggle-track on" id="sfx-toggle" onclick="toggle(this,'sfx')">
           <div class="toggle-thumb"></div>
@@ -111,8 +157,8 @@ tailwind.config = {
       </div>
       <div class="flex items-center justify-between">
         <div>
-          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Text-to-Speech</p>
-          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Yara reads words aloud</p>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Leitura em voz alta</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">A Yara lê as palavras em voz alta</p>
         </div>
         <div class="toggle-track on" id="tts-toggle" onclick="toggle(this,'tts')">
           <div class="toggle-thumb"></div>
@@ -120,8 +166,8 @@ tailwind.config = {
       </div>
       <div class="flex items-center justify-between">
         <div>
-          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">AI Features</p>
-          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Yara AI Chat, Story Time, Word of the Day</p>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Recursos de IA</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Conversa com a Yara, Hora da História e Palavra do Dia</p>
         </div>
         <div class="toggle-track on" id="ai-toggle" onclick="toggle(this,'ai')">
           <div class="toggle-thumb"></div>
@@ -130,8 +176,8 @@ tailwind.config = {
       <!-- Translation language -->
       <div class="flex items-center justify-between gap-4">
         <div>
-          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Translate Words Into</p>
-          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Language shown on flashcard translate button</p>
+          <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Traduzir palavras para</p>
+          <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Idioma que aparece no botão de tradução dos flashcards</p>
         </div>
         <select id="lang-select"
                 class="bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-label font-bold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 flex-shrink-0">
@@ -158,8 +204,8 @@ tailwind.config = {
     </h2>
     <div class="flex items-center justify-between">
       <div>
-        <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Dark Mode</p>
-        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Switch to a dark theme across all pages</p>
+        <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Modo escuro</p>
+        <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Usar tema escuro em todas as páginas</p>
       </div>
       <div class="toggle-track" id="dark-toggle" onclick="toggle(this,'darkMode')">
         <div class="toggle-thumb"></div>
@@ -171,20 +217,20 @@ tailwind.config = {
   <section class="bg-white dark:bg-[#002a54] border border-slate-100 dark:border-white/10 rounded-2xl p-6 fade-up shadow-sm" style="animation-delay:.16s">
     <h2 class="font-headline font-bold text-slate-900 dark:text-white text-lg mb-5 flex items-center gap-2">
       <span class="material-symbols-outlined text-yellow-500" style="font-variation-settings:'FILL' 1;">tune</span>
-      Difficulty
+      Dificuldade
     </h2>
     <div class="grid grid-cols-3 gap-3" id="diff-grid">
       <button onclick="setDiff('easy')" data-diff="easy"
               class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
-        🐣 Easy
+        🐣 Fácil
       </button>
       <button onclick="setDiff('medium')" data-diff="medium"
               class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
-        🌿 Medium
+        🌿 Médio
       </button>
       <button onclick="setDiff('hard')" data-diff="hard"
               class="diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95">
-        🔥 Hard
+        🔥 Difícil
       </button>
     </div>
   </section>
@@ -198,10 +244,10 @@ tailwind.config = {
     <div id="account-info" class="flex items-center gap-4 mb-5 p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
       <div id="acc-avatar" class="text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/10 rounded-full">🐾</div>
       <div class="flex-1 min-w-0">
-        <p id="acc-name"  class="font-label font-bold text-slate-900 dark:text-white text-base truncate">Explorer</p>
-        <p id="acc-email" class="font-body text-slate-400 text-xs mt-0.5 truncate">Guest session</p>
+        <p id="acc-name"  class="font-label font-bold text-slate-900 dark:text-white text-base truncate">Explorador</p>
+        <p id="acc-email" class="font-body text-slate-400 text-xs mt-0.5 truncate">Sessão de visitante</p>
       </div>
-      <span id="acc-badge" class="font-label text-xs font-bold px-3 py-1 rounded-full bg-pink-500/20 text-pink-500 border border-pink-500/30">Guest</span>
+      <span id="acc-badge" class="font-label text-xs font-bold px-3 py-1 rounded-full bg-pink-500/20 text-pink-500 border border-pink-500/30">Visitante</span>
     </div>
     <div class="flex flex-col gap-3">
       <button onclick="signOut()"
@@ -221,14 +267,14 @@ tailwind.config = {
     <p class="font-body text-slate-500 dark:text-slate-400 text-sm mb-5">Resetting will delete all XP, badges, and streak data. This cannot be undone.</p>
     <button onclick="resetProgress()"
             class="w-full py-3 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-500 font-label font-bold rounded-xl border border-red-200 dark:border-red-500/30 active:scale-95 transition-all">
-      Reset All Progress
+      Apagar todo o progresso
     </button>
   </section>
 
   <!-- App info -->
   <section class="text-center fade-up" style="animation-delay:.4s">
-    <p class="font-label text-slate-400 text-xs">Capy Yara Adventures · v2.0</p>
-    <p class="font-label text-slate-400 text-xs mt-1">Powered by OpenAI 🤖 · Built with ❤️</p>
+    <p class="font-label text-slate-400 text-xs">Capy Yara English · v2.0</p>
+    <p class="font-label text-slate-400 text-xs mt-1">Powered by OpenAI 🤖 · Feito com ❤️</p>
   </section>
 
 </main>
@@ -238,7 +284,7 @@ tailwind.config = {
 
 <!-- Save toast -->
 <div id="save-toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-emerald-500 text-white font-label font-bold px-8 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-  ✅ Settings saved!
+  ✅ Ajustes salvos!
 </div>
 
 <!-- Parent Gateway Modal -->
@@ -250,26 +296,27 @@ tailwind.config = {
     <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 border-2 border-slate-600">
       <span class="material-symbols-outlined text-white text-3xl">lock</span>
     </div>
-    <h3 class="font-headline text-2xl font-black text-white mb-2">Parents Only</h3>
-    <p class="font-body text-slate-400 text-sm mb-6">Please solve this to continue.</p>
+    <h3 class="font-headline text-2xl font-black text-white mb-2">Só para os pais</h3>
+    <p class="font-body text-slate-400 text-sm mb-6">Resolva a conta abaixo para continuar.</p>
 
     <div class="bg-[#001f3f] inset-0 rounded-xl py-4 mb-6 border border-white/10">
       <p class="font-headline text-3xl font-black text-pink-400" id="parent-math">5 + 7 = ?</p>
     </div>
 
     <input type="number" id="parent-answer" placeholder="Enter answer" class="w-full bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-white text-center font-headline text-2xl mb-4 focus:outline-none focus:border-pink-500 transition-colors">
-    <p id="parent-err" class="text-red-400 text-xs font-label mb-4 hidden">Incorrect answer. Try again.</p>
+    <p id="parent-err" class="text-red-400 text-xs font-label mb-4 hidden">Resposta errada. Tente de novo.</p>
 
     <button onclick="verifyParentSubmit()" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-label font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform text-lg">
-      Verify
+      Verificar
     </button>
   </div>
 </div>
 
-<script src="store.js?v=c52d7db"></script>
-<script src="auth.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="components.js?v=push2"></script>
 <script>
   Components.mount('top-nav-placeholder', Components.renderTopNav(''));
   Components.mount('side-nav-placeholder', Components.renderSideNav(''));
@@ -411,7 +458,7 @@ function loadAccountInfo() {
 }
 
 function signOut() {
-  if (!confirm('Sign out of Capy Yara Adventures?')) return;
+  if (!confirm('Sign out of Capy Yara English?')) return;
   Auth.logout();
 }
 
@@ -467,6 +514,97 @@ function resetProgress() {
     window.location.href = '6_Home_Forest_Expedition.html';
   });
 }
+
+// ── Lembrete diário ────────────────────────────────────────────────────────
+// A tela reflete o estado REAL da máquina do CapyPush, não um booleano guardado
+// à parte — que é como uma tela de ajustes começa a mentir.
+(function () {
+  const trilho = document.getElementById('push-toggle');
+  const titulo = document.getElementById('push-titulo');
+  const sub = document.getElementById('push-sub');
+  const ajuda = document.getElementById('push-ajuda');
+  const ajudaTexto = document.getElementById('push-ajuda-texto');
+  const rechecar = document.getElementById('push-recheck');
+  if (!trilho || !window.CapyPush) return;
+
+  // Instrução de desbloqueio POR NAVEGADOR: "vá nas configurações" não ajuda
+  // ninguém — o caminho é diferente em cada um.
+  // ATENÇÃO À ORDEM: a UA do Chrome CONTÉM a palavra "Safari"
+  // ("…Chrome/152 Safari/537.36"). Testar Safari antes de Chrome manda todo
+  // usuário de Chrome para a instrução do Safari — que fala de um menu que
+  // não existe no aparelho dele. Safari de verdade é o que tem "Safari" e NÃO
+  // tem "Chrome"/"Chromium".
+  function comoDesbloquear() {
+    const ua = navigator.userAgent;
+    const chromium = /Chrome|Chromium|CriOS|Edg/.test(ua);
+    if (/Android/.test(ua)) return 'Toque no 🔒 ao lado do endereço → Permissões → Notificações → Permitir. Depois volte aqui.';
+    if (/Firefox|FxiOS/.test(ua)) return 'Clique no 🔒 à esquerda do endereço → Notificações → remova o bloqueio. Depois volte aqui.';
+    if (chromium) return 'Clique no 🔒 (ou no ícone à esquerda do endereço) → Notificações → Permitir. Depois volte aqui.';
+    if (/Safari/.test(ua)) {
+      return /iP(hone|ad|od)/.test(ua)
+        ? 'Abra os Ajustes do iPhone → Apps → Safari → Notificações e libere para capyenglish.com.br.'
+        : 'No Safari: menu Safari → Configurações → Sites → Notificações → permita capyenglish.com.br.';
+    }
+    return 'Abra as permissões do site no seu navegador e libere as Notificações. Depois volte aqui.';
+  }
+
+  const TEXTOS = {
+    ligado:                { on: true,  t: 'Lembretes ligados',        s: 'A Yara te chama às 19h se você ainda não praticou.' },
+    pode_pedir:            { on: false, t: 'Lembretes desligados',     s: 'Ligue para a Yara te lembrar de praticar todo dia.' },
+    desligado_por_escolha: { on: false, t: 'Lembretes desligados',     s: 'Você desligou. Pode religar quando quiser.' },
+    orfa:                  { on: true,  t: 'Religando…',               s: 'Restaurando sua inscrição.' },
+    granted_sem_sub:       { on: true,  t: 'Religando…',               s: 'Restaurando sua inscrição.' },
+    negado:                { on: false, t: 'Bloqueado no navegador',   s: 'O navegador está barrando as notificações deste site.' },
+    ios_aba:               { on: false, t: 'Instale o app primeiro',   s: 'No iPhone, o lembrete só funciona com o Capy na tela de início.' },
+    nao_suportado:         { on: false, t: 'Sem suporte aqui',         s: 'Este navegador não aceita notificações. Tente pelo celular.' },
+  };
+
+  async function pintar() {
+    const ctx = await CapyPush.contexto();
+    const st = CapyPush.estado(ctx);
+    const cfg = TEXTOS[st] || TEXTOS.pode_pedir;
+
+    trilho.classList.toggle('on', cfg.on);
+    trilho.setAttribute('aria-checked', String(cfg.on));
+    titulo.textContent = cfg.t;
+    sub.textContent = cfg.s;
+
+    let dica = '';
+    let mostrarRecheck = false;
+    if (st === 'negado') { dica = comoDesbloquear(); mostrarRecheck = true; }
+    else if (st === 'ios_aba') {
+      const ipad = navigator.maxTouchPoints > 1 && !/iPhone/.test(navigator.userAgent);
+      dica = `Toque em Compartilhar (${ipad ? 'canto superior direito' : 'barra de baixo'}) → Adicionar à Tela de Início. Depois abra o Capy por lá.`;
+    } else if (st === 'ligado' && !ctx.logado) {
+      dica = 'Você está como visitante. Entre na sua conta para os lembretes chegarem de verdade.';
+    }
+    ajuda.classList.toggle('hidden', !dica);
+    ajudaTexto.textContent = dica;
+    rechecar.classList.toggle('hidden', !mostrarRecheck);
+
+    // Os dois becos consertam sozinhos; repinta quando terminar.
+    if (st === 'orfa' || st === 'granted_sem_sub') {
+      await CapyPush.reconciliar();
+      setTimeout(pintar, 400);
+    }
+  }
+
+  async function alternar() {
+    const ctx = await CapyPush.contexto();
+    const st = CapyPush.estado(ctx);
+    if (st === 'ligado') { await CapyPush.desligar(); }
+    else if (st === 'ios_aba' || st === 'nao_suportado' || st === 'negado') { /* nada a alternar: a ajuda já explica */ }
+    else { await CapyPush.ligar(); }
+    pintar();
+  }
+
+  trilho.addEventListener('click', alternar);
+  trilho.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternar(); }
+  });
+  rechecar.addEventListener('click', pintar);
+  pintar();
+})();
 </script>
 </body>
 </html>

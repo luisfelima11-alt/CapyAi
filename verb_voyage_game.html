@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#001f3f">
+  <title>Verb Voyage — Capy Yara English</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700&family=Lexend:wght@600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--navy:#001f3f;--deep:#001326;--pink:#ec4899;--green:#10b981;--sky:#38bdf8;--lilac:#a78bfa;--mist:#f8fafc}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 8%,rgba(56,189,248,.14),transparent 28rem),radial-gradient(circle at 90% 70%,rgba(236,72,153,.13),transparent 30rem),var(--navy);color:var(--mist);font-family:'Be Vietnam Pro',sans-serif}
+    button,a{font:inherit}
+    button:focus-visible,a:focus-visible{outline:4px solid var(--sky);outline-offset:4px}
+    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+    .shell{width:min(960px,calc(100% - 32px));margin:auto;padding:128px 0 72px}
+    .back{display:inline-flex;align-items:center;gap:8px;color:#bae6fd;text-decoration:none;font-weight:800}
+    .hero{text-align:center;margin:32px auto 24px}
+    .eyebrow{font:700 12px 'Lexend',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#7dd3fc}
+    h1{font:800 clamp(38px,8vw,72px)/.96 'Plus Jakarta Sans',sans-serif;margin:10px 0 14px;letter-spacing:-.055em}
+    .hero p{max-width:620px;margin:auto;color:#a8bad0;line-height:1.65}
+    .voyage-map{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:min(560px,100%);margin:26px auto 0}
+    .voyage-map::before{content:'';position:absolute;left:8%;right:8%;top:18px;height:7px;border-radius:999px;background:rgba(255,255,255,.09)}
+    .map-stop{position:relative;z-index:1;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#173653;color:#8da4ba;font:700 13px 'Lexend',sans-serif;box-shadow:0 0 0 6px var(--navy)}
+    .map-stop.done{background:var(--green);color:white}.map-stop.current{background:var(--pink);color:white;transform:scale(1.12);box-shadow:0 0 0 6px var(--navy),0 0 0 10px rgba(236,72,153,.2)}
+    .panel{background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045));border-radius:48px;padding:clamp(22px,5vw,44px);box-shadow:0 28px 80px rgba(0,0,0,.3);backdrop-filter:blur(16px)}
+    .topline{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .counter,.score{font:700 13px 'Lexend',sans-serif;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.08)}
+    .score{color:#86efac}.combo{color:#f9a8d4;margin-left:6px}
+    .progress{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:18px 0 30px}
+    .progress>div{height:100%;width:10%;border-radius:inherit;background:linear-gradient(90deg,var(--sky),var(--pink));transition:width .35s ease}
+    .time-sign{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:rgba(167,139,250,.15);color:#ddd6fe;font:700 12px 'Lexend',sans-serif}
+    .prompt{margin:22px 0 8px;font:800 clamp(23px,5vw,38px)/1.3 'Plus Jakarta Sans',sans-serif;letter-spacing:-.025em}
+    .translation{color:#94a9bd;margin:0 0 25px}
+    .blank{display:inline-block;min-width:110px;color:#f9a8d4;border-bottom:5px solid var(--pink);text-align:center;padding:0 8px}
+    .answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .answer{min-height:68px;border:0;border-radius:22px;background:#fff;color:var(--navy);font:800 16px 'Lexend',sans-serif;padding:15px;cursor:pointer;box-shadow:0 8px 0 #b7c4d1;transition:transform .15s,box-shadow .15s,background .15s}
+    .answer:hover{transform:translateY(-2px);box-shadow:0 10px 0 #b7c4d1}.answer:active{transform:translateY(5px);box-shadow:0 3px 0 #b7c4d1}.answer:disabled{cursor:default}
+    .answer.correct{background:#34d399;color:#052e25;box-shadow:0 7px 0 #059669}.answer.wrong{background:#fb7185;color:#4c0519;box-shadow:0 7px 0 #be123c}
+    .feedback{min-height:88px;margin-top:24px;padding:17px 20px;border-radius:24px;background:rgba(0,0,0,.18);color:#c7d5e3;line-height:1.55}
+    .feedback strong{display:block;color:white;margin-bottom:4px}.feedback.good strong{color:#86efac}.feedback.bad strong{color:#fda4af}
+    .next{display:none;width:100%;margin-top:16px;border:0;border-radius:999px;background:var(--pink);color:white;padding:16px 22px;font:800 15px 'Lexend',sans-serif;cursor:pointer}.next.show{display:block}
+    .finish{text-align:center;padding:12px 0}.finish .emoji{font-size:76px}.finish h2{font:800 38px 'Plus Jakarta Sans',sans-serif;margin:10px 0}.finish .xp{font:800 26px 'Lexend',sans-serif;color:#86efac}.finish-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:26px}.finish-actions a,.finish-actions button{border:0;border-radius:999px;padding:14px 22px;color:white;text-decoration:none;font-weight:800;cursor:pointer}.again{background:var(--pink)}.more{background:rgba(255,255,255,.12)}
+    @media(max-width:600px){.shell{width:min(100% - 20px,960px);padding-top:108px}.panel{border-radius:32px}.answers{grid-template-columns:1fr}.hero{margin-top:24px}.answer{min-height:58px}.voyage-map{padding:0 5px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.map-stop.current{transform:none}}
+  </style>
+</head>
+<body>
+  <div id="top-nav-placeholder"></div>
+  <div id="side-nav-placeholder"></div>
+  <main class="shell">
+    <a class="back" href="5_Game_Pavilion_Forest_Edition.html">← Voltar ao Pavilhão</a>
+    <header class="hero">
+      <div class="eyebrow">Expedição de gramática</div>
+      <h1>Verb Voyage ⛵</h1>
+      <p>Viaje pelo presente, passado e futuro. Use a pista de tempo para escolher a forma verbal que completa cada frase.</p>
+      <div id="voyage-map" class="voyage-map" aria-label="Progresso da expedição"></div>
+    </header>
+    <section id="game-panel" class="panel" aria-live="polite">
+      <div class="topline">
+        <span id="round" class="counter">Rodada 1 de 10</span>
+        <span class="score"><span id="score">0 XP</span><span id="combo" class="combo"></span></span>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
+      <span id="time-sign" class="time-sign">🧭 every day</span>
+      <h2 id="prompt" class="prompt"></h2>
+      <p id="translation" class="translation"></p>
+      <div id="answers" class="answers"></div>
+      <div id="feedback" class="feedback">Escolha uma resposta para a Yara explicar a regra.</div>
+      <button id="next" class="next">Próxima parada →</button>
+    </section>
+  </main>
+  <div id="mobile-nav-placeholder"></div>
+  <script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+  <script src="components.js?v=push2"></script>
+  <script>
+    Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+    const ITEMS = [
+      {signal:'every day',sentence:'Yara ___ English every day.',pt:'Yara estuda inglês todos os dias.',answer:'studies',options:['study','studies','studied','will study'],rule:'“Every day” indica rotina. Com she/he/it, o verbo recebe -s.'},
+      {signal:'right now',sentence:'We ___ a new game right now.',pt:'Nós estamos jogando um jogo novo agora.',answer:'are playing',options:['play','played','are playing','will play'],rule:'“Right now” pede Present Continuous: am/is/are + verbo-ing.'},
+      {signal:'yesterday',sentence:'Leo ___ his homework yesterday.',pt:'Leo terminou a tarefa ontem.',answer:'finished',options:['finishes','finish','finished','will finish'],rule:'“Yesterday” situa a ação no passado. O verbo regular recebe -ed.'},
+      {signal:'last night',sentence:'I ___ a funny story last night.',pt:'Eu li uma história engraçada ontem à noite.',answer:'read',options:['reads','am reading','read','will read'],rule:'No passado, “read” mantém a escrita, mas é pronunciado como “red”.'},
+      {signal:'tomorrow',sentence:'They ___ the museum tomorrow.',pt:'Eles visitarão o museu amanhã.',answer:'will visit',options:['visited','visit','are visit','will visit'],rule:'“Tomorrow” aponta para o futuro. “Will + verbo” expressa uma ação futura.'},
+      {signal:'usually',sentence:'My teacher usually ___ early.',pt:'Minha professora geralmente chega cedo.',answer:'arrives',options:['arrive','arrives','arrived','is arrive'],rule:'“Usually” marca hábito. Com my teacher (she), usamos arrives.'},
+      {signal:'at the moment',sentence:'The children ___ at the moment.',pt:'As crianças estão correndo neste momento.',answer:'are running',options:['run','ran','are running','will running'],rule:'Ação acontecendo agora: are + running. Dobramos o n em run → running.'},
+      {signal:'two days ago',sentence:'We ___ to the beach two days ago.',pt:'Nós fomos à praia dois dias atrás.',answer:'went',options:['go','goes','went','will go'],rule:'“Ago” pede passado. O passado irregular de go é went.'},
+      {signal:'next week',sentence:'I ___ my cousin next week.',pt:'Eu vou visitar minha prima na próxima semana.',answer:'will visit',options:['visited','visits','will visit','am visit'],rule:'“Next week” é futuro. Use will + forma base do verbo.'},
+      {signal:'never',sentence:'He never ___ coffee at night.',pt:'Ele nunca bebe café à noite.',answer:'drinks',options:['drink','drinks','drank','is drinking'],rule:'“Never” descreve hábito. He pede drinks no Simple Present.'},
+      {signal:'when I was a child',sentence:'I ___ in a small town when I was a child.',pt:'Eu morava em uma cidade pequena quando era criança.',answer:'lived',options:['live','lives','lived','will live'],rule:'Um período concluído no passado pede Simple Past: lived.'},
+      {signal:'look!',sentence:'Look! The bird ___ away.',pt:'Olhe! O pássaro está voando para longe.',answer:'is flying',options:['flies','flew','is flying','will fly'],rule:'“Look!” chama atenção para algo acontecendo agora: is flying.'},
+      {signal:'every Saturday',sentence:'We ___ soccer every Saturday.',pt:'Nós jogamos futebol todo sábado.',answer:'play',options:['play','plays','played','are playing'],rule:'Rotina com we usa a forma base no Simple Present: play.'},
+      {signal:'last weekend',sentence:'She ___ a cake last weekend.',pt:'Ela fez um bolo no fim de semana passado.',answer:'made',options:['make','makes','made','is making'],rule:'O passado irregular de make é made.'},
+      {signal:'soon',sentence:'The bus ___ soon.',pt:'O ônibus chegará em breve.',answer:'will arrive',options:['arrived','arrives yesterday','will arrive','will arrived'],rule:'Depois de will, o verbo fica na forma base: will arrive.'}
+    ];
+    const $ = id => document.getElementById(id);
+    const shuffle = list => [...list].sort(() => Math.random() - .5);
+    let deck = [], step = 0, points = 0, streak = 0, locked = false;
+
+    function buildMap(){
+      $('voyage-map').innerHTML = Array.from({length:10},(_,i)=>`<span class="map-stop ${i<step?'done':i===step?'current':''}">${i<step?'✓':i+1}</span>`).join('');
+    }
+    function speak(text){
+      if(!('speechSynthesis' in window)) return;
+      const utterance = new SpeechSynthesisUtterance(text.replace('___', deck[step].answer));
+      utterance.lang='en-US'; utterance.rate=.82; speechSynthesis.cancel(); speechSynthesis.speak(utterance);
+    }
+    function render(){
+      if(step >= 10) return finish();
+      locked=false; buildMap(); const item=deck[step];
+      $('round').textContent=`Rodada ${step+1} de 10`;
+      $('score').textContent=`${points} XP`;
+      $('combo').textContent=streak>=2?` · combo x${streak}`:'';
+      $('progress-bar').style.width=`${(step+1)*10}%`;
+      $('time-sign').textContent=`🧭 ${item.signal}`;
+      $('prompt').innerHTML=item.sentence.replace('___','<span class="blank">___</span>');
+      $('translation').textContent=item.pt;
+      $('answers').innerHTML=shuffle(item.options).map(option=>`<button class="answer" data-answer="${option}">${option}</button>`).join('');
+      $('answers').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>choose(button,item)));
+      $('feedback').className='feedback'; $('feedback').textContent='Escolha uma resposta para a Yara explicar a regra.';
+      $('next').classList.remove('show');
+    }
+    function choose(button,item){
+      if(locked) return; locked=true;
+      const correct=button.dataset.answer===item.answer;
+      $('answers').querySelectorAll('button').forEach(btn=>{btn.disabled=true;if(btn.dataset.answer===item.answer)btn.classList.add('correct')});
+      if(correct){streak++;const earned=10+Math.min(6,(streak-1)*2);points+=earned;$('feedback').innerHTML=`<strong>Boa viagem! +${earned} XP</strong>${item.rule}`;$('feedback').className='feedback good'}
+      else{streak=0;button.classList.add('wrong');$('feedback').innerHTML=`<strong>Quase! A resposta é “${item.answer}”.</strong>${item.rule}`;$('feedback').className='feedback bad'}
+      $('score').textContent=`${points} XP`; speak(item.sentence); $('next').classList.add('show'); $('next').focus();
+    }
+    function saveResult(){
+      try{const stats=JSON.parse(localStorage.getItem('capyGameStats')||'{}');const old=stats.verb_voyage||{};stats.verb_voyage={plays:(old.plays||0)+1,best:Math.max(old.best||0,points),lastPlayed:Date.now()};localStorage.setItem('capyGameStats',JSON.stringify(stats))}catch(e){}
+    }
+    function finish(){
+      buildMap(); saveResult();
+      if(window.Store){Store.addXP(points);Store.completeActivity('games')}
+      $('game-panel').innerHTML=`<div class="finish"><div class="emoji">🏝️</div><h2>Expedição concluída!</h2><p>Você atravessou presente, passado e futuro.</p><div class="xp">+${points} XP</div><div class="finish-actions"><button class="again" onclick="location.reload()">Jogar novamente</button><a class="more" href="5_Game_Pavilion_Forest_Edition.html">Ver mais jogos</a></div></div>`;
+    }
+    $('next').addEventListener('click',()=>{step++;render()});
+    deck=shuffle(ITEMS).slice(0,10);render();
+  </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
+</body>
+</html>

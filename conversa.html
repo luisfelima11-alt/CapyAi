@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<title>Conversar com a Yara | Capy English</title>
+<!--
+  Esta página virou um toco em 22/set/2026.
+
+  A ligação por voz e o chat de texto viviam separados: aqui a voz, no
+  ai_chat.html o texto, e o único jeito de chegar até aqui era um botão de lá.
+  Agora os dois moram no ai_chat.html — o mesmo compositor escreve ou liga, e a
+  transcrição da chamada e as mensagens digitadas entram no MESMO fio.
+
+  O arquivo não foi apagado de propósito: bookmark de aluno e entrada no
+  histórico do navegador continuam existindo. HTML é `no-cache` no Vercel e o
+  sw.js nunca cacheou HTML, então este redirecionamento vale já no primeiro
+  acesso, sem purge.
+
+  A query string é preservada: `conversa.html?persona=travel` continua levando
+  à capivara certa.
+-->
+<meta http-equiv="refresh" content="0;url=ai_chat.html"/>
+<style>
+  body{font-family:system-ui,sans-serif;background:#f8fafc;color:#001f3f;
+       display:flex;min-height:100vh;align-items:center;justify-content:center;
+       margin:0;padding:24px;text-align:center;font-weight:700}
+  a{color:#be123c}
+</style>
+</head>
+<body>
+<p>A conversa com a Yara mudou de lugar. <a href="ai_chat.html" id="ir">Ir agora →</a></p>
+<script>
+  (function () {
+    var destino = 'ai_chat.html' + (location.search || '');
+    document.getElementById('ir').setAttribute('href', destino);
+    // replace, não href: o botão voltar não pode devolver a pessoa para um
+    // redirecionamento que a joga de novo para frente.
+    location.replace(destino);
+  })();
+</script>
+</body>
+</html>

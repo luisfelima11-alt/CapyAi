@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fill in the Blank — Capy Yara Adventures</title>
+<title>Fill in the Blank — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -61,6 +61,24 @@ tailwind.config = {
   #prog-fill { transition: width 0.5s ease; }
   #sentence-area { line-height: 2.8; }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/fill_blank_game.html"/>
+<meta property="og:title" content="Fill in the Blank — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Fill in the Blank — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-primary font-body text-white min-h-screen flex flex-col">
 
@@ -71,8 +89,8 @@ tailwind.config = {
     <span class="material-symbols-outlined text-xl">arrow_back</span>
   </button>
   <div>
-    <p class="font-label text-xs text-orange-400 uppercase tracking-widest font-bold">Fill in the Blank</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Complete the sentence! ✏️</h1>
+    <p class="font-label text-xs text-orange-400 uppercase tracking-widest font-bold">Complete a Frase</p>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Complete a frase! ✏️</h1>
   </div>
   <div class="ml-auto flex items-center gap-4">
     <div class="flex gap-1" id="hearts">
@@ -93,7 +111,7 @@ tailwind.config = {
 <main class="flex-1 flex flex-col items-center justify-center px-6 py-10 gap-10">
 
   <!-- Question number -->
-  <p class="font-label text-orange-400 text-sm font-bold uppercase tracking-widest fade-up" id="q-label">Question 1 of 10</p>
+  <p class="font-label text-orange-400 text-sm font-bold uppercase tracking-widest fade-up" id="q-label">Pergunta 1 de 10</p>
 
   <!-- Emoji hint -->
   <div class="text-7xl fade-up" id="q-emoji">🌿</div>
@@ -111,7 +129,9 @@ tailwind.config = {
 
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
@@ -145,7 +165,7 @@ function renderQuestion() {
   answered = false;
   const q  = shuffled[currentQ];
 
-  document.getElementById('q-label').textContent   = `Question ${currentQ+1} of ${shuffled.length}`;
+  document.getElementById('q-label').textContent   = `Pergunta ${currentQ+1} de ${shuffled.length}`;
   document.getElementById('q-emoji').textContent   = q.emoji;
   document.getElementById('prog-fill').style.width = `${(currentQ/shuffled.length)*100}%`;
   document.getElementById('feedback').classList.add('hidden');
@@ -195,7 +215,7 @@ function pickOption(btn, chosen, correct) {
     document.getElementById('score-disp').textContent = score;
     blank.classList.add('correct');
     btn.classList.add('correct-chip');
-    fb.textContent = `✅ Correct! "${correct}" — well done! 🎉`;
+    fb.textContent = `✅ Correto! "${correct}" — muito bem! 🎉`;
     fb.classList.add('bg-emerald-500/20','text-emerald-300','border-emerald-500/40');
     launchSparks();
     setTimeout(next, 1500);
@@ -208,7 +228,7 @@ function pickOption(btn, chosen, correct) {
     document.querySelectorAll('.option-chip').forEach(b => {
       if (b.textContent === correct) b.classList.add('correct-chip');
     });
-    fb.textContent = `❌ The answer is "${correct}". Keep going! 💪`;
+    fb.textContent = `❌ A resposta é "${correct}". Continue! 💪`;
     fb.classList.add('bg-red-500/20','text-red-300','border-red-500/40');
 
     const area = document.getElementById('sentence-area');
@@ -272,21 +292,21 @@ function showFinished() {
          scale-0 opacity-0 transition-all duration-500">
       <div class="text-7xl">✏️</div>
       <div>
-        <p class="font-label text-orange-400 font-bold text-sm uppercase tracking-widest mb-1">Complete!</p>
+        <p class="font-label text-orange-400 font-bold text-sm uppercase tracking-widest mb-1">Completo!</p>
         <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
-        <p class="font-body text-slate-300">${score} / ${shuffled.length * 10} points</p>
+        <p class="font-body text-slate-300">${score} / ${shuffled.length * 10} pontos</p>
       </div>
       <div class="flex gap-1">
         ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
              style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
       </div>
       <p class="font-body text-slate-400 text-sm">
-        ${stars===3?'🏅 Grammar Star badge! Perfect score!':stars===2?'Great work! You know your sentences! 🌿':'Keep practising — you\'re getting better! 💪'}
+        ${stars===3?'🏅 Medalha Estrela da Gramática! Pontuação perfeita!':stars===2?'Muito bem! Você manda bem nas frases! 🌿':'Continue praticando — você está melhorando! 💪'}
       </p>
       <div class="flex gap-3 flex-wrap justify-center">
-        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again 🔄</button>
+        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Jogar de novo 🔄</button>
         <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-orange-500 hover:bg-orange-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-orange-500/30">Games 🌿</button>
+                class="bg-orange-500 hover:bg-orange-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-orange-500/30">Jogos 🌿</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -297,5 +317,7 @@ function showFinished() {
   launchSparks();
 }
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

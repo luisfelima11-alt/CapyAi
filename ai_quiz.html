@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AI Quiz — Capy Yara Adventures</title>
+<title>AI Quiz — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -36,6 +36,24 @@ tailwind.config = {
   @keyframes spark { 0%{opacity:1;transform:translate(0,0) scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)} }
   .spark { position:absolute; width:8px; height:8px; border-radius:50%; animation: spark 0.8s ease forwards; }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/ai_quiz.html"/>
+<meta property="og:title" content="AI Quiz — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="AI Quiz — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-primary font-body text-white min-h-screen flex flex-col">
 
@@ -47,7 +65,7 @@ tailwind.config = {
   </button>
   <!-- Yara avatar -->
   <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-pink-400/50 flex-shrink-0 shadow-md">
-    <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+    <img src="yara-avatar.png?v=3" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
   </div>
   <div>
     <p class="font-label text-xs text-pink-400 uppercase tracking-widest font-bold">AI Quiz</p>
@@ -107,7 +125,7 @@ tailwind.config = {
     <div class="flex gap-1" id="result-stars"></div>
     <!-- Yara message -->
     <div class="bg-surface-container border border-white/10 rounded-xl px-6 py-4 text-left flex gap-3 items-start w-full">
-      <img src="Hello%20Yara%20profile%20pic%20002.png"
+      <img src="yara-avatar.png?v=3"
            class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-emerald-400/40" alt="Yara" onerror="this.onerror=null;this.src='yara.svg'"/>
       <p class="font-body text-sm text-slate-300 leading-relaxed" id="yara-comment">Amazing work!</p>
     </div>
@@ -126,7 +144,9 @@ tailwind.config = {
 
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+    <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
 // ── Read URL params ──────────────────────────────────────────────────────────

@@ -1,12 +1,24 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Classes — Capy Yara Adventures</title>
+<title>Cursos de Inglês — Capy English</title>
+<meta name="description" content="6 cursos completos: iniciante, intermediário, avançado, business, viagem e francês. Mais de 112 aulas com vocabulário, gramática e conversação."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/classes.html"/>
+<meta property="og:title" content="Cursos de Inglês — Capy English"/>
+<meta property="og:description" content="6 cursos completos com mais de 112 aulas: vocabulário, gramática e conversação."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -15,15 +27,27 @@
   *{font-family:'Plus Jakarta Sans',sans-serif}
   @keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
   @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
   .float{animation:floatUp 3s ease-in-out infinite}
   .card-in{animation:fadeIn .4s ease both}
+  .slide-in{animation:slideDown .35s ease both}
   .lesson-card{transition:all .2s cubic-bezier(.34,1.56,.64,1)}
   .lesson-card:hover{transform:translateY(-4px)}
   .available-card{background:linear-gradient(135deg,#fff 0%,#fdf4ff 100%)}
   .available-card:hover{box-shadow:0 20px 40px -8px rgba(168,85,247,.25)}
   .shine{background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);background-size:200% 100%;animation:shine 2.5s infinite}
   @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+  /* Folder cards */
+  .folder-card{transition:all .22s cubic-bezier(.34,1.56,.64,1);cursor:pointer}
+  .folder-card:hover{transform:translateY(-6px)}
+  .folder-card.active{ring:2px}
+  .folder-tab{clip-path:polygon(0 100%,0 30%,15% 0,85% 0,100% 30%,100% 100%)}
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-violet-50/40 min-h-screen">
 
@@ -34,7 +58,6 @@
 
   <!-- ── Hero ─────────────────────────────────────────────────────────── -->
   <div class="relative overflow-hidden bg-gradient-to-br from-navy via-violet-900 to-purple-900 text-white">
-    <!-- Floating emojis bg -->
     <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
       <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">📚</span>
       <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.6s">✏️</span>
@@ -43,93 +66,442 @@
       <span class="absolute text-7xl float" style="top:50%;right:8%;animation-delay:.9s">🌟</span>
       <span class="absolute text-5xl float" style="top:75%;right:25%;animation-delay:1.5s">📖</span>
     </div>
-
-    <div class="relative max-w-7xl mx-auto px-6 py-14 flex flex-col md:flex-row items-center gap-8">
+    <div class="relative max-w-7xl mx-auto px-6 py-12 flex items-center gap-8">
       <div class="flex-1">
         <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-bold mb-4">
-          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">menu_book</span>
-          Jadson's English Course
+          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">school</span>
+          Capy English · Cursos
         </div>
         <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
-          📚 English<br><span class="text-violet-300">Classes</span>
+          📚 Escolha seu<br><span class="text-violet-300">Curso</span>
         </h1>
-        <p class="text-white/70 text-lg mb-6 max-w-lg">44 real lessons from Jadson's course — transformed into interactive experiences. Study vocab, grammar, expressions and practise speaking.</p>
-        <!-- Progress bar -->
-        <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden relative">
-          <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-pink-400 to-violet-400 relative" style="width:100%">
-            <span class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-lg shadow-amber-300/60 animate-pulse"></span>
-          </div>
+        <p class="text-white/70 text-lg max-w-lg">Inglês do jeito que funciona — interativo, gamificado e com a Yara do seu lado. Escolha o curso e comece agora.</p>
+      </div>
+      <div class="hidden md:block flex-shrink-0 float">
+        <div class="relative">
+          <div class="absolute -inset-3 bg-gradient-to-br from-violet-400/40 to-pink-400/40 rounded-full blur-2xl"></div>
+          <img src="yara.png?v=3" alt="Yara" class="relative w-44 h-44 lg:w-52 lg:h-52 rounded-full object-cover border-4 border-white/25 shadow-2xl"/>
+          <div class="absolute -bottom-1 -right-1 bg-pink-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg rotate-[-4deg]">Vamos? 🐾</div>
         </div>
-        <p class="text-white/50 text-sm">🎉 44 of 44 lessons available · Course complete!</p>
       </div>
     </div>
   </div>
 
-  <!-- ── Lesson Grid ────────────────────────────────────────────────────── -->
-  <div class="max-w-7xl mx-auto px-4 md:px-6 py-10">
+  <!-- ── Course Folders ──────────────────────────────────────────────── -->
+  <div class="max-w-7xl mx-auto px-4 md:px-6 pt-10 pb-4">
+    <h2 class="text-xl font-black text-navy mb-1">Meus Cursos</h2>
+    <p class="text-slate-500 text-sm mb-6">Selecione um curso para ver as aulas</p>
 
-    <!-- Section header -->
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h2 class="text-2xl font-black text-navy">All Lessons</h2>
-        <p class="text-slate-500 text-sm mt-0.5">Click on an available lesson to start</p>
-      </div>
-      <div class="flex items-center gap-2 text-sm">
-        <span class="inline-flex items-center gap-1.5 bg-violet-100 text-violet-700 font-bold px-3 py-1.5 rounded-full">
-          <span class="w-2 h-2 rounded-full bg-violet-500"></span> Available
-        </span>
-        <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-full">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Completed
-        </span>
-      </div>
-    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-6 gap-4" id="course-folders">
 
-    <!-- Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="lessons-grid">
-    </div>
-
-    <!-- More Courses -->
-    <div class="mt-12">
-      <h2 class="text-2xl font-black text-navy mb-1">Mais Cursos</h2>
-      <p class="text-slate-500 text-sm mb-6">Expanda seus horizontes com outros idiomas</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div onclick="window.location.href='classes_fr.html'" class="cursor-pointer group rounded-2xl overflow-hidden border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 hover:border-blue-400 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-200/50">
-          <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-2xl shadow-lg shadow-blue-300/40">🇫🇷</div>
-              <div>
-                <div class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-0.5">Novo Curso</div>
-                <h3 class="font-black text-navy text-base leading-tight">Cours de Français</h3>
-              </div>
+      <!-- ── Folder 1: Starter ── -->
+      <div class="folder-card active" id="folder-starter" onclick="selectCourse('starter')">
+        <div class="rounded-2xl overflow-hidden border-2 border-violet-400 bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-lg shadow-violet-300/30" id="folder-starter-inner">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="graduation-cap"><span class="text-2xl">🎓</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-violet-200 mb-1">Jadson's Course</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Starter</h3>
+            <p class="text-white/70 text-xs mb-3">Do zero ao intermediário. 44 aulas interativas com Yara.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">44 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">A1 → B1</span>
             </div>
-            <p class="text-slate-500 text-sm mb-4">Do zero ao básico sólido em 7 aulas interativas. English → French.</p>
-            <div class="flex items-center gap-2 flex-wrap mb-4">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Débutant</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">7 aulas</span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">EN → FR</span>
+            <div class="w-full bg-white/20 rounded-full h-1.5 overflow-hidden">
+              <div class="h-full bg-white rounded-full" id="starter-progress-bar" style="width:0%"></div>
             </div>
-            <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm py-2.5 rounded-xl group-hover:scale-105 active:scale-95 transition-all shadow-sm">
+            <p class="text-white/60 text-[10px] mt-1" id="starter-progress-text">0 de 44 aulas</p>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-violet-300 via-pink-300 to-violet-300"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 2: Business ── -->
+      <div class="folder-card" id="folder-business" onclick="selectCourse('business')">
+        <div class="rounded-2xl overflow-hidden border-2 border-blue-300 bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="briefcase"><span class="text-2xl">💼</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-1">Business English</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Business</h3>
+            <p class="text-white/70 text-xs mb-3">Reuniões, e-mails e negociações profissionais em inglês.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">15 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">B1 → B2</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-blue-300 via-indigo-300 to-blue-300"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 3: Travel ── -->
+      <div class="folder-card" id="folder-travel" onclick="selectCourse('travel')">
+        <div class="rounded-2xl overflow-hidden border-2 border-emerald-300 bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg shadow-emerald-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="plane"><span class="text-2xl">✈️</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Travel English</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Travel</h3>
+            <p class="text-white/70 text-xs mb-3">Aeroportos, hotéis, restaurantes e situações reais de viagem.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">15 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">A2 → B1</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-emerald-300 via-teal-300 to-emerald-300"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 4: Intermediate ── -->
+      <div class="folder-card" id="folder-intermediate" onclick="selectCourse('intermediate')">
+        <div class="rounded-2xl overflow-hidden border-2 border-rose-300 bg-gradient-to-br from-rose-600 to-orange-600 text-white shadow-lg shadow-rose-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="target"><span class="text-2xl">🎯</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-rose-200 mb-1">Intermediate</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Intermediate</h3>
+            <p class="text-white/70 text-xs mb-3">Past, Present Perfect, Past Perfect e conversação real.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">20 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">B1 → B2</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-rose-300 via-orange-300 to-rose-300"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 5: Advanced ── -->
+      <div class="folder-card" id="folder-advanced" onclick="selectCourse('advanced')">
+        <div class="rounded-2xl overflow-hidden border-2 border-purple-300 bg-gradient-to-br from-purple-700 to-fuchsia-700 text-white shadow-lg shadow-purple-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="award"><span class="text-2xl">🏆</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-purple-200 mb-1">Advanced</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Advanced</h3>
+            <p class="text-white/70 text-xs mb-3">Inversões, cleft sentences, phrasal verbs e idioms de nível C1.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">10 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">B2 → C1</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-purple-300 via-fuchsia-300 to-purple-300"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 6: Français ── -->
+      <div class="folder-card" id="folder-francais" onclick="selectCourse('francais')">
+        <div class="rounded-2xl overflow-hidden border-2 border-indigo-200 bg-gradient-to-br from-slate-50 to-indigo-50 shadow-sm">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-2xl shadow-md shadow-blue-300/30 mb-3">🇫🇷</div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Disponível</div>
+            <h3 class="font-black text-lg leading-tight text-navy mb-1">Français</h3>
+            <p class="text-slate-500 text-xs mb-3">Do zero ao A2 em 12 aulas interativas. EN → FR.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600">12 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-600">Débutant</span>
+            </div>
+            <button class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs py-2 rounded-xl hover:scale-105 active:scale-95 transition-all">
               Commencer →
             </button>
           </div>
           <div class="h-1 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400"></div>
         </div>
       </div>
+
+      <!-- ── Folder 7: GPS Tronic (curso exclusivo) ── -->
+      <div class="folder-card" id="folder-turkish" onclick="selectCourse('turkish')">
+        <div class="rounded-2xl overflow-hidden border-2 border-red-200 bg-gradient-to-br from-red-50 to-rose-50 shadow-sm">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-rose-600 flex items-center justify-center text-2xl shadow-md shadow-red-300/30 mb-3">🇹🇷</div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">Novo curso</div>
+            <h3 class="font-black text-lg leading-tight text-navy mb-1">Türkçe</h3>
+            <p class="text-slate-500 text-xs mb-3">Turco A1 completo: pronúncia, sufixos e situações reais com prática diária.</p>
+            <div class="flex flex-wrap gap-1 mb-4"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-600">36 aulas</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-600">A1 → A2</span></div>
+            <button class="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white font-black text-xs py-2 rounded-xl hover:scale-105 active:scale-95 transition-all">Başla →</button>
+          </div><div class="h-1 bg-gradient-to-r from-red-400 via-rose-400 to-red-400"></div>
+        </div>
+      </div>
+
+      <div class="folder-card" id="folder-gpstronic" onclick="selectCourse('gpstronic')">
+        <div class="rounded-2xl overflow-hidden border-2 border-emerald-300 bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-lg shadow-emerald-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="satellite"><span class="text-2xl">🛰️</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Curso exclusivo</div>
+            <h3 class="font-black text-lg leading-tight mb-1">GPS Tronic</h3>
+            <p class="text-white/70 text-xs mb-3">Inglês técnico para GPS agrícola, tratores e agricultura de precisão.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">9 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">A2 → B1</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-emerald-300 via-green-300 to-emerald-300"></div>
+        </div>
+      </div>
+
+      <div class="folder-card" id="folder-agro" onclick="selectCourse('agro')">
+        <div class="rounded-2xl overflow-hidden border-2 border-amber-300 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="tractor"><span class="text-2xl">🚜</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-amber-100 mb-1">Curso exclusivo</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Agro English</h3>
+            <p class="text-white/70 text-xs mb-3">Inglês do zero absoluto para quem vive do campo: do alfabeto à conversa na fazenda.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">8 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">A0 → A1</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-amber-200 via-orange-200 to-amber-200"></div>
+        </div>
+      </div>
+
+      <!-- ── Folder 8: Medical English ── -->
+      <div class="folder-card" id="folder-med" onclick="selectCourse('med')">
+        <div class="rounded-2xl overflow-hidden border-2 border-cyan-300 bg-gradient-to-br from-cyan-700 to-sky-800 text-white shadow-lg shadow-cyan-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="stethoscope"><span class="text-2xl">🩺</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-cyan-200 mb-1">Para médicos</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Medical English</h3>
+            <p class="text-white/70 text-xs mb-3">Do zero à consulta: entenda o que o paciente diz, não só o que o artigo escreve.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">10 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">A0 → A2</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-cyan-300 via-sky-300 to-cyan-300"></div>
+        </div>
+      </div>
+
+      <div class="folder-card" id="folder-interview" onclick="selectCourse('interview')">
+        <div class="rounded-2xl overflow-hidden border-2 border-indigo-300 bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-lg shadow-indigo-300/30">
+          <div class="p-5">
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-3 backdrop-blur-sm" data-icon-key="interview"><span class="text-2xl">💼</span></div>
+            <div class="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Acesso livre</div>
+            <h3 class="font-black text-lg leading-tight mb-1">Entrevista de Emprego</h3>
+            <p class="text-white/70 text-xs mb-3">Uma entrevista online do começo ao fim: apresentar-se, responder cenários, descrever seu ambiente e falar de salário.</p>
+            <div class="flex flex-wrap gap-1 mb-4">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">8 aulas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white">B1 → B2</span>
+            </div>
+            <button class="w-full bg-white/20 hover:bg-white/30 text-white font-black text-xs py-2 rounded-xl transition-all">
+              Acessar →
+            </button>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-indigo-300 via-violet-300 to-indigo-300"></div>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <!-- ── Lessons Panel (shown when a course is selected) ──────────────── -->
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-6" id="lessons-panel">
+
+    <!-- Starter Lessons -->
+    <div id="panel-starter" class="slide-in">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center text-lg">🎓</div>
+          <div>
+            <h2 class="text-xl font-black text-navy leading-none">Starter — Jadson's Course</h2>
+            <p class="text-slate-500 text-xs mt-0.5">Clique em uma aula para começar</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+          <span class="inline-flex items-center gap-1.5 bg-violet-100 text-violet-700 font-bold px-3 py-1.5 rounded-full text-xs">
+            <span class="w-2 h-2 rounded-full bg-violet-500"></span> Disponível
+          </span>
+          <span class="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 font-bold px-3 py-1.5 rounded-full text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Concluída
+          </span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="lessons-grid"></div>
+    </div>
+
+  </div>
+
+<!-- SEO:indice-aulas -->
+<nav aria-label="Todas as aulas do curso Inglês" class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
+  <details class="bg-white/60 border border-slate-200 rounded-2xl p-5">
+    <summary class="font-black text-navy cursor-pointer text-sm">📚 Todas as aulas do curso Inglês (44)</summary>
+    <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1.5 text-xs">
+      <li><a href="aula_01.html" class="text-slate-500 hover:text-navy underline decoration-dotted">To Have, Want, Need & Like</a></li>
+      <li><a href="aula_02.html" class="text-slate-500 hover:text-navy underline decoration-dotted">To Go, Do, Say & See</a></li>
+      <li><a href="aula_03.html" class="text-slate-500 hover:text-navy underline decoration-dotted">To Get, Make, Know & Take</a></li>
+      <li><a href="aula_04.html" class="text-slate-500 hover:text-navy underline decoration-dotted">To Come, Think, Look & Give</a></li>
+      <li><a href="aula_05.html" class="text-slate-500 hover:text-navy underline decoration-dotted">To Tell, Work, Feel & Leave</a></li>
+      <li><a href="aula_06.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Modal Verbs: Can, Could & Should</a></li>
+      <li><a href="aula_07.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Past Simple — Regular Verbs</a></li>
+      <li><a href="aula_08.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Past Simple — Irregular Verbs</a></li>
+      <li><a href="aula_09.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Prepositions of Place</a></li>
+      <li><a href="aula_10.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Quantifiers: Many, Much & More</a></li>
+      <li><a href="aula_11.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Adjectives & Comparatives</a></li>
+      <li><a href="aula_12.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Future: Will & Going To</a></li>
+      <li><a href="aula_13.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Work & Career</a></li>
+      <li><a href="aula_14.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Technology & Digital Life</a></li>
+      <li><a href="aula_15.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Travel & Tourism</a></li>
+      <li><a href="aula_16.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Home & Daily Routines</a></li>
+      <li><a href="aula_17.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Food, Drinks & Restaurants</a></li>
+      <li><a href="aula_18.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Shopping & Money</a></li>
+      <li><a href="aula_19.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Health & Body</a></li>
+      <li><a href="aula_20.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Achievements & Challenges</a></li>
+      <li><a href="aula_21.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Comparatives</a></li>
+      <li><a href="aula_22.html" class="text-slate-500 hover:text-navy underline decoration-dotted">The Concept of MOST</a></li>
+      <li><a href="aula_23.html" class="text-slate-500 hover:text-navy underline decoration-dotted">MOST in Conversation</a></li>
+      <li><a href="aula_24.html" class="text-slate-500 hover:text-navy underline decoration-dotted">At the Restaurant</a></li>
+      <li><a href="aula_25.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Present Perfect</a></li>
+      <li><a href="aula_26.html" class="text-slate-500 hover:text-navy underline decoration-dotted">The Future with WILL</a></li>
+      <li><a href="aula_27.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Speaking About Your Life</a></li>
+      <li><a href="aula_28.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Personalities & Moods</a></li>
+      <li><a href="aula_29.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Phrasal Verbs: Part 2</a></li>
+      <li><a href="aula_30.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Reported Speech</a></li>
+      <li><a href="aula_31.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Passive Voice</a></li>
+      <li><a href="aula_32.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Awkward Situations & Apologies</a></li>
+      <li><a href="aula_43.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Let's Make Plans!</a></li>
+      <li><a href="aula_44.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Tell Me About Yourself</a></li>
+      <li><a href="aula_33.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Going to & Get Phrasal Verbs</a></li>
+      <li><a href="aula_34.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Expressing Opinions & Debating</a></li>
+      <li><a href="aula_35.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Future with Will — Advanced</a></li>
+      <li><a href="aula_36.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Music & TO GET Advanced</a></li>
+      <li><a href="aula_37.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Modal Verbs: Could, Should, Must, Might</a></li>
+      <li><a href="aula_38.html" class="text-slate-500 hover:text-navy underline decoration-dotted">1st Conditional</a></li>
+      <li><a href="aula_39.html" class="text-slate-500 hover:text-navy underline decoration-dotted">2nd Conditional</a></li>
+      <li><a href="aula_40.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Gerunds & Infinitives</a></li>
+      <li><a href="aula_41.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Relative Clauses</a></li>
+      <li><a href="aula_42.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Linking Words</a></li>
+    </ul>
+  </details>
+</nav>
+
+<!-- SEO:indice-cursos -->
+<nav aria-label="Cursos e trilhas" class="max-w-6xl mx-auto px-6 pb-10">
+  <p class="text-slate-500 text-xs font-black uppercase tracking-widest mb-3">Cursos e trilhas</p>
+  <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-1.5 text-xs">
+    <li><a href="classes.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Inglês — todos os cursos</a></li>
+    <li><a href="classes_intermediate.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Inglês Intermediate</a></li>
+    <li><a href="classes_advanced.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Inglês Advanced</a></li>
+    <li><a href="classes_business.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Inglês para Business</a></li>
+    <li><a href="classes_travel.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Inglês para Viagem</a></li>
+    <li><a href="classes_fr.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Francês com a Yara</a></li>
+    <li><a href="classes_gpstronic.html" class="text-slate-500 hover:text-navy underline decoration-dotted">GPS Tronic (turma fechada)</a></li>
+    <li><a href="classes_agro.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Agro English — do zero (turma fechada)</a></li>
+    <li><a href="classes_med.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Medical English — inglês para médicos</a></li>
+          <li><a href="classes_interview.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Entrevista de Emprego em Inglês</a></li>
+    <li><a href="learn.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Inglês</a></li>
+    <li><a href="learn_fr.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Francês</a></li>
+    <li><a href="learn_intermediate.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária Intermediate</a></li>
+    <li><a href="learn_gpstronic.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária GPS Tronic</a></li>
+    <li><a href="learn_agro.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária Agro English</a></li>
+    <li><a href="learn_med.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária Medical English</a></li>
+          <li><a href="learn_interview.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Entrevista</a></li>
+    <li><a href="placement_test.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Teste de Nível</a></li>
+  </ul>
+</nav>
 </main>
 
 <div id="mobile-nav-placeholder"></div>
 <div id="footer-placeholder"></div>
 
-<script src="store.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="components.js?v=push2"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 Components.mount('footer-placeholder', Components.renderFooter());
 
+// ── Course folder icons — outline SVGs replacing emoji where available ─────
+document.querySelectorAll('#course-folders [data-icon-key]').forEach(el => {
+  const svg = Components.icon(el.dataset.iconKey, 'w-6 h-6');
+  if (svg) el.innerHTML = svg;
+});
+
+// ── Course folder selection ───────────────────────────────────────────────
+// ── Cursos: a fonte da verdade ─────────────────────────────────────────────
+// Antes eram DUAS listas que divergiam: um COURSE_IDS com 5 ids (faltando
+// metade dos cursos) e uma cadeia de 10 `if` com os destinos. Agora e um mapa
+// so, e o COURSE_IDS sai dele.
+//
+// A IA de cada curso (PERSONAS em api/index.js) usa EXATAMENTE estes ids no
+// campo `curso`, e tests/realtime-voice.test.js le este bloco por regex e
+// afirma que nenhuma persona aponta para curso que nao existe aqui. Renomear
+// um id sem renomear o outro vira teste vermelho.
+const CURSOS = {
+  business:     'classes_business.html',
+  travel:       'classes_travel.html',
+  intermediate: 'classes_intermediate.html',
+  advanced:     'classes_advanced.html',
+  francais:     'classes_fr.html',
+  turkish:      'classes_tr.html',
+  gpstronic:    'classes_gpstronic.html',
+  agro:         'classes_agro.html',
+  med:          'classes_med.html',
+  interview:    'classes_interview.html',
+};
+// O `starter` e o unico que NAO navega: ele abre um painel aqui mesmo
+// (#panel-starter). Por isso fica fora do mapa, mas entra na lista de pastas.
+const COURSE_IDS = ['starter', ...Object.keys(CURSOS)];
+
+function selectCourse(id) {
+  if (Object.prototype.hasOwnProperty.call(CURSOS, id)) { window.location.href = CURSOS[id]; return; }
+
+  // Update folder visual states
+  COURSE_IDS.forEach(c => {
+    const inner = document.getElementById('folder-' + c + '-inner') ||
+                  document.querySelector('#folder-' + c + ' > div');
+    const folder = document.getElementById('folder-' + c);
+    if (!folder) return;
+    if (c === id) {
+      folder.classList.add('active');
+    } else {
+      folder.classList.remove('active');
+    }
+  });
+
+  // Highlight active folder border
+  const folderEl = document.getElementById('folder-' + id);
+  if (folderEl) {
+    document.querySelectorAll('.folder-card > div').forEach(d => {
+      d.classList.remove('ring-2','ring-violet-400','shadow-xl');
+    });
+    folderEl.querySelector('div').classList.add('ring-2','shadow-xl');
+  }
+
+  // Show/hide panels
+  ['starter','business','travel'].forEach(p => {
+    const panel = document.getElementById('panel-' + p);
+    if (!panel) return;
+    if (p === id) {
+      panel.classList.remove('hidden');
+      panel.classList.add('slide-in');
+    } else {
+      panel.classList.add('hidden');
+    }
+  });
+
+  // Scroll to panel
+  document.getElementById('lessons-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Lesson data ───────────────────────────────────────────────────────────
 const LESSONS = [
   {n:1,  emoji:'💬', title:'To Have, Want, Need & Like',       tags:['Verbs','Present Simple'],  available:true, href:'aula_01.html'},
   {n:2,  emoji:'🚶', title:'To Go, Do, Say & See',              tags:['Verbs','Daily Life'],       available:true, href:'aula_02.html'},
@@ -177,9 +549,8 @@ const LESSONS = [
   {n:44, emoji:'🧩', title:'Linking Words',          tags:['Grammar','Connectors'],     available:true, href:'aula_42.html'},
 ];
 
+// ── Render lesson grid ────────────────────────────────────────────────────
 const grid = document.getElementById('lessons-grid');
-
-// Plan gating: lessons 1-5 are FREE, lessons 6+ require Pro or Super.
 const FREE_LESSON_LIMIT = 5;
 function isPro() { return typeof Store !== 'undefined' && (Store.state?.planType === 'pro' || Store.state?.planType === 'super'); }
 
@@ -194,23 +565,18 @@ LESSONS.forEach((l, i) => {
       : 'bg-slate-50 border-slate-200 opacity-75'}`;
   card.style.animationDelay = `${i * 0.04}s`;
 
-  if (locked) {
-    card.onclick = () => showPaywall(l);
-  } else if (l.available) {
-    card.onclick = () => window.location.href = l.href;
-  }
+  if (locked) { card.onclick = () => showPaywall(l); }
+  else if (l.available) { card.onclick = () => window.location.href = l.href; }
 
   const badge = locked
     ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">🔒 Pro</div>`
     : l.available
-      ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Available</div>`
+      ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Free</div>`
       : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-100 text-slate-400 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Soon</div>`;
 
   card.innerHTML = `
     <div class="relative p-5">
       ${badge}
-
-      <!-- Number + Emoji -->
       <div class="flex items-start gap-3 mb-3 pr-16">
         <div class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl ${locked ? 'bg-orange-100 grayscale-[40%]' : l.available ? 'bg-violet-100' : 'bg-slate-100'}">
           ${l.emoji}
@@ -220,33 +586,22 @@ LESSONS.forEach((l, i) => {
           <h3 class="font-black text-sm text-navy leading-snug mt-0.5 ${locked ? 'opacity-80' : ''}">${l.title}</h3>
         </div>
       </div>
-
-      <!-- Tags -->
       <div class="flex flex-wrap gap-1 mb-4">
         ${l.tags.map(t => `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${locked ? 'bg-orange-100/60 text-orange-700' : l.available ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-500'}">${t}</span>`).join('')}
       </div>
-
-      <!-- Button -->
       ${locked
-        ? `<button class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
-            🔓 Desbloquear com Pro
-           </button>`
+        ? `<button class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">🔓 Desbloquear com Pro</button>`
         : l.available
-        ? `<button class="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
-            Start Lesson →
-           </button>`
-        : `<button disabled class="w-full bg-slate-200 text-slate-400 font-black text-sm py-2.5 rounded-xl cursor-not-allowed">
-            Coming Soon
-           </button>`
+        ? `<button class="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-black text-sm py-2.5 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">Start Lesson →</button>`
+        : `<button disabled class="w-full bg-slate-200 text-slate-400 font-black text-sm py-2.5 rounded-xl cursor-not-allowed">Coming Soon</button>`
       }
     </div>
     ${l.available && !locked ? '<div class="h-1 shine bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400"></div>' : ''}
   `;
 
-  // Completion indicator
   try {
     const state = Store.state || Store.get?.();
-    if (state && state.completedLessons && state.completedLessons.includes(l.n)) {
+    if (state?.completedLessons?.includes(l.n)) {
       const check = document.createElement('div');
       check.className = 'absolute top-3 left-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-emerald-300/50 z-10';
       check.textContent = '✓';
@@ -257,7 +612,16 @@ LESSONS.forEach((l, i) => {
   grid.appendChild(card);
 });
 
-// ── Paywall modal ───────────────────────────────────────────────────────────
+// ── Progress bar update ───────────────────────────────────────────────────
+try {
+  const state = Store.state || Store.get?.();
+  const done = state?.completedLessons?.length || 0;
+  const pct = Math.round((done / 44) * 100);
+  document.getElementById('starter-progress-bar').style.width = pct + '%';
+  document.getElementById('starter-progress-text').textContent = `${done} de 44 aulas`;
+} catch(e) {}
+
+// ── Paywall modal ─────────────────────────────────────────────────────────
 function showPaywall(lesson) {
   let modal = document.getElementById('paywall-modal');
   if (!modal) {
@@ -296,15 +660,7 @@ function showPaywall(lesson) {
   }
 }
 
-// Re-render grid when plan changes (e.g. after returning from Kiwify checkout with ?refresh=1)
-document.addEventListener('planChanged', () => {
-  grid.innerHTML = '';
-  LESSONS.forEach((l, i) => {
-    // Trigger re-render by re-running the loop logic
-    // (simpler approach: location.reload())
-  });
-  location.reload();
-});
+document.addEventListener('planChanged', () => location.reload());
 </script>
 </body>
 </html>

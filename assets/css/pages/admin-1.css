@@ -1,0 +1,17 @@
+*{font-family:'Plus Jakarta Sans',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+body{background:radial-gradient(circle at 10% 0%,#0a2c52 0%,#001a33 45%,#000e1c 100%)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease both}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(6px)}
+.tab-btn.active{background:linear-gradient(135deg,#FF9F1C,#FF3E81);color:#001f3f}
+::-webkit-scrollbar{height:6px;width:6px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
+.progress-bar{transition:width .5s ease}
+.race-head{background:linear-gradient(125deg,rgba(255,62,129,.2),rgba(255,159,28,.12) 48%,rgba(46,196,182,.14));border:1px solid rgba(255,255,255,.12)}
+.race-kicker,.race-label{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.race-number{font-family:'JetBrains Mono',monospace;font-size:clamp(1.6rem,4vw,2.25rem);font-weight:900;margin-top:.2rem}
+.race-track{position:relative;height:4px;margin-top:2rem;border-radius:999px;background:linear-gradient(90deg,#FF3E81,#FF9F1C,#2EC4B6)}
+.race-track:after{content:'';position:absolute;inset:-5px 0;border-top:1px dashed rgba(255,255,255,.15);border-bottom:1px dashed rgba(255,255,255,.15)}
+#camp-runner{position:absolute;top:50%;translate:-50% -50%;font-size:25px;z-index:2;transition:left .7s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 5px 8px rgba(0,0,0,.5))}
+@media(prefers-reduced-motion:reduce){.fade-up{animation:none}.progress-bar,#camp-runner{transition:none}}

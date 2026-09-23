@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="pt-BR"><head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Yara's Forest — Games</title>
+<title>Jogos — Capy English</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Lexend:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
@@ -70,7 +70,35 @@
             border-color: #ec4899;
             color: #f9a8d4;
         }
+        .mission-card {
+            background: radial-gradient(circle at 90% 15%, rgba(236,72,153,.2), transparent 15rem),
+                        linear-gradient(135deg, rgba(16,185,129,.2), rgba(255,255,255,.06));
+            box-shadow: 0 24px 70px rgba(0,0,0,.22);
+        }
+        .game-search:focus { outline: 3px solid rgba(56,189,248,.65); outline-offset: 3px; }
+        #games-grid > button:focus-visible { outline: 3px solid #38bdf8; outline-offset: 3px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+        }
     </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/5_Game_Pavilion_Forest_Edition.html"/>
+<meta property="og:title" content="Jogos — Capy English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Jogos — Capy English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-navy font-body text-slate-100 selection:bg-pink-brand selection:text-white">
 <!-- Component Placeholders -->
@@ -94,8 +122,8 @@
 <div id="stat-level-badge" class="absolute -bottom-2 -right-2 bg-green-brand text-white px-3 py-0.5 rounded-full font-label font-bold text-xs shadow-md">Level 12</div>
 </div>
 <div class="flex-1 min-w-0">
-<h1 class="font-headline text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">Game Pavilion: <span class="text-pink-brand">Forest Edition</span></h1>
-<p class="font-body text-sm text-slate-400 mt-1">Complete missions to earn rare badges!</p>
+<h1 class="font-headline text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">Pavilhão de Jogos: <span class="text-pink-brand">Forest Edition</span></h1>
+<p class="font-body text-sm text-slate-400 mt-1">Complete missões e ganhe medalhas raras!</p>
 <div class="mt-3 flex flex-wrap gap-2">
 <a href="#trophies" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-1.5 rounded-full font-label font-bold text-xs hover:scale-105 transition-all">
 <span class="material-symbols-outlined text-green-brand text-sm" style="font-variation-settings:'FILL' 1;">military_tech</span>Badge Vault
@@ -104,20 +132,44 @@
 </div>
 </div>
 </header>
+<!-- Daily Forest Mission -->
+<section class="max-w-7xl mx-auto mb-7 relative z-10" aria-labelledby="daily-mission-title">
+<div class="mission-card rounded-[2rem] p-5 md:p-7 overflow-hidden relative">
+<div class="flex flex-col md:flex-row md:items-center gap-5">
+<div class="w-20 h-20 rounded-[1.5rem] bg-emerald-400/15 flex items-center justify-center text-5xl flex-shrink-0" aria-hidden="true">🧭</div>
+<div class="flex-1 min-w-0">
+<p class="font-label text-[10px] font-black uppercase tracking-[.2em] text-emerald-300">Missão da floresta · muda todo dia</p>
+<h2 id="daily-mission-title" class="font-headline text-xl md:text-3xl font-black text-white mt-1">A Yara escolheu um desafio para você</h2>
+<p id="daily-mission-copy" class="text-slate-300 text-sm mt-2">Uma prática curta para manter sua sequência ativa.</p>
+</div>
+<div class="flex flex-wrap gap-2 md:justify-end">
+<button id="daily-mission-btn" class="bg-pink-brand hover:bg-pink-brand-dim text-white rounded-full px-6 py-3 font-label font-black text-sm active:scale-95 transition-all">Jogar missão</button>
+<button id="surprise-game-btn" class="bg-white/10 hover:bg-white/20 text-white rounded-full px-5 py-3 font-label font-black text-sm active:scale-95 transition-all">🎲 Surpresa</button>
+</div>
+</div>
+</div>
+</section>
 <!-- Games Grid -->
 <section class="max-w-7xl mx-auto relative z-10">
 <div class="flex items-center justify-between mb-3">
-<h2 class="font-headline text-base font-extrabold text-white">Choose a Game</h2>
-<span class="text-slate-500 text-xs font-label">18 games</span>
+<h2 class="font-headline text-base font-extrabold text-white">Escolha um jogo</h2>
+<span id="visible-game-count" class="text-slate-500 text-xs font-label">25 jogos</span>
 </div>
 <div class="flex gap-2 flex-wrap mb-4" id="filter-bar">
-<button class="filter-btn active" data-filter="all">All</button>
-<button class="filter-btn" data-filter="vocab">📝 Words</button>
-<button class="filter-btn" data-filter="math">🔢 Math</button>
-<button class="filter-btn" data-filter="grammar">🔬 Grammar</button>
+<button class="filter-btn active" data-filter="all">Todos</button>
+<button class="filter-btn" data-filter="vocab">📝 Palavras</button>
+<button class="filter-btn" data-filter="math">🔢 Matemática</button>
+<button class="filter-btn" data-filter="grammar">🔬 Gramática</button>
 <button class="filter-btn" data-filter="arcade">🕹️ Arcade</button>
-<button class="filter-btn" data-filter="ai">🤖 AI</button>
+<button class="filter-btn" data-filter="ai">🤖 IA</button>
 </div>
+<label class="block mb-4 max-w-xl">
+<span class="sr-only">Buscar jogo</span>
+<span class="relative block">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true">search</span>
+<input id="game-search" class="game-search w-full rounded-full bg-white/10 text-white placeholder:text-slate-500 pl-12 pr-5 py-3 border-0 font-label text-sm" type="search" placeholder="Buscar por nome: verbos, listening, palavras..." autocomplete="off">
+</span>
+</label>
 <div id="games-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
 <button onclick="window.location.href='word_match_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
 <div class="w-full aspect-square rounded-xl bg-gradient-to-br from-blue-900 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform duration-200 select-none">🔤</span></div>
@@ -214,12 +266,36 @@
 <span class="font-label font-bold text-white text-[11px] text-center leading-tight w-full px-0.5">Tic Tac Toe</span>
 <span class="text-[9px] font-bold text-slate-300 bg-slate-500/15 px-2 py-0.5 rounded-full leading-none">Arcade</span>
 </button>
+<button onclick="window.location.href='listening_sprint_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-sky-700 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">🎧</span><span class="absolute top-1 right-1 bg-sky-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Listening Sprint</span><span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full">Words</span>
+</button>
+<button onclick="window.location.href='phrase_path_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-fuchsia-800 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">🧩</span><span class="absolute top-1 right-1 bg-fuchsia-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Phrase Path</span><span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full">Grammar</span>
+</button>
+<button onclick="window.location.href='rapid_translate_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="vocab">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-orange-700 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">⚡</span><span class="absolute top-1 right-1 bg-orange-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Rapid Translate</span><span class="text-[9px] font-bold text-green-400 bg-green-400/15 px-2 py-0.5 rounded-full">Words</span>
+</button>
+<button onclick="window.location.href='dialogue_quest_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-emerald-700 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">💬</span><span class="absolute top-1 right-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Dialogue Quest</span><span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full">Grammar</span>
+</button>
+<button onclick="window.location.href='verb_voyage_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-sky-700 via-violet-800 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">⛵</span><span class="absolute top-1 right-1 bg-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Verb Voyage</span><span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full">Grammar</span>
+</button>
+<button onclick="window.location.href='preposition_picnic_game.html'" class="group flex flex-col items-center gap-1.5 p-2.5 rounded-2xl bg-white/5 border border-white/[0.08] hover:bg-white/10 hover:scale-[1.06] hover:border-white/20 transition-all cursor-pointer w-full" data-category="grammar">
+<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-emerald-600 via-teal-800 to-[#001f3f] flex items-center justify-center overflow-hidden relative"><span class="text-3xl group-hover:scale-110 transition-transform">🧺</span><span class="absolute top-1 right-1 bg-pink-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">NEW</span></div><span class="font-label font-bold text-white text-[11px] text-center leading-tight">Preposition Picnic</span><span class="text-[9px] font-bold text-purple-300 bg-purple-500/15 px-2 py-0.5 rounded-full">Grammar</span>
+</button>
+</div>
+<div id="games-empty" class="hidden mt-5 rounded-[2rem] bg-white/5 px-6 py-10 text-center">
+<div class="text-5xl" aria-hidden="true">🔎</div>
+<h3 class="font-headline text-xl font-black text-white mt-3">Nenhum jogo encontrado</h3>
+<p class="text-slate-400 text-sm mt-2">Tente outro nome ou volte a mostrar todas as missões.</p>
+<button id="clear-game-search" class="mt-5 rounded-full bg-pink-brand hover:bg-pink-brand-dim px-6 py-3 text-white font-label font-black text-sm active:scale-95 transition-all">Limpar busca</button>
 </div>
 </section>
 <!-- Trophy Room Section -->
 <section class="max-w-7xl mx-auto pt-14 pb-10 relative z-10" id="trophies">
 <div class="mb-8 flex items-center gap-4">
-<h2 class="font-headline text-2xl md:text-3xl font-black text-pink-brand">Badge Vault</h2>
+<h2 class="font-headline text-2xl md:text-3xl font-black text-pink-brand">Minhas medalhas</h2>
 <div class="h-px flex-1 bg-white/10 rounded-full"></div>
 </div>
 <div id="badge-vault" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4"></div>
@@ -232,10 +308,12 @@
 <span class="material-symbols-outlined text-3xl" data-icon="expand_less">expand_less</span>
 </button>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+    <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="components.js?v=push2"></script>
 <script>
     Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
     Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
@@ -285,8 +363,6 @@
         }).join('');
     }
 
-    Store.completeActivity('games');
-
     // Auto-unlock Legend when all other badges are earned
     function checkLegend() {
         const others = BADGE_CATALOG.filter(b => b.id !== 'legend').map(b => b.id);
@@ -297,16 +373,50 @@
     checkLegend();
     document.addEventListener('stateChanged', () => { updateUI(); checkLegend(); });
 
+    // Daily recommendation, surprise game and catalog search
+    const gameTiles = [...document.querySelectorAll('#games-grid > button')];
+    const dailyIndex = Math.floor(Date.now() / 86400000) % gameTiles.length;
+    const dailyTile = gameTiles[dailyIndex];
+    const dailyTitle = dailyTile.querySelector('.font-label.font-bold')?.textContent.trim() || 'Jogo da Yara';
+    document.getElementById('daily-mission-title').textContent = `Missão de hoje: ${dailyTitle}`;
+    document.getElementById('daily-mission-copy').textContent = 'Complete uma partida, ganhe XP e mantenha sua sequência ativa.';
+    document.getElementById('daily-mission-btn').addEventListener('click', () => dailyTile.click());
+    document.getElementById('surprise-game-btn').addEventListener('click', () => {
+        const visible = gameTiles.filter(tile => tile.style.display !== 'none');
+        (visible[Math.floor(Math.random() * visible.length)] || gameTiles[0]).click();
+    });
+
+    let selectedCategory = 'all';
+    function applyGameFilters() {
+        const query = document.getElementById('game-search').value.toLocaleLowerCase('pt-BR').trim();
+        let visible = 0;
+        gameTiles.forEach(tile => {
+            const matchesCategory = selectedCategory === 'all' || tile.dataset.category === selectedCategory;
+            const matchesQuery = !query || tile.textContent.toLocaleLowerCase('pt-BR').includes(query);
+            const show = matchesCategory && matchesQuery;
+            tile.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        document.getElementById('visible-game-count').textContent = `${visible} ${visible === 1 ? 'jogo' : 'jogos'}`;
+        document.getElementById('games-empty').classList.toggle('hidden', visible !== 0);
+    }
+
     // Category filter
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const f = btn.dataset.filter;
-            document.querySelectorAll('#games-grid > button').forEach(tile => {
-                tile.style.display = (f === 'all' || tile.dataset.category === f) ? '' : 'none';
-            });
+            selectedCategory = btn.dataset.filter;
+            applyGameFilters();
         });
+    });
+    document.getElementById('game-search').addEventListener('input', applyGameFilters);
+    document.getElementById('clear-game-search').addEventListener('click', () => {
+        document.getElementById('game-search').value = '';
+        selectedCategory = 'all';
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === 'all'));
+        applyGameFilters();
+        document.getElementById('game-search').focus();
     });
 </script>
 </body></html>

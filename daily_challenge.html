@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AI Daily Challenge — Capy Yara Adventures</title>
+<title>AI Daily Challenge — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -86,28 +86,46 @@ tailwind.config = {
     animation: confettiFall 1.2s ease-out forwards;
   }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/daily_challenge.html"/>
+<meta property="og:title" content="AI Daily Challenge — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="AI Daily Challenge — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-navy font-body text-white min-h-screen flex flex-col">
 
 <!-- Header -->
-<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50 flex-shrink-0">
+<header class="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50 flex-shrink-0">
   <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
+          class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
     <span class="material-symbols-outlined text-xl">arrow_back</span>
   </button>
-  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-rose-400/50 flex-shrink-0 shadow-md">
-    <img src="Hello%20Yara%20profile%20pic%20002.png" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
+  <div class="hidden sm:block w-10 h-10 rounded-full overflow-hidden border-2 border-rose-400/50 flex-shrink-0 shadow-md">
+    <img src="yara-avatar.png?v=3" alt="Yara" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='yara.svg'"/>
   </div>
-  <div class="flex-1">
-    <p class="font-label text-xs text-rose-400 uppercase tracking-widest font-bold">AI Daily Challenge</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Today's Challenge ⚡</h1>
+  <div class="flex-1 min-w-0">
+    <p class="font-label text-[9px] sm:text-xs text-rose-400 uppercase tracking-widest font-bold truncate">AI Daily Challenge</p>
+    <h1 class="font-headline font-bold text-white text-sm sm:text-lg leading-none truncate">Today's Challenge ⚡</h1>
   </div>
-  <div class="flex items-center gap-2">
-    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm flex items-center gap-1.5">
+  <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+    <div class="bg-white/10 border border-white/15 rounded-full px-2.5 sm:px-4 py-2 font-label font-bold text-xs sm:text-sm flex items-center gap-1">
       <span class="material-symbols-outlined text-rose-400 text-base" style="font-variation-settings:'FILL' 1;">local_fire_department</span>
-      <span id="streak-disp">0</span> day streak
+      <span id="streak-disp">0</span><span class="hidden md:inline"> day streak</span>
     </div>
-    <div class="bg-rose-500/20 border border-rose-500/40 rounded-full px-4 py-2 font-label font-bold text-sm text-rose-300">
+    <div class="bg-rose-500/20 border border-rose-500/40 rounded-full px-2.5 sm:px-4 py-2 font-label font-bold text-xs sm:text-sm text-rose-300 whitespace-nowrap">
       +<span id="xp-disp">0</span> XP
     </div>
   </div>
@@ -285,12 +303,14 @@ tailwind.config = {
 
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+    <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
 // ── State ──────────────────────────────────────────────────────────────────────
-const TODAY     = new Date().toISOString().slice(0, 10);
+const TODAY     = capyHojeBR();
 let challenge   = null;
 let hintVisible = false;
 let xpEarned    = 0;
@@ -553,5 +573,7 @@ window.submitAnswer = async function() {
   document.getElementById('submit-label').textContent = 'Submit Answer';
 };
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

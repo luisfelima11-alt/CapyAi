@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Sentence Builder — Capy Yara Adventures</title>
+<title>Sentence Builder — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -72,6 +72,24 @@ tailwind.config = {
   @keyframes spark { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
   .spark { position:fixed; width:8px; height:8px; border-radius:50%; animation:spark 0.8s ease forwards; pointer-events:none; z-index:9999; }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/sentence_builder_game.html"/>
+<meta property="og:title" content="Sentence Builder — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Sentence Builder — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-primary font-body text-white min-h-screen flex flex-col">
 
@@ -83,7 +101,7 @@ tailwind.config = {
   </button>
   <div>
     <p class="font-label text-xs text-purple-400 uppercase tracking-widest font-bold">Sentence Builder</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Put the words in order! 📝</h1>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Coloque as palavras em ordem! 📝</h1>
   </div>
   <!-- Score + lives -->
   <div class="ml-auto flex items-center gap-4">
@@ -108,15 +126,15 @@ tailwind.config = {
 
   <!-- Round / image hint -->
   <div class="text-center slide-up" id="top-area">
-    <p class="font-label text-purple-400 text-sm font-bold uppercase tracking-widest mb-2" id="round-label">Round 1 of 8</p>
+    <p class="font-label text-purple-400 text-sm font-bold uppercase tracking-widest mb-2" id="round-label">Rodada 1 de 8</p>
     <div class="text-6xl mb-4" id="sentence-emoji">🌳</div>
-    <p class="font-body text-slate-400 text-sm" id="sentence-hint">Arrange the words to make a sentence!</p>
+    <p class="font-body text-slate-400 text-sm" id="sentence-hint">Organize as palavras para formar uma frase!</p>
   </div>
 
   <!-- Answer slots -->
   <div id="answer-row" class="flex flex-wrap gap-3 justify-center min-h-[56px] items-center
        bg-white/5 border border-white/10 rounded-2xl px-6 py-4 w-full max-w-2xl slide-up">
-    <p class="text-white/30 font-label text-sm" id="slots-placeholder">Tap words below to build the sentence…</p>
+    <p class="text-white/30 font-label text-sm" id="slots-placeholder">Toque nas palavras abaixo para montar a frase…</p>
   </div>
 
   <!-- Feedback -->
@@ -128,16 +146,18 @@ tailwind.config = {
   <!-- Controls -->
   <div class="flex gap-4 mt-2">
     <button onclick="clearAnswer()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold px-6 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
-      <span class="material-symbols-outlined text-sm">backspace</span> Clear
+      <span class="material-symbols-outlined text-sm">backspace</span> Limpar
     </button>
     <button onclick="checkAnswer()" id="check-btn"
             class="flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-purple-500/30">
-      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span> Check!
+      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span> Verificar!
     </button>
   </div>
 </main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
@@ -168,7 +188,7 @@ function renderRound() {
     bankTiles = [];
 
     const s = SENTENCES[currentRound];
-    document.getElementById('round-label').textContent  = `Round ${currentRound + 1} of ${SENTENCES.length}`;
+    document.getElementById('round-label').textContent  = `Rodada ${currentRound + 1} de ${SENTENCES.length}`;
     document.getElementById('sentence-emoji').textContent = s.emoji;
     document.getElementById('sentence-hint').textContent  = s.hint;
 
@@ -181,7 +201,7 @@ function renderRound() {
 
     // Clear answer row & show placeholder
     const row = document.getElementById('answer-row');
-    row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Tap words below to build the sentence…</p>';
+    row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Toque nas palavras abaixo para montar a frase…</p>';
 
     // Shuffle words for bank
     const shuffled = [...s.words].sort(() => Math.random() - 0.5);
@@ -237,7 +257,7 @@ function removeSlot(slot, origBtn) {
     // Re-add placeholder if empty
     if (answerSlots.length === 0) {
         const row = document.getElementById('answer-row');
-        row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Tap words below to build the sentence…</p>';
+        row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Toque nas palavras abaixo para montar a frase…</p>';
     }
 }
 
@@ -247,7 +267,7 @@ function clearAnswer() {
     answerSlots = [];
     bankTiles.forEach(b => b.classList.remove('used'));
     const row = document.getElementById('answer-row');
-    row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Tap words below to build the sentence…</p>';
+    row.innerHTML = '<p class="text-white/30 font-label text-sm" id="slots-placeholder">Toque nas palavras abaixo para montar a frase…</p>';
 }
 
 // ── Check answer ──────────────────────────────────────────────────────────────
@@ -269,7 +289,7 @@ function checkAnswer() {
         const pts = 15;
         score += pts;
         document.getElementById('score-display').textContent = score;
-        fb.textContent = `✅ Perfect! "${correct}" 🎉`;
+        fb.textContent = `✅ Perfeito! "${correct}" 🎉`;
         fb.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
         launchSparks();
         // Highlight slots green
@@ -278,7 +298,7 @@ function checkAnswer() {
     } else {
         lives--;
         updateHearts();
-        fb.textContent = `❌ Try again! The sentence is: "${correct}"`;
+        fb.textContent = `❌ Tente de novo! A frase é: "${correct}"`;
         fb.classList.add('bg-red-500/20', 'text-red-300', 'border-red-500/40');
         document.getElementById('answer-row').classList.add('wrong-shake');
         setTimeout(() => document.getElementById('answer-row').classList.remove('wrong-shake'), 450);
@@ -351,17 +371,17 @@ function showResults() {
           </span>
         </div>
         <div>
-          <p class="font-label text-purple-400 font-bold text-sm uppercase tracking-widest mb-1">Game Over!</p>
+          <p class="font-label text-purple-400 font-bold text-sm uppercase tracking-widest mb-1">Fim de Jogo!</p>
           <h2 class="font-headline text-5xl font-black text-white mb-1">+${xpEarned} XP</h2>
-          <p class="font-body text-slate-300">Score: ${score} / ${total * 15} points</p>
+          <p class="font-body text-slate-300">Pontuação: ${score} / ${total * 15} pontos</p>
         </div>
         <div class="flex gap-1">
           ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}" style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
         </div>
-        ${score>=90?`<div class="bg-purple-500/20 border border-purple-500/40 rounded-xl px-4 py-2 text-purple-300 font-label font-bold text-sm">🏅 Grammar Star badge unlocked!</div>`:''}
+        ${score>=90?`<div class="bg-purple-500/20 border border-purple-500/40 rounded-xl px-4 py-2 text-purple-300 font-label font-bold text-sm">🏅 Medalha Estrela da Gramática desbloqueada!</div>`:''}
         <div class="flex gap-3 flex-wrap justify-center">
-          <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again</button>
-          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-purple-500 hover:bg-purple-600 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-purple-500/30">Back 🌿</button>
+          <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Jogar de novo</button>
+          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-purple-500 hover:bg-purple-600 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-purple-500/30">Voltar 🌿</button>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -380,5 +400,7 @@ function showGameOver() {
 // ── Boot ──────────────────────────────────────────────────────────────────────
 renderRound();
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

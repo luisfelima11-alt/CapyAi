@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
@@ -242,37 +242,57 @@
     opacity: 1;
   }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/flappy_yara_game.html"/>
+<meta property="og:title" content="Flappy Yara 🐾"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Flappy Yara 🐾"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body>
 
-<button id="back-btn" onclick="history.back()">← Back</button>
+<button id="back-btn" onclick="capyVoltar()">← Voltar</button>
 
 <div id="game-wrapper">
   <div id="score-bar">
-    <div class="pill">⭐ Score: <span class="score-val" id="disp-score">0</span></div>
-    <div class="pill">🏆 Best: <span class="best-val" id="disp-best">0</span></div>
+    <div class="pill">⭐ Pontos: <span class="score-val" id="disp-score">0</span></div>
+    <div class="pill">🏆 Recorde: <span class="best-val" id="disp-best">0</span></div>
   </div>
   <canvas id="c"></canvas>
-  <div id="hint-text">SPACE · TAP · CLICK to flap</div>
+  <div id="hint-text">ESPAÇO · TOQUE · CLIQUE para voar</div>
 </div>
 
-<div id="xp-toast">+20 XP — Great job! 🌟</div>
+<div id="xp-toast">+20 XP — Muito bem! 🌟</div>
 
 <!-- ── Quiz Overlay ── -->
 <div id="quiz-overlay">
   <div id="quiz-box">
-    <div id="quiz-yara"><img src="yara.png?v=2" alt="Yara"/></div>
-    <div id="quiz-badge">ENGLISH CHALLENGE</div>
+    <div id="quiz-yara"><img src="yara.png?v=3" alt="Yara"/></div>
+    <div id="quiz-badge">DESAFIO DE INGLÊS</div>
     <div id="quiz-streak-bar"></div>
-    <div id="quiz-prompt">What does this word mean in Portuguese?</div>
+    <div id="quiz-prompt">O que esta palavra significa em português?</div>
     <div id="quiz-word">HELLO</div>
     <div id="quiz-choices"></div>
     <div id="quiz-feedback"></div>
-    <button id="quiz-continue" onclick="quizContinue()">▶ Play Again</button>
+    <button id="quiz-continue" onclick="quizContinue()">▶ Jogar de novo</button>
   </div>
 </div>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script>
 // ─────────────────────────────────────────────
 //  roundRect POLYFILL (older Chrome/Safari/Firefox)
@@ -364,7 +384,7 @@ yaraImg.onerror = () => {
   // Try fallback image
   const fb = new Image();
   fb.onload = () => { yaraImg.src = fb.src; imgLoaded = true; };
-  fb.src = 'Hello%20Yara%20profile%20pic%20002.png';
+  fb.src = 'yara-avatar.png?v=3';
 };
 yaraImg.src = 'yara.png';
 
@@ -798,7 +818,7 @@ function drawDeadScreen() {
   roundRectFill(ctx, W() * 0.2, H() * 0.59, W() * 0.6, H() * 0.1, 12);
   ctx.font      = `800 ${Math.max(13, W() * 0.042)}px 'Plus Jakarta Sans', sans-serif`;
   ctx.fillStyle = '#fff';
-  ctx.fillText('▶  Play Again', W() / 2, H() * 0.655);
+  ctx.fillText('▶  Jogar de novo', W() / 2, H() * 0.655);
 
   ctx.restore();
 }
@@ -840,6 +860,7 @@ function loop() {
       localStorage.setItem('flappyYaraBest', bestScore);
       updateScoreUI();
     }
+    try { if (typeof Store !== 'undefined') Store.completeActivity('games'); } catch(e) {}
     state = 'dead';
     drawFrame();       // draw final frame
     showQuiz();        // show English quiz before dead screen
@@ -1154,7 +1175,7 @@ resetGame();
     if (bestScore > 0) {
       ctx.font = `700 ${Math.max(10, W() * 0.032)}px 'Lexend', sans-serif`;
       ctx.fillStyle = '#34d399';
-      ctx.fillText(`🏆 Best: ${bestScore}`, W() / 2, H() * 0.94);
+      ctx.fillText(`🏆 Recorde: ${bestScore}`, W() / 2, H() * 0.94);
     }
 
     ctx.restore();
@@ -1162,6 +1183,28 @@ resetGame();
     requestAnimationFrame(startLoop);
   }
 })();
+</script>
+
+<script>
+// Volta para a página anterior sem depender do estado do history.
+// Ver o porquê no commit: history.length pode vir 0, e a guarda de login
+// reempurra a pessoa pra frente quando o back cai numa página protegida.
+function capyVoltar() {
+  var casa = '5_Game_Pavilion_Forest_Edition.html';
+  var inicio = location.href;
+  var destino = casa;
+  try {
+    var ref = document.referrer;
+    if (ref && new URL(ref).origin === location.origin && ref !== inicio) destino = ref;
+  } catch (e) {}
+  if (history.length > 1) {
+    history.back();
+    // rede de segurança: se o back não saiu do lugar, navega de fato
+    setTimeout(function () { if (location.href === inicio) location.href = destino; }, 400);
+  } else {
+    location.href = destino;
+  }
+}
 </script>
 </body>
 </html>

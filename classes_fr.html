@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Cours de Français — Capy Yara Adventures</title>
+<title>Cours de Français — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -22,6 +22,24 @@
 .available-card:hover{box-shadow:0 20px 40px -8px rgba(29,78,216,.2)}
 .shine{background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);background-size:200% 100%;animation:shine 2.5s infinite}
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/classes_fr.html"/>
+<meta property="og:title" content="Cours de Français — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Cours de Français — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 min-h-screen">
 
@@ -49,11 +67,14 @@
       <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
         🇫🇷 Français<br><span class="text-blue-300">avec Yara</span>
       </h1>
-      <p class="text-white/70 text-lg mb-6 max-w-lg">7 interactive lessons from absolute zero — greetings, numbers, colors, family, verbs, food, and dates. All in English → French.</p>
+      <p class="text-white/70 text-lg mb-6 max-w-lg">12 lições interativas do zero absoluto — saudações, números, cores, família, verbos, comida, horas, direções e o passé composé. Com a Yara do seu lado.</p>
+      <a href="learn_fr.html" class="inline-flex items-center gap-2 bg-white text-blue-700 font-black px-5 py-3 rounded-2xl mb-6 hover:scale-105 active:scale-95 transition-all shadow-lg">
+        🗓️ Prática Diária de Francês →
+      </a>
       <div class="bg-white/10 rounded-full h-3 w-full max-w-sm mb-2 overflow-hidden">
         <div id="progress-bar" class="h-full rounded-full bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 transition-all" style="width:0%"></div>
       </div>
-      <p id="progress-label" class="text-white/50 text-sm">0 of 7 lessons completed</p>
+      <p id="progress-label" class="text-white/50 text-sm">0 of 12 lessons completed</p>
     </div>
   </div>
 
@@ -61,7 +82,7 @@
   <div class="max-w-7xl mx-auto px-4 md:px-6 py-10">
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-black text-navy">All 7 Lessons</h2>
+        <h2 class="text-2xl font-black text-navy">All 12 Lessons</h2>
         <p class="text-slate-500 text-sm mt-0.5">Débutant · English → French · Click to start</p>
       </div>
       <div class="flex items-center gap-2 text-sm">
@@ -73,6 +94,19 @@
         </span>
       </div>
     </div>
+
+    <!-- IA do curso: abre a Capivara IA ja na persona deste curso. O id da
+         persona tem que existir no PERSONAS de api/index.js — um teste confere. -->
+    <a href="ai_chat.html?persona=francais" class="block bg-white border-2 border-pink-200 rounded-3xl p-5 mb-8 hover:border-pink-400 hover:scale-[1.01] active:scale-[.99] transition-all shadow-sm">
+      <div class="flex items-center gap-4">
+        <span class="text-4xl" aria-hidden="true">🥖</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-black text-lg text-navy">Capivara francesa</p>
+          <p class="text-slate-500 text-sm">Converse em francês, escrevendo ou por voz. Travou? Ela explica em português e te devolve a frase.</p>
+        </div>
+        <span class="bg-pink-500 text-white font-black px-5 py-2.5 rounded-full text-sm flex-shrink-0">Conversar →</span>
+      </div>
+    </a>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10" id="lessons-grid"></div>
 
@@ -111,13 +145,36 @@
       </div>
     </div>
   </div>
+
+<!-- SEO:indice-aulas -->
+<nav aria-label="Todas as aulas do curso Français" class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
+  <details class="bg-white/60 border border-slate-200 rounded-2xl p-5">
+    <summary class="font-black text-navy cursor-pointer text-sm">📚 Todas as aulas do curso Français (12)</summary>
+    <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1.5 text-xs">
+      <li><a href="fr_aula_01.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Salutations — Greetings & Introductions</a></li>
+      <li><a href="fr_aula_02.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Chiffres — Numbers 1–20</a></li>
+      <li><a href="fr_aula_03.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Couleurs — Colors & Adjectives</a></li>
+      <li><a href="fr_aula_04.html" class="text-slate-500 hover:text-navy underline decoration-dotted">La Famille — Family & Possessives</a></li>
+      <li><a href="fr_aula_05.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Être & Avoir — To Be & To Have</a></li>
+      <li><a href="fr_aula_06.html" class="text-slate-500 hover:text-navy underline decoration-dotted">La Nourriture — Food & Partitive Articles</a></li>
+      <li><a href="fr_aula_07.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Jours et les Mois — Days, Months & Dates</a></li>
+      <li><a href="fr_aula_08.html" class="text-slate-500 hover:text-navy underline decoration-dotted">L'Heure — Telling the Time</a></li>
+      <li><a href="fr_aula_09.html" class="text-slate-500 hover:text-navy underline decoration-dotted">La Météo — Weather & Seasons</a></li>
+      <li><a href="fr_aula_10.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Directions — Directions & the City</a></li>
+      <li><a href="fr_aula_11.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Les Vêtements — Clothes & Shopping</a></li>
+      <li><a href="fr_aula_12.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Le Passé Composé — Talking About the Past</a></li>
+    </ul>
+  </details>
+</nav>
 </main>
 
 <div id="mobile-nav-placeholder"></div>
 <div id="footer-placeholder"></div>
 
-<script src="store.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="components.js?v=push2"></script>
 <script src="tts-fr.js?v=c52d7db"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -133,6 +190,11 @@ const LESSONS = [
   {n:5, emoji:'✨', title:'Être & Avoir',        subtitle:'To Be & To Have',           href:'fr_aula_05.html'},
   {n:6, emoji:'🥐', title:'La Nourriture',      subtitle:'Food & Partitive Articles', href:'fr_aula_06.html'},
   {n:7, emoji:'📅', title:'Les Jours et les Mois', subtitle:'Days, Months & Dates',  href:'fr_aula_07.html'},
+  {n:8, emoji:'⏰', title:'L\'Heure',            subtitle:'Telling the Time',          href:'fr_aula_08.html'},
+  {n:9, emoji:'🌦️', title:'La Météo',           subtitle:'Weather & Seasons',         href:'fr_aula_09.html'},
+  {n:10,emoji:'🧭', title:'Les Directions',     subtitle:'Directions & the City',     href:'fr_aula_10.html'},
+  {n:11,emoji:'🛍️', title:'Les Vêtements',      subtitle:'Clothes & Shopping',        href:'fr_aula_11.html'},
+  {n:12,emoji:'⏪', title:'Le Passé Composé',    subtitle:'Talking About the Past',    href:'fr_aula_12.html'},
 ];
 
 // Track completed French lessons separately

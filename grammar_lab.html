@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Grammar Lab — Capy Yara Adventures</title>
+<title>Grammar Lab — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
@@ -55,6 +55,24 @@ tailwind.config={darkMode:"class",theme:{extend:{
   .tabs-scroll{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
   .tabs-scroll::-webkit-scrollbar{display:none;}
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/grammar_lab.html"/>
+<meta property="og:title" content="Grammar Lab — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Grammar Lab — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-navy font-body text-white min-h-screen flex flex-col">
 
@@ -66,7 +84,7 @@ tailwind.config={darkMode:"class",theme:{extend:{
   </button>
   <div class="flex-1">
     <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold">Grammar Lab</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Learn Grammar! 📝</h1>
+    <h1 class="font-headline font-bold text-white text-lg leading-none">Aprenda Gramática! 📝</h1>
   </div>
   <div class="bg-yellow-500/20 border border-yellow-500/40 rounded-full px-4 py-2 font-label font-bold text-sm text-yellow-300">
     <span id="xp-disp">0</span> XP
@@ -80,7 +98,9 @@ tailwind.config={darkMode:"class",theme:{extend:{
 
 <main class="flex-1 flex flex-col gap-6 px-4 py-6 max-w-2xl mx-auto w-full" id="lesson-area"></main>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+    <script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
@@ -225,7 +245,7 @@ function showLesson(idx) {
     <div class="flex items-center gap-4 fade-up">
       <div class="text-5xl">${l.icon}</div>
       <div>
-        <p class="font-label text-xs ${l.accent} uppercase tracking-widest font-bold">Grammar Lesson</p>
+        <p class="font-label text-xs ${l.accent} uppercase tracking-widest font-bold">Lição de Gramática</p>
         <h2 class="font-headline font-black text-white text-2xl">${l.title}</h2>
       </div>
     </div>
@@ -248,7 +268,7 @@ function showLesson(idx) {
     <button onclick="startQuiz()" class="w-full py-5 bg-gradient-to-r from-yellow-500 to-amber-500
             hover:from-yellow-400 hover:to-amber-400 text-navy font-headline font-bold text-xl
             rounded-full shadow-xl shadow-yellow-500/30 active:scale-95 transition-all fade-up" style="animation-delay:0.1s">
-      Practice Now! 🎯
+      Praticar Agora! 🎯
     </button>
   `;
 }
@@ -273,7 +293,7 @@ function showQuestion() {
 
     <!-- Question card -->
     <div class="bg-gradient-to-br from-yellow-950 to-navy-light border border-yellow-500/20 rounded-[2rem] p-8 pop-in">
-      <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold mb-3">Question ${quizIdx+1} of ${l.questions.length}</p>
+      <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold mb-3">Pergunta ${quizIdx+1} de ${l.questions.length}</p>
       <p class="font-headline font-bold text-white text-xl leading-snug mb-6">${q.q}</p>
       <div class="flex flex-col gap-3" id="q-opts">
         ${opts.map(opt => `<button class="q-opt" onclick="answerQ(this,'${opt.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}','${q.exp.replace(/'/g,"\\'")}')"> ${opt} </button>`).join('')}
@@ -287,7 +307,7 @@ function showQuestion() {
 
     <button id="next-btn" onclick="nextQuestion()" class="hidden w-full py-4 bg-yellow-500 hover:bg-yellow-400
             text-navy font-label font-bold rounded-2xl active:scale-95 transition-all shadow-lg shadow-yellow-500/30 fade-up">
-      ${quizIdx + 1 < l.questions.length ? 'Next Question →' : 'See Results 🎉'}
+      ${quizIdx + 1 < l.questions.length ? 'Próxima Pergunta →' : 'Ver Resultados 🎉'}
     </button>
   `;
 }
@@ -300,7 +320,7 @@ function answerQ(btn, chosen, correct, exp) {
   else { quizScore++; }
 
   document.getElementById('fb-emoji').textContent = ok ? '✅' : '💡';
-  document.getElementById('fb-text').textContent  = ok ? 'Correct! Well done! 🌟' : exp;
+  document.getElementById('fb-text').textContent  = ok ? 'Correto! Muito bem! 🌟' : exp;
   document.getElementById('q-feedback').classList.remove('hidden');
   document.getElementById('next-btn').classList.remove('hidden');
 }
@@ -334,24 +354,24 @@ function showResults() {
     <div class="bg-gradient-to-br from-yellow-950 to-navy-light border border-yellow-500/30 rounded-[3rem] p-10 flex flex-col items-center gap-5 text-center pop-in">
       <div class="text-7xl">${stars === 3 ? '🏆' : stars === 2 ? '🌟' : '📖'}</div>
       <div>
-        <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">Quiz Complete!</p>
+        <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">Quiz Completo!</p>
         <h2 class="font-headline text-5xl font-black text-white mb-1">${quizScore}/${total}</h2>
-        <p class="font-body text-slate-300">${stars === 3 ? 'Perfect score!' : stars === 2 ? 'Great effort!' : 'Keep practising!'}</p>
+        <p class="font-body text-slate-300">${stars === 3 ? 'Pontuação perfeita!' : stars === 2 ? 'Ótimo esforço!' : 'Continue praticando!'}</p>
       </div>
       <div class="flex gap-1">
         ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-slate-600'}" style="font-variation-settings:'FILL' ${i<=stars?1:0};">star</span>`).join('')}
       </div>
-      <p class="font-body text-slate-400 text-sm">+${xp} XP earned!</p>
+      <p class="font-body text-slate-400 text-sm">+${xp} XP conquistados!</p>
       <div class="flex gap-3 flex-wrap justify-center">
         <button onclick="switchLesson(${currentLesson})" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
-          Try Again 🔄
+          Tentar de Novo 🔄
         </button>
         ${currentLesson + 1 < LESSONS.length ? `
         <button onclick="switchLesson(${currentLesson+1})" class="bg-yellow-500 hover:bg-yellow-400 text-navy font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
-          Next Lesson →
+          Próxima Lição →
         </button>` : `
         <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="bg-yellow-500 hover:bg-yellow-400 text-navy font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
-          Home 🏠
+          Início 🏠
         </button>`}
       </div>
     </div>

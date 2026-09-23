@@ -517,4 +517,348 @@ const LESSONS = [
       { words: ['Tomorrow', 'is', 'a', 'sunny', 'day.'], emoji: '🗓️', hint: 'Predict tomorrow\'s weather!' },
     ],
   },
+
+  // ─── TIER 4: Elementary+ (XP 300+) ─────────────────────────────────────────
+
+  {
+    id: 16,
+    title: 'Clothes',
+    emoji: '👕',
+    xpRequired: 300,
+    xpReward: 45,
+    tier: 4,
+    vocab: [
+      { word: 'Shirt',  emoji: '👕', pronunciation: '/ʃɜːrt/',   hint: 'You wear this on your upper body' },
+      { word: 'Pants',  emoji: '👖', pronunciation: '/pænts/',   hint: 'You wear these on your legs' },
+      { word: 'Shoes',  emoji: '👟', pronunciation: '/ʃuːz/',    hint: 'You wear these on your feet' },
+      { word: 'Dress',  emoji: '👗', pronunciation: '/drɛs/',    hint: 'A one-piece garment worn by girls and women' },
+      { word: 'Jacket', emoji: '🧥', pronunciation: '/ˈdʒæk.ɪt/', hint: 'You wear this outside when it is cold' },
+    ],
+    grammar: {
+      title: 'Present Continuous: I\'m wearing...',
+      rule: 'Use <b>I\'m wearing ___</b> to say what clothes you have on right now.',
+      examples: [
+        'I\'m wearing a <b>red shirt</b>.',
+        'She\'s wearing a <b>blue dress</b>.',
+        'We\'re wearing <b>jackets</b> because it\'s cold.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I\'m wearing a ___ today.', answer: 'shirt', distractors: ['pants', 'shoes', 'happy'] },
+      { sentence: 'She\'s wearing a pretty ___.', answer: 'dress', distractors: ['jacket', 'shirt', 'run'] },
+      { sentence: 'Put on your ___, it\'s cold outside.', answer: 'jacket', distractors: ['shoes', 'dress', 'pen'] },
+    ],
+    sentences: [
+      { words: ['I\'m', 'wearing', 'a', 'blue', 'shirt.'], emoji: '👕', hint: 'What are you wearing?' },
+      { words: ['She', 'is', 'wearing', 'new', 'shoes.'], emoji: '👟', hint: 'Describe her shoes!' },
+    ],
+  },
+
+  {
+    id: 17,
+    title: 'Jobs & Work',
+    emoji: '👩‍⚕️',
+    xpRequired: 300,
+    xpReward: 45,
+    tier: 4,
+    vocab: [
+      { word: 'Teacher',  emoji: '👩‍🏫', pronunciation: '/ˈtiː.tʃər/', hint: 'A person who teaches at school' },
+      { word: 'Doctor',   emoji: '👩‍⚕️', pronunciation: '/ˈdɒk.tər/', hint: 'A person who helps sick people' },
+      { word: 'Driver',   emoji: '🚕', pronunciation: '/ˈdraɪ.vər/', hint: 'A person who drives a vehicle for a job' },
+      { word: 'Farmer',   emoji: '👨‍🌾', pronunciation: '/ˈfɑːr.mər/', hint: 'A person who grows crops and raises animals' },
+      { word: 'Engineer', emoji: '👷', pronunciation: '/ˌɛn.dʒɪˈnɪr/', hint: 'A person who designs and builds things' },
+    ],
+    grammar: {
+      title: 'Talking About Jobs',
+      rule: 'Use <b>He is a ___</b> or <b>She works as a ___</b> to describe someone\'s job.',
+      examples: [
+        'He is a <b>doctor</b>.',
+        'She works as a <b>teacher</b>.',
+        'My uncle is an <b>engineer</b>.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'He is a ___ at the hospital.', answer: 'doctor',  distractors: ['farmer', 'driver', 'shirt'] },
+      { sentence: 'She works as a ___ at school.', answer: 'teacher', distractors: ['driver', 'doctor', 'dress'] },
+      { sentence: 'My dad is an ___ who builds bridges.', answer: 'engineer', distractors: ['farmer', 'teacher', 'driver'] },
+    ],
+    sentences: [
+      { words: ['She', 'is', 'a', 'doctor.'], emoji: '👩‍⚕️', hint: 'What is her job?' },
+      { words: ['He', 'works', 'as', 'a', 'driver.'], emoji: '🚕', hint: 'Describe his job!' },
+    ],
+  },
+
+  {
+    id: 18,
+    title: 'Places in Town',
+    emoji: '🏙️',
+    xpRequired: 300,
+    xpReward: 45,
+    tier: 4,
+    vocab: [
+      { word: 'Bank',     emoji: '🏦', pronunciation: '/bæŋk/',      hint: 'A place where you keep your money' },
+      { word: 'Market',   emoji: '🏪', pronunciation: '/ˈmɑːr.kɪt/', hint: 'A place where you buy food and goods' },
+      { word: 'Hospital', emoji: '🏥', pronunciation: '/ˈhɒs.pɪ.təl/', hint: 'A place where sick people get help' },
+      { word: 'Park',     emoji: '🏞️', pronunciation: '/pɑːrk/',    hint: 'A green place to play and relax' },
+      { word: 'Station',  emoji: '🚉', pronunciation: '/ˈsteɪ.ʃən/', hint: 'A place where trains or buses stop' },
+    ],
+    grammar: {
+      title: 'Prepositions of Place',
+      rule: 'Use <b>next to</b>, <b>behind</b>, and <b>between</b> to say where things are.',
+      examples: [
+        'The bank is <b>next to</b> the market.',
+        'The park is <b>behind</b> the hospital.',
+        'The station is <b>between</b> the bank and the park.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'The market is ___ the bank.', answer: 'next to', distractors: ['behind', 'between', 'happy'] },
+      { sentence: 'The park is ___ the school.', answer: 'behind', distractors: ['next to', 'between', 'jacket'] },
+      { sentence: 'The station is ___ the bank and the park.', answer: 'between', distractors: ['behind', 'next to', 'dress'] },
+    ],
+    sentences: [
+      { words: ['The', 'bank', 'is', 'next', 'to', 'the', 'market.'], emoji: '🏦', hint: 'Where is the bank?' },
+      { words: ['The', 'park', 'is', 'behind', 'the', 'hospital.'], emoji: '🏞️', hint: 'Where is the park?' },
+    ],
+  },
+
+  {
+    id: 19,
+    title: 'Daily Routine',
+    emoji: '🌄',
+    xpRequired: 300,
+    xpReward: 45,
+    tier: 4,
+    vocab: [
+      { word: 'Wake up',        emoji: '⏰', pronunciation: '/weɪk ʌp/',        hint: 'Stop sleeping and open your eyes' },
+      { word: 'Brush teeth',    emoji: '🪥', pronunciation: '/brʌʃ tiːθ/',      hint: 'Clean your teeth with a brush' },
+      { word: 'Have breakfast', emoji: '🍳', pronunciation: '/hæv ˈbrɛk.fəst/', hint: 'Eat the first meal of the day' },
+      { word: 'Go to work',     emoji: '💼', pronunciation: '/ɡoʊ tuː wɜːrk/', hint: 'Travel to your job' },
+      { word: 'Go to bed',      emoji: '🛌', pronunciation: '/ɡoʊ tuː bɛd/',   hint: 'Lie down to sleep at night' },
+    ],
+    grammar: {
+      title: 'Adverbs of Frequency',
+      rule: 'Use <b>always</b>, <b>usually</b>, and <b>never</b> to say how often you do something.',
+      examples: [
+        'I <b>always</b> wake up at 7.',
+        'She <b>usually</b> has breakfast at home.',
+        'He <b>never</b> goes to bed late.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I ___ wake up at 7 o\'clock.', answer: 'always', distractors: ['never', 'sometimes', 'shirt'] },
+      { sentence: 'She ___ has breakfast before school.', answer: 'usually', distractors: ['always', 'never', 'park'] },
+      { sentence: 'He ___ brushes his teeth at night.', answer: 'never', distractors: ['always', 'usually', 'bank'] },
+    ],
+    sentences: [
+      { words: ['I', 'always', 'wake', 'up', 'early.'], emoji: '⏰', hint: 'What time do you wake up?' },
+      { words: ['She', 'usually', 'goes', 'to', 'work', 'by', 'bus.'], emoji: '💼', hint: 'How does she get to work?' },
+    ],
+  },
+
+  {
+    id: 20,
+    title: 'Shopping',
+    emoji: '🛒',
+    xpRequired: 300,
+    xpReward: 45,
+    tier: 4,
+    vocab: [
+      { word: 'Price',    emoji: '🏷️', pronunciation: '/praɪs/',    hint: 'How much something costs' },
+      { word: 'Cheap',    emoji: '💰', pronunciation: '/tʃiːp/',    hint: 'Costing very little money' },
+      { word: 'Expensive', emoji: '💎', pronunciation: '/ɪkˈspɛn.sɪv/', hint: 'Costing a lot of money' },
+      { word: 'Buy',      emoji: '🛍️', pronunciation: '/baɪ/',      hint: 'To get something by paying money' },
+      { word: 'Pay',      emoji: '💳', pronunciation: '/peɪ/',      hint: 'To give money for something' },
+    ],
+    grammar: {
+      title: 'Asking Prices: How much...?',
+      rule: 'Use <b>How much is/are ___?</b> to ask the price of something.',
+      examples: [
+        '<b>How much is</b> this shirt?',
+        '<b>How much are</b> these shoes?',
+        'It is very <b>cheap</b>!',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'How much ___ this jacket?', answer: 'is',   distractors: ['are', 'buy', 'pay'] },
+      { sentence: 'These shoes are very ___.', answer: 'expensive', distractors: ['cheap', 'price', 'buy'] },
+      { sentence: 'I want to ___ a new dress.', answer: 'buy',  distractors: ['pay', 'price', 'cheap'] },
+    ],
+    sentences: [
+      { words: ['How', 'much', 'is', 'this', 'shirt?'], emoji: '🏷️', hint: 'Ask about the price!' },
+      { words: ['I', 'want', 'to', 'buy', 'new', 'shoes.'], emoji: '🛍️', hint: 'What do you want to buy?' },
+    ],
+  },
+
+  // ─── TIER 5: Pre-Intermediate+ (XP 400+) ───────────────────────────────────
+
+  {
+    id: 21,
+    title: 'Hobbies & Free Time',
+    emoji: '🎨',
+    xpRequired: 400,
+    xpReward: 50,
+    tier: 5,
+    vocab: [
+      { word: 'Play',  emoji: '🎮', pronunciation: '/pleɪ/',  hint: 'To do something for fun, like games' },
+      { word: 'Read',  emoji: '📖', pronunciation: '/riːd/',  hint: 'To look at and understand words' },
+      { word: 'Dance', emoji: '💃', pronunciation: '/dæns/',  hint: 'To move your body to music' },
+      { word: 'Swim',  emoji: '🏊', pronunciation: '/swɪm/',  hint: 'To move through water using your body' },
+      { word: 'Cook',  emoji: '🍳', pronunciation: '/kʊk/',   hint: 'To prepare food by heating it' },
+    ],
+    grammar: {
+      title: 'Like / Love / Hate + -ing',
+      rule: 'Use <b>like/love/hate + verb-ing</b> to talk about hobbies.',
+      examples: [
+        'I <b>love reading</b> books.',
+        'She <b>likes dancing</b> on weekends.',
+        'He <b>hates cooking</b>.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I love ___ books on Sundays.', answer: 'reading', distractors: ['cooking', 'swimming', 'buy'] },
+      { sentence: 'She likes ___ at the pool.', answer: 'swimming', distractors: ['dancing', 'reading', 'price'] },
+      { sentence: 'He hates ___ dinner.', answer: 'cooking', distractors: ['dancing', 'reading', 'cheap'] },
+    ],
+    sentences: [
+      { words: ['I', 'love', 'reading', 'books.'], emoji: '📖', hint: 'What do you love doing?' },
+      { words: ['She', 'likes', 'dancing', 'and', 'singing.'], emoji: '💃', hint: 'What does she like?' },
+    ],
+  },
+
+  {
+    id: 22,
+    title: 'Months & Seasons',
+    emoji: '📆',
+    xpRequired: 400,
+    xpReward: 50,
+    tier: 5,
+    vocab: [
+      { word: 'January', emoji: '🎉', pronunciation: '/ˈdʒæn.ju.ɛr.i/', hint: 'The first month of the year' },
+      { word: 'Spring',  emoji: '🌷', pronunciation: '/sprɪŋ/',        hint: 'The season when flowers bloom' },
+      { word: 'Summer',  emoji: '☀️', pronunciation: '/ˈsʌm.ər/',      hint: 'The hottest season of the year' },
+      { word: 'Autumn',  emoji: '🍂', pronunciation: '/ˈɔː.təm/',      hint: 'The season when leaves fall' },
+      { word: 'Winter',  emoji: '❄️', pronunciation: '/ˈwɪn.tər/',     hint: 'The coldest season of the year' },
+    ],
+    grammar: {
+      title: 'My Birthday Is In...',
+      rule: 'Use <b>My birthday is in ___</b> to talk about the month of your birthday.',
+      examples: [
+        'My birthday is in <b>January</b>.',
+        'Her birthday is in <b>summer</b>.',
+        'We celebrate in <b>spring</b>.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'My birthday is in ___.', answer: 'January', distractors: ['spring', 'winter', 'shirt'] },
+      { sentence: 'Flowers bloom in ___.', answer: 'spring',  distractors: ['winter', 'autumn', 'bank'] },
+      { sentence: 'Leaves fall in ___.', answer: 'autumn',   distractors: ['summer', 'spring', 'buy'] },
+    ],
+    sentences: [
+      { words: ['My', 'birthday', 'is', 'in', 'January.'], emoji: '🎉', hint: 'When is your birthday?' },
+      { words: ['It', 'is', 'very', 'hot', 'in', 'summer.'], emoji: '☀️', hint: 'Describe summer!' },
+    ],
+  },
+
+  {
+    id: 23,
+    title: 'At the Restaurant',
+    emoji: '🍽️',
+    xpRequired: 400,
+    xpReward: 50,
+    tier: 5,
+    vocab: [
+      { word: 'Menu',      emoji: '📋', pronunciation: '/ˈmɛn.juː/', hint: 'A list of food you can order' },
+      { word: 'Order',     emoji: '📝', pronunciation: '/ˈɔːr.dər/', hint: 'To ask for food at a restaurant' },
+      { word: 'Waiter',    emoji: '🧑‍🍳', pronunciation: '/ˈweɪ.tər/', hint: 'A person who serves food at a restaurant' },
+      { word: 'Bill',      emoji: '🧾', pronunciation: '/bɪl/',      hint: 'The paper that shows how much to pay' },
+      { word: 'Delicious', emoji: '😋', pronunciation: '/dɪˈlɪʃ.əs/', hint: 'Tasting very good' },
+    ],
+    grammar: {
+      title: 'Ordering Food: I\'d like...',
+      rule: 'Use <b>I\'d like ___</b> or <b>Can I have ___?</b> to order food politely.',
+      examples: [
+        '<b>I\'d like</b> a pizza, please.',
+        '<b>Can I have</b> the menu, please?',
+        'This soup is <b>delicious</b>!',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I\'d ___ a pizza, please.', answer: 'like', distractors: ['have', 'order', 'buy'] },
+      { sentence: 'Can I have the ___, please?', answer: 'menu', distractors: ['bill', 'waiter', 'price'] },
+      { sentence: 'This cake is really ___!', answer: 'delicious', distractors: ['cheap', 'expensive', 'menu'] },
+    ],
+    sentences: [
+      { words: ['I\'d', 'like', 'a', 'pizza,', 'please.'], emoji: '🍕', hint: 'Order your favorite food!' },
+      { words: ['Can', 'I', 'have', 'the', 'bill,', 'please?'], emoji: '🧾', hint: 'Ask for the bill!' },
+    ],
+  },
+
+  {
+    id: 24,
+    title: 'Sports',
+    emoji: '⚽',
+    xpRequired: 400,
+    xpReward: 50,
+    tier: 5,
+    vocab: [
+      { word: 'Soccer', emoji: '⚽', pronunciation: '/ˈsɒk.ər/', hint: 'A game played with a ball and two goals' },
+      { word: 'Run',    emoji: '🏃', pronunciation: '/rʌn/',    hint: 'To move fast using your legs' },
+      { word: 'Team',   emoji: '🤼', pronunciation: '/tiːm/',   hint: 'A group of people playing together' },
+      { word: 'Win',    emoji: '🏆', pronunciation: '/wɪn/',    hint: 'To finish first in a game' },
+      { word: 'Ball',   emoji: '🏀', pronunciation: '/bɔːl/',   hint: 'A round object used in many sports' },
+    ],
+    grammar: {
+      title: 'Can / Can\'t for Ability',
+      rule: 'Use <b>can</b> and <b>can\'t</b> to say what you are able or unable to do.',
+      examples: [
+        'I <b>can</b> play soccer.',
+        'She <b>can\'t</b> swim yet.',
+        'They <b>can</b> run very fast.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I ___ play soccer very well.', answer: 'can', distractors: ['can\'t', 'is', 'win'] },
+      { sentence: 'He ___ swim, but he is learning.', answer: 'can\'t', distractors: ['can', 'run', 'win'] },
+      { sentence: 'Our ___ won the game!', answer: 'team', distractors: ['ball', 'soccer', 'run'] },
+    ],
+    sentences: [
+      { words: ['I', 'can', 'play', 'soccer.'], emoji: '⚽', hint: 'What sport can you play?' },
+      { words: ['Our', 'team', 'won', 'the', 'game!'], emoji: '🏆', hint: 'Celebrate the win!' },
+    ],
+  },
+
+  {
+    id: 25,
+    title: 'Travel & Vacation',
+    emoji: '✈️',
+    xpRequired: 400,
+    xpReward: 50,
+    tier: 5,
+    vocab: [
+      { word: 'Airport',  emoji: '🛫', pronunciation: '/ˈɛr.pɔːrt/', hint: 'A place where planes take off and land' },
+      { word: 'Ticket',   emoji: '🎫', pronunciation: '/ˈtɪk.ɪt/',   hint: 'A paper you need to travel' },
+      { word: 'Hotel',    emoji: '🏨', pronunciation: '/hoʊˈtɛl/',   hint: 'A place where you sleep on vacation' },
+      { word: 'Beach',    emoji: '🏖️', pronunciation: '/biːtʃ/',     hint: 'Sand next to the ocean' },
+      { word: 'Passport', emoji: '🛂', pronunciation: '/ˈpæs.pɔːrt/', hint: 'A document you need to travel abroad' },
+    ],
+    grammar: {
+      title: 'Future Plans: Going to',
+      rule: 'Use <b>I\'m going to ___</b> to talk about future plans.',
+      examples: [
+        'I\'m going to <b>visit</b> the beach.',
+        'We\'re going to <b>stay</b> at a hotel.',
+        'She\'s going to <b>fly</b> next week.',
+      ],
+    },
+    fillBlanks: [
+      { sentence: 'I\'m going to ___ my passport at the airport.', answer: 'show', distractors: ['buy', 'wear', 'cook'] },
+      { sentence: 'We\'re going to stay at a ___.', answer: 'hotel', distractors: ['beach', 'airport', 'ticket'] },
+      { sentence: 'I bought a ___ for the flight.', answer: 'ticket', distractors: ['passport', 'hotel', 'beach'] },
+    ],
+    sentences: [
+      { words: ['I\'m', 'going', 'to', 'visit', 'the', 'beach.'], emoji: '🏖️', hint: 'What are your vacation plans?' },
+      { words: ['We\'re', 'going', 'to', 'stay', 'at', 'a', 'hotel.'], emoji: '🏨', hint: 'Where will you stay?' },
+    ],
+  },
 ];

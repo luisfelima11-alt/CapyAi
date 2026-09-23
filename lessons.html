@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lessons — Capy Yara Adventures</title>
+  <title>Lessons — Capy Yara English</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
@@ -69,6 +69,24 @@
     .scramble-box.filled { background:#fdf2f8; border:2px solid #ec4899; border-radius:10px; }
     @keyframes xpPop { 0%{opacity:1;transform:translateX(-50%) translateY(0)} 100%{opacity:0;transform:translateX(-50%) translateY(-40px)} }
   </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/lessons.html"/>
+<meta property="og:title" content="Lessons — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Lessons — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
@@ -144,7 +162,7 @@
     </div>
     <!-- ── GAME STEP PANEL (shown during game step in guided mode) ── -->
     <div id="panel-game" class="tool-panel" style="display:none">
-      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 text-center">
+      <div id="game-step-card" class="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 text-center">
         <div id="game-step-emoji" class="text-6xl mb-4"></div>
         <h3 id="game-step-title" class="text-2xl font-black text-navy mb-2"></h3>
         <p class="text-slate-500 mb-6 text-sm">Play this game to reinforce what you just learned!</p>
@@ -230,7 +248,7 @@
     <div id="progress-dashboard" class="mb-5"></div>
 
     <!-- Tool tabs -->
-    <div class="flex gap-2 flex-wrap mb-5" id="tool-tabs">
+    <div class="flex gap-2 md:flex-wrap flex-nowrap overflow-x-auto snap-x pb-1 mb-5 [&>button]:snap-start [&>button]:flex-shrink-0" id="tool-tabs">
       <button class="tool-tab active px-4 py-2 rounded-2xl font-bold text-sm bg-navy text-white border-2 border-transparent" data-tool="vocab" onclick="switchTool('vocab')">🃏 Flashcards</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="quiz"  onclick="switchTool('quiz')">❓ Quiz</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="build" onclick="switchTool('build')">🏗️ Build</button>
@@ -258,1386 +276,83 @@
   </main>
 </div>
 
-<script src="store.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="memory.js?v=mem1"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
+<script src="components.js?v=push2"></script>
+<script src="celebration.js?v=cel3"></script>
+<script src="yara-widget.js?v=yw5"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
 // LESSON DATA — All 24 Jadson lessons + custom lessons merged at boot
 // ══════════════════════════════════════════════════════════════════════════════
 let ALL_LESSONS = []; // populated at DOMContentLoaded
-const JADSON_LESSONS = [
-  {
-    id: 1, title: 'To Have, Want, Need, Like', emoji: '💬',
-    verbs: ['To Have','To Want','To Need','To Like'],
-    vocab: [
-      {en:'Water',pt:'Água'},{en:'Food',pt:'Comida'},{en:'Coffee',pt:'Café'},
-      {en:'Money',pt:'Dinheiro'},{en:'A car',pt:'Um carro'},{en:'A house',pt:'Uma casa'},
-      {en:'Time',pt:'Tempo'},{en:'Help',pt:'Ajuda'},{en:'A job',pt:'Um emprego'},
-      {en:'A break',pt:'Uma pausa'},{en:'My family',pt:'Minha família'},{en:'My friends',pt:'Meus amigos'},
-      {en:'Work',pt:'Trabalho'},{en:'Home',pt:'Casa/Lar'},{en:'Today',pt:'Hoje'},
-      {en:'Now',pt:'Agora'},{en:'People',pt:'Pessoas'},{en:'A problem',pt:'Um problema'},
-      {en:'Information',pt:'Informação'},{en:'Something',pt:'Algo'},{en:'Good',pt:'Bom'},
-      {en:'New',pt:'Novo'},{en:'More',pt:'Mais'},{en:'Some',pt:'Algum/uns'},
-      {en:'Very',pt:'Muito'},{en:'With',pt:'Com'},{en:'And',pt:'E'},
-      {en:'But',pt:'Mas'},{en:'Big',pt:'Grande'},{en:'Small',pt:'Pequeno'},
-    ],
-    expressions: [
-      {expr:'Excuse me',meaning:'Com licença / Me desculpe',example:'Excuse me, I have a question.'},
-      {expr:"I'm sorry",meaning:'Sinto muito / Me desculpe',example:"I'm sorry, I have a problem now."},
-      {expr:'How much is it?',meaning:'Quanto custa?',example:'How much is it for the new car?'},
-      {expr:"That's fine",meaning:'Está bem / Tudo certo',example:"You want a break? That's fine."},
-    ],
-    sentences: [
-      'I have a car.','You have a big house.','He has a new job.',
-      'She wants a break now.','We need more money.','They like good food.',
-      'I need help now.','You have my coffee.',
-    ],
-    grammar: {
-      title: 'A Regra dos 3 Mosqueteiros (He, She, It)',
-      rules: [
-        'Para a maioria dos verbos, adicione <b>-s</b> no final para He, She, It: I want → He <b>wants</b>',
-        'O verbo "To Have" é irregular: I have → He <b>has</b>',
-        'Para todos os outros pronomes (I, You, We, They), o verbo <b>não muda</b>.',
-      ],
-      table: {
-        headers: ['Pronome','To Have','To Want','To Need','To Like'],
-        rows: [
-          ['I','have','want','need','like'],
-          ['You','have','want','need','like'],
-          ['He/She/It','<b>has</b>','<b>wants</b>','<b>needs</b>','<b>likes</b>'],
-          ['We','have','want','need','like'],
-          ['They','have','want','need','like'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ a new job now.',a:'wants',opts:['want','wants','need','like']},
-      {q:'I ___ help now.',a:'need',opts:['needs','have','need','wants']},
-      {q:'They ___ good food.',a:'like',opts:['likes','have','want','like']},
-      {q:'He ___ my coffee.',a:'has',opts:['have','has','want','needs']},
-      {q:'We ___ more time.',a:'have',opts:['has','want','have','need']},
-    ],
-    speak: ['I have a car.','She needs help.','They like good food.','We want more time.','He has a new job.'],
-  },
+let CUR_TTS_LANG = 'en-US';
+// ── Dados das lições: carregados sob demanda ────────────────────────────────
+// Antes as 108 lições de inglês ficavam aqui dentro (646 KB) e os outros cursos
+// vinham em quatro scripts — tudo baixado sempre, para abrir UMA lição de ~4 KB.
+// Agora só o índice é obrigatório; a lição vem por fetch. Regerar com
+// `node scripts/build-lesson-data.js` depois de mexer em qualquer fonte.
+let LESSON_INDEX = [];               // {id, title, emoji, lang} de todas as lições
+const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta sessão
 
-  {
-    id: 2, title: 'To Go, Do, Say, See', emoji: '🚶',
-    verbs: ['To Go','To Do','To Say','To See'],
-    vocab: [
-      {en:'Year',pt:'Ano'},{en:'Day',pt:'Dia'},{en:'Man',pt:'Homem'},
-      {en:'Woman',pt:'Mulher'},{en:'Life',pt:'Vida'},{en:'Child',pt:'Criança'},
-      {en:'World',pt:'Mundo'},{en:'School',pt:'Escola'},{en:'State',pt:'Estado'},
-      {en:'Student',pt:'Estudante'},{en:'Group',pt:'Grupo'},{en:'Country',pt:'País'},
-      {en:'Hand',pt:'Mão'},{en:'Part',pt:'Parte'},{en:'Place',pt:'Lugar'},
-      {en:'Case',pt:'Caso'},{en:'Week',pt:'Semana'},{en:'Company',pt:'Empresa'},
-      {en:'System',pt:'Sistema'},{en:'Program',pt:'Programa'},{en:'Question',pt:'Pergunta'},
-      {en:'Night',pt:'Noite'},{en:'Point',pt:'Ponto'},{en:'Room',pt:'Quarto/Sala'},
-      {en:'Story',pt:'História'},{en:'Fact',pt:'Fato'},{en:'Month',pt:'Mês'},
-      {en:'Lot',pt:'Muito/Bastante'},{en:'Right',pt:'Certo/Direito'},{en:'Study',pt:'Estudo'},
-    ],
-    expressions: [
-      {expr:'So far, so good.',meaning:'Até agora, tudo bem.',example:'So far, so good, I see the point.'},
-      {expr:'My bad.',meaning:'Minha culpa / Foi mal.',example:'My bad, I do the wrong thing.'},
-      {expr:'Hang in there.',meaning:'Aguenta firme / Não desista.',example:'Hang in there, you do a good job.'},
-      {expr:'A piece of cake.',meaning:'Moleza / Muito fácil.',example:'This study is a piece of cake.'},
-    ],
-    sentences: [
-      'I go to school.','You go to work.','He goes to the room.',
-      'She says the story.','We do a lot of things.','They see the school.',
-      'Do you go to school?','Does he see the man?',
-    ],
-    grammar: {
-      title: 'Do / Does — Negativas e Perguntas',
-      rules: [
-        'Para negar: <b>don\'t</b> (I/You/We/They) e <b>doesn\'t</b> (He/She/It)',
-        'Com doesn\'t, o verbo principal <b>perde o -s</b>: He goes → He doesn\'t <b>go</b>',
-        'Para perguntas, coloque Do/Does <b>no início</b>: Do you go? / Does she see?',
-      ],
-      table: {
-        headers: ['Pronome','Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I','I go','I don\'t go','Do I go?'],
-          ['You','You go','You don\'t go','Do you go?'],
-          ['He/She','He goes','He doesn\'t go','Does he go?'],
-          ['We','We go','We don\'t go','Do we go?'],
-          ['They','They go','They don\'t go','Do they go?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'He ___ to the room.',a:'goes',opts:['go','goes','do','see']},
-      {q:'She ___ the story.',a:'says',opts:['say','see','says','goes']},
-      {q:'___ you go to school?',a:'Do',opts:['Does','Do','Is','Are']},
-      {q:'He ___ go to work. (negative)',a:"doesn't",opts:["don't","doesn't","isn't","aren't"]},
-      {q:'They ___ the school.',a:'see',opts:['sees','go','see','do']},
-    ],
-    speak: ['I go to school.','Does she go to work?','They don\'t see the problem.','He does his homework.','We say the truth.'],
-  },
+async function carregarIndice() {
+  if (LESSON_INDEX.length) return LESSON_INDEX;
+  try {
+    const r = await fetch('data/lessons-index.json?v=med816');
+    if (r.ok) LESSON_INDEX = await r.json();
+  } catch (e) { /* offline: segue com o que der */ }
+  return LESSON_INDEX;
+}
 
-  {
-    id: 3, title: 'To Get, Make, Know, Take', emoji: '🧠',
-    verbs: ['To Get','To Make','To Know','To Take'],
-    vocab: [
-      {en:'Way',pt:'Caminho/Jeito'},{en:'Thing',pt:'Coisa'},{en:'Person',pt:'Pessoa'},
-      {en:'Eye',pt:'Olho'},{en:'Mother',pt:'Mãe'},{en:'Father',pt:'Pai'},
-      {en:'Brother',pt:'Irmão'},{en:'Sister',pt:'Irmã'},{en:'Friend',pt:'Amigo'},
-      {en:'Book',pt:'Livro'},{en:'Door',pt:'Porta'},{en:'Window',pt:'Janela'},
-      {en:'City',pt:'Cidade'},{en:'Street',pt:'Rua'},{en:'Bus',pt:'Ônibus'},
-      {en:'Plane',pt:'Avião'},{en:'Idea',pt:'Ideia'},{en:'Solution',pt:'Solução'},
-      {en:'Name',pt:'Nome'},{en:'Number',pt:'Número'},{en:'Side',pt:'Lado'},
-      {en:'Kind',pt:'Tipo/Gentil'},{en:'Head',pt:'Cabeça'},{en:'Office',pt:'Escritório'},
-      {en:'Service',pt:'Serviço'},{en:'Body',pt:'Corpo'},{en:'Face',pt:'Rosto'},
-      {en:'End',pt:'Fim'},{en:'Morning',pt:'Manhã'},{en:'Afternoon',pt:'Tarde'},
-    ],
-    expressions: [
-      {expr:'Break the ice.',meaning:'Quebrar o gelo (iniciar conversa).',example:'He knows how to break the ice.'},
-      {expr:'Cut corners.',meaning:'Fazer o mínimo/pular etapas.',example:"Don't cut corners with your study."},
-      {expr:'Better late than never.',meaning:'Melhor tarde do que nunca.',example:'Better late than never, I get the solution.'},
-      {expr:"Call it a day.",meaning:'Encerrar por hoje.',example:"Let's call it a day, we take the bus now."},
-    ],
-    sentences: [
-      'I get the book.','She gets the money.','You make the food.',
-      'We make the plan.','I know the way.','He knows the name.',
-      'They take the bus.','She takes the time.',
-    ],
-    grammar: {
-      title: 'WH-Questions (Question Words)',
-      rules: [
-        '<b>What</b> = O que/Qual | <b>Where</b> = Onde | <b>Who</b> = Quem',
-        '<b>Why</b> = Por que | <b>When</b> = Quando | <b>How</b> = Como',
-        'Estrutura: [Question Word] + [Do/Does] + [Sujeito] + [Verbo]?',
-      ],
-      table: {
-        headers: ['Question Word','Significado','Exemplo'],
-        rows: [
-          ['What','O que / Qual','What do you know?'],
-          ['Where','Onde','Where does she go?'],
-          ['Who','Quem','Who takes the bus?'],
-          ['Why','Por que','Why do they take the bus?'],
-          ['When','Quando','When do you make the food?'],
-          ['How','Como','How do you get there?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ the book from the shelf.',a:'get',opts:['make','get','know','take']},
-      {q:'She ___ a good point.',a:'makes',opts:['gets','makes','knows','takes']},
-      {q:'___ do you know? (O que...)',a:'What',opts:['Where','What','Who','When']},
-      {q:'___ does she go? (Onde...)',a:'Where',opts:['What','Why','Where','How']},
-      {q:'He ___ the bus every morning.',a:'takes',opts:['makes','gets','takes','knows']},
-    ],
-    speak: ['I know the way.','What do you make?','She takes the bus.','We get the solution.','How do they know?'],
-  },
+async function garantirLicao(id) {
+  if (LICOES_CARREGADAS.has(id)) return LICOES_CARREGADAS.get(id);
+  const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
+  if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
+  try {
+    const r = await fetch('data/lessons/' + id + '.json?v=med816');
+    if (!r.ok) return null;
+    const licao = await r.json();
+    LICOES_CARREGADAS.set(id, licao);
+    if (!ALL_LESSONS.some(l => l.id === licao.id)) ALL_LESSONS.push(licao);
+    return licao;
+  } catch (e) { return null; }
+}
 
-  {
-    id: 4, title: 'To Come, Think, Look, Give', emoji: '👀',
-    verbs: ['To Come','To Think','To Look','To Give'],
-    vocab: [
-      {en:'Time',pt:'Hora/Vez'},{en:'Season',pt:'Estação'},{en:'Team',pt:'Time/Equipe'},
-      {en:'Road',pt:'Estrada'},{en:'Hour',pt:'Hora'},{en:'Boy',pt:'Menino'},
-      {en:'Girl',pt:'Menina'},{en:'Object',pt:'Objeto'},{en:'Baby',pt:'Bebê'},
-      {en:'Earth',pt:'Terra'},{en:'University',pt:'Universidade'},{en:'Town',pt:'Cidade pequena'},
-      {en:'Parents',pt:'Pais'},{en:'Teacher',pt:'Professor(a)'},{en:'Class',pt:'Turma/Aula'},
-      {en:'Nation',pt:'Nação'},{en:'Issue',pt:'Problema/Edição'},{en:'Arm',pt:'Braço'},
-      {en:'Piece',pt:'Pedaço'},{en:'Area',pt:'Área'},{en:'Example',pt:'Exemplo'},
-      {en:'Weekend',pt:'Fim de semana'},{en:'Business',pt:'Negócio'},{en:'Method',pt:'Método'},
-      {en:'Project',pt:'Projeto'},{en:'Answer',pt:'Resposta'},{en:'Task',pt:'Tarefa'},
-      {en:'Amount',pt:'Quantia'},{en:'Evening',pt:'Noite (início)'},{en:'Detail',pt:'Detalhe'},
-    ],
-    expressions: [
-      {expr:'Break a leg.',meaning:'Boa sorte! (antes de apresentação)',example:'Break a leg with your new project!'},
-      {expr:'Under the weather.',meaning:'Sentindo-se mal/doente.',example:"I'm feeling under the weather today."},
-      {expr:'Once in a blue moon.',meaning:'Muito raramente.',example:'Once in a blue moon, I come to the town.'},
-      {expr:'The best of both worlds.',meaning:'O melhor dos dois mundos.',example:"It's the best of both worlds for the team."},
-    ],
-    sentences: [
-      'I come to the university.','She comes to the evening class.',
-      'I think about the project.','He thinks about the method.',
-      'I look at the object.','She looks at the baby.',
-      'I give the answer.','He gives the task to the team.',
-    ],
-    grammar: {
-      title: 'Present Continuous (Verbo + ING)',
-      rules: [
-        'Usado para ações que estão acontecendo <b>agora</b> ou ao redor do presente.',
-        'Estrutura: [Sujeito] + [am/is/are] + [verbo-ING]',
-        'Regras do -ING: verbos com -e final → tire o -e e adicione -ING (come → com<b>ing</b>). Consoante-vogal-consoante → dobre a última (run → runn<b>ing</b>)',
-      ],
-      table: {
-        headers: ['Pronome','Auxiliar','Exemplo'],
-        rows: [
-          ['I','am','I am looking at the road.'],
-          ['You','are','You are thinking about the project.'],
-          ['He/She/It','is','She is coming to the class.'],
-          ['We','are','We are giving the answer.'],
-          ['They','are','They are looking at the team.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ to the class every Monday.',a:'comes',opts:['come','comes','think','give']},
-      {q:'I am ___ about the project. (present continuous)',a:'thinking',opts:['think','thinks','thinking','thought']},
-      {q:'He ___ the task to the team.',a:'gives',opts:['give','gives','look','come']},
-      {q:'They are ___ at the road.',a:'looking',opts:['look','looks','looking','looked']},
-      {q:"___ a leg! (Boa sorte!)",a:'Break',opts:['Give','Take','Break','Make']},
-    ],
-    speak: ['She is thinking about the answer.','I give the example.','They look at the team.','We are coming to the class.','He thinks about the detail.'],
-  },
+async function garantirLicoes(ids) {
+  const out = [];
+  for (const id of ids) { const l = await garantirLicao(id); if (l) out.push(l); }
+  return out;
+}
 
-  {
-    id: 5, title: 'To Tell, Work, Feel, Leave', emoji: '✉️',
-    verbs: ['To Tell','To Work','To Feel','To Leave'],
-    vocab: [
-      {en:'Experience',pt:'Experiência'},{en:'Decision',pt:'Decisão'},{en:'Reason',pt:'Razão'},
-      {en:'Knowledge',pt:'Conhecimento'},{en:'Change',pt:'Mudança'},{en:'Result',pt:'Resultado'},
-      {en:'Value',pt:'Valor'},{en:'Goal',pt:'Objetivo'},{en:'Effort',pt:'Esforço'},
-      {en:'Energy',pt:'Energia'},{en:'Manager',pt:'Gerente'},{en:'Boss',pt:'Chefe'},
-      {en:'Apartment',pt:'Apartamento'},{en:'College',pt:'Faculdade'},{en:'Magazine',pt:'Revista'},
-      {en:'Challenge',pt:'Desafio'},{en:'Opportunity',pt:'Oportunidade'},{en:'Situation',pt:'Situação'},
-      {en:'Meeting',pt:'Reunião'},{en:'Process',pt:'Processo'},{en:'Step',pt:'Passo'},
-      {en:'Level',pt:'Nível'},{en:'Topic',pt:'Tópico'},{en:'Subject',pt:'Assunto/Matéria'},
-      {en:'Point of view',pt:'Ponto de vista'},{en:'Behavior',pt:'Comportamento'},
-      {en:'Attention',pt:'Atenção'},{en:'Progress',pt:'Progresso'},{en:'Ability',pt:'Habilidade'},
-      {en:'Feature',pt:'Característica'},
-    ],
-    expressions: [
-      {expr:'Hit the hay.',meaning:'Ir dormir.',example:"I'm tired. Time to hit the hay."},
-      {expr:'Spill the beans.',meaning:'Revelar um segredo.',example:'Who spilled the beans about the surprise?'},
-      {expr:'Feel like a million bucks.',meaning:'Sentir-se ótimo.',example:"I feel like a million bucks today!"},
-      {expr:'Get the ball rolling.',meaning:'Começar algo/dar o pontapé inicial.',example:"Let's get the ball rolling on this project."},
-    ],
-    sentences: [
-      'I tell the truth.','She tells the story.','We work every day.',
-      'He works at the office.','I feel good today.','She feels tired.',
-      'They leave the meeting.','He leaves the room.',
-    ],
-    grammar: {
-      title: 'Present Perfect (Have/Has + Past Participle)',
-      rules: [
-        'Usado para ações que aconteceram em algum momento no passado, sem especificar quando, ou que têm relevância no presente.',
-        'Estrutura: [I/You/We/They] + <b>have</b> + particípio passado',
-        'Estrutura: [He/She/It] + <b>has</b> + particípio passado',
-        'Palavras-chave: <b>already, yet, ever, never, just, since, for</b>',
-      ],
-      table: {
-        headers: ['Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I have worked.','I haven\'t worked.','Have you worked?'],
-          ['She has left.','She hasn\'t left.','Has she left?'],
-          ['They have told.','They haven\'t told.','Have they told?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ the story to the class.',a:'tells',opts:['tell','tells','work','leave']},
-      {q:'I have ___ here for 5 years.',a:'worked',opts:['work','works','worked','working']},
-      {q:'He has already ___ the meeting.',a:'left',opts:['leave','leaves','left','leaving']},
-      {q:'Have you ever ___ like a million bucks?',a:'felt',opts:['feel','feels','felt','feeling']},
-      {q:'We ___ on the new project now.',a:'work',opts:['works','tell','work','leave']},
-    ],
-    speak: ['I feel good today.','She has told the story.','We work every day.','Have you ever left early?','He tells the truth.'],
-  },
+// ── Curso de cada lição ─────────────────────────────────────────────────────
+// Cada curso tem sua própria faixa de ids: inglês base 1-110, francês 201-212,
+// turco 301-336, intermediate 401-440, GPS Tronic 501-508, entrevista 601-612.
+// O cabeçalho precisa da posição DENTRO do curso — sem isso a lição 501 saía
+// como "Aula 501 de 170" (o id cru e a contagem de todo o inglês).
+// A faixa vai do início de um curso até o início do próximo, para que uma aula
+// nova (111, 509, 613…) caia no curso certo sem ninguém mexer aqui.
+// Curso novo TEM que entrar aqui. Sem o início da faixa, a lição é contada
+// dentro do curso anterior: a 701 do Agro aparecia como "Aula 13 de 24",
+// somada às 12 do Entrevista (601-612).
+const INICIOS_DE_CURSO = [1, 201, 301, 401, 501, 601, 701, 801];
 
-  {
-    id: 6, title: 'Modal Verbs: Can, Could, Should', emoji: '⚡',
-    verbs: ['Can','Could','Should','Would'],
-    vocab: [
-      {en:'Skill',pt:'Habilidade'},{en:'Ability',pt:'Capacidade'},{en:'Permission',pt:'Permissão'},
-      {en:'Request',pt:'Pedido'},{en:'Advice',pt:'Conselho'},{en:'Suggestion',pt:'Sugestão'},
-      {en:'Possibility',pt:'Possibilidade'},{en:'Wish',pt:'Desejo'},{en:'Preference',pt:'Preferência'},
-      {en:'Choice',pt:'Escolha'},{en:'Option',pt:'Opção'},{en:'Condition',pt:'Condição'},
-      {en:'Consequence',pt:'Consequência'},{en:'Situation',pt:'Situação'},{en:'Rule',pt:'Regra'},
-      {en:'Law',pt:'Lei'},{en:'Right',pt:'Direito'},{en:'Duty',pt:'Dever'},
-      {en:'Responsibility',pt:'Responsabilidade'},{en:'Plan',pt:'Plano'},{en:'Schedule',pt:'Agenda'},
-      {en:'Language',pt:'Idioma'},{en:'Drive',pt:'Dirigir'},{en:'Swim',pt:'Nadar'},
-      {en:'Cook',pt:'Cozinhar'},{en:'Speak',pt:'Falar'},{en:'Understand',pt:'Entender'},
-      {en:'Explain',pt:'Explicar'},{en:'Describe',pt:'Descrever'},{en:'Compare',pt:'Comparar'},
-    ],
-    expressions: [
-      {expr:'Can I ask you something?',meaning:'Posso te perguntar algo?',example:'Can I ask you something about the schedule?'},
-      {expr:'Could you repeat that?',meaning:'Você poderia repetir isso?',example:'Could you repeat that, please? I didn\'t understand.'},
-      {expr:'You should try it.',meaning:'Você deveria tentar.',example:'You should try the new method. It works!'},
-      {expr:'I would love to.',meaning:'Eu adoraria.',example:'Would you like to join us? I would love to!'},
-    ],
-    sentences: [
-      'I can speak English.','She can swim very well.','Can you help me?',
-      'Could you repeat that?','You should study every day.','We should leave now.',
-      'I would love to come.','Would you like some coffee?',
-    ],
-    grammar: {
-      title: 'Modal Verbs — Regra de Ouro',
-      rules: [
-        'Verbos modais <b>NUNCA mudam</b> — sem -s para He/She/It: He <b>can</b> (nunca "cans")',
-        'Sempre seguidos de verbo no infinitivo <b>sem "to"</b>: I can <b>swim</b> ✓',
-        '<b>Can</b> = habilidade/permissão | <b>Could</b> = forma mais educada/passado | <b>Should</b> = conselho | <b>Would</b> = condicional/pedido educado',
-      ],
-      table: {
-        headers: ['Modal','Uso','Exemplo'],
-        rows: [
-          ['Can','Habilidade / Permissão','I can drive.'],
-          ['Could','Pedido educado / Possibilidade','Could you help me?'],
-          ['Should','Conselho / Obrigação moral','You should sleep more.'],
-          ['Would','Pedido formal / Condicional','Would you like tea?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ speak three languages.',a:'can',opts:['cans','can','could to','should to']},
-      {q:'___ you repeat that, please?',a:'Could',opts:['Can you','Could','Would to','Should']},
-      {q:'You ___ study every day.',a:'should',opts:['shoulds','should to','should','can to']},
-      {q:'I ___ love to come to the party.',a:'would',opts:['will to','would','could to','should']},
-      {q:'Modal verbs are followed by verb + ___',a:'nothing (bare infinitive)',opts:['to','ing','nothing (bare infinitive)','ed']},
-    ],
-    speak: ['Can you help me?','She should study more.','I would love to go.','Could you explain that?','We can do it!'],
-  },
+function faixaDoCurso(id) {
+  const ini = INICIOS_DE_CURSO.filter(s => id >= s).pop() || INICIOS_DE_CURSO[0];
+  const prox = INICIOS_DE_CURSO.find(s => s > ini);
+  return { ini, fim: prox ? prox - 1 : Infinity };
+}
 
-  {
-    id: 7, title: 'Past Simple — Regular Verbs', emoji: '⏪',
-    verbs: ['Worked','Played','Studied','Watched'],
-    vocab: [
-      {en:'Yesterday',pt:'Ontem'},{en:'Last week',pt:'Semana passada'},{en:'Last year',pt:'Ano passado'},
-      {en:'Ago',pt:'Atrás'},{en:'Then',pt:'Então/Depois'},{en:'Before',pt:'Antes'},
-      {en:'After',pt:'Depois'},{en:'While',pt:'Enquanto'},{en:'When',pt:'Quando'},
-      {en:'During',pt:'Durante'},{en:'Travel',pt:'Viagem/Viajar'},{en:'Visit',pt:'Visitar'},
-      {en:'Talk',pt:'Conversar'},{en:'Call',pt:'Ligar'},{en:'Walk',pt:'Caminhar'},
-      {en:'Open',pt:'Abrir'},{en:'Close',pt:'Fechar'},{en:'Start',pt:'Começar'},
-      {en:'Finish',pt:'Terminar'},{en:'Use',pt:'Usar'},{en:'Help',pt:'Ajudar'},
-      {en:'Try',pt:'Tentar'},{en:'Stop',pt:'Parar'},{en:'Wait',pt:'Esperar'},
-      {en:'Return',pt:'Retornar'},{en:'Clean',pt:'Limpar'},{en:'Cook',pt:'Cozinhar'},
-      {en:'Learn',pt:'Aprender'},{en:'Listen',pt:'Ouvir'},{en:'Watch',pt:'Assistir'},
-    ],
-    expressions: [
-      {expr:'Back in the day.',meaning:'Antigamente / Na época.',example:'Back in the day, we walked to school.'},
-      {expr:'Once upon a time.',meaning:'Era uma vez.',example:'Once upon a time, I lived in another city.'},
-      {expr:'It\'s history now.',meaning:'Isso é passado.',example:"We had a fight but it's history now."},
-      {expr:'Long story short.',meaning:'Resumindo.',example:'Long story short, I missed the bus yesterday.'},
-    ],
-    sentences: [
-      'I worked all day yesterday.','She studied English last year.',
-      'We watched a movie last night.','He called his mother yesterday.',
-      'They traveled to another city.','I finished the project last week.',
-      'She opened the door and walked in.','We talked for two hours.',
-    ],
-    grammar: {
-      title: 'Simple Past — Verbos Regulares',
-      rules: [
-        'Adicione <b>-ed</b> ao infinitivo: work → work<b>ed</b>, call → call<b>ed</b>',
-        'Verbos terminados em -e: adicione apenas <b>-d</b>: use → use<b>d</b>, close → close<b>d</b>',
-        'Verbos terminados em consoante+y: troque y por <b>-ied</b>: study → stud<b>ied</b>',
-        'Para negar: <b>didn\'t</b> + verbo no infinitivo: I didn\'t work.',
-        'Para perguntar: <b>Did</b> + sujeito + infinitivo: Did you work?',
-      ],
-      table: {
-        headers: ['Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I worked.','I didn\'t work.','Did you work?'],
-          ['She studied.','She didn\'t study.','Did she study?'],
-          ['They watched.','They didn\'t watch.','Did they watch?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ English last year. (study)',a:'studied',opts:['studyed','studied','study','studying']},
-      {q:'She ___ her friend yesterday. (call)',a:'called',opts:['call','calls','called','calling']},
-      {q:'They ___ work last week. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
-      {q:'___ you watch the movie? (question)',a:'Did',opts:['Do','Does','Did','Have']},
-      {q:'He ___ the door and walked in. (open)',a:'opened',opts:['open','opens','opened','opening']},
-    ],
-    speak: ['I worked yesterday.','Did you study last night?','She called her mother.','We didn\'t watch TV.','They traveled last year.'],
-  },
-
-  {
-    id: 8, title: 'Past Simple — Irregular Verbs', emoji: '🔄',
-    verbs: ['Go→Went','See→Saw','Make→Made','Take→Took'],
-    vocab: [
-      {en:'Airport',pt:'Aeroporto'},{en:'Hotel',pt:'Hotel'},{en:'Ticket',pt:'Passagem/Bilhete'},
-      {en:'Luggage',pt:'Bagagem'},{en:'Flight',pt:'Voo'},{en:'Reservation',pt:'Reserva'},
-      {en:'Client',pt:'Cliente'},{en:'Report',pt:'Relatório'},{en:'Email',pt:'E-mail'},
-      {en:'Schedule',pt:'Agenda/Cronograma'},{en:'Manager',pt:'Gerente'},{en:'Early',pt:'Cedo'},
-      {en:'Late',pt:'Tarde'},{en:'Ready',pt:'Pronto'},{en:'Check-in',pt:'Check-in'},
-      {en:'Meeting',pt:'Reunião'},{en:'Office',pt:'Escritório'},{en:'Project',pt:'Projeto'},
-      {en:'Call',pt:'Ligação'},{en:'Tomorrow',pt:'Amanhã'},{en:'Yesterday',pt:'Ontem'},
-      {en:'Trip',pt:'Viagem'},{en:'Conference',pt:'Conferência'},{en:'Deadline',pt:'Prazo'},
-      {en:'Presentation',pt:'Apresentação'},{en:'Budget',pt:'Orçamento'},{en:'Contract',pt:'Contrato'},
-      {en:'Deal',pt:'Negócio/Acordo'},{en:'Partner',pt:'Parceiro'},{en:'Colleague',pt:'Colega'},
-    ],
-    expressions: [
-      {expr:'Nice to meet you.',meaning:'Prazer em conhecê-lo(a).',example:'Nice to meet you! I went to your office last week.'},
-      {expr:'Can you help me?',meaning:'Você pode me ajudar?',example:'Can you help me? I need to go to the hotel.'},
-      {expr:"Let's get started.",meaning:'Vamos começar.',example:"Let's get started. I made a plan for today."},
-      {expr:'Have a good trip.',meaning:'Faça uma boa viagem.',example:'Have a good trip! See you when you get back.'},
-    ],
-    sentences: [
-      'I went to the office yesterday.','She saw the manager this morning.',
-      'We made a reservation at the hotel.','He took the luggage to the room.',
-      'They went to the airport early.','I saw the email last night.',
-      'Did she make a report?','I didn\'t take the bus.',
-    ],
-    grammar: {
-      title: 'Simple Past — Verbos Irregulares',
-      rules: [
-        'Verbos irregulares <b>mudam completamente</b> de forma — é preciso memorizar!',
-        'Com <b>did/didn\'t</b>, o verbo volta ao infinitivo: She didn\'t <b>make</b> (não "made")',
-      ],
-      table: {
-        headers: ['Infinitivo','Passado','Negativo','Pergunta'],
-        rows: [
-          ['go','went','didn\'t go','Did you go?'],
-          ['see','saw','didn\'t see','Did she see?'],
-          ['make','made','didn\'t make','Did he make?'],
-          ['take','took','didn\'t take','Did they take?'],
-          ['have','had','didn\'t have','Did we have?'],
-          ['come','came','didn\'t come','Did it come?'],
-          ['get','got','didn\'t get','Did you get?'],
-          ['give','gave','didn\'t give','Did she give?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ to the airport yesterday. (go)',a:'went',opts:['goed','gone','went','go']},
-      {q:'She ___ the manager this morning. (see)',a:'saw',opts:['seen','saw','seed','see']},
-      {q:'We ___ a reservation. (make)',a:'made',opts:['maked','make','made','making']},
-      {q:'He ___ the luggage. (take)',a:'took',opts:['taked','take','taken','took']},
-      {q:'I ___ make the report. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
-    ],
-    speak: ['I went to the airport.','She made a reservation.','Did you see the email?','We took the bus.','He didn\'t go to the meeting.'],
-  },
-
-  {
-    id: 9, title: 'Prepositions of Place', emoji: '📍',
-    verbs: ['In','On','At','Under / Between / Behind'],
-    vocab: [
-      {en:'In',pt:'Em (dentro de)'},{en:'On',pt:'Em cima de (superfície)'},{en:'At',pt:'Em (ponto específico)'},
-      {en:'Under',pt:'Embaixo de'},{en:'Between',pt:'Entre (dois)'},{en:'Behind',pt:'Atrás de'},
-      {en:'In front of',pt:'Na frente de'},{en:'Next to',pt:'Ao lado de'},{en:'Beside',pt:'Ao lado de'},
-      {en:'Above',pt:'Acima de'},{en:'Below',pt:'Abaixo de'},{en:'Inside',pt:'Dentro de'},
-      {en:'Outside',pt:'Fora de'},{en:'Near',pt:'Perto de'},{en:'Far from',pt:'Longe de'},
-      {en:'Corner',pt:'Esquina/Canto'},{en:'Wall',pt:'Parede'},{en:'Floor',pt:'Chão'},
-      {en:'Ceiling',pt:'Teto'},{en:'Shelf',pt:'Prateleira'},{en:'Drawer',pt:'Gaveta'},
-      {en:'Pocket',pt:'Bolso'},{en:'Bag',pt:'Bolsa'},{en:'Box',pt:'Caixa'},
-      {en:'Fridge',pt:'Geladeira'},{en:'Sofa',pt:'Sofá'},{en:'Table',pt:'Mesa'},
-      {en:'Chair',pt:'Cadeira'},{en:'Bed',pt:'Cama'},{en:'Roof',pt:'Telhado'},
-    ],
-    expressions: [
-      {expr:"It's right there.",meaning:'Está bem ali.',example:"Your keys? They're right there on the table."},
-      {expr:"I can't find it.",meaning:'Não consigo encontrar.',example:"I can't find my phone. Is it under the sofa?"},
-      {expr:'Around the corner.',meaning:'Logo ali / Na esquina.',example:'The pharmacy is around the corner.'},
-      {expr:'In the middle of.',meaning:'No meio de.',example:'The park is in the middle of the city.'},
-    ],
-    sentences: [
-      'The keys are in my pocket.','The book is on the table.',
-      'I am at the bus stop.','The dog is under the bed.',
-      'The bank is between the pharmacy and the supermarket.',
-      'My car is in front of the house.',
-      'Sit next to me, please.','The clock is on the wall.',
-    ],
-    grammar: {
-      title: 'Preposições de Lugar — The Target Method',
-      rules: [
-        '<b>AT</b> = ponto específico, endereço preciso: at the bus stop, at school, at home',
-        '<b>ON</b> = superfície (tocando em cima): on the table, on the wall, on the floor',
-        '<b>IN</b> = dentro de (limites fechados): in the box, in Brazil, in the room',
-        '<b>UNDER</b> = embaixo | <b>BETWEEN</b> = entre dois | <b>NEXT TO</b> = ao lado',
-      ],
-      table: {
-        headers: ['Preposição','Uso','Exemplo'],
-        rows: [
-          ['IN','Espaços fechados / países / cidades','I live in Brazil.'],
-          ['ON','Superfícies / ruas','The book is on the table.'],
-          ['AT','Pontos específicos / endereços','I am at the office.'],
-          ['UNDER','Diretamente abaixo','The cat is under the bed.'],
-          ['BETWEEN','No meio de dois','She is between her friends.'],
-          ['NEXT TO','Ao lado','Sit next to me.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'The milk is ___ the fridge.',a:'in',opts:['on','in','at','under']},
-      {q:'The book is ___ the table.',a:'on',opts:['in','at','on','next to']},
-      {q:'I am waiting ___ the station.',a:'at',opts:['in','on','at','between']},
-      {q:'The cat is hiding ___ the chair.',a:'under',opts:['on','in','under','behind']},
-      {q:'The bank is ___ the pharmacy and the school.',a:'between',opts:['next to','behind','between','in front of']},
-    ],
-    speak: ['The keys are in my pocket.','She is at the office.','Put it on the table.','He is behind the door.','We are next to the park.'],
-  },
-
-  {
-    id: 10, title: 'Quantifiers: Many, Much, More', emoji: '🔢',
-    verbs: ['Many','Much','More','A lot of'],
-    vocab: [
-      {en:'Many',pt:'Muitos/Muitas (contável)'},{en:'Much',pt:'Muito/Muita (incontável)'},
-      {en:'More',pt:'Mais (comparação/adicional)'},{en:'A lot of',pt:'Muito/Muitos (ambos)'},
-      {en:'A few',pt:'Alguns/uns poucos (contável)'},{en:'A little',pt:'Um pouco (incontável)'},
-      {en:'Some',pt:'Alguns/um pouco (afirmativo)'},{en:'Any',pt:'Algum/nenhum (neg/interr)'},
-      {en:'Enough',pt:'Suficiente'},{en:'Too much',pt:'Muito demais'},{en:'Too many',pt:'Muitos demais'},
-      {en:'Sugar',pt:'Açúcar'},{en:'Water',pt:'Água'},{en:'Milk',pt:'Leite'},
-      {en:'Rice',pt:'Arroz'},{en:'Bread',pt:'Pão'},{en:'Time',pt:'Tempo'},
-      {en:'Money',pt:'Dinheiro'},{en:'Space',pt:'Espaço'},{en:'Traffic',pt:'Trânsito'},
-      {en:'Experience',pt:'Experiência'},{en:'Information',pt:'Informação'},{en:'Homework',pt:'Tarefa'},
-      {en:'Questions',pt:'Perguntas'},{en:'Friends',pt:'Amigos'},{en:'Books',pt:'Livros'},
-      {en:'Pages',pt:'Páginas'},{en:'Times',pt:'Vezes'},{en:'Places',pt:'Lugares'},
-      {en:'People',pt:'Pessoas'},
-    ],
-    expressions: [
-      {expr:'That\'s too much.',meaning:'Isso é demais.',example:"That's too much work for one day!"},
-      {expr:'A little bit.',meaning:'Um pouquinho.',example:'Can I have a little bit more water?'},
-      {expr:'How many/much...?',meaning:'Quantos/Quanta...?',example:'How many books do you have? How much sugar?'},
-      {expr:'Not enough.',meaning:'Não suficiente.',example:"I don't have enough time to finish."},
-    ],
-    sentences: [
-      'How much money do you have?','There are many people at the party.',
-      "I don't have much time.",'Do you want more coffee?',
-      'She has a lot of friends.','I have a lot of work today.',
-      "There isn't much milk.",'How many pages does this book have?',
-    ],
-    grammar: {
-      title: 'Countable vs. Uncountable Nouns',
-      rules: [
-        '<b>MANY</b> → usa com substantivos <b>contáveis</b> (que têm plural): many books, many friends',
-        '<b>MUCH</b> → usa com substantivos <b>incontáveis</b> (sem plural): much water, much time',
-        '<b>A LOT OF</b> → funciona com <b>ambos</b>: a lot of books / a lot of water',
-        '<b>MORE</b> → comparação ou quantidade adicional (ambos): more books / more water',
-      ],
-      table: {
-        headers: ['','Contável (books)','Incontável (water)'],
-        rows: [
-          ['✓ Afirmativo','many books / a lot of books','much water / a lot of water'],
-          ['? Pergunta','How many books?','How much water?'],
-          ['✗ Negativo','not many books','not much water'],
-          ['+ Mais','more books','more water'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'How ___ money do you have?',a:'much',opts:['many','much','more','lot']},
-      {q:'There are ___ people at the party.',a:'many',opts:['much','many','more','lot of']},
-      {q:'I have ___ of work today.',a:'a lot',opts:['many','much','a lot','more']},
-      {q:'Do you want ___ coffee? (adicional)',a:'more',opts:['many','much','more','some']},
-      {q:"There isn't ___ milk in the fridge.",a:'much',opts:['many','much','more','a lot']},
-    ],
-    speak: ['How much water do you drink?','I have many friends.','She needs more time.','There isn\'t much sugar.','How many books do you have?'],
-  },
-
-  {
-    id: 11, title: 'Adjectives & Comparatives', emoji: '📊',
-    verbs: ['Big→Bigger','Good→Better','Fast→Faster','Beautiful→More beautiful'],
-    vocab: [
-      {en:'Big / Bigger / Biggest',pt:'Grande / Maior / O maior'},{en:'Small / Smaller',pt:'Pequeno / Menor'},
-      {en:'Fast / Faster',pt:'Rápido / Mais rápido'},{en:'Slow / Slower',pt:'Lento / Mais lento'},
-      {en:'Good / Better / Best',pt:'Bom / Melhor / O melhor'},{en:'Bad / Worse / Worst',pt:'Ruim / Pior / O pior'},
-      {en:'Old / Older',pt:'Velho / Mais velho'},{en:'Young / Younger',pt:'Jovem / Mais jovem'},
-      {en:'Tall / Taller',pt:'Alto / Mais alto'},{en:'Short / Shorter',pt:'Baixo / Mais baixo'},
-      {en:'Hot / Hotter',pt:'Quente / Mais quente'},{en:'Cold / Colder',pt:'Frio / Mais frio'},
-      {en:'Expensive',pt:'Caro'},{en:'Cheap',pt:'Barato'},{en:'Easy',pt:'Fácil'},
-      {en:'Difficult / Hard',pt:'Difícil'},{en:'Happy',pt:'Feliz'},{en:'Sad',pt:'Triste'},
-      {en:'Beautiful',pt:'Bonito/Linda'},{en:'Ugly',pt:'Feio'},{en:'Clean',pt:'Limpo'},
-      {en:'Dirty',pt:'Sujo'},{en:'Strong',pt:'Forte'},{en:'Weak',pt:'Fraco'},
-      {en:'Smart',pt:'Inteligente'},{en:'Funny',pt:'Engraçado'},{en:'Boring',pt:'Chato'},
-      {en:'Interesting',pt:'Interessante'},{en:'Important',pt:'Importante'},{en:'Popular',pt:'Popular'},
-    ],
-    expressions: [
-      {expr:'The more, the merrier.',meaning:'Quanto mais, melhor.',example:'Invite everyone! The more, the merrier.'},
-      {expr:'Better safe than sorry.',meaning:'Melhor prevenir do que remediar.',example:'Take an umbrella. Better safe than sorry.'},
-      {expr:'The best of the best.',meaning:'O melhor dos melhores.',example:'She is the best of the best in her class.'},
-      {expr:'As good as it gets.',meaning:'Não fica melhor que isso.',example:"This coffee is as good as it gets."},
-    ],
-    sentences: [
-      'My house is bigger than yours.','She is taller than her sister.',
-      'This is the best coffee I have ever had.','English is easier than I thought.',
-      'He is faster than me.','That movie was more interesting than this one.',
-      'Today is hotter than yesterday.','She is more beautiful than ever.',
-    ],
-    grammar: {
-      title: 'Comparativos e Superlativos',
-      rules: [
-        '<b>Adjetivos curtos</b> (1 sílaba): adicione <b>-er</b> / <b>-est</b>: big → bigger → biggest',
-        '<b>Adjetivos longos</b> (2+ sílabas): use <b>more / most</b>: beautiful → more beautiful',
-        'Para comparar: [A] + is + <b>adjective-er / more adj</b> + than + [B]',
-        '<b>Irregulares</b>: good → better → best | bad → worse → worst',
-      ],
-      table: {
-        headers: ['Adjetivo','Comparativo','Superlativo'],
-        rows: [
-          ['big','bigger','the biggest'],
-          ['small','smaller','the smallest'],
-          ['good','better','the best'],
-          ['bad','worse','the worst'],
-          ['beautiful','more beautiful','the most beautiful'],
-          ['interesting','more interesting','the most interesting'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'My car is ___ than yours. (big)',a:'bigger',opts:['more big','bigger','bigest','most big']},
-      {q:'She is the ___ student in the class. (good)',a:'best',opts:['better','more good','goodest','best']},
-      {q:'This test is ___ than the last one. (difficult)',a:'more difficult',opts:['difficulter','more difficult','most difficult','difficultier']},
-      {q:'Today is ___ than yesterday. (hot)',a:'hotter',opts:['more hot','hoter','hotter','hottest']},
-      {q:'He runs ___ than me. (fast)',a:'faster',opts:['more fast','fastest','faster','fastly']},
-    ],
-    speak: ['She is taller than me.','This is the best day ever!','English is more interesting than I thought.','He is faster than his brother.','That is the most beautiful place.'],
-  },
-
-  {
-    id: 12, title: 'Future: Will & Going to', emoji: '🔮',
-    verbs: ['Will + verb','Am/Is/Are going to + verb','Shall','Won\'t (will not)'],
-    vocab: [
-      {en:'Tomorrow',pt:'Amanhã'},{en:'Next week',pt:'Próxima semana'},{en:'Next year',pt:'Próximo ano'},
-      {en:'Soon',pt:'Em breve'},{en:'Later',pt:'Mais tarde'},{en:'In the future',pt:'No futuro'},
-      {en:'Plan',pt:'Plano'},{en:'Intention',pt:'Intenção'},{en:'Promise',pt:'Promessa'},
-      {en:'Prediction',pt:'Previsão'},{en:'Decision',pt:'Decisão'},{en:'Dream',pt:'Sonho'},
-      {en:'Goal',pt:'Meta'},{en:'Hope',pt:'Esperança'},{en:'Expect',pt:'Esperar/Prever'},
-      {en:'Probably',pt:'Provavelmente'},{en:'Maybe',pt:'Talvez'},{en:'Definitely',pt:'Definitivamente'},
-      {en:'Graduate',pt:'Formarse'},{en:'Marry',pt:'Casar'},{en:'Move',pt:'Mudar-se'},
-      {en:'Buy',pt:'Comprar'},{en:'Sell',pt:'Vender'},{en:'Build',pt:'Construir'},
-      {en:'Travel',pt:'Viajar'},{en:'Learn',pt:'Aprender'},{en:'Earn',pt:'Ganhar'},
-      {en:'Save',pt:'Economizar'},{en:'Start',pt:'Começar'},{en:'Retire',pt:'Aposentar-se'},
-    ],
-    expressions: [
-      {expr:'I\'ll think about it.',meaning:'Vou pensar a respeito.',example:"Should I take the job? I'll think about it."},
-      {expr:'It\'s going to be great.',meaning:'Vai ser ótimo.',example:"Don't worry, it's going to be great!"},
-      {expr:'One day...',meaning:'Um dia...',example:'One day, I will speak English perfectly.'},
-      {expr:'Before you know it.',meaning:'Antes que você perceba.',example:'Study every day and before you know it, you\'ll be fluent.'},
-    ],
-    sentences: [
-      "I'll call you tomorrow.",'She is going to study tonight.',
-      'They will travel to London next year.','We are going to buy a new car.',
-      "It's going to rain today.",'I will never give up.',
-      'Will you help me?','Is she going to be there?',
-    ],
-    grammar: {
-      title: 'Will vs. Going to',
-      rules: [
-        '<b>WILL</b>: decisão espontânea, promessa, previsão sem evidência: "I\'ll help you!" (agora decidi)',
-        '<b>GOING TO</b>: plano já decidido, intenção, previsão com evidência: "I\'m going to study" (já planejei)',
-        'Estrutura WILL: [Sujeito] + will + [infinitivo sem to]',
-        'Estrutura GOING TO: [Sujeito] + am/is/are + going to + [infinitivo sem to]',
-      ],
-      table: {
-        headers: ['','Will','Going to'],
-        rows: [
-          ['Afirmativo','I will go.','I am going to go.'],
-          ['Negativo','I won\'t go.','I\'m not going to go.'],
-          ['Pergunta','Will you go?','Are you going to go?'],
-          ['Uso','Decisão espontânea / promessa','Plano já feito / intenção'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'Look at those clouds. It ___ rain. (evidência)',a:'is going to',opts:['will','is going to','going to','shall']},
-      {q:'Hold on, ___ help you. (decisão espontânea)',a:"I'll",opts:["I'm going to","I'll","I shall to","I am will"]},
-      {q:'She ___ travel to London next month. (plano)',a:'is going to',opts:['will','is going to','goes to','shall']},
-      {q:'___ you help me? (pedido com will)',a:'Will',opts:['Shall','Going to','Will','Are']},
-      {q:'They ___ (will + neg) give up.',a:"won't",opts:["don't will","won't","not will","willn't"]},
-    ],
-    speak: ['I\'ll call you later.','She is going to study tonight.','Will you come to the party?','We won\'t give up.','It\'s going to be a great day!'],
-  },
-
-  // ── LESSONS 13–24: From Aulas 14–28 ─────────────────────────────────────────
-
-  {
-    id: 13, title: 'Work & Career', emoji: '💼',
-    verbs: ['To Work / Worked','To Hire / Hired','To Quit / Quit','To Apply / Applied'],
-    vocab: [
-      {en:'Job',pt:'Emprego'},{en:'Career',pt:'Carreira'},{en:'Company',pt:'Empresa'},
-      {en:'Office',pt:'Escritório'},{en:'Boss',pt:'Chefe'},{en:'Manager',pt:'Gerente'},
-      {en:'Employee',pt:'Funcionário'},{en:'Colleague',pt:'Colega'},{en:'Salary',pt:'Salário'},
-      {en:'Bonus',pt:'Bônus'},{en:'Interview',pt:'Entrevista'},{en:'Resume',pt:'Currículo'},
-      {en:'Application',pt:'Candidatura'},{en:'Skills',pt:'Habilidades'},{en:'Experience',pt:'Experiência'},
-      {en:'Promotion',pt:'Promoção'},{en:'Meeting',pt:'Reunião'},{en:'Deadline',pt:'Prazo'},
-      {en:'Project',pt:'Projeto'},{en:'Task',pt:'Tarefa'},{en:'Success',pt:'Sucesso'},
-      {en:'Business',pt:'Negócio'},{en:'Client',pt:'Cliente'},{en:'Contract',pt:'Contrato'},
-      {en:'Full-time',pt:'Tempo integral'},{en:'Part-time',pt:'Meio período'},{en:'Remote work',pt:'Trabalho remoto'},
-      {en:'Retirement',pt:'Aposentadoria'},{en:'Unemployed',pt:'Desempregado'},{en:'Promotion',pt:'Promoção'},
-    ],
-    expressions: [
-      {expr:'I applied for the job.',meaning:'Me candidatei para o emprego.',example:'I applied for the job and got an interview.'},
-      {expr:'She got a promotion.',meaning:'Ela foi promovida.',example:'She worked hard and got a promotion last year.'},
-      {expr:'I quit my job.',meaning:'Eu saí do meu emprego.',example:'He quit his job and started his own business.'},
-      {expr:'We hit the deadline.',meaning:'Cumprimos o prazo.',example:'The team worked all night and hit the deadline.'},
-    ],
-    sentences: [
-      'She worked at the company for five years.','He applied for the job online.',
-      'They hired a new manager last month.','I quit my old job and found a better one.',
-      'She earned a big bonus this year.','We met the client at the office.',
-      'Did you apply for the promotion?','He didn\'t work on weekends.',
-    ],
-    grammar: {
-      title: 'Simple Past — Verbos Regulares de Trabalho',
-      rules: [
-        'Verbos regulares: adicione <b>-ed</b> → work → work<b>ed</b>, hire → hire<b>d</b>',
-        'Apply → appli<b>ed</b> (y → ied quando precedido de consoante)',
-        'Negativo: <b>didn\'t</b> + infinitivo → "She didn\'t work."',
-        'Pergunta: <b>Did</b> + sujeito + infinitivo → "Did he apply?"',
-        'Quit é irregular: quit → <b>quit</b> (não muda no passado!)',
-      ],
-      table: {
-        headers: ['Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I worked.','I didn\'t work.','Did I work?'],
-          ['She applied.','She didn\'t apply.','Did she apply?'],
-          ['He quit.','He didn\'t quit.','Did he quit?'],
-          ['They hired.','They didn\'t hire.','Did they hire?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ for the job last week. (apply)',a:'applied',opts:['apply','applyed','applied','applies']},
-      {q:'He ___ his job after 5 years. (quit)',a:'quit',opts:['quited','quit','quits','quitting']},
-      {q:'They ___ a new manager. (hire)',a:'hired',opts:['hire','hires','hirable','hired']},
-      {q:'I ___ work on Saturday. (negative)',a:"didn't",opts:["don't","doesn't","didn't","wasn't"]},
-      {q:'___ she earn a bonus? (question)',a:'Did',opts:['Was','Did','Does','Has']},
-    ],
-    speak: ['I applied for a new job.','She quit her job last year.','Did you get a promotion?','He worked very hard.','They didn\'t hire anyone.'],
-  },
-
-  {
-    id: 14, title: 'Technology & Digital Life', emoji: '💻',
-    verbs: ['To Send / Sent','To Download / Downloaded','To Upload / Uploaded','To Connect / Connected'],
-    vocab: [
-      {en:'Computer',pt:'Computador'},{en:'Laptop',pt:'Notebook'},{en:'Smartphone',pt:'Celular'},
-      {en:'Screen',pt:'Tela'},{en:'Keyboard',pt:'Teclado'},{en:'Internet',pt:'Internet'},
-      {en:'Website',pt:'Site'},{en:'Social Media',pt:'Redes sociais'},{en:'Email',pt:'E-mail'},
-      {en:'Password',pt:'Senha'},{en:'Account',pt:'Conta'},{en:'Profile',pt:'Perfil'},
-      {en:'Message',pt:'Mensagem'},{en:'Notification',pt:'Notificação'},{en:'App',pt:'Aplicativo'},
-      {en:'Software',pt:'Software'},{en:'Wi-Fi',pt:'Wi-Fi'},{en:'Data',pt:'Dados'},
-      {en:'File',pt:'Arquivo'},{en:'Folder',pt:'Pasta'},{en:'Link',pt:'Link'},
-      {en:'Browser',pt:'Navegador'},{en:'Search Engine',pt:'Mecanismo de busca'},{en:'Cloud',pt:'Nuvem'},
-      {en:'Online',pt:'Online'},{en:'Offline',pt:'Offline'},{en:'Update',pt:'Atualização'},
-      {en:'Virus',pt:'Vírus'},{en:'Backup',pt:'Backup'},{en:'Video call',pt:'Videochamada'},
-    ],
-    expressions: [
-      {expr:'My phone died.',meaning:'Meu celular descarregou.',example:'I missed your call — my phone died.'},
-      {expr:'The Wi-Fi is down.',meaning:'O Wi-Fi está fora.',example:'I can\'t connect. The Wi-Fi is down again.'},
-      {expr:'I\'ll send it over.',meaning:'Vou enviar / mandar.',example:'I finished the file. I\'ll send it over right now.'},
-      {expr:'Let me Google that.',meaning:'Deixa eu pesquisar isso.',example:'I don\'t know the answer — let me Google that.'},
-    ],
-    sentences: [
-      'I sent the email this morning.','She downloaded the app yesterday.',
-      'We uploaded the photos to the cloud.','He connected to the Wi-Fi at the café.',
-      'Did you receive my message?','They updated the software last night.',
-      'I searched for information online.','She didn\'t remember her password.',
-    ],
-    grammar: {
-      title: 'Simple Past — Verbos de Tecnologia',
-      rules: [
-        'Download → download<b>ed</b> | Upload → upload<b>ed</b> | Connect → connect<b>ed</b>',
-        'Send é irregular: send → <b>sent</b> | Receive → receive<b>d</b>',
-        'Negativo: <b>didn\'t</b> + infinitivo → "I didn\'t send."',
-        'Pergunta: <b>Did</b> + sujeito + infinitivo → "Did she connect?"',
-      ],
-      table: {
-        headers: ['Infinitivo','Passado','Negativo'],
-        rows: [
-          ['send','sent','didn\'t send'],
-          ['download','downloaded','didn\'t download'],
-          ['upload','uploaded','didn\'t upload'],
-          ['connect','connected','didn\'t connect'],
-          ['receive','received','didn\'t receive'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ the file to the cloud. (upload)',a:'uploaded',opts:['upload','uploads','uploading','uploaded']},
-      {q:'I ___ you an email this morning. (send)',a:'sent',opts:['sended','send','sent','sending']},
-      {q:'He ___ to the Wi-Fi at the hotel. (connect)',a:'connected',opts:['connect','connects','connected','connecting']},
-      {q:'They ___ download the app. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
-      {q:'___ you receive my message?',a:'Did',opts:['Have','Did','Does','Was']},
-    ],
-    speak: ['I sent you a message.','Did you download the app?','She connected to the internet.','We uploaded the video.','I didn\'t receive the email.'],
-  },
-
-  {
-    id: 15, title: 'Travel & Tourism', emoji: '✈️',
-    verbs: ['To Travel / Traveled','To Arrive / Arrived','To Stay / Stayed','To Visit / Visited'],
-    vocab: [
-      {en:'Airport',pt:'Aeroporto'},{en:'Airplane',pt:'Avião'},{en:'Flight',pt:'Voo'},
-      {en:'Ticket',pt:'Passagem'},{en:'Passport',pt:'Passaporte'},{en:'Suitcase',pt:'Mala'},
-      {en:'Luggage',pt:'Bagagem'},{en:'Boarding pass',pt:'Cartão de embarque'},{en:'Gate',pt:'Portão'},
-      {en:'Security',pt:'Segurança'},{en:'Customs',pt:'Alfândega'},{en:'Hotel',pt:'Hotel'},
-      {en:'Reservation',pt:'Reserva'},{en:'Room service',pt:'Serviço de quarto'},{en:'Tourist',pt:'Turista'},
-      {en:'Sightseeing',pt:'Passeio turístico'},{en:'Landmark',pt:'Ponto turístico'},{en:'Museum',pt:'Museu'},
-      {en:'Map',pt:'Mapa'},{en:'Guidebook',pt:'Guia de viagem'},{en:'Souvenir',pt:'Lembrança'},
-      {en:'Beach',pt:'Praia'},{en:'Mountain',pt:'Montanha'},{en:'City center',pt:'Centro da cidade'},
-      {en:'Train station',pt:'Estação de trem'},{en:'Bus stop',pt:'Ponto de ônibus'},{en:'Taxi',pt:'Táxi'},
-      {en:'Vacation',pt:'Férias'},{en:'Trip',pt:'Viagem'},{en:'Destination',pt:'Destino'},
-    ],
-    expressions: [
-      {expr:'I\'m all packed.',meaning:'Estou com tudo arrumado.',example:'The taxi comes at 6am — I\'m all packed!'},
-      {expr:'Safe travels!',meaning:'Boa viagem! / Viaje com segurança!',example:'Safe travels! Send me photos when you arrive.'},
-      {expr:'We got lost.',meaning:'Nós nos perdemos.',example:'We didn\'t have a map and got lost in the city.'},
-      {expr:'It was worth it.',meaning:'Valeu a pena.',example:'The line was long but it was worth it — the view was amazing.'},
-    ],
-    sentences: [
-      'I traveled to Paris last summer.','She arrived at the airport early.',
-      'We stayed at a beautiful hotel.','He visited the Eiffel Tower.',
-      'They booked the tickets online.','I packed my suitcase the night before.',
-      'Did you visit the museum?','She didn\'t arrive on time.',
-    ],
-    grammar: {
-      title: 'Simple Past — Planejando e Contando Viagens',
-      rules: [
-        'Travel → travel<b>ed</b> | Arrive → arrive<b>d</b> | Stay → stay<b>ed</b> | Visit → visit<b>ed</b>',
-        'Book → book<b>ed</b> | Pack → pack<b>ed</b> | Miss → miss<b>ed</b>',
-        'Negativo: <b>didn\'t</b> + infinitivo → "He didn\'t arrive on time."',
-        'Para contar uma viagem use: <b>First... Then... After that... Finally...</b>',
-      ],
-      table: {
-        headers: ['Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I traveled.','I didn\'t travel.','Did you travel?'],
-          ['She arrived.','She didn\'t arrive.','Did she arrive?'],
-          ['We stayed.','We didn\'t stay.','Did we stay?'],
-          ['He visited.','He didn\'t visit.','Did he visit?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'We ___ at a hotel in Paris. (stay)',a:'stayed',opts:['stay','stays','stayed','staying']},
-      {q:'She ___ to London last year. (travel)',a:'traveled',opts:['travel','travels','traveled','travelling']},
-      {q:'He ___ the Eiffel Tower. (visit)',a:'visited',opts:['visit','visits','visited','visiting']},
-      {q:'They ___ arrive on time. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
-      {q:'___ you book the tickets? (question)',a:'Did',opts:['Have','Did','Does','Were']},
-    ],
-    speak: ['I traveled to another country.','She visited a famous museum.','Did you stay at a hotel?','We arrived early.','He didn\'t pack his passport.'],
-  },
-
-  {
-    id: 16, title: 'Health & Wellness', emoji: '🏥',
-    verbs: ['To Feel / Felt','To Eat / Ate','To Sleep / Slept','To Drink / Drank'],
-    vocab: [
-      {en:'Health',pt:'Saúde'},{en:'Body',pt:'Corpo'},{en:'Head',pt:'Cabeça'},
-      {en:'Stomach',pt:'Estômago'},{en:'Heart',pt:'Coração'},{en:'Muscle',pt:'Músculo'},
-      {en:'Pain',pt:'Dor'},{en:'Headache',pt:'Dor de cabeça'},{en:'Fever',pt:'Febre'},
-      {en:'Cold',pt:'Resfriado'},{en:'Flu',pt:'Gripe'},{en:'Medicine',pt:'Remédio'},
-      {en:'Doctor',pt:'Médico'},{en:'Appointment',pt:'Consulta'},{en:'Hospital',pt:'Hospital'},
-      {en:'Pharmacy',pt:'Farmácia'},{en:'Healthy food',pt:'Comida saudável'},{en:'Junk food',pt:'Comida não saudável'},
-      {en:'Fruit',pt:'Fruta'},{en:'Vegetables',pt:'Legumes/Verduras'},{en:'Water',pt:'Água'},
-      {en:'Exercise',pt:'Exercício'},{en:'Gym',pt:'Academia'},{en:'Running',pt:'Corrida'},
-      {en:'Sleep',pt:'Sono'},{en:'Stress',pt:'Estresse'},{en:'Energy',pt:'Energia'},
-      {en:'Lifestyle',pt:'Estilo de vida'},{en:'Diet',pt:'Dieta'},{en:'Recovery',pt:'Recuperação'},
-    ],
-    expressions: [
-      {expr:'I\'m under the weather.',meaning:'Estou me sentindo mal.',example:'I can\'t come today — I\'m a bit under the weather.'},
-      {expr:'Take it easy.',meaning:'Descanse / Vá com calma.',example:'You worked too hard. Take it easy this weekend.'},
-      {expr:'I need a check-up.',meaning:'Preciso de um check-up.',example:'I haven\'t been to the doctor in a year — I need a check-up.'},
-      {expr:'Sleep it off.',meaning:'Dormir para melhorar.',example:'You have a cold? Just sleep it off and drink water.'},
-    ],
-    sentences: [
-      'I felt tired all day yesterday.','She ate healthy food last week.',
-      'He slept for ten hours after the trip.','We drank a lot of water during exercise.',
-      'Did you feel better after the medicine?','I didn\'t eat breakfast this morning.',
-      'She exercised every day last month.','They recovered quickly from the flu.',
-    ],
-    grammar: {
-      title: 'Simple Past — Verbos Irregulares de Saúde',
-      rules: [
-        'Estes verbos mudam completamente no passado — é preciso memorizar!',
-        'feel → <b>felt</b> | eat → <b>ate</b> | sleep → <b>slept</b> | drink → <b>drank</b>',
-        'Com <b>didn\'t</b>, o verbo volta ao infinitivo: "I didn\'t <b>eat</b>" (não "ate")',
-        'Dica: exercised, recovered, rested são regulares → apenas adicione <b>-ed</b>',
-      ],
-      table: {
-        headers: ['Infinitivo','Passado','Negativo'],
-        rows: [
-          ['feel','felt','didn\'t feel'],
-          ['eat','ate','didn\'t eat'],
-          ['sleep','slept','didn\'t sleep'],
-          ['drink','drank','didn\'t drink'],
-          ['recover','recovered','didn\'t recover'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She ___ very tired yesterday. (feel)',a:'felt',opts:['feeled','feel','felt','feeling']},
-      {q:'I ___ healthy food all week. (eat)',a:'ate',opts:['eated','eat','ate','eating']},
-      {q:'He ___ for 9 hours last night. (sleep)',a:'slept',opts:['sleeped','sleep','slept','sleeping']},
-      {q:'We ___ drink enough water. (negative)',a:"didn't",opts:["don't","doesn't","didn't","weren't"]},
-      {q:'___ you feel better after the medicine?',a:'Did',opts:['Have','Did','Does','Were']},
-    ],
-    speak: ['I felt sick yesterday.','She ate a lot of fruit.','Did you sleep well?','He drank water after the gym.','We didn\'t eat junk food.'],
-  },
-
-  {
-    id: 17, title: 'My Home — There is / There are', emoji: '🏠',
-    verbs: ['There is','There are','There was','There were'],
-    vocab: [
-      {en:'House',pt:'Casa'},{en:'Apartment',pt:'Apartamento'},{en:'Living room',pt:'Sala de estar'},
-      {en:'Kitchen',pt:'Cozinha'},{en:'Bedroom',pt:'Quarto'},{en:'Bathroom',pt:'Banheiro'},
-      {en:'Dining room',pt:'Sala de jantar'},{en:'Garden',pt:'Jardim'},{en:'Garage',pt:'Garagem'},
-      {en:'Sofa',pt:'Sofá'},{en:'Table',pt:'Mesa'},{en:'Chair',pt:'Cadeira'},
-      {en:'Wardrobe',pt:'Guarda-roupa'},{en:'Fridge',pt:'Geladeira'},{en:'Stove',pt:'Fogão'},
-      {en:'Microwave',pt:'Micro-ondas'},{en:'Sink',pt:'Pia'},{en:'Mirror',pt:'Espelho'},
-      {en:'Curtain',pt:'Cortina'},{en:'Rug',pt:'Tapete'},{en:'Bookshelf',pt:'Estante'},
-      {en:'Armchair',pt:'Poltrona'},{en:'Coffee table',pt:'Mesa de centro'},{en:'Nightstand',pt:'Criado-mudo'},
-      {en:'Lamp',pt:'Abajur/Lâmpada'},{en:'Shower',pt:'Chuveiro'},{en:'Toilet',pt:'Vaso sanitário'},
-      {en:'Window',pt:'Janela'},{en:'Door',pt:'Porta'},{en:'Wall',pt:'Parede'},
-    ],
-    expressions: [
-      {expr:'Make yourself at home.',meaning:'Fique à vontade.',example:'Come in, make yourself at home! There\'s coffee in the kitchen.'},
-      {expr:'Home sweet home.',meaning:'Lar doce lar.',example:'After the long trip — home sweet home!'},
-      {expr:'There\'s no place like home.',meaning:'Não há lugar como o lar.',example:'I love traveling but there\'s no place like home.'},
-      {expr:'Housewarming party.',meaning:'Festa de inauguração da casa.',example:'We moved in last week — let\'s have a housewarming party!'},
-    ],
-    sentences: [
-      'There is a sofa in the living room.','There are two bedrooms in my apartment.',
-      'There is a big fridge in the kitchen.','There are no curtains in the bedroom.',
-      'There was a garden when I was a child.','There were three chairs around the table.',
-      'Is there a microwave in the kitchen?','Are there any windows in the bathroom?',
-    ],
-    grammar: {
-      title: 'There is / There are / There was / There were',
-      rules: [
-        '<b>There is</b> → singular (presente): "There is a sofa in the living room."',
-        '<b>There are</b> → plural (presente): "There are two chairs."',
-        '<b>There was</b> → singular (passado): "There was a lamp here."',
-        '<b>There were</b> → plural (passado): "There were books on the shelf."',
-        'Negativo: There <b>isn\'t</b> / <b>aren\'t</b> / <b>wasn\'t</b> / <b>weren\'t</b>',
-      ],
-      table: {
-        headers: ['','Singular','Plural'],
-        rows: [
-          ['Presente','There is a bed.','There are two beds.'],
-          ['Passado','There was a table.','There were chairs.'],
-          ['Negativo (pres.)','There isn\'t a garage.','There aren\'t any windows.'],
-          ['Negativo (pass.)','There wasn\'t a fridge.','There weren\'t curtains.'],
-          ['Pergunta (pres.)','Is there a bathroom?','Are there two rooms?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'___ a sofa in the living room.',a:'There is',opts:['There are','There is','There was','There were']},
-      {q:'___ three bedrooms in my apartment.',a:'There are',opts:['There is','There are','There was','There were']},
-      {q:'___ a garden when I was a child.',a:'There was',opts:['There is','There are','There was','There were']},
-      {q:'There ___ a fridge in the kitchen. (negative, present)',a:"isn't",opts:["aren't","isn't","wasn't","weren't"]},
-      {q:'___ any windows in the bathroom? (question)',a:'Are there',opts:['Is there','Are there','Was there','Were there']},
-    ],
-    speak: ['There is a sofa in my living room.','There are two bedrooms.','Is there a garden?','There was a lamp here before.','There aren\'t any curtains.'],
-  },
-
-  {
-    id: 18, title: 'Past Continuous', emoji: '🎬',
-    verbs: ['Was / Were + verb-ing','While','When','At that moment'],
-    vocab: [
-      {en:'Opportunity',pt:'Oportunidade'},{en:'Challenge',pt:'Desafio'},{en:'Achievement',pt:'Conquista'},
-      {en:'Strategy',pt:'Estratégia'},{en:'Progress',pt:'Progresso'},{en:'Consequence',pt:'Consequência'},
-      {en:'Responsibility',pt:'Responsabilidade'},{en:'Innovation',pt:'Inovação'},{en:'Environment',pt:'Ambiente/Meio ambiente'},
-      {en:'Community',pt:'Comunidade'},{en:'Development',pt:'Desenvolvimento'},{en:'Impact',pt:'Impacto'},
-      {en:'Influence',pt:'Influência'},{en:'Benefit',pt:'Benefício'},{en:'Perspective',pt:'Perspectiva'},
-      {en:'All day',pt:'O dia todo'},{en:'All night',pt:'A noite toda'},{en:'At that time',pt:'Naquele momento'},
-      {en:'Meanwhile',pt:'Enquanto isso'},{en:'Suddenly',pt:'De repente'},{en:'Interrupted',pt:'Interrompido'},
-      {en:'Working',pt:'Trabalhando'},{en:'Sleeping',pt:'Dormindo'},{en:'Driving',pt:'Dirigindo'},
-      {en:'Studying',pt:'Estudando'},{en:'Cooking',pt:'Cozinhando'},{en:'Watching',pt:'Assistindo'},
-      {en:'Running',pt:'Correndo'},{en:'Talking',pt:'Falando'},{en:'Waiting',pt:'Esperando'},
-    ],
-    expressions: [
-      {expr:'I was in the middle of something.',meaning:'Estava no meio de algo.',example:'Sorry I missed your call — I was in the middle of a meeting.'},
-      {expr:'What were you thinking?',meaning:'O que você estava pensando?',example:'You left without a coat? What were you thinking?'},
-      {expr:'It was raining cats and dogs.',meaning:'Estava chovendo muito (forte).',example:'We couldn\'t go out — it was raining cats and dogs.'},
-      {expr:'Time was flying.',meaning:'O tempo estava voando.',example:'We were having so much fun that time was flying.'},
-    ],
-    sentences: [
-      'I was working when she called.','They were studying all night.',
-      'She was cooking dinner at 7pm.','We were watching a movie when the lights went out.',
-      'He was driving to work while it was raining.','What were you doing at 9 o\'clock?',
-      'I wasn\'t sleeping — I was reading.','Were they waiting for me?',
-    ],
-    grammar: {
-      title: 'Past Continuous — Ação em Progresso no Passado',
-      rules: [
-        'Estrutura: <b>was/were</b> + verbo<b>-ing</b>',
-        'I/He/She/It + <b>was</b> | You/We/They + <b>were</b>',
-        'Uso 1 — Ação em progresso num momento passado: "At 8pm, I was studying."',
-        'Uso 2 — Duas ações simultâneas: "She was cooking <b>while</b> he was watching TV."',
-        'Uso 3 — Ação interrompida: "I was sleeping <b>when</b> the phone rang." (rang = Simple Past)',
-      ],
-      table: {
-        headers: ['Afirmativo','Negativo','Pergunta'],
-        rows: [
-          ['I was working.','I wasn\'t working.','Was I working?'],
-          ['She was studying.','She wasn\'t studying.','Was she studying?'],
-          ['They were waiting.','They weren\'t waiting.','Were they waiting?'],
-          ['We were driving.','We weren\'t driving.','Were we driving?'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ when she called. (work)',a:'was working',opts:['worked','was working','were working','working']},
-      {q:'They ___ all night. (study)',a:'were studying',opts:['studied','was studying','were studying','studying']},
-      {q:'___ you waiting for me?',a:'Were',opts:['Was','Were','Did','Have']},
-      {q:'She ___ sleeping — she was reading. (negative)',a:"wasn't",opts:["didn't","wasn't","weren't","not"]},
-      {q:'What ___ he doing at 9pm?',a:'was',opts:['is','was','were','did']},
-    ],
-    speak: ['I was studying at 8pm.','Were you sleeping?','She was cooking when I arrived.','We weren\'t watching TV.','They were talking all night.'],
-  },
-
-  {
-    id: 19, title: 'Superlatives', emoji: '🏆',
-    verbs: ['The most','The least','The -est','Better / Best'],
-    vocab: [
-      {en:'Strong',pt:'Forte'},{en:'Fast',pt:'Rápido'},{en:'Tall',pt:'Alto'},
-      {en:'Big',pt:'Grande'},{en:'Small',pt:'Pequeno'},{en:'Old',pt:'Velho/Antigo'},
-      {en:'New',pt:'Novo'},{en:'Happy',pt:'Feliz'},{en:'Busy',pt:'Ocupado'},
-      {en:'Expensive',pt:'Caro'},{en:'Cheap',pt:'Barato'},{en:'Interesting',pt:'Interessante'},
-      {en:'Boring',pt:'Chato'},{en:'Intelligent',pt:'Inteligente'},{en:'Difficult',pt:'Difícil'},
-      {en:'Easy',pt:'Fácil'},{en:'Beautiful',pt:'Bonito/Bonita'},{en:'Popular',pt:'Popular'},
-      {en:'Important',pt:'Importante'},{en:'Useful',pt:'Útil'},{en:'Dangerous',pt:'Perigoso'},
-      {en:'Safe',pt:'Seguro'},{en:'Comfortable',pt:'Confortável'},{en:'Modern',pt:'Moderno'},
-      {en:'Ancient',pt:'Antigo/Ancestral'},{en:'Famous',pt:'Famoso'},{en:'Crowded',pt:'Lotado'},
-      {en:'Quiet',pt:'Quieto/Tranquilo'},{en:'Friendly',pt:'Amigável'},{en:'Polluted',pt:'Poluído'},
-    ],
-    expressions: [
-      {expr:'The best of all.',meaning:'O melhor de todos.',example:'This is the best coffee I\'ve ever had — the best of all!'},
-      {expr:'Second to none.',meaning:'Sem igual / O melhor.',example:'Her cooking is second to none in this city.'},
-      {expr:'Once in a lifetime.',meaning:'Uma vez na vida.',example:'Seeing the Northern Lights was a once in a lifetime experience.'},
-      {expr:'Top of the class.',meaning:'O melhor da turma.',example:'She studied the most and finished top of the class.'},
-    ],
-    sentences: [
-      'This is the tallest building in the city.','She is the most intelligent student in the class.',
-      'That was the best movie I have ever seen.','English is the most useful language to learn.',
-      'He is the fastest runner on the team.','This is the most expensive restaurant in town.',
-      'It was the worst day of my life.','She is the happiest person I know.',
-    ],
-    grammar: {
-      title: 'Superlatives — O/A Melhor, O/A Maior...',
-      rules: [
-        'Adjetivos curtos (1-2 sílabas): <b>the</b> + adjetivo + <b>-est</b> → the tall<b>est</b>, the fast<b>est</b>',
-        'Adjetivos longos (3+ sílabas): <b>the most</b> + adjetivo → the most beautiful, the most expensive',
-        'Dobrar consoante final: big → the bigg<b>est</b> | hot → the hott<b>est</b>',
-        'y → iest: happy → the happ<b>iest</b> | busy → the bus<b>iest</b>',
-        'Irregulares: good → <b>the best</b> | bad → <b>the worst</b> | far → <b>the furthest</b>',
-      ],
-      table: {
-        headers: ['Adjetivo','Comparativo','Superlativo'],
-        rows: [
-          ['tall','taller than','the tallest'],
-          ['fast','faster than','the fastest'],
-          ['big','bigger than','the biggest'],
-          ['beautiful','more beautiful than','the most beautiful'],
-          ['expensive','more expensive than','the most expensive'],
-          ['good','better than','the best'],
-          ['bad','worse than','the worst'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'She is ___ student in the class. (intelligent)',a:'the most intelligent',opts:['most intelligent','the most intelligent','the intelligenter','most intelligenter']},
-      {q:'This is ___ building in the city. (tall)',a:'the tallest',opts:['the most tall','taller','the tallest','most tall']},
-      {q:'That was ___ day of my life. (bad)',a:'the worst',opts:['the baddest','the most bad','the worst','the badder']},
-      {q:'English is ___ language for business. (useful)',a:'the most useful',opts:['the usefulest','most useful','the most useful','the usefuller']},
-      {q:'He is ___ runner on the team. (fast)',a:'the fastest',opts:['the most fast','the fastest','faster','most fast']},
-    ],
-    speak: ['This is the best day ever.','She is the most intelligent person I know.','It was the worst experience.','English is the most useful language.','He is the tallest in the room.'],
-  },
-
-  {
-    id: 20, title: 'MOST — Quantifier & Reference', emoji: '📊',
-    verbs: ['To Show / Showed','To Believe / Believed','To Choose / Chose','To Spend / Spent'],
-    vocab: [
-      {en:'Most people',pt:'A maioria das pessoas'},{en:'Most of the time',pt:'A maior parte do tempo'},
-      {en:'Most of my money',pt:'A maior parte do meu dinheiro'},{en:'Most likely',pt:'Muito provavelmente'},
-      {en:'For the most part',pt:'Na maior parte'},{en:'Make the most of it',pt:'Aproveitar ao máximo'},
-      {en:'At most',pt:'No máximo'},{en:'The most important',pt:'O mais importante'},
-      {en:'Time',pt:'Tempo'},{en:'Money',pt:'Dinheiro'},{en:'People',pt:'Pessoas'},
-      {en:'Ideas',pt:'Ideias'},{en:'Problems',pt:'Problemas'},{en:'Solutions',pt:'Soluções'},
-      {en:'Friends',pt:'Amigos'},{en:'Family',pt:'Família'},{en:'Work',pt:'Trabalho'},
-      {en:'City',pt:'Cidade'},{en:'Country',pt:'País'},{en:'World',pt:'Mundo'},
-      {en:'Believe',pt:'Acreditar'},{en:'Choose',pt:'Escolher'},{en:'Show',pt:'Mostrar'},
-      {en:'Spend',pt:'Gastar'},{en:'Agree',pt:'Concordar'},{en:'Decide',pt:'Decidir'},
-      {en:'Opinion',pt:'Opinião'},{en:'Experience',pt:'Experiência'},{en:'Result',pt:'Resultado'},
-      {en:'Difference',pt:'Diferença'},{en:'Effort',pt:'Esforço'},
-    ],
-    expressions: [
-      {expr:'For the most part.',meaning:'Na maior parte / Em geral.',example:'For the most part, I enjoy my work — but it\'s stressful sometimes.'},
-      {expr:'Make the most of it.',meaning:'Aproveitar ao máximo.',example:'We only have one week in Paris — let\'s make the most of it!'},
-      {expr:'Most likely.',meaning:'Muito provavelmente.',example:'I don\'t know for sure, but she\'s most likely going to accept the job.'},
-      {expr:'At most.',meaning:'No máximo.',example:'The meeting will take an hour at most.'},
-    ],
-    sentences: [
-      'Most people believe that honesty is important.','I spend most of my time at work.',
-      'She chose the most expensive option.','He showed most of his work to the manager.',
-      'Most of my friends live in another city.','For the most part, I agree with your idea.',
-      'She most likely chose the best solution.','We make the most of every opportunity.',
-    ],
-    grammar: {
-      title: 'MOST — 3 Usos Essenciais',
-      rules: [
-        '<b>Most + substantivo</b> (geral, sem artigo): "Most people like music." → A maioria das pessoas',
-        '<b>The most + adjetivo</b> (superlativo): "The most important thing." → A coisa mais importante',
-        '<b>Most of + the/my/his/...</b> (referência específica): "Most of my money." → A maior parte do meu dinheiro',
-        '⚠️ Atenção: <b>Most</b> people (geral) vs. <b>Most of the</b> people (grupo específico)',
-      ],
-      table: {
-        headers: ['Uso','Estrutura','Exemplo'],
-        rows: [
-          ['Quantificador','Most + noun','Most people work hard.'],
-          ['Superlativo','The most + adj.','The most beautiful city.'],
-          ['Referência','Most of + the/pronoun','Most of my time.'],
-          ['Expressão','For the most part','For the most part, I agree.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'___ people think English is important.',a:'Most',opts:['The most','Most of the','Most','Most of']},
-      {q:'I spend ___ my time at work.',a:'most of',opts:['most','the most','most of','mostly']},
-      {q:'She chose ___ expensive restaurant.',a:'the most',opts:['most','most of','the most','mostly']},
-      {q:'___, I enjoy my job.',a:'For the most part',opts:['Most likely','At most','For the most part','Most of']},
-      {q:'She ___ the best answer. (choose, past)',a:'chose',opts:['choosed','choose','chosen','chose']},
-    ],
-    speak: ['Most people agree with me.','I spend most of my time studying.','For the most part, I\'m happy.','She most likely chose the best option.','Make the most of every day!'],
-  },
-
-  {
-    id: 21, title: 'Can, Could & Would', emoji: '🎯',
-    verbs: ['Can (ability)','Could (past / polite)','Would (polite / hypothetical)','Many / Much / A lot of'],
-    vocab: [
-      {en:'Ability',pt:'Habilidade'},{en:'Request',pt:'Pedido'},{en:'Permission',pt:'Permissão'},
-      {en:'Advice',pt:'Conselho'},{en:'Preference',pt:'Preferência'},{en:'Choice',pt:'Escolha'},
-      {en:'Option',pt:'Opção'},{en:'Budget',pt:'Orçamento'},{en:'Workload',pt:'Carga de trabalho'},
-      {en:'Deadline',pt:'Prazo'},{en:'Feedback',pt:'Retorno/Feedback'},{en:'Challenge',pt:'Desafio'},
-      {en:'Opportunity',pt:'Oportunidade'},{en:'Pressure',pt:'Pressão'},{en:'Balance',pt:'Equilíbrio'},
-      {en:'Effort',pt:'Esforço'},{en:'Goal',pt:'Meta'},{en:'Achievement',pt:'Conquista'},
-      {en:'Issue',pt:'Problema/Questão'},{en:'Support',pt:'Apoio'},{en:'Afford',pt:'Ter dinheiro para'},
-      {en:'Handle',pt:'Lidar com'},{en:'Describe',pt:'Descrever'},{en:'Recommend',pt:'Recomendar'},
-      {en:'Polite',pt:'Educado'},{en:'Favor',pt:'Favor'},{en:'Mind',pt:'Importar-se'},
-      {en:'Abroad',pt:'No exterior'},{en:'Fluent',pt:'Fluente'},{en:'Improve',pt:'Melhorar'},
-    ],
-    expressions: [
-      {expr:'Could you do me a favor?',meaning:'Você poderia me fazer um favor?',example:'Could you do me a favor and send me the file?'},
-      {expr:'I would love to.',meaning:'Eu adoraria.',example:'Would you like to join us? I would love to!'},
-      {expr:'I can\'t afford it right now.',meaning:'Não posso pagar por isso agora.',example:'It\'s a great trip but I can\'t afford it right now.'},
-      {expr:'Would you mind...?',meaning:'Você se importaria de...?',example:'Would you mind closing the window? It\'s cold.'},
-    ],
-    sentences: [
-      'I can handle a lot of pressure at work.','Could you describe your experience?',
-      'I would love to work abroad one day.','She can speak three languages.',
-      'Could you help me with this problem?','He would choose a different career now.',
-      'There are many options — which would you prefer?','I can\'t afford much this month.',
-    ],
-    grammar: {
-      title: 'Can / Could / Would — Modais Essenciais',
-      rules: [
-        '<b>CAN</b>: habilidade presente / permissão → "I can speak English." / "Can I leave early?"',
-        '<b>COULD</b>: habilidade passada / pedido educado → "I could swim as a child." / "Could you help me?"',
-        '<b>WOULD</b>: hipotético / desejo / pedido formal → "I would love to." / "Would you like coffee?"',
-        '<b>MANY</b>: substantivos contáveis → "many books, many people, many options"',
-        '<b>MUCH</b>: substantivos incontáveis → "much time, much money, much work"',
-        '<b>A LOT OF</b>: ambos → "a lot of books / a lot of time"',
-      ],
-      table: {
-        headers: ['Modal','Uso','Exemplo'],
-        rows: [
-          ['Can','Habilidade/permissão','I can handle pressure.'],
-          ['Could','Passado/pedido polido','Could you help me?'],
-          ['Would','Hipotético/desejo','I would love to travel.'],
-          ['Many','Contável (pl.)','Many people agree.'],
-          ['Much','Incontável','I don\'t have much time.'],
-          ['A lot of','Ambos','A lot of work to do.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'___ you speak any other language?',a:'Can',opts:['Would','Could','Can','Should']},
-      {q:'___ you help me with this report?',a:'Could',opts:['Would','Could','Can','Must']},
-      {q:'I ___ love to work abroad.',a:'would',opts:['can','could','would','should']},
-      {q:'There aren\'t ___ options. (countable)',a:'many',opts:['much','many','a lot','very']},
-      {q:'I don\'t have ___ time today. (uncountable)',a:'much',opts:['many','much','a lot','most']},
-    ],
-    speak: ['I can speak two languages.','Could you do me a favor?','I would love to travel.','There are many options.','I don\'t have much time.'],
-  },
-
-  {
-    id: 22, title: 'Future with WILL & WON\'T', emoji: '🚀',
-    verbs: ['Will + verb','Won\'t (will not)','I\'ll / She\'ll / They\'ll','Will + subject + verb?'],
-    vocab: [
-      {en:'Future',pt:'Futuro'},{en:'Plan',pt:'Plano'},{en:'Goal',pt:'Meta'},
-      {en:'Dream',pt:'Sonho'},{en:'Promise',pt:'Promessa'},{en:'Change',pt:'Mudança'},
-      {en:'Decision',pt:'Decisão'},{en:'Result',pt:'Resultado'},{en:'Success',pt:'Sucesso'},
-      {en:'Risk',pt:'Risco'},{en:'Opportunity',pt:'Oportunidade'},{en:'Investment',pt:'Investimento'},
-      {en:'Career',pt:'Carreira'},{en:'Business',pt:'Negócio'},{en:'Course',pt:'Curso'},
-      {en:'Language',pt:'Língua/Idioma'},{en:'Health',pt:'Saúde'},{en:'Money',pt:'Dinheiro'},
-      {en:'House',pt:'Casa'},{en:'Team',pt:'Equipe'},{en:'Project',pt:'Projeto'},
-      {en:'Promotion',pt:'Promoção'},{en:'Prediction',pt:'Previsão'},{en:'Spontaneous',pt:'Espontâneo'},
-      {en:'Offer',pt:'Oferta'},{en:'Refuse',pt:'Recusar'},{en:'Accept',pt:'Aceitar'},
-      {en:'Definitely',pt:'Definitivamente'},{en:'Probably',pt:'Provavelmente'},{en:'Maybe',pt:'Talvez'},
-    ],
-    expressions: [
-      {expr:'I\'ll keep that in mind.',meaning:'Vou ter isso em mente.',example:'Great advice — I\'ll keep that in mind, thank you.'},
-      {expr:'It will all work out.',meaning:'Vai dar tudo certo.',example:'Don\'t worry — it will all work out in the end.'},
-      {expr:'I won\'t let you down.',meaning:'Não vou te decepcionar.',example:'You can count on me — I won\'t let you down.'},
-      {expr:'That will never happen.',meaning:'Isso nunca vai acontecer.',example:'I\'ll quit? That will never happen — I love this job!'},
-    ],
-    sentences: [
-      'I will plan my future carefully.','She won\'t promise what she can\'t do.',
-      'Will they expect big changes?','I\'ll help you with the project.',
-      'He won\'t give up on his dream.','We will travel to Europe next year.',
-      'Will you come to the meeting?','They\'ll probably get the promotion.',
-    ],
-    grammar: {
-      title: 'WILL / WON\'T — O Futuro Espontâneo',
-      rules: [
-        'Afirmativo: Sujeito + <b>will</b> + infinitivo → "I will plan my future."',
-        'Negativo: Sujeito + <b>won\'t</b> + infinitivo → "She won\'t promise that."',
-        'Pergunta: <b>Will</b> + sujeito + infinitivo? → "Will they expect a change?"',
-        'Contrações: I\'ll, You\'ll, He\'ll, She\'ll, We\'ll, They\'ll, Won\'t',
-        '4 usos: <b>Previsão</b> | <b>Promessa</b> | <b>Decisão espontânea</b> | <b>Oferta</b>',
-        '⚠️ WILL ≠ GOING TO: WILL = decisão agora | GOING TO = plano já feito',
-      ],
-      table: {
-        headers: ['Forma','Estrutura','Exemplo'],
-        rows: [
-          ['Afirmativo','will + verb','I will help you.'],
-          ['Negativo','won\'t + verb','She won\'t come.'],
-          ['Pergunta','Will + subj + verb?','Will you help me?'],
-          ['Resposta curta','Yes, I will / No, I won\'t','Yes, I will!'],
-          ['Contração','I\'ll / She\'ll / Won\'t','I\'ll call you later.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ call you tomorrow. (promise)',a:"'ll",opts:["'ll","'m going to","won't","go to"]},
-      {q:'She ___ give up on her dream. (negative)',a:"won't",opts:["don't will","won't","not will","willn't"]},
-      {q:'___ you come to the party?',a:'Will',opts:['Are','Will','Do','Going to']},
-      {q:'Look at those clouds — it ___ rain. (prediction)',a:'will',opts:['will','is going to','go to','shall']},
-      {q:'I ___ keep that in mind. (contraction)',a:"I'll",opts:["I will to","I'm will","I'll","I going to"]},
-    ],
-    speak: ['I\'ll help you with that.','She won\'t give up.','Will you join us?','They\'ll probably come.','I won\'t let you down.'],
-  },
-
-  {
-    id: 23, title: 'Personalities & Moods — Aula 28', emoji: '😊',
-    verbs: ['To Feel / Felt / Felt','To Seem / Seemed / Seemed','To Act / Acted / Acted','To Express / Expressed / Expressed'],
-    vocab: [
-      // Moods & Emotional States
-      {en:'Happy',pt:'Feliz'},{en:'Sad',pt:'Triste'},{en:'Angry',pt:'Com raiva'},
-      {en:'Upset',pt:'Chateado/a'},{en:'Tired',pt:'Cansado/a'},{en:'Anxious',pt:'Ansioso/a'},
-      {en:'Excited',pt:'Animado/a'},{en:'Bored',pt:'Entediado/a'},{en:'Frustrated',pt:'Frustrado/a'},
-      {en:'Nervous',pt:'Nervoso/a'},{en:'Relieved',pt:'Aliviado/a'},{en:'Overwhelmed',pt:'Sobrecarregado/a'},
-      {en:'Confident',pt:'Confiante'},{en:'Embarrassed',pt:'Envergonhado/a'},{en:'Proud',pt:'Orgulhoso/a'},
-      // Personality Types
-      {en:'Outgoing',pt:'Extrovertido/a'},{en:'Shy',pt:'Tímido/a'},{en:'Honest',pt:'Honesto/a'},
-      {en:'Kind',pt:'Gentil / Bondoso/a'},{en:'Stubborn',pt:'Teimoso/a'},{en:'Patient',pt:'Paciente'},
-      {en:'Ambitious',pt:'Ambicioso/a'},{en:'Sensitive',pt:'Sensível'},{en:'Creative',pt:'Criativo/a'},
-      {en:'Reliable',pt:'Confiável'},{en:'Impulsive',pt:'Impulsivo/a'},{en:'Empathetic',pt:'Empático/a'},
-      {en:'Pessimistic',pt:'Pessimista'},{en:'Optimistic',pt:'Otimista'},
-      // Degree adverbs
-      {en:'A little',pt:'Um pouco'},{en:'Quite',pt:'Bastante'},{en:'Extremely',pt:'Extremamente'},
-      {en:'Incredibly',pt:'Incrivelmente'},
-    ],
-    expressions: [
-      {expr:"I'm not in the mood.",meaning:'Não estou com vontade / no clima.',example:"Don't ask me to go out — I'm not in the mood tonight."},
-      {expr:"She's on top of the world.",meaning:'Ela está nas nuvens / feliz demais.',example:"She got the promotion — she's on top of the world right now."},
-      {expr:"He's driving me crazy.",meaning:'Ele está me deixando louco/a.',example:"He keeps interrupting me — he's driving me crazy!"},
-      {expr:"I'm feeling under pressure.",meaning:'Estou me sentindo sob pressão.',example:"With all these deadlines, I'm really feeling under pressure."},
-    ],
-    sentences: [
-      'She is very patient with her students.','I felt anxious before the job interview.',
-      'He seems really tired today.','They acted very confident during the presentation.',
-      'She expressed how excited she was about the trip.','I feel overwhelmed with so much work.',
-      'He is quite stubborn — he never changes his mind.','She seemed relieved when the meeting ended.',
-      'I feel a little nervous about the meeting.','He acted extremely confident in the interview.',
-      'She is incredibly empathetic with her team.','They seem pessimistic about the results.',
-    ],
-    grammar: {
-      title: 'Aula 28 — 3 Estruturas para Descrever Pessoas',
-      rules: [
-        '<b>TO BE + adjetivo</b> → personalidade permanente: "She <b>is</b> very patient." / "He <b>is</b> outgoing."',
-        '<b>TO FEEL / SEEM + adjetivo</b> → estado temporário: "I <b>feel</b> anxious today." / "He <b>seems</b> tired."',
-        '<b>TO ACT + adjetivo</b> → comportamento em situação: "She <b>acted</b> confident." / "Don\'t <b>act</b> so impulsive!"',
-        '<b>Intensificadores (grau):</b> a little → quite → really → very → extremely → incredibly',
-        'Ex: "I\'m <b>a little</b> upset." / "She\'s <b>quite</b> shy." / "He\'s <b>incredibly</b> patient."',
-      ],
-      table: {
-        headers: ['Estrutura','Uso','Exemplo do PDF'],
-        rows: [
-          ['To be + adj.','Personalidade permanente','She is very reliable.'],
-          ['To feel + adj.','Estado emocional agora','I feel nervous today.'],
-          ['To seem + adj.','Aparência / impressão','He seems upset right now.'],
-          ['To act + adj.','Comportamento momentâneo','She acted stubborn.'],
-          ['a little / quite','Grau fraco / médio','I\'m quite tired.'],
-          ['very / extremely','Grau forte / máximo','She\'s extremely confident.'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ very anxious before the exam. (feel — past)',a:'felt',opts:['feel','feeled','felt','feeling']},
-      {q:'She ___ tired today. (seem — present)',a:'seems',opts:['seem','seemed','seems','seeming']},
-      {q:'"He never changes his mind." → He is very ___.',a:'Stubborn',opts:['Patient','Stubborn','Shy','Reliable']},
-      {q:'They ___ really excited during the presentation. (act — past)',a:'acted',opts:['act','acts','acted','acting']},
-      {q:'Which word means "Aliviado/a"?',a:'Relieved',opts:['Relieved','Overwhelmed','Proud','Bored']},
-      {q:'Which word means "Sobrecarregado/a"?',a:'Overwhelmed',opts:['Frustrated','Embarrassed','Overwhelmed','Nervous']},
-      {q:'Which word means "Empático/a"?',a:'Empathetic',opts:['Ambitious','Sensitive','Reliable','Empathetic']},
-      {q:'"She loves meeting new people." → She is very ___.',a:'Outgoing',opts:['Shy','Stubborn','Outgoing','Patient']},
-      {q:'"He makes decisions too fast." → He is very ___.',a:'Impulsive',opts:['Reliable','Patient','Creative','Impulsive']},
-      {q:'What does "I\'m not in the mood" mean?',a:'Não estou com vontade',opts:['Estou feliz','Não estou com vontade','Estou animado','Estou cansado']},
-      {q:'What does "She\'s on top of the world" mean?',a:'Ela está feliz demais',opts:['Ela está triste','Ela está cansada','Ela está feliz demais','Ela está ansiosa']},
-      {q:'Qual intensificador é o MAIS forte?',a:'Extremely',opts:['A little','Quite','Very','Extremely']},
-    ],
-    speak: [
-      'I feel really excited today.','She seems very confident in meetings.',
-      'He acted quite stubborn during the discussion.','I\'m extremely tired this week.',
-      'They seemed relieved after the project ended.','She is incredibly empathetic with her team.',
-      'I\'m not in the mood for this meeting.','He\'s driving me crazy with his impulsive decisions.',
-    ],
-  },
-
-  {
-    id: 24, title: 'Still vs. Yet & Possessives', emoji: '⏳',
-    verbs: ['To Have','To Share','To Keep','To Finish'],
-    vocab: [
-      {en:'Still',pt:'Ainda (continua)'},{en:'Yet',pt:'Ainda não / Já (em perguntas)'},
-      {en:'My',pt:'Meu/Minha'},{en:'Your',pt:'Seu/Sua/Teu/Tua'},{en:'His',pt:'Dele'},
-      {en:'Her',pt:'Dela'},{en:'Our',pt:'Nosso/Nossa'},{en:'Their',pt:'Deles/Delas'},
-      {en:'Its',pt:'Seu/Sua (de coisa/animal)'},{en:'Book',pt:'Livro'},{en:'Car',pt:'Carro'},
-      {en:'Keys',pt:'Chaves'},{en:'Wallet',pt:'Carteira'},{en:'Phone',pt:'Celular'},
-      {en:'Job',pt:'Emprego'},{en:'Work',pt:'Trabalho'},{en:'Project',pt:'Projeto'},
-      {en:'Homework',pt:'Tarefa/Lição de casa'},{en:'Breakfast',pt:'Café da manhã'},
-      {en:'Lunch',pt:'Almoço'},{en:'Dinner',pt:'Jantar'},{en:'Coffee',pt:'Café'},
-      {en:'Dream',pt:'Sonho'},{en:'Goal',pt:'Meta'},{en:'Secret',pt:'Segredo'},
-      {en:'Opinion',pt:'Opinião'},{en:'Feeling',pt:'Sentimento'},{en:'Problem',pt:'Problema'},
-      {en:'Solution',pt:'Solução'},{en:'Idea',pt:'Ideia'},
-    ],
-    expressions: [
-      {expr:'Are you still here?',meaning:'Você ainda está aqui?',example:'Are you still here? I thought you left an hour ago!'},
-      {expr:'I haven\'t finished yet.',meaning:'Ainda não terminei.',example:'Can you wait? I haven\'t finished yet.'},
-      {expr:'Keep it to yourself.',meaning:'Guarde para si / Não conte para ninguém.',example:'It\'s a secret — keep it to yourself, please.'},
-      {expr:"It's my turn.",meaning:'É minha vez.',example:"Stop! It's my turn to speak now."},
-    ],
-    sentences: [
-      'Are you still working on the project?','I still don\'t understand this grammar rule.',
-      'She still lives with her parents.','Have you finished your homework yet?',
-      'I haven\'t eaten breakfast yet.','She hasn\'t arrived yet.',
-      'My phone is on the table.','Their car is still in the garage.',
-    ],
-    grammar: {
-      title: 'STILL vs. YET + Possessive Adjectives',
-      rules: [
-        '<b>STILL</b> (Ainda — algo continua): ANTES do verbo principal ou ENTRE auxiliar e verbo principal',
-        'Ex: "I <b>still</b> don\'t know." / "Are you <b>still</b> here?" / "It\'s <b>still</b> raining."',
-        '<b>YET</b> (Ainda não / Já): NO FINAL da frase — usado em negativos e perguntas',
-        'Ex: "Have you finished <b>yet</b>?" / "I haven\'t eaten <b>yet</b>." / "She hasn\'t arrived <b>yet</b>."',
-        '<b>Possessive Adjectives</b>: sempre ANTES do substantivo — My, Your, His, Her, Its, Our, Their',
-      ],
-      table: {
-        headers: ['Palavra','Posição','Exemplo'],
-        rows: [
-          ['STILL','Antes do verbo principal','I still work there.'],
-          ['STILL','Entre aux. e verbo','Are you still waiting?'],
-          ['YET','No final (negativa)','I haven\'t finished yet.'],
-          ['YET','No final (pergunta)','Have you eaten yet?'],
-          ['My/Your/His...','Antes do substantivo','My book / Her car / Their house'],
-        ]
-      }
-    },
-    quiz: [
-      {q:'I ___ don\'t understand. (still/yet)',a:'still',opts:['yet','still','already','ever']},
-      {q:'Have you finished the project ___?',a:'yet',opts:['still','yet','already','ever']},
-      {q:'She ___ lives with her parents.',a:'still',opts:['yet','still','already','just']},
-      {q:'I haven\'t eaten breakfast ___.',a:'yet',opts:['still','yet','already','just']},
-      {q:'___ car is still in the garage. (they)',a:'Their',opts:['They','Them','Their','Theirs']},
-    ],
-    speak: ['Are you still working?','I haven\'t finished yet.','She still doesn\'t know.','Have you eaten yet?','Their house is very beautiful.'],
-  },
-];
+// {pos, total} da lição dentro do curso dela — ex.: a 508 vira {pos: 8, total: 8}.
+// Lição personalizada não está no índice; entra na conta na posição do id dela.
+function posicaoNoCurso(id) {
+  const { ini, fim } = faixaDoCurso(id);
+  const ids = LESSON_INDEX.filter(l => l.id >= ini && l.id <= fim).map(l => l.id);
+  if (!ids.includes(id)) ids.push(id);
+  ids.sort((a, b) => a - b);
+  return { pos: ids.indexOf(id) + 1, total: ids.length };
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // LESSON PROGRESS — Per-lesson per-tool tracking
@@ -1654,7 +369,7 @@ function getLessonProgress(id) {
   return blank;
 }
 function saveLessonProgress(id, data) {
-  data.lastActivity = new Date().toISOString().slice(0,10);
+  data.lastActivity = capyHojeBR();
   localStorage.setItem('lessonProgress_j' + id, JSON.stringify(data));
 }
 function markToolDone(id, toolKey, stars) {
@@ -1690,9 +405,456 @@ function removeWeakWord(id, en) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// REVIEW MODE ("Revisão da Yara") — self-contained mini-flow, isolated from the
+// guided-lesson runner to avoid touching completedMinis/capyLastMini/quests.
+// Reuses .choice-btn styles, speakWord(), CapySound and Store.addXP.
+// ══════════════════════════════════════════════════════════════════════════════
+let reviewWords = [], reviewIdx = 0, reviewScore = 0, reviewXP = 0, reviewDominated = 0, reviewScheduled = 0;
+
+// SRS ("spaced repetition"): a weak word without w.srs is treated as due
+// immediately (streak 0). Once srs exists, it's due only when nextDue <= now.
+function isWeakWordDue(w) {
+  if (w.mastered) return false;
+  if (!w.srs) return true;
+  return w.srs.nextDue <= Date.now();
+}
+
+function gatherWeakWords() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith('lessonProgress_j')) continue;
+    try {
+      const data = JSON.parse(localStorage.getItem(key));
+      const lessonId = parseInt(key.replace('lessonProgress_j', ''), 10);
+      (data.weakWords || []).forEach(w => {
+        if (!isWeakWordDue(w)) return;
+        out.push({ en: w.en, pt: w.pt, lessonId, nextDue: (w.srs && w.srs.nextDue) || 0 });
+      });
+    } catch (e) { /* ignore malformed entries */ }
+  }
+  // Palavras que vieram de OUTRO aparelho vivem na lista canônica do CapyMemory,
+  // não nas chaves por lição — sem isto, a fila de revisão continuaria presa a
+  // este navegador mesmo com a memória sincronizada.
+  if (window.CapyMemory) {
+    const jaTem = new Set(out.map(w => String(w.en).trim().toLowerCase()));
+    try {
+      CapyMemory.due().forEach(w => {
+        const k = String(w.en).trim().toLowerCase();
+        if (!k || jaTem.has(k)) return;
+        jaTem.add(k);
+        out.push({ en: w.en, pt: w.pt, lessonId: w.lessonId || 0, nextDue: (w.srs && w.srs.nextDue) || 0 });
+      });
+    } catch (e) { /* memória indisponível: a fila local ainda funciona */ }
+  }
+  // Oldest-due first: words never reviewed (nextDue 0) come before words that
+  // just became due again.
+  out.sort((a, b) => a.nextDue - b.nextDue);
+  return out;
+}
+
+// Updates a weak word's SRS state after a review answer. Locates the word the
+// same way removeWeakWord() does (lessonId + en) and persists via
+// getLessonProgress/saveLessonProgress. Streak 1 -> +1 day, streak 2 -> +3
+// days, streak >=3 -> word is mastered. A wrong answer resets the streak and
+// makes the word due again immediately.
+//
+// A palavra dominada é MARCADA (`mastered: true`), não removida. Numa união
+// entre aparelhos, ausência seria ambígua: "eu dominei" e "nunca vi esta palavra
+// neste aparelho" ficariam idênticos, e a palavra dominada voltaria para a fila
+// toda vez que o outro aparelho sincronizasse. isWeakWordDue() ignora as marcadas.
+function updateWeakWordSRS(lessonId, en, isCorrect) {
+  const p = getLessonProgress(lessonId);
+  const idx = p.weakWords.findIndex(w => w.en === en);
+  if (idx === -1) return { dominated: false, scheduled: false };
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const w = p.weakWords[idx];
+  if (isCorrect) {
+    const streak = ((w.srs && w.srs.streak) || 0) + 1;
+    if (streak >= 3) {
+      w.mastered = true;
+      w.srs = { streak, nextDue: Date.now() };
+      saveLessonProgress(lessonId, p);
+      if (window.CapyMemory) CapyMemory.marcarSujo();
+      return { dominated: true, scheduled: false };
+    }
+    const days = streak === 1 ? 1 : 3;
+    w.srs = { streak, nextDue: Date.now() + days * DAY_MS };
+    saveLessonProgress(lessonId, p);
+    if (window.CapyMemory) CapyMemory.marcarSujo();
+    return { dominated: false, scheduled: true };
+  }
+  w.srs = { streak: 0, nextDue: Date.now() };
+  saveLessonProgress(lessonId, p);
+  if (window.CapyMemory) CapyMemory.marcarSujo();
+  return { dominated: false, scheduled: false };
+}
+
+function initReviewMode() {
+  const sidebar = document.getElementById('lesson-sidebar');
+  if (sidebar) sidebar.style.display = 'none';
+  document.querySelectorAll('.md\\:hidden').forEach(el => {
+    if (el.querySelector('#mobile-lesson-select')) el.style.display = 'none';
+  });
+  const tabs = document.getElementById('tool-tabs');
+  if (tabs) tabs.style.display = 'none';
+  const dash = document.getElementById('progress-dashboard');
+  if (dash) dash.style.display = 'none';
+  const header = document.getElementById('lesson-header');
+  if (header) header.style.display = 'none';
+  const guidedHeader = document.getElementById('guided-header');
+  if (guidedHeader) guidedHeader.style.display = 'none';
+  document.querySelectorAll('.tool-panel').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+  const main = document.querySelector('main');
+  if (main) { main.classList.remove('md:ml-72'); main.classList.add('max-w-2xl', 'mx-auto'); }
+
+  let container = document.getElementById('review-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'review-container';
+    if (main) main.appendChild(container);
+  }
+
+  reviewWords = gatherWeakWords().slice(0, 10);
+  reviewIdx = 0; reviewScore = 0; reviewXP = 0; reviewDominated = 0; reviewScheduled = 0;
+  // Analytics: review session started (cross-lesson, no single lessonId)
+  if (window.capyTrack) capyTrack('review_start');
+  renderReviewStep();
+}
+
+function renderReviewStep() {
+  const container = document.getElementById('review-container');
+  if (!container) return;
+  if (!reviewWords.length) {
+    container.innerHTML = `
+      <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
+        <div class="text-5xl mb-3">🎉</div>
+        <h2 class="text-xl font-black text-navy mb-2">Nenhuma palavra para revisar!</h2>
+        <p class="text-slate-500 text-sm mb-6">Continue estudando para acumular palavras de revisão.</p>
+        <button onclick="window.location.href='learn.html'" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
+      </div>`;
+    return;
+  }
+  if (reviewIdx >= reviewWords.length) { renderReviewFinish(); return; }
+
+  const item = reviewWords[reviewIdx];
+  const pool = reviewWords.filter((_, i) => i !== reviewIdx).map(w => w.pt);
+  const distractors = shuffle([...new Set(pool)]).filter(pt => pt !== item.pt).slice(0, 3);
+  const opts = shuffle([item.pt, ...distractors]);
+  const isListening = reviewIdx % 2 === 1; // alterna quiz escrito / listening
+
+  container.innerHTML = `
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-bold text-white/60">🔁 Revisão da Yara · ${reviewIdx + 1} / ${reviewWords.length}</span>
+        <span class="text-xs font-bold text-emerald-400">${reviewScore} ✓</span>
+      </div>
+      <div class="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full transition-all duration-300" style="width:${((reviewIdx + 1) / reviewWords.length) * 100}%"></div>
+      </div>
+      <div class="bg-white rounded-3xl shadow-sm p-6 text-center">
+        ${isListening ? `
+          <p class="text-slate-400 text-xs font-bold uppercase tracking-wide mb-3">🔊 Ouça e escolha a tradução</p>
+          <button onclick="speakWord('${item.en.replace(/'/g, "\\'")}', 'en-US')" class="mx-auto mb-2 w-16 h-16 rounded-full bg-navy text-white text-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all min-h-[44px]">🔊</button>
+          <p class="text-slate-400 text-xs">Toque para ouvir novamente</p>
+        ` : `
+          <p class="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Qual é a tradução?</p>
+          <p class="font-headline text-2xl font-black text-navy">${item.en}</p>
+        `}
+      </div>
+      <div class="grid grid-cols-2 gap-2" id="review-opts">
+        ${opts.map((o, i) => `
+          <button id="ropt-${i}" class="choice-btn bg-white border-2 border-slate-200 rounded-2xl px-3 py-3 font-bold text-navy text-sm hover:border-pink-300 hover:bg-pink-50 shadow-sm transition-all min-h-[44px]"
+                  onclick="answerReview(this,'${o.replace(/'/g, "\\'")}','${item.pt.replace(/'/g, "\\'")}','${item.en.replace(/'/g, "\\'")}',${item.lessonId})">
+            ${o}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  if (isListening) setTimeout(() => speakWord(item.en, 'en-US'), 150);
+}
+
+function answerReview(btn, chosen, correct, en, lessonId) {
+  document.querySelectorAll('#review-opts .choice-btn').forEach(b => b.setAttribute('disabled', ''));
+  const isCorrect = chosen === correct;
+  if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();
+  if (isCorrect) {
+    btn.classList.add('correct');
+    reviewScore++;
+    reviewXP += 3;
+    const srsResult = updateWeakWordSRS(lessonId, en, true);
+    if (srsResult.dominated) reviewDominated++;
+    else if (srsResult.scheduled) reviewScheduled++;
+    if (window.Store) Store.addXP(3);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#review-opts .choice-btn').forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct'); });
+    updateWeakWordSRS(lessonId, en, false);
+  }
+  setTimeout(() => { reviewIdx++; renderReviewStep(); }, isCorrect ? 600 : 1300);
+}
+
+function renderReviewFinish() {
+  const container = document.getElementById('review-container');
+  if (!container) return;
+  const total = reviewWords.length;
+  const pct = total ? Math.round((reviewScore / total) * 100) : 0;
+  // Analytics: review session finished
+  if (window.capyTrack) capyTrack('review_finish');
+  if (pct >= 70 && window.CapyJuice) CapyJuice.celebrate();
+  container.innerHTML = `
+    <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
+      <div class="text-6xl mb-3">${pct >= 70 ? '🏆' : '💪'}</div>
+      <h2 class="text-xl font-black text-navy mb-1">Revisão concluída!</h2>
+      <p class="text-slate-500 text-sm mb-5">${reviewScore} / ${total} acertos</p>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl px-6 py-3 mb-4 inline-block">
+        <p class="font-black text-yellow-700">+${reviewXP} XP</p>
+      </div>
+      ${(reviewDominated > 0 || reviewScheduled > 0) ? `
+      <div class="flex justify-center gap-2 flex-wrap mb-6 text-xs font-bold">
+        ${reviewDominated > 0 ? `<span class="bg-emerald-50 text-emerald-700 rounded-full px-3 py-2">${reviewDominated} palavra${reviewDominated > 1 ? 's' : ''} dominada${reviewDominated > 1 ? 's' : ''} 🏆</span>` : ''}
+        ${reviewScheduled > 0 ? `<span class="bg-blue-50 text-blue-700 rounded-full px-3 py-2">${reviewScheduled} volta${reviewScheduled > 1 ? 'm' : ''} em breve ⏳</span>` : ''}
+      </div>` : `<div class="mb-6"></div>`}
+      <button onclick="window.location.href='learn.html'" class="w-full bg-pink-500 hover:bg-pink-400 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════════════════════════════════
-let currentLesson = JADSON_LESSONS[0];
+// BOSS MODE ("Desafio da Yara") — self-contained chapter-end AI conversation.
+// Isolated flow (like REVIEW MODE above): doesn't touch completedMinis/quests.
+let bossChapterId    = null;
+let lastBossLessons  = '';
+let bossHistory      = [];   // [{role:'user'|'model', text}]
+let bossTurns        = 0;    // number of student turns sent
+let bossVocab        = [];
+const BOSS_TOTAL_TURNS = 6;
+
+async function initBossMode(chapterId, lessonIdsParam) {
+  bossChapterId   = chapterId;
+  lastBossLessons = lessonIdsParam || '';
+  bossHistory     = [];
+  bossTurns       = 0;
+
+  // Hide normal lesson UI (same elements hidden by GUIDED_MODE / review mode)
+  const sidebar = document.getElementById('lesson-sidebar');
+  if (sidebar) sidebar.style.display = 'none';
+  document.querySelectorAll('.md\\:hidden').forEach(el => {
+    if (el.querySelector('#mobile-lesson-select')) el.style.display = 'none';
+  });
+  const tabs = document.getElementById('tool-tabs');
+  if (tabs) tabs.style.display = 'none';
+  const dash = document.getElementById('progress-dashboard');
+  if (dash) dash.style.display = 'none';
+  const header = document.getElementById('lesson-header');
+  if (header) header.style.display = 'none';
+  const guidedHeader = document.getElementById('guided-header');
+  if (guidedHeader) guidedHeader.style.display = 'none';
+  document.querySelectorAll('.tool-panel').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+  const main = document.querySelector('main');
+  if (main) { main.classList.remove('md:ml-72'); main.classList.add('max-w-2xl', 'mx-auto'); }
+
+  // AI gate — respects plan limits, same as sendChat()
+  if (window.Store && !Store.consumeAI()) {
+    renderBossPaywall();
+    return;
+  }
+
+  // Analytics: boss challenge actually starting (past the paywall gate)
+  if (window.capyTrack) capyTrack('boss_start', { lessonId: String(chapterId) });
+
+  // Gather vocabulary from the chapter's lessons (up to 40 words, shuffled)
+  const lessonIds = lastBossLessons.split(',').map(s => parseInt(s, 10)).filter(Boolean);
+  const chapterLessons = await garantirLicoes(lessonIds);
+  let words = [];
+  chapterLessons.forEach(l => { (l.vocab || []).forEach(v => words.push(v.en)); });
+  words = shuffle([...new Set(words)]).slice(0, 40);
+  bossVocab = words;
+
+  const chapterTitle = chapterLessons.length ? chapterLessons.map(l => l.title).join(', ') : 'this chapter';
+
+  let container = document.getElementById('boss-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'boss-container';
+    if (main) main.appendChild(container);
+  }
+
+  container.innerHTML = `
+    <div class="bg-gradient-to-br from-fuchsia-600 to-purple-700 rounded-3xl overflow-hidden shadow-2xl shadow-fuchsia-500/20">
+      <div class="p-5 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl flex-shrink-0">👑</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-white font-black text-lg leading-tight">Desafio da Yara</p>
+          <p class="text-white/70 text-xs mt-0.5">Converse com a Yara para dominar o capítulo</p>
+        </div>
+      </div>
+      <div id="boss-messages" class="bg-white p-4 space-y-3 min-h-[260px] max-h-[420px] overflow-y-auto"></div>
+      <div id="boss-input-row" class="border-t border-white/10 bg-white p-4 flex gap-2">
+        <input id="boss-input" type="text" placeholder="Answer in English…"
+               class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:border-fuchsia-400 transition-colors min-h-[44px]"
+               onkeydown="if(event.key==='Enter')sendBossMessage()"/>
+        <button onclick="sendBossMessage()"
+                class="bg-fuchsia-600 text-white font-black px-5 py-3 rounded-xl text-sm hover:bg-fuchsia-500 active:scale-95 transition-all flex-shrink-0 min-h-[44px]">
+          Send →
+        </button>
+      </div>
+    </div>
+  `;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Yara opens the conversation
+  const opener = `Hi! 👋 Let's talk about what you learned in this chapter. Ready? Tell me — what's your favorite word or topic from: ${chapterTitle}?`;
+  appendBossMsg('yara', opener);
+  bossHistory.push({ role: 'model', text: opener });
+}
+
+function renderBossPaywall() {
+  const main = document.querySelector('main');
+  let container = document.getElementById('boss-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'boss-container';
+    if (main) main.appendChild(container);
+  }
+  container.innerHTML = `
+    <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
+      <div class="text-5xl mb-3">🔒</div>
+      <h2 class="text-xl font-black text-navy mb-2">Sem créditos de IA hoje</h2>
+      <p class="text-slate-500 text-sm mb-6">Faça upgrade para desbloquear mais conversas com a Yara e enfrentar o Desafio!</p>
+      <button onclick="window.location.href='landing.html'" class="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px] mb-2">✨ Fazer upgrade</button>
+      <button onclick="window.location.href='learn.html'" class="w-full bg-slate-100 hover:bg-slate-200 text-navy font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
+    </div>`;
+}
+
+function appendBossMsg(who, text) {
+  const el = document.getElementById('boss-messages');
+  if (!el) return;
+  const div = document.createElement('div');
+  if (who === 'yara') {
+    div.className = 'flex gap-2 items-start';
+    div.innerHTML = `<span class="text-xl mt-0.5 flex-shrink-0">🐾</span>
+      <div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]">${text}</div>`;
+  } else {
+    div.className = 'flex gap-2 items-start justify-end';
+    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]">${text}</div>`;
+  }
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendBossMessage() {
+  const input = document.getElementById('boss-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  input.disabled = true;
+  appendBossMsg('student', msg);
+  bossHistory.push({ role: 'user', text: msg });
+  bossTurns++;
+
+  const el = document.getElementById('boss-messages');
+  const typing = document.createElement('div');
+  typing.id = 'boss-typing-indicator';
+  typing.className = 'flex gap-2 items-start';
+  typing.innerHTML = `<span class="text-xl mt-0.5">🐾</span><div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-400">...</div>`;
+  el.appendChild(typing);
+  el.scrollTop = el.scrollHeight;
+
+  const isFinalTurn = bossTurns >= BOSS_TOTAL_TURNS;
+  const systemPrompt = isFinalTurn
+    ? `You are Yara evaluating a chapter challenge. Chapter vocabulary: ${bossVocab.join(', ')}. The conversation is now over. Based on the student's participation, respond ONLY with valid JSON (no markdown fences): {"passed": true/false, "feedback": "a short warm message in English, 1-2 sentences", "wordsUsed": N}. "passed" should be generous — true if the student engaged with English replies that were minimally relevant to the topic.`
+    : `You are Yara evaluating a chapter challenge. Chapter vocabulary: ${bossVocab.join(', ')}. Have a natural 6-turn conversation in simple English about these topics. Encourage the student to use the vocabulary. Keep replies short (2-3 sentences) and friendly.`;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        history: bossHistory.slice(0, -1).slice(-8),
+        message: isFinalTurn ? (msg + '\n\n[SYSTEM: conversation over — respond with the JSON evaluation now]') : msg,
+        systemOverride: systemPrompt,
+        userId: (JSON.parse(localStorage.getItem('capySession') || 'null') || {}).id || 'guest'
+      })
+    });
+    const data = await resp.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    typing.remove();
+
+    if (isFinalTurn) {
+      finishBossChallenge(reply);
+    } else {
+      appendBossMsg('yara', reply);
+      bossHistory.push({ role: 'model', text: reply });
+      input.disabled = false;
+      input.focus();
+    }
+  } catch (e) {
+    typing.remove();
+    appendBossMsg('yara', 'Oops, I lost my train of thought! Try again? 🐾');
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+function finishBossChallenge(rawReply) {
+  let passed, feedback;
+  try {
+    const clean = rawReply.replace(/```json\n?|\n?```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    passed = !!parsed.passed;
+    feedback = parsed.feedback || '';
+  } catch (e) {
+    // Fallback: generous heuristic — passed if ≥4 student replies with ≥4 words each
+    const studentReplies = bossHistory.filter(h => h.role === 'user');
+    passed = studentReplies.length >= 4 && studentReplies.filter(r => r.text.trim().split(/\s+/).length >= 4).length >= 4;
+    feedback = passed
+      ? "Great effort! You did a wonderful job practicing English with me. 🌟"
+      : "Nice try! Keep practicing and you'll master this chapter soon. 💪";
+  }
+
+  const container = document.getElementById('boss-container');
+  if (!container) return;
+
+  if (passed) {
+    if (window.Store) Store.beatBoss(bossChapterId);
+    // Analytics: boss defeated
+    if (window.capyTrack) capyTrack('boss_win', { lessonId: String(bossChapterId) });
+    if (window.CapyCelebra) {
+      // capítulo fechado ganha a comemoração grande, com coroa
+      CapyCelebra.mostrar({ tipo: 'capitulo', titulo: 'Capítulo dominado!',
+                            subtitulo: 'Você derrotou o chefe', xp: 50 });
+    } else {
+      if (window.CapyJuice) CapyJuice.celebrate();
+      if (window.CapySound) CapySound.fanfare();
+    }
+    container.innerHTML = `
+      <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
+        <div class="text-7xl mb-3">👑</div>
+        <h2 class="text-2xl font-black text-navy mb-2">Capítulo dominado!</h2>
+        <p class="text-slate-500 text-sm mb-5">${feedback}</p>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl px-6 py-3 mb-6 inline-block">
+          <p class="font-black text-yellow-700">+50 XP</p>
+        </div>
+        <button onclick="window.location.href='learn.html'" class="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
+      </div>`;
+  } else {
+    container.innerHTML = `
+      <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
+        <div class="text-6xl mb-3">💪</div>
+        <h2 class="text-xl font-black text-navy mb-2">Quase lá!</h2>
+        <p class="text-slate-500 text-sm mb-6">${feedback}</p>
+        <button onclick="initBossMode(bossChapterId, lastBossLessons)" class="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px] mb-2">🔁 Tentar de novo</button>
+        <button onclick="window.location.href='learn.html'" class="w-full bg-slate-100 hover:bg-slate-200 text-navy font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
+      </div>`;
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let currentLesson = null;   // preenchido no boot por garantirLicao()
 let currentTool   = 'vocab';
 let vocabIdx      = 0;
 let quizIdx       = 0;
@@ -1729,9 +891,19 @@ let chatExchanges = 0;
 // ══════════════════════════════════════════════════════════════════════════════
 // AI FEATURES
 // ══════════════════════════════════════════════════════════════════════════════
+// O nivel vem da FAIXA DE ID, que e o curso. Sem isto todo quiz saia 'beginner'.
+function nivelDaLicao(lesson) {
+  const id = Number(lesson.id);
+  if (id >= 601) return 'B1';   // entrevista de emprego
+  if (id >= 501) return 'A2';   // GPS Tronic
+  if (id >= 401) return 'B1';   // intermediate
+  if (id >= 301) return 'A2';   // turco
+  if (id >= 201) return 'A1';   // frances
+  return id > 60 ? 'B1' : 'A1'; // ingles base
+}
 async function loadAIQuiz(lesson) {
-  const today = new Date().toISOString().slice(0, 10);
-  const cacheKey = 'capyAIQuiz_' + lesson.id + '_' + today;
+  const today = capyHojeBR();
+  const cacheKey = 'capyAIQuiz_v2_' + lesson.id + '_' + today;
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     try { aiQuizQuestions = JSON.parse(cached); return; } catch(e) {}
@@ -1741,7 +913,14 @@ async function loadAIQuiz(lesson) {
     const resp = await fetch('/api/lesson-quiz', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic: lesson.title, vocab, level: 'beginner' })
+      body: JSON.stringify({
+        // Antes ia 'beginner' fixo: uma licao B1 do curso de entrevista recebia
+        // pergunta de iniciante. E a gramatica da licao nem era enviada.
+        topic: lesson.title,
+        vocab,
+        level: nivelDaLicao(lesson),
+        grammar: lesson.grammar && lesson.grammar.title,
+      })
     });
     const data = await resp.json();
     const text = data.candidates[0].content.parts[0].text;
@@ -1770,9 +949,14 @@ function renderAIChat() {
   document.getElementById('aichat-messages').innerHTML = '';
   document.getElementById('aichat-done-row').style.display = 'none';
   document.getElementById('aichat-input').value = '';
+  document.getElementById('aichat-input').placeholder = _lessonLanguage() === 'tr'
+    ? 'Türkçe cevap yazın… (ou peça ajuda em português)'
+    : 'Type your answer in English…';
   updateAIRemainingBadge();
   // Yara opens the conversation
-  const opener = `Great job finishing the lesson on "${currentLesson.title}"! 🌟 Can you tell me one word you learned today?`;
+  const opener = _lessonLanguage() === 'tr'
+    ? `Harika! “${currentLesson.title}” dersini bitirdin. 🌟 Bugün öğrendiğin bir Türkçe kelime söyler misin?`
+    : `Great job finishing the lesson on "${currentLesson.title}"! 🌟 Can you tell me one word you learned today?`;
   appendChatMsg('yara', opener);
   chatHistory.push({ role: 'model', text: opener });
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1791,6 +975,10 @@ function appendChatMsg(who, text) {
   }
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
+  // Click-to-translate on Yara's questions only — never on the student's own answer
+  if (who === 'yara') {
+    try { if (window.CapyTranslate) CapyTranslate.enable(div.querySelector('div')); } catch (e) {}
+  }
 }
 
 function showPaywallModal() {
@@ -1838,7 +1026,7 @@ async function sendChat() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ history: chatHistory.slice(-6), message: msg,
-                             lessonTopic: currentLesson.title, vocab })
+                             lessonTopic: currentLesson.title, vocab, lang: _lessonLanguage() })
     });
     const data = await resp.json();
     const reply = data.candidates[0].content.parts[0].text;
@@ -1873,14 +1061,160 @@ let miniNum = 0;
 // The steps active this session — overridden at boot if miniNum > 0
 let activeSteps = GUIDED_STEPS;
 const TRAIL_GAMES = {
-  1:'word_match_game.html',   2:'fill_blank_game.html',  3:'grammar_lab.html',
-  4:'matching_pairs_game.html',5:'sentence_builder_game.html',6:'spelling_bee_game.html',
-  7:'word_scramble_game.html', 8:'word_search_game.html', 9:'fill_blank_game.html',
-  10:'grammar_lab.html',      11:'hangman_game.html',    12:'berry_math_game.html',
-  13:'color_catch_game.html', 14:'word_match_game.html', 15:'word_search_game.html',
-  16:'hangman_game.html',     17:'matching_pairs_game.html',18:'word_search_game.html',
-  19:'word_scramble_game.html',20:'flappy_yara_game.html',21:'spelling_bee_game.html',
-  22:'color_catch_game.html', 23:'word_scramble_game.html', 24:'daily_challenge.html',
+  "1": "word_match_game.html",
+  "2": "fill_blank_game.html",
+  "3": "grammar_lab.html",
+  "4": "matching_pairs_game.html",
+  "5": "sentence_builder_game.html",
+  "6": "spelling_bee_game.html",
+  "7": "word_scramble_game.html",
+  "8": "alphabet.html",
+  "9": "fill_blank_game.html",
+  "10": "grammar_lab.html",
+  "11": "hangman_game.html",
+  "12": "number_quest.html",
+  "13": "color_catch_game.html",
+  "14": "word_match_game.html",
+  "15": "forest_puzzle_game.html",
+  "16": "hangman_game.html",
+  "17": "matching_pairs_game.html",
+  "18": "sound_seekers_game.html",
+  "19": "word_scramble_game.html",
+  "20": "flappy_yara_game.html",
+  "21": "spelling_bee_game.html",
+  "22": "reading_room.html",
+  "23": "word_scramble_game.html",
+  "24": "daily_challenge.html",
+  "25": "word_match_game.html",
+  "26": "forest_puzzle_game.html",
+  "27": "matching_pairs_game.html",
+  "28": "spelling_bee_game.html",
+  "29": "berry_math_game.html",
+  "30": "word_scramble_game.html",
+  "31": "sound_seekers_game.html",
+  "32": "hangman_game.html",
+  "33": "grammar_lab.html",
+  "34": "sentence_builder_game.html",
+  "35": "word_match_game.html",
+  "36": "fill_blank_game.html",
+  "37": "number_quest.html",
+  "38": "matching_pairs_game.html",
+  "39": "daily_challenge.html",
+  "40": "word_scramble_game.html",
+  "41": "reading_room.html",
+  "42": "hangman_game.html",
+  "43": "grammar_lab.html",
+  "44": "sentence_builder_game.html",
+  "45": "word_match_game.html",
+  "46": "fill_blank_game.html",
+  "47": "grammar_lab.html",
+  "48": "forest_puzzle_game.html",
+  "49": "daily_challenge.html",
+  "50": "word_scramble_game.html",
+  "51": "word_search_game.html",
+  "52": "hangman_game.html",
+  "53": "sound_seekers_game.html",
+  "54": "sentence_builder_game.html",
+  "55": "word_match_game.html",
+  "56": "fill_blank_game.html",
+  "57": "sentence_builder_game.html",
+  "58": "grammar_lab.html",
+  "59": "word_scramble_game.html",
+  "60": "reading_room.html",
+  "61": "hangman_game.html",
+  "62": "grammar_lab.html",
+  "63": "matching_pairs_game.html",
+  "64": "daily_challenge.html",
+  "65": "word_match_game.html",
+  "66": "forest_puzzle_game.html",
+  "67": "sentence_builder_game.html",
+  "68": "grammar_lab.html",
+  "69": "daily_challenge.html",
+  "70": "word_scramble_game.html",
+  "71": "word_search_game.html",
+  "72": "tictactoe_game.html",
+  "73": "matching_pairs_game.html",
+  "74": "daily_challenge.html",
+  "75": "word_match_game.html",
+  "76": "fill_blank_game.html",
+  "77": "sentence_builder_game.html",
+  "78": "reading_room.html",
+  "79": "daily_challenge.html",
+  "80": "word_scramble_game.html",
+  "81": "word_search_game.html",
+  "82": "hangman_game.html",
+  "83": "matching_pairs_game.html",
+  "84": "daily_challenge.html",
+  "85": "sound_seekers_game.html",
+  "86": "fill_blank_game.html",
+  "87": "sentence_builder_game.html",
+  "88": "grammar_lab.html",
+  "89": "daily_challenge.html",
+  "90": "word_scramble_game.html",
+  "91": "number_quest.html",
+  "92": "hangman_game.html",
+  "93": "matching_pairs_game.html",
+  "94": "daily_challenge.html",
+  "95": "grammar_lab.html",
+  "96": "tictactoe_game.html",
+  "97": "matching_pairs_game.html",
+  "98": "word_match_game.html",
+  "99": "sentence_builder_game.html",
+  "100": "daily_challenge.html",
+  "101": "fill_blank_game.html",
+  "102": "hangman_game.html",
+  "103": "word_search_game.html",
+  "104": "sound_seekers_game.html",
+  "105": "grammar_lab.html",
+  "106": "reading_room.html",
+  "107": "word_search_game.html",
+  "108": "grammar_lab.html",
+  "109": "word_scramble_game.html",
+  "110": "sentence_builder_game.html",
+  "301": "word_match_game.html",
+  "302": "matching_pairs_game.html",
+  "303": "sentence_builder_game.html",
+  "304": "fill_blank_game.html",
+  "305": "word_scramble_game.html",
+  "306": "grammar_lab.html",
+  "307": "matching_pairs_game.html",
+  "308": "word_search_game.html",
+  "309": "sentence_builder_game.html",
+  "310": "word_match_game.html",
+  "311": "number_quest.html",
+  "312": "sound_seekers_game.html",
+  "313": "matching_pairs_game.html",
+  "314": "word_match_game.html",
+  "315": "fill_blank_game.html",
+  "316": "sentence_builder_game.html",
+  "317": "word_scramble_game.html",
+  "318": "fill_blank_game.html",
+  "319": "sentence_builder_game.html",
+  "320": "matching_pairs_game.html",
+  "321": "sound_seekers_game.html",
+  "322": "word_match_game.html",
+  "323": "sentence_builder_game.html",
+  "324": "daily_challenge.html",
+  "201": "word_match_game.html",
+  "202": "number_quest.html",
+  "203": "color_catch_game.html",
+  "204": "matching_pairs_game.html",
+  "205": "fill_blank_game.html",
+  "206": "word_scramble_game.html",
+  "207": "spelling_bee_game.html",
+  "208": "number_quest.html",
+  "209": "word_search_game.html",
+  "210": "sentence_builder_game.html",
+  "211": "hangman_game.html",
+  "212": "grammar_lab.html",
+  "501": "word_match_game.html",
+  "502": "matching_pairs_game.html",
+  "503": "sentence_builder_game.html",
+  "504": "fill_blank_game.html",
+  "505": "word_scramble_game.html",
+  "506": "grammar_lab.html",
+  "507": "matching_pairs_game.html",
+  "508": "word_search_game.html"
 };
 const GAME_NAMES = {
   'word_match_game.html':'Word Match','fill_blank_game.html':'Fill in the Blank',
@@ -1890,6 +1224,9 @@ const GAME_NAMES = {
   'hangman_game.html':'Hangman','berry_math_game.html':'Berry Math',
   'color_catch_game.html':'Color Catch','flappy_yara_game.html':'Flappy Yara',
   'daily_challenge.html':'Daily Challenge',
+  'forest_puzzle_game.html':'Forest Puzzle','sound_seekers_game.html':'Sound Seekers',
+  'reading_room.html':'Reading Room','alphabet.html':'Alphabet',
+  'number_quest.html':'Number Quest','tictactoe_game.html':'Tic-Tac-Toe',
 };
 
 let GUIDED_MODE = false;
@@ -1897,7 +1234,18 @@ let guidedStep  = 0;
 
 // v2 = 6-step flow (no vocab). If old v1 key exists, clear it.
 const GUIDED_VERSION = 'v2';
-function _miniSuffix() { return miniNum > 0 ? '_m' + miniNum : ''; }
+function _lessonLanguage() { return (currentLesson && currentLesson.lang) || 'en'; }
+function _nextLessonInCurrentLanguage() {
+  const language = _lessonLanguage();
+  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language);
+  const currentIndex = languageLessons.findIndex(lesson => lesson.id === currentLesson.id);
+  return currentIndex >= 0 ? (languageLessons[currentIndex + 1] || null) : null;
+}
+function _lessonLower(value) {
+  const locale = _lessonLanguage() === 'tr' ? 'tr-TR' : _lessonLanguage() === 'fr' ? 'fr-FR' : 'en-US';
+  return String(value || '').toLocaleLowerCase(locale);
+}
+function _miniSuffix() { return '_' + _lessonLanguage() + (miniNum > 0 ? '_m' + miniNum : ''); }
 function getGuidedStep(lessonId) {
   const suffix = _miniSuffix();
   const vKey = 'capyGuidedVer_' + lessonId + suffix;
@@ -1983,20 +1331,71 @@ function guidedNextStep() {
 }
 
 function showGameStep() {
-  const gameFile = TRAIL_GAMES[currentLesson.id] || 'word_match_game.html';
-  const gameName = GAME_NAMES[gameFile] || 'Game';
-  document.getElementById('game-step-emoji').textContent  = '🎮';
-  document.getElementById('game-step-title').textContent  = gameName;
-  document.getElementById('game-step-link').href          = gameFile;
-  document.getElementById('game-step-link').setAttribute('href', gameFile);
-  // Hide all other panels, show game panel via style.display (bypasses Tailwind active class)
-  document.querySelectorAll('.tool-panel').forEach(p => {
-    p.classList.remove('active');
-    if (p.id !== 'panel-game' && p.id !== 'panel-aichat') p.style.display = '';
-  });
-  document.getElementById('panel-game').style.display = 'block';
-  document.getElementById('panel-aichat').style.display = 'none';
+  if (_lessonLanguage() === 'tr') {
+    startTurkishGame();
+    document.querySelectorAll('.tool-panel').forEach(p => {
+      p.classList.remove('active');
+      if (p.id !== 'panel-game' && p.id !== 'panel-aichat') p.style.display = '';
+    });
+    document.getElementById('panel-game').style.display = 'block';
+    document.getElementById('panel-aichat').style.display = 'none';
+    window.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  // O "Game" do dia passa a usar o vocabulário DA LIÇÃO.
+  //
+  // Antes daqui saía um link para um jogo standalone (hangman_game.html,
+  // word_match_game.html…). Nenhum desses jogos lê parâmetro de URL,
+  // localStorage ou sabe qual é a lição: todos têm lista de palavras fixa
+  // própria. Resultado: o dia 2 da trilha caía num vocabulário sem relação
+  // nenhuma com o que o aluno acabou de estudar — reclamação do Luis em
+  // 13/set/2026, e ele estava certo: era desconexo por construção.
+  //
+  // Os três jogos abaixo são in-page e montados a partir de
+  // currentLesson.vocab. O turco já fazia assim (startTurkishGame).
+  // O id da lição escolhe qual, para o dia 2 não ser sempre igual.
+  const JOGOS_DA_LICAO = ['speed', 'scramble', 'typing'];
+  let jogo = JOGOS_DA_LICAO[Number(currentLesson.id) % JOGOS_DA_LICAO.length];
+  // scramble precisa de palavras de uma só palavra e 3+ letras; se a lição
+  // não tiver nenhuma, o painel ficaria vazio.
+  if (jogo === 'scramble' && !getScrambleWords().length) jogo = 'speed';
+  document.querySelectorAll('.tool-panel').forEach(p => { p.style.display = ''; });
+  const chat = document.getElementById('panel-aichat');
+  if (chat) chat.style.display = 'none';
+  switchTool(jogo, true);
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+let trGameCards = [], trGameOptions = [], trGameIndex = 0, trGameScore = 0, trGameLocked = false;
+function trShuffle(items) { return [...items].sort(() => Math.random() - .5); }
+function startTurkishGame() {
+  trGameCards = trShuffle(currentLesson.vocab).slice(0, Math.min(6,currentLesson.vocab.length));
+  trGameIndex = 0; trGameScore = 0; trGameLocked = false;
+  renderTurkishGame();
+}
+function renderTurkishGame() {
+  const cardEl = document.getElementById('game-step-card');
+  if (trGameIndex >= trGameCards.length) {
+    cardEl.innerHTML = `<div class="text-6xl mb-4">${trGameScore===trGameCards.length?'🏆':'🧿'}</div><p class="text-xs font-black uppercase tracking-widest text-teal-600">Mini desafio concluído</p><h3 class="text-3xl font-black text-navy mt-2">${trGameScore}/${trGameCards.length} corretas</h3><p class="text-slate-500 text-sm mt-3 mb-6">Você treinou o vocabulário de “${currentLesson.title}” em turco.</p><button onclick="guidedGameDone()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-black py-4 rounded-2xl">Continuar na trilha →</button>`;
+    return;
+  }
+  const card = trGameCards[trGameIndex];
+  const distractors = trShuffle(currentLesson.vocab.filter(v=>v.en!==card.en)).slice(0,3).map(v=>v.pt);
+  trGameOptions = trShuffle([card.pt,...distractors]);
+  trGameLocked = false;
+  cardEl.innerHTML = `<div class="flex justify-between items-center mb-6"><span class="text-xs font-black text-teal-600 bg-teal-50 px-3 py-1.5 rounded-full">Türkçe eşleştirme</span><span class="text-xs font-bold text-slate-400">${trGameIndex+1}/${trGameCards.length}</span></div><button onclick="speakWord(trGameCards[trGameIndex].en,'tr-TR')" class="w-20 h-20 rounded-[1.75rem] bg-red-50 text-3xl mx-auto hover:scale-105 transition-transform" aria-label="Ouvir palavra em turco">🔊</button><h3 class="font-black text-navy text-3xl mt-4">${card.en}</h3><p class="text-slate-400 text-sm mt-1 mb-6">Escolha o significado em português</p><div class="grid sm:grid-cols-2 gap-3">${trGameOptions.map((opt,i)=>`<button data-tr-answer="${i}" onclick="answerTurkishGame(${i})" class="text-left bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold p-4 rounded-2xl transition-colors">${opt}</button>`).join('')}</div><p id="tr-game-feedback" class="h-6 mt-4 text-sm font-black"></p>`;
+}
+function answerTurkishGame(index) {
+  if (trGameLocked) return; trGameLocked = true;
+  const chosen = trGameOptions[index];
+  const correct = trGameCards[trGameIndex].pt;
+  const ok = chosen === correct; if (ok) trGameScore++;
+  const btn = document.querySelector(`[data-tr-answer="${index}"]`);
+  if (btn) btn.className = `text-left text-white font-bold p-4 rounded-2xl ${ok?'bg-emerald-500':'bg-red-500'}`;
+  const feedback = document.getElementById('tr-game-feedback');
+  feedback.textContent = ok ? 'Doğru! Correto! ✓' : `Resposta: ${correct}`;
+  feedback.className = `h-6 mt-4 text-sm font-black ${ok?'text-emerald-600':'text-red-600'}`;
+  setTimeout(()=>{trGameIndex++;renderTurkishGame()},850);
 }
 
 function guidedGameDone() {
@@ -2021,18 +1420,21 @@ function guidedLessonComplete() {
   if (window.Store) {
     Store.addXP(xpReward);
     if (isFullMode) {
-      Store.completeLesson(currentLesson.id);
-      Store.completeLesson('j' + currentLesson.id);
+      Store.completeLesson(currentLesson.id, _lessonLanguage());
+      if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
       Store.activateStreak();
     } else {
-      Store.completeMini(currentLesson.id, miniNum);  // calls completeLesson on mini 4
+      Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());  // calls completeLesson on mini 4
       // also save 'j' format so sidebar stays green
-      if (isLastMini) Store.completeLesson('j' + currentLesson.id);
+      if (isLastMini && _lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
     }
     if ((isFullMode && fullXP >= 40) || (isLastMini && xpReward >= 15)) {
       Store.unlockBadge('lesson_hero');
     }
   }
+
+  // Analytics: lesson/mini completion
+  if (window.capyTrack) capyTrack('mini_complete', { lessonId: String(currentLesson.id) });
 
   // Update overlay texts
   const completionTitle = isFullMode
@@ -2053,11 +1455,10 @@ function guidedLessonComplete() {
   // Wire up Next button
   const nextBtn = document.getElementById('gco-next-btn');
   if (isFullMode) {
-    const next = currentLesson.id + 1;
-    const hasNext = next <= 24;
-    if (hasNext) {
-      nextBtn.textContent = 'Next Lesson: ' + next + ' →';
-      nextBtn.onclick = () => { window.location.href = 'lessons.html?lesson=' + next + '&guided=1'; };
+    const nextLesson = _nextLessonInCurrentLanguage();
+    if (nextLesson) {
+      nextBtn.textContent = 'Next Lesson: ' + nextLesson.title + ' →';
+      nextBtn.onclick = () => { window.location.href = 'lessons.html?lesson=' + nextLesson.id + '&guided=1'; };
       nextBtn.style.display = '';
     } else {
       nextBtn.style.display = 'none';
@@ -2073,12 +1474,11 @@ function guidedLessonComplete() {
     nextBtn.style.display = '';
   } else {
     // Mini 4 (last): go to next lesson's Day 1
-    const nextLesson = currentLesson.id + 1;
-    const hasNext    = nextLesson <= 24;
-    if (hasNext) {
-      nextBtn.textContent = 'Lesson ' + nextLesson + ' — Day 1 →';
+    const nextLesson = _nextLessonInCurrentLanguage();
+    if (nextLesson) {
+      nextBtn.textContent = nextLesson.title + ' — Day 1 →';
       nextBtn.onclick = () => {
-        window.location.href = 'lessons.html?lesson=' + nextLesson + '&mini=1&guided=1';
+        window.location.href = 'lessons.html?lesson=' + nextLesson.id + '&mini=1&guided=1';
       };
       nextBtn.style.display = '';
     } else {
@@ -2086,7 +1486,24 @@ function guidedLessonComplete() {
     }
   }
 
-  document.getElementById('guided-complete-overlay').style.display = 'flex';
+  // A festa entra ANTES do resumo: a Yara comemora por ~2,4s e, quando ela
+  // sai, a tela de "Lesson Complete" já está montada atrás. Se o módulo não
+  // tiver carregado, o resumo aparece direto como sempre foi.
+  const _mostraResumo = () => {
+    document.getElementById('guided-complete-overlay').style.display = 'flex';
+  };
+  if (window.CapyCelebra) {
+    CapyCelebra.mostrar({
+      tipo: 'licao',
+      titulo: completionTitle.replace(/^[^\p{L}]+/u, ''),
+      subtitulo: currentLesson.emoji + ' ' + currentLesson.title,
+      xp: xpReward,
+    });
+    _mostraResumo();
+  } else {
+    _mostraResumo();
+    if (window.CapySound) CapySound.fanfare();
+  }
 }
 
 // Hook into markToolDone — advance guided step when current tool finishes
@@ -2096,18 +1513,37 @@ const _origMarkToolDone = markToolDone;
 // ══════════════════════════════════════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const urlParams0 = new URLSearchParams(location.search);
+  if (urlParams0.get('review') === '1') {
+    Components.mount('top-nav-placeholder', Components.renderTopNav('lessons'));
+    initReviewMode();
+    return;
+  }
   Components.mount('top-nav-placeholder', Components.renderTopNav('lessons'));
   // Merge built-in + custom lessons
-  ALL_LESSONS = [...JADSON_LESSONS, ...(Store.state.customLessons || [])];
+  ALL_LESSONS = [...(Store.state.customLessons || [])];
+  await carregarIndice();
+
+  const bossParam = urlParams0.get('boss');
+  if (bossParam) {
+    initBossMode(parseInt(bossParam, 10), urlParams0.get('lessons') || '');
+    return;
+  }
 
   const urlParams = new URLSearchParams(location.search);
   const startId   = parseInt(urlParams.get('lesson') || '1');
+  const startLang = (LESSON_INDEX.find(l => l.id === startId) || {}).lang || 'en';
+  await garantirLicao(startId);
   GUIDED_MODE     = urlParams.get('guided') === '1';
   miniNum         = parseInt(urlParams.get('mini') || '0');
   // Override activeSteps for mini mode
   if (miniNum > 0 && MINI_CONFIGS[miniNum]) {
     activeSteps = MINI_CONFIGS[miniNum];
+  }
+
+  if (GUIDED_MODE && miniNum > 0) {
+    try { localStorage.setItem('capyLastMini_' + startLang, JSON.stringify({ lessonId: startId, miniNum, lang: startLang, at: Date.now() })); } catch(e) {}
   }
 
   if (GUIDED_MODE) {
@@ -2124,6 +1560,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     buildSidebar();
   }
+
+  // Analytics: normal lesson load (funnel entry point)
+  if (window.capyTrack) capyTrack('mini_start', { lessonId: String(startId) });
 
   loadLesson(startId);
   if (!GUIDED_MODE) {
@@ -2148,11 +1587,12 @@ function buildSidebar() {
   const select = document.getElementById('mobile-lesson-select');
   list.innerHTML = '';
   select.innerHTML = '';
-  ALL_LESSONS.forEach(l => {
-    const done = window.Store && Store.state.completedLessons && Store.state.completedLessons.includes('j' + l.id);
+  LESSON_INDEX.forEach(l => {
+    const done = window.Store && Store.isLessonDone && Store.isLessonDone(l.id, l.lang || 'en');
     // Sidebar item
     const btn = document.createElement('button');
-    btn.className = `lesson-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 ${l.id === currentLesson.id ? 'active' : ''}`;
+    // currentLesson só existe depois de loadLesson(), e buildSidebar() roda antes.
+    btn.className = `lesson-item w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 ${currentLesson && l.id === currentLesson.id ? 'active' : ''}`;
     btn.id = `lesson-btn-${l.id}`;
     btn.innerHTML = `
       <span class="lesson-num w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold flex-shrink-0 ${done ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}">
@@ -2170,8 +1610,12 @@ function buildSidebar() {
   });
 }
 
-function loadLesson(id) {
-  currentLesson = ALL_LESSONS.find(l => l.id === id) || ALL_LESSONS[0];
+async function loadLesson(id) {
+  currentLesson = await garantirLicao(id) || ALL_LESSONS[0];
+  if (!currentLesson) return;
+  CUR_TTS_LANG = currentLesson && currentLesson.lang === 'fr' ? 'fr-FR'
+    : currentLesson && currentLesson.lang === 'tr' ? 'tr-TR'
+    : 'en-US';
   // Sidebar highlight
   document.querySelectorAll('.lesson-item').forEach(b => b.classList.remove('active'));
   const active = document.getElementById(`lesson-btn-${id}`);
@@ -2220,12 +1664,13 @@ function loadLesson(id) {
 // ══════════════════════════════════════════════════════════════════════════════
 function renderHeader() {
   const l = currentLesson;
+  const { pos, total } = posicaoNoCurso(l.id);
   document.getElementById('lesson-header').innerHTML = `
     <div class="bg-gradient-to-r from-navy to-blue-900 rounded-3xl p-6 text-white">
       <div class="flex items-center gap-4">
         <span class="text-5xl">${l.emoji}</span>
         <div>
-          <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Aula ${l.id} de ${JADSON_LESSONS.length}</p>
+          <p class="text-blue-200 text-xs font-bold uppercase tracking-widest mb-1">Aula ${pos} de ${total}</p>
           <h2 class="font-headline text-xl font-extrabold">${l.title}</h2>
           <div class="flex flex-wrap gap-2 mt-2">
             ${l.verbs.map(v => `<span class="bg-white/10 border border-white/20 text-xs font-bold px-2.5 py-1 rounded-full">${v}</span>`).join('')}
@@ -2303,7 +1748,7 @@ function renderVocab() {
 
       <!-- action buttons -->
       <div class="flex gap-2 justify-center flex-wrap">
-        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-pink-200">
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-pink-200">
           <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> EN
         </button>
         <button onclick="speakWord('${card.pt.replace(/'/g,"\\'")}','pt-BR')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-emerald-200">
@@ -2332,13 +1777,14 @@ function renderVocab() {
     </div>
   `;
   // Auto-speak English word on card load
-  setTimeout(() => speakWord(card.en, 'en-US'), 150);
+  setTimeout(() => speakWord(card.en, CUR_TTS_LANG), 150);
 }
 function vocabGoTo(i) {
   vocabIdx = i;
   renderVocab();
 }
 function speakWord(text, lang) {
+  if (window.CapyTTS) { CapyTTS.speak(text, lang); return; }
   if (!window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lang; u.rate = 0.85;
@@ -2377,7 +1823,7 @@ function renderQuiz() {
         <div class="h-full bg-gradient-to-r from-pink-400 to-pink-500 rounded-full transition-all duration-300" style="width:${((quizIdx+1)/qs.length)*100}%"></div>
       </div>
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
-        <p class="font-headline text-lg font-bold text-navy text-center">${q.q}</p>
+        <p id="quiz-question" class="font-headline text-lg font-bold text-navy text-center">${q.q}</p>
       </div>
       <div class="grid grid-cols-2 gap-2" id="quiz-opts">
         ${opts.map((o,i) => `
@@ -2389,27 +1835,65 @@ function renderQuiz() {
       </div>
     </div>
   `;
+  // Click-to-translate on the question statement only (not the answer choices)
+  try { if (window.CapyTranslate) CapyTranslate.enable('#quiz-question'); } catch (e) {}
 }
 function answerQuiz(btn, chosen, correct) {
   document.querySelectorAll('.choice-btn').forEach(b => b.setAttribute('disabled',''));
   const isCorrect = chosen === correct;
+  if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();
   if (isCorrect) {
     btn.classList.add('correct'); quizScore++; quizStreak++;
     removeWeakWord(currentLesson.id, correct);
+    if (window.Store) Store.questProgress('quiz_correct', 1);
   } else {
     btn.classList.add('wrong'); quizStreak = 0;
     document.querySelectorAll('.choice-btn').forEach(b => { if(b.textContent.trim()===correct) b.classList.add('correct'); });
     const wv = currentLesson.vocab.find(v => v.en === correct || v.pt === correct);
     if (wv) recordWeakWord(currentLesson.id, wv, 'quiz');
   }
+  // Confirmação em TEXTO, não só a cor. Daltônico não enxerga verde/vermelho,
+  // e quem errou precisa LER qual era a certa. O campo "why" é opcional: as
+  // 218 lições que já existem não têm, então a caixa degrada para só a resposta.
+  (function confirmar() {
+    const grade = document.getElementById('quiz-opts');
+    if (!grade || !grade.parentNode) return;
+    let fb = document.getElementById('quiz-feedback');
+    if (!fb) {
+      fb = document.createElement('div');
+      fb.id = 'quiz-feedback';
+      grade.parentNode.appendChild(fb);
+    }
+    const qs  = (GUIDED_MODE && aiQuizQuestions.length > 0) ? aiQuizQuestions
+              : (shuffledQuiz.length ? shuffledQuiz : currentLesson.quiz);
+    const porque = (qs && qs[quizIdx] && (qs[quizIdx].why || qs[quizIdx].rule || qs[quizIdx].explain)) || '';
+    fb.className = 'rounded-2xl px-4 py-3 text-sm font-bold leading-snug mt-1 ' +
+      (isCorrect ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                 : 'bg-amber-50 text-amber-800 border border-amber-200');
+    fb.textContent = '';
+    const linha1 = document.createElement('span');
+    linha1.textContent = isCorrect ? '✅ Isso!' : '💡 Quase — a resposta é ' + correct;
+    fb.appendChild(linha1);
+    if (porque) {
+      const linha2 = document.createElement('span');
+      linha2.className = 'block font-semibold opacity-90 mt-0.5';
+      linha2.textContent = porque;
+      fb.appendChild(linha2);
+    }
+  })();
   setTimeout(() => {
     quizIdx++;
     const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
       ? aiQuizQuestions.length
       : (shuffledQuiz.length || currentLesson.quiz.length);
-    if (quizIdx >= qLen) { quizDone = true; renderQuizFinish(); }
+    if (quizIdx >= qLen) {
+      quizDone = true;
+      // Analytics: quiz finished (fires once per completion)
+      if (window.capyTrack) capyTrack('quiz_finish', { lessonId: String(currentLesson.id) });
+      renderQuizFinish();
+    }
     else renderQuiz();
-  }, isCorrect ? 600 : 1200);
+  }, isCorrect ? 1100 : 2600);   // tempo de ler a confirmação, sobretudo no erro
 }
 function renderQuizFinish() {
   const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
@@ -2422,7 +1906,14 @@ function renderQuizFinish() {
   if (window.Store) {
     Store.activateStreak();
     Store.completeActivity('lessons');
-    if (pct >= 60) Store.completeLesson('j' + currentLesson.id);
+    if (pct >= 60) {
+      Store.completeLesson(currentLesson.id, _lessonLanguage());
+      if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
+    }
+    if (pct >= 60 && window.CapyCelebra) {
+      CapyCelebra.mostrar({ tipo: 'licao', titulo: 'Lição concluída!',
+                            subtitulo: currentLesson.emoji + ' ' + currentLesson.title });
+    }
   }
   document.getElementById('panel-quiz').innerHTML = `
     <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
@@ -2503,6 +1994,7 @@ function buildClear() {
   const fb = document.getElementById('build-feedback');
   if (fb) { fb.classList.add('hidden'); fb.textContent=''; }
 }
+let buildTentativas = {};
 function buildCheck(sent, idx) {
   const built = buildBuilt.map(x=>x.w).join(' ');
   const fb = document.getElementById('build-feedback');
@@ -2510,12 +2002,26 @@ function buildCheck(sent, idx) {
     fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-emerald-100 text-emerald-700';
     fb.textContent = '✨ Correto! Muito bem!';
     fb.classList.remove('hidden');
-    speakWord(sent, 'en-US');
+    speakWord(sent, CUR_TTS_LANG);
     if (window.Store) Store.addXP(5);
     setTimeout(() => { buildSentIdx++; renderBuild(); }, 1200);
   } else {
-    fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-red-100 text-red-600';
-    fb.textContent = '🔄 Tente novamente!';
+    // Errar e continuar sem saber a resposta trava o aluno. Depois de 3
+    // tentativas a frase certa aparece — ele copia uma vez e aprende a ordem.
+    buildTentativas[idx] = (buildTentativas[idx] || 0) + 1;
+    const revelar = buildTentativas[idx] >= 3;
+    fb.className = 'text-center py-2.5 px-3 rounded-2xl font-bold text-sm ' +
+      (revelar ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-red-100 text-red-600');
+    fb.textContent = '';
+    const l1 = document.createElement('span');
+    l1.textContent = revelar ? '💡 A frase é:' : '🔄 Tente novamente!';
+    fb.appendChild(l1);
+    if (revelar) {
+      const l2 = document.createElement('span');
+      l2.className = 'block text-navy font-black mt-0.5';
+      l2.textContent = sent;
+      fb.appendChild(l2);
+    }
     fb.classList.remove('hidden');
   }
 }
@@ -2547,7 +2053,7 @@ function renderExpr() {
           <div class="bg-white rounded-3xl border-2 border-slate-100 p-5 shadow-sm hover:border-pink-200 transition-all group">
             <div class="flex items-start justify-between gap-3 mb-3">
               <p class="font-headline text-lg font-extrabold text-navy">"${e.expr}"</p>
-              <button onclick="speakWord('${e.expr.replace(/'/g,"\\'")}','en-US')" class="flex-shrink-0 w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 transition-all">
+              <button onclick="speakWord('${e.expr.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="flex-shrink-0 w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 transition-all">
                 <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
               </button>
             </div>
@@ -2679,7 +2185,7 @@ function renderGram() {
             <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-2xl">
               <span class="w-6 h-6 bg-slate-200 text-slate-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">${i+1}</span>
               <p class="text-navy font-medium text-sm">${s}</p>
-              <button onclick="speakWord('${s.replace(/'/g,"\\'")}','en-US')" class="flex-shrink-0 w-7 h-7 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 ml-auto">
+              <button onclick="speakWord('${s.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="flex-shrink-0 w-7 h-7 bg-pink-50 rounded-full flex items-center justify-center hover:bg-pink-100 ml-auto">
                 <span class="material-symbols-outlined text-pink-500 text-xs" style="font-variation-settings:'FILL' 1;">volume_up</span>
               </button>
             </div>
@@ -2693,7 +2199,6 @@ function renderGram() {
 // ══════════════════════════════════════════════════════════════════════════════
 // TOOL 6: SPEAKING PRACTICE
 // ══════════════════════════════════════════════════════════════════════════════
-let recognition = null;
 let isListening  = false;
 
 function renderSpeak() {
@@ -2702,17 +2207,17 @@ function renderSpeak() {
   document.getElementById('panel-speak').innerHTML = `
     <div class="space-y-5">
       <div class="text-center bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl border border-teal-100 p-6">
-        <p class="text-xs font-bold text-teal-500 uppercase tracking-wide mb-3">Diga em inglês 🎤</p>
+        <p class="text-xs font-bold text-teal-500 uppercase tracking-wide mb-3">Diga em ${_lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês'} 🎤</p>
         <p class="font-headline text-2xl font-extrabold text-navy mb-4">"${phrase}"</p>
-        <button onclick="speakWord('${phrase.replace(/'/g,"\\'")}','en-US')" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-teal-200 text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all mb-4">
+        <button onclick="speakWord('${phrase.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-teal-200 text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all mb-4">
           <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir exemplo
         </button>
         <div>
-          <button id="mic-btn" onclick="toggleMic('${phrase.replace(/'/g,"\\'")}','${phrase.replace(/'/g,"\\'")}'))"
+          <button id="mic-btn" onclick="toggleMic('${phrase.replace(/'/g,"\\'")}')"
                   class="w-20 h-20 rounded-full bg-teal-500 hover:bg-teal-600 text-white flex items-center justify-center mx-auto shadow-xl shadow-teal-500/30 transition-all active:scale-95">
             <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;">mic</span>
           </button>
-          <p class="text-xs text-teal-600 mt-2 font-bold">Toque para falar</p>
+          <p id="mic-hint" class="text-xs text-teal-600 mt-2 font-bold">Toque para falar</p>
         </div>
       </div>
 
@@ -2740,29 +2245,70 @@ function renderSpeak() {
   `;
 }
 
-function toggleMic(phrase) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    showSpeakFeedback(false, "Microfone não suportado neste navegador. Tente o Chrome.");
-    return;
-  }
-  if (isListening) { recognition.stop(); return; }
-  recognition = new SpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.interimResults = false;
-  isListening = true;
-  const btn = document.getElementById('mic-btn');
-  if (btn) { btn.style.background = '#ef4444'; btn.style.boxShadow = '0 0 0 8px rgba(239,68,68,0.2)'; }
-  recognition.onresult = (e) => {
-    const spoken = e.results[0][0].transcript.toLowerCase().trim();
-    const target = phrase.toLowerCase().replace(/[.,!?]/g,'');
-    const ok = spoken.includes(target.substring(0,10)) || levenshtein(spoken, target) <= Math.floor(target.length * 0.35);
+async function toggleMic(phrase) {
+  const btn  = document.getElementById('mic-btn');
+  const hint = document.getElementById('mic-hint');
+
+  // Segundo toque: já está gravando → para e transcreve com Whisper
+  if (isListening) {
+    isListening = false;
+    if (btn)  { btn.style.background = ''; btn.style.boxShadow = ''; }
+    if (hint) hint.textContent = 'Toque para falar';
+    const fb = document.getElementById('speak-feedback');
+    if (fb) {
+      fb.classList.remove('hidden');
+      fb.className = 'bg-teal-50 border border-teal-200 rounded-3xl p-5 text-center shadow-sm';
+      fb.innerHTML = '<div class="text-teal-600 font-bold text-sm">🎧 Processando sua fala...</div>';
+    }
+    const lang = CUR_TTS_LANG === 'fr-FR' ? 'fr' : CUR_TTS_LANG === 'tr-TR' ? 'tr' : 'en';
+    const { text, empty, error } = await CapyMic.stopAndTranscribe({ lang });
+    if (empty)  { showSpeakFeedback(false, '(nada foi ouvido)', phrase); return; }
+    // Falha TÉCNICA (limite diário, rede, etc.) — nunca compara isto com a
+    // frase-alvo. Antes, o texto do erro entrava em showSpeakFeedback como se
+    // fosse a fala do aluno, e o CapyFala comparava "Erro ao processar áudio"
+    // contra a frase francesa palavra por palavra, produzindo um "Faltou: a,
+    // quelle, heure, tu, arrives" sem sentido nenhum — e sempre a MESMA
+    // mensagem genérica, mesmo quando a causa real era limite diário atingido.
+    if (error) { showSpeakError(error, phrase); return; }
+    // CapyFala põe os dois lados no mesmo formato antes de comparar: o Whisper
+    // transcreve número como ALGARISMO ("j'ai 25 ans") e a frase-alvo está por
+    // extenso ("J'ai vingt-cinq ans") — comparando cru, quem pronunciou certo
+    // levava "Quase! Tente novamente".
+    const spoken = String(text || '').trim();
+    const ok = window.CapyFala
+      ? CapyFala.passou(phrase, spoken, lang)
+      : _lessonLower(spoken).includes(_lessonLower(phrase).substring(0, 10));
+    if (window.CapySound) ok ? CapySound.correct() : CapySound.wrong();
     showSpeakFeedback(ok, spoken, phrase);
     if (ok && window.Store) Store.addXP(8);
-  };
-  recognition.onerror = () => { isListening = false; if (btn) { btn.style.background=''; btn.style.boxShadow=''; } showSpeakFeedback(false, "Não ouvi nada. Tente novamente!"); };
-  recognition.onend   = () => { isListening = false; if (btn) { btn.style.background=''; btn.style.boxShadow=''; } };
-  recognition.start();
+    return;
+  }
+
+  // Primeiro toque: começa a gravar
+  isListening = true;
+  if (btn)  { btn.style.background = '#ef4444'; btn.style.boxShadow = '0 0 0 8px rgba(239,68,68,0.2)'; }
+  if (hint) hint.textContent = 'Toque de novo para enviar';
+  const started = await CapyMic.start({
+    onError: (kind) => {
+      isListening = false;
+      if (btn)  { btn.style.background = ''; btn.style.boxShadow = ''; }
+      if (hint) hint.textContent = 'Toque para falar';
+      showSpeakError(kind === 'not_supported' ? 'Microfone não suportado neste navegador.' : 'Permita o microfone para praticar a fala.', phrase);
+    }
+  });
+  if (!started) isListening = false;
+}
+
+// Falha técnica — mic recusado, sem áudio processável, limite diário do plano.
+// Visualmente distinta de "errou a pronúncia": sem comparação de palavras,
+// sem "Faltou:", e mostra a mensagem REAL (não uma genérica sempre igual).
+function showSpeakError(message, target) {
+  const fb = document.getElementById('speak-feedback');
+  if (!fb) return;
+  fb.classList.remove('hidden');
+  fb.className = 'bg-amber-50 border border-amber-200 rounded-3xl p-5 text-center shadow-sm';
+  fb.innerHTML = `<div class="text-amber-600 font-bold text-base mb-1">⚠️ Não deu para ouvir</div>
+                  <p class="text-xs text-slate-500">${message}</p>`;
 }
 
 function showSpeakFeedback(ok, spoken, target) {
@@ -2774,17 +2320,20 @@ function showSpeakFeedback(ok, spoken, target) {
                     <p class="text-sm text-slate-500">Você disse: "<span class="font-bold text-navy">${spoken}</span>"</p>`;
     fb.className = 'bg-emerald-50 border border-emerald-200 rounded-3xl p-5 text-center shadow-sm';
     const nextIdx = speakIdx + 1;
+    if (window.Store) Store.questProgress('speak_ok', 1);
     if (nextIdx >= (shuffledSpeak.length || currentLesson.speak.length)) {
       markToolDone(currentLesson.id, 'speak');
     }
     setTimeout(() => { speakIdx = Math.min(nextIdx, (shuffledSpeak.length || currentLesson.speak.length)-1); renderSpeak(); }, 1500);
   } else {
     // Record the phrase word as weak (find matching vocab)
-    const wv = currentLesson.vocab.find(v => target.toLowerCase().includes(v.en.toLowerCase()));
+    const wv = currentLesson.vocab.find(v => _lessonLower(target).includes(_lessonLower(v.en)));
     if (wv) recordWeakWord(currentLesson.id, wv, 'speak');
+    const faltou = window.CapyFala ? CapyFala.acerto(target, spoken, _lessonLanguage()).faltando : [];
     fb.innerHTML = `<div class="text-red-500 font-bold text-base mb-1">Quase! Tente novamente.</div>
                     <p class="text-xs text-slate-400">Você disse: "${spoken}"</p>
-                    <p class="text-xs text-slate-500 mt-1">Meta: "<b>${target}</b>"</p>`;
+                    <p class="text-xs text-slate-500 mt-1">Meta: "<b>${target}</b>"</p>
+                    ${faltou.length ? `<p class="text-xs text-red-400 mt-1">Faltou: <b>${faltou.join(', ')}</b></p>` : ''}`;
     fb.className = 'bg-red-50 border border-red-200 rounded-3xl p-5 text-center shadow-sm';
   }
 }
@@ -2889,11 +2438,11 @@ function renderListen() {
       <!-- Listen button — compact -->
       <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-4 text-center">
         <p class="text-xs font-bold text-violet-500 uppercase tracking-wide mb-3">${isEnToPt ? 'Ouça e escolha a tradução' : 'Ouça e escolha em inglês'}</p>
-        <button onclick="speakWord('${isEnToPt ? card.en.replace(/'/g,"\\'") : card.pt.replace(/'/g,"\\'")}','${isEnToPt?'en-US':'pt-BR'}')"
+        <button onclick="speakWord('${isEnToPt ? card.en.replace(/'/g,"\\'") : card.pt.replace(/'/g,"\\'")}','${isEnToPt?CUR_TTS_LANG:'pt-BR'}')"
                 class="w-16 h-16 rounded-full bg-violet-500 hover:bg-violet-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-violet-500/30 transition-all active:scale-95">
           <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">volume_up</span>
         </button>
-        <p class="text-xs text-violet-400 font-bold mt-2">Toque para ouvir</p>
+        <p id="listen-reveal" class="text-xs text-violet-400 font-bold mt-2">Toque para ouvir</p>
       </div>
       <!-- Choice buttons -->
       <div class="grid grid-cols-2 gap-2" id="listen-opts">
@@ -2907,16 +2456,44 @@ function renderListen() {
       <p class="text-center text-xs font-bold text-emerald-600">✓ ${listenScore} corretas</p>
     </div>
   `;
-  setTimeout(() => speakWord(isEnToPt ? card.en : card.pt, isEnToPt ? 'en-US' : 'pt-BR'), 200);
+  setTimeout(() => speakWord(isEnToPt ? card.en : card.pt, isEnToPt ? CUR_TTS_LANG : 'pt-BR'), 200);
 }
 function answerListen(btn, isCorrect) {
   document.querySelectorAll('#listen-opts .choice-btn').forEach(b => b.setAttribute('disabled',''));
   const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();  // Revela POR ESCRITO o que o aluno acabou de OUVIR — regra do projeto para
+  // toda atividade de escuta sem texto na tela. Sem isto, no modo EN → PT ele
+  // ouve a palavra em inglês, escolhe a tradução e nunca vê como ela se
+  // escreve: a atividade cobra escuta e não devolve a grafia.
+  (function revelarOuvido() {
+    const rev = document.getElementById('listen-reveal');
+    if (!rev) return;
+    const item = vocab[listenIdx];
+    if (!item) return;
+    const ouvido = listenMode === 'en-to-pt' ? item.en : item.pt;
+    const par    = listenMode === 'en-to-pt' ? item.pt : item.en;
+    rev.className = 'mt-2';
+    rev.textContent = '';
+    const linhaStatus = document.createElement('span');
+    linhaStatus.className = isCorrect
+      ? 'block text-emerald-600 font-black text-xs mb-1'
+      : 'block text-amber-600 font-black text-xs mb-1';
+    linhaStatus.textContent = isCorrect ? '✅ Isso!' : '💡 Quase — você ouviu:';
+    rev.appendChild(linhaStatus);
+    const a = document.createElement('span');
+    a.className = 'block text-navy font-black text-base leading-tight';
+    a.textContent = ouvido;          // textContent, nunca innerHTML: o vocabulário é dado, não markup
+    const b = document.createElement('span');
+    b.className = 'block text-violet-400 font-bold text-xs mt-0.5';
+    b.textContent = par;
+    rev.append(a, b);
+  })();
   if (isCorrect) {
     btn.classList.add('correct');
     listenScore++;
     listenStreak++;
     removeWeakWord(currentLesson.id, vocab[listenIdx].en);
+    if (window.Store) Store.questProgress('listen_correct', 1);
     // Flash XP popup
     const xpPop = document.createElement('div');
     xpPop.textContent = listenStreak >= 3 ? `+${listenStreak} 🔥` : '✓';
@@ -2934,7 +2511,7 @@ function answerListen(btn, isCorrect) {
     listenIdx++;
     if (listenIdx >= vocab.length) { listenDone = true; renderListenFinish(); }
     else renderListen();
-  }, isCorrect ? 700 : 1200);
+  }, isCorrect ? 1600 : 2400);   // tempo de ler a palavra revelada, não só de ouvir o som
 }
 function renderListenFinish() {
   const total = shuffledVocab.length || currentLesson.vocab.length;
@@ -2985,7 +2562,7 @@ function renderTyping() {
       <div class="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-3xl border border-cyan-100 p-6 text-center">
         <p class="text-xs font-bold text-cyan-500 uppercase tracking-wide mb-2">Digite em ${answerLang}</p>
         <p class="font-headline text-3xl font-extrabold text-navy mb-1">${prompt}</p>
-        <button onclick="speakWord('${prompt.replace(/'/g,"\\'")}','${isEnToPt?'en-US':'pt-BR'}')"
+        <button onclick="speakWord('${prompt.replace(/'/g,"\\'")}','${isEnToPt?CUR_TTS_LANG:'pt-BR'}')"
                 class="inline-flex items-center gap-1 text-xs text-cyan-500 font-bold hover:text-cyan-700 mt-1">
           <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir
         </button>
@@ -3014,11 +2591,11 @@ function checkTyping() {
   if (typeChecked) return;
   const input = document.getElementById('type-input');
   if (!input) return;
-  const typed  = input.value.trim().toLowerCase();
+  const typed  = _lessonLower(input.value.trim());
   const vocab  = currentLesson.vocab;
   const card   = vocab[typeIdx];
   const isEnToPt = typeMode === 'en-to-pt';
-  const correct  = (isEnToPt ? card.pt : card.en).toLowerCase();
+  const correct  = _lessonLower(isEnToPt ? card.pt : card.en);
   // Levenshtein tolerance
   const maxErr = correct.length <= 5 ? 1 : correct.length <= 12 ? 2 : 3;
   const dist   = levenshtein(typed, correct);
@@ -3111,7 +2688,7 @@ function renderSpeed() {
           <span id="speed-secs" class="absolute inset-0 flex items-center justify-center font-extrabold text-2xl text-navy">6</span>
         </div>
         <p class="font-headline text-3xl font-extrabold text-navy">${card.en}</p>
-        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')"
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')"
                 class="mt-2 text-xs text-orange-500 font-bold flex items-center gap-1 hover:text-orange-700">
           <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span>
         </button>
@@ -3151,6 +2728,7 @@ function answerSpeed(btn, isCorrect, en, pt) {
   speedAnswered = true;
   if (speedTimer) { clearInterval(speedTimer); speedTimer = null; }
   document.querySelectorAll('#speed-opts .choice-btn').forEach(b => b.setAttribute('disabled',''));
+  if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();
   if (isCorrect) {
     btn.classList.add('correct');
     speedScore++;
@@ -3242,7 +2820,7 @@ function renderScramble() {
       <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border border-purple-100 p-6 text-center">
         <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em inglês</p>
         <p class="text-lg font-extrabold text-navy mb-1">${card.pt}</p>
-        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','en-US')"
+        <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')"
                 class="text-xs text-purple-400 font-bold flex items-center gap-1 mx-auto hover:text-purple-600">
           <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir
         </button>
@@ -3333,7 +2911,7 @@ function scrambleCheckNow() {
     const xpEarned = Math.max(2, 8 - scrambleHints);
     addXPToProgress(currentLesson.id, xpEarned);
     removeWeakWord(currentLesson.id, card.en);
-    speakWord(card.en, 'en-US');
+    speakWord(card.en, CUR_TTS_LANG);
     if (fb) {
       fb.className = 'text-center py-2.5 rounded-2xl font-bold text-sm bg-emerald-100 text-emerald-700';
       fb.textContent = `✨ Correto! +${xpEarned} XP`;

@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Color Catch — Capy Yara Adventures</title>
+<title>Color Catch — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -39,6 +39,24 @@
   }
   @keyframes timerShrink { from{stroke-dashoffset:0} to{stroke-dashoffset:220} }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/color_catch_game.html"/>
+<meta property="og:title" content="Color Catch — Capy Yara English"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Color Catch — Capy Yara English"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
 
@@ -49,9 +67,9 @@
 
   <!-- Header -->
   <div class="text-center">
-    <span class="font-label text-violet-400 text-sm font-bold uppercase tracking-widest">Mini-Game</span>
+    <span class="font-label text-violet-400 text-sm font-bold uppercase tracking-widest">Mini-Jogo</span>
     <h1 class="font-headline text-5xl md:text-6xl font-black text-white mt-1">Color Catch</h1>
-    <p class="font-body text-slate-400 text-lg mt-1">Tap the tile that matches the <em>color name</em>!</p>
+    <p class="font-body text-slate-400 text-lg mt-1">Toque no quadrado que corresponde ao <em>nome da cor</em>!</p>
   </div>
 
   <!-- Stats bar -->
@@ -61,14 +79,14 @@
       <span id="score-display" class="font-headline font-black text-2xl">0</span>
       <span class="font-label text-slate-400 text-sm">pts</span>
     </div>
-    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Round 1 / 8</span>
+    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Rodada 1 / 8</span>
     <div id="hearts-display" class="flex gap-1"></div>
   </div>
 
   <!-- Target card with timer ring -->
   <div class="w-full bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 p-10
               flex flex-col items-center gap-4">
-    <span class="font-label text-slate-400 text-xs uppercase tracking-widest">Find this color:</span>
+    <span class="font-label text-slate-400 text-xs uppercase tracking-widest">Ache esta cor:</span>
 
     <!-- Timer ring + word -->
     <div class="relative flex items-center justify-center w-44 h-44">
@@ -84,7 +102,7 @@
             class="font-headline text-5xl font-black text-white z-10 select-none">RED</span>
     </div>
 
-    <p class="font-label text-slate-500 text-xs">Tap fast — the ring is ticking!</p>
+    <p class="font-label text-slate-500 text-xs">Toque rápido — o tempo está correndo!</p>
   </div>
 
   <!-- Color tiles grid (2×2) -->
@@ -103,10 +121,12 @@
 <div id="mobile-nav-placeholder"></div>
 <div id="footer-placeholder"></div>
 
-<script src="store.js?v=c52d7db"></script>
+<script src="auth-secure.js?v=auth20260918"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=1"></script>
 <script src="levelup-overlay.js?v=c52d7db"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=c52d7db"></script>
+<script src="components.js?v=push2"></script>
 <script>
   Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
   Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
@@ -199,7 +219,7 @@
     correctColor = COLORS[correctIdx];
     const tileIndices = pick4(correctIdx);
 
-    document.getElementById('round-display').textContent = `Round ${round+1} / ${TOTAL_ROUNDS}`;
+    document.getElementById('round-display').textContent = `Rodada ${round+1} / ${TOTAL_ROUNDS}`;
     hideFeedback();
 
     // Target word — Stroop effect for harder rounds: color the word differently
@@ -346,5 +366,7 @@
 
   document.addEventListener('DOMContentLoaded', startGame);
 </script>
+<script src="celebration.js?v=cel3"></script>
+<script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>
