@@ -1,6 +1,17 @@
 .env
 .env.local
+# Qualquer .env baixado da Vercel (env pull) — nunca commitar.
+# ATENÇÃO: o .gitignore NÃO aceita comentário no fim da linha do padrão. Se
+# escrever `.env.*   # comentário`, o padrão vira a linha inteira e deixa de
+# ignorar coisa nenhuma — foi exatamente o que aconteceu aqui, e o
+# `.env.producao` ficou desprotegido sem ninguém notar.
+.env.*
+!.env.example
 node_modules/
 .vercel/
+database.json
+security-audit-private/
+test-results/
+playwright-report/
 
 .vercel
