@@ -6,9 +6,13 @@
 (function () {
     // Inject overlay HTML into the page
     const overlayHTML = `
+        <!-- Nasce escondido pela CLASSE, não por style inline. Antes era
+             style="display:none!important": inline com !important vence a regra
+             de display:flex !important da folha de estilo, e o
+             show() só remove a classe — então o overlay nunca aparecia. A
+             comemoração de subir de nível não chegou a ser vista por nenhum aluno. -->
         <div id="levelup-overlay"
-             class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
-             style="display:none!important;">
+             class="hidden-overlay fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
             <div id="levelup-card"
                  class="relative bg-gradient-to-br from-navy via-[#001f3f] to-slate-900
                         border-2 border-pink-500/60 rounded-[3rem] px-16 py-14
@@ -53,6 +57,21 @@
         style.textContent = `
             #levelup-overlay { display: flex !important; }
             #levelup-overlay.hidden-overlay { display: none !important; }
+            /* Tela baixa (tablet ou celular deitado). O cartão tem ~560px de
+               altura com o espaçamento cheio; numa tela de 420 ele cortava em
+               cima E embaixo — medido: topo em -70px, botão em y=432. Como o
+               overlay é fixo e não rola, o aluno ficava preso, sem conseguir
+               fechar. Aqui a solução é compactar, não deitar: são quatro
+               blocos empilhados e lado a lado o botão ficaria solto. */
+            @media (max-height: 640px) {
+                #levelup-card { padding: 16px 28px !important; gap: 8px !important; }
+                #levelup-card .w-28 { width: 64px !important; height: 64px !important; }
+                #levelup-title { font-size: 44px !important; margin-bottom: 0 !important; }
+                #levelup-card button { padding-top: 10px !important; padding-bottom: 10px !important; }
+            }
+            /* Rede de segurança: nunca passa da altura visível; se ainda assim
+               não couber, rola em vez de esconder o botão de fechar. */
+            #levelup-card { max-height: calc(100dvh - 24px); overflow-y: auto; }
             #levelup-card.show {
                 transform: scale(1) !important;
                 opacity: 1 !important;

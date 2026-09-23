@@ -36,6 +36,22 @@
           @media (prefers-reduced-motion: reduce) {
             #streak-card { transition:none; }
           }
+          /* Paisagem baixa (tablet ou celular deitado). O cartão em pé tem uns
+             550px de altura: imagem quadrada de 380px + texto + botão. Com o
+             aparelho deitado sobram 400-560px e o botão "Continuar" caía FORA
+             da tela — medido: y=461 numa tela de 420. Como o overlay é fixo e
+             não rola, o aluno ficava preso atrás dele, sem conseguir fechar.
+             Deitado, a sobra é de largura: imagem à esquerda, texto à direita. */
+          @media (orientation: landscape) and (max-height: 640px) {
+            #streak-card { width:min(92vw,620px); display:flex; align-items:stretch; }
+            #streak-card .streak-media { width:44%; aspect-ratio:auto; height:auto;
+              max-height:calc(100dvh - 32px); }
+            #streak-info { flex:1; display:flex; flex-direction:column;
+              justify-content:center; padding:16px 18px; }
+          }
+          /* Rede de segurança para qualquer tela: o cartão nunca passa da altura
+             visível, e se ainda assim não couber, rola em vez de esconder o botão. */
+          #streak-card { max-height:calc(100dvh - 24px); overflow-y:auto; }
         `;
         document.head.appendChild(style);
 
