@@ -449,7 +449,7 @@ function buildDiscussionGrid(data, gridId) {
     const div = document.createElement('div');
     div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:border-pink-300 transition-colors';
     div.innerHTML = `
-      <button onclick="speak('${item.text.replace(/<[^>]+>/g,'').replace(/'/g,\"'\")}')" class="flex-shrink-0 w-12 h-12 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+      <button onclick="speak('${item.text.replace(/<[^>]+>/g,'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" class="flex-shrink-0 w-12 h-12 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
         <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
       </button>
       <p class="flex-1 text-navy font-semibold text-sm leading-relaxed">${item.text}</p>
