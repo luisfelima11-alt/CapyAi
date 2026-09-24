@@ -265,18 +265,21 @@ function renderPlan() {
 }
 
 function openCancellation() {
-  // Kiwify customer portal — actual link tbd. For now, mailto + instructions.
+  // Subscriptions are sold through Kiwify: the buyer cancels there, without talking to anyone.
   const modal = document.createElement('div');
   modal.style.cssText = 'position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);';
   modal.innerHTML = `
     <div style="background:#fff;border-radius:20px;max-width:420px;padding:26px;position:relative;">
       <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:#f1f5f9;border:none;font-weight:900;cursor:pointer;">×</button>
       <h2 style="font-weight:900;font-size:18px;color:#0f172a;margin:0 0 10px;">Gerenciar assinatura</h2>
-      <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 18px;">
-        Por enquanto, para cancelar sua assinatura você precisa entrar em contato com a gente — vamos cuidar do cancelamento sem burocracia e sem perguntas.
+      <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 12px;">
+        Você cancela sozinho, a qualquer momento, pela Kiwify: abra o e-mail <strong>"Pagamento de assinatura aprovado"</strong> e clique em <strong>Gerenciar assinatura</strong>.
       </p>
-      <a href="mailto:luisfelima11@gmail.com?subject=Cancelar%20assinatura%20Capy%20English" style="display:block;text-align:center;background:#0f172a;color:#fff;padding:12px;border-radius:12px;text-decoration:none;font-weight:900;">📧 Enviar e-mail</a>
-      <p style="color:#94a3b8;font-size:11px;margin:12px 0 0;text-align:center;">Em breve: portal de auto-gerenciamento da Kiwify.</p>
+      <p style="color:#64748b;font-size:13px;line-height:1.5;margin:0 0 18px;">
+        Comprou há menos de 7 dias? Você tem direito ao reembolso integral (arrependimento).
+      </p>
+      <a href="https://ajuda.kiwify.com.br/pt-br/article/como-cancelar-a-assinatura-do-produto-que-comprei-19d0my1/" target="_blank" rel="noopener" style="display:block;text-align:center;background:#0f172a;color:#fff;padding:12px;border-radius:12px;text-decoration:none;font-weight:900;margin-bottom:8px;">Passo a passo na Kiwify →</a>
+      <a href="mailto:luisfelima11@gmail.com?subject=Cancelar%20assinatura%20Capy%20English" style="display:block;text-align:center;background:#f1f5f9;color:#0f172a;padding:12px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px;">Precisa de ajuda? Fale com a gente</a>
     </div>`;
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
   document.body.appendChild(modal);
