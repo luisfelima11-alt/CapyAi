@@ -560,8 +560,9 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
         apiRes.on('end', () => {
             res.setHeader('Content-Type', 'application/json');
             if (apiRes.statusCode !== 200) {
-                let errBody; try { errBody = JSON.parse(data); } catch { errBody = { error: { message: data } }; }
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: errBody?.error?.message || data } }));
+                // The provider's message can name the org, key or model: log it, answer generically.
+                console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
+                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
                 return;
             }
             try {
@@ -573,7 +574,7 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
             }
         });
     });
-    apiReq.on('error', err => { res.status(500).end(JSON.stringify({ error: { code: 500, message: err.message } })); });
+    apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
     apiReq.write(postData);
     apiReq.end();
 }
@@ -1490,6 +1491,12 @@ module.exports = async (req, res) => {
             return;
         }
     }
+
+    // Writes must come from our own pages. Browsers always send Origin on
+    // POST/PUT/PATCH/DELETE (sendBeacon included); the only server-to-server
+    // writer, the Kiwify webhook, is handled above this point. (Outside
+    // production assertOrigin lets a missing Origin through, for local tools.)
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) assertOrigin(req);
 
     // Same-origin CORS. Credentials are never exposed to arbitrary origins.
     const origin = req.headers.origin || '';
@@ -3048,107 +3055,6 @@ Respond ONLY with valid JSON, no markdown:
         return;
     }
 
-    // ── Magic Link Auth ──────────────────────────────────────────────────────
-    // POST /api/auth/magic-link  body: { email }
-    // Creates account if needed, generates 15-min token, sends email via Resend.
-    if (req.method === 'POST' && url === '/api/auth/magic-link') {
-        const { email } = await readBody(req);
-        const norm = (email || '').toLowerCase().trim();
-        if (!norm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) {
-            res.status(400).json({ error: 'invalid_email' }); return;
-        }
-        // Abuse limit (5/day for free, scales with plan)
-        const _rl = await checkRateLimit(req, 'magic-link', null);
-        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
-
-        // Find or create account
-        const found = await sb(`/accounts?email=eq.${encodeURIComponent(norm)}&select=id,name`);
-        let userId   = found?.[0]?.id;
-        let userName = found?.[0]?.name;
-        let isNewUser = false;
-        if (!userId) {
-            userId   = 'magic-' + crypto.randomBytes(8).toString('hex');
-            userName = norm.split('@')[0];
-            await sb('/accounts', {
-                method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                body: JSON.stringify({
-                    id: userId, name: userName, email: norm,
-                    password: '__magic__' + crypto.randomBytes(8).toString('hex'),
-                    avatar: '🐾', pending_setup: false,
-                    created_at: new Date().toISOString(),
-                }),
-            });
-            isNewUser = true;
-        }
-
-        // Generate token (15-min expiry)
-        const token = crypto.randomBytes(24).toString('base64url');
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-        await sb('/magic_link_tokens', {
-            method: 'POST',
-            headers: { 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ token, email: norm, user_id: userId, expires_at: expiresAt }),
-        });
-
-        const verifyUrl = `https://www.capyenglish.com.br/verify.html?token=${token}`;
-        const RESEND_KEY = process.env.RESEND_API_KEY;
-
-        // Dev mode: no Resend key → return link directly so testing still works
-        if (!RESEND_KEY) {
-            console.warn('[magic-link] RESEND_API_KEY not set — returning link in response (dev mode)');
-            res.status(200).json({
-                ok: true, isNewUser, devLink: verifyUrl,
-                warning: 'RESEND_API_KEY not configured. Showing link directly (dev mode only).',
-            });
-            return;
-        }
-
-        // Send email via Resend
-        const html = `<!DOCTYPE html><html lang="pt-BR"><body style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;margin:0">
-<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,.06)">
-  <div style="text-align:center;font-size:48px;margin-bottom:8px">🐾</div>
-  <h1 style="color:#001f3f;font-weight:900;font-size:22px;margin:0 0 12px;text-align:center">Seu link de acesso</h1>
-  <p style="font-size:15px;color:#475569;line-height:1.6;text-align:center;margin:0 0 24px">Olá, <strong>${userName}</strong>! Clique no botão abaixo para entrar na Capy English. O link expira em 15 minutos.</p>
-  <div style="text-align:center;margin:28px 0">
-    <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg,#FF9F1C,#fb923c);color:#fff;font-weight:900;padding:15px 32px;border-radius:14px;text-decoration:none;font-size:15px;box-shadow:0 8px 20px rgba(249,115,22,.3)">⚡ Entrar agora</a>
-  </div>
-  <p style="font-size:12px;color:#94a3b8;line-height:1.6;text-align:center;margin:24px 0 8px">Se você não solicitou esse link, é só ignorar.</p>
-  <p style="font-size:11px;color:#cbd5e1;line-height:1.5;text-align:center;word-break:break-all;margin:0">Ou copie e cole no navegador:<br>${verifyUrl}</p>
-  <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0">
-  <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">Capy English · Aprenda inglês com a Yara 🌿</p>
-</div></body></html>`;
-
-        try {
-            const sendRes = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + RESEND_KEY,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: process.env.EMAIL_FROM || 'Capy English <contato@capyenglish.com.br>',
-                    to: [norm],
-                    subject: '🐾 Seu link de acesso · Capy English',
-                    html,
-                }),
-            });
-            if (!sendRes.ok) {
-                const errText = await sendRes.text();
-                console.error('[magic-link] Resend error:', sendRes.status, errText.slice(0, 300));
-                res.status(502).json({ error: 'email_send_failed', details: errText.slice(0, 200) });
-                return;
-            }
-            console.log('[legacy-magic-link] message sent');
-            res.status(200).json({ ok: true, isNewUser });
-            return;
-        } catch (e) {
-            console.error('[magic-link] fetch error:', e.message);
-            res.status(500).json({ error: 'email_send_failed', details: e.message });
-            return;
-        }
-    }
-
     // POST /api/auth/verify  body: { token }
     // Validates token, marks used, returns user object for client to save as session.
     if (req.method === 'POST' && url === '/api/auth/verify') {
@@ -3481,7 +3387,7 @@ Rules:
             apiRes.on('end', () => {
                 try {
                     const parsed = JSON.parse(data);
-                    if (parsed.error) { res.status(502).json({ error: parsed.error.message || 'Erro na transcrição.' }); return; }
+                    if (parsed.error) { console.error('[transcribe] upstream', String(parsed.error.message || '').slice(0, 300)); res.status(502).json({ error: 'Erro na transcrição.' }); return; }
                     res.status(200).json({ text: (parsed.text || '').trim() });
                 } catch (e) { res.status(500).json({ error: 'Erro ao processar a transcrição.' }); }
             });
