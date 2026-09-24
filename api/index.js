@@ -383,7 +383,12 @@ async function sbPublic(path, opts = {}) {
   return data;
 }
 
-async function accountForAuthUser(authUser) {
+// Claiming an unlinked account row by e-mail (legacy accounts, courtesy plans
+// granted to an address before signup) needs proof that this person owns the
+// inbox. Only the e-mailed-link callback gives that proof; anywhere else an
+// unconfirmed (or auto-confirmed) signup could take someone else's plan and
+// progress just by typing their address.
+async function accountForAuthUser(authUser, { podeReivindicarPorEmail = false } = {}) {
     if (!authUser?.id) return null;
     let rows = await sb(`/accounts?auth_user_id=eq.${encodeURIComponent(authUser.id)}&select=id,name,email,avatar,auth_user_id&limit=2`);
     if (Array.isArray(rows) && rows.length === 1) return rows[0];
@@ -403,6 +408,9 @@ async function accountForAuthUser(authUser) {
     if (legacy.auth_user_id && legacy.auth_user_id !== authUser.id) {
         throw new HttpError(409, 'account_already_linked', 'This account is already linked to another identity.');
     }
+    if (!podeReivindicarPorEmail || !authUser.email_confirmed_at) {
+        throw new HttpError(409, 'email_claim_required', 'This account already exists. Open the link we e-mail you to recover it.');
+    }
     await sb(`/accounts?id=eq.${encodeURIComponent(legacy.id)}`, {
         method: 'PATCH',
         headers: { 'Prefer': 'return=minimal' },
@@ -411,8 +419,8 @@ async function accountForAuthUser(authUser) {
     return { ...legacy, auth_user_id: authUser.id };
 }
 
-async function ensureAppAccount(authUser, requested = {}) {
-    let account = await accountForAuthUser(authUser);
+async function ensureAppAccount(authUser, requested = {}, opcoes = {}) {
+    let account = await accountForAuthUser(authUser, opcoes);
     if (account) return account;
     const name = sanitizeStoredJson(String(requested.name || authUser?.user_metadata?.name || authUser?.email?.split('@')[0] || 'Student').trim().slice(0, 80));
     const avatar = sanitizeStoredJson(String(requested.avatar || authUser?.user_metadata?.avatar || '🐾').slice(0, 32));
@@ -1468,8 +1476,10 @@ module.exports = async (req, res) => {
         const limited = await checkRateLimit(req, 'auth-login', null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
         const session = await signInWithPassword(norm, password);
-        const csrfToken = setSessionCookies(res, session);
+        // Resolve the app account first: if it can't be (email_claim_required),
+        // no half-working session cookie is left behind.
         const account = await ensureAppAccount(session.user, {});
+        const csrfToken = setSessionCookies(res, session);
         res.status(200).json({ ok: true, user: publicUser(session.user, account), csrfToken });
         return;
     }
@@ -1487,8 +1497,12 @@ module.exports = async (req, res) => {
         const codeChallenge = createPkceChallenge(res);
         const result = await signUpWithPassword(norm, password, { name: cleanName, avatar: String(avatar || '🐾').slice(0, 32) }, codeChallenge);
         const authUser = result.user;
-        if (authUser) await ensureAppAccount(authUser, { name: cleanName, avatar });
-        if (result.access_token && result.refresh_token) {
+        let reivindicarPorEmail = false;
+        if (authUser) {
+            try { await ensureAppAccount(authUser, { name: cleanName, avatar }); }
+            catch (e) { if (e && e.code === 'email_claim_required') reivindicarPorEmail = true; else throw e; }
+        }
+        if (result.access_token && result.refresh_token && !reivindicarPorEmail) {
             clearPkceCookie(res);
             const csrfToken = setSessionCookies(res, result);
             const account = await accountForAuthUser(authUser);
@@ -1530,7 +1544,9 @@ module.exports = async (req, res) => {
             session = await verifyEmailToken(tokenHash, type);
         }
         setSessionCookies(res, session);
-        if (session.user) await ensureAppAccount(session.user, {});
+        // The e-mailed link proves inbox ownership: the only place allowed to
+        // claim an existing account row by e-mail.
+        if (session.user) await ensureAppAccount(session.user, {}, { podeReivindicarPorEmail: true });
         const requestedNext = qs.get('next') || '/account.html?reset=1';
         const next = caminhoInterno(requestedNext) || '/account.html';
         res.statusCode = 302;
@@ -1590,6 +1606,14 @@ module.exports = async (req, res) => {
         // Anonymous visitors retain the existing rate-limited access.
         const sessionCookies = parseCookies(req);
         if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        // Identify the student BEFORE counting. checkRateLimit caches the first
+        // result per key, so a count made here without identity was the one
+        // every route reused: all calls were plan "free" by IP — paying
+        // students hit the free cap, and a school behind one IP shared one
+        // quota. A broken cookie degrades to anonymous, as in /api/chat.
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.refresh] || sessionCookies[COOKIE_NAMES.guest]) {
+            try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { req._securityIdentity = null; }
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
@@ -2197,7 +2221,8 @@ module.exports = async (req, res) => {
         // Cookie invalido nao derruba a conversa: degrada para anonimo, que e
         // exatamente o que acontecia antes deste bloco existir.
         const cookiesChat = parseCookies(req);
-        if (cookiesChat[COOKIE_NAMES.access] || cookiesChat[COOKIE_NAMES.refresh] || cookiesChat[COOKIE_NAMES.guest]) {
+        // The central AI gate already tried; don't ask Supabase twice.
+        if (!req._securityIdentity && (cookiesChat[COOKIE_NAMES.access] || cookiesChat[COOKIE_NAMES.refresh] || cookiesChat[COOKIE_NAMES.guest])) {
             try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { /* segue anonimo */ }
         }
         const userId = req._securityIdentity?.appUserId || null;
