@@ -96,7 +96,36 @@ a 401 sends the user to login with `?reason=session`.
 `Store` and `Auth` are exposed as `window.Store` / `window.Auth` (a top-level `const` is not a window property;
 many pages check `if (window.Store)`).
 
-Fires DOM events: `stateChanged`, `levelUp`, `badgeUnlocked`, `streakMilestone`, `planChanged`.
+**Streak & daily goal (server-owned for logged-in users):** call `Store.activateStreak(kind)` after any real
+study activity outside lesson pages (game won, trail mini-lesson, challenge). It updates locally (guests) and
+reports `POST /api/activity`; the reply is applied with `Store.applyServerStreak(streak, today)`.
+`Store.refreshSummary()` loads `GET /api/me/summary` (`Store.summary`: streak, today's goal, next lesson).
+Fields: `streakDays`, `longestStreak`, `lastStudyDay` (local `YYYY-MM-DD`), `streakActive` (studied today).
+
+Fires DOM events: `stateChanged`, `levelUp`, `badgeUnlocked`, `streakMilestone`, `planChanged`,
+`streakExtended`, `dailyGoalReached`, `summaryLoaded`.
+
+### Lesson progress (`progress.js`, loaded last on every `aula_XX` / `fr_aula_XX` page)
+
+Works with every lesson template because it only relies on `markSection(id?)`, `Store.addXP(n)` and
+`.tab-btn[data-tab]` (the open tab has `.active`). It:
+- restores finished sections on load (dots + ✓ on tabs) and opens the first pending tab (or `#tab` in the URL);
+- grants each XP reward of a tab once per user (`xp:<tab>:<amount>#<n>`) — reloading does not farm XP;
+- saves to `/api/progress` (table `lesson_progress`) for logged-in users, `localStorage` for guests;
+- a lesson is complete when `homework` (or every tab) is done → `Store.completeLesson(<display n>)`.
+
+When creating a lesson page: keep `markSection('<tab>')` calls, give tab buttons `class="tab-btn" data-tab="…"`,
+add it to `classes.html` `LESSONS`, then run `npm run curriculum` (regenerates `curriculum.json`: order + tabs,
+used by the API for "continue where you left off") and `npm run inject -- --src=progress.js --where=body --only='^(fr_)?aula_\d+\.html$'`.
+
+### Analytics (`analytics.js`, first script in `<head>` of every page except admin/teacher/verify)
+
+`capyTrack(event, props)` / `capyIdentify(userId)` — no-ops until `CAPY_ANALYTICS.posthogKey` is set in
+`analytics.js`. PostHog uses memory-only persistence until the visitor accepts the consent banner; "Agora não"
+disables analytics. Users are identified by internal id only. Events: `signup_completed`, `login_completed`,
+`magic_link_requested`, `onboarding_completed`, `lesson_started`, `lesson_section_completed`, `lesson_completed`,
+`yara_message_sent`, `streak_extended`, `daily_goal_reached`, `paywall_viewed`, `checkout_clicked`.
+New pages: `npm run inject -- --src=analytics.js --where=head`.
 
 ### Auth (`auth.js` + `/api/auth/*`)
 
@@ -125,6 +154,9 @@ so only the API can read/write them.
 - `user_state` — `user_id (PK), data (jsonb), updated_at`
 - `user_profiles` — `id (PK), english_level, goals, interests, interests_detail, daily_goal_minutes, onboarding_complete, plan, plan_expires_at, kiwify_subscription_id, updated_at`
 - `magic_link_tokens`, `rate_limit_log`, `api_metrics_daily`, `homework_submissions`
+- `lesson_progress` — `(user_id, lesson_id, item)` PK; item = `section:<tab>` | `xp:<tab>:<amount>#<n>`
+- `activity_days` — `(user_id, day)` PK, `count` (study activities per Brazil-time day)
+- `user_streaks` — `user_id` PK, `current`, `longest`, `last_day` (logic in `api/_lib/progress.js`)
 
 Schema changes live in `supabase/migrations/` (run them in the Supabase SQL editor; see Deployment).
 
@@ -157,6 +189,11 @@ The course has **44 lessons total**. The grid in `classes.html` displays them in
 ---
 
 ### Three Lesson Templates
+
+> Reality check: section tracking varies more than the three templates below suggest —
+> `markSection(id)` with a `doneSections` Set (01–13, 25, 36, 37, fr), `markSection(s)` with a `done` object
+> (14–19, 38–42, 43–44), and id-less counters `markSection()` (20–24, 26–27, 29–32, 34 via `lesson-engine.js`;
+> 28, 33, 35 inline). `progress.js` handles all of them; id-less calls use the open tab as the section.
 
 #### Template 1 — New/Standard (aulas 01–19, 33–42)
 7-tab pattern, fully self-contained inline JS, no `lesson-engine.js`.
@@ -478,6 +515,10 @@ Auth: `POST /api/auth/signup | login | logout | password | magic-link | verify`,
 
 User data (session required): `GET/POST /api/db` (`type=state`), `GET/POST /api/profile`, `GET /api/me` (plan),
 `POST /api/homework`. Public: `GET /api/db/leaderboard` (names HTML-escaped).
+
+Progress (session required): `GET /api/progress?lessonId=aula_12`, `POST /api/progress {lessonId, items}`
+(new sections count as a study day), `POST /api/activity {kind}`, `GET /api/me/summary`
+(`{streak, today:{count, goal, reached}, lessons:{completed, total, next}}`).
 
 AI (rate limited per plan; guests per IP — `RATE_LIMITS`):
 - `POST /api/chat` — Yara. `mode`: `tutor` (default), `lesson` (widget; `context.page`, `context.lang`),
