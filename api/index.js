@@ -848,6 +848,154 @@ const REGRAS_TEXTO = [
     'Always end with a simple question or encouragement, so the conversation keeps going.',
 ];
 
+// ── Quem e o aluno ───────────────────────────────────────────────────────────
+// Pedido do Luis em 24/set, depois de testar as ligacoes: "as conversas estao
+// muito vagas: oi, tudo bem? To bem, e voce? Ah, tudo joia? Ok, legal." O
+// motivo era medivel: a VOZ so recebia a faixa de nivel e as palavras fracas —
+// nem o nome, nem do que o aluno gosta. Sem assunto, o modelo cai no papo de
+// elevador. O chat recebia o perfil, mas por um caminho proprio que chamava
+// quem nao tinha nivel de 'beginner' enquanto a voz dizia 'desconhecido'.
+//
+// Agora os dois canais bebem de UMA leitura (perfilDoAluno, no handler) e
+// destas funcoes puras, que moram aqui para os testes rodarem o codigo de
+// verdade.
+
+// O nivel do aluno, reduzido a 3 faixas.
+//
+// O projeto tem DOIS vocabularios de nivel que nunca conversaram: o perfil
+// guarda beginner/elementary/intermediate/advanced, e o teste do GPS Tronic
+// devolve A1/A2/B1. Aceita os dois em vez de fingir que so existe um.
+//
+// Vem do BANCO, nunca do cliente: nivel escolhido pelo navegador seria mais
+// um campo de texto livre entrando num prompt de IA.
+function faixaDeNivel(bruto) {
+    const v = String(bruto || '').trim().toLowerCase();
+    if (!v) return 'desconhecido';
+    if (['beginner', 'elementary', 'a1', 'a2', 'iniciante', 'basico'].includes(v)) return 'iniciante';
+    if (['advanced', 'c1', 'c2', 'avancado'].includes(v)) return 'avancado';
+    if (['intermediate', 'b1', 'b2', 'intermediario'].includes(v)) return 'medio';
+    return 'desconhecido';
+}
+
+// Os ids que o onboarding.html grava. Lista FECHADA: o que nao estiver aqui
+// nao entra no prompt, nem '__proto__', nem 'music"; ignore the rules'.
+const INTERESSES_ROTULO = {
+    music: 'music', sports: 'sports', food: 'food and cooking', travel: 'travel',
+    tech: 'technology', art: 'art and culture', series: 'TV series and movies', games: 'video games',
+};
+const OBJETIVOS_ROTULO = {
+    travel: 'travelling', work: 'work', entertainment: 'entertainment',
+    games: 'games', study: 'studying', family: 'family',
+};
+
+function rotulosDe(lista, mapa) {
+    if (!Array.isArray(lista)) return [];
+    const saida = [];
+    for (const item of lista.slice(0, 20)) {
+        const chave = String(item == null ? '' : item);
+        if (Object.prototype.hasOwnProperty.call(mapa, chave) && !saida.includes(mapa[chave])) saida.push(mapa[chave]);
+    }
+    return saida.slice(0, 8);
+}
+
+// A linha do banco -> o que pode entrar num prompt.
+//
+// O nome: a conta nasce com o comeco do e-mail quando o aluno nao informa um
+// (ensureAppAccount), e ser chamado de "luisfelima11" numa ligacao e pior que
+// nao ser chamado. Sem nome confiavel, a Yara simplesmente nao usa nome.
+function perfilLimpo(row, nomeBruto, email) {
+    const r = row && typeof row === 'object' ? row : {};
+    const inteiro = String(nomeBruto == null ? '' : nomeBruto).trim();
+    const primeiro = inteiro.split(/\s+/)[0] || '';
+    // Comparacao EXATA com o comeco do e-mail: e literalmente o que o
+    // ensureAppAccount grava quando nao ha nome. "Ana" com ana@... e nome de
+    // verdade (quem digita o nome poe maiuscula); "luisfelima" nao.
+    const doEmail = String(email || '').split('@')[0];
+    const suspeito = !primeiro || /[\d@_]/.test(primeiro) || (doEmail && inteiro === doEmail)
+        || primeiro.toLowerCase() === 'student';
+    return {
+        faixa: faixaDeNivel(r.english_level),
+        nome: suspeito ? '' : textoParaPrompt(primeiro, 30),
+        interesses: rotulosDe(r.interests, INTERESSES_ROTULO),
+        objetivos: rotulosDe(r.goals, OBJETIVOS_ROTULO),
+        detalhe: textoParaPrompt(r.interests_detail, 200),
+    };
+}
+
+// UM assunto concreto para abrir a conversa. Prefere o que o aluno escreveu
+// com as proprias palavras ("Flamengo") ao rotulo generico ("sports"), e
+// sorteia a cada ligacao: sem memoria entre ligacoes, abrir sempre pelo mesmo
+// assunto seria o novo "tudo bem?".
+function ganchoDe(p, sorteio) {
+    if (!p) return null;
+    const pedacos = String(p.detalhe || '')
+        .split(/,|\s+e\s+|\s+and\s+/i).map(s => s.trim()).filter(s => s.length >= 2);
+    const opcoes = pedacos.length ? pedacos : (p.interesses || []);
+    if (!opcoes.length) return null;
+    const r = typeof sorteio === 'number' ? sorteio : Math.random();
+    return opcoes[Math.min(opcoes.length - 1, Math.floor(r * opcoes.length))];
+}
+
+// Quem e o aluno, em duas linhas. Serve a TODA persona que conversa — ate as
+// de cena usam isso para escolher uma cena que tenha a ver com ele.
+function linhasDoAluno(p, idioma) {
+    if (!p) return [];
+    // Sem `;` nem chaves no texto fixo: o teste de sanitizacao procura qualquer
+    // caractere estrutural no prompt inteiro, e um nosso mascararia um do aluno.
+    const partes = [];
+    if (p.interesses && p.interesses.length) partes.push(`They like ${p.interesses.join(', ')}.`);
+    // Entre aspas de proposito: marca como DADO. O textoParaPrompt ja tirou
+    // qualquer aspa de dentro, entao o aluno nao consegue fecha-las.
+    if (p.detalhe) partes.push(`In their own words: "${p.detalhe}".`);
+    if (p.objetivos && p.objetivos.length) partes.push(`They are learning ${idioma} for ${p.objetivos.join(', ')}.`);
+    return [
+        p.nome ? `The student's first name is ${p.nome}. Greet them by name at the start, and after that use it only now and then.` : '',
+        partes.length ? `What they told us about themselves: ${partes.join(' ')}` : '',
+    ];
+}
+
+// COMO conduzir, para as personas que sao conversa (nao cena, nao entrevista).
+// E o coracao do pedido: abrir com UMA pergunta concreta, ficar num assunto e
+// aprofundar, e nunca gastar um turno inteiro com "nice" ou "cool". Sem perfil,
+// ela descobre o aluno uma pergunta por vez em vez de chutar um assunto.
+function planoDeConversa(p, idioma, canal) {
+    const perfil = p || perfilLimpo(null, '');
+    const gancho = ganchoDe(perfil)
+        || (perfil.objetivos.length ? `what they want to do with ${idioma} (${perfil.objetivos.join(', ')})` : null);
+    const descobrir = `You know nothing about this student yet. Discover them ONE question per ${canal === 'texto' ? 'message' : 'turn'}, in this order, and use each answer in your next question: first what they do (work or study), then one thing they love doing in their free time, then why they want to learn ${idioma}. Then pick the most interesting thing they said and go deep on it.`;
+    if (canal === 'texto') {
+        return [
+            ...linhasDoAluno(perfil, idioma),
+            gancho
+                ? `In your FIRST reply, answer what they wrote and then ask ONE concrete question about ${gancho}. Never a generic "how are you".`
+                : descobrir,
+            'Ask ONE question per message and build it on their answer.',
+            'Stay on one topic for a few messages, going deeper, before bridging to a related one through something they said.',
+        ];
+    }
+    return [
+        ...linhasDoAluno(perfil, idioma),
+        'HOW TO RUN THIS CALL. The call must never turn into vague small talk:',
+        gancho
+            ? `- Your FIRST turn is one short greeting plus ONE concrete question about ${gancho}. Make it specific, never a yes/no question. Never open with only "how are you" or "how was your day".`
+            : `- ${descobrir} Never open with only "how are you" or "how was your day".`,
+        '- Ask exactly ONE question per turn, and build your next question on their answer.',
+        '- Stay on ONE topic for at least four exchanges, going deeper each time: details, reasons, a real example, a story, their opinion.',
+        '- If they answer in one or two words, ask for a full sentence ("Tell me more. Why?", "What happened next?"). If they are stuck, give them the first words and let them finish.',
+        '- Never spend a whole turn on "nice", "cool" or "very good": react to WHAT they said in a few words, then ask your next question.',
+        '- When a topic runs dry, bridge to a related one through something they said, never to a random subject.',
+    ];
+}
+
+// As personas de CENA (viagem, negocios, agro) nao ganham o plano inteiro — a
+// cena ja da o assunto. Ganham quem e o aluno, e a dica de escolher uma cena
+// que tenha a ver com ele.
+function alunoNaCena(p, idioma) {
+    const linhas = linhasDoAluno(p, idioma);
+    if (!linhas.some(Boolean)) return [];
+    return [...linhas, 'When you choose the scene, prefer one connected to their goals or interests.'];
+}
+
 const PERSONAS = {
     conversa: {
         rotulo: 'Yara', legenda: 'Conversa livre sobre o dia a dia',
@@ -857,6 +1005,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
             'This is a SPOKEN conversation. Keep every reply under two short sentences and always end with a question, so the student keeps talking.',
             `Speak simple, beginner-friendly ${c.idioma}. Speak at a calm, clear pace.`,
             'If the student is stuck, asks for a meaning, or speaks Portuguese, answer briefly in Brazilian Portuguese and then give them the sentence again so they can try it.',
@@ -870,6 +1019,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
             'Be warm, playful and curious about the student. Never discuss anything outside language learning or friendly everyday topics.',
             c.fracas.length ? `Words this student has been getting wrong: ${c.fracas.join(', ')}. Work one or two into the conversation naturally. Never list them.` : '',
         ],
@@ -918,6 +1068,10 @@ const PERSONAS = {
             'This is a SPOKEN call, in PORTUGUESE. Open by introducing yourself as Maia in a funny way, in Portuguese, and teach the first English word right away.',
             'Short turns of one or two sentences, comic timing, a little pause before the punchline, and laugh sometimes.',
             'Actually DO the accents with your voice when you do an accent bit — that is the fun of the call.',
+            // So quem e o aluno: a Maia tem o fluxo dela, mas zoar com o time
+            // dele ou a serie que ele ama e muito mais engracado que zoar no vazio.
+            ...linhasDoAluno(c.perfil, c.idioma),
+            c.perfil && (c.perfil.interesses.length || c.perfil.detalhe) ? 'Use what they like as material for the words you teach and for your jokes.' : '',
             'End every turn asking them, IN PORTUGUESE, to say ONE short English word or phrase ("Agora fala comigo: ..."). Never mix English words into your Portuguese sentences.',
             c.fracas.length ? `Words this student keeps getting wrong: ${c.fracas.join(', ')}. When one comes up, roast it lovingly in Portuguese and make them nail it.` : '',
         ],
@@ -925,6 +1079,8 @@ const PERSONAS = {
             'This is a WRITTEN chat, in PORTUGUESE. One to three short lines. Use emojis freely (😂💀🤌) and CAPS for dramatic reactions.',
             'Put the English you are teaching between quotes, so it stands out from the Portuguese around it.',
             'You can WRITE the accents phonetically ("rélou mai frendi", "oh daaahling") — that is how the accent joke works in text — and comment on them in Portuguese.',
+            ...linhasDoAluno(c.perfil, c.idioma),
+            c.perfil && (c.perfil.interesses.length || c.perfil.detalhe) ? 'Use what they like as material for the words you teach and for your jokes.' : '',
             'End every message asking them, IN PORTUGUESE, to write ONE short English word or phrase ("Agora escreve: ..."). Never mix English words into your Portuguese sentences.',
             c.fracas.length ? `Words this student keeps getting wrong: ${c.fracas.join(', ')}. Roast them lovingly in Portuguese when they come up.` : '',
         ],
@@ -946,12 +1102,14 @@ const PERSONAS = {
             'Open in Brazilian PORTUGUESE: greet them, say what is going to happen, and tell them it is fine to answer in Portuguese at first.',
             `Then introduce ${c.idioma} slowly: ONE short sentence at a time, immediately followed by its meaning in Portuguese.`,
             `Only move to mostly-${c.idioma} once they have answered you in ${c.idioma} twice. Never rush this.`,
+            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
             'Celebrate any attempt, even a single word. Keep every reply under two short sentences and end with a question.',
             c.tema ? `Today's topic: "${c.tema}".` : '',
         ],
         texto_modo: c => [
             'Write mostly in Brazilian Portuguese at first, introducing ONE short English sentence at a time with its meaning right after it.',
             ...REGRAS_TEXTO,
+            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
             'Celebrate any attempt, even a single word.',
         ],
     },
@@ -965,6 +1123,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Put the student IN the scene and play the other person (the agent, the receptionist, the waiter). Say where you both are, then speak in role.',
             'Keep every reply under two short sentences and end with something they have to answer.',
             'When they get stuck, give them the exact phrase to say, then let them say it.',
@@ -974,6 +1133,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Your FIRST reply sets the scene: say where you both are (the check-in desk, the hotel reception...) and speak as the other person there.',
             'Anchor every reply in a real travel situation, and give them the exact phrase they would need there.',
         ],
@@ -988,6 +1148,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Play the other person in the situation (the colleague, the client, the manager) and keep it professional but friendly.',
             'Keep every reply under two short sentences and end with something they have to answer.',
             'When they say something that would sound rude or too casual at work, give them the polite version once and move on.',
@@ -997,6 +1158,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Your FIRST reply sets the scene: say where you both are (a meeting, a call with a client...) and speak as the colleague or client.',
             'Anchor every reply in a real work situation, and show the polite professional wording when theirs would sound blunt.',
         ],
@@ -1007,7 +1169,7 @@ const PERSONAS = {
     // O campo `curso` usa EXATAMENTE os ids do mapa CURSOS de classes.html, e
     // um teste amarra as duas listas: divergencia vira teste vermelho, nao bug
     // seis meses depois. `intermediate` e `advanced` nao tem persona de
-    // proposito — sao faixas de NIVEL, e o nivelDoAluno ja adapta o ritmo de
+    // proposito — sao faixas de NIVEL, e o perfilDoAluno ja adapta o ritmo de
     // qualquer capivara. Persona separada so duplicaria esse sistema.
 
     agro: {
@@ -1019,6 +1181,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Put the student IN the situation and play the other person (the technician, the supplier, the agronomist). Say where you both are, then speak in role.',
             'Keep every reply under two short sentences and end with something they have to answer.',
             'Use the concrete words of the job — soil, harvest, sprayer, yield, moisture, the machine — instead of classroom vocabulary.',
@@ -1027,6 +1190,7 @@ const PERSONAS = {
         texto_modo: c => [
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
+            ...alunoNaCena(c.perfil, c.idioma),
             'Your FIRST reply sets the scene: say where you both are (the field, the workshop, a supplier visit...) and speak as the technician or supplier.',
             'Anchor every reply in a real field situation, and give them the exact phrase they would need there.',
         ],
@@ -1067,6 +1231,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
             'This is a SPOKEN conversation. Keep every reply under two short sentences and always end with a question.',
             `Speak simple, beginner-friendly ${c.idioma} at a calm, clear pace.`,
             `When they get stuck or answer in Portuguese, explain briefly in Brazilian Portuguese and then give them the ${c.idioma} sentence again so they can try it.`,
@@ -1076,6 +1241,7 @@ const PERSONAS = {
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
             `Write in ${c.idioma}, and explain in Brazilian Portuguese whenever they need it.`,
+            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
         ],
     },
 
@@ -1088,6 +1254,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
             'This is a SPOKEN conversation. Keep every reply under two short sentences and always end with a question.',
             `Speak simple, beginner-friendly ${c.idioma} at a calm, clear pace.`,
             `When they get stuck or answer in Portuguese, explain briefly in Brazilian Portuguese and then give them the ${c.idioma} sentence again so they can try it.`,
@@ -1097,6 +1264,7 @@ const PERSONAS = {
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
             `Write in ${c.idioma}, and explain in Brazilian Portuguese whenever they need it.`,
+            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
         ],
     },
 
@@ -1109,6 +1277,7 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
             'Mix the workshop with ordinary life: a part that did not arrive, a customer on the phone, but also the weekend, food, family.',
             'Keep every reply under two short sentences and always end with a question. Never lecture and never list.',
             'When they freeze, give them the exact sentence to say and let them repeat it. Praise the attempt, not the accuracy.',
@@ -1118,6 +1287,7 @@ const PERSONAS = {
             ...aberturaTexto(c.faixa, c.idioma),
             ...REGRAS_TEXTO,
             'Mix workshop situations with ordinary life, and give the exact phrase when they get stuck.',
+            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
         ],
     },
 
@@ -1134,6 +1304,8 @@ const PERSONAS = {
         ],
         voz_modo: c => [
             ...c.abertura,
+            // So o nome: o recrutador nao conversa sobre os gostos do candidato.
+            c.perfil && c.perfil.nome ? `The candidate's first name is ${c.perfil.nome}. Use it when you greet them.` : '',
             c.cargo
                 ? `The candidate is interviewing for this position: "${c.cargo}". Ask questions that fit that role.`
                 : 'Start by asking what role the candidate is applying for, then tailor your questions to it.',
@@ -1754,10 +1926,11 @@ module.exports = async (req, res) => {
         const alunoDaVez = req._securityIdentity && req._securityIdentity.appUserId;
         // Em paralelo: sao duas idas ao banco independentes, e ficam no caminho
         // critico do "Chamando..." que o aluno esta olhando na tela.
-        const [faixa, fracas] = await Promise.all([
-            nivelDoAluno(alunoDaVez),
+        const [perfil, fracas] = await Promise.all([
+            perfilDoAluno(alunoDaVez, req._securityIdentity && req._securityIdentity.appAccount),
             palavrasFracas(alunoDaVez, 8),
         ]);
+        const faixa = perfil.faixa;
 
         const ABERTURA = {
             iniciante: [
@@ -1800,7 +1973,7 @@ module.exports = async (req, res) => {
         // linhas eram reconstruidas a cada request dentro deste handler.
         // (A `persona` ja foi resolvida la em cima, porque ela decide o idioma.)
         const ctx = {
-            idioma, tema, vocab, fracas, cargo, faixa,
+            idioma, tema, vocab, fracas, cargo, faixa, perfil,
             abertura: persona.entrevistador ? aberturaEntrevista : aberturaConversa,
         };
         const instrucoes = [...persona.nucleo(ctx), ...persona.voz_modo(ctx)].filter(Boolean).join(' ');
@@ -1913,29 +2086,21 @@ module.exports = async (req, res) => {
     //    com qualquer coisa no formato ??voz?. Nenhum outro prefixo do projeto
     //    contem "voz" (mem_, push_, __analytics_, __teacher_brief_, __conversa_),
     //    entao na pratica e exato. Se um dia criarem um, isto aqui precisa mudar.
-    // O nivel do aluno, reduzido a 3 faixas.
+    // Quem e o aluno: faixa de nivel, primeiro nome, gostos e objetivo, numa
+    // leitura so. Voz E chat usam esta funcao — antes cada canal tinha a sua e
+    // elas discordavam (o chat chamava de 'beginner' quem nao tinha nivel).
     //
-    // O projeto tem DOIS vocabularios de nivel que nunca conversaram: o perfil
-    // guarda beginner/elementary/intermediate/advanced, e o teste do GPS Tronic
-    // devolve A1/A2/B1. Aceita os dois em vez de fingir que so existe um.
-    //
-    // Vem do BANCO, nunca do cliente: nivel escolhido pelo navegador seria mais
-    // um campo de texto livre entrando num prompt de IA.
-    function faixaDeNivel(bruto) {
-        const v = String(bruto || '').trim().toLowerCase();
-        if (!v) return 'desconhecido';
-        if (['beginner', 'elementary', 'a1', 'a2', 'iniciante', 'basico'].includes(v)) return 'iniciante';
-        if (['advanced', 'c1', 'c2', 'avancado'].includes(v)) return 'avancado';
-        if (['intermediate', 'b1', 'b2', 'intermediario'].includes(v)) return 'medio';
-        return 'desconhecido';
-    }
-
-    async function nivelDoAluno(appUserId) {
-        if (!appUserId) return 'desconhecido';
+    // Vem do BANCO, nunca do cliente, e passa inteiro pelo perfilLimpo (lista
+    // fechada de ids + textoParaPrompt) antes de chegar perto de um prompt.
+    // sb() e nao sbUser(): quem garante o isolamento e o appUserId da sessao.
+    async function perfilDoAluno(appUserId, conta) {
+        const nome = conta && conta.name;
+        const email = conta && conta.email;
+        if (!appUserId) return perfilLimpo(null, '', '');
         try {
-            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(appUserId)}&select=english_level`);
-            return faixaDeNivel(rows && rows[0] && rows[0].english_level);
-        } catch (e) { return 'desconhecido'; }
+            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(appUserId)}&select=english_level,goals,interests,interests_detail`);
+            return perfilLimpo(rows && rows[0], nome, email);
+        } catch (e) { return perfilLimpo(null, nome, email); }
     }
 
     // As palavras que o aluno erra vivem em `mem_<id>` desde julho e nunca
@@ -2214,8 +2379,8 @@ module.exports = async (req, res) => {
         if (req.headers && req.headers.origin) assertOrigin(req);
         // A identidade NUNCA era resolvida aqui. `req._securityIdentity` so e
         // escrito dentro de resolveSecurityIdentity, e este handler nunca a
-        // chamava — entao `userId` era sempre null e o profileContext abaixo
-        // era codigo morto desde o refactor de seguranca. A Yara de texto nao
+        // chamava — entao `userId` era sempre null e o perfil do aluno era
+        // codigo morto desde o refactor de seguranca. A Yara de texto nao
         // sabia nem o nivel do aluno. Espelha o /api/realtime-token.
         //
         // Cookie invalido nao derruba a conversa: degrada para anonimo, que e
@@ -2231,27 +2396,18 @@ module.exports = async (req, res) => {
         const _rl = await checkRateLimit(req, 'chat', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
-        // Fetch user profile to personalize Yara's responses
-        let profileContext = '';
-        if (userId && userId !== 'guest') {
-            const rows = await sbUser(req._securityIdentity, `/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
-            const p = rows?.[0];
-            if (p) {
-                const detail = p.interests_detail ? `\n- Favorite specifics: ${p.interests_detail}` : '';
-                profileContext = `\n\nStudent profile:\n- English level: ${p.english_level || 'beginner'}\n- Learning goals: ${(p.goals || []).join(', ') || 'general'}\n- Interests: ${(p.interests || []).join(', ') || 'various'}${detail}\n- Daily study goal: ${p.daily_goal_minutes || 10} minutes\nTailor your language complexity and vocabulary to their level. When relevant, reference their specific favorites naturally in examples or conversation.`;
-            }
-        }
-
-        // Mesmo catalogo da voz. O nivel e as palavras erradas vinham sendo
-        // usados so na ligacao desde setembro; agora o texto tambem os ve.
+        // Mesmo catalogo E mesmo perfil da voz. Aqui havia um `profileContext`
+        // proprio que chamava de 'beginner' quem nao tinha nivel (a voz dizia
+        // 'desconhecido') e colava o interests_detail cru no prompt. Saiu: os
+        // dois canais leem o aluno pelo perfilDoAluno.
         const persona = personaDe(personaPedida);
-        const [faixaChat, fracasChat] = await Promise.all([
-            nivelDoAluno(userId),
+        const [perfilChat, fracasChat] = await Promise.all([
+            perfilDoAluno(userId, req._securityIdentity && req._securityIdentity.appAccount),
             palavrasFracas(userId, 8),
         ]);
-        const ctxChat = { idioma: idiomaDe(persona.lang), faixa: faixaChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
+        const ctxChat = { idioma: idiomaDe(persona.lang), faixa: perfilChat.faixa, perfil: perfilChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
         const systemPrompt = [...persona.nucleo(ctxChat), ...persona.texto_modo(ctxChat)]
-            .filter(Boolean).join(' ') + profileContext;
+            .filter(Boolean).join(' ');
         const messages = [{ role: 'system', content: systemPrompt }];
         (Array.isArray(history) ? history.slice(-20) : []).forEach(m => {
             // O cliente do ai_chat.html empilha {role, content}; o lessons.html e
