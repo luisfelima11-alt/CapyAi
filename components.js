@@ -1147,61 +1147,89 @@ window.CapyPush = {
 };
 
 // ── CapyMic: gravação de voz + transcrição via Whisper (compartilhado) ──────
-// Usado no Speak step da trilha (lessons.html) e no AI Chat por voz (ai_chat.html).
+// Usado no Speak step da trilha (lessons.html), no "Falar resposta" das aulas
+// de curso e na pronúncia do self-study.js. (O ai_chat.html tem gravador próprio.)
 window.CapyMic = {
-    _stream: null, _recorder: null, _chunks: [], _autoStopTimer: null,
+    MAX_MS: 15000, // sobra para frase curta; no "Falar resposta" das aulas, um 2º toque acrescenta à resposta
+    _rec: null,    // gravação atual: { stream, recorder, chunks, timer, stopped, claimed }
 
     // Pede permissão e começa a gravar. onError recebe 'not_supported' | 'permission_denied'.
-    async start({ onError } = {}) {
+    // onAutoStop() é chamado se a trava de MAX_MS parar o gravador antes do chamador:
+    // o áudio fica guardado, e o chamador pega o texto chamando stopAndTranscribe()
+    // (o mesmo caminho do toque em "parar"). Quem não passa onAutoStop recebe o
+    // áudio guardado no próximo stopAndTranscribe().
+    async start({ onError, onAutoStop } = {}) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
             onError && onError('not_supported');
             return false;
         }
+        let stream;
         try {
-            this._stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         } catch (e) {
             onError && onError('permission_denied');
             return false;
         }
+        this.cancel(); // gravação anterior esquecida aberta: solta o mic dela
         const mimeType = ['audio/webm', 'audio/mp4', 'audio/ogg'].find(t => MediaRecorder.isTypeSupported(t)) || '';
-        this._recorder = new MediaRecorder(this._stream, mimeType ? { mimeType } : undefined);
-        this._chunks = [];
-        this._recorder.ondataavailable = e => { if (e.data && e.data.size) this._chunks.push(e.data); };
-        this._recorder.start();
-        // Trava de segurança: ninguém fica com o mic aberto pra sempre
-        clearTimeout(this._autoStopTimer);
-        this._autoStopTimer = setTimeout(() => this.stopAndTranscribe().catch(() => {}), 15000);
+        const rec = {
+            stream, recorder: new MediaRecorder(stream, mimeType ? { mimeType } : undefined),
+            chunks: [], timer: 0, stopped: null, claimed: false,
+        };
+        rec.recorder.ondataavailable = e => { if (e.data && e.data.size) rec.chunks.push(e.data); };
+        rec.recorder.start();
+        this._rec = rec;
+        // Trava de segurança: ninguém fica com o mic aberto pra sempre. Ela só PARA
+        // o gravador. Antes ela chamava stopAndTranscribe() sozinha e jogava o
+        // texto fora: quem falava mais de 15s pagava a transcrição, perdia a fala
+        // e, ao tocar em "parar", recebia { empty:true } — "Não ouvi nada".
+        rec.timer = setTimeout(() => {
+            this._stop(rec).then(() => { if (!rec.claimed && onAutoStop) onAutoStop(); });
+        }, this.MAX_MS);
         return true;
     },
 
-    isRecording() { return !!(this._recorder && this._recorder.state === 'recording'); },
+    isRecording() { return !!(this._rec && this._rec.recorder.state === 'recording'); },
 
-    // Para a gravação e devolve { text, empty, error }.
+    // Para o gravador (uma vez só) e resolve quando o último pedaço de áudio chegou:
+    // sem timeslice, o MediaRecorder entrega todo o áudio no dataavailable do stop.
+    _stop(rec) {
+        clearTimeout(rec.timer);
+        if (!rec.stopped) {
+            rec.stopped = new Promise(resolve => {
+                rec.recorder.onstop = () => { rec.stream.getTracks().forEach(t => t.stop()); resolve(); };
+            });
+            if (rec.recorder.state !== 'inactive') rec.recorder.stop();
+            else rec.recorder.onstop(); // parou sozinho (ex.: mic desconectado)
+        }
+        return rec.stopped;
+    },
+
+    // Para a gravação e devolve { text, empty, error }. Cada gravação é transcrita
+    // (e cobrada) uma vez só: uma 2ª chamada devolve { empty:true }.
     async stopAndTranscribe({ lang } = {}) {
-        clearTimeout(this._autoStopTimer);
-        if (!this._recorder) return { text: '', empty: true };
-        return new Promise((resolve) => {
-            this._recorder.onstop = async () => {
-                if (this._stream) this._stream.getTracks().forEach(t => t.stop());
-                if (!this._chunks.length) { resolve({ text: '', empty: true }); return; }
-                const mimeType = this._recorder.mimeType || 'audio/webm';
-                const blob = new Blob(this._chunks, { type: mimeType });
-                try {
-                    const text = await this._sendToWhisper(blob, mimeType, lang);
-                    resolve({ text, empty: false });
-                } catch (e) {
-                    resolve({ text: '', empty: false, error: e.message || 'Erro na transcrição.' });
-                }
-            };
-            if (this._recorder.state !== 'inactive') this._recorder.stop();
-            else resolve({ text: '', empty: true });
-        });
+        const rec = this._rec;
+        if (!rec) return { text: '', empty: true };
+        rec.claimed = true;
+        this._rec = null;
+        await this._stop(rec);
+        if (!rec.chunks.length) return { text: '', empty: true };
+        const mimeType = rec.recorder.mimeType || 'audio/webm';
+        const blob = new Blob(rec.chunks, { type: mimeType });
+        try {
+            const text = await this._sendToWhisper(blob, mimeType, lang);
+            return { text, empty: false };
+        } catch (e) {
+            return { text: '', empty: false, error: e.message || 'Erro na transcrição.' };
+        }
     },
 
     cancel() {
-        clearTimeout(this._autoStopTimer);
-        if (this._recorder && this._recorder.state !== 'inactive') { this._recorder.onstop = null; this._recorder.stop(); }
-        if (this._stream) this._stream.getTracks().forEach(t => t.stop());
+        const rec = this._rec;
+        if (!rec) return;
+        rec.claimed = true;
+        this._rec = null;
+        this._stop(rec);
     },
 
     async _sendToWhisper(blob, mimeType, lang) {

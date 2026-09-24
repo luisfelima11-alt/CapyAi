@@ -680,7 +680,7 @@ test('o catalogo publico nao vaza prompt nenhum', () => {
     assert.ok(!bruto.includes(proibido), 'vazou "' + proibido + '" no /api/personas');
   }
   for (const p of lista) {
-    assert.deepEqual(Object.keys(p).sort(), ['arte', 'curso', 'destino', 'id', 'lang', 'legenda', 'rotulo']);
+    assert.deepEqual(Object.keys(p).sort(), ['arte', 'curso', 'destino', 'escuta', 'id', 'lang', 'legenda', 'rotulo']);
   }
 });
 
@@ -878,4 +878,90 @@ test('o chat escrito entrega o historico ao modelo, com o papel certo de cada fa
   assert.equal(m[1].content, 'My name is Ana.');
   assert.equal(m[2].content, 'Nice to meet you, Ana!');
   assert.equal(m[3].content, 'formato antigo do lessons.html');
+});
+
+// ── Maia, a zoeira ──────────────────────────────────────────────────────────
+
+test('a Maia tem voz propria, diferente da Yara', async () => {
+  const maia = tokenHarness({ body: { cenario: 'maia' } });
+  await maia.run();
+  const yara = tokenHarness({ body: { cenario: 'conversa' } });
+  await yara.run();
+  const vozMaia = JSON.parse(maia.requests[0].payload).session.audio.output.voice;
+  const vozYara = JSON.parse(yara.requests[0].payload).session.audio.output.voice;
+  assert.notEqual(vozMaia, vozYara, 'e outra personagem: o aluno tem que ouvir a diferenca');
+  assert.match(JSON.parse(maia.requests[0].payload).session.instructions, /You are Maia/);
+});
+
+test('a zoeira da Maia tem limite nos DOIS canais: zoa o erro, nunca a pessoa', async () => {
+  // Iniciante se assusta facil. O limite nao pode existir so na ligacao e sumir
+  // no chat escrito (foi exatamente assim que o idioma quebrou na Fase 5).
+  const voz = tokenHarness({ body: { cenario: 'maia' } });
+  await voz.run();
+  const texto = chatHarness({ body: { message: 'Hi', persona: 'maia' } });
+  await texto.run();
+  for (const [canal, prompt] of [
+    ['voz', JSON.parse(voz.requests[0].payload).session.instructions],
+    ['texto', sistemaDo(texto)],
+  ]) {
+    assert.match(prompt, /roast the MISTAKE, never the person/i, canal + ': sem a regra central');
+    // Dois defeitos vistos em producao: inventar um erro que o aluno nao cometeu,
+    // e repetir a frase de exemplo do prompt em toda resposta.
+    assert.match(prompt, /Only roast a mistake the student ACTUALLY made/, canal + ': ela inventa erro');
+    assert.match(prompt, /NEVER repeat them word for word/, canal + ': ela copia o exemplo');
+    // Zoou "my parents are my cousins" e corrigiu para "my parents are my parents".
+    assert.match(prompt, /The correction is what the student MEANT to say/, canal + ': correcao sem sentido');
+    assert.match(prompt, /HARD LIMITS: never joke about appearance/, canal + ': sem os limites');
+    assert.match(prompt, /drop the roast at once/, canal + ': nao para de zoar quando o aluno se magoa');
+    assert.match(prompt, /Every roast ends with a real correction/, canal + ': zoacao sem correcao');
+  }
+});
+
+test('no chat escrito a Maia escreve o sotaque, na ligacao ela fala o sotaque', async () => {
+  const texto = chatHarness({ body: { message: 'Hi', persona: 'maia' } });
+  await texto.run();
+  assert.match(sistemaDo(texto), /WRITE the accents phonetically/);
+  const voz = tokenHarness({ body: { cenario: 'maia' } });
+  await voz.run();
+  assert.match(JSON.parse(voz.requests[0].payload).session.instructions, /DO the accents with your voice/);
+});
+
+test('a Maia fala PORTUGUES com o iniciante, nos dois canais', async () => {
+  // Pedido do Luis depois de testar: as piadas tem que ser em portugues, senao o
+  // iniciante nao entende a zoacao.
+  const voz = tokenHarness({ body: { cenario: 'maia' } });
+  await voz.run();
+  const texto = chatHarness({ body: { message: 'Hi', persona: 'maia' } });
+  await texto.run();
+  for (const [canal, prompt] of [
+    ['voz', JSON.parse(voz.requests[0].payload).session.instructions],
+    ['texto', sistemaDo(texto)],
+  ]) {
+    assert.match(prompt, /about 80% Portuguese, 20% English/, canal + ': sem a proporcao');
+    assert.match(prompt, /EVERY joke, roast, reaction, explanation and instruction is in PORTUGUESE/, canal + ': piada fora do portugues');
+    assert.match(prompt, /Never say two English sentences in a row/, canal);
+    assert.match(prompt, /Gente, SOCORRO!/, canal + ': sem o exemplo em portugues que ancora o tom');
+  }
+});
+
+test('quem fala portugues com a capivara nao tem a fala forcada para ingles na transcricao', async () => {
+  // Forcar language:en fazia o portugues do iniciante aparecer embaralhado no fio.
+  for (const cenario of ['maia', 'iniciante']) {
+    const h = tokenHarness({ body: { cenario } });
+    await h.run();
+    const tr = JSON.parse(h.requests[0].payload).session.audio.input.transcription;
+    assert.equal(tr.model, 'gpt-4o-mini-transcribe');
+    assert.ok(!('language' in tr), cenario + ' ainda forca um idioma na transcricao: ' + tr.language);
+  }
+  // As outras continuam transcrevendo no idioma da conversa.
+  for (const [cenario, lingua] of [['travel', 'en'], ['francais', 'fr'], ['turkish', 'tr']]) {
+    const h = tokenHarness({ body: { cenario } });
+    await h.run();
+    assert.equal(JSON.parse(h.requests[0].payload).session.audio.input.transcription.language, lingua, cenario);
+  }
+  // E o catalogo publico avisa o microfone do chat a mesma coisa.
+  const pub = Object.fromEntries(catalogoReal().personasPublicas().map(p => [p.id, p.escuta]));
+  assert.equal(pub.maia, null);
+  assert.equal(pub.iniciante, null);
+  assert.equal(pub.francais, 'fr');
 });

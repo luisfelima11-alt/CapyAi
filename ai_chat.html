@@ -35,9 +35,10 @@
   #palco{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--navy)}
   /* Fundo: a propria arte, ampliada e borrada, preenchendo o que sobra. */
   .fundo{position:absolute;inset:-8%;background-size:cover;background-position:center;
-         filter:blur(44px) saturate(1.35);transform:scale(1.12);opacity:.72}
+         filter:blur(44px) saturate(1.35);transform:scale(1.12);opacity:.72;transition:opacity .35s ease}
   .retrato{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
-           object-position:center 46%;display:block;animation:respira 9s ease-in-out infinite}
+           object-position:center 46%;display:block;animation:respira 9s ease-in-out infinite;
+           transition:opacity .35s ease}
   @keyframes respira{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
   /* Enquanto ela fala, o clipe assume e a respiração sai da frente. */
   #palco[data-estado="ia_falando"] .retrato{animation:none}
@@ -80,7 +81,7 @@
   @keyframes saltinho{0%,62%,100%{transform:translateY(0);opacity:.45}31%{transform:translateY(-7px);opacity:1}}
 
   /* ── Barra de cima ──────────────────────────────────────────────────────── */
-  .coluna{max-width:44rem;margin-inline:auto;padding-inline:1rem}
+  .coluna{max-width:44rem;margin-inline:auto}
   #topo{position:relative;z-index:3;flex:none;display:flex;align-items:center;justify-content:space-between;
         gap:.6rem;padding:.7rem 1rem calc(.6rem);}
   .redondo{width:36px;height:36px;border-radius:50%;background:var(--vidro);
@@ -101,9 +102,10 @@
   /* ── O fio: uma lista só, voz e texto juntos ────────────────────────────── */
   /* Duas listas fariam a fala dela sumir quando o aluno voltasse a digitar, que
      é o contrário do que a fusão existe para fazer. */
+  /* 1.1rem em cima: a primeira fala ficava a 14px da barra, grudada nela. */
   #fio{position:relative;z-index:1;flex:1;overflow-y:auto;overscroll-behavior:contain;
-       padding:.5rem 0 1rem;-webkit-overflow-scrolling:touch}
-  #fio .coluna{display:flex;flex-direction:column;gap:.6rem}
+       padding:1.1rem 1rem 1rem;-webkit-overflow-scrolling:touch}
+  #fio .coluna{display:flex;flex-direction:column;justify-content:flex-end;gap:.6rem;min-height:100%}
   #fio p{max-width:min(85%,34rem);padding:.65rem .9rem;border-radius:1.1rem;
          font-size:.95rem;line-height:1.5;font-weight:600;
          backdrop-filter:blur(10px);word-wrap:break-word;overflow-wrap:anywhere;
@@ -131,8 +133,11 @@
   #fio .digitando i:nth-child(3){animation-delay:.28s}
 
   /* ── Compositor ─────────────────────────────────────────────────────────── */
+  /* A caixa ficava a 13px da borda no celular: com barra de gestos ou barra do
+     navegador, o polegar batia na borda. Agora tem folga de verdade. */
   #compositor{position:relative;z-index:3;flex:none;
-              padding:0 1rem calc(.8rem + env(safe-area-inset-bottom,0px))}
+              padding:.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom,0px))}
+  @media(min-width:768px){#compositor{padding-bottom:calc(2rem + env(safe-area-inset-bottom,0px))}}
   .caixa{max-width:44rem;margin-inline:auto;background:rgba(255,255,255,.1);
          backdrop-filter:blur(16px);border:1px solid var(--borda);
          border-radius:1.5rem;padding:.65rem .75rem;transition:border-color .2s}
@@ -145,7 +150,7 @@
   .cresce{flex:1}
   #btn-persona{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);
                border:1px solid var(--borda);border-radius:999px;padding:.35rem .7rem;
-               font-size:.78rem;font-weight:800;max-width:60%;transition:background .15s}
+               font-size:.78rem;font-weight:800;min-width:0;flex:0 1 auto;transition:background .15s}
   #btn-persona:hover{background:rgba(255,255,255,.18)}
   #btn-persona span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #btn-persona svg{flex:none;transition:transform .2s}
@@ -153,11 +158,29 @@
   .acao{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
         justify-content:center;flex:none;transition:transform .15s,background .15s}
   .acao:not(:disabled):active{transform:scale(.9)}
-  #ligar{background:rgba(255,255,255,.14)}
-  #silenciar{background:rgba(255,255,255,.14)}
-  #silenciar[hidden]{display:none}
-  #ligar.desligar{background:linear-gradient(135deg,#e11d48,#f43f5e)}
+  .acao[hidden]{display:none}
+  #ligar,#silenciar{background:rgba(255,255,255,.14)}
+  #ligar.desligar,#silenciar.desligar{background:linear-gradient(135deg,#e11d48,#f43f5e)}
+  /* O botao da ponta direita troca de papel como no WhatsApp: microfone com a
+     caixa vazia, seta de enviar quando ha texto. */
+  #gravar{background:var(--rosa)}
+  #gravar.gravando{background:linear-gradient(135deg,#e11d48,#f43f5e);
+                   box-shadow:0 0 0 0 rgba(225,29,72,.6);animation:pulsoRec 1.4s ease-out infinite}
+  @keyframes pulsoRec{0%{box-shadow:0 0 0 0 rgba(225,29,72,.55)}100%{box-shadow:0 0 0 12px rgba(225,29,72,0)}}
   #btn-enviar{background:var(--rosa)}
+
+  /* Enquanto grava, a faixa de gravacao ocupa o lugar do texto. */
+  .gravacao{display:none;align-items:center;gap:.6rem;min-height:1.9rem;padding:.2rem .25rem;
+            font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .caixa.gravando #entrada,.caixa.transcrevendo #entrada{display:none}
+  .caixa.gravando .gravacao,.caixa.transcrevendo .gravacao{display:flex}
+  .ponto-rec{width:10px;height:10px;border-radius:50%;background:#f43f5e;flex:none;
+             animation:cursorPisca 1s steps(2,start) infinite}
+  .caixa.transcrevendo .ponto-rec{background:#94a3b8;animation:none}
+  #cancelar-gravacao{margin-left:auto;font-size:.78rem;font-weight:800;color:rgba(255,255,255,.6);
+                     padding:.3rem .6rem;border-radius:999px}
+  #cancelar-gravacao:hover{background:rgba(255,255,255,.1);color:#fff}
+  .caixa.transcrevendo #cancelar-gravacao{display:none}
   .dica{max-width:44rem;margin:.5rem auto 0;font-size:.7rem;font-weight:600;
         color:rgba(255,255,255,.42);text-align:center;line-height:1.4}
 
@@ -202,7 +225,7 @@
   .opcao .seta{flex:none;opacity:.45}
 
   /* ── Aviso e toast ──────────────────────────────────────────────────────── */
-  #aviso{position:relative;z-index:3;flex:none;max-width:44rem;margin:0 auto .5rem;
+  #aviso{position:relative;z-index:3;flex:none;width:calc(100% - 2rem);max-width:44rem;margin:0 auto .5rem;
          padding:.6rem .9rem;border-radius:.9rem;font-size:.8rem;font-weight:700;line-height:1.4;
          background:rgba(255,159,28,.16);border:1px solid rgba(255,159,28,.35);color:#FFD9A8}
   #aviso[hidden]{display:none}
@@ -212,10 +235,22 @@
          font-size:.78rem;font-weight:800;padding:.5rem 1rem;border-radius:999px}
   #toast[hidden]{display:none}
 
+  @media(min-width:768px){
+    #fio p{font-size:1.02rem;padding:.75rem 1rem}
+    #titulo{font-size:.9rem}
+    #cracha{padding:.45rem .9rem}
+    #cracha img{width:26px;height:26px}
+    .redondo{width:40px;height:40px}
+    #entrada{font-size:1.05rem}
+    .acao{width:42px;height:42px}
+    #btn-persona{font-size:.84rem;padding:.42rem .85rem}
+  }
+  /* Tela de toque (tablet, celular): nao ha Enter nem Shift+Enter para ensinar. */
+  @media(hover:none){.dica-teclado{display:none}}
   @media(max-width:480px){
     #fio p{font-size:.9rem;max-width:90%}
     #entrada{font-size:1rem}   /* nunca abaixo de 16px: o iOS dá zoom no foco */
-    .dica{display:none}
+    .dica{margin-top:.4rem;font-size:.68rem}
   }
   @media(prefers-reduced-motion:reduce){
     *,*::before,*::after{animation:none!important;transition:none!important}
@@ -274,8 +309,13 @@
 
 <form id="compositor" autocomplete="off">
   <div class="caixa">
+    <div class="gravacao" aria-live="polite">
+      <span class="ponto-rec" aria-hidden="true"></span>
+      <span id="gravacao-txt">Gravando 0:00</span>
+      <button id="cancelar-gravacao" type="button">Cancelar</button>
+    </div>
     <textarea id="entrada" rows="1" maxlength="2000"
-              placeholder="Escreva ou toque no microfone…"
+              placeholder="Escreva uma mensagem…"
               aria-label="Escreva uma mensagem para a Yara"></textarea>
     <div class="acoes">
       <button id="btn-persona" type="button" aria-haspopup="listbox"
@@ -288,15 +328,21 @@
               aria-label="Silenciar o microfone" title="Silenciar" hidden>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 3l18 18"/><path d="M9 5a3 3 0 0 1 6 0v5"/><path d="M5 11a7 7 0 0 0 10.6 6"/><path d="M19 11a7 7 0 0 1-.6 2.8"/><path d="M12 19v3"/></svg>
       </button>
+      <!-- Telefone = ligacao ao vivo. Antes a ligacao era o MICROFONE, e o aluno,
+           que conhece o microfone do WhatsApp, achava que ia mandar um audio. -->
       <button id="ligar" class="acao" type="button" aria-label="Ligar para a Yara" title="Ligar">
-        <svg id="icone-ligar" width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.07A7 7 0 0 0 19 11Z"/></svg>
+        <span class="ic-ligar"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1l-2.2 2.2Z"/></svg></span><span class="ic-desligar" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1a1 1 0 0 1-.56.9 11.5 11.5 0 0 0-2.66 1.85 1 1 0 0 1-1.4 0L.29 13.08a1 1 0 0 1 0-1.41C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67a1 1 0 0 1 0 1.41l-2.48 2.49a1 1 0 0 1-1.4 0 11.3 11.3 0 0 0-2.67-1.85 1 1 0 0 1-.56-.9v-3.1A15 15 0 0 0 12 9Z"/></svg></span>
       </button>
-      <button id="btn-enviar" class="acao" type="submit" aria-label="Enviar" disabled>
+      <!-- Microfone = grava e manda como mensagem. Vira a seta de enviar quando ha texto. -->
+      <button id="gravar" class="acao" type="button" aria-label="Gravar um áudio" title="Gravar um áudio">
+        <span class="ic-mic"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.07A7 7 0 0 0 19 11Z"/></svg></span><span class="ic-parar" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg></span>
+      </button>
+      <button id="btn-enviar" class="acao" type="submit" aria-label="Enviar" hidden>
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
       </button>
     </div>
   </div>
-  <p class="dica">Enter envia · Shift+Enter quebra a linha</p>
+  <p class="dica"><span class="dica-teclado">Enter envia · Shift+Enter quebra a linha · </span>🎤 grava um áudio · 📞 liga para ela</p>
 </form>
 
 <div id="veu" hidden></div>
@@ -305,7 +351,7 @@
 
 <script src="auth-secure.js?v=auth20260918"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=1"></script>
+<script src="streak-overlay.js?v=land1"></script>
 <script src="conversa-core.js?v=palco20260920"></script>
 <script>
 'use strict';
@@ -427,6 +473,36 @@ function dadosDaPersona(id) {
   return PERSONAS.find(p => p.id === id) || null;
 }
 
+// Troca a arte do palco e o fundo borrado — o "papel de parede" de cada
+// capivara. Com transicao quando o ALUNO troca (no carregamento da pagina e
+// imediato), e a arte nova e baixada ANTES de aparecer: sem isso a tela
+// piscava vazia entre uma capivara e outra.
+let trocaDaVez = 0;
+function trocarArte(arte, animar) {
+  const v = $('yara-video'), fundo = $('fundo');
+  // Um <video> com clipe carregado mostra o QUADRO do clipe, nao o poster.
+  // Depois de uma ligacao com a Yara, o clipe dela ficava no palco e trocar
+  // para a viajante continuava mostrando a Yara. Descarrega o clipe.
+  if (v.getAttribute('src') && arte !== ARTE_PADRAO) {
+    try { v.pause(); } catch (_) {}
+    v.removeAttribute('src');
+    try { v.load(); } catch (_) {}
+    delete v.dataset.pronto;
+  }
+  const vez = ++trocaDaVez;
+  const aplicar = () => {
+    if (vez !== trocaDaVez) return;   // o aluno ja trocou de novo: vale a ultima
+    v.poster = arte;
+    fundo.style.backgroundImage = 'url("' + arte + '")';
+    requestAnimationFrame(() => { v.style.opacity = ''; fundo.style.opacity = ''; });
+  };
+  if (!animar || semMovimento()) { aplicar(); return; }
+  v.style.opacity = '0'; fundo.style.opacity = '0';
+  const img = new Image();
+  img.onload = img.onerror = () => setTimeout(aplicar, 200);
+  img.src = arte;
+}
+
 function aplicarPersona(id, comHistoria) {
   const p = dadosDaPersona(id);
   // `destino` é a persona que não é conversada aqui: o menu navega para a página
@@ -435,9 +511,8 @@ function aplicarPersona(id, comHistoria) {
   personaAtual = p ? p.id : 'conversa';
   $('btn-persona-rotulo').textContent = p ? p.rotulo : 'Yara';
   const arte = (p && p.arte) || ARTE_PADRAO;
-  $('yara-video').poster = arte;
+  trocarArte(arte, comHistoria);
   $('cracha-arte').src = arte;
-  $('fundo').style.backgroundImage = 'url("' + arte + '")';
   $('titulo').textContent = p ? p.rotulo : 'Yara AI';
   if (comHistoria) {
     try {
@@ -656,15 +731,37 @@ function registrarUso(uso, duracaoMs) {
 // ── Controles ────────────────────────────────────────────────────────────────
 function controles() {
   const ligado = chamada.ligado(), pendente = chamada.pendente();
+  const emChamada = ligado || pendente;
+  const rec = gravando(), transc = gravacao.transcrevendo;
+  const temTexto = !!$('entrada').value.trim();
+
   const b = $('ligar');
-  b.className = 'acao' + (ligado || pendente ? ' desligar' : '');
-  b.setAttribute('aria-label', ligado || pendente ? 'Encerrar a chamada' : 'Ligar para a Yara');
-  b.title = ligado || pendente ? 'Encerrar' : 'Ligar';
-  // Digitar no meio de uma ligação de voz não tem semântica: a sessão Realtime
-  // não recebe o texto. Desabilitar é mais honesto que aceitar e engolir.
-  $('entrada').disabled = ligado || pendente;
-  $('btn-enviar').disabled = ligado || pendente || !$('entrada').value.trim();
-  $('btn-persona').disabled = ligado || pendente;
+  b.className = 'acao' + (emChamada ? ' desligar' : '');
+  b.setAttribute('aria-label', emChamada ? 'Encerrar a chamada' : 'Ligar para a Yara');
+  b.title = emChamada ? 'Encerrar' : 'Ligar';
+  b.querySelector('.ic-ligar').hidden = emChamada;
+  b.querySelector('.ic-desligar').hidden = !emChamada;
+  b.disabled = rec || transc;
+
+  // A ponta direita e UM lugar so: microfone com a caixa vazia, seta de enviar
+  // com texto — o padrao do WhatsApp. Na ligacao os dois somem: o aluno fala.
+  const g = $('gravar');
+  g.hidden = emChamada || (temTexto && !rec);
+  g.className = 'acao' + (rec ? ' gravando' : '');
+  g.setAttribute('aria-label', rec ? 'Parar e enviar o áudio' : 'Gravar um áudio');
+  g.title = rec ? 'Parar e enviar' : 'Gravar um áudio';
+  g.querySelector('.ic-mic').hidden = rec;
+  g.querySelector('.ic-parar').hidden = !rec;
+  g.disabled = transc;
+  $('btn-enviar').hidden = emChamada || rec || !temTexto;
+
+  // Digitar no meio de uma ligacao de voz nao tem semantica: a sessao Realtime
+  // nao recebe o texto. Desabilitar e mais honesto que aceitar e engolir.
+  $('entrada').disabled = emChamada || rec || transc;
+  $('btn-persona').disabled = emChamada || rec || transc;
+  document.querySelector('.caixa').classList.toggle('gravando', rec);
+  document.querySelector('.caixa').classList.toggle('transcrevendo', !!transc);
+
   const mudo = $('silenciar');
   mudo.hidden = !ligado;
   mudo.setAttribute('aria-pressed', String(chamada.mudo()));
@@ -676,13 +773,110 @@ $('silenciar').addEventListener('click', () => { chamada.silenciar(!chamada.mudo
 
 $('ligar').addEventListener('click', async () => {
   if (chamada.ligado() || chamada.pendente()) { chamada.desligar(); return; }
+  if (gravando() || gravacao.transcrevendo) return;
   avisar('');
   fecharMenu();
   controles();
   const ok = await chamada.ligar({ cenario: personaAtual, lang: 'en' });
   controles();
-  if (ok) avisar('Você está falando com uma IA. Fale no seu ritmo — toque de novo para encerrar.');
+  if (ok) avisar('Você está falando com uma IA. Fale no seu ritmo — toque no telefone vermelho para encerrar.');
 });
+
+
+// ── Mandar áudio ─────────────────────────────────────────────────────────────
+// O microfone GRAVA e manda a fala como mensagem, transcrita pelo mesmo
+// /api/transcribe das aulas. A ligacao ao vivo e o botao de telefone.
+//
+// Nao usa o CapyMic do components.js: aquele pesa 106 KB e a trava dele e de
+// 15s, feita para frase curta do Speak step (desde 23/set ela para e entrega o
+// texto; antes descartava). Mensagem de chat e mais longa: aqui a trava e de
+// 60s e tambem PARA e ENVIA.
+const GRAVA_MAX_MS = 60000;
+const gravacao = { stream: null, rec: null, partes: [], inicio: 0, relogio: 0, trava: 0, cancelada: false, transcrevendo: false };
+const gravando = () => !!(gravacao.rec && gravacao.rec.state === 'recording');
+
+function pintarRelogio() {
+  const s = Math.floor((Date.now() - gravacao.inicio) / 1000);
+  const falta = Math.max(0, Math.round((GRAVA_MAX_MS - (Date.now() - gravacao.inicio)) / 1000));
+  $('gravacao-txt').textContent = 'Gravando ' + Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') +
+    (falta <= 10 ? ' \u00b7 envia sozinho em ' + falta + 's' : '');
+}
+
+async function comecarGravacao() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+    toast('Este navegador n\u00e3o grava \u00e1udio. Escreva a mensagem.'); return;
+  }
+  try { gravacao.stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (_) { toast('Permita o microfone para mandar \u00e1udio.'); return; }
+  const tipo = ['audio/webm', 'audio/mp4', 'audio/ogg'].find(x => MediaRecorder.isTypeSupported(x)) || '';
+  gravacao.rec = new MediaRecorder(gravacao.stream, tipo ? { mimeType: tipo } : undefined);
+  gravacao.partes = []; gravacao.cancelada = false;
+  gravacao.rec.ondataavailable = e => { if (e.data && e.data.size) gravacao.partes.push(e.data); };
+  gravacao.rec.onstop = aoPararGravacao;
+  gravacao.rec.start();
+  gravacao.inicio = Date.now();
+  gravacao.relogio = setInterval(pintarRelogio, 250);
+  gravacao.trava = setTimeout(() => pararGravacao(false), GRAVA_MAX_MS);
+  pintarRelogio();
+  controles();
+}
+
+function pararGravacao(cancelar) {
+  if (!gravacao.rec) return;
+  gravacao.cancelada = !!cancelar;
+  clearTimeout(gravacao.trava); clearInterval(gravacao.relogio);
+  if (gravacao.rec.state !== 'inactive') gravacao.rec.stop();
+}
+
+async function aoPararGravacao() {
+  const rec = gravacao.rec, partes = gravacao.partes, cancelada = gravacao.cancelada;
+  if (gravacao.stream) gravacao.stream.getTracks().forEach(x => x.stop());
+  gravacao.stream = null; gravacao.rec = null;
+  if (cancelada || !partes.length) { controles(); return; }
+  const tipo = (rec && rec.mimeType) || 'audio/webm';
+  gravacao.transcrevendo = true;
+  $('gravacao-txt').textContent = 'Transcrevendo\u2026';
+  controles();
+  let texto = '';
+  try { texto = await transcrever(new Blob(partes, { type: tipo }), tipo); }
+  catch (e) { toast(e.message || 'N\u00e3o consegui entender o \u00e1udio.'); }
+  gravacao.transcrevendo = false;
+  controles();
+  if (!texto.trim()) { if (!document.getElementById('toast').hidden) return; toast('N\u00e3o ouvi nada. Tente de novo.'); return; }
+  entrada.value = texto.trim();
+  ajustarAltura();
+  enviar('voz');
+}
+
+async function transcrever(blob, tipo) {
+  const base64 = await new Promise((ok, falha) => {
+    const r = new FileReader();
+    r.onloadend = () => ok(String(r.result).split(',')[1] || '');
+    r.onerror = falha;
+    r.readAsDataURL(blob);
+  });
+  // A lingua em que o ALUNO fala com esta capivara: a francesa transcreve
+  // frances; a Maia e a de iniciantes, que recebem portugues, detectam sozinhas
+  // (escuta null) — forcar ingles embaralhava o portugues do aluno.
+  const p = dadosDaPersona(personaAtual);
+  const escuta = p && Object.prototype.hasOwnProperty.call(p, 'escuta') ? p.escuta : ((p && p.lang) || 'en');
+  const r = await fetch('/api/transcribe', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
+    body: JSON.stringify(escuta ? { audioBase64: base64, mimeType: tipo, lang: escuta } : { audioBase64: base64, mimeType: tipo }),
+  });
+  const d = await r.json().catch(() => ({}));
+  // O servidor manda o CODIGO em `error` e o texto para humano em `message`.
+  if (!r.ok || d.error) throw new Error(d.message || 'N\u00e3o consegui entender o \u00e1udio.');
+  return d.text || '';
+}
+
+$('gravar').addEventListener('click', () => {
+  if (gravacao.transcrevendo) return;
+  if (gravando()) pararGravacao(false); else { fecharMenu(); comecarGravacao(); }
+});
+$('cancelar-gravacao').addEventListener('click', () => pararGravacao(true));
+// Sair da pagina gravando: solta o microfone (a luz vermelha do navegador apaga).
+window.addEventListener('pagehide', () => pararGravacao(true));
 
 // ── Enviar texto ─────────────────────────────────────────────────────────────
 const entrada = $('entrada');
@@ -696,13 +890,13 @@ entrada.addEventListener('keydown', e => {
 });
 $('compositor').addEventListener('submit', e => { e.preventDefault(); enviar(); });
 
-async function enviar() {
+async function enviar(canal) {
   const texto = entrada.value.trim();
-  if (!texto || chamada.ligado() || chamada.pendente()) return;
+  if (!texto || chamada.ligado() || chamada.pendente() || gravando()) return;
   entrada.value = '';
   ajustarAltura();
   controles();
-  dizer('eu', 'texto', texto);
+  dizer('eu', canal === 'voz' ? 'voz' : 'texto', texto);
   historia.push({ role: 'user', content: texto });
   pensando(true);
   try {
@@ -751,7 +945,7 @@ async function enviar() {
     sessionStorage.removeItem('capyPrimeiraMensagem');
   } catch (_) { primeira = ''; }
 
-  dizer('ia', 'texto', 'Olá, ' + userName + '! 🐾 Escreva em inglês, ou toque no microfone para ligar.');
+  dizer('ia', 'texto', 'Olá, ' + userName + '! 🐾 Escreva pra mim, grave um áudio no 🎤 ou me ligue no 📞.');
 
   if (primeira) {
     entrada.value = primeira.slice(0, 300);

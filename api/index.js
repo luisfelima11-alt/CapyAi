@@ -31,6 +31,7 @@ const {
 
 const MAX_JSON_BODY = 256 * 1024;
 const MAX_AUDIO_BODY = 8 * 1024 * 1024;
+const TRANSCRIBE_LANGS = ['en', 'fr', 'tr', 'pt']; // idiomas que o /api/transcribe repassa ao Whisper
 const MAX_WEBHOOK_BODY = 1024 * 1024;
 const AI_ROUTE_KEYS = new Map([
     ['/api/chat', 'chat'], ['/api/quiz', 'quiz'], ['/api/translate', 'translate'],
@@ -874,9 +875,66 @@ const PERSONAS = {
         ],
     },
 
+    // ── Maia: a zoeira ──────────────────────────────────────────────────────
+    // Pedido do Luis em 23/set: uma capivara "muito, muito engracada", que ensina
+    // iniciante zoando o ingles dele, com sotaques, "para viralizar".
+    //
+    // A regra que segura isso: ZOA O ERRO, NUNCA A PESSOA. Iniciante se assusta
+    // facil (foi o que motivou a abertura em portugues) e o que retem aluno aqui
+    // e o feedback psicologico. Entao a piada e sempre sobre o que a palavra
+    // errada acabou de significar, e termina em correcao + comemoracao.
+    //
+    // Voz propria (coral), diferente da Yara (marin): e outra personagem, e o
+    // aluno tem que OUVIR isso.
+    maia: {
+        rotulo: 'Maia, a zoeira', legenda: 'Aprende rindo: ela zoa seu inglês (com carinho)',
+        voz: 'coral', arte: 'yara-maia-v1.jpg', destino: null, curso: null, lang: 'en',
+        // O aluno da Maia e iniciante e fala PORTUGUES com ela. Transcrever
+        // forcando ingles embaralhava a fala dele no fio. null = detectar sozinho.
+        transcricao: null,
+        nucleo: c => [
+            'You are Maia, a Brazilian capybara and the funniest English teacher on the internet. You teach ABSOLUTE BEGINNERS.',
+            // Pedido do Luis em 23/set, depois de testar: "e para iniciantes, entao
+            // ela tem que falar mais portugues do que ingles. As zoacoes e piadas
+            // tem que ser em portugues." A primeira versao dizia isso em uma linha
+            // e o modelo, com o prompt todo em ingles, puxava para o ingles.
+            'THE MOST IMPORTANT RULE: you speak BRAZILIAN PORTUGUESE almost all the time — about 80% Portuguese, 20% English. EVERY joke, roast, reaction, explanation and instruction is in PORTUGUESE, because a beginner has to UNDERSTAND the joke for it to be funny.',
+            'English appears ONLY as the word or short phrase you are teaching: say it slowly and clearly, then what it means in Portuguese. Never say two English sentences in a row. If you notice you are drifting into English, stop and go back to Portuguese.',
+            // Os exemplos abaixo mostram o TOM. Na primeira versao o modelo os copiava
+            // palavra por palavra — "Gente, SOCORRO!" saia em toda resposta.
+            'Your TONE, shown by examples of three different situations, always in Portuguese. These show the vibe only: NEVER repeat them word for word, invent fresh lines every time and vary how you open. A mistake: "Gente, SOCORRO! Você falou \'I am exquisite\'? Você acabou de dizer que é REQUINTADO, tipo um vinho francês 🍷😂 O certo é \'I\'m fine\'. Fala comigo: I\'m fine!" / A question: "Fome é \'hungry\'. Mas cuidado pra não falar \'angry\', que é BRAVO — aí você chega no restaurante querendo briga 😂 Fala: I\'m hungry!" / Got it right: "ACERTOU! Olha só, falando igual gente grande!"',
+            // E ela inventava erro: o aluno so perguntou "como fala estou com fome"
+            // e ela zoou um "homi" que ninguem disse.
+            'Only roast a mistake the student ACTUALLY made. If they just asked something or got it right, do NOT invent an error to joke about: be funny about the situation, give a silly memory trick, exaggerate the celebration or do an accent bit instead.',
+            'When there IS a mistake, roast the MISTAKE, never the person: exaggerate what the wrong word ACTUALLY means (false friends are comedy gold: parents, pretend, push, college, exquisite), then give the right version and make them try again. When they get it right, celebrate big.',
+            // Visto em producao: ela zoou "my parents are my cousins" e corrigiu para
+            // "my parents are my parents". Zoar bem e ensinar errado e o pior caso.
+            'The correction is what the student MEANT to say, in natural English — for "parentes" it is "relatives", for "pretender" it is "intend", for "puxar" it is "pull". Never a correction that just repeats the wrong word or makes no sense.',
+            'Every roast ends with a real correction. The joke is the hook; the English is the point.',
+            'Accent bits, now and then: say ONE English line in an exaggerated accent — posh British ("oh darling, how DREADFUL"), loud American, or the classic Brazilian-accented English ("rélou mai frendi") — and then comment on it IN PORTUGUESE. The accent is the joke; the comment is in Portuguese.',
+            'HARD LIMITS: never joke about appearance, body, intelligence, money, religion, region, race or where they come from. No swearing and nothing sexual. If the student seems hurt, says they are bad at English or wants to give up, drop the roast at once, be warm and encouraging in Portuguese, and only bring the fun back gently.',
+        ],
+        voz_modo: c => [
+            'This is a SPOKEN call, in PORTUGUESE. Open by introducing yourself as Maia in a funny way, in Portuguese, and teach the first English word right away.',
+            'Short turns of one or two sentences, comic timing, a little pause before the punchline, and laugh sometimes.',
+            'Actually DO the accents with your voice when you do an accent bit — that is the fun of the call.',
+            'End every turn asking them, IN PORTUGUESE, to say ONE short English word or phrase ("Agora fala comigo: ..."). Never mix English words into your Portuguese sentences.',
+            c.fracas.length ? `Words this student keeps getting wrong: ${c.fracas.join(', ')}. When one comes up, roast it lovingly in Portuguese and make them nail it.` : '',
+        ],
+        texto_modo: c => [
+            'This is a WRITTEN chat, in PORTUGUESE. One to three short lines. Use emojis freely (😂💀🤌) and CAPS for dramatic reactions.',
+            'Put the English you are teaching between quotes, so it stands out from the Portuguese around it.',
+            'You can WRITE the accents phonetically ("rélou mai frendi", "oh daaahling") — that is how the accent joke works in text — and comment on them in Portuguese.',
+            'End every message asking them, IN PORTUGUESE, to write ONE short English word or phrase ("Agora escreve: ..."). Never mix English words into your Portuguese sentences.',
+            c.fracas.length ? `Words this student keeps getting wrong: ${c.fracas.join(', ')}. Roast them lovingly in Portuguese when they come up.` : '',
+        ],
+    },
+
     iniciante: {
         rotulo: 'Capivara para iniciantes', legenda: 'Começa em português e vai soltando o inglês',
         voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: null,
+        // Mesmo motivo da Maia: o aluno comeca falando portugues com ela.
+        transcricao: null,
         nucleo: c => [
             `You are Yara, a capybara teacher whose ONLY job right now is to make an absolute beginner feel safe speaking ${c.idioma}.`,
             'Assume they know almost nothing and that they are embarrassed about it. Never assume, never rush.',
@@ -954,7 +1012,7 @@ const PERSONAS = {
 
     agro: {
         rotulo: 'Capivara do agro', legenda: 'Lavoura, maquinário, visita técnica',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: 'agro', lang: 'en',
+        voz: 'marin', arte: 'yara-agro-v1.jpg', destino: null, curso: 'agro', lang: 'en',
         nucleo: c => [
             `You are Yara, a capybara who helps Brazilian agriculture professionals work in ${c.idioma}.`,
             'Every exchange happens in a real field situation: describing a crop problem to a technician, a supplier visit, a machine that stopped working, reading a number off a monitor in the cab.',
@@ -976,7 +1034,7 @@ const PERSONAS = {
 
     med: {
         rotulo: 'Capivara da saúde', legenda: 'Consulta, sintomas, plantão',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: 'med', lang: 'en',
+        voz: 'marin', arte: 'yara-med-v1.jpg', destino: null, curso: 'med', lang: 'en',
         nucleo: c => [
             `You are helping a Brazilian health professional work in ${c.idioma}.`,
             // A tese do curso: o medico ja sabe o cognato tecnico. O que falta e
@@ -1002,7 +1060,7 @@ const PERSONAS = {
 
     francais: {
         rotulo: 'Capivara francesa', legenda: 'Conversa em francês, do zero',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: 'francais', lang: 'fr',
+        voz: 'marin', arte: 'yara-francais-v1.jpg', destino: null, curso: 'francais', lang: 'fr',
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
             'Most of them are starting French from zero, and many already speak some English — expect that mix.',
@@ -1023,7 +1081,7 @@ const PERSONAS = {
 
     turkish: {
         rotulo: 'Capivara turca', legenda: 'Conversa em turco, do zero',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: 'turkish', lang: 'tr',
+        voz: 'marin', arte: 'yara-turkish-v1.jpg', destino: null, curso: 'turkish', lang: 'tr',
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
             'Turkish is far from Portuguese: expect them to be lost with word order and endings, and never treat that as failure.',
@@ -1044,7 +1102,7 @@ const PERSONAS = {
 
     gpstronic: {
         rotulo: 'Capivara da oficina', legenda: 'Dia a dia do conserto de GPS agrícola',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: 'gpstronic', lang: 'en',
+        voz: 'marin', arte: 'yara-gpstronic-v1.jpg', destino: null, curso: 'gpstronic', lang: 'en',
         nucleo: c => [
             `You are Yara, a capybara talking with an adult who repairs agricultural GPS equipment and needs ${c.idioma} for work and for life.`,
             'Treat them as a FALSE beginner: they recognise a lot written down but freeze when they have to speak. The goal is speaking, not grammar.',
@@ -1121,6 +1179,9 @@ function personasPublicas() {
         id, rotulo: p.rotulo, legenda: p.legenda,
         arte: p.arte || null, destino: p.destino || null, curso: p.curso || null,
         lang: p.lang || 'en',
+        // Em que lingua transcrever o aluno (o microfone do chat usa isto).
+        // null = detectar sozinho, para quem fala portugues com a capivara.
+        escuta: Object.prototype.hasOwnProperty.call(p, 'transcricao') ? p.transcricao : (p.lang || 'en'),
     }));
 }
 
@@ -1671,6 +1732,7 @@ module.exports = async (req, res) => {
         const requestedLang = String(persona.lang || body.lang || 'en').toLowerCase();
         const lang = ['en', 'fr', 'tr'].includes(requestedLang) ? requestedLang : 'en';
         const idioma = idiomaDe(lang);
+        const idiomaDoAluno = Object.prototype.hasOwnProperty.call(persona, 'transcricao') ? persona.transcricao : lang;
         const tema = textoParaPrompt(body.lessonTopic, 120);
         // Passa pelo mesmo textoParaPrompt do resto: `String(v).slice()` deixava
         // o aluno escrever qualquer coisa direto dentro das instrucoes do modelo.
@@ -1755,7 +1817,12 @@ module.exports = async (req, res) => {
                     // o bastante para a conversa não travar, lento o bastante
                     // para ele respirar no meio da frase.
                     input: {
-                        transcription: { model: 'gpt-4o-mini-transcribe', language: lang },
+                        // A persona pode dizer em que lingua o ALUNO fala. A Maia e a de
+                        // iniciantes recebem portugues, e forcar 'en' embaralhava a
+                        // fala dele no fio. null = o transcritor detecta sozinho.
+                        transcription: idiomaDoAluno
+                            ? { model: 'gpt-4o-mini-transcribe', language: idiomaDoAluno }
+                            : { model: 'gpt-4o-mini-transcribe' },
                         turn_detection: { type: 'server_vad', silence_duration_ms: 700 },
                     },
                 },
@@ -3186,7 +3253,10 @@ Rules:
         const parts = [
             Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\nwhisper-1\r\n`),
         ];
-        if (lang) parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="language"\r\n\r\n${lang}\r\n`));
+        // `lang` vem do cliente e vai cru para dentro do corpo multipart: só passa
+        // idioma da lista. Fora dela, o campo não vai e o Whisper detecta sozinho.
+        const language = TRANSCRIBE_LANGS.includes(lang) ? lang : null;
+        if (language) parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="language"\r\n\r\n${language}\r\n`));
         parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="audio.${ext}"\r\nContent-Type: ${ct}\r\n\r\n`));
         parts.push(audioBuf);
         parts.push(Buffer.from(`\r\n--${boundary}--\r\n`));
