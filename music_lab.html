@@ -276,22 +276,39 @@ function renderSearchResults(tracks) {
     container.classList.remove('hidden');
     return;
   }
-  container.innerHTML = tracks.slice(0, 7).map((t, i) => `
-    <button onclick="selectSong('${esc(t.artist?.name)}','${esc(t.title)}','${esc(t.album?.cover_medium||'')}','${esc(t.album?.title||'')}')"
-            class="result-card w-full text-left px-4 py-3 flex items-center gap-3 ${i < tracks.length-1 ? 'border-b border-slate-100' : ''}">
-      ${t.album?.cover_medium
-        ? `<img src="${t.album.cover_medium}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0"/>`
+  // Titles, artists and covers come from an outside catalogue: escape the
+  // text, allow only https images, and keep data out of onclick strings.
+  const lista = tracks.slice(0, 7);
+  container.innerHTML = lista.map((t, i) => {
+    const capa = urlHttps(t.album?.cover_medium);
+    return `
+    <button type="button" data-ti="${i}"
+            class="result-card w-full text-left px-4 py-3 flex items-center gap-3 ${i < lista.length-1 ? 'border-b border-slate-100' : ''}">
+      ${capa
+        ? `<img src="${escHtml(capa)}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0"/>`
         : `<span class="text-2xl flex-shrink-0">🎵</span>`}
       <div class="min-w-0">
-        <p class="font-black text-navy text-sm truncate">${t.title}</p>
-        <p class="text-slate-400 text-xs">${t.artist?.name || ''}</p>
+        <p class="font-black text-navy text-sm truncate">${escHtml(t.title)}</p>
+        <p class="text-slate-400 text-xs">${escHtml(t.artist?.name)}</p>
       </div>
-    </button>`).join('');
+    </button>`;
+  }).join('');
+  container.querySelectorAll('button[data-ti]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = lista[Number(btn.dataset.ti)] || {};
+      selectSong(String(t.artist?.name || ''), String(t.title || ''), urlHttps(t.album?.cover_medium), String(t.album?.title || ''));
+    });
+  });
   container.classList.remove('hidden');
 }
 
-function esc(str) {
-  return (str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function urlHttps(u) {
+  try { const url = new URL(String(u || '')); return url.protocol === 'https:' ? url.href : ''; }
+  catch (e) { return ''; }
 }
 
 async function selectSong(artist, title, cover, album) {
@@ -415,24 +432,24 @@ function renderResults(data) {
     <div class="bg-white border-2 border-purple-100 rounded-2xl p-5">
       <div class="flex items-start justify-between gap-3 mb-2">
         <div>
-          <span class="font-black text-navy text-lg">${v.word}</span>
-          ${v.phonetic ? `<span class="text-slate-400 text-sm ml-2">${v.phonetic}</span>` : ''}
+          <span class="font-black text-navy text-lg">${escHtml(v.word)}</span>
+          ${v.phonetic ? `<span class="text-slate-400 text-sm ml-2">${escHtml(v.phonetic)}</span>` : ''}
         </div>
-        <span class="bg-purple-100 text-purple-700 text-xs font-black px-2.5 py-1 rounded-full flex-shrink-0">${v.pt}</span>
+        <span class="bg-purple-100 text-purple-700 text-xs font-black px-2.5 py-1 rounded-full flex-shrink-0">${escHtml(v.pt)}</span>
       </div>
-      ${v.example ? `<p class="text-slate-500 text-sm italic mb-2 bg-slate-50 rounded-xl px-3 py-2">"${v.example}"</p>` : ''}
-      ${v.tip ? `<p class="text-purple-600 text-xs font-bold">💡 ${v.tip}</p>` : ''}
+      ${v.example ? `<p class="text-slate-500 text-sm italic mb-2 bg-slate-50 rounded-xl px-3 py-2">"${escHtml(v.example)}"</p>` : ''}
+      ${v.tip ? `<p class="text-purple-600 text-xs font-bold">💡 ${escHtml(v.tip)}</p>` : ''}
     </div>`).join('');
 
   // Chunks
   document.getElementById('chunks-list').innerHTML = (data.chunks || []).map(c => `
     <div class="bg-white border-2 border-pink-100 rounded-2xl p-5">
       <div class="flex items-center gap-2 mb-2">
-        <span class="font-black text-navy text-base">${c.phrase}</span>
-        ${c.type ? `<span class="bg-pink-100 text-pink-600 text-xs font-bold px-2 py-0.5 rounded-full">${c.type}</span>` : ''}
+        <span class="font-black text-navy text-base">${escHtml(c.phrase)}</span>
+        ${c.type ? `<span class="bg-pink-100 text-pink-600 text-xs font-bold px-2 py-0.5 rounded-full">${escHtml(c.type)}</span>` : ''}
       </div>
-      <p class="text-slate-600 text-sm mb-2">${c.meaning}</p>
-      ${c.example ? `<p class="text-slate-400 text-xs italic bg-slate-50 rounded-xl px-3 py-2">${c.example}</p>` : ''}
+      <p class="text-slate-600 text-sm mb-2">${escHtml(c.meaning)}</p>
+      ${c.example ? `<p class="text-slate-400 text-xs italic bg-slate-50 rounded-xl px-3 py-2">${escHtml(c.example)}</p>` : ''}
     </div>`).join('');
 
   // Quiz — normalize field names (AI sometimes returns question/options/answer instead of q/opts/ans)
@@ -447,11 +464,11 @@ function renderResults(data) {
   document.getElementById('quiz-result').classList.add('hidden');
   document.getElementById('quiz-list').innerHTML = _quizData.map((q, qi) => `
     <div class="bg-white border-2 border-slate-100 rounded-2xl p-5" id="quiz-q-${qi}">
-      <p class="font-black text-navy text-sm mb-3"><span class="text-purple-500">${qi+1}.</span> ${q.q}</p>
+      <p class="font-black text-navy text-sm mb-3"><span class="text-purple-500">${qi+1}.</span> ${escHtml(q.q)}</p>
       <div class="space-y-2">
         ${q.opts.map((o, oi) => `
           <button class="opt-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white"
-                  data-qi="${qi}" data-oi="${oi}">${o}</button>`).join('')}
+                  data-qi="${qi}" data-oi="${oi}">${escHtml(o)}</button>`).join('')}
       </div>
       <div id="quiz-explain-${qi}" class="hidden mt-3 text-xs font-bold text-emerald-600 bg-emerald-50 rounded-xl px-3 py-2"></div>
     </div>`).join('');

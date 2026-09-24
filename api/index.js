@@ -799,6 +799,37 @@ function readBody(req, maxBytes = MAX_JSON_BODY) {
 // Aqui e lista de PERMISSAO, nao de bloqueio: letra (com acento), digito,
 // espaco, hifen, barra, ponto e virgula. Todo o resto vira espaco. Nome de
 // vaga e tema de aula cabem nisso; instrucao disfarcada, nao.
+// Where to send the browser after the auth callback: only a path on this same
+// site. `startsWith('/')` alone is not enough — browsers read "\" as "/", so
+// "/\evil.com" becomes "//evil.com", an off-site redirect.
+function caminhoInterno(valor) {
+    const bruto = String(valor || '');
+    if (!bruto.startsWith('/') || bruto.startsWith('//') || bruto.includes('\\')) return null;
+    try {
+        const base = 'https://capy.invalid';
+        const alvo = new URL(bruto, base);
+        if (alvo.origin !== base) return null;
+        return alvo.pathname + alvo.search + alvo.hash;
+    } catch (e) { return null; }
+}
+
+// Free text from the student that ends up inside a prompt (a name, a topic,
+// a sentence). Unlike textoParaPrompt (slugs and titles) it keeps ordinary
+// punctuation, but drops markup, backticks, braces and control characters,
+// folds newlines (no fake "system:" lines) and clips the length.
+function textoLivreParaPrompt(valor, limite) {
+    return String(valor == null ? '' : valor)
+        .slice(0, limite)
+        .replace(/[\u0000-\u001F\u007F<>`{}\[\]\\]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function listaParaPrompt(valor, maxItens, limite) {
+    return (Array.isArray(valor) ? valor : []).slice(0, maxItens)
+        .map(v => textoLivreParaPrompt(v, limite)).filter(Boolean);
+}
+
 function textoParaPrompt(valor, limite) {
     return String(valor == null ? '' : valor)
         .slice(0, limite)
@@ -1489,7 +1520,7 @@ module.exports = async (req, res) => {
         setSessionCookies(res, session);
         if (session.user) await ensureAppAccount(session.user, {});
         const requestedNext = qs.get('next') || '/account.html?reset=1';
-        const next = requestedNext.startsWith('/') && !requestedNext.startsWith('//') ? requestedNext : '/account.html';
+        const next = caminhoInterno(requestedNext) || '/account.html';
         res.statusCode = 302;
         res.setHeader('Location', next);
         res.end();
@@ -2203,13 +2234,18 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST' && url === '/api/quiz') {
-        const { words, deckLabel } = await readBody(req);
+        const corpoQuiz = await readBody(req);
+        const deckLabel = textoLivreParaPrompt(corpoQuiz.deckLabel, 60);
+        const words = listaParaPrompt(corpoQuiz.words, 20, 40);
         const prompt = `You are creating a fun English quiz for children aged 5-8.\nThe child just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nGenerate exactly 4 multiple-choice questions. Each has 4 options, one correct answer.\nRespond ONLY with a valid JSON array:\n[{"question":"What is this? 🍎","image_hint":"Apple","options":["Apple","River","Bird","Tree"],"correct":"Apple"}]`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.7, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/translate') {
-        const { word, targetLang, context } = await readBody(req);
+        const corpoTr = await readBody(req);
+        const word = textoLivreParaPrompt(corpoTr.word, 60);
+        const targetLang = textoLivreParaPrompt(corpoTr.targetLang, 30) || 'Portuguese';
+        const context = textoLivreParaPrompt(corpoTr.context, 300);
         const ctxLine = context ? `\nUse this sentence for context (the word may be inflected there): "${context}"` : '';
         const prompt = `Translate the word "${word}" into ${targetLang}.${ctxLine}\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${targetLang})."}`;
         callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req); return;
@@ -2362,9 +2398,10 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/story') {
-        const { words, name } = await readBody(req);
-        const childName = name || 'Explorer';
-        const wordList  = (words || ['apple','tree','bird']).join(', ');
+        const corpoSt = await readBody(req);
+        const childName = textoLivreParaPrompt(corpoSt.name, 40) || 'Explorer';
+        const listaSt = listaParaPrompt(corpoSt.words, 12, 30);
+        const wordList  = (listaSt.length ? listaSt : ['apple','tree','bird']).join(', ');
         const prompt = `Write a short fun English story for a child named ${childName} aged 5-8.\nMUST use these words: ${wordList}.\nMax 5 sentences. Simple English. Feature capybara Yara. Happy ending. 1-2 emojis per sentence.\nRespond ONLY with valid JSON:\n{"title":"...","sentences":["..."],"moral":"..."}`;
         callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req); return;
     }
@@ -2383,26 +2420,35 @@ Respond ONLY with valid JSON, no markdown:
 
     if (req.method === 'POST' && url === '/api/flashcard-deck') {
         const { topic } = await readBody(req);
-        const t = topic || 'animals';
+        const t = textoLivreParaPrompt(topic, 60) || 'animals';
         const prompt = `Create 10 English vocabulary flashcards for "${t}" for children aged 5-8.\nRespond ONLY with a valid JSON array:\n[{"word":"Sun","emoji":"☀️","pronunciation":"/sʌn/","hint":"It shines in the sky","example":"The sun is bright today."}]`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.8, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/dialogue-scene') {
         const { topic } = await readBody(req);
-        const t = topic || 'pets';
+        const t = textoLivreParaPrompt(topic, 60) || 'pets';
         const prompt = `Create a short English grammar dialogue for children aged 5-8 about "${t}".\nRespond ONLY with valid JSON:\n{"emoji":"🐶","scene":"...","intro":"...","grammarFocus":"...","questions":[{"prompt":"___ dog is fluffy.","choices":["My","Me","I"],"answer":"My","explanation":"We use My to show the dog belongs to me."}]}\nProvide exactly 6 questions, each with 3 choices.`;
         callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/parent-report') {
-        const { name, xp, badges, lessons, recentDate } = await readBody(req);
+        const corpoPr = await readBody(req);
+        const name = textoLivreParaPrompt(corpoPr.name, 40);
+        const xp = Math.max(0, Math.min(1e9, Number(corpoPr.xp) || 0));
+        const badges = Array.isArray(corpoPr.badges) ? corpoPr.badges : [];
+        const lessons = Array.isArray(corpoPr.lessons) ? corpoPr.lessons : [];
+        const recentDate = textoLivreParaPrompt(corpoPr.recentDate, 30);
         const prompt = `Act as an educational analyst for a children's language app.\nChild: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for parents celebrating effort and giving one practical offline tip.\nRespond ONLY with valid JSON:\n{"title":"Weekly Progress Report for ${name||'Your Child'}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}`;
         callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {
-        const { topic, vocab, level, grammar } = await readBody(req);
+        const corpoLq = await readBody(req);
+        const topic = textoLivreParaPrompt(corpoLq.topic, 120);
+        const vocab = listaParaPrompt(corpoLq.vocab, 30, 40);
+        const level = /^(A1|A2|B1|B2|C1|C2)$/i.test(String(corpoLq.level || '')) ? String(corpoLq.level).toUpperCase() : '';
+        const grammar = textoLivreParaPrompt(corpoLq.grammar, 200);
         // O prompt antigo dizia "for children" e travava o nivel em 'beginner'.
         // Os alunos sao ADULTOS (tecnicos de GPS agricola, candidato a vaga,
         // profissionais). E o exemplo de JSON usava opts ["A","B","C","D"]:
@@ -2421,7 +2467,14 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/lesson-chat') {
-        const { history, message, lessonTopic, vocab, lang = 'en' } = await readBody(req);
+        const { history: historyRaw, message: messageRaw, lessonTopic, vocab: vocabRaw, lang = 'en' } = await readBody(req);
+        if (typeof messageRaw !== 'string' || !messageRaw.trim() || messageRaw.length > 2000) {
+            throw new HttpError(400, 'invalid_message', 'Message must contain 1 to 2000 characters.');
+        }
+        const message = messageRaw.trim();
+        const vocab = listaParaPrompt(vocabRaw, 30, 40);
+        const history = (Array.isArray(historyRaw) ? historyRaw.slice(-20) : [])
+            .map(m => ({ role: m?.role, text: String(m?.text ?? '').slice(0, 2000) }));
         const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
         const temaLimpo = textoParaPrompt(lessonTopic, 120);
         const system = `You are Yara, a friendly capybara teaching ${targetLanguage} to Brazilian students.\nLesson: "${temaLimpo}". Vocabulary: ${(vocab||[]).join(', ')}.\nRules: under 2 sentences per reply; use beginner ${targetLanguage}; end with a question; be warm and encouraging. Answer in Brazilian Portuguese when the student asks for meaning, translation, or says they are stuck. Explain briefly in Portuguese, then give the ${targetLanguage} again so they can try.`;
@@ -3103,7 +3156,9 @@ Rules:
 
     // POST /api/personalize → AI mini-lesson themed around user interests
     if (req.method === 'POST' && url === '/api/personalize') {
-        const { topic, vocab } = await readBody(req);
+        const corpoPe = await readBody(req);
+        const topic = textoLivreParaPrompt(corpoPe.topic, 120);
+        const vocab = listaParaPrompt(corpoPe.vocab, 20, 40);
         const userId = req._securityIdentity?.appUserId || null;
         const _rl = await checkRateLimit(req, 'personalize', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
@@ -4224,10 +4279,10 @@ Rules:
         const _rl = await checkRateLimit(req, 'study-plan', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
-        const mins    = dailyGoalMinutes || 10;
-        const intList = (interests || []).join(', ') || 'various';
-        const lvl     = level || 'beginner';
-        const lesson  = currentLesson || 1;
+        const mins    = Math.max(5, Math.min(180, Number(dailyGoalMinutes) || 10));
+        const intList = listaParaPrompt(interests, 10, 40).join(', ') || 'various';
+        const lvl     = textoLivreParaPrompt(level, 30) || 'beginner';
+        const lesson  = textoLivreParaPrompt(currentLesson, 40) || 1;
 
         const prompt = `You are an expert English study planner for Brazilian learners. Create a 7-day personalized weekly study schedule.
 
@@ -4291,7 +4346,8 @@ Rules:
 
     // POST /api/music → analyze song lyrics, generate vocab/chunks/quiz
     if (req.method === 'POST' && url === '/api/music') {
-        const { lyrics, artist } = await readBody(req);
+        const { lyrics, artist: artistRaw } = await readBody(req);
+        const artist = textoLivreParaPrompt(artistRaw, 80);
         const userId = req._securityIdentity?.appUserId || null;
         const _rl = await checkRateLimit(req, 'music', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }

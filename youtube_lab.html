@@ -423,14 +423,19 @@ function renderResult(data) {
 }
 
 // ── Quiz ───────────────────────────────────────────────────────────────
+let quizData = [];
 function renderQuiz(questions) {
+  // Options, answer and explanation come from the AI, whose prompt carries the
+  // video captions (uploader-controlled). Buttons only carry indexes; the text
+  // is looked up on click, never rebuilt from an onclick string.
+  quizData = Array.isArray(questions) ? questions : [];
   const el = document.getElementById('quiz-container');
-  el.innerHTML = questions.map((q, qi) => `
+  el.innerHTML = quizData.map((q, qi) => `
     <div class="bg-white/5 rounded-2xl p-4 border border-white/8">
       <p class="text-white font-bold text-sm mb-3">${qi+1}. ${escHtml(q.question)}</p>
       <div class="space-y-2">
         ${(q.options || []).map((opt, oi) => `
-          <button onclick="answerQuiz(${qi}, '${escAttr(opt)}', '${escAttr(q.correct)}', '${escAttr(q.explanation||'')}', this)"
+          <button type="button" data-qi="${qi}" data-oi="${oi}"
                   class="w-full text-left bg-white/8 hover:bg-white/15 border border-white/10 rounded-xl px-4 py-2.5 text-white/80 text-sm font-semibold transition-all disabled:cursor-default"
                   id="quiz-${qi}-${oi}">
             ${escHtml(opt)}
@@ -440,6 +445,14 @@ function renderQuiz(questions) {
       <p id="explain-${qi}" class="hidden text-xs text-white/60 mt-3 bg-white/5 rounded-lg p-2 leading-relaxed"></p>
     </div>
   `).join('');
+  el.querySelectorAll('button[data-qi]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qi = Number(btn.dataset.qi);
+      const q = quizData[qi] || {};
+      const opt = (q.options || [])[Number(btn.dataset.oi)];
+      answerQuiz(qi, String(opt ?? ''), String(q.correct ?? ''), String(q.explanation || ''), btn);
+    });
+  });
 }
 
 function answerQuiz(qi, answer, correct, explanation, btn) {
@@ -579,10 +592,7 @@ function switchTab(name) {
 
 // ── Utils ──────────────────────────────────────────────────────────────
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  return String(s).replace(/'/g,"\\'");
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function updateNavState() {
   const xpEl = document.getElementById('nav-xp');
