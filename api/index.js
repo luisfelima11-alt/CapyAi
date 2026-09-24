@@ -116,6 +116,14 @@ const VOZ_MINUTOS_MES = { free: 0, pro: 0, super: 60 };
 // nao so contra aluno. Estourou, ninguem liga ate o dono liberar.
 const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 
+// Server-side floor for voice billing (reservarVoz / liquidarReservaVoz): the
+// longest session booked up front when a token is issued, and the minimum
+// cost per minute when the browser's own report is missing or lower. The
+// browser reports tokens and duration itself, so without a floor a report of
+// "0" meant unlimited voice.
+const VOZ_SESSAO_MAX_SEG = Math.max(60, Number(process.env.VOZ_SESSAO_MAX_MIN || 30) * 60);
+const VOZ_USD_POR_MIN_PISO = Number(process.env.VOZ_USD_POR_MIN_PISO || 0.02);
+
 const RATE_LIMITS = {
     chat:         { free:  20, pro: 200, super: 500 },  // per day
     music:        { free:   3, pro:  50, super: 150 },
@@ -1883,6 +1891,13 @@ module.exports = async (req, res) => {
         if (typeof valor !== 'string' || !valor.trim()) { res.status(502).json({ error: 'realtime_unavailable' }); return; }
         const expiresAt = dados.expires_at || (dados.client_secret && dados.client_secret.expires_at);
 
+        // Book the minutes now, on the server. The browser's report at hang-up
+        // only settles this reservation (liquidarReservaVoz), never erases it.
+        if (!ehAdmin && req._securityIdentity && req._securityIdentity.appUserId && req._vozRestante != null) {
+            const reserva = Math.max(60, Math.min(VOZ_SESSAO_MAX_SEG, Math.round(req._vozRestante * 60)));
+            await reservarVoz(req._securityIdentity.appUserId, String(body.cenario || 'conversa').slice(0, 40), reserva);
+        }
+
         res.status(200).json({ minutosRestantes: req._vozRestante == null ? null : Number(req._vozRestante.toFixed(1)),
             value: valor,
             expiresAt: Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null,
@@ -2006,6 +2021,61 @@ module.exports = async (req, res) => {
     // chave por dia que existia antes fazia a segunda ligacao apagar a primeira.
     // O prefixo `__` ja e excluido por todos os filtros de linha sintetica
     // (ver `ehAluno`), entao a linha nao conta como aluno no roster.
+    async function reservarVoz(appUserId, cenario, segundos) {
+        try {
+            const agora = new Date().toISOString();
+            await sb('/user_state', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({
+                    user_id: `__voz_${appUserId}_${agora}_reserva`,
+                    data: {
+                        cenario, reserva: true, emitidoEm: Date.now(), em: agora,
+                        custo: { segundos, usd: Number((segundos / 60 * VOZ_USD_POR_MIN_PISO).toFixed(4)) },
+                    },
+                    updated_at: agora,
+                }),
+            });
+            return true;
+        } catch (e) {
+            // Same stance as consumoVozDoMes: failing to measure doesn't block the call.
+            console.error('[voz] reserva nao gravada', e && e.message);
+            return false;
+        }
+    }
+
+    // Settles the newest open reservation with max(browser report, server clock
+    // since the token was issued), capped at what was reserved. Returns false
+    // when there is nothing to settle (admin, old client), so the caller falls
+    // back to recording the report as before.
+    async function liquidarReservaVoz(req, res, corpo, custo) {
+        try {
+            const identity = await getRequestIdentity(req, res, { allowGuest: true });
+            if (!identity || !identity.appUserId) return false;
+            const mes = new Date().toISOString().slice(0, 7);
+            const padrao = encodeURIComponent(`__voz_${identity.appUserId}_${mes}*_reserva`);
+            const abertas = await sb(`/user_state?user_id=like.${padrao}&data->>reserva=eq.true&select=user_id,data&order=updated_at.desc&limit=1`) || [];
+            const alvo = abertas[0];
+            if (!alvo || !alvo.data) return false;
+            const reservados = Number(alvo.data.custo && alvo.data.custo.segundos) || 0;
+            const decorridos = Math.max(0, Math.round((Date.now() - (Number(alvo.data.emitidoEm) || Date.now())) / 1000));
+            const segundos = Math.max(custo.segundos, Math.min(decorridos, reservados));
+            const usd = Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO);
+            const agora = new Date().toISOString();
+            await sb(`/user_state?user_id=eq.${encodeURIComponent(alvo.user_id)}`, {
+                method: 'PATCH',
+                headers: { 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    data: { ...alvo.data, reserva: false, liquidadoEm: agora,
+                            cenario: String((corpo && corpo.cenario) || alvo.data.cenario || 'conversa').slice(0, 40),
+                            custo: { ...custo, segundos, usd: Number(usd.toFixed(4)) } },
+                    updated_at: agora,
+                }),
+            });
+            return true;
+        } catch (e) { return false; }
+    }
+
     async function gravarUsoVoz(req, res, corpo, custo) {
         try {
             const identity = await getRequestIdentity(req, res, { allowGuest: true });
@@ -2037,8 +2107,11 @@ module.exports = async (req, res) => {
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
         const corpo = await readBody(req);
         const custo = calcularCustoVoz(corpo);
-        // Ligacao de 0 segundo nao vira linha: o aluno desistiu antes de conectar.
-        if (custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
+        // With a reservation from /api/realtime-token, settle it (the server's
+        // clock is the floor). Without one, record the report as before; a
+        // 0-second call is not recorded — the student gave up before connecting.
+        const liquidou = await liquidarReservaVoz(req, res, corpo, custo);
+        if (!liquidou && custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
         res.status(204).end();
         return;
     }
@@ -2132,8 +2205,9 @@ module.exports = async (req, res) => {
         const name = String(body.name || '').trim().slice(0, 80);
         if (!name) { res.status(400).json({ error: 'invalid_name' }); return; }
 
-        // Slug must match what the page derives, so re-taking the test updates
-        // the same row instead of piling up duplicates.
+        // The slug is derived from the typed name, so anyone could send someone
+        // else's. Each attempt is therefore its own row (slug + time): a retake
+        // shows up as a new attempt and nobody can overwrite another result.
         const slug = String(body.slug || '').trim().toLowerCase();
         if (!/^[a-z0-9_]{1,60}$/.test(slug)) { res.status(400).json({ error: 'invalid_slug' }); return; }
 
@@ -2159,9 +2233,9 @@ module.exports = async (req, res) => {
         try {
             await sb('/user_state', {
                 method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                headers: { 'Prefer': 'return=minimal' },
                 body: JSON.stringify({
-                    user_id: 'gpstronic_test_' + slug,
+                    user_id: `gpstronic_test_${slug}_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
                     data: clean,
                     updated_at: new Date().toISOString(),
                 }),
@@ -3958,7 +4032,7 @@ Rules:
             completedAt: r.data?.completedAt || r.updated_at,
             score: r.data?.score ?? null,
             byBand: r.data?.byBand || {},
-        }));
+        })).sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')));
         res.status(200).json({ results });
         return;
     }
