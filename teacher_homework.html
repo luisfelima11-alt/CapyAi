@@ -137,9 +137,11 @@ async function loadSubmissions() {
   </div>`;
 
   try {
-    const res = await fetch(`/api/homework?key=${encodeURIComponent(_teacherKey)}`);
-    if (res.status === 401) {
-      document.getElementById('login-err').textContent = 'Senha incorreta.';
+    const res = await fetch('/api/homework', { headers: { 'X-Admin-Key': _teacherKey }, cache: 'no-store' });
+    if (res.status === 401 || res.status === 403 || res.status === 503) {
+      document.getElementById('login-err').textContent = res.status === 503
+        ? 'Acesso de professor não configurado no servidor (TEACHER_KEY).'
+        : 'Senha incorreta.';
       document.getElementById('login-err').classList.remove('hidden');
       document.getElementById('dashboard').classList.add('hidden');
       document.getElementById('login-screen').classList.remove('hidden');

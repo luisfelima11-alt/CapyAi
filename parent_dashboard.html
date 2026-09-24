@@ -230,12 +230,17 @@ initGate();
 /* ── Dashboard Logic ───────────────────────────────────────────────────────── */
 let allAccounts = [];
 
+// Only the logged-in account is shown: the API never lists other users.
 async function loadAccounts() {
     try {
-        const res = await fetch('/api/db/accounts');
+        const res = await fetch('/api/auth/session', { cache: 'no-store' });
+        if (res.status === 401) {
+            document.getElementById('account-list').innerHTML = `<div class="text-slate-400 text-sm p-4 text-center">Entre na conta do aluno para ver o relatório.</div>`;
+            return;
+        }
         if (!res.ok) throw new Error();
         const data = await res.json();
-        allAccounts = data.accounts || [];
+        allAccounts = data && data.user ? [data.user] : [];
         renderAccountList();
     } catch(e) {
         document.getElementById('account-list').innerHTML = `<div class="text-red-400 text-sm p-4 text-center">Failed to load accounts. Try reloading.</div>`;

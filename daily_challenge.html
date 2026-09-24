@@ -412,19 +412,12 @@ async function submitAnswer() {
   document.getElementById('example-box').classList.add('hidden');
   document.getElementById('comeback-box').classList.add('hidden');
 
-  // Ask Yara to grade the answer
-  const systemPrompt = `You are Yara the capybara, a warm and encouraging English tutor for young children (age 5-8).
-The child was given this challenge: "${challenge.instruction}"
-Their answer was: "${answer}"
-In exactly 2 sentences: give warm, encouraging feedback and gently correct any mistakes.
-Then on a new line write: STARS:X where X is 1, 2, or 3 (3=excellent, 2=good, 1=needs improvement).
-Be kind and use simple words.`;
-
+  // Ask Yara to grade the answer (grading prompt lives on the server)
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: answer, history: [], systemOverride: systemPrompt })
+      body: JSON.stringify({ mode: 'challenge-grade', message: answer, context: { instruction: challenge.instruction || '' } })
     });
     const data = await res.json();
     const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text

@@ -231,40 +231,24 @@
     isLoading = true;
     const typingEl = addMsg('yara typing', IS_FR ? 'Yara réfléchit…' : 'Yara is thinking…');
 
-    // Build context-aware system prompt
+    // Page context goes to the server, which owns Yara's prompt (mode: 'lesson').
     const pageCtx = collectContext();
-    const baseLang = IS_FR ? 'French' : 'English';
-    const systemPrompt = `You are Yara, a friendly capybara who is an expert ${baseLang} language tutor.
-The student is on this lesson page. Here is the current page context:
----
-${pageCtx}
----
-Rules:
-- Be warm, encouraging and concise (2-4 sentences max per reply).
-- If the student asks you to check their writing, look at "Student wrote" in the context above and give specific feedback.
-- Correct mistakes gently with the right form shown clearly.
-- Use 1-2 relevant emojis.
-- Always respond in the same language the student used (English or Portuguese for explanations, ${baseLang} for examples/corrections).
-- If they ask about something not visible in context, ask them to paste their text.`;
-
-    // Get userId from session
-    let userId = 'guest';
-    try { userId = JSON.parse(localStorage.getItem('capySession') || '{}').id || 'guest'; } catch(e) {}
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          mode: 'lesson',
           message: text,
           history,
-          systemOverride: systemPrompt,
-          userId,
+          context: { page: pageCtx, lang: LANG },
         }),
       });
       const data = await res.json();
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
         || data?.error?.message
+        || data?.message
         || (IS_FR ? 'Désolée, une erreur s\'est produite.' : 'Sorry, something went wrong.');
 
       typingEl.classList.remove('typing');

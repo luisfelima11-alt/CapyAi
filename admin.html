@@ -144,8 +144,9 @@ async function loadStats() {
   if (!key) { showStatus('Digite a admin key acima.', 'warn'); return; }
   localStorage.setItem(KEY_STORAGE, key);
   try {
-    const r = await fetch('/api/admin/stats?key=' + encodeURIComponent(key));
+    const r = await fetch('/api/admin/stats', { headers: { 'X-Admin-Key': key }, cache: 'no-store' });
     if (r.status === 403) { showStatus('Key inválida. Verifique TEACHER_KEY.', 'error'); refreshBtn.disabled = true; return; }
+    if (r.status === 503) { showStatus('TEACHER_KEY não configurada no servidor (mínimo 8 caracteres).', 'error'); refreshBtn.disabled = true; return; }
     if (r.status === 404) { showStatus('Endpoint /api/admin/stats não encontrado. Backend ainda não deployado.', 'warn'); refreshBtn.disabled = true; return; }
     if (!r.ok) { showStatus('Erro ' + r.status + ' ao buscar stats.', 'error'); return; }
     data = await r.json();

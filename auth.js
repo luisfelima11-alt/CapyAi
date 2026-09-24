@@ -1,46 +1,67 @@
 /**
- * auth.js — Capy Yara Adventures
- * Lightweight localStorage-based auth. Not production security — prototype only.
+ * auth.js — Capy English
+ * The real session is an HttpOnly cookie set by the server (/api/auth/*).
+ * localStorage.capySession only caches {id, name, email, avatar} for display.
  */
 const Auth = {
-    USERS_KEY:   'capyUsers',
     SESSION_KEY: 'capySession',
 
     /* ── helpers ─────────────────────────────────────── */
-    async _getUsers() {
+    async _post(path, body) {
         try {
-            const res = await fetch('/api/db/accounts');
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem(this.USERS_KEY, JSON.stringify(data.accounts));
-                return data.accounts;
-            }
-        } catch(e) {}
-        return JSON.parse(localStorage.getItem(this.USERS_KEY) || '[]');
-    },
-    async _saveUsers(u) {
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(u));
-        try {
-            await fetch('/api/db/accounts', {
+            const res = await fetch(path, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ accounts: u })
+                body: JSON.stringify(body || {}),
             });
-        } catch(e) {}
+            let data = {};
+            try { data = await res.json(); } catch (e) {}
+            return { ok: res.ok, status: res.status, data: data || {} };
+        } catch (e) {
+            return { ok: false, status: 0, data: { message: 'Sem conexão. Verifique sua internet e tente de novo.' } };
+        }
     },
-    _encode(pw)       { return btoa(unescape(encodeURIComponent(pw)));                        },
 
     /* ── session ─────────────────────────────────────── */
-    getSession()      { return JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null'); },
-    isLoggedIn()      { return !!this.getSession();                                           },
+    getSession() {
+        try { return JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null'); } catch (e) { return null; }
+    },
+    isLoggedIn()      { return !!this.getSession(); },
 
     saveSession(user) {
         const s = { id: user.id, name: user.name, email: user.email, avatar: user.avatar };
         localStorage.setItem(this.SESSION_KEY, JSON.stringify(s));
+        try { sessionStorage.setItem('capySessOk', user.id); } catch (e) {}
     },
 
-    logout() {
-        localStorage.removeItem(this.SESSION_KEY);
+    // Removes everything this device knows about the current user.
+    clearLocal(userId) {
+        try {
+            localStorage.removeItem(this.SESSION_KEY);
+            localStorage.removeItem('capyPlanSyncedAt');
+            localStorage.removeItem('capyYaraState');
+            if (userId && userId !== 'guest') localStorage.removeItem('capyYaraState_' + userId);
+            sessionStorage.removeItem('capySessOk');
+        } catch (e) {}
+    },
+
+    // The server no longer accepts this device's session (expired, logged out
+    // elsewhere, or created before the security update): ask to log in again.
+    // Local progress is kept; it is refreshed from the server after login.
+    sessionExpired() {
+        try {
+            localStorage.removeItem(this.SESSION_KEY);
+            localStorage.removeItem('capyPlanSyncedAt');
+            sessionStorage.removeItem('capySessOk');
+        } catch (e) {}
+        window.location.href = '4_Login_Capy_Yara_Welcomes_You.html?reason=session';
+    },
+
+    async logout() {
+        const s = this.getSession();
+        try { if (window.Store && Store._flush) Store._flush(true); } catch (e) {}
+        try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+        this.clearLocal(s && s.id);
         window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
     },
 
@@ -55,28 +76,18 @@ const Auth = {
 
     /* ── sign up ─────────────────────────────────────── */
     async signUp(name, email, password, avatar = '🐾') {
-        const users = await this._getUsers();
-        const norm  = email.toLowerCase().trim();
-
         if (!name || name.trim().length < 2)
-            return { ok: false, field: 'name', error: 'Name must be at least 2 characters.' };
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm))
-            return { ok: false, field: 'email', error: 'Please enter a valid email address.' };
-        if (password.length < 6)
-            return { ok: false, field: 'password', error: 'Password must be at least 6 characters.' };
-        if (users.find(u => u.email === norm))
-            return { ok: false, field: 'email', error: 'An account with that email already exists.' };
+            return { ok: false, field: 'name', error: 'O nome precisa ter pelo menos 2 letras.' };
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim()))
+            return { ok: false, field: 'email', error: 'Digite um e-mail válido.' };
+        if (!password || password.length < 8)
+            return { ok: false, field: 'password', error: 'A senha precisa ter pelo menos 8 caracteres.' };
 
-        const user = {
-            id:        Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            name:      name.trim(),
-            email:     norm,
-            password:  this._encode(password),
-            avatar,
-            createdAt: new Date().toISOString(),
-        };
-        users.push(user);
-        await this._saveUsers(users);
+        const r = await this._post('/api/auth/signup', { name, email, password, avatar });
+        if (!r.ok) {
+            return { ok: false, field: r.data.field || 'email', error: r.data.message || 'Não foi possível criar sua conta agora.' };
+        }
+        const user = r.data.user;
         this.saveSession(user);
 
         // Seed a fresh Store state for this user
@@ -93,45 +104,60 @@ const Auth = {
 
     /* ── login ───────────────────────────────────────── */
     async login(email, password) {
-        const users = await this._getUsers();
-        const norm  = email.toLowerCase().trim();
-        const user  = users.find(u => u.email === norm);
+        const r = await this._post('/api/auth/login', { email, password });
+        if (!r.ok) {
+            return {
+                ok: false,
+                code: r.data.error,
+                field: r.data.field || 'password',
+                error: r.data.message || 'E-mail ou senha incorretos.',
+            };
+        }
+        this.saveSession(r.data.user);
+        await this.loadRemoteState(r.data.user.id);
+        return { ok: true, user: r.data.user };
+    },
 
-        if (!user)
-            return { ok: false, field: 'email', error: 'No account found with that email.' };
-        if (user.password !== this._encode(password))
-            return { ok: false, field: 'password', error: 'Incorrect password. Try again.' };
-
-        this.saveSession(user);
-        return { ok: true, user };
+    // Copies the progress saved on the server to this device. Call right after
+    // login, before any page runs Store.save(), so nothing overwrites it.
+    async loadRemoteState(userId) {
+        try {
+            const res = await fetch('/api/db?type=state', { cache: 'no-store' });
+            if (!res.ok) return false;
+            const data = await res.json();
+            if (data && typeof data === 'object') {
+                localStorage.setItem('capyYaraState_' + userId, JSON.stringify(data));
+            }
+            return true;
+        } catch (e) { return false; }
     },
 
     /* guest session (no account needed) */
     continueAsGuest() {
         const guest = { id: 'guest', name: 'Explorer', email: '', avatar: '🌿' };
-        this.saveSession(guest);
+        localStorage.setItem(this.SESSION_KEY, JSON.stringify(guest));
     },
 
     /* ── Profile / Onboarding ────────────────────────── */
 
-    /** Fetch user profile from Supabase. Returns null for guests or on error. */
+    /** Fetch the logged-in user's profile. Returns null for guests or on error. */
     async fetchProfile(userId) {
         if (!userId || userId === 'guest') return null;
         try {
-            const res = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`);
+            const res = await fetch('/api/profile', { cache: 'no-store' });
             if (res.ok) return await res.json();
         } catch(e) {}
         return null;
     },
 
-    /** Save (upsert) user profile to Supabase. */
+    /** Save (upsert) the logged-in user's profile. */
     async saveProfile(userId, profileData) {
         if (!userId || userId === 'guest') return false;
         try {
             const res = await fetch('/api/profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, ...profileData })
+                body: JSON.stringify(profileData)
             });
             return res.ok;
         } catch(e) {}
@@ -147,7 +173,13 @@ const Auth = {
     async checkOnboarding() {
         const session = this.getSession();
         if (!session || session.id === 'guest') return true; // guests skip onboarding
-        const profile = await this.fetchProfile(session.id);
+        let res;
+        try { res = await fetch('/api/profile', { cache: 'no-store' }); }
+        catch (e) { return true; }                          // offline: don't block the page
+        if (res.status === 401) { this.sessionExpired(); return false; }
+        if (!res.ok) return true;                           // server hiccup: don't force onboarding
+        let profile = null;
+        try { profile = await res.json(); } catch (e) {}
         if (!profile || !profile.onboarding_complete) {
             window.location.href = 'onboarding.html';
             return false;
@@ -165,3 +197,9 @@ const Auth = {
         return true;
     },
 };
+
+// Pages check `window.Auth`; a top-level const is not a window property.
+window.Auth = Auth;
+
+// Old versions cached every account (including passwords) on the device.
+try { localStorage.removeItem('capyUsers'); } catch (e) {}

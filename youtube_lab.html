@@ -505,32 +505,27 @@ async function sendChat() {
   addTypingIndicator();
 
   try {
-    const session = Auth.getSession();
-    const systemPrompt = `You are Yara, a friendly capybara English teacher. The student just watched a YouTube video.
-Video summary: "${labData?.summary || 'a YouTube video'}"
-Key vocabulary covered: ${(labData?.vocabulary||[]).map(v=>v.word).join(', ')}
-
-Rules:
-- Keep replies to 2-3 sentences.
-- Discuss the video content, help with vocabulary, correct grammar gently.
-- Always end with a question to keep the conversation going.
-- Be warm, encouraging, and use 1-2 emojis.`;
-
+    // Yara's prompt lives on the server (mode: 'youtube'); we only send the video data.
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        mode: 'youtube',
         history: chatHistory.slice(0, -1),
         message: msg,
-        systemOverride: systemPrompt,
-        userId: session?.id
+        context: {
+          summary: labData?.summary || '',
+          vocabulary: (labData?.vocabulary || []).map(v => v.word),
+        },
       })
     });
 
     document.getElementById('typing-indicator')?.remove();
 
     const data = await res.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Hmm, let me think about that! 🤔 Can you tell me more about what you liked in the video?";
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      || (res.status === 429 && data?.message)
+      || "Hmm, let me think about that! 🤔 Can you tell me more about what you liked in the video?";
 
     addChatBubble('yara', reply);
     chatHistory.push({ role: 'model', text: reply });

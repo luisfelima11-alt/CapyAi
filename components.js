@@ -1,4 +1,20 @@
 const Components = {
+    // Ends the session on the server (HttpOnly cookie) and on this device.
+    async logout() {
+        try { if (window.Auth && Auth.logout) { await Auth.logout(); return; } } catch (e) {}
+        try { if (window.Store && Store._flush) Store._flush(true); } catch (e) {}
+        try { await fetch('/api/auth/logout', { method: 'POST', keepalive: true }); } catch (e) {}
+        try {
+            const s = JSON.parse(localStorage.getItem('capySession') || 'null');
+            localStorage.removeItem('capySession');
+            localStorage.removeItem('capyPlanSyncedAt');
+            localStorage.removeItem('capyYaraState');
+            if (s && s.id && s.id !== 'guest') localStorage.removeItem('capyYaraState_' + s.id);
+            sessionStorage.removeItem('capySessOk');
+        } catch (e) {}
+        window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
+    },
+
     applyDarkMode() {
         try {
             const s = JSON.parse(localStorage.getItem('capySettings') || '{}');
@@ -67,7 +83,7 @@ const Components = {
                                 <span class="material-symbols-outlined text-slate-400 text-base">settings</span> Settings
                             </a>
                             <div class="border-t border-slate-100 dark:border-slate-800">
-                                <button onclick="(function(){ try{ var a=window.Auth||null; if(a){ a.logout(); } else { localStorage.removeItem('capySession'); window.location.href='4_Login_Capy_Yara_Welcomes_You.html'; } }catch(e){ localStorage.removeItem('capySession'); window.location.href='4_Login_Capy_Yara_Welcomes_You.html'; } })()"
+                                <button onclick="Components.logout()"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-sm transition-colors text-left">
                                     <span class="material-symbols-outlined text-base">logout</span> Sign Out
                                 </button>

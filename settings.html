@@ -456,13 +456,8 @@ function verifyParentSubmit() {
 function resetProgress() {
   openParentGate(() => {
     if (!confirm('Are you sure? All XP, badges, and streaks will be lost! 😢')) return;
-    const sess = Auth.getSession();
-    localStorage.removeItem('capyYaraState');
-    if (sess && sess.id !== 'guest') {
-      localStorage.removeItem('capyYaraState_' + sess.id);
-    }
     localStorage.removeItem('capyWotd');
-    Store.init();
+    Store.resetProgress();   // also resets the copy saved on the server
     alert('Progress reset! Starting fresh 🌿');
     window.location.href = '6_Home_Forest_Expedition.html';
   });

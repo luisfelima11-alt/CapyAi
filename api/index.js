@@ -1,5 +1,8 @@
-const https = require('https');
+const https  = require('https');
 const crypto = require('crypto');
+const { sb, sbRequest, sbRows } = require('./_lib/supabase');
+const session = require('./_lib/session');
+const { buildChat, clip, clipList, cleanHistory } = require('./_lib/prompts');
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
 // Product IDs from Kiwify dashboard URLs (.../products/edit/<UUID>).
@@ -35,71 +38,172 @@ function isAnnualSubscription(payload) {
     return /anual|annual|yearly|ano(?!\w)|year/i.test(candidates);
 }
 
-// Read raw body (needed for HMAC validation — readBody() parses JSON).
-function readRawBody(req) {
+// ── Small helpers ───────────────────────────────────────────────────────────
+const nowIso = () => new Date().toISOString();
+const enc = encodeURIComponent;
+
+function escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Plain text for names/avatars: strips characters that could become HTML.
+function cleanText(v, max) {
+    return clip(String(v == null ? '' : v).replace(/[<>"'`&]/g, '').trim(), max);
+}
+
+function normEmail(email) { return String(email || '').toLowerCase().trim(); }
+function isValidEmail(email) { return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+function publicUser(acc) {
+    return { id: acc.id, name: acc.name, email: acc.email, avatar: acc.avatar || '🐾' };
+}
+
+// "YYYY-MM-DD" in Brazil time — daily limits and daily content flip at 00:00 BRT.
+function todayBRT() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+}
+
+function secondsUntilBrtMidnight() {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0)); // 00:00 BRT = 03:00 UTC
+    if (next <= now) next.setUTCDate(next.getUTCDate() + 1);
+    return Math.ceil((next - now) / 1000);
+}
+
+// Read raw body with a size cap (returns null if the cap is exceeded).
+function readRawBody(req, maxBytes = 256 * 1024) {
     return new Promise((resolve, reject) => {
-        let chunks = [];
-        req.on('data', c => chunks.push(Buffer.from(c)));
-        req.on('end',  () => resolve(Buffer.concat(chunks).toString('utf8')));
+        const chunks = [];
+        let size = 0;
+        let overflow = false;
+        req.on('data', c => {
+            if (overflow) return;
+            size += c.length;
+            if (size > maxBytes) { overflow = true; chunks.length = 0; return; }
+            chunks.push(Buffer.from(c));
+        });
+        req.on('end',  () => resolve(overflow ? null : Buffer.concat(chunks).toString('utf8')));
         req.on('error', reject);
     });
 }
 
+async function readBody(req, maxBytes) {
+    let raw = null;
+    try { raw = await readRawBody(req, maxBytes); } catch (e) { return {}; }
+    if (!raw) return {};
+    try {
+        const v = JSON.parse(raw);
+        return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+    } catch (e) { return {}; }
+}
+
+function clientIp(req) {
+    const xff = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    return xff || String(req.headers['x-real-ip'] || '') || (req.socket && req.socket.remoteAddress) || 'unknown';
+}
+
+// ── Allowed origins (CSRF defense for cookie-authenticated POSTs) ──────────
+function isAllowedOrigin(origin) {
+    if (!origin) return true; // same-origin navigations / non-browser clients
+    let u;
+    try { u = new URL(origin); } catch (e) { return false; }
+    const host = u.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return true;
+    if (u.protocol !== 'https:') return false;
+    if (host === 'capyenglish.com.br' || host === 'www.capyenglish.com.br') return true;
+    if (/^capy-yara-adventures[a-z0-9-]*\.vercel\.app$/.test(host)) return true;
+    const extra = [
+        process.env.APP_URL,
+        process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+        process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
+        process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
+        ...(process.env.ALLOWED_ORIGINS || '').split(','),
+    ].map(s => (s || '').trim()).filter(Boolean);
+    return extra.some(o => { try { return new URL(o).origin === u.origin; } catch (e) { return false; } });
+}
+
+// ── Admin / teacher key (header X-Admin-Key, never a default) ──────────────
+function adminAuth(req) {
+    const expected = process.env.TEACHER_KEY || '';
+    if (expected.length < 8) return 'not_configured';
+    const given = String(req.headers['x-admin-key'] || '');
+    return given && session.safeEqual(given, expected) ? 'ok' : 'forbidden';
+}
+
+function rejectAdmin(res, status) {
+    if (status === 'not_configured') res.status(503).json({ error: 'admin_not_configured', message: 'Configure TEACHER_KEY (8+ caracteres) nas variáveis de ambiente.' });
+    else res.status(403).json({ error: 'forbidden' });
+}
+
 // ── Rate limiting ───────────────────────────────────────────────────────────
+// Daily quotas (reset 00:00 BRT). `guest` = no session (counted per IP).
 const RATE_LIMITS = {
-    chat:         { free:  20, pro: 200, super: 500 },  // per day
-    music:        { free:   3, pro:  50, super: 150 },
-    'study-plan': { free:   2, pro:  20, super:  60 },
-    personalize:  { free:   2, pro:  30, super:  90 },
-    youtube:      { free:   3, pro:  30, super:  90 },
-    lyrics:       { free:  10, pro: 100, super: 300 },
-    tts:          { free: 200, pro:1000, super:2000 },
-    'magic-link': { free:   5, pro:  10, super:  20 },  // per IP/email per day (abuse prevention)
+    chat:         { guest:  10, free:  20, pro: 200, super: 500 },
+    'ai-gen':     { guest:  15, free:  40, pro: 200, super: 500 },  // quiz, translate, story, flashcards, dialogue, reports
+    daily:        { guest:  10, free:  10, pro:  20, super:  20 },  // word-of-day / daily-challenge (cache miss only)
+    music:        { guest:   1, free:   3, pro:  50, super: 150 },
+    'study-plan': { guest:   1, free:   2, pro:  20, super:  60 },
+    personalize:  { guest:   1, free:   2, pro:  30, super:  90 },
+    youtube:      { guest:   1, free:   3, pro:  30, super:  90 },
+    lyrics:       { guest:  10, free:  10, pro: 100, super: 300 },
+    tts:          { guest: 300, free: 300, pro:1000, super:2000 },
+    'magic-link': { guest:   5, free:   5, pro:   5, super:   5 },  // per IP
+    'magic-link-email': { guest: 5 },                                // per e-mail address
+    signup:       { guest:  10 },                                    // per IP
+    login:        { guest:  30 },                                    // per IP
+    'login-email':{ guest:  15 },                                    // per e-mail address
+    password:     { guest:  10, free:  10, pro:  10, super:  10 },
 };
 
 async function getUserPlan(userId) {
-    if (!userId) return 'free';
-    const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=plan,plan_expires_at`);
-    const row = rows?.[0];
+    if (!userId) return 'guest';
+    const rows = await sbRows(`/user_profiles?id=eq.${enc(userId)}&select=plan,plan_expires_at`);
+    const row = rows[0];
     if (!row) return 'free';
     if (row.plan_expires_at && new Date(row.plan_expires_at) < new Date()) return 'free';
     return (row.plan === 'pro' || row.plan === 'super') ? row.plan : 'free';
 }
 
-async function checkRateLimit(req, key, userId) {
-    const today = new Date().toISOString().slice(0, 10);
-    const ipHdr = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-    const ip = String(ipHdr).split(',')[0].trim();
-    const identity = userId ? ('u:' + userId) : ('ip:' + ip);
-    const bucket = `${identity}|${key}|${today}`;
-    const plan = await getUserPlan(userId);
-    const limit = (RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10;
+// identity: explicit bucket owner (e.g. 'e:<email>'); default = user or IP.
+async function checkRateLimit(req, key, userId, identity) {
+    const today = todayBRT();
+    const who = identity || (userId ? ('u:' + userId) : ('ip:' + clientIp(req)));
+    const bucket = `${who}|${key}|${today}`;
+    const plan = identity ? 'guest' : await getUserPlan(userId);
+    const table = RATE_LIMITS[key] || RATE_LIMITS.chat;
+    const limit = table[plan] ?? table.free ?? table.guest ?? 10;
 
-    const existing = await sb(`/rate_limit_log?bucket=eq.${encodeURIComponent(bucket)}&select=count`);
-    const used = existing?.[0]?.count || 0;
+    const existing = await sbRows(`/rate_limit_log?bucket=eq.${enc(bucket)}&select=count`);
+    const used = existing[0]?.count || 0;
     if (used >= limit) {
-        const now = new Date();
-        const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-        return { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used, plan };
+        return { ok: false, retryAfter: secondsUntilBrtMidnight(), limit, used, plan, key };
     }
     await sb('/rate_limit_log', {
         method: 'POST',
         headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-        body: JSON.stringify({ bucket, count: used + 1, updated_at: new Date().toISOString() }),
+        body: JSON.stringify({ bucket, count: used + 1, updated_at: nowIso() }),
     });
-    return { ok: true, limit, used: used + 1, plan };
+    return { ok: true, limit, used: used + 1, plan, key };
 }
+
+const AUTH_LIMIT_KEYS = new Set(['signup', 'login', 'login-email', 'magic-link', 'magic-link-email', 'password']);
 
 function rateLimitedResponse(res, info) {
     res.setHeader('Retry-After', String(info.retryAfter));
     res.setHeader('X-RateLimit-Limit', String(info.limit));
     res.setHeader('X-RateLimit-Used',  String(info.used));
     res.setHeader('X-RateLimit-Plan',  info.plan);
+    const message = AUTH_LIMIT_KEYS.has(info.key)
+        ? 'Muitas tentativas por hoje. Tente novamente mais tarde.'
+        : info.plan === 'guest'
+            ? 'Limite diário para visitantes atingido. Crie sua conta grátis para continuar.'
+            : info.plan === 'free'
+                ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
+                : 'Limite diário do seu plano atingido. Tente novamente amanhã.';
     res.status(429).json({
-        error: 'rate_limited',
-        message: info.plan === 'free'
-            ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
-            : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
+        error: 'rate_limited', message,
         limit: info.limit, used: info.used, plan: info.plan, retryAfter: info.retryAfter,
     });
 }
@@ -124,8 +228,8 @@ async function persistMetrics() {
     });
     for (const row of snapshot) {
         try {
-            const existing = await sb(`/api_metrics_daily?day=eq.${row.day}&endpoint=eq.${encodeURIComponent(row.endpoint)}&select=*`);
-            const prev = existing?.[0];
+            const existing = await sbRows(`/api_metrics_daily?day=eq.${row.day}&endpoint=eq.${enc(row.endpoint)}&select=*`);
+            const prev = existing[0];
             const merged = prev ? {
                 day: row.day, endpoint: row.endpoint,
                 requests: prev.requests + row.requests,
@@ -142,84 +246,156 @@ async function persistMetrics() {
     Object.keys(_metrics).forEach(k => delete _metrics[k]);
 }
 
-// ── Supabase ──────────────────────────────────────────────────────────────────
-const SB_URL = process.env.SUPABASE_URL;   // https://xxxx.supabase.co
-const SB_KEY = process.env.SUPABASE_KEY;   // service role key (server-side only)
-
-async function sb(path, opts = {}) {
-  if (!SB_URL || !SB_KEY) return null;
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1${path}`, {
-      ...opts,
-      headers: {
-        'apikey':        SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
-        'Content-Type':  'application/json',
-        ...(opts.headers || {}),
-      },
-    });
-    if (r.status === 204) return null;
-    const text = await r.text();
-    return text ? JSON.parse(text) : null;
-  } catch (e) { return null; }
-}
-
+// ── OpenAI ────────────────────────────────────────────────────────────────────
 const API_KEY = process.env.OPENAI_API_KEY;
 const MODEL   = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const AI_UNAVAILABLE = 'A Yara está indisponível no momento. Tente de novo em instantes.';
 
-function callOpenAI(messages, maxTokens, temperature, res) {
-    if (!API_KEY) {
-        res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
-        return;
-    }
-    const postData = JSON.stringify({ model: MODEL, messages, max_tokens: maxTokens, temperature });
-    const options = {
-        hostname: 'api.openai.com',
-        path:     '/v1/chat/completions',
-        method:   'POST',
-        headers: {
-            'Content-Type':   'application/json',
-            'Authorization':  `Bearer ${API_KEY}`,
-            'Content-Length': Buffer.byteLength(postData)
-        }
-    };
-    const apiReq = https.request(options, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Content-Type', 'application/json');
-            if (apiRes.statusCode !== 200) {
-                let errBody; try { errBody = JSON.parse(data); } catch { errBody = { error: { message: data } }; }
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: errBody?.error?.message || data } }));
-                return;
-            }
-            try {
-                const parsed = JSON.parse(data);
-                const text = parsed?.choices?.[0]?.message?.content || '';
-                res.status(200).end(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
-            } catch(e) {
-                res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Failed to parse OpenAI response' } }));
-            }
+// Resolves to { ok:true, text } or { ok:false, status, error } — never rejects.
+function openaiChat({ messages, maxTokens, temperature, json, timeoutMs = 25000 }) {
+    return new Promise(resolve => {
+        if (!API_KEY) return resolve({ ok: false, status: 503, error: 'AI features require OPENAI_API_KEY.' });
+        const payload = { model: MODEL, messages, max_tokens: maxTokens, temperature };
+        if (json) payload.response_format = { type: 'json_object' };
+        const postData = JSON.stringify(payload);
+        let settled = false;
+        const finish = r => { if (!settled) { settled = true; resolve(r); } };
+        const apiReq = https.request({
+            hostname: 'api.openai.com',
+            path:     '/v1/chat/completions',
+            method:   'POST',
+            headers: {
+                'Content-Type':   'application/json',
+                'Authorization':  `Bearer ${API_KEY}`,
+                'Content-Length': Buffer.byteLength(postData),
+            },
+        }, apiRes => {
+            let data = '';
+            apiRes.on('data', chunk => data += chunk);
+            apiRes.on('end', () => {
+                if (apiRes.statusCode !== 200) {
+                    let msg = data;
+                    try { msg = JSON.parse(data)?.error?.message || data; } catch (e) {}
+                    console.error('[openai]', apiRes.statusCode, String(msg).slice(0, 200));
+                    finish({ ok: false, status: 502, error: 'upstream_error' });
+                    return;
+                }
+                try { finish({ ok: true, text: JSON.parse(data)?.choices?.[0]?.message?.content || '' }); }
+                catch (e) { finish({ ok: false, status: 502, error: 'Failed to parse OpenAI response' }); }
+            });
         });
+        apiReq.setTimeout(timeoutMs, () => apiReq.destroy(new Error('timeout')));
+        apiReq.on('error', err => {
+            console.error('[openai]', err.message);
+            finish({ ok: false, status: err.message === 'timeout' ? 504 : 502, error: err.message });
+        });
+        apiReq.write(postData);
+        apiReq.end();
     });
-    apiReq.on('error', err => { res.status(500).end(JSON.stringify({ error: { code: 500, message: err.message } })); });
-    apiReq.write(postData);
-    apiReq.end();
 }
 
-function readBody(req) {
-    return new Promise((resolve, reject) => {
-        let body = '';
-        req.on('data', c => body += c);
-        req.on('end', () => { try { resolve(JSON.parse(body)); } catch(e) { resolve({}); } });
-        req.on('error', reject);
+// Chat-style endpoints reply with the legacy Gemini-shaped envelope that all
+// client parsers expect: { candidates:[{ content:{ parts:[{ text }] } }] }.
+async function callOpenAI(messages, maxTokens, temperature, res, opts = {}) {
+    const r = await openaiChat({ messages, maxTokens, temperature, json: opts.json });
+    if (!r.ok) {
+        const message = r.status === 503 ? 'AI features require OPENAI_API_KEY.' : AI_UNAVAILABLE;
+        res.status(r.status).json({ error: { code: r.status, message } });
+        return;
+    }
+    res.status(200).json({ candidates: [{ content: { parts: [{ text: r.text }] } }] });
+}
+
+// JSON-generating endpoints (YouTube Lab, personalize, study plan, music).
+async function sendOpenAIJson(res, prompt, { maxTokens, temperature, errorMessage, extra }) {
+    const r = await openaiChat({ messages: [{ role: 'user', content: prompt }], maxTokens, temperature, json: true, timeoutMs: 45000 });
+    if (!r.ok) {
+        res.status(r.status).json({ error: r.status === 503 ? 'AI features require OPENAI_API_KEY.' : 'Erro de conexão com a IA.' });
+        return;
+    }
+    try { res.status(200).json({ ...(extra || {}), ...JSON.parse(r.text || '{}') }); }
+    catch (e) { res.status(502).json({ error: errorMessage }); }
+}
+
+// Daily content: one generation per day per warm instance, same for everyone.
+const _dailyCache = {};
+async function sendDailyContent(req, res, key, prompt, maxTokens, temperature, userId) {
+    const day = todayBRT();
+    const hit = _dailyCache[key];
+    if (hit && hit.day === day) { res.status(200).json(hit.body); return; }
+    const _rl = await checkRateLimit(req, 'daily', userId);
+    if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+    const r = await openaiChat({ messages: [{ role: 'user', content: prompt(day) }], maxTokens, temperature });
+    if (!r.ok) {
+        res.status(r.status).json({ error: { code: r.status, message: r.status === 503 ? 'AI features require OPENAI_API_KEY.' : AI_UNAVAILABLE } });
+        return;
+    }
+    const body = { candidates: [{ content: { parts: [{ text: r.text }] } }] };
+    _dailyCache[key] = { day, body };
+    res.status(200).json(body);
+}
+
+// ── Profile fields a user may edit (plan/billing fields are server-only) ────
+const PROFILE_FIELDS = {
+    english_level:       v => (typeof v === 'string' ? clip(v, 20) : null),
+    goals:               v => clipList(v, 10, 40),
+    interests:           v => clipList(v, 12, 40),
+    interests_detail:    v => (v == null ? null : clip(v, 300)),
+    daily_goal_minutes:  v => { const n = Number(v); return Number.isFinite(n) && n >= 1 && n <= 120 ? Math.round(n) : 10; },
+    onboarding_complete: v => !!v,
+};
+
+function pickProfile(body) {
+    const out = {};
+    Object.keys(PROFILE_FIELDS).forEach(k => {
+        if (Object.prototype.hasOwnProperty.call(body, k)) out[k] = PROFILE_FIELDS[k](body[k]);
     });
+    return out;
+}
+
+async function sendMagicLinkEmail({ to, userName, verifyUrl }) {
+    const html = `<!DOCTYPE html><html lang="pt-BR"><body style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;margin:0">
+<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,.06)">
+  <div style="text-align:center;font-size:48px;margin-bottom:8px">🦫</div>
+  <h1 style="color:#001f3f;font-weight:900;font-size:22px;margin:0 0 12px;text-align:center">Seu link de acesso</h1>
+  <p style="font-size:15px;color:#475569;line-height:1.6;text-align:center;margin:0 0 24px">Olá, <strong>${escapeHtml(userName)}</strong>! Clique no botão abaixo para entrar na Capy English. O link expira em 15 minutos.</p>
+  <div style="text-align:center;margin:28px 0">
+    <a href="${escapeHtml(verifyUrl)}" style="display:inline-block;background:linear-gradient(135deg,#FF9F1C,#fb923c);color:#fff;font-weight:900;padding:15px 32px;border-radius:14px;text-decoration:none;font-size:15px;box-shadow:0 8px 20px rgba(249,115,22,.3)">⚡ Entrar agora</a>
+  </div>
+  <p style="font-size:12px;color:#94a3b8;line-height:1.6;text-align:center;margin:24px 0 8px">Se você não solicitou esse link, é só ignorar.</p>
+  <p style="font-size:11px;color:#cbd5e1;line-height:1.5;text-align:center;word-break:break-all;margin:0">Ou copie e cole no navegador:<br>${escapeHtml(verifyUrl)}</p>
+  <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0">
+  <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">Capy English · Aprenda inglês com a Yara 🌿</p>
+</div></body></html>`;
+
+    const sendRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + process.env.RESEND_API_KEY,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            from: process.env.EMAIL_FROM || 'Capy English <onboarding@resend.dev>',
+            to: [to],
+            subject: '🦫 Seu link de acesso · Capy English',
+            html,
+        }),
+    });
+    if (!sendRes.ok) {
+        const errText = await sendRes.text();
+        console.error('[magic-link] Resend error:', sendRes.status, errText.slice(0, 300));
+        return false;
+    }
+    return true;
 }
 
 
 module.exports = async (req, res) => {
     const url = req.url.split('?')[0];
+
+    // Light identity (signature only, no DB) — used for rate limits and logs.
+    const sess    = session.readSession(req);
+    const sessUid = sess ? sess.uid : null;
 
     // ── Logging middleware ────────────────────────────────────────────────
     const _t0 = Date.now();
@@ -229,26 +405,24 @@ module.exports = async (req, res) => {
     const _logRequest = () => {
         if (res._capyLogged) return; res._capyLogged = true;
         const ms = Date.now() - _t0;
-        let user = '-';
-        try {
-            user = (new URL(req.url, 'http://localhost').searchParams.get('userId') || '').slice(0, 12) || '-';
-        } catch (e) {}
+        const user = (sessUid || '-').slice(0, 12);
         console.log(`[${new Date().toISOString()}] ${req.method} ${url} ${_capturedStatus} ${ms}ms user=${user}`);
         if (url.startsWith('/api/')) bumpMetrics(url, _capturedStatus, ms);
     };
     res.on('finish', _logRequest);
     res.on('close',  _logRequest);
 
-    // ── Kiwify webhook (must be handled BEFORE CORS / body parsing) ──────────
+    // ── Kiwify webhook (must be handled BEFORE body parsing) ─────────────────
     // POST /api/kiwify-webhook?signature=<hmac>
     // Kiwify sends order.approved, subscription.canceled, subscription.expired,
     // subscription.renewed events. Each contains Customer.email + Product info.
     // Maps Customer.email → accounts.id → user_profiles.plan.
     if (req.method === 'POST' && url === '/api/kiwify-webhook') {
         try {
-            const rawBody = await readRawBody(req);
+            const rawBody = await readRawBody(req, 1024 * 1024);
+            if (rawBody == null) { res.status(413).end('payload too large'); return; }
             const qs = new URL(req.url, 'http://localhost').searchParams;
-            const signature = qs.get('signature') || req.headers['x-kiwify-signature'] || '';
+            const signature = String(qs.get('signature') || req.headers['x-kiwify-signature'] || '');
             const secret = process.env.KIWIFY_WEBHOOK_SECRET || '';
             // Validate signature (HMAC-SHA1 per Kiwify docs)
             if (!secret) {
@@ -257,7 +431,7 @@ module.exports = async (req, res) => {
                 return;
             }
             const expected = crypto.createHmac('sha1', secret).update(rawBody).digest('hex');
-            if (signature !== expected) {
+            if (!signature || !session.safeEqual(signature, expected)) {
                 console.error('[kiwify-webhook] invalid signature');
                 res.status(401).end('invalid signature');
                 return;
@@ -267,13 +441,13 @@ module.exports = async (req, res) => {
             catch (e) { res.status(400).end('bad json'); return; }
 
             const event = payload.webhook_event_type || payload.event || '';
-            const email = (payload.Customer?.email || payload.customer?.email || '').toLowerCase().trim();
+            const email = normEmail(payload.Customer?.email || payload.customer?.email);
             const productId   = payload.Product?.product_id || payload.product_id || '';
             const productName = payload.Product?.product_name || payload.product_name || '';
             const subscriptionId = payload.Subscription?.id || payload.subscription_id
                                 || payload.order_id || payload.order_ref || null;
 
-            console.log(`[kiwify-webhook] event=${event} email=${email} product=${productName} sub=${subscriptionId}`);
+            console.log(`[kiwify-webhook] event=${event} product=${productName} sub=${subscriptionId}`);
 
             if (!email) {
                 res.status(400).end('missing customer email');
@@ -300,27 +474,25 @@ module.exports = async (req, res) => {
             }
 
             // Find user by email
-            let accountRows = await sb(`/accounts?email=eq.${encodeURIComponent(email)}&select=id,name`);
-            let userId;
-            if (accountRows && accountRows.length > 0) {
-                userId = accountRows[0].id;
-            } else {
+            const accountRows = await sbRows(`/accounts?email=eq.${enc(email)}&select=id,name`);
+            let userId = accountRows[0]?.id;
+            if (!userId) {
                 // Create pending account (user hasn't signed up yet — will claim it later via email magic link)
                 const newAccount = {
-                    name: payload.Customer?.first_name || payload.Customer?.full_name || email.split('@')[0],
+                    id: crypto.randomUUID(),
+                    name: cleanText(payload.Customer?.first_name || payload.Customer?.full_name || email.split('@')[0], 60),
                     email,
-                    password: '__pending__' + crypto.randomBytes(8).toString('hex'),
                     avatar: '🐾',
                     pending_setup: true,
-                    created_at: new Date().toISOString(),
+                    created_at: nowIso(),
                 };
-                const created = await sb('/accounts', {
+                const created = await sbRequest('/accounts', {
                     method: 'POST',
                     headers: { 'Prefer': 'return=representation' },
                     body: JSON.stringify(newAccount),
                 });
-                userId = created?.[0]?.id;
-                console.log(`[kiwify-webhook] created pending account for ${email} → ${userId}`);
+                userId = created.ok && Array.isArray(created.data) ? created.data[0]?.id : null;
+                console.log(`[kiwify-webhook] created pending account → ${userId}`);
             }
 
             if (!userId) {
@@ -338,11 +510,11 @@ module.exports = async (req, res) => {
                     plan: newPlan,
                     plan_expires_at: expiresAt,
                     kiwify_subscription_id: subscriptionId,
-                    updated_at: new Date().toISOString(),
+                    updated_at: nowIso(),
                 }),
             });
 
-            console.log(`[kiwify-webhook] ✅ ${email} → plan=${newPlan}, expires=${expiresAt}`);
+            console.log(`[kiwify-webhook] ✅ user=${userId} → plan=${newPlan}, expires=${expiresAt}`);
             res.status(200).end('ok');
             return;
         } catch (e) {
@@ -352,334 +524,451 @@ module.exports = async (req, res) => {
         }
     }
 
-    // CORS (only for non-webhook routes)
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // The app and its API share one origin: no CORS headers are sent, so other
+    // sites cannot read API responses. Cross-site POSTs are rejected outright.
     if (req.method === 'OPTIONS') { res.status(204).end(); return; }
-
-    if (req.method === 'POST' && url === '/api/chat') {
-        const { history, message, systemOverride, userId } = await readBody(req);
-        const _rl = await checkRateLimit(req, 'chat', userId);
-        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
-
-        // Fetch user profile to personalize Yara's responses
-        let profileContext = '';
-        if (userId && userId !== 'guest') {
-            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
-            const p = rows?.[0];
-            if (p) {
-                const detail = p.interests_detail ? `\n- Favorite specifics: ${p.interests_detail}` : '';
-                profileContext = `\n\nStudent profile:\n- English level: ${p.english_level || 'beginner'}\n- Learning goals: ${(p.goals || []).join(', ') || 'general'}\n- Interests: ${(p.interests || []).join(', ') || 'various'}${detail}\n- Daily study goal: ${p.daily_goal_minutes || 10} minutes\nTailor your language complexity and vocabulary to their level. When relevant, reference their specific favorites naturally in examples or conversation.`;
-            }
-        }
-
-        const basePrompt = `You are Yara, a friendly and cheerful capybara who teaches English to Brazilian students.\nRules:\n- Adapt your English level to the student's profile (default: A1 simple if unknown).\n- Keep every reply to 1-3 short sentences maximum.\n- Be warm, playful and encouraging. Use 1-2 emojis per reply.\n- If the student makes a grammar mistake, gently correct it once, then continue.\n- If the student writes in Portuguese, reply in English and kindly encourage them to try in English.\n- Never discuss anything outside English learning or friendly topics.\n- Always end with a simple question or encouragement to keep the conversation going.`;
-        const systemPrompt = systemOverride || (basePrompt + profileContext);
-        const messages = [{ role: 'system', content: systemPrompt }];
-        (history || []).forEach(m => messages.push({ role: m.role === 'model' ? 'assistant' : 'user', content: m.text }));
-        messages.push({ role: 'user', content: message });
-        callOpenAI(messages, 150, 0.85, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/quiz') {
-        const { words, deckLabel } = await readBody(req);
-        const prompt = `You are creating a fun English quiz for children aged 5-8.\nThe child just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nGenerate exactly 4 multiple-choice questions. Each has 4 options, one correct answer.\nRespond ONLY with a valid JSON array:\n[{"question":"What is this? 🍎","image_hint":"Apple","options":["Apple","River","Bird","Tree"],"correct":"Apple"}]`;
-        callOpenAI([{ role: 'user', content: prompt }], 600, 0.7, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/translate') {
-        const { word, targetLang } = await readBody(req);
-        const prompt = `Translate the English word "${word}" into ${targetLang}.\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${targetLang})."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/story') {
-        const { words, name } = await readBody(req);
-        const childName = name || 'Explorer';
-        const wordList  = (words || ['apple','tree','bird']).join(', ');
-        const prompt = `Write a short fun English story for a child named ${childName} aged 5-8.\nMUST use these words: ${wordList}.\nMax 5 sentences. Simple English. Feature capybara Yara. Happy ending. 1-2 emojis per sentence.\nRespond ONLY with valid JSON:\n{"title":"...","sentences":["..."],"moral":"..."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res); return;
-    }
-
-    if (req.method === 'GET' && url === '/api/word-of-day') {
-        const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Pick ONE interesting English word for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"word":"Butterfly","emoji":"🦋","pronunciation":"/ˈbʌt.ə.flaɪ/","partOfSpeech":"noun","simpleMeaning":"A beautiful insect with big colourful wings.","exampleSentence":"I saw a butterfly in the garden today.","funFact":"Butterflies taste with their feet!"}`;
-        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res); return;
-    }
-
-    if (req.method === 'GET' && url === '/api/daily-challenge') {
-        const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Create ONE fun English challenge for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"type":"sentence","emoji":"🦁","title":"Use a Brave Word!","instruction":"Use the word 'brave' in a sentence about an animal.","hint":"Think about what a brave animal might do.","example":"The brave lion protected its cubs.","xp":20}`;
-        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/flashcard-deck') {
-        const { topic } = await readBody(req);
-        const t = topic || 'animals';
-        const prompt = `Create 10 English vocabulary flashcards for "${t}" for children aged 5-8.\nRespond ONLY with a valid JSON array:\n[{"word":"Sun","emoji":"☀️","pronunciation":"/sʌn/","hint":"It shines in the sky","example":"The sun is bright today."}]`;
-        callOpenAI([{ role: 'user', content: prompt }], 600, 0.8, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/dialogue-scene') {
-        const { topic } = await readBody(req);
-        const t = topic || 'pets';
-        const prompt = `Create a short English grammar dialogue for children aged 5-8 about "${t}".\nRespond ONLY with valid JSON:\n{"emoji":"🐶","scene":"...","intro":"...","grammarFocus":"...","questions":[{"prompt":"___ dog is fluffy.","choices":["My","Me","I"],"answer":"My","explanation":"We use My to show the dog belongs to me."}]}\nProvide exactly 6 questions, each with 3 choices.`;
-        callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/parent-report') {
-        const { name, xp, badges, lessons, recentDate } = await readBody(req);
-        const prompt = `Act as an educational analyst for a children's language app.\nChild: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for parents celebrating effort and giving one practical offline tip.\nRespond ONLY with valid JSON:\n{"title":"Weekly Progress Report for ${name||'Your Child'}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}`;
-        callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/lesson-quiz') {
-        const { topic, vocab, level } = await readBody(req);
-        const prompt = `Create 5 multiple-choice English quiz questions about "${topic}" at ${level||'beginner'} level for children.\nVocabulary: ${(vocab||[]).join(', ')}.\nReturn ONLY valid JSON array:\n[{"q":"...","opts":["A","B","C","D"],"a":"correct option","explain":"why"}]`;
-        callOpenAI([{ role: 'user', content: prompt }], 700, 0.7, res); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/lesson-chat') {
-        const { history, message, lessonTopic, vocab } = await readBody(req);
-        const system = `You are Yara, a friendly capybara teaching English to children aged 8-12.\nLesson: "${lessonTopic}". Vocabulary: ${(vocab||[]).join(', ')}.\nRules: under 2 sentences per reply; simple English; end with a question; warm and encouraging.`;
-        const messages = [{ role: 'system', content: system }];
-        (history||[]).forEach(m => messages.push({ role: m.role==='model'?'assistant':'user', content: m.text }));
-        messages.push({ role: 'user', content: message });
-        callOpenAI(messages, 120, 0.85, res); return;
-    }
-
-    // ── DB endpoints (Supabase) ───────────────────────────────────────────────
-
-    // Leaderboard: top 20 by XP
-    if (req.method === 'GET' && url.startsWith('/api/db/leaderboard')) {
-        const [accounts, states] = await Promise.all([
-            sb('/accounts?select=id,name,avatar'),
-            sb('/user_state?select=user_id,data'),
-        ]);
-        const stateMap = {};
-        (states || []).forEach(s => { stateMap[s.user_id] = s.data || {}; });
-        const board = (accounts || []).map(a => ({
-            id: a.id, name: a.name, avatar: a.avatar || '🐾',
-            xp: stateMap[a.id]?.xp || 0,
-            badgesCount: (stateMap[a.id]?.badges || []).length,
-        })).sort((a, b) => b.xp - a.xp).slice(0, 20);
-        res.status(200).json(board); return;
-    }
-
-    // Get all accounts (auth.js login/signup flow)
-    if (req.method === 'GET' && url.startsWith('/api/db/accounts')) {
-        const rows = await sb('/accounts?select=id,name,email,password,avatar,created_at&order=created_at.asc');
-        res.status(200).json({ accounts: rows || [] }); return;
-    }
-
-    // Save accounts — auth.js sends the full array on signup; upsert handles duplicates
-    if (req.method === 'POST' && url === '/api/db/accounts') {
-        const { accounts } = await readBody(req);
-        if (accounts && accounts.length) {
-            await sb('/accounts', {
-                method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                body: JSON.stringify(accounts),
-            });
-        }
-        res.status(200).json({ success: true }); return;
-    }
-
-    // Get user progress state
-    if (req.method === 'GET' && url.startsWith('/api/db')) {
-        const qs = new URL(req.url, 'http://localhost').searchParams;
-        const type = qs.get('type'), userId = qs.get('userId');
-        if (type === 'state' && userId) {
-            const rows = await sb(`/user_state?user_id=eq.${encodeURIComponent(userId)}&select=data`);
-            res.status(200).json(rows?.[0]?.data || null);
-        } else {
-            res.status(200).json(null);
-        }
+    if (req.method === 'POST' && !isAllowedOrigin(req.headers.origin)) {
+        res.status(403).json({ error: 'forbidden_origin' });
         return;
     }
 
-    // Save user progress state
-    if (req.method === 'POST' && url === '/api/db') {
-        const { type, userId, payload } = await readBody(req);
-        if (userId && payload && type === 'state') {
-            await sb('/user_state', {
-                method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                body: JSON.stringify({
-                    user_id:    userId,
-                    data:       payload,
-                    updated_at: new Date().toISOString(),
-                }),
-            });
+    // ── Auth ─────────────────────────────────────────────────────────────────
+    if (url.startsWith('/api/auth/') && !session.isConfigured()) {
+        console.error('[auth] SESSION_SECRET not set (min 16 chars)');
+        res.status(503).json({ error: 'session_not_configured', message: 'Login temporariamente indisponível.' });
+        return;
+    }
+
+    // POST /api/auth/signup  body: { name, email, password, avatar }
+    if (req.method === 'POST' && url === '/api/auth/signup') {
+        const { name, email, password, avatar } = await readBody(req, 16 * 1024);
+        const cleanName = cleanText(name, 60);
+        const norm = normEmail(email);
+        if (cleanName.length < 2) { res.status(400).json({ error: 'invalid_name', field: 'name', message: 'O nome precisa ter pelo menos 2 letras.' }); return; }
+        if (!isValidEmail(norm)) { res.status(400).json({ error: 'invalid_email', field: 'email', message: 'Digite um e-mail válido.' }); return; }
+        if (typeof password !== 'string' || password.length < 8 || password.length > 200) {
+            res.status(400).json({ error: 'weak_password', field: 'password', message: 'A senha precisa ter pelo menos 8 caracteres.' }); return;
         }
-        res.status(200).json({ success: true }); return;
-    }
+        const _rl = await checkRateLimit(req, 'signup', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
-    // ── User Profile ──────────────────────────────────────────────────────────
-
-    // GET /api/profile?userId=xxx → returns user_profiles row
-    if (req.method === 'GET' && url.startsWith('/api/profile')) {
-        const qs = new URL(req.url, 'http://localhost').searchParams;
-        const userId = qs.get('userId');
-        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
-        const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
-        res.status(200).json(rows?.[0] || null); return;
-    }
-
-    // POST /api/profile → upserts user_profiles row
-    if (req.method === 'POST' && url === '/api/profile') {
-        const { userId, ...profileData } = await readBody(req);
-        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
-        await sb('/user_profiles', {
+        const existing = await sbRows(`/accounts?email=eq.${enc(norm)}&select=id`);
+        if (existing.length) {
+            res.status(409).json({ error: 'email_taken', field: 'email', message: 'Já existe uma conta com esse e-mail. Entre com sua senha ou receba um link por e-mail.' });
+            return;
+        }
+        const account = {
+            id: crypto.randomUUID(),
+            name: cleanName,
+            email: norm,
+            password_hash: await session.hashPassword(password),
+            avatar: cleanText(avatar, 16) || '🐾',
+            session_version: 1,
+            email_verified_at: null,
+            created_at: nowIso(),
+        };
+        const ins = await sbRequest('/accounts', {
             method: 'POST',
-            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({ id: userId, ...profileData, updated_at: new Date().toISOString() }),
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify(account),
         });
-        res.status(200).json({ success: true }); return;
+        if (!ins.ok) {
+            if (ins.status === 409) { res.status(409).json({ error: 'email_taken', field: 'email', message: 'Já existe uma conta com esse e-mail.' }); return; }
+            console.error('[auth/signup] insert failed', ins.status, JSON.stringify(ins.data || '').slice(0, 200));
+            res.status(500).json({ error: 'signup_failed', message: 'Não foi possível criar sua conta agora. Tente de novo.' });
+            return;
+        }
+        session.setSessionCookie(req, res, account.id, 1, 'signup');
+        res.status(200).json({ ok: true, user: publicUser(account) });
+        return;
     }
 
-    // ── Magic Link Auth ──────────────────────────────────────────────────────
+    // POST /api/auth/login  body: { email, password }
+    if (req.method === 'POST' && url === '/api/auth/login') {
+        const { email, password } = await readBody(req, 16 * 1024);
+        const norm = normEmail(email);
+        const invalid = { error: 'invalid_credentials', field: 'password', message: 'E-mail ou senha incorretos.' };
+        if (!isValidEmail(norm) || typeof password !== 'string' || !password || password.length > 200) {
+            res.status(400).json(invalid); return;
+        }
+        const _rlIp = await checkRateLimit(req, 'login', null);
+        if (!_rlIp.ok) { rateLimitedResponse(res, _rlIp); return; }
+        const _rlEmail = await checkRateLimit(req, 'login-email', null, 'e:' + norm);
+        if (!_rlEmail.ok) { rateLimitedResponse(res, _rlEmail); return; }
+
+        const rows = await sbRows(`/accounts?email=eq.${enc(norm)}&select=id,name,email,avatar,password_hash,session_version`);
+        const acc = rows[0];
+        if (!acc) { res.status(401).json(invalid); return; }
+        if (!acc.password_hash) {
+            // Legacy account (old base64 password was exposed) or passwordless
+            // account: must prove e-mail ownership via magic link first.
+            res.status(403).json({
+                error: 'password_reset_required', field: 'password',
+                message: 'Por segurança, enviamos o acesso por e-mail: use o link e depois crie uma nova senha.',
+            });
+            return;
+        }
+        if (!(await session.verifyPassword(password, acc.password_hash))) { res.status(401).json(invalid); return; }
+        session.setSessionCookie(req, res, acc.id, acc.session_version || 1, 'pw');
+        res.status(200).json({ ok: true, user: publicUser(acc) });
+        return;
+    }
+
+    // POST /api/auth/logout
+    if (req.method === 'POST' && url === '/api/auth/logout') {
+        session.clearSessionCookie(req, res);
+        res.status(200).json({ ok: true });
+        return;
+    }
+
+    // GET /api/auth/session → current user (or 401)
+    if (req.method === 'GET' && url === '/api/auth/session') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const extra = await sbRows(`/accounts?id=eq.${enc(acc.id)}&select=password_hash`);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ user: publicUser(acc), hasPassword: !!extra[0]?.password_hash });
+        return;
+    }
+
+    // POST /api/auth/password  body: { password, currentPassword? }
+    // currentPassword is required unless the session came from a magic link
+    // in the last 30 minutes (that is the "forgot password" flow).
+    if (req.method === 'POST' && url === '/api/auth/password') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const { password, currentPassword } = await readBody(req, 16 * 1024);
+        if (typeof password !== 'string' || password.length < 8 || password.length > 200) {
+            res.status(400).json({ error: 'weak_password', field: 'password', message: 'A senha precisa ter pelo menos 8 caracteres.' }); return;
+        }
+        const _rl = await checkRateLimit(req, 'password', acc.id);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const row = (await sbRows(`/accounts?id=eq.${enc(acc.id)}&select=password_hash,session_version`))[0] || {};
+        const recentLink = sess && sess.m === 'link' && (Date.now() / 1000 - (sess.iat || 0)) < 30 * 60;
+        if (row.password_hash && !recentLink) {
+            const okCurrent = typeof currentPassword === 'string' && await session.verifyPassword(currentPassword, row.password_hash);
+            if (!okCurrent) { res.status(401).json({ error: 'wrong_password', field: 'currentPassword', message: 'Senha atual incorreta.' }); return; }
+        }
+        const newVersion = (row.session_version || 1) + 1;   // logs out other devices
+        const upd = await sbRequest(`/accounts?id=eq.${enc(acc.id)}`, {
+            method: 'PATCH',
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ password_hash: await session.hashPassword(password), password: null, session_version: newVersion }),
+        });
+        if (!upd.ok) { res.status(500).json({ error: 'password_update_failed' }); return; }
+        session.setSessionCookie(req, res, acc.id, newVersion, 'pw');
+        res.status(200).json({ ok: true });
+        return;
+    }
+
     // POST /api/auth/magic-link  body: { email }
     // Creates account if needed, generates 15-min token, sends email via Resend.
     if (req.method === 'POST' && url === '/api/auth/magic-link') {
-        const { email } = await readBody(req);
-        const norm = (email || '').toLowerCase().trim();
-        if (!norm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) {
-            res.status(400).json({ error: 'invalid_email' }); return;
+        const { email } = await readBody(req, 16 * 1024);
+        const norm = normEmail(email);
+        if (!isValidEmail(norm)) { res.status(400).json({ error: 'invalid_email' }); return; }
+        const devMode = process.env.CAPY_DEV === '1';
+        if (!process.env.RESEND_API_KEY && !devMode) {
+            console.error('[magic-link] RESEND_API_KEY not set');
+            res.status(503).json({ error: 'email_not_configured', message: 'Envio de e-mail indisponível no momento.' });
+            return;
         }
-        // Abuse limit (5/day for free, scales with plan)
+        // Abuse limits: per IP and per destination address
         const _rl = await checkRateLimit(req, 'magic-link', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const _rlEmail = await checkRateLimit(req, 'magic-link-email', null, 'e:' + norm);
+        if (!_rlEmail.ok) { rateLimitedResponse(res, _rlEmail); return; }
 
         // Find or create account
-        const found = await sb(`/accounts?email=eq.${encodeURIComponent(norm)}&select=id,name`);
-        let userId   = found?.[0]?.id;
-        let userName = found?.[0]?.name;
+        const found = await sbRows(`/accounts?email=eq.${enc(norm)}&select=id,name`);
+        let userId   = found[0]?.id;
+        let userName = found[0]?.name;
         let isNewUser = false;
         if (!userId) {
-            userId   = 'magic-' + crypto.randomBytes(8).toString('hex');
-            userName = norm.split('@')[0];
-            await sb('/accounts', {
+            userId   = crypto.randomUUID();
+            userName = cleanText(norm.split('@')[0], 60) || 'Explorer';
+            const created = await sbRequest('/accounts', {
                 method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                headers: { 'Prefer': 'return=minimal' },
                 body: JSON.stringify({
                     id: userId, name: userName, email: norm,
-                    password: '__magic__' + crypto.randomBytes(8).toString('hex'),
-                    avatar: '🐾', pending_setup: false,
-                    created_at: new Date().toISOString(),
+                    avatar: '🐾', pending_setup: false, session_version: 1,
+                    created_at: nowIso(),
                 }),
             });
+            if (!created.ok) {
+                console.error('[magic-link] account insert failed', created.status);
+                res.status(500).json({ error: 'account_create_failed' }); return;
+            }
             isNewUser = true;
         }
 
         // Generate token (15-min expiry)
         const token = crypto.randomBytes(24).toString('base64url');
         const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-        await sb('/magic_link_tokens', {
+        const saved = await sbRequest('/magic_link_tokens', {
             method: 'POST',
             headers: { 'Prefer': 'return=minimal' },
             body: JSON.stringify({ token, email: norm, user_id: userId, expires_at: expiresAt }),
         });
+        if (!saved.ok) { res.status(500).json({ error: 'token_save_failed' }); return; }
 
-        const verifyUrl = `https://www.capyenglish.com.br/verify.html?token=${token}`;
-        const RESEND_KEY = process.env.RESEND_API_KEY;
+        const appUrl = (process.env.APP_URL || 'https://www.capyenglish.com.br').replace(/\/+$/, '');
+        const verifyUrl = `${appUrl}/verify.html?token=${token}`;
 
-        // Dev mode: no Resend key → return link directly so testing still works
-        if (!RESEND_KEY) {
-            console.warn('[magic-link] RESEND_API_KEY not set — returning link in response (dev mode)');
-            res.status(200).json({
-                ok: true, isNewUser, devLink: verifyUrl,
-                warning: 'RESEND_API_KEY not configured. Showing link directly (dev mode only).',
-            });
+        // Local development only: return the link instead of e-mailing it.
+        if (devMode && !process.env.RESEND_API_KEY) {
+            res.status(200).json({ ok: true, isNewUser, devLink: verifyUrl, warning: 'DEV MODE: link returned in the response.' });
             return;
         }
-
-        // Send email via Resend
-        const html = `<!DOCTYPE html><html lang="pt-BR"><body style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;margin:0">
-<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,.06)">
-  <div style="text-align:center;font-size:48px;margin-bottom:8px">🦫</div>
-  <h1 style="color:#001f3f;font-weight:900;font-size:22px;margin:0 0 12px;text-align:center">Seu link de acesso</h1>
-  <p style="font-size:15px;color:#475569;line-height:1.6;text-align:center;margin:0 0 24px">Olá, <strong>${userName}</strong>! Clique no botão abaixo para entrar na Capy English. O link expira em 15 minutos.</p>
-  <div style="text-align:center;margin:28px 0">
-    <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg,#FF9F1C,#fb923c);color:#fff;font-weight:900;padding:15px 32px;border-radius:14px;text-decoration:none;font-size:15px;box-shadow:0 8px 20px rgba(249,115,22,.3)">⚡ Entrar agora</a>
-  </div>
-  <p style="font-size:12px;color:#94a3b8;line-height:1.6;text-align:center;margin:24px 0 8px">Se você não solicitou esse link, é só ignorar.</p>
-  <p style="font-size:11px;color:#cbd5e1;line-height:1.5;text-align:center;word-break:break-all;margin:0">Ou copie e cole no navegador:<br>${verifyUrl}</p>
-  <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0">
-  <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">Capy English · Aprenda inglês com a Yara 🌿</p>
-</div></body></html>`;
 
         try {
-            const sendRes = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + RESEND_KEY,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: process.env.EMAIL_FROM || 'Capy English <onboarding@resend.dev>',
-                    to: [norm],
-                    subject: '🦫 Seu link de acesso · Capy English',
-                    html,
-                }),
-            });
-            if (!sendRes.ok) {
-                const errText = await sendRes.text();
-                console.error('[magic-link] Resend error:', sendRes.status, errText.slice(0, 300));
-                res.status(502).json({ error: 'email_send_failed', details: errText.slice(0, 200) });
-                return;
-            }
-            console.log(`[magic-link] ✅ sent to ${norm} (new=${isNewUser})`);
+            const sent = await sendMagicLinkEmail({ to: norm, userName, verifyUrl });
+            if (!sent) { res.status(502).json({ error: 'email_send_failed' }); return; }
+            console.log(`[magic-link] ✅ sent (new=${isNewUser})`);
             res.status(200).json({ ok: true, isNewUser });
-            return;
         } catch (e) {
             console.error('[magic-link] fetch error:', e.message);
-            res.status(500).json({ error: 'email_send_failed', details: e.message });
-            return;
+            res.status(502).json({ error: 'email_send_failed' });
         }
-    }
-
-    // POST /api/auth/verify  body: { token }
-    // Validates token, marks used, returns user object for client to save as session.
-    if (req.method === 'POST' && url === '/api/auth/verify') {
-        const { token } = await readBody(req);
-        if (!token) { res.status(400).json({ error: 'token_required' }); return; }
-        const rows = await sb(`/magic_link_tokens?token=eq.${encodeURIComponent(token)}&select=email,user_id,expires_at,used_at`);
-        const row = rows?.[0];
-        if (!row) { res.status(404).json({ error: 'token_not_found' }); return; }
-        if (row.used_at) { res.status(410).json({ error: 'token_used' }); return; }
-        if (new Date(row.expires_at) < new Date()) { res.status(410).json({ error: 'token_expired' }); return; }
-        // Mark used
-        await sb(`/magic_link_tokens?token=eq.${encodeURIComponent(token)}`, {
-            method: 'PATCH',
-            headers: { 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ used_at: new Date().toISOString() }),
-        });
-        // Fetch user for session
-        const acc = await sb(`/accounts?id=eq.${encodeURIComponent(row.user_id)}&select=id,name,email,avatar`);
-        if (!acc?.[0]) { res.status(404).json({ error: 'user_not_found' }); return; }
-        res.status(200).json({ ok: true, user: acc[0] });
         return;
     }
 
-    // GET /api/me?userId=xxx → returns subscription/plan info
-    // Used by frontend to gate Pro/Super features in real time.
-    // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
-    if (req.method === 'GET' && url.startsWith('/api/me')) {
-        const qs = new URL(req.url, 'http://localhost').searchParams;
-        const userId = qs.get('userId');
-        if (!userId) { res.status(400).json({ error: 'userId required' }); return; }
-        const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=plan,plan_expires_at,kiwify_subscription_id`);
-        const row = rows?.[0] || {};
-        // Default to 'free' if no row or plan column doesn't exist yet
-        const plan = (row.plan === 'pro' || row.plan === 'super') ? row.plan : 'free';
-        // If plan expired, downgrade to free
-        let effectivePlan = plan;
-        if (plan !== 'free' && row.plan_expires_at) {
-            if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
+    // POST /api/auth/verify  body: { token }
+    // Validates token, marks it used (atomically), sets the session cookie.
+    if (req.method === 'POST' && url === '/api/auth/verify') {
+        const { token } = await readBody(req, 16 * 1024);
+        if (!token || typeof token !== 'string' || token.length > 100) { res.status(400).json({ error: 'token_required' }); return; }
+        const rows = await sbRows(`/magic_link_tokens?token=eq.${enc(token)}&select=email,user_id,expires_at,used_at`);
+        const row = rows[0];
+        if (!row) { res.status(404).json({ error: 'token_not_found' }); return; }
+        if (row.used_at) { res.status(410).json({ error: 'token_used' }); return; }
+        if (new Date(row.expires_at) < new Date()) { res.status(410).json({ error: 'token_expired' }); return; }
+        // Mark used only if still unused → a token can never be redeemed twice.
+        const marked = await sbRequest(`/magic_link_tokens?token=eq.${enc(token)}&used_at=is.null`, {
+            method: 'PATCH',
+            headers: { 'Prefer': 'return=representation' },
+            body: JSON.stringify({ used_at: nowIso() }),
+        });
+        if (!marked.ok || !Array.isArray(marked.data) || marked.data.length === 0) { res.status(410).json({ error: 'token_used' }); return; }
+
+        const acc = (await sbRows(`/accounts?id=eq.${enc(row.user_id)}&select=id,name,email,avatar,password_hash,session_version,email_verified_at`))[0];
+        if (!acc) { res.status(404).json({ error: 'user_not_found' }); return; }
+        if (!acc.email_verified_at) {
+            await sb(`/accounts?id=eq.${enc(acc.id)}`, {
+                method: 'PATCH',
+                headers: { 'Prefer': 'return=minimal' },
+                body: JSON.stringify({ email_verified_at: nowIso(), pending_setup: false }),
+            });
         }
-        res.setHeader('Cache-Control', 'private, max-age=60');
+        session.setSessionCookie(req, res, acc.id, acc.session_version || 1, 'link');
+        res.status(200).json({ ok: true, user: publicUser(acc), needsPassword: !acc.password_hash });
+        return;
+    }
+
+    // ── AI endpoints (all rate limited; identity = session user or IP) ──────
+
+    // POST /api/chat  body: { mode, message, history, context }
+    // Modes and their system prompts are defined server-side (api/_lib/prompts.js).
+    if (req.method === 'POST' && url === '/api/chat') {
+        const body = await readBody(req, 64 * 1024);
+        const mode = typeof body.mode === 'string' ? body.mode : 'tutor';
+        if (mode !== 'reading-story' && !String(body.message || '').trim()) {
+            res.status(400).json({ error: { code: 400, message: 'message required' } }); return;
+        }
+        const _rl = await checkRateLimit(req, mode === 'reading-story' ? 'ai-gen' : 'chat', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+
+        // Personalize Yara's free chat with the student's profile
+        let profileContext = '';
+        if (mode === 'tutor' && sessUid) {
+            const p = (await sbRows(`/user_profiles?id=eq.${enc(sessUid)}&select=english_level,goals,interests,interests_detail,daily_goal_minutes`))[0];
+            if (p) {
+                const detail = p.interests_detail ? `\n- Favorite specifics: ${clip(p.interests_detail, 300)}` : '';
+                profileContext = `\n\nStudent profile:\n- English level: ${p.english_level || 'beginner'}\n- Learning goals: ${(p.goals || []).join(', ') || 'general'}\n- Interests: ${(p.interests || []).join(', ') || 'various'}${detail}\n- Daily study goal: ${p.daily_goal_minutes || 10} minutes\nTailor your language complexity and vocabulary to their level. When relevant, reference their specific favorites naturally in examples or conversation.`;
+            }
+        }
+        const chat = buildChat({ mode, message: body.message, history: body.history, context: body.context, profileContext });
+        await callOpenAI(chat.messages, chat.maxTokens, chat.temperature, res, { json: chat.json });
+        return;
+    }
+
+    if (req.method === 'POST' && url === '/api/quiz') {
+        const { words, deckLabel } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const prompt = `You are creating a fun English quiz for children aged 5-8.\nThe child just studied these words from the "${clip(deckLabel, 60)}" deck: ${clipList(words, 20, 40).join(', ')}.\nGenerate exactly 4 multiple-choice questions. Each has 4 options, one correct answer.\nRespond ONLY with a valid JSON array:\n[{"question":"What is this? 🍎","image_hint":"Apple","options":["Apple","River","Bird","Tree"],"correct":"Apple"}]`;
+        await callOpenAI([{ role: 'user', content: prompt }], 600, 0.7, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/translate') {
+        const { word, targetLang } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const lang = clip(targetLang, 30) || 'Portuguese';
+        const prompt = `Translate the English word "${clip(word, 60)}" into ${lang}.\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${lang})."}`;
+        await callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/story') {
+        const { words, name } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const childName = cleanText(name, 40) || 'Explorer';
+        const list = clipList(words, 12, 30);
+        const wordList  = (list.length ? list : ['apple', 'tree', 'bird']).join(', ');
+        const prompt = `Write a short fun English story for a child named ${childName} aged 5-8.\nMUST use these words: ${wordList}.\nMax 5 sentences. Simple English. Feature capybara Yara. Happy ending. 1-2 emojis per sentence.\nRespond ONLY with valid JSON:\n{"title":"...","sentences":["..."],"moral":"..."}`;
+        await callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res); return;
+    }
+
+    if (req.method === 'GET' && url === '/api/word-of-day') {
+        await sendDailyContent(req, res, 'word-of-day',
+            day => `Today is ${day}. Pick ONE interesting English word for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"word":"Butterfly","emoji":"🦋","pronunciation":"/ˈbʌt.ə.flaɪ/","partOfSpeech":"noun","simpleMeaning":"A beautiful insect with big colourful wings.","exampleSentence":"I saw a butterfly in the garden today.","funFact":"Butterflies taste with their feet!"}`,
+            200, 0.9, sessUid);
+        return;
+    }
+
+    if (req.method === 'GET' && url === '/api/daily-challenge') {
+        await sendDailyContent(req, res, 'daily-challenge',
+            day => `Today is ${day}. Create ONE fun English challenge for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"type":"sentence","emoji":"🦁","title":"Use a Brave Word!","instruction":"Use the word 'brave' in a sentence about an animal.","hint":"Think about what a brave animal might do.","example":"The brave lion protected its cubs.","xp":20}`,
+            150, 1.0, sessUid);
+        return;
+    }
+
+    if (req.method === 'POST' && url === '/api/flashcard-deck') {
+        const { topic } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const t = clip(topic, 60) || 'animals';
+        const prompt = `Create 10 English vocabulary flashcards for "${t}" for children aged 5-8.\nRespond ONLY with a valid JSON array:\n[{"word":"Sun","emoji":"☀️","pronunciation":"/sʌn/","hint":"It shines in the sky","example":"The sun is bright today."}]`;
+        await callOpenAI([{ role: 'user', content: prompt }], 600, 0.8, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/dialogue-scene') {
+        const { topic } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const t = clip(topic, 60) || 'pets';
+        const prompt = `Create a short English grammar dialogue for children aged 5-8 about "${t}".\nRespond ONLY with valid JSON:\n{"emoji":"🐶","scene":"...","intro":"...","grammarFocus":"...","questions":[{"prompt":"___ dog is fluffy.","choices":["My","Me","I"],"answer":"My","explanation":"We use My to show the dog belongs to me."}]}\nProvide exactly 6 questions, each with 3 choices.`;
+        await callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/parent-report') {
+        const { name, xp, badges, lessons, recentDate } = await readBody(req, 64 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const n = cleanText(name, 40) || 'Student';
+        const prompt = `Act as an educational analyst for a children's language app.\nChild: ${n}, XP: ${Number(xp) || 0}, Badges: ${Array.isArray(badges) ? badges.length : 0}, Lessons: ${Array.isArray(lessons) ? lessons.length : 0}, Last active: ${clip(recentDate, 20) || 'Recently'}.\nWrite a warm 2-3 paragraph summary for parents celebrating effort and giving one practical offline tip.\nRespond ONLY with valid JSON:\n{"title":"Weekly Progress Report for ${n}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}`;
+        await callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/lesson-quiz') {
+        const { topic, vocab, level } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'ai-gen', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const prompt = `Create 5 multiple-choice English quiz questions about "${clip(topic, 80)}" at ${clip(level, 20) || 'beginner'} level for children.\nVocabulary: ${clipList(vocab, 20, 40).join(', ')}.\nReturn ONLY valid JSON array:\n[{"q":"...","opts":["A","B","C","D"],"a":"correct option","explain":"why"}]`;
+        await callOpenAI([{ role: 'user', content: prompt }], 700, 0.7, res); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/lesson-chat') {
+        const { history, message, lessonTopic, vocab } = await readBody(req, 64 * 1024);
+        if (!String(message || '').trim()) { res.status(400).json({ error: { code: 400, message: 'message required' } }); return; }
+        const _rl = await checkRateLimit(req, 'chat', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const system = `You are Yara, a friendly capybara teaching English to children aged 8-12.\nLesson: "${clip(lessonTopic, 80)}". Vocabulary: ${clipList(vocab, 20, 40).join(', ')}.\nRules: under 2 sentences per reply; simple English; end with a question; warm and encouraging.`;
+        const messages = [{ role: 'system', content: system }, ...cleanHistory(history), { role: 'user', content: clip(message, 600) }];
+        await callOpenAI(messages, 120, 0.85, res); return;
+    }
+
+    // ── DB endpoints (Supabase) ───────────────────────────────────────────────
+
+    // Leaderboard: top 20 by XP (public; names are HTML-escaped for safe rendering)
+    if (req.method === 'GET' && url.startsWith('/api/db/leaderboard')) {
+        const [accounts, states] = await Promise.all([
+            sbRows('/accounts?select=id,name,avatar'),
+            sbRows('/user_state?select=user_id,data'),
+        ]);
+        const stateMap = {};
+        states.forEach(s => { stateMap[s.user_id] = s.data || {}; });
+        const board = accounts.map(a => ({
+            id: a.id, name: escapeHtml(a.name), avatar: escapeHtml(a.avatar || '🐾'),
+            xp: Number(stateMap[a.id]?.xp) || 0,
+            badgesCount: (stateMap[a.id]?.badges || []).length,
+        })).sort((a, b) => b.xp - a.xp).slice(0, 20);
+        res.status(200).json(board); return;
+    }
+
+    // The old account-list endpoints leaked every user's e-mail and password.
+    if (url.startsWith('/api/db/accounts')) {
+        res.status(410).json({ error: 'gone', message: 'Use /api/auth/*' });
+        return;
+    }
+
+    // GET /api/db?type=state → the logged-in user's saved progress
+    if (req.method === 'GET' && (url === '/api/db' || url === '/api/db/')) {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const type = new URL(req.url, 'http://localhost').searchParams.get('type');
+        res.setHeader('Cache-Control', 'no-store');
+        if (type === 'state') {
+            const rows = await sbRows(`/user_state?user_id=eq.${enc(acc.id)}&select=data`);
+            res.status(200).json(rows[0]?.data || null);
+        } else {
+            res.status(200).json(null);
+        }
+        return;
+    }
+
+    // POST /api/db  body: { type:'state', payload } → saves the logged-in user's progress
+    if (req.method === 'POST' && url === '/api/db') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const { type, payload } = await readBody(req, 256 * 1024);
+        if (type === 'state' && payload && typeof payload === 'object' && !Array.isArray(payload)) {
+            const saved = await sbRequest('/user_state', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({ user_id: acc.id, data: payload, updated_at: nowIso() }),
+            });
+            if (!saved.ok) { res.status(502).json({ error: 'save_failed' }); return; }
+        }
+        res.status(200).json({ success: true }); return;
+    }
+
+    // ── User Profile ──────────────────────────────────────────────────────────
+
+    // GET /api/profile → the logged-in user's user_profiles row
+    if (req.method === 'GET' && url === '/api/profile') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const rows = await sbRows(`/user_profiles?id=eq.${enc(acc.id)}&select=*`);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json(rows[0] || null); return;
+    }
+
+    // POST /api/profile → upserts editable profile fields only (never plan/billing)
+    if (req.method === 'POST' && url === '/api/profile') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const fields = pickProfile(await readBody(req, 16 * 1024));
+        const saved = await sbRequest('/user_profiles', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify({ id: acc.id, ...fields, updated_at: nowIso() }),
+        });
+        if (!saved.ok) { res.status(502).json({ error: 'save_failed' }); return; }
+        res.status(200).json({ success: true }); return;
+    }
+
+    // GET /api/me → plan info for the logged-in user (used to gate Pro/Super UI)
+    if (req.method === 'GET' && url === '/api/me') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const row = (await sbRows(`/user_profiles?id=eq.${enc(acc.id)}&select=plan,plan_expires_at,kiwify_subscription_id`))[0] || {};
+        const plan = (row.plan === 'pro' || row.plan === 'super') ? row.plan : 'free';
+        let effectivePlan = plan;
+        if (plan !== 'free' && row.plan_expires_at && new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
+        res.setHeader('Cache-Control', 'private, no-store');
         res.status(200).json({
             plan: effectivePlan,
             planExpiresAt: row.plan_expires_at || null,
@@ -692,16 +981,17 @@ module.exports = async (req, res) => {
 
     // POST /api/youtube → fetch transcript + generate learning content
     if (req.method === 'POST' && url === '/api/youtube') {
-        const { videoUrl, userId } = await readBody(req);
-        const _rl = await checkRateLimit(req, 'youtube', userId);
-        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const { videoUrl } = await readBody(req, 16 * 1024);
 
         // Extract video ID
-        const videoIdMatch = (videoUrl || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+        const videoIdMatch = String(videoUrl || '').match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
         if (!videoIdMatch) {
             res.status(400).json({ error: 'URL do YouTube inválida. Verifique o link e tente novamente.' }); return;
         }
         const videoId = videoIdMatch[1];
+
+        const _rl = await checkRateLimit(req, 'youtube', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         // ── httpsFetch: uses native https module (avoids fetch availability issues) ──
         function httpsFetch(urlStr, opts = {}) {
@@ -715,7 +1005,7 @@ module.exports = async (req, res) => {
                         headers: { 'Accept-Encoding': 'identity', ...(opts.headers || {}) },
                         timeout: 8000,
                     };
-                    const req = https.request(reqOpts, r => {
+                    const r0 = https.request(reqOpts, r => {
                         const chunks = [];
                         r.on('data', c => chunks.push(c));
                         r.on('end', () => {
@@ -724,10 +1014,10 @@ module.exports = async (req, res) => {
                                 text: () => body, json: () => JSON.parse(body) });
                         });
                     });
-                    req.on('error', reject);
-                    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
-                    if (opts.body) req.write(opts.body);
-                    req.end();
+                    r0.on('error', reject);
+                    r0.on('timeout', () => { r0.destroy(); reject(new Error('timeout')); });
+                    if (opts.body) r0.write(opts.body);
+                    r0.end();
                 } catch(e) { reject(e); }
             });
         }
@@ -744,8 +1034,8 @@ module.exports = async (req, res) => {
 
         async function fetchCaptionUrl(baseUrl) {
             try {
-                const url = baseUrl.replace(/\\u0026/g, '&') + '&fmt=json3';
-                const r = await httpsFetch(url);
+                const capUrl = baseUrl.replace(/\\u0026/g, '&') + '&fmt=json3';
+                const r = await httpsFetch(capUrl);
                 if (r.ok) return parseCaptionEvents(r.json());
             } catch(e) {}
             return null;
@@ -846,35 +1136,11 @@ Rules:
 - questions: exactly 5 multiple choice questions with 4 options each
 - Keep everything appropriate for language learning`;
 
-        if (!API_KEY) {
-            res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return;
-        }
-
-        const aiBody = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1800, temperature: 0.3, response_format: { type: 'json_object' } });
-        const aiOptions = {
-            hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(aiBody) }
-        };
-
-        const aiReq = https.request(aiOptions, aiRes => {
-            let data = '';
-            aiRes.on('data', c => data += c);
-            aiRes.on('end', () => {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Content-Type', 'application/json');
-                try {
-                    const parsed = JSON.parse(data);
-                    const content = parsed?.choices?.[0]?.message?.content || '{}';
-                    const learning = JSON.parse(content);
-                    res.status(200).json({ videoId, transcript: transcriptSnippet, ...learning });
-                } catch(e) {
-                    res.status(500).json({ error: 'Erro ao processar o conteúdo do vídeo.' });
-                }
-            });
+        await sendOpenAIJson(res, prompt, {
+            maxTokens: 1800, temperature: 0.3,
+            errorMessage: 'Erro ao processar o conteúdo do vídeo.',
+            extra: { videoId, transcript: transcriptSnippet },
         });
-        aiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
-        aiReq.write(aiBody);
-        aiReq.end();
         return;
     }
 
@@ -882,17 +1148,18 @@ Rules:
 
     // POST /api/personalize → AI mini-lesson themed around user interests
     if (req.method === 'POST' && url === '/api/personalize') {
-        const { topic, vocab, userId } = await readBody(req);
-        const _rl = await checkRateLimit(req, 'personalize', userId);
+        const body = await readBody(req, 16 * 1024);
+        const topic = clip(body.topic, 100);
+        const vocab = clipList(body.vocab, 12, 40);
+        const _rl = await checkRateLimit(req, 'personalize', sessUid);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         let interests = 'various topics', detail = '', level = 'beginner';
-        if (userId && userId !== 'guest') {
-            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
-            const p = rows?.[0];
+        if (sessUid) {
+            const p = (await sbRows(`/user_profiles?id=eq.${enc(sessUid)}&select=interests,interests_detail,english_level`))[0];
             if (p) {
                 interests = (p.interests || []).join(', ') || interests;
-                detail    = p.interests_detail || '';
+                detail    = clip(p.interests_detail || '', 300);
                 level     = p.english_level    || level;
             }
         }
@@ -901,7 +1168,7 @@ Rules:
         const prompt = `You are Yara, a friendly capybara English teacher for Brazilian students. Create a short personalized bonus lesson.
 
 Lesson topic: "${topic}"
-Key vocabulary from today's lesson: ${(vocab || []).join(', ')}
+Key vocabulary from today's lesson: ${vocab.join(', ')}
 Student interests: ${interests}
 ${favorites}
 Student English level: ${level}
@@ -927,39 +1194,24 @@ Rules:
   "tip": "One short practical grammar tip based on these examples, in Portuguese."
 }`;
 
-        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
-
-        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 700, temperature: 0.85, response_format: { type: 'json_object' } });
-        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
-        const apiReq = https.request(opts, apiRes => {
-            let data = '';
-            apiRes.on('data', c => data += c);
-            apiRes.on('end', () => {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Content-Type', 'application/json');
-                try {
-                    const parsed = JSON.parse(data);
-                    const content = parsed?.choices?.[0]?.message?.content || '{}';
-                    res.status(200).json(JSON.parse(content));
-                } catch(e) { res.status(500).json({ error: 'Erro ao gerar aula personalizada.' }); }
-            });
-        });
-        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
-        apiReq.write(body); apiReq.end(); return;
+        await sendOpenAIJson(res, prompt, { maxTokens: 700, temperature: 0.85, errorMessage: 'Erro ao gerar aula personalizada.' });
+        return;
     }
 
     // ── Study Plan ────────────────────────────────────────────────────────────
 
     // POST /api/study-plan → AI-generated weekly study schedule
     if (req.method === 'POST' && url === '/api/study-plan') {
-        const { userId, currentLesson, dailyGoalMinutes, interests, level } = await readBody(req);
-        const _rl = await checkRateLimit(req, 'study-plan', userId);
+        const { currentLesson, dailyGoalMinutes, interests, level } = await readBody(req, 16 * 1024);
+        const _rl = await checkRateLimit(req, 'study-plan', sessUid);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
-        const mins    = dailyGoalMinutes || 10;
-        const intList = (interests || []).join(', ') || 'various';
-        const lvl     = level || 'beginner';
-        const lesson  = currentLesson || 1;
+        const minsNum = Number(dailyGoalMinutes);
+        const mins    = Number.isFinite(minsNum) && minsNum > 0 && minsNum <= 120 ? Math.round(minsNum) : 10;
+        const intList = clipList(interests, 12, 40).join(', ') || 'various';
+        const lvl     = clip(level, 20) || 'beginner';
+        const lessonNum = Number(currentLesson);
+        const lesson  = Number.isInteger(lessonNum) && lessonNum >= 1 && lessonNum <= 44 ? lessonNum : 1;
 
         const prompt = `You are an expert English study planner for Brazilian learners. Create a 7-day personalized weekly study schedule.
 
@@ -998,47 +1250,29 @@ Rules:
   ]
 }`;
 
-        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
-
-        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1200, temperature: 0.75, response_format: { type: 'json_object' } });
-        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
-        const apiReq = https.request(opts, apiRes => {
-            let data = '';
-            apiRes.on('data', c => data += c);
-            apiRes.on('end', () => {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Content-Type', 'application/json');
-                try {
-                    const parsed = JSON.parse(data);
-                    const content = parsed?.choices?.[0]?.message?.content || '{}';
-                    res.status(200).json(JSON.parse(content));
-                } catch(e) { res.status(500).json({ error: 'Erro ao gerar cronograma.' }); }
-            });
-        });
-        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
-        apiReq.write(body); apiReq.end(); return;
+        await sendOpenAIJson(res, prompt, { maxTokens: 1200, temperature: 0.75, errorMessage: 'Erro ao gerar cronograma.' });
+        return;
     }
 
     // ── Music Lab ─────────────────────────────────────────────────────────────
 
     // POST /api/music → analyze song lyrics, generate vocab/chunks/quiz
     if (req.method === 'POST' && url === '/api/music') {
-        const { lyrics, artist, userId } = await readBody(req);
-        const _rl = await checkRateLimit(req, 'music', userId);
+        const { lyrics, artist } = await readBody(req, 64 * 1024);
+        const snippet = String(lyrics || '').slice(0, 1000);
+        if (snippet.length < 20) { res.status(400).json({ error: 'Cole a letra da música antes de analisar!' }); return; }
+
+        const _rl = await checkRateLimit(req, 'music', sessUid);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         let level = 'beginner';
-        if (userId && userId !== 'guest') {
-            const rows = await sb(`/user_profiles?id=eq.${encodeURIComponent(userId)}&select=english_level`);
-            level = rows?.[0]?.english_level || level;
+        if (sessUid) {
+            level = (await sbRows(`/user_profiles?id=eq.${enc(sessUid)}&select=english_level`))[0]?.english_level || level;
         }
-
-        const snippet = (lyrics || '').slice(0, 1000);
-        if (snippet.length < 20) { res.status(400).json({ error: 'Cole a letra da música antes de analisar!' }); return; }
 
         const prompt = `You are Yara, a friendly capybara English teacher. Analyze these song lyrics and create a music-based English lesson for a Brazilian ${level}-level student.
 
-Artist: ${artist || 'Unknown Artist'}
+Artist: ${clip(artist, 80) || 'Unknown Artist'}
 Lyrics:
 """
 ${snippet}
@@ -1065,39 +1299,23 @@ Rules:
   ]
 }`;
 
-        if (!API_KEY) { res.status(503).json({ error: 'AI features require OPENAI_API_KEY.' }); return; }
-
-        const body = JSON.stringify({ model: MODEL, messages: [{ role: 'user', content: prompt }], max_tokens: 1400, temperature: 0.75, response_format: { type: 'json_object' } });
-        const opts = { hostname: 'api.openai.com', path: '/v1/chat/completions', method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}`, 'Content-Length': Buffer.byteLength(body) } };
-        const apiReq = https.request(opts, apiRes => {
-            let data = '';
-            apiRes.on('data', c => data += c);
-            apiRes.on('end', () => {
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Content-Type', 'application/json');
-                try {
-                    const parsed = JSON.parse(data);
-                    const content = parsed?.choices?.[0]?.message?.content || '{}';
-                    res.status(200).json(JSON.parse(content));
-                } catch(e) { res.status(500).json({ error: 'Erro ao analisar a letra.' }); }
-            });
-        });
-        apiReq.on('error', () => res.status(500).json({ error: 'Erro de conexão com a IA.' }));
-        apiReq.write(body); apiReq.end(); return;
+        await sendOpenAIJson(res, prompt, { maxTokens: 1400, temperature: 0.75, errorMessage: 'Erro ao analisar a letra.' });
+        return;
     }
 
     // ── Lyrics Proxy ──────────────────────────────────────────────────────────
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
-        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+    if (req.method === 'GET' && url === '/api/lyrics-search') {
+        const q = clip(new URL(req.url, 'http://localhost').searchParams.get('q') || '', 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
-        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
+        const _rl = await checkRateLimit(req, 'lyrics', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const target = `https://api.lyrics.ovh/suggest/${enc(q)}`;
+        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' }, timeout: 8000 }, (r) => {
             let d = '';
             r.on('data', c => d += c);
             r.on('end', () => {
                 res.setHeader('Content-Type', 'application/json');
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.status(r.statusCode).end(d);
             });
         }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
@@ -1105,18 +1323,19 @@ Rules:
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
-        const p = new URL(`https://x.com${req.url}`).searchParams;
-        const artist = p.get('artist') || '';
-        const title  = p.get('title')  || '';
+    if (req.method === 'GET' && url === '/api/lyrics') {
+        const p = new URL(req.url, 'http://localhost').searchParams;
+        const artist = clip(p.get('artist') || '', 100);
+        const title  = clip(p.get('title')  || '', 100);
         if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
-        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
+        const _rl = await checkRateLimit(req, 'lyrics', sessUid);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const target = `https://api.lyrics.ovh/v1/${enc(artist)}/${enc(title)}`;
+        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' }, timeout: 8000 }, (r) => {
             let d = '';
             r.on('data', c => d += c);
             r.on('end', () => {
                 res.setHeader('Content-Type', 'application/json');
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.status(r.statusCode).end(d);
             });
         }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
@@ -1131,10 +1350,10 @@ Rules:
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
-        const voice = qs2.get('voice') || 'nova';
-        const lang  = qs2.get('lang')  || 'en';
-        const _ttsUserId = qs2.get('userId');
-        const _rl = await checkRateLimit(req, 'tts', _ttsUserId);
+        const VOICES = ['nova', 'alloy', 'echo', 'fable', 'onyx', 'shimmer'];
+        const voice = VOICES.includes(qs2.get('voice')) ? qs2.get('voice') : 'nova';
+        const lang  = qs2.get('lang') === 'fr' ? 'fr' : 'en';
+        const _rl = await checkRateLimit(req, 'tts', sessUid);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         // French: use gpt-4o-mini-tts with native accent instructions
@@ -1160,18 +1379,18 @@ Rules:
                 let d = '';
                 ttsRes.on('data', c => d += c);
                 ttsRes.on('end', () => {
-                    let detail = d;
-                    try { detail = JSON.parse(d)?.error?.message || d; } catch {}
-                    res.status(502).json({ error: 'OpenAI TTS error', detail: String(detail).slice(0, 400) });
+                    console.error('[tts]', ttsRes.statusCode, d.slice(0, 200));
+                    res.status(502).json({ error: 'tts_failed' });
                 });
                 return;
             }
             res.setHeader('Content-Type', 'audio/mpeg');
-            res.setHeader('Cache-Control', 'public, max-age=86400');
-            res.setHeader('Access-Control-Allow-Origin', '*');
+            // Same text → same audio: let the browser and Vercel's CDN reuse it.
+            res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=2592000');
             ttsRes.pipe(res);
         });
-        ttsReq.on('error', e => res.status(502).json({ error: e.message }));
+        ttsReq.setTimeout(20000, () => ttsReq.destroy(new Error('timeout')));
+        ttsReq.on('error', e => { if (!res.headersSent) res.status(502).json({ error: 'tts_failed' }); });
         ttsReq.write(body);
         ttsReq.end();
         return;
@@ -1179,63 +1398,63 @@ Rules:
 
     // ── Homework Submissions ──────────────────────────────────────────────────
 
-    // POST /api/homework → save a student homework submission to Supabase
+    // POST /api/homework → save the logged-in student's homework submission
     if (req.method === 'POST' && url === '/api/homework') {
-        const { userId, studentName, lessonId, lessonTitle, answers, xp } = await readBody(req);
-        if (!userId || !lessonId) { res.status(400).json({ error: 'userId and lessonId required' }); return; }
-        const result = await sb('/homework_submissions', {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const { lessonId, lessonTitle, answers, xp } = await readBody(req, 64 * 1024);
+        if (!lessonId) { res.status(400).json({ error: 'lessonId required' }); return; }
+        const result = await sbRequest('/homework_submissions', {
             method: 'POST',
             headers: { 'Prefer': 'return=representation' },
             body: JSON.stringify({
-                user_id:       userId,
-                student_name:  studentName || 'Unknown',
-                lesson_id:     String(lessonId),
-                lesson_title:  lessonTitle || '',
-                answers:       answers || {},
-                xp_earned:     xp || 0,
-                submitted_at:  new Date().toISOString(),
+                user_id:       acc.id,
+                student_name:  acc.name || 'Unknown',
+                lesson_id:     clip(lessonId, 20),
+                lesson_title:  clip(lessonTitle, 120),
+                answers:       answers && typeof answers === 'object' ? answers : {},
+                xp_earned:     Math.max(0, Math.min(200, Number(xp) || 0)),
+                submitted_at:  nowIso(),
             }),
         });
-        res.status(200).json({ success: true, id: result?.[0]?.id || null }); return;
+        const id = result.ok && Array.isArray(result.data) ? result.data[0]?.id || null : null;
+        res.status(result.ok ? 200 : 502).json({ success: result.ok, id }); return;
     }
 
-    // GET /api/homework?key=TEACHER_KEY → list all submissions (teacher only)
-    // GET /api/homework?key=TEACHER_KEY&lessonId=32 → filter by lesson
-    // GET /api/homework?key=TEACHER_KEY&userId=xxx → filter by student
-    if (req.method === 'GET' && url.startsWith('/api/homework')) {
-        const p = new URL(`https://x.com${req.url}`).searchParams;
-        const key      = p.get('key') || '';
-        const expected = process.env.TEACHER_KEY || 'capyteacher2025';
-        if (key !== expected) { res.status(401).json({ error: 'Unauthorized' }); return; }
+    // GET /api/homework (header X-Admin-Key) → list submissions (teacher only)
+    //   ?lessonId=32 → filter by lesson · ?userId=xxx → filter by student
+    if (req.method === 'GET' && url === '/api/homework') {
+        const auth = adminAuth(req);
+        if (auth !== 'ok') { rejectAdmin(res, auth); return; }
+        const p = new URL(req.url, 'http://localhost').searchParams;
         const lessonId = p.get('lessonId');
         const userId   = p.get('userId');
         let filter = '';
-        if (lessonId) filter += `&lesson_id=eq.${encodeURIComponent(lessonId)}`;
-        if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
-        const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc${filter}`);
-        res.status(200).json(rows || []); return;
+        if (lessonId) filter += `&lesson_id=eq.${enc(lessonId)}`;
+        if (userId)   filter += `&user_id=eq.${enc(userId)}`;
+        const rows = await sbRows(`/homework_submissions?select=*&order=submitted_at.desc${filter}`);
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json(rows); return;
     }
 
     // ── Admin stats ───────────────────────────────────────────────────────────
-    // GET /api/admin/stats?key=TEACHER_KEY → metrics for /admin.html dashboard
+    // GET /api/admin/stats (header X-Admin-Key) → metrics for /admin.html dashboard
     if (req.method === 'GET' && url === '/api/admin/stats') {
-        const qs = new URL(req.url, 'http://localhost').searchParams;
-        const key = qs.get('key') || '';
-        const expected = process.env.TEACHER_KEY || 'capyteacher2025';
-        if (key !== expected) { res.status(403).json({ error: 'forbidden' }); return; }
+        const auth = adminAuth(req);
+        if (auth !== 'ok') { rejectAdmin(res, auth); return; }
         const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
         const metricsRaw = await sb(`/api_metrics_daily?day=gte.${since}&order=day.desc,requests.desc&limit=200`);
         // sb() returns Supabase error object if table doesn't exist — coerce to array
         const metrics = Array.isArray(metricsRaw) ? metricsRaw : [];
         const tableMissing = metricsRaw && !Array.isArray(metricsRaw);
-        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Cache-Control', 'no-store');
         res.status(200).json({
             metrics,
             live: Object.entries(_metrics).map(([k, v]) => {
                 const [day, endpoint] = k.split('|');
                 return { day, endpoint, ...v, note: 'in-memory (not yet persisted)' };
             }),
-            generatedAt: new Date().toISOString(),
+            generatedAt: nowIso(),
             warning: tableMissing
                 ? 'api_metrics_daily table not found in Supabase — run the SQL migration to start persisting metrics.'
                 : undefined,

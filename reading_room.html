@@ -269,38 +269,14 @@ function setDiff(btn, diff) {
 async function loadStory() {
   showState('loading');
 
-  const diffDesc = difficulty === 'easy' ? 'very simple A1 English for a 5-6 year old'
-                 : difficulty === 'medium' ? 'simple A2 English for a 7-8 year old'
-                 : 'intermediate B1 English for a 9-10 year old';
-
-  const prompt = `Write a short children's story about "${selectedTopic}" using ${diffDesc}.
-Feature Yara the capybara as the main character. Include 5 sentences, each with 1-2 emojis.
-Then create 3 multiple-choice comprehension questions about the story (4 options each, only 1 correct).
-
-Respond ONLY with valid JSON, no markdown fences:
-{
-  "title": "The Brave Rainbow",
-  "emoji": "🌈",
-  "sentences": ["Yara saw a beautiful rainbow. 🌈✨", "..."],
-  "moral": "Always look for colour after rain!",
-  "questions": [
-    {
-      "q": "What did Yara see?",
-      "options": ["A rainbow","A dragon","A cake","A boat"],
-      "correct": "A rainbow",
-      "explanation": "The story says Yara saw a beautiful rainbow."
-    }
-  ]
-}`;
-
+  // The story prompt lives on the server (mode: 'reading-story').
   try {
     const res  = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
-        history: [],
-        message: prompt,
-        systemOverride: 'You are a creative children\'s author. Return only valid JSON as instructed.'
+        mode: 'reading-story',
+        context: { topic: selectedTopic, difficulty },
       })
     });
     const json = await res.json();

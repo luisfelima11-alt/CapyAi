@@ -249,6 +249,8 @@ tailwind.config = {
       <!-- ── LOGIN FORM ── -->
       <div id="form-login" class="form-panel flex flex-col gap-5">
 
+        <p id="login-notice" class="hidden rounded-xl bg-amber-50 text-amber-800 text-xs font-label leading-relaxed px-4 py-3"></p>
+
         <div class="flex flex-col gap-4">
           <!-- email -->
           <div class="flex flex-col gap-1.5">
@@ -343,7 +345,7 @@ tailwind.config = {
           <label class="font-label text-xs font-bold uppercase tracking-widest text-slate-500">Password</label>
           <div class="input-wrap">
             <span class="material-symbols-outlined icon text-slate-400 text-xl">lock</span>
-            <input id="signup-password" type="password" placeholder="Min. 6 characters" autocomplete="new-password"
+            <input id="signup-password" type="password" placeholder="Min. 8 characters" autocomplete="new-password"
                    oninput="updateStrength()"
                    class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50
                           font-body text-sm text-slate-800 placeholder:text-slate-400
@@ -387,6 +389,11 @@ tailwind.config = {
           <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1;">person_add</span>
           Create Account
         </button>
+
+        <p class="text-center font-body text-[11px] text-slate-400 leading-relaxed">
+          Ao criar sua conta, você concorda com os <a href="termos.html" target="_blank" class="text-pink-brand hover:underline">Termos de Uso</a>
+          e a <a href="privacidade.html" target="_blank" class="text-pink-brand hover:underline">Política de Privacidade</a>.
+        </p>
 
         <p id="err-signup-general" class="text-red-500 text-xs font-label text-center hidden"></p>
       </div>
@@ -540,7 +547,7 @@ function togglePw(inputId, btn) {
 function updateStrength() {
   const pw = document.getElementById('signup-password').value;
   let score = 0;
-  if (pw.length >= 6)  score++;
+  if (pw.length >= 8)  score++;
   if (pw.length >= 10) score++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
   if (/\d/.test(pw) || /[^A-Za-z0-9]/.test(pw)) score++;
@@ -591,31 +598,36 @@ async function handleLogin() {
   if (!email)    { showError('login-email',    'Email is required.');    return; }
   if (!password) { showError('login-password', 'Password is required.'); return; }
 
+  // Auth.login also copies the progress saved on the server to this device.
   const result = await Auth.login(email, password);
   if (!result.ok) {
-    showError('login-' + result.field, result.error);
+    if (result.code === 'password_reset_required') {
+      // Old accounts must confirm the e-mail once (their old password was exposed).
+      showNotice('Por segurança, contas antigas precisam confirmar o e-mail uma vez. Estamos enviando um link de acesso — depois você cria uma senha nova.');
+      forgotPassword();
+      return;
+    }
+    showError('login-' + (result.field === 'email' ? 'email' : 'password'), result.error);
     return;
   }
 
-  // Attempt to sync Store with the remote DB or fallback to local
-  const storeKey = 'capyYaraState_' + result.user.id;
-  try {
-    const res = await fetch(`/api/db?type=state&userId=${result.user.id}`);
-    if (res.ok) {
-      const dbState = await res.json();
-      if (dbState) localStorage.setItem(storeKey, JSON.stringify(dbState));
-    }
-    const resSet = await fetch(`/api/db?type=settings&userId=${result.user.id}`);
-    if (resSet.ok) {
-      const dbSet = await resSet.json();
-      if (dbSet) localStorage.setItem('capySettings', JSON.stringify(dbSet));
-    }
-  } catch(e) {}
-  
-  const saved = localStorage.getItem(storeKey);
-  if (saved) localStorage.setItem('capyYaraState', saved);
-
   showSuccess(result.user.name, false);
+}
+
+function showNotice(msg) {
+  const el = document.getElementById('login-notice');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Redirected here because the server session expired (or after the security update).
+if (new URLSearchParams(window.location.search).get('reason') === 'session') {
+  showNotice('Por segurança, entre novamente. Se sua conta é antiga, use "Entrar com link no e-mail" e depois crie uma senha nova.');
 }
 
 /* ── signup handler ─────────────────────────────── */
@@ -640,16 +652,15 @@ async function handleSignup() {
     return;
   }
 
-  // Also set playerName in the shared store
+  // Also set playerName in this user's store (the session cookie is already set)
   const storeData = JSON.parse(localStorage.getItem('capyYaraState_' + result.user.id) || '{}');
-  storeData.playerName = name;
+  storeData.playerName = result.user.name;
   localStorage.setItem('capyYaraState_' + result.user.id, JSON.stringify(storeData));
-  localStorage.setItem('capyYaraState', JSON.stringify(storeData));
-  
+
   try {
     await fetch('/api/db', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'state', userId: result.user.id, payload: storeData })
+      body: JSON.stringify({ type: 'state', payload: storeData })
     });
   } catch(e) {}
 
@@ -686,7 +697,7 @@ async function forgotPassword() {
     <div style="background:#fff;border-radius:24px;max-width:420px;width:100%;padding:32px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,.25);position:relative">
       <div style="font-size:48px;margin-bottom:12px">🦫</div>
       <h2 style="font-weight:900;font-size:20px;color:#001f3f;margin:0 0 8px">Enviando link de acesso...</h2>
-      <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 20px">Para <strong>${email}</strong></p>
+      <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 20px">Para <strong>${escapeHtml(email)}</strong></p>
       <div style="width:40px;height:40px;border:4px solid #fde68a;border-top-color:#FF9F1C;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto"></div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>`;
@@ -704,7 +715,7 @@ async function forgotPassword() {
       return;
     }
     if (!r.ok && !data.devLink) {
-      modal.innerHTML = renderMagicModal('⚠️', 'Não conseguimos enviar', data.details || 'Tente novamente em alguns minutos.');
+      modal.innerHTML = renderMagicModal('⚠️', 'Não conseguimos enviar', escapeHtml(data.message || 'Tente novamente em alguns minutos.'));
       return;
     }
 
@@ -723,7 +734,7 @@ async function forgotPassword() {
     }
 
     // Normal: success
-    modal.innerHTML = renderMagicModal('✉️', 'Check seu e-mail!', `Mandamos um link de acesso pra <strong>${email}</strong>. O link expira em 15 minutos.<br><br><span style="font-size:12px;color:#94a3b8">Não chegou? Verifique a caixa de spam.</span>`);
+    modal.innerHTML = renderMagicModal('✉️', 'Check seu e-mail!', `Mandamos um link de acesso pra <strong>${escapeHtml(email)}</strong>. O link expira em 15 minutos.<br><br><span style="font-size:12px;color:#94a3b8">Não chegou? Verifique a caixa de spam.</span>`);
   } catch (e) {
     modal.innerHTML = renderMagicModal('⚠️', 'Falha de rede', 'Verifique sua conexão e tente novamente.');
   }

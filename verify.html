@@ -36,6 +36,24 @@
       <div class="flex justify-center"><div class="spinner"></div></div>
     </div>
 
+    <!-- Set-password state (old accounts / accounts created by e-mail link) -->
+    <div id="password-state" class="hidden text-left">
+      <div class="text-5xl mb-4 text-center pop">🔐</div>
+      <h1 class="font-black text-2xl text-navy mb-2 text-center">Crie sua senha</h1>
+      <p class="text-slate-500 text-sm mb-6 text-center">Você entrou pelo link. Crie uma senha para entrar mais rápido da próxima vez.</p>
+      <label for="new-password" class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5">Nova senha</label>
+      <input id="new-password" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres"
+             class="w-full h-12 rounded-xl border-2 border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 focus:outline-none focus:border-[#FF9F1C] mb-2"/>
+      <p id="password-error" class="text-red-500 text-xs mb-3 hidden"></p>
+      <button id="save-password-btn" type="button"
+              class="block w-full bg-gradient-to-r from-[#FF9F1C] to-orange-400 text-white font-black py-3.5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-orange-500/20">
+        Salvar senha
+      </button>
+      <button id="skip-password-btn" type="button" class="block w-full text-slate-400 hover:text-slate-600 font-bold text-sm py-3">
+        Agora não
+      </button>
+    </div>
+
     <!-- Error state -->
     <div id="error-state" class="hidden">
       <div class="text-6xl mb-4 pop">⚠️</div>
@@ -87,7 +105,7 @@
       return;
     }
 
-    // Save session in the same format auth.js uses
+    // The server set the session cookie; cache the display info like auth.js does
     const session = {
       id: data.user.id,
       name: data.user.name,
@@ -95,18 +113,63 @@
       avatar: data.user.avatar || '🐾',
     };
     localStorage.setItem('capySession', JSON.stringify(session));
+    try { sessionStorage.setItem('capySessOk', session.id); } catch (e) {}
 
     // Force plan re-sync after login
     localStorage.removeItem('capyPlanSyncedAt');
 
-    loading.classList.add('hidden');
-    success.classList.remove('hidden');
-    document.getElementById('success-name').textContent = `Boa, ${session.name}! Redirecionando...`;
+    // Bring the progress saved on the server to this device before any page saves.
+    try {
+      const st = await fetch('/api/db?type=state', { cache: 'no-store' });
+      if (st.ok) {
+        const remote = await st.json();
+        if (remote && typeof remote === 'object') {
+          localStorage.setItem('capyYaraState_' + session.id, JSON.stringify(remote));
+        }
+      }
+    } catch (e) {}
 
-    // Redirect to home after a brief moment
-    setTimeout(() => {
-      window.location.href = '6_Home_Forest_Expedition.html?refresh=1';
-    }, 1200);
+    const goHome = () => {
+      loading.classList.add('hidden');
+      document.getElementById('password-state').classList.add('hidden');
+      success.classList.remove('hidden');
+      document.getElementById('success-name').textContent = `Boa, ${session.name}! Redirecionando...`;
+      setTimeout(() => { window.location.href = '6_Home_Forest_Expedition.html?refresh=1'; }, 1200);
+    };
+
+    if (!data.needsPassword) { goHome(); return; }
+
+    // Old accounts (and accounts created by e-mail link) have no password yet.
+    loading.classList.add('hidden');
+    document.getElementById('password-state').classList.remove('hidden');
+    document.getElementById('skip-password-btn').onclick = goHome;
+    document.getElementById('save-password-btn').onclick = async () => {
+      const pwErr = document.getElementById('password-error');
+      const password = document.getElementById('new-password').value;
+      pwErr.classList.add('hidden');
+      if (password.length < 8) {
+        pwErr.textContent = 'A senha precisa ter pelo menos 8 caracteres.';
+        pwErr.classList.remove('hidden');
+        return;
+      }
+      try {
+        const pr = await fetch('/api/auth/password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        const pd = await pr.json().catch(() => ({}));
+        if (!pr.ok) {
+          pwErr.textContent = pd.message || 'Não foi possível salvar a senha. Tente de novo.';
+          pwErr.classList.remove('hidden');
+          return;
+        }
+        goHome();
+      } catch (e) {
+        pwErr.textContent = 'Falha de rede. Tente de novo.';
+        pwErr.classList.remove('hidden');
+      }
+    };
   } catch (e) {
     showError('Falha de rede', 'Verifique sua conexão e tente novamente.');
   }
