@@ -16,3 +16,15 @@ alter table public.accounts
 alter table public.accounts
   drop constraint if exists accounts_avatar_no_markup,
   add constraint accounts_avatar_no_markup check (avatar !~ '[<>]') not valid;
+
+-- 2. current_account_id() is an RLS helper for signed-in users. "revoke ... from
+--    public" (202607190001) does not remove the explicit grant Supabase gives
+--    anon on new functions, which the security advisor flags.
+revoke execute on function public.current_account_id() from anon;
+
+-- 3. Token accounting per endpoint and day (bumpTokens in api/index.js). The
+--    code writes these columns: run this before deploying, or the metrics
+--    upsert fails (silently — metrics are best-effort) until it runs.
+alter table if exists public.api_metrics_daily
+  add column if not exists tokens_in  bigint not null default 0,
+  add column if not exists tokens_out bigint not null default 0;

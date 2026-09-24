@@ -286,6 +286,16 @@ function bumpMetrics(url, status, ms) {
         _persistTimer.unref?.();
     }
 }
+// Tokens per endpoint and day, next to the request counts. Without them no
+// cost per route can be measured — the base for any AI spending cap.
+function bumpTokens(endpoint, usage) {
+    if (!endpoint || !usage) return;
+    const key = `${new Date().toISOString().slice(0, 10)}|${endpoint}`;
+    const m = _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+    m.tokens_in  = (m.tokens_in  || 0) + (Number(usage.prompt_tokens     ?? usage.input_tokens)  || 0);
+    m.tokens_out = (m.tokens_out || 0) + (Number(usage.completion_tokens ?? usage.output_tokens) || 0);
+}
+
 async function persistMetrics() {
     _persistTimer = null;
     const snapshot = Object.entries(_metrics).map(([k, v]) => {
@@ -301,6 +311,8 @@ async function persistMetrics() {
                 requests: prev.requests + row.requests,
                 errors:   prev.errors   + row.errors,
                 total_ms: prev.total_ms + row.total_ms,
+                tokens_in:  (prev.tokens_in  || 0) + (row.tokens_in  || 0),
+                tokens_out: (prev.tokens_out || 0) + (row.tokens_out || 0),
             } : row;
             await sb('/api_metrics_daily', {
                 method: 'POST',
@@ -567,6 +579,7 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
             }
             try {
                 const parsed = JSON.parse(data);
+                bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                 const text = parsed?.choices?.[0]?.message?.content || '';
                 res.status(200).end(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
             } catch(e) {
@@ -613,6 +626,7 @@ function chatComplete(messages, opts = {}) {
                 }
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(opts.rota, parsed?.usage);
                     resolve({
                         text:  parsed?.choices?.[0]?.message?.content || '',
                         usage: parsed?.usage || null,
@@ -2265,7 +2279,7 @@ module.exports = async (req, res) => {
                         + 'Seja honesta: se ele foi mal, diga com gentileza mas sem inventar elogio.',
                 },
                 { role: 'user', content: (cargo ? `Vaga: ${cargo}\n\n` : '') + dialogo },
-            ], { json: true, temperature: 0.3, maxTokens: 900 });
+            ], { json: true, temperature: 0.3, maxTokens: 900, rota: req.url.split('?')[0] });
             feedback = sanitizeAiOutput(JSON.parse(r.text));
         } catch (e) {
             console.error('[conversa-feedback]', e.message);
@@ -2534,6 +2548,7 @@ Return exactly ${items.length} articles, in the same order as the items above.`;
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const aiArticles = Array.isArray(obj.articles) ? obj.articles : [];
@@ -2603,6 +2618,7 @@ Respond ONLY with valid JSON, no markdown:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const article = {
@@ -3258,6 +3274,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const learning = JSON.parse(content);
                     res.status(200).json({ videoId, transcript: transcriptSnippet, ...learning });
@@ -3335,6 +3352,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar aula personalizada.' }); }
@@ -3387,6 +3405,7 @@ Rules:
             apiRes.on('end', () => {
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     if (parsed.error) { console.error('[transcribe] upstream', String(parsed.error.message || '').slice(0, 300)); res.status(502).json({ error: 'Erro na transcrição.' }); return; }
                     res.status(200).json({ text: (parsed.text || '').trim() });
                 } catch (e) { res.status(500).json({ error: 'Erro ao processar a transcrição.' }); }
@@ -4131,7 +4150,7 @@ Rules:
             const r = await chatComplete([
                 { role: 'system', content: 'Você é o assistente de um professor de inglês brasileiro. Responda SEMPRE em português do Brasil, direto e sem enrolação, como quem fala com o professor no café. Devolva APENAS um objeto JSON com estas chaves: "manchete" (uma frase sobre o dia), "churn" (array de até 5 strings: quem está em risco de sumir e o que fazer), "acoes" (array de até 4 strings: o que o professor faz hoje), "conteudo" (array de até 3 strings: o que cobrir na próxima aula), "animo" (uma frase de incentivo honesta, sem bajulação). Não invente dados que não estão no relatório.' },
                 { role: 'user', content: prompt },
-            ], { json: true, temperature: 0.3, maxTokens: 700 });
+            ], { json: true, temperature: 0.3, maxTokens: 700, rota: req.url.split('?')[0] });
             usage = r.usage;
             brief = sanitizeAiOutput(JSON.parse(r.text));
         } catch (e) {
@@ -4373,6 +4392,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const out = JSON.parse(content);
                     out.score = Math.min(5, Math.max(1, parseInt(out.score, 10) || 3));
@@ -4446,6 +4466,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar cronograma.' }); }
@@ -4514,6 +4535,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao analisar a letra.' }); }
