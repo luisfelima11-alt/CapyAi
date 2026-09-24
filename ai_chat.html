@@ -225,6 +225,7 @@ const history = [];
 // ── Greeting ───────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
+    if (history.length) return;   // the conversation already started
     showBubble(`Olá, ${userName}! 🐾 I'm Yara — ask me anything in English!`, false);
   }, 600);
 });
@@ -236,20 +237,29 @@ async function sendMessage() {
   if (!text) return;
   input.value = '';
   showUserPill(text);
+  // Earlier turns only (the new message goes in `message`), in the API's {role, text} format.
+  const past = history.slice(-8).map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', text: m.content }));
   history.push({ role: 'user', content: text });
-  setTimeout(() => showBubble('', true), 400);
+  // Typing dots after 400ms — cancelled if the reply arrives first (it would hide the reply).
+  const typingTimer = setTimeout(() => showBubble('', true), 400);
+  window.capyTrack?.('yara_message_sent', { surface: 'chat' });
 
   try {
     const res  = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, userId, history: history.slice(-8) })
+      body: JSON.stringify({ message: text, history: past })
     });
     const data = await res.json();
-    const reply = data.reply || data.message || '...';
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      || data?.error?.message
+      || data?.message
+      || 'Ops! Tente novamente. 😅';
     history.push({ role: 'assistant', content: reply });
+    clearTimeout(typingTimer);
     showBubble(reply, false);
   } catch {
+    clearTimeout(typingTimer);
     showBubble('Ops! Tente novamente. 😅', false);
   }
 }

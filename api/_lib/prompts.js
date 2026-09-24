@@ -25,11 +25,13 @@ function clipList(list, maxItems, maxLen) {
         .filter(Boolean);
 }
 
+// Accepts {role:'user'|'model'|'assistant', text} (or `content` instead of `text`).
 function cleanHistory(history) {
     return (Array.isArray(history) ? history : [])
-        .filter(m => m && typeof m.text === 'string' && m.text.trim())
+        .map(m => ({ role: m && m.role, text: m && (typeof m.text === 'string' ? m.text : m.content) }))
+        .filter(m => typeof m.text === 'string' && m.text.trim())
         .slice(-LIMITS.historyItems)
-        .map(m => ({ role: m.role === 'model' ? 'assistant' : 'user', content: clip(m.text, LIMITS.historyText) }));
+        .map(m => ({ role: m.role === 'model' || m.role === 'assistant' ? 'assistant' : 'user', content: clip(m.text, LIMITS.historyText) }));
 }
 
 const YARA_TUTOR = `You are Yara, a friendly and cheerful capybara who teaches English to Brazilian students.
