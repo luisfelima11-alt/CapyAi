@@ -457,7 +457,7 @@ converte qualquer falha de escrita em `HttpError(502,'database_error')`, esconde
 mensagem real do PostgREST, então o erro não dizia qual coluna faltava.
 **Correção:** no bloco do `grant-plan` em `api/index.js`, gerar
 `userId = 'grant-' + crypto.randomBytes(8).toString('hex')` e mandar no insert.
-Confirmado em produção: `gavinhacarol@gmail.com → super (conta CRIADA agora)`.
+Confirmado em produção: `aluna@exemplo.com → super (conta CRIADA agora)`.
 **Como pegar isso de novo:**
 ```bash
 node scripts/cortesias.mjs                         # lista, nao escreve
