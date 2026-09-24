@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<script src="analytics.js"></script>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
   <meta http-equiv="Pragma" content="no-cache"/>
   <meta http-equiv="Expires" content="0"/>
@@ -611,6 +612,8 @@ async function handleLogin() {
     return;
   }
 
+  window.capyIdentify?.(result.user.id);
+  window.capyTrack?.('login_completed', { method: 'password' });
   showSuccess(result.user.name, false);
 }
 
@@ -664,6 +667,8 @@ async function handleSignup() {
     });
   } catch(e) {}
 
+  window.capyIdentify?.(result.user.id);
+  window.capyTrack?.('signup_completed', { method: 'password' });
   showSuccess(result.user.name, true);
 }
 
@@ -702,6 +707,7 @@ async function forgotPassword() {
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>`;
 
+  window.capyTrack?.('magic_link_requested');
   try {
     const r = await fetch('/api/auth/magic-link', {
       method: 'POST',

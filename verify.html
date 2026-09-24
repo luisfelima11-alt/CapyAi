@@ -129,6 +129,16 @@
       }
     } catch (e) {}
 
+    // verify.html does not load analytics (the URL has a token): hand the event to the next page.
+    const queueTrack = (event, props) => {
+      try {
+        const q = JSON.parse(sessionStorage.getItem('capyPendingTrack') || '[]');
+        q.push({ event, props });
+        sessionStorage.setItem('capyPendingTrack', JSON.stringify(q));
+      } catch (e) {}
+    };
+    queueTrack('login_completed', { method: 'link', needs_password: !!data.needsPassword });
+
     const goHome = () => {
       loading.classList.add('hidden');
       document.getElementById('password-state').classList.add('hidden');
@@ -164,6 +174,7 @@
           pwErr.classList.remove('hidden');
           return;
         }
+        queueTrack('password_created', { via: 'link' });
         goHome();
       } catch (e) {
         pwErr.textContent = 'Falha de rede. Tente de novo.';

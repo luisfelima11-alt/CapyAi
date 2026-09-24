@@ -22,6 +22,7 @@
 
   function showYaraPaywall() {
     if (document.getElementById('yw-paywall')) return;
+    window.capyTrack?.('paywall_viewed', { trigger: 'yara_widget', lesson: LESSON_NUM || null });
     const modal = document.createElement('div');
     modal.id = 'yw-paywall';
     modal.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);font-family:system-ui,sans-serif;';
@@ -230,6 +231,8 @@
 
     isLoading = true;
     const typingEl = addMsg('yara typing', IS_FR ? 'Yara réfléchit…' : 'Yara is thinking…');
+
+    window.capyTrack?.('yara_message_sent', { surface: 'lesson_widget', lesson: LESSON_NUM || null, lang: LANG });
 
     // Page context goes to the server, which owns Yara's prompt (mode: 'lesson').
     const pageCtx = collectContext();

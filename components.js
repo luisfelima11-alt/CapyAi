@@ -4,6 +4,7 @@ const Components = {
         try { if (window.Auth && Auth.logout) { await Auth.logout(); return; } } catch (e) {}
         try { if (window.Store && Store._flush) Store._flush(true); } catch (e) {}
         try { await fetch('/api/auth/logout', { method: 'POST', keepalive: true }); } catch (e) {}
+        try { window.capyResetAnalytics?.(); } catch (e) {}
         try {
             const s = JSON.parse(localStorage.getItem('capySession') || 'null');
             localStorage.removeItem('capySession');

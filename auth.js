@@ -61,6 +61,7 @@ const Auth = {
         const s = this.getSession();
         try { if (window.Store && Store._flush) Store._flush(true); } catch (e) {}
         try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+        try { window.capyResetAnalytics?.(); } catch (e) {}
         this.clearLocal(s && s.id);
         window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
     },

@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
+<script src="analytics.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bem-vindo à Capy English! | Onboarding</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -465,6 +466,10 @@ async function saveProfile() {
       interests_detail: profile.interestsDetail || null,
       daily_goal_minutes: profile.minutes,
       onboarding_complete: true
+    });
+    window.capyTrack?.('onboarding_completed', {
+      level: profile.level, goals: (profile.goals || []).length,
+      interests: (profile.interests || []).length, daily_goal_minutes: profile.minutes,
     });
 
     // Update Store locally
