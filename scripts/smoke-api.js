@@ -315,6 +315,79 @@ function listen(server) {
         assert.strictEqual((await bob.req('GET', '/api/me')).json.plan, 'pro');
     });
 
+    console.log('\n📈 Lesson progress, streak and summary');
+    const { todayBRT, addDays } = require('../api/_lib/dates');
+    const today = todayBRT();
+    const carla = client('10.0.5.1');
+    let carlaId;
+    await test('progress endpoints need a session', async () => {
+        assert.strictEqual((await anon.req('GET', '/api/progress?lessonId=aula_01')).status, 401);
+        assert.strictEqual((await anon.req('POST', '/api/progress', { lessonId: 'aula_01', items: ['section:vocab'] })).status, 401);
+        assert.strictEqual((await anon.req('POST', '/api/activity', { kind: 'game' })).status, 401);
+        assert.strictEqual((await anon.req('GET', '/api/me/summary')).status, 401);
+    });
+    await test('first section of the day starts the streak; items are saved once', async () => {
+        const s = await carla.req('POST', '/api/auth/signup', { name: 'Carla', email: 'carla@example.com', password: 'password789' });
+        carlaId = s.json.user.id;
+        await carla.req('POST', '/api/profile', { daily_goal_minutes: 10 });   // goal = 2 activities
+        const r = await carla.req('POST', '/api/progress', { lessonId: 'aula_01', items: ['section:vocab', 'xp:vocab:20#1', 'bogus', 'section:<script>'] });
+        assert.strictEqual(r.status, 200, r.text);
+        assert.deepStrictEqual(r.json.inserted.sort(), ['section:vocab', 'xp:vocab:20#1']);
+        assert.deepStrictEqual([r.json.streak.current, r.json.streak.extended], [1, true]);
+        assert.deepStrictEqual([r.json.today.count, r.json.today.goal, r.json.today.reached], [1, 2, false]);
+        const again = await carla.req('POST', '/api/progress', { lessonId: 'aula_01', items: ['section:vocab', 'xp:vocab:20#1'] });
+        assert.deepStrictEqual(again.json.inserted, []);
+        assert.strictEqual(again.json.streak, null, 'nothing new → no study activity counted');
+        const got = await carla.req('GET', '/api/progress?lessonId=aula_01');
+        assert.deepStrictEqual(got.json.items.sort(), ['section:vocab', 'xp:vocab:20#1']);
+    });
+    await test('invalid lesson ids are rejected', async () => {
+        assert.strictEqual((await carla.req('POST', '/api/progress', { lessonId: '../accounts', items: ['section:vocab'] })).status, 400);
+        assert.strictEqual((await carla.req('GET', '/api/progress?lessonId=aula_1%27')).status, 400);
+    });
+    await test('second activity reaches the daily goal without extending the streak twice', async () => {
+        const r = await carla.req('POST', '/api/activity', { kind: 'game' });
+        assert.strictEqual(r.status, 200, r.text);
+        assert.deepStrictEqual([r.json.streak.current, r.json.streak.extended], [1, false]);
+        assert.deepStrictEqual([r.json.today.count, r.json.today.reached, r.json.today.justReached], [2, true, true]);
+    });
+    await test('streak continues from yesterday (with milestone) and resets after a missed day', async () => {
+        const row = store.user_streaks.find(x => x.user_id === carlaId);
+        Object.assign(row, { current: 6, longest: 6, last_day: addDays(today, -1) });
+        const r = await carla.req('POST', '/api/activity', { kind: 'trail' });
+        assert.deepStrictEqual([r.json.streak.current, r.json.streak.extended, r.json.streak.milestone], [7, true, 7]);
+        Object.assign(row, { current: 9, longest: 9, last_day: addDays(today, -3) });
+        const sum = await carla.req('GET', '/api/me/summary');
+        assert.strictEqual(sum.json.streak.current, 0, 'a broken streak shows 0');
+        const r2 = await carla.req('POST', '/api/activity', { kind: 'game' });
+        assert.deepStrictEqual([r2.json.streak.current, r2.json.streak.longest], [1, 9]);
+    });
+    await test('lesson completes on homework; summary continues from the furthest lesson', async () => {
+        let sum = await carla.req('GET', '/api/me/summary');
+        assert.deepStrictEqual([sum.json.lessons.next.id, sum.json.lessons.next.section], ['aula_01', 'expressions']);
+        const r = await carla.req('POST', '/api/progress', { lessonId: 'aula_01', items: ['section:homework'] });
+        assert.strictEqual(r.json.lessonCompleted, true);
+        sum = await carla.req('GET', '/api/me/summary');
+        assert.deepStrictEqual(sum.json.lessons.completed, [1]);
+        assert.strictEqual(sum.json.lessons.next.id, 'aula_02');
+        await carla.req('POST', '/api/progress', { lessonId: 'aula_43', items: ['section:situation'] });
+        sum = await carla.req('GET', '/api/me/summary');
+        assert.deepStrictEqual([sum.json.lessons.next.id, sum.json.lessons.next.n, sum.json.lessons.next.section], ['aula_43', 33, 'dialogue']);
+    });
+    await test("users cannot read or write another user's progress", async () => {
+        const r = await bob.req('GET', '/api/progress?lessonId=aula_01');
+        assert.deepStrictEqual(r.json.items, []);
+        await bob.req('POST', '/api/progress', { lessonId: 'aula_01', items: ['section:speak'], userId: carlaId });
+        assert.ok(!store.lesson_progress.some(x => x.user_id === carlaId && x.item === 'section:speak'));
+    });
+    await test('saved items per lesson are capped', async () => {
+        for (let k = 0; k < 6; k++) {
+            const items = Array.from({ length: 20 }, (_, i) => `xp:t${k}:10#${i + 1}`);
+            await carla.req('POST', '/api/progress', { lessonId: 'aula_02', items });
+        }
+        assert.strictEqual(store.lesson_progress.filter(x => x.user_id === carlaId && x.lesson_id === 'aula_02').length, 80);
+    });
+
     console.log('\n📁 Dev server static files');
     await test('dotfiles, server code and path traversal are not served', async () => {
         for (const p of ['/.env', '/.git/config', '/scripts/dev-server.js', '/api/index.js', '/..%2f..%2fetc%2fpasswd']) {

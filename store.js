@@ -1,9 +1,18 @@
+// "YYYY-MM-DD" in the browser's timezone, shifted by `offset` days.
+function capyLocalDay(offset) {
+    const d = new Date();
+    if (offset) d.setDate(d.getDate() + offset);
+    return d.toLocaleDateString('en-CA');
+}
+
 // Fresh default state (a function, so arrays/objects are never shared).
 function capyDefaultState() {
     return {
         xp: 0,
-        streakActive: false,
-        streakDays: 0,
+        streakActive: false,    // studied today
+        streakDays: 0,          // consecutive study days (server value for logged-in users)
+        longestStreak: 0,
+        lastStudyDay: '',       // 'YYYY-MM-DD' of the last study activity
         badges: [],
         completedActivities: {},
         completedLessons: [],
@@ -55,6 +64,7 @@ const Store = {
         } else {
             this._writeLocal();
         }
+        this._migrateStreakFields();
         this.checkDailyReset();
         if (this._userId) this._syncWithServer(hadLocal);
     },
@@ -92,6 +102,89 @@ const Store = {
         // Forces immediate sync if URL has ?refresh=1 (used after Kiwify checkout return).
         const forceSync = new URLSearchParams(window.location.search).get('refresh') === '1';
         this.syncPlanFromServer({ force: forceSync });
+
+        // 4) Streak, daily goal and "continue" come from the server.
+        this.refreshSummary();
+    },
+
+    // Old saves had no lastStudyDay (and a streak that never reset): infer it once.
+    _migrateStreakFields() {
+        if (this.state.lastStudyDay !== undefined && this.state.lastStudyDay !== '') return;
+        if (!(this.state.streakDays > 0)) { this.state.lastStudyDay = ''; return; }
+        const today = capyLocalDay(), yesterday = capyLocalDay(-1);
+        const q = this.state.lastQuestDate || '';
+        // Studied today → today; seen recently → give the benefit of the doubt (yesterday).
+        this.state.lastStudyDay = this.state.streakActive && q === today ? today
+            : (q >= yesterday ? yesterday : q);
+    },
+
+    // Latest server summary ({streak, today, lessons}); cached for 2 minutes per tab.
+    summary: null,
+    async refreshSummary({ force = false } = {}) {
+        if (!this._userId) return null;
+        try {
+            const cached = JSON.parse(sessionStorage.getItem('capySummary') || 'null');
+            if (!force && cached && cached.uid === this._userId && Date.now() - cached.at < 120000) {
+                this._applySummary(cached.data);
+                return cached.data;
+            }
+            const r = await fetch('/api/me/summary', { cache: 'no-store' });
+            if (!r.ok) return null;
+            const data = await r.json();
+            sessionStorage.setItem('capySummary', JSON.stringify({ uid: this._userId, at: Date.now(), data }));
+            this._applySummary(data);
+            return data;
+        } catch (e) { return null; }
+    },
+
+    _applySummary(data) {
+        if (!data) return;
+        this.summary = data;
+        this.applyServerStreak(data.streak, null, { silent: true });
+        document.dispatchEvent(new CustomEvent('summaryLoaded', { detail: data }));
+    },
+
+    // Server streak → local state. `today` = {count, goal, reached, justReached}.
+    applyServerStreak(streak, today, { silent = false } = {}) {
+        if (!streak) return;
+        const before = this.state.streakDays;
+        const next = {
+            streakDays: streak.current || 0,
+            longestStreak: Math.max(streak.longest || 0, this.state.longestStreak || 0),
+            streakActive: !!streak.activeToday,
+            lastStudyDay: streak.activeToday ? capyLocalDay() : this.state.lastStudyDay,
+        };
+        if (Object.keys(next).some(k => this.state[k] !== next[k])) {
+            Object.assign(this.state, next);
+            this.save();
+        }
+        if (silent) return;
+        try { sessionStorage.removeItem('capySummary'); } catch (e) {}   // numbers changed on the server
+        if (streak.extended) {
+            window.capyTrack?.('streak_extended', { days: streak.current });
+            document.dispatchEvent(new CustomEvent('streakExtended', { detail: { days: streak.current, before } }));
+            if (streak.milestone) this.checkStreakMilestone();
+        }
+        if (today && today.justReached) {
+            window.capyTrack?.('daily_goal_reached', { goal: today.goal });
+            document.dispatchEvent(new CustomEvent('dailyGoalReached', { detail: today }));
+        }
+    },
+
+    // Tells the server a study activity happened (games, trail, challenge...).
+    async reportActivity(kind) {
+        if (!this._userId) return null;
+        try {
+            const r = await fetch('/api/activity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ kind: kind || 'other' }),
+            });
+            if (!r.ok) return null;
+            const data = await r.json();
+            this.applyServerStreak(data.streak, data.today);
+            return data;
+        } catch (e) { return null; }
     },
 
     _sessionExpired() {
@@ -136,12 +229,14 @@ const Store = {
     },
 
     checkDailyReset() {
-        const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+        const today = capyLocalDay();
         if (this.state.lastQuestDate !== today) {
             this.state.completedActivities = {};   // clear ALL daily activities
-            this.state.streakActive = false;
+            this.state.streakActive = this.state.lastStudyDay === today;
             this.state.aiUsageToday = 0;           // reset AI counter daily
             this.state.lastQuestDate = today;
+            // A missed day breaks the streak (logged-in users get the server value later).
+            if (this.state.lastStudyDay && this.state.lastStudyDay < capyLocalDay(-1)) this.state.streakDays = 0;
             this.save();
         }
     },
@@ -215,13 +310,31 @@ const Store = {
         return this.getLevel() * 100;
     },
 
-    activateStreak() {
-        if (!this.state.streakActive) {
+    // Call after any real study activity (game won, trail mini-lesson, challenge...).
+    // Counts at most once per day locally; logged-in users also report it to the
+    // server, whose answer (streak, daily goal) replaces the local numbers.
+    activateStreak(kind) {
+        const today = capyLocalDay();
+        if (this.state.lastStudyDay !== today) {
+            this.state.streakDays = this.state.lastStudyDay === capyLocalDay(-1) ? (this.state.streakDays || 0) + 1 : 1;
+            this.state.longestStreak = Math.max(this.state.longestStreak || 0, this.state.streakDays);
+            this.state.lastStudyDay = today;
             this.state.streakActive = true;
-            this.state.streakDays += 1;
             this.save();
-            this.checkStreakMilestone();
+            if (!this._userId) {
+                window.capyTrack?.('streak_extended', { days: this.state.streakDays });
+                this.checkStreakMilestone();
+            }
         }
+        if (this._userId) this.reportActivity(kind || this._pageKind());
+    },
+
+    _pageKind() {
+        const p = location.pathname;
+        if (/_game\.html$|Game_Pavilion|flappy|tictactoe/i.test(p)) return 'game';
+        if (/lessons\.html|lesson_runner|learn\.html/.test(p)) return 'trail';
+        if (/daily_challenge|6_Home/.test(p)) return 'challenge';
+        return 'other';
     },
 
     checkStreakMilestone() {
@@ -281,11 +394,9 @@ const Store = {
             this.state.completedMinis.push(key);
             this.save();
         }
-        // When last mini done → also mark the full lesson complete + streak
-        if (miniNum === 4) {
-            this.completeLesson(lessonId);
-            this.activateStreak();
-        }
+        // Each mini-lesson is a day of study; the last one also completes the lesson.
+        if (miniNum === 4) this.completeLesson(lessonId);
+        this.activateStreak('trail');
     },
 
     isMiniDone(lessonId, miniNum) {

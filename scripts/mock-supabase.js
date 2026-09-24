@@ -4,7 +4,8 @@
 // ════════════════════════════════════════════════════════════════════════════
 // Supports exactly what api/index.js uses: filters (eq, gte, is.null),
 // select (columns or *), order, limit, POST insert/upsert
-// (Prefer: resolution=merge-duplicates), PATCH, and return=representation.
+// (Prefer: resolution=merge-duplicates | ignore-duplicates), PATCH, and
+// return=representation.
 // Also enforces the unique lower(email) index from supabase/migrations/0001.
 //
 // Local dev without a real database:
@@ -23,6 +24,9 @@ const PRIMARY_KEYS = {
     api_metrics_daily:    ['day', 'endpoint'],
     magic_link_tokens:    ['token'],
     homework_submissions: ['id'],
+    lesson_progress:      ['user_id', 'lesson_id', 'item'],
+    activity_days:        ['user_id', 'day'],
+    user_streaks:         ['user_id'],
 };
 
 function createStore() {
@@ -118,6 +122,7 @@ function createServer(store = createStore()) {
             if (req.method === 'POST') {
                 const items = Array.isArray(payload) ? payload : [payload];
                 const upsert = prefer.includes('resolution=merge-duplicates');
+                const ignoreDup = prefer.includes('resolution=ignore-duplicates');
                 const pk = PRIMARY_KEYS[table];
                 const written = [];
                 for (const item of items) {
@@ -128,6 +133,7 @@ function createServer(store = createStore()) {
                     }
                     if (table === 'homework_submissions' && row.id == null) row.id = homeworkSeq++;
                     const existing = rows.find(r => pk.every(k => r[k] === row[k]));
+                    if (existing && ignoreDup) continue;   // ON CONFLICT DO NOTHING: not returned
                     if (existing && !upsert) return pgError(res, 409, '23505', 'duplicate key value violates unique constraint');
                     if (emailTaken(table, row, existing)) return pgError(res, 409, '23505', 'duplicate key value violates unique constraint "accounts_email_lower_key"');
                     if (existing) { Object.assign(existing, row); written.push(existing); }

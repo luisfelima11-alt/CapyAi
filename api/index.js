@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const { sb, sbRequest, sbRows } = require('./_lib/supabase');
 const session = require('./_lib/session');
 const { buildChat, clip, clipList, cleanHistory } = require('./_lib/prompts');
+const { todayBRT, secondsUntilBrtMidnight } = require('./_lib/dates');
+const progress = require('./_lib/progress');
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
 // Product IDs from Kiwify dashboard URLs (.../products/edit/<UUID>).
@@ -58,18 +60,6 @@ function isValidEmail(email) { return email.length <= 254 && /^[^\s@]+@[^\s@]+\.
 
 function publicUser(acc) {
     return { id: acc.id, name: acc.name, email: acc.email, avatar: acc.avatar || '🐾' };
-}
-
-// "YYYY-MM-DD" in Brazil time — daily limits and daily content flip at 00:00 BRT.
-function todayBRT() {
-    return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
-}
-
-function secondsUntilBrtMidnight() {
-    const now = new Date();
-    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0)); // 00:00 BRT = 03:00 UTC
-    if (next <= now) next.setUTCDate(next.getUTCDate() + 1);
-    return Math.ceil((next - now) / 1000);
 }
 
 // Read raw body with a size cap (returns null if the cap is exceeded).
@@ -155,6 +145,8 @@ const RATE_LIMITS = {
     login:        { guest:  30 },                                    // per IP
     'login-email':{ guest:  15 },                                    // per e-mail address
     password:     { guest:  10, free:  10, pro:  10, super:  10 },
+    activity:     { free: 300, pro: 300, super: 300 },          // study activity reports (games, trail...)
+    progress:     { free: 600, pro: 600, super: 600 },          // lesson progress saves
 };
 
 async function getUserPlan(userId) {
@@ -974,6 +966,56 @@ module.exports = async (req, res) => {
             planExpiresAt: row.plan_expires_at || null,
             kiwifySubscriptionId: row.kiwify_subscription_id || null,
         });
+        return;
+    }
+
+    // ── Lesson progress & streaks (api/_lib/progress.js) ─────────────────────
+
+    // GET /api/progress?lessonId=aula_12 → items saved for that lesson
+    if (req.method === 'GET' && url === '/api/progress') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const lessonId = new URL(req.url, 'http://localhost').searchParams.get('lessonId') || '';
+        if (!progress.LESSON_ID_RE.test(lessonId)) { res.status(400).json({ error: 'invalid_lesson' }); return; }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ lessonId, items: await progress.getLessonItems(acc.id, lessonId) });
+        return;
+    }
+
+    // POST /api/progress  body: { lessonId, items: ['section:vocab', 'xp:vocab:20#1'] }
+    // New sections count as a study activity (streak + daily goal).
+    if (req.method === 'POST' && url === '/api/progress') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const { lessonId, items } = await readBody(req, 16 * 1024);
+        if (!progress.LESSON_ID_RE.test(String(lessonId || ''))) { res.status(400).json({ error: 'invalid_lesson' }); return; }
+        const _rl = await checkRateLimit(req, 'progress', acc.id);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const r = await progress.saveLessonItems(acc.id, lessonId, items);
+        if (r.error) { res.status(502).json({ error: r.error }); return; }
+        res.status(200).json({ ok: true, inserted: r.inserted, lessonCompleted: r.lessonCompleted,
+            streak: r.study ? r.study.streak : null, today: r.study ? r.study.today : null });
+        return;
+    }
+
+    // POST /api/activity  body: { kind } → counts a study activity outside lesson pages
+    // (games, trail mini-lessons, daily challenge…) for the streak and daily goal.
+    if (req.method === 'POST' && url === '/api/activity') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        const _rl = await checkRateLimit(req, 'activity', acc.id);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const r = await progress.recordStudyDay(acc.id);
+        res.status(200).json({ ok: true, streak: r.streak, today: r.today });
+        return;
+    }
+
+    // GET /api/me/summary → streak, today's goal and "continue where you left off"
+    if (req.method === 'GET' && url === '/api/me/summary') {
+        const acc = await session.requireUser(req, res);
+        if (!acc) { res.status(401).json({ error: 'unauthenticated' }); return; }
+        res.setHeader('Cache-Control', 'private, no-store');
+        res.status(200).json(await progress.getSummary(acc.id));
         return;
     }
 

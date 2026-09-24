@@ -269,7 +269,7 @@ function markSection(s) {
     if (typeof Store !== 'undefined') {
       Store.addXP(30);
       const st = Store.get();
-      if (!st.completedLessons.includes(44)) { st.completedLessons.push(44); Store._save(st); }
+      if (!st.completedLessons.includes(34)) { st.completedLessons.push(34); Store._save(st); }  // display #34 in classes.html
     }
   }
 }
@@ -670,7 +670,7 @@ function submitHomework44() {
   if (typeof Store !== 'undefined') {
     Store.addXP(75);
     const st = Store.get();
-    if (!st.completedLessons.includes(44)) { st.completedLessons.push(44); Store._save(st); }
+    if (!st.completedLessons.includes(34)) { st.completedLessons.push(34); Store._save(st); }  // display #34 in classes.html
   }
   showXP('+75 XP 🎉');
   updateDots44();
@@ -701,5 +701,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>window.YARA_WIDGET = { lang: 'en', lessonTitle: 'Tell Me About Yourself', lessonNum: 44 };</script>
 <script src="yara-widget.js?v=d465bfc"></script>
+<script src="progress.js"></script>
 </body>
 </html>
