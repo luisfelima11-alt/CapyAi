@@ -149,6 +149,7 @@ const RATE_LIMITS = {
     homework:     { free:  20, pro: 100, super: 200 },
     'auth-login': { free:  20, pro:  20, super:  20 },
     'auth-signup':{ free:   5, pro:   5, super:   5 },
+    mfa:          { free:  20, pro:  20, super:  20 },  // admin MFA enroll/verify attempts per day
     track:        { free: 200, pro: 200, super: 200 },  // per IP per day (analytics beacon)
 };
 
@@ -485,23 +486,21 @@ async function writeSecurityAudit(req, action, targetType, targetId = '') {
 }
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
-// Two independent ways in: (1) Bearer ADMIN_KEY/CRON_SECRET — used by scripts,
-// cron jobs, and admin.html's older key-prompt flow; (2) a cookie-based Supabase
-// session whose app_metadata.role is 'admin' — used by the newer admin.html
-// login flow (auth-secure.js), which never sends an Authorization header.
-// MFA is intentionally not required here (unlike requireRole) since no admin
-// account has enrolled MFA yet — tighten this once that's set up.
+// The only way in is a Supabase session whose app_metadata.role is 'admin'
+// (admin.html via auth-secure.js). Static keys are gone: ADMIN_KEY/CRON_SECRET
+// opened every admin route — including "log in as a student" and "set any
+// password" — to whoever held a string from a .env file. CRON_SECRET still
+// guards the two cron routes, which check it themselves.
+//
+// MFA: required (aal2) once ADMIN_REQUIRE_MFA=true. It stays opt-in so that
+// shipping the enrolment screen can't lock the owner out: enrol first at
+// /admin.html, then set the variable (see SECURITY-ROLLOUT).
 async function isAdminReq(req, res) {
-    const auth = req.headers['authorization'] || '';
-    const m = /^Bearer\s+(.+)$/i.exec(auth);
-    if (m) {
-        const token = m[1].trim();
-        const validKeys = [process.env.ADMIN_KEY, process.env.CRON_SECRET].filter(Boolean);
-        if (validKeys.some(k => safeEqual(token, k))) return true;
-    }
     try {
         const identity = await getRequestIdentity(req, res, { allowGuest: false });
-        if (identity?.kind === 'user' && identity.session.user?.app_metadata?.role === 'admin') return true;
+        if (identity?.kind !== 'user' || identity.session.user?.app_metadata?.role !== 'admin') return false;
+        if (process.env.ADMIN_REQUIRE_MFA === 'true' && identity.session.jwt?.aal !== 'aal2') return false;
+        return true;
     } catch (e) { /* no valid session — fall through to false */ }
     return false;
 }
@@ -1573,6 +1572,77 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // ── Admin MFA (TOTP) ─────────────────────────────────────────────────────
+    // GET  /api/auth/mfa/status               → { aal, enforced, factors:[{id,status,friendlyName}] }
+    // POST /api/auth/mfa/enroll               → { factorId, qrCode, secret, uri }
+    // POST /api/auth/mfa/verify {factorId, code} → { ok, aal:'aal2', csrfToken }
+    // Admins only. Enrolling at aal1 is allowed only while the account has no
+    // verified factor; after that a new one needs aal2, or a stolen password
+    // could register the thief's own phone.
+    if (url.startsWith('/api/auth/mfa/')) {
+        const identity = await getRequestIdentity(req, res, { allowGuest: false });
+        if (!identity || identity.kind !== 'user' || identity.session.user?.app_metadata?.role !== 'admin') {
+            throw new HttpError(403, 'admin_only', 'Only administrators manage MFA here.');
+        }
+        const sessao = identity.session;
+        const fatores = (Array.isArray(sessao.user?.factors) ? sessao.user.factors : [])
+            .filter(f => f && f.factor_type === 'totp');
+        const verificados = fatores.filter(f => f.status === 'verified');
+        const aal = sessao.jwt?.aal || 'aal1';
+
+        if (req.method === 'GET' && url === '/api/auth/mfa/status') {
+            res.status(200).json({
+                aal,
+                enforced: process.env.ADMIN_REQUIRE_MFA === 'true',
+                factors: fatores.map(f => ({ id: f.id, status: f.status, friendlyName: f.friendly_name || '' })),
+            });
+            return;
+        }
+
+        if (req.method === 'POST' && (url === '/api/auth/mfa/enroll' || url === '/api/auth/mfa/verify')) {
+            assertCsrf(req);
+            const limited = await checkRateLimit(req, 'mfa', null);
+            if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        }
+
+        if (req.method === 'POST' && url === '/api/auth/mfa/enroll') {
+            if (verificados.length && aal !== 'aal2') {
+                throw new HttpError(403, 'mfa_required', 'Confirm the code from your current authenticator first.');
+            }
+            // Half-finished enrolments pile up (and Supabase caps them): clear them.
+            for (const f of fatores.filter(f => f.status !== 'verified')) {
+                try { await Security.mfaUnenroll(sessao.accessToken, f.id); } catch (e) { /* keep going */ }
+            }
+            const nome = `Capy Admin ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
+            const r = await Security.mfaEnroll(sessao.accessToken, nome);
+            const qr = String(r?.totp?.qr_code || '');
+            res.status(200).json({
+                factorId: r?.id || '',
+                qrCode: qr.startsWith('data:image/') ? qr : (qr ? `data:image/svg+xml;utf8,${encodeURIComponent(qr)}` : ''),
+                secret: r?.totp?.secret || '',
+                uri: r?.totp?.uri || '',
+            });
+            return;
+        }
+
+        if (req.method === 'POST' && url === '/api/auth/mfa/verify') {
+            const { factorId, code } = await readBody(req);
+            const id = String(factorId || '');
+            const codigo = String(code || '').replace(/\s+/g, '');
+            if (!fatores.some(f => f.id === id)) throw new HttpError(400, 'invalid_factor', 'Unknown authenticator.');
+            if (!/^\d{6}$/.test(codigo)) throw new HttpError(400, 'invalid_code', 'The code has 6 digits.');
+            const nova = await Security.mfaChallengeAndVerify(sessao.accessToken, id, codigo);
+            if (!nova?.access_token || !nova?.refresh_token) throw new HttpError(502, 'mfa_failed', 'Could not confirm the code.');
+            const csrfToken = setSessionCookies(res, nova);
+            await writeSecurityAudit(req, 'admin.mfa.verified', 'account', identity.appUserId || sessao.user?.id || '');
+            res.status(200).json({ ok: true, aal: 'aal2', csrfToken });
+            return;
+        }
+
+        res.status(404).json({ error: 'not_found' });
+        return;
+    }
+
     if (req.method === 'POST' && url === '/api/auth/set-password') {
         assertCsrf(req);
         const identity = await requireAppUser(req, res);
@@ -1626,9 +1696,8 @@ module.exports = async (req, res) => {
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
 
-    // /api/admin/* routes use their own Bearer-token check (isAdminReq(),
-    // ADMIN_KEY/CRON_SECRET) inside each handler — not the cookie-based
-    // Supabase role system, which the admin.html dashboard doesn't speak.
+    // /api/admin/* routes call isAdminReq() inside each handler: an admin
+    // Supabase session (aal2 once ADMIN_REQUIRE_MFA=true), no static keys.
 
     // ── Realtime config for the shared whiteboard ─────────────────────────────
     // GET /api/realtime-config → { url, key }
@@ -3390,11 +3459,11 @@ Rules:
     }
 
     // ── Admin: conceder plano por e-mail (cortesias) ─────────────────────────
-    // POST /api/admin/grant-plan {email, plan?, expiresAt?} · Auth: Bearer CRON_SECRET
+    // POST /api/admin/grant-plan {email, plan?, expiresAt?} · Auth: admin session (isAdminReq)
     if (req.method === 'POST' && url === '/api/admin/grant-plan') {
         assertCsrf(req);
         // Same auth path as every other /api/admin/* route: a session whose
-        // app_metadata.role === 'admin', or Bearer ADMIN_KEY/CRON_SECRET.
+        // app_metadata.role === 'admin' (aal2 once ADMIN_REQUIRE_MFA=true).
         // requireRole() is deliberately not used here because it also demands
         // MFA (aal2), which no admin account has enrolled — that made granting
         // courtesies impossible from admin.html. Owner-authorised 30/jul.
