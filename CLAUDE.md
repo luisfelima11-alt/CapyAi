@@ -9,21 +9,28 @@ Capy Yara Adventures is a gamified English-learning platform for Brazilian stude
 ## Dev Server
 
 ```bash
-node scripts/dev-server.js   # starts on http://localhost:8765
+npm run dev        # node scripts/dev-server.js → http://localhost:8765
+npm run mock:db    # optional: in-memory Supabase stand-in on :54321
+npm run test:api   # security/auth regression tests (no network, no keys needed)
 ```
 
-Requires `.env`:
-```
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini   # optional, this is the default
-PORT=8765                   # optional
-```
+`scripts/dev-server.js` serves the static files and delegates every `/api/*` request to the
+**same handler that runs in production** (`api/index.js`). Never re-implement API routes in the dev server.
+It also sets `CAPY_DEV=1` (magic links are shown on screen instead of e-mailed) and a random
+`SESSION_SECRET` if none is set.
 
-The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
+Env vars (see `.env.example`): `SESSION_SECRET`, `SUPABASE_URL`, `SUPABASE_KEY`, `OPENAI_API_KEY`,
+`RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL`, `TEACHER_KEY`, `KIWIFY_WEBHOOK_SECRET`, optional `OPENAI_MODEL`,
+`PORT`, `ALLOWED_ORIGINS`. For local dev without a database: `SUPABASE_URL=http://localhost:54321 SUPABASE_KEY=dev`.
 
 ## Deployment
 
-Vercel (project: `capy-yara-adventures`). Production URL: **https://capy-yara-adventures.vercel.app**
+Vercel (project: `capy-yara-adventures`). Production URL: **https://www.capyenglish.com.br**
+
+**Order matters when a change needs the database:** run the SQL in `supabase/migrations/` (Supabase SQL editor)
+**before** deploying code that depends on it; files named "after deploy" run after. Required production env:
+`SESSION_SECRET` (auth is disabled without it), `RESEND_API_KEY` (magic links refuse to work without it),
+`TEACHER_KEY` (8+ chars; admin pages are closed without it).
 
 ```bash
 npx vercel --prod --force   # always use --force to bypass cache
@@ -66,59 +73,73 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
-**⚠️ Cache busting:** All pages reference `components.js?v=3`. When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+**⚠️ Cache busting:** Pages reference local scripts as `name.js?v=<git sha>`. After changing any shared JS
+(`components.js`, `store.js`, `auth.js`, `yara-widget.js`...), commit and run `npm run bump`, then commit the bump.
 
 **⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
 ### State Management (`store.js`)
 
-Global state in `localStorage` key `capyYaraState_{userId}`:
+Progress in `localStorage`: `capyYaraState_{userId}` for logged-in users, `capyYaraState` for guests.
 - `xp`, `badges[]`, `completedLessons[]`, `completedMinis[]`
-- `planType`: `'free'` | `'plus'` | `'pro'`
+- `planType`: `'free'` | `'pro'` | `'super'` (synced from `/api/me`; UI hint only — the server enforces limits)
 - `starBerries`, `streakDays`, `aiUsageToday`
 
-Key methods: `Store.addXP(n)`, `Store.completeLesson(id)`, `Store.completeMini(lessonId, miniNum)`, `Store.consumeAI()`.
+Key methods: `Store.addXP(n)`, `Store.completeLesson(id)`, `Store.completeMini(lessonId, miniNum)`, `Store.consumeAI()`,
+`Store.resetProgress()` (also resets the server copy — never "reset" by deleting localStorage keys).
 
-Fires DOM events: `stateChanged`, `levelUp`, `badgeUnlocked`, `streakMilestone`.
+Sync rules: `save()` writes locally and pushes to `/api/db` with a 2s debounce (flushed on `pagehide`).
+For logged-in users nothing is pushed until the server copy was loaded (`Store._remoteReady`) — this
+prevents a new device from overwriting saved progress. On load, `/api/auth/session` is checked once per tab;
+a 401 sends the user to login with `?reason=session`.
 
-### Auth (`auth.js`)
+`Store` and `Auth` are exposed as `window.Store` / `window.Auth` (a top-level `const` is not a window property;
+many pages check `if (window.Store)`).
 
-Session in `localStorage.capySession` = `{id, name, email, avatar}`.
+Fires DOM events: `stateChanged`, `levelUp`, `badgeUnlocked`, `streakMilestone`, `planChanged`.
+
+### Auth (`auth.js` + `/api/auth/*`)
+
+The session is an **HttpOnly cookie** `capy_sess` set by the server (HMAC-signed `{uid, v, exp, iat, m}`,
+30 days, `api/_lib/session.js`). Same-origin `fetch('/api/...')` calls send it automatically.
+`localStorage.capySession` = `{id, name, email, avatar}` is only a display cache.
 ```js
-Auth.requireAuth()      // redirects to login if no session
-Auth.getSession()       // returns session object or null
-Auth.continueAsGuest()  // guest session: {id:'guest', name:'Explorer'}
+await Auth.signUp(name, email, password, avatar)  // POST /api/auth/signup (password ≥ 8 chars)
+await Auth.login(email, password)                  // POST /api/auth/login + copies saved progress to the device
+Auth.logout()                                      // POST /api/auth/logout + clears local data
+Auth.getSession() / Auth.continueAsGuest() / Auth.checkOnboarding()
 ```
-Passwords are base64-encoded (not production-grade). User data stored in Supabase (see below).
+- Passwords: scrypt hash in `accounts.password_hash`. The old base64 `accounts.password` column was exposed
+  publicly and is **never** accepted: such accounts get `403 password_reset_required`, sign in with the
+  magic link (`/api/auth/magic-link` → `verify.html`) and create a new password (`POST /api/auth/password`).
+- `accounts.session_version` revokes sessions (bumped on password change → other devices are logged out).
 
 ### Backend — Supabase (`api/index.js`)
 
-The API uses Supabase Postgres for persistent user data. Env vars required on Vercel:
-```
-SUPABASE_URL=https://kxihhowppupmfanufkim.supabase.co
-SUPABASE_KEY=<service role key>   # server-side only, never expose client-side
-```
-
-API calls Supabase REST API directly via `fetch()` — no npm package needed:
-```js
-async function sb(path, opts = {}) {
-  const r = await fetch(`${SB_URL}/rest/v1${path}`, {
-    ...opts,
-    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`,
-                'Content-Type': 'application/json', ...(opts.headers||{}) },
-  });
-  if (r.status === 204) return null;
-  const text = await r.text();
-  return text ? JSON.parse(text) : null;
-}
-```
+The API uses Supabase Postgres via its REST API (`api/_lib/supabase.js`: `sb()`, `sbRows()`, `sbRequest()`).
+`SUPABASE_KEY` is the service-role key: server-side only. RLS is enabled on all tables with no policies,
+so only the API can read/write them.
 
 **Supabase tables:**
-- `accounts` — `id, name, email, password, avatar, created_at`
+- `accounts` — `id, name, email, password (legacy, nulled), password_hash, session_version, email_verified_at, avatar, pending_setup, created_at`
 - `user_state` — `user_id (PK), data (jsonb), updated_at`
+- `user_profiles` — `id (PK), english_level, goals, interests, interests_detail, daily_goal_minutes, onboarding_complete, plan, plan_expires_at, kiwify_subscription_id, updated_at`
+- `magic_link_tokens`, `rate_limit_log`, `api_metrics_daily`, `homework_submissions`
 
-`/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
-Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
+Schema changes live in `supabase/migrations/` (run them in the Supabase SQL editor; see Deployment).
+
+### 🔒 Security rules (keep these when adding features)
+
+- **Identity comes only from the session** (`session.requireUser(req, res)` for private data,
+  `session.readSession(req)` for rate-limit identity). Never trust a `userId` sent by the browser.
+- Users may only edit whitelisted profile fields (`PROFILE_FIELDS`); plan/billing fields are written only by the Kiwify webhook.
+- Never return password/hash columns; never add endpoints that list other users' data.
+- **AI:** system prompts live on the server (`api/_lib/prompts.js`, `POST /api/chat` with `mode`). Every
+  endpoint that calls OpenAI must call `checkRateLimit()` first and clip user input.
+- No `Access-Control-Allow-Origin: *`; cross-site POSTs are rejected (`isAllowedOrigin`).
+- Admin endpoints use the `X-Admin-Key` header (`TEACHER_KEY`), never a query string or a default key.
+- Escape user-provided text (names, e-mails) before putting it in `innerHTML`.
+- Add a case to `scripts/smoke-api.js` for every new endpoint and run `npm run test:api`.
 
 ### Lesson Architecture
 
@@ -306,9 +327,10 @@ Chapter accent colors (hero gradients):
 
 ## Existing Aula Files
 
-Present: `aula_01` – `aula_44` (**44 lessons total**). All lessons are available and linked in `classes.html`.
+Present: `aula_01` – `aula_44` (**44 lessons total**, including `aula_25`). All lessons are available and linked in `classes.html`.
 
-Missing file (no HTML): `aula_25` — there is no aula_25.html. The grid skips it by going from display #25 → `aula_25.html` which doesn't exist; check `classes.html` LESSONS array if needed.
+⚠️ Inline scripts break on unescaped apostrophes (`'Let's go'`). Check every page with a JS parser after
+editing lesson content (e.g. extract `<script>` blocks and run them through `new vm.Script()`).
 
 **Homework status (all aulas now have homework):**
 - aulas 01–19: always had homework (new template)
@@ -450,16 +472,20 @@ document.querySelectorAll('.fill-check').forEach(inp => {
 
 ---
 
-## API Endpoints (`scripts/dev-server.js`)
+## API Endpoints (`api/index.js`)
 
-- `POST /api/chat` — Free-form Yara conversation
-- `POST /api/quiz` — AI quiz generation
-- `POST /api/translate` — Word translation
-- `POST /api/lesson-chat` — Yara chat scoped to lesson topic
-- `POST /api/dialogue-scene` — AI grammar dialogue generator
-- `POST /api/flashcard-deck` — Vocabulary deck generation
-- `POST /api/story` — AI story generation
-- `GET /api/word-of-day` — Daily vocabulary word
-- `GET /api/daily-challenge` — Daily challenge prompt
-- `GET/POST /api/db` — Local JSON user state (reads/writes `database.json`)
-- `GET /api/db/leaderboard` — Top 20 users by XP
+Auth: `POST /api/auth/signup | login | logout | password | magic-link | verify`, `GET /api/auth/session`.
+
+User data (session required): `GET/POST /api/db` (`type=state`), `GET/POST /api/profile`, `GET /api/me` (plan),
+`POST /api/homework`. Public: `GET /api/db/leaderboard` (names HTML-escaped).
+
+AI (rate limited per plan; guests per IP — `RATE_LIMITS`):
+- `POST /api/chat` — Yara. `mode`: `tutor` (default), `lesson` (widget; `context.page`, `context.lang`),
+  `youtube` (`context.summary`, `context.vocabulary`), `challenge-grade` (`context.instruction`),
+  `reading-story` (`context.topic`, `context.difficulty`). Replies use the legacy envelope
+  `{candidates:[{content:{parts:[{text}]}}]}`.
+- `POST /api/quiz | translate | story | flashcard-deck | dialogue-scene | parent-report | lesson-quiz | lesson-chat`
+- `GET /api/word-of-day`, `GET /api/daily-challenge` (cached per day)
+- `POST /api/youtube | personalize | study-plan | music`, `GET /api/lyrics-search | lyrics`, `GET /api/tts`
+
+Admin (`X-Admin-Key` header): `GET /api/homework`, `GET /api/admin/stats`. Payments: `POST /api/kiwify-webhook` (HMAC).
