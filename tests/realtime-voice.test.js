@@ -222,7 +222,7 @@ function tokenHarness(options = {}) {
   const start = source.indexOf("    if (req.method === 'POST' && url === '/api/realtime-token') {");
   const end = source.indexOf('// ── Devolutiva da conversa por voz', start);
   assert.ok(start > 0 && end > start, 'realtime route must remain present');
-  const requests = [], checks = [];
+  const requests = [], checks = [], reservas = [];
   const timers = new Map();
   let timerId = 0;
   const req = { method: 'POST', headers: { origin: 'https://www.capyenglish.com.br', ...(options.headers || {}) } };
@@ -274,6 +274,10 @@ function tokenHarness(options = {}) {
     getUserPlan: async () => options.plano || 'super',
     VOZ_MINUTOS_MES: { free: 0, pro: 0, super: 60 },
     VOZ_TETO_USD_MES: 50,
+    // Reserva no servidor: o token emitido ja conta minutos, o relato do
+    // navegador so liquida (ver reservarVoz/liquidarReservaVoz).
+    VOZ_SESSAO_MAX_SEG: 30 * 60,
+    reservarVoz: async (aluno, cenario, segundos) => { reservas.push({ aluno, cenario, segundos }); return true; },
     consumoVozDoMes: async quem => (quem === null
       ? (options.consumoGeral === undefined ? { segundos: 0, minutos: 0, usd: 0 } : options.consumoGeral)
       : (options.consumoMeu === undefined ? { segundos: 0, minutos: 0, usd: 0 } : options.consumoMeu)),
@@ -293,7 +297,7 @@ function tokenHarness(options = {}) {
     setTimeout: fn => { const id = ++timerId; timers.set(id, fn); return id; }, clearTimeout: id => timers.delete(id),
   });
   vm.runInContext('async function runRoute() {\n' + source.slice(start, end) + '\n}', context);
-  return { run: () => context.runRoute(), res, requests, checks, timers, Security };
+  return { run: () => context.runRoute(), res, requests, checks, timers, Security, reservas };
 }
 
 test('voice credentials require OpenAI configuration, not only an OpenRouter key', async () => {
@@ -568,6 +572,26 @@ test('falha de leitura do consumo LIBERA a ligacao e devolve a cota cheia', asyn
   assert.equal(h.res.statusCode, 200);
   assert.equal(h.res.body.minutosRestantes, 60);
   assert.equal(h.requests.length, 1);
+});
+
+test('emitir o token reserva os minutos no servidor; admin nao reserva', async () => {
+  const nomes = require('../api/security').COOKIE_NAMES;
+  const logado = { cookie: nomes.access + '=mock-session; ' + nomes.csrf + '=mock-csrf', 'x-csrf-token': 'mock-csrf' };
+  // 60 min de cota e nada usado: reserva o teto de uma sessao (30 min), nao a cota inteira.
+  const aluno = tokenHarness({ admin: false, aluno: 'aluno-1', headers: logado });
+  await aluno.run();
+  assert.equal(aluno.res.statusCode, 200);
+  assert.equal(aluno.reservas.length, 1);
+  assert.equal(aluno.reservas[0].aluno, 'aluno-1');
+  assert.equal(aluno.reservas[0].segundos, 30 * 60);
+  // Sobrando 5 minutos, reserva so os 5 — o que resta e o limite real.
+  const quase = tokenHarness({ admin: false, aluno: 'aluno-2', headers: logado, consumoMeu: { segundos: 55 * 60, minutos: 55, usd: 1 } });
+  await quase.run();
+  assert.equal(quase.reservas[0].segundos, 5 * 60);
+  const admin = tokenHarness({ admin: true });
+  await admin.run();
+  assert.equal(admin.res.statusCode, 200);
+  assert.equal(admin.reservas.length, 0);
 });
 
 test('admin nunca e barrado pelo plano nem pela cota', async () => {

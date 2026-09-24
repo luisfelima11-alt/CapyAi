@@ -1277,6 +1277,24 @@ function parseNewsRSS(xml, limit) {
 }
 
 
+// AI responses are sanitized on their way out (sanitizeAiOutput). The runtime's
+// res.json/res.send may hand res.end a Buffer (larger bodies, ETag path)
+// instead of a string: handle both, or the longest AI answers would go out
+// untouched. Content-Length was computed for the original body; a stale value
+// makes the client wait for bytes that never come.
+function limparCorpoIa(body, res) {
+    const contentType = String(res.getHeader?.('Content-Type') || '');
+    const ehBuffer = Buffer.isBuffer(body);
+    if (!(typeof body === 'string' || ehBuffer) || !/application\/json/i.test(contentType)) return body;
+    try {
+        const limpo = JSON.stringify(sanitizeAiOutput(JSON.parse(ehBuffer ? body.toString('utf8') : body)));
+        if (!res.headersSent && res.getHeader?.('Content-Length') !== undefined) {
+            res.setHeader('Content-Length', Buffer.byteLength(limpo));
+        }
+        return limpo;
+    } catch (_) { return body; }
+}
+
 module.exports = async (req, res) => {
   try {
     applyApiHeaders(res);
@@ -1284,25 +1302,7 @@ module.exports = async (req, res) => {
 
     if (AI_ROUTE_KEYS.has(url)) {
         const originalEnd = res.end.bind(res);
-        res.end = (body, ...args) => {
-            const contentType = String(res.getHeader?.('Content-Type') || '');
-            // The runtime's res.json/res.send may hand us a Buffer (larger
-            // bodies, ETag path) instead of a string: sanitize both, or the
-            // longest AI answers would go out untouched.
-            const ehBuffer = Buffer.isBuffer(body);
-            if ((typeof body === 'string' || ehBuffer) && /application\/json/i.test(contentType)) {
-                try {
-                    body = JSON.stringify(sanitizeAiOutput(JSON.parse(ehBuffer ? body.toString('utf8') : body)));
-                    // Content-Length was computed for the original body; a
-                    // stale value would make the client wait for bytes that
-                    // never come.
-                    if (!res.headersSent && res.getHeader?.('Content-Length') !== undefined) {
-                        res.setHeader('Content-Length', Buffer.byteLength(body));
-                    }
-                } catch (_) {}
-            }
-            return originalEnd(body, ...args);
-        };
+        res.end = (body, ...args) => originalEnd(limparCorpoIa(body, res), ...args);
     }
 
     // ── Logging middleware ────────────────────────────────────────────────
@@ -4715,4 +4715,9 @@ Rules:
       res.end();
     }
   }
+};
+
+// Pure helpers, exposed for tests/security.test.js only.
+module.exports._internos = {
+    caminhoInterno, textoLivreParaPrompt, listaParaPrompt, limparCorpoIa, senhaVazada,
 };

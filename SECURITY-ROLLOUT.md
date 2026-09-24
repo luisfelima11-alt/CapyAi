@@ -86,3 +86,35 @@ History rewriting and force-pushing are repository-owner operations. After the
 encrypted evidence copy is verified, use a reviewed history-rewrite procedure,
 coordinate with every collaborator, invalidate existing clones, and run secret
 scanning against the rewritten full history before reopening pushes.
+
+## Release 5 — 2026-09-24 audit (branch `claude/security-hardening`)
+
+Deploy order:
+
+1. Run `supabase/migrations/202609240001_release1_hardening.sql` in the Supabase
+   SQL editor **before** deploying: markup check on `accounts.name/avatar`,
+   `revoke execute on current_account_id() from anon`, and the
+   `tokens_in/tokens_out` columns the metrics code now writes.
+2. Deploy to Preview, then production. `ADMIN_KEY` is no longer read (delete it);
+   `CRON_SECRET` only opens the two cron routes now. Optional knobs:
+   `VOZ_SESSAO_MAX_MIN` (default 30) and `VOZ_USD_POR_MIN_PISO` (default 0.02).
+3. Open `/admin.html`, use the "Ativar agora" banner to enrol an authenticator
+   and keep its secret in a password manager. Then set `ADMIN_REQUIRE_MFA=true`
+   and redeploy: admin routes require `aal2` from then on. Lost phone: delete
+   the factor in Supabase (Authentication → Users) and enrol again.
+
+Checks after deploy:
+
+- `curl -sI https://www.capyenglish.com.br/admin.html | grep -i content-security`
+  shows `script-src 'self';` (the compatibility CSP no longer matches the six
+  hardened pages).
+- A Kiwify test webhook lands in `webhook_events` (signature is read from
+  `?signature=` or the header).
+- `/.well-known/security.txt` is served; `voice-test.html` and
+  `pixel_preview.html` are not.
+
+Owner actions outside the code: make the GitHub repository private (the old
+history still holds student e-mails), MFA on every platform account, SPF/DKIM
+(Resend) and DMARC `p=none` on the domain plus MX forwarding for
+`contato@`/`privacidade@` (published on the site, currently undeliverable),
+"Confirm email" on in Supabase Auth, and a monthly spending limit at OpenAI.
