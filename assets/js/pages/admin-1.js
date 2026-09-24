@@ -951,7 +951,7 @@ document.getElementById('pwd-set')?.addEventListener('click', async (ev) => {
   };
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrar('Informe um e-mail válido.', false); return; }
-  if (senha.length < 8) { mostrar('A senha precisa ter pelo menos 8 caracteres.', false); return; }
+  if (senha.length < 12) { mostrar('A senha precisa ter pelo menos 12 caracteres.', false); return; }
 
   const rotulo = btn.textContent;
   btn.disabled = true; btn.textContent = 'definindo…';

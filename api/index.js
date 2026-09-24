@@ -547,7 +547,6 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
         res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
         return;
     }
-    const origin = req?.headers?.origin || '';
     const postData = JSON.stringify({ model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature });
     const options = {
         hostname: CHAT_HOST,
@@ -559,7 +558,6 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
-            if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
             res.setHeader('Content-Type', 'application/json');
             if (apiRes.statusCode !== 200) {
                 let errBody; try { errBody = JSON.parse(data); } catch { errBody = { error: { message: data } }; }
@@ -814,6 +812,32 @@ function readBody(req, maxBytes = MAX_JSON_BODY) {
 // Aqui e lista de PERMISSAO, nao de bloqueio: letra (com acento), digito,
 // espaco, hifen, barra, ponto e virgula. Todo o resto vira espaco. Nome de
 // vaga e tema de aula cabem nisso; instrucao disfarcada, nao.
+// Leaked-password check (HaveIBeenPwned, k-anonymity): only the first 5 hex
+// characters of the SHA-1 leave the server. Supabase has this built in only on
+// the Pro plan. Fails open: an HIBP outage must not block sign-ups.
+async function senhaVazada(senha) {
+    const hash = crypto.createHash('sha1').update(String(senha), 'utf8').digest('hex').toUpperCase();
+    const prefixo = hash.slice(0, 5);
+    const sufixo = hash.slice(5);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    try {
+        const r = await fetch(`https://api.pwnedpasswords.com/range/${prefixo}`, {
+            headers: { 'Add-Padding': 'true', 'User-Agent': 'capy-english-password-check' },
+            signal: ctrl.signal,
+        });
+        if (!r.ok) return false;
+        const texto = await r.text();
+        return texto.split('\n').some(linha => {
+            const [suf, qtd] = linha.trim().split(':');
+            return suf === sufixo && Number(qtd) > 0;
+        });
+    } catch (e) { return false; }
+    finally { clearTimeout(timer); }
+}
+
+const MSG_SENHA_VAZADA = 'Essa senha já apareceu em vazamentos de dados na internet. Escolha outra.';
+
 // Where to send the browser after the auth callback: only a path on this same
 // site. `startsWith('/')` alone is not enough — browsers read "\" as "/", so
 // "/\evil.com" becomes "//evil.com", an off-site redirect.
@@ -1290,7 +1314,12 @@ module.exports = async (req, res) => {
         let claimedEventId = null;
         try {
             const rawBody = await readRawBody(req);
-            const signature = req.headers['x-kiwify-signature'] || '';
+            // Kiwify signs the body (HMAC-SHA1 with the webhook token) and sends
+            // the signature as ?signature= on the webhook URL; some setups send
+            // it as a header. Accept either — reading only the header made every
+            // real purchase fail in silence.
+            const assinaturaNaUrl = new URL(req.url, 'http://localhost').searchParams.get('signature') || '';
+            const signature = String(req.headers['x-kiwify-signature'] || assinaturaNaUrl);
             const secret = process.env.KIWIFY_WEBHOOK_SECRET || '';
             // Validate signature (HMAC-SHA1 per Kiwify docs)
             if (!secret) {
@@ -1314,8 +1343,14 @@ module.exports = async (req, res) => {
             const productName = payload.Product?.product_name || payload.product_name || '';
             const subscriptionId = payload.Subscription?.id || payload.subscription_id
                                 || payload.order_id || payload.order_ref || null;
+            // Idempotency key. Never the subscription id alone: it is the same
+            // on every renewal, so the 2nd renewal was dropped as a "duplicate"
+            // and the student lost the plan they paid for. The order id is per
+            // charge; the body hash differs between charges and only repeats on
+            // a genuine redelivery.
             const providerEventId = String(
-                payload.event_id || payload.id || `${event}:${subscriptionId || crypto.createHash('sha256').update(rawBody).digest('hex')}`
+                payload.event_id || payload.id
+                || `${event}:${payload.order_id || payload.order_ref || crypto.createHash('sha256').update(rawBody).digest('hex')}`
             ).slice(0, 200);
             const claimResponse = await sb('/rpc/claim_webhook_event', {
                 method: 'POST',
@@ -1501,6 +1536,7 @@ module.exports = async (req, res) => {
         if (typeof password !== 'string' || password.length < 12) throw new HttpError(400, 'weak_password', 'Password must contain at least 12 characters.');
         const limited = await checkRateLimit(req, 'auth-signup', null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        if (await senhaVazada(password)) throw new HttpError(400, 'pwned_password', MSG_SENHA_VAZADA);
         const codeChallenge = createPkceChallenge(res);
         const result = await signUpWithPassword(norm, password, { name: cleanName, avatar: String(avatar || '🐾').slice(0, 32) }, codeChallenge);
         const authUser = result.user;
@@ -1648,6 +1684,7 @@ module.exports = async (req, res) => {
         const identity = await requireAppUser(req, res);
         const { password } = await readBody(req);
         if (typeof password !== 'string' || password.length < 12) throw new HttpError(400, 'weak_password', 'Password must contain at least 12 characters.');
+        if (await senhaVazada(password)) throw new HttpError(400, 'pwned_password', MSG_SENHA_VAZADA);
         await updatePassword(identity.session.accessToken, password);
         res.status(204).end();
         return;
@@ -2487,7 +2524,6 @@ Return exactly ${items.length} articles, in the same order as the items above.`;
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -2557,7 +2593,6 @@ Respond ONLY with valid JSON, no markdown:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -3314,7 +3349,6 @@ Rules:
             let data = '';
             aiRes.on('data', c => data += c);
             aiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -3392,7 +3426,6 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -3446,7 +3479,6 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 try {
                     const parsed = JSON.parse(data);
                     if (parsed.error) { res.status(502).json({ error: parsed.error.message || 'Erro na transcrição.' }); return; }
@@ -3537,7 +3569,6 @@ Rules:
             console.error('[grant-plan] nao consegui gerar o link de acesso:', e.message);
         }
 
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({
             ok: true, userId, accountCreated: created, profile: check?.[0] || null, loginUrl,
         });
@@ -3883,7 +3914,8 @@ Rules:
         const norm = String(email || '').toLowerCase().trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) { res.status(400).json({ error: 'invalid_email' }); return; }
         const senha = String(password || '');
-        if (senha.length < 8) { res.status(400).json({ error: 'senha_curta', message: 'A senha precisa ter pelo menos 8 caracteres.' }); return; }
+        if (senha.length < 12) { res.status(400).json({ error: 'senha_curta', message: 'A senha precisa ter pelo menos 12 caracteres.' }); return; }
+        if (await senhaVazada(senha)) { res.status(400).json({ error: 'pwned_password', message: MSG_SENHA_VAZADA }); return; }
 
         // O log de auditoria registra QUEM e QUANDO, nunca a senha.
         await writeSecurityAudit(req, 'admin.password.set', 'account', norm);
@@ -4150,7 +4182,6 @@ Rules:
 
     // GET /api/push-public-key → VAPID public key for client subscription
     if (req.method === 'GET' && url === '/api/push-public-key') {
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({ key: process.env.VAPID_PUBLIC_KEY || null });
         return;
     }
@@ -4372,7 +4403,6 @@ Rules:
         }
         if (podadas) console.warn(`[send-reminders] ${podadas} inscricao(oes) morta(s) removida(s)`);
 
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({
             ok: true, date: today, pushed, emailed, skipped, errors, podadas,
             nudgedNewcomers, totalUsers: states.filter(s => ehAluno(s.user_id)).length,
@@ -4390,7 +4420,6 @@ Rules:
 
         const student = String(text || '').slice(0, 2000).trim();
         if (!student || student.split(/\s+/).length < 3) {
-            if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
             res.status(400).json({ error: 'Escreva pelo menos uma frase para a Yara corrigir.' }); return;
         }
 
@@ -4435,7 +4464,6 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -4509,7 +4537,6 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -4578,7 +4605,6 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
@@ -4602,7 +4628,6 @@ Rules:
             r.on('data', c => d += c);
             r.on('end', () => {
                 res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.status(r.statusCode).end(d);
             });
         }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
@@ -4621,7 +4646,6 @@ Rules:
             r.on('data', c => d += c);
             r.on('end', () => {
                 res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.status(r.statusCode).end(d);
             });
         }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
@@ -4636,10 +4660,12 @@ Rules:
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
-        const voice = qs2.get('voice') || 'nova';
+        // Fixed voice list (the six every TTS model we use accepts); anything
+        // else falls back to the one the site uses.
+        const VOZES_TTS = new Set(['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer']);
+        const voice = VOZES_TTS.has(qs2.get('voice')) ? qs2.get('voice') : 'nova';
         const lang  = qs2.get('lang')  || 'en';
-        const _ttsUserId = qs2.get('userId');
-        const _rl = await checkRateLimit(req, 'tts', _ttsUserId);
+        const _rl = await checkRateLimit(req, 'tts', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         const isFr = lang === 'fr';
@@ -4669,18 +4695,17 @@ Rules:
                     let d = '';
                     ttsRes.on('data', c => d += c);
                     ttsRes.on('end', () => {
-                        let detail = d;
-                        try { detail = JSON.parse(d)?.error?.message || d; } catch {}
-                        res.status(502).json({ error: 'OpenAI TTS error', detail: String(detail).slice(0, 400) });
+                        // The provider's text can name the org/key or the model: log it, don't send it.
+                        console.error('[tts] upstream', ttsRes.statusCode, String(d).slice(0, 300));
+                        res.status(502).json({ error: 'tts_unavailable' });
                     });
                     return;
                 }
                 res.setHeader('Content-Type', 'audio/mpeg');
                 res.setHeader('Cache-Control', 'public, max-age=86400');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 ttsRes.pipe(res);
             });
-            ttsReq.on('error', e => res.status(502).json({ error: e.message }));
+            ttsReq.on('error', e => { console.error('[tts] request', e.message); res.status(502).json({ error: 'tts_unavailable' }); });
             ttsReq.write(body);
             ttsReq.end();
         }
