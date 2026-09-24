@@ -2438,7 +2438,14 @@ Respond ONLY with valid JSON, no markdown:
         const board = await sbPublic('/rpc/public_leaderboard', {
             method: 'POST', body: JSON.stringify({ p_limit: 20 }),
         });
-        res.status(200).json(board); return;
+        // Names/avatars are typed by students and shown to everyone: no markup
+        // leaves the server, whatever the page does with it.
+        const limpo = Array.isArray(board) ? board.map(r => ({
+            ...r,
+            name: String(r?.name ?? '').replace(/[<>]/g, '').slice(0, 80),
+            avatar: String(r?.avatar ?? '').replace(/[<>]/g, '').slice(0, 32) || '🐾',
+        })) : board;
+        res.status(200).json(limpo); return;
     }
 
     // Permanently retired: this endpoint previously exposed password material.

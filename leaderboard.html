@@ -201,6 +201,12 @@ tailwind.config = {
     return AV_COLS[sum % AV_COLS.length];
   }
 
+  // Names and avatars are typed by other students and rendered for everyone
+  // who opens the ranking: always escape them before they go into innerHTML.
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
   // ── Get current player from Store ──────────────────────────────────────────
   function getLocalPlayer() {
     try {
@@ -289,10 +295,10 @@ tailwind.config = {
         <!-- Avatar -->
         <div class="flex flex-col items-center mb-3 pop-in" style="animation-delay:${(rank-1)*0.1}s">
           <div class="relative ${col} w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center text-2xl md:text-3xl shadow-xl ${rings[rank-1]} mb-1">
-            ${user.avatar}
+            ${escHtml(user.avatar)}
             ${youBadge}
           </div>
-          <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${user.name}</p>
+          <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${escHtml(user.name)}</p>
           <p class="font-label text-xs text-slate-400">${user.xp.toLocaleString()} XP</p>
         </div>
         <!-- Block -->
@@ -340,12 +346,12 @@ tailwind.config = {
         <div class="px-5 py-4 flex gap-3 items-center transition-colors ${youCls}" style="animation:fadeUp 0.4s ease ${i*0.05}s both;">
           <div class="w-8 text-center font-headline font-black text-slate-500 text-sm">${rank}</div>
           <div class="${col} w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 shadow-inner relative">
-            ${user.avatar}
+            ${escHtml(user.avatar)}
             ${user.isYou ? '<span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-pink-500 rounded-full border border-navy"></span>' : ''}
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-headline font-bold text-sm ${user.isYou ? 'text-pink-300' : 'text-white'} truncate">
-              ${user.name}${user.isYou ? ' <span class="font-label text-xs text-pink-400/70">(You)</span>' : ''}
+              ${escHtml(user.name)}${user.isYou ? ' <span class="font-label text-xs text-pink-400/70">(You)</span>' : ''}
             </p>
             <p class="font-body text-xs text-slate-500">${user.badgesCount} badge${user.badgesCount !== 1 ? 's' : ''} earned</p>
           </div>

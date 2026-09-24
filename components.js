@@ -32,7 +32,10 @@ const Components = {
         let sessionAvatar = '🐾';
         try {
             const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
-            if (sess) { sessionName = sess.name || ''; sessionAvatar = sess.avatar || '🐾'; }
+            // Both end up inside HTML below (a title attribute and text), and the
+            // name is whatever the student typed: escape before interpolating.
+            const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            if (sess) { sessionName = esc(sess.name || ''); sessionAvatar = esc(sess.avatar || '🐾'); }
         } catch(e) {}
 
         return `

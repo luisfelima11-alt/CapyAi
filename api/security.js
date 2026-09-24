@@ -343,13 +343,21 @@ async function requireRole(req, res, allowedRoles) {
   return { ...identity, role };
 }
 
+// Name and avatar are student-controlled (the account row and the Supabase
+// user_metadata are both writable by their owner) and the browser caches them
+// for the nav and the leaderboard. Strip markup here so no page has to be the
+// last line of defence.
+function semMarcacao(value, max) {
+  return String(value == null ? '' : value).replace(/[<>]/g, '').slice(0, max);
+}
+
 function publicUser(user, appUser = null) {
   return {
     id: appUser?.id || user?.id,
     authUserId: user?.id,
-    name: appUser?.name || user?.user_metadata?.name || '',
+    name: semMarcacao(appUser?.name || user?.user_metadata?.name || '', 80),
     email: user?.email || '',
-    avatar: appUser?.avatar || user?.user_metadata?.avatar || '🐾',
+    avatar: semMarcacao(appUser?.avatar || user?.user_metadata?.avatar || '🐾', 32) || '🐾',
     role: user?.app_metadata?.role || 'student',
   };
 }
