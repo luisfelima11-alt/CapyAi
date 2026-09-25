@@ -118,3 +118,24 @@ history still holds student e-mails), MFA on every platform account, SPF/DKIM
 (Resend) and DMARC `p=none` on the domain plus MX forwarding for
 `contato@`/`privacidade@` (published on the site, currently undeliverable),
 "Confirm email" on in Supabase Auth, and a monthly spending limit at OpenAI.
+
+## Release 5b — prompts for 16+ and the visitor invitation (2026-09-25, same branch)
+
+No migration. It ships together with Release 5.
+
+Checks after deploy (the AI text itself can only be judged with the real key):
+
+- Open `ai_quiz.html`, `story_time.html`, `daily_challenge.html`,
+  `3_Dialogue_Expedition_Yara_Turn.html` and the flashcards page (AI deck +
+  translate). Content is written for adults and no page falls back to its
+  error state.
+- The word of the day and the daily challenge vary from day to day; the old
+  single examples ("Butterfly", "Use a Brave Word!") are gone from the prompts.
+- In a private window, continue as a visitor and use AI 3 times, with more
+  than a minute before the 3rd (visitors get 2 per minute). The 4th use shows
+  the "Criar conta grátis" invitation, and its button opens the signup tab.
+
+Env note: the API reads `SUPABASE_SECRET_KEY` and falls back to `SUPABASE_KEY`
+(`api/index.js`, `api/security.js`). Delete `SUPABASE_KEY` on Vercel only after
+confirming that `SUPABASE_SECRET_KEY` is set for Production and Preview:
+otherwise every database call fails.
