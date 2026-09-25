@@ -554,12 +554,17 @@ function chatHeaders(contentLength) {
     return h;
 }
 
-function callOpenAI(messages, maxTokens, temperature, res, req) {
+function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
     if (!CHAT_KEY) {
         res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
         return;
     }
-    const postData = JSON.stringify({ model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature });
+    const corpo = { model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature };
+    // API JSON mode for routes that answer one JSON object (same as chatComplete,
+    // newsline and music). The prompt must still say "JSON". Routes that answer
+    // an array (quiz, flashcard-deck, lesson-quiz) can't use it.
+    if (opts.json) corpo.response_format = { type: 'json_object' };
+    const postData = JSON.stringify(corpo);
     const options = {
         hostname: CHAT_HOST,
         path:     CHAT_PATH,
@@ -2486,7 +2491,7 @@ module.exports = async (req, res) => {
         const context = textoLivreParaPrompt(corpoTr.context, 300);
         const ctxLine = context ? `\nUse this sentence for context (the word may be inflected there): "${context}"` : '';
         const prompt = `Translate the word "${word}" into ${targetLang}.${ctxLine}\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${targetLang})."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req, { json: true }); return;
     }
 
     // ── Newsline: real news headlines rewritten at the student's level ────────
@@ -2641,19 +2646,19 @@ Respond ONLY with valid JSON, no markdown:
         const listaSt = listaParaPrompt(corpoSt.words, 12, 30);
         const wordList  = (listaSt.length ? listaSt : ['apple','tree','bird']).join(', ');
         const prompt = `Write a short, light English story for a Brazilian learner (16+) named ${nomeAluno}, with Yara the capybara in it.\nUse every one of these words: ${wordList}.\nAt most 5 sentences of simple English (A1-A2), 1-2 emojis per sentence, and an upbeat ending.\nRespond ONLY with valid JSON with these fields: "title" (short), "sentences" (array with the story sentences), "moral" (one short sentence).`;
-        callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req, { json: true }); return;
     }
 
     if (req.method === 'GET' && url === '/api/word-of-day') {
         const today = new Date().toISOString().slice(0, 10);
         const prompt = `Today is ${today}. Pick ONE useful, interesting English word for Brazilian teens and adults (16+) at A2-B1 level; vary it from day to day.\nRespond ONLY with valid JSON with these fields: "word", "emoji" (one), "pronunciation" (IPA between slashes), "partOfSpeech", "simpleMeaning" (one short English sentence), "exampleSentence" (one sentence from everyday adult life), "funFact" (one short curiosity about the word).`;
-        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req, { json: true }); return;
     }
 
     if (req.method === 'GET' && url === '/api/daily-challenge') {
         const today = new Date().toISOString().slice(0, 10);
         const prompt = `Today is ${today}. Create ONE short English writing challenge for Brazilian teens and adults (16+) at A2-B1 level, set in everyday adult life (work, travel, study, home).\nRespond ONLY with valid JSON with these fields: "type" (one of "sentence", "describe", "translate"), "emoji" (one), "title" (short), "instruction" (what to write), "hint" (one short tip), "example" (one model answer), "xp" (20).`;
-        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/flashcard-deck') {
@@ -2667,7 +2672,7 @@ Respond ONLY with valid JSON, no markdown:
         const { topic } = await readBody(req);
         const t = textoLivreParaPrompt(topic, 60) || 'pets';
         const prompt = `Create a short English grammar dialogue about "${t}" for Brazilian teens and adults (16+) at A1-A2 level.\nRespond ONLY with valid JSON with these fields: "emoji" (one), "scene" (one sentence setting the scene), "intro" (one sentence introducing the dialogue), "grammarFocus" (the grammar point practised), "questions" (exactly 6 items, each with "prompt" (a sentence with ___ where the missing word goes), "choices" (3 options), "answer" (the exact text of one choice) and "explanation" (one short sentence)).`;
-        callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/parent-report') {
@@ -2678,7 +2683,7 @@ Respond ONLY with valid JSON, no markdown:
         const lessons = Array.isArray(corpoPr.lessons) ? corpoPr.lessons : [];
         const recentDate = textoLivreParaPrompt(corpoPr.recentDate, 30);
         const prompt = `Act as an educational analyst for a language app for teens and adults.\nStudent: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for a parent or guardian, celebrating effort and giving one practical tip to support study at home.\nRespond ONLY with valid JSON with these fields: "title" ("Weekly Progress Report for ${name||'your student'}"), "summary" (the 2-3 paragraphs, separated by a blank line), "parentTip" (the tip).`;
-        callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {
