@@ -124,6 +124,8 @@
 
 </div><!-- /app -->
 
+<!-- Para o nivel do teste chegar ao servidor (e a Yara saber o nivel certo). -->
+<script src="auth-secure.js?v=auth20260918"></script>
 <script>
 // ── Questions ──────────────────────────────────────────────────────────────────
 const QUESTIONS = [
@@ -257,6 +259,19 @@ function showResult() {
   localStorage.setItem('capyPlayerLevel',   level.key);
   localStorage.setItem('capyStartLesson',   level.startLesson);
   localStorage.setItem('capyPlacementDone', '1');
+  salvarNivelNoPerfil(level.key);
+}
+
+// O resultado ficava SO no navegador: a Yara (voz e chat) le o nivel do
+// perfil no servidor e nunca via o teste. Manda so o english_level — o POST
+// /api/profile e parcial, entao os gostos do aluno ficam intactos.
+const NIVEL_DO_PERFIL = { starter: 'beginner', elementary: 'elementary', 'pre-intermediate': 'intermediate', intermediate: 'intermediate' };
+function salvarNivelNoPerfil(chave) {
+  try {
+    if (!window.Auth || typeof Auth.saveProfile !== 'function' || !Auth.isLoggedIn || !Auth.isLoggedIn()) return;
+    const nivel = NIVEL_DO_PERFIL[chave];
+    if (nivel) Auth.saveProfile(null, { english_level: nivel });
+  } catch (e) { /* o teste continua funcionando sem conta */ }
 }
 
 function goToTrail() { window.location.href = 'learn.html'; }

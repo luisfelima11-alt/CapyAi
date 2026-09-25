@@ -423,6 +423,10 @@ test('actual voice pages work at mobile and desktop with only simulated micropho
           assert.equal(await page.locator('[data-nextjs-dialog], .vite-error-overlay').count(), 0);
           await page.locator('#ligar').click();
           await page.waitForFunction(() => document.getElementById('ligar').classList.contains('desligar'));
+          // O botao vira "desligar" ja no "chamando"; o pedido do SDP sai um
+          // instante depois. Com a suite inteira rodando em paralelo esse
+          // instante passava do assert (visto em 25/set). Espera ate 5 s.
+          for (let i = 0; i < 100 && requests.length < 2; i++) await page.waitForTimeout(50);
           assert.deepEqual(requests, ['token', 'mock-openai']);
           await page.locator('#silenciar').waitFor({ state: 'visible' });
           await page.locator('#silenciar').click();

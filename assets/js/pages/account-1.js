@@ -222,3 +222,67 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 // React to plan change events
 document.addEventListener('planChanged', () => { renderPlan(); renderStats(); });
+
+// ── Sobre mim: o que a Yara sabe do aluno ───────────────────────────────
+// E o que a Yara usa para abrir as conversas com uma pergunta concreta em vez
+// de "tudo bem?". Tudo por textContent: o detalhe e texto livre do aluno.
+const SOBRE_ROTULOS = {
+  nivel: { beginner: 'Iniciante', elementary: 'Básico', intermediate: 'Intermediário', advanced: 'Avançado' },
+  objetivos: { travel: 'viajar', work: 'trabalho', entertainment: 'entretenimento', games: 'games', study: 'estudos', family: 'família' },
+  gostos: { music: 'música', sports: 'esportes', food: 'comida', travel: 'viagem', tech: 'tecnologia', art: 'arte', series: 'séries e filmes', games: 'games' },
+};
+
+function linhaSobre(rotulo, valor) {
+  const p = document.createElement('p');
+  const r = document.createElement('span');
+  r.className = 'text-slate-700 font-bold text-sm';
+  r.textContent = rotulo + ': ';
+  p.appendChild(r);
+  p.appendChild(document.createTextNode(valor));
+  return p;
+}
+
+function renderSobreMim(perfil) {
+  const alvo = document.getElementById('sobre-mim');
+  if (!alvo) return;
+  alvo.textContent = '';
+  if (/[?&]salvo=1(?:&|$)/.test(location.search)) {
+    const ok = document.createElement('p');
+    ok.className = 'text-slate-700 font-bold text-sm';
+    ok.textContent = '✓ Salvo! A Yara já usa isso na próxima conversa.';
+    alvo.appendChild(ok);
+  }
+  const p = perfil || {};
+  const lista = (valores, mapa) => (Array.isArray(valores) ? valores : []).map(v => mapa[v]).filter(Boolean).join(', ');
+  const linhas = [];
+  if (SOBRE_ROTULOS.nivel[p.english_level]) linhas.push(linhaSobre('Nível', SOBRE_ROTULOS.nivel[p.english_level]));
+  const objetivos = lista(p.goals, SOBRE_ROTULOS.objetivos);
+  if (objetivos) linhas.push(linhaSobre('Aprende inglês para', objetivos));
+  const gostos = lista(p.interests, SOBRE_ROTULOS.gostos);
+  if (gostos) linhas.push(linhaSobre('Gosta de', gostos));
+  if (p.interests_detail) linhas.push(linhaSobre('Nas suas palavras', '“' + String(p.interests_detail).slice(0, 200) + '”'));
+  if (!linhas.length) {
+    const vazio = document.createElement('p');
+    vazio.className = 'text-slate-400 text-sm italic';
+    vazio.textContent = 'A Yara ainda não sabe nada sobre você — conte em 1 minuto e as conversas ficam sobre o que você gosta. ';
+    const a = document.createElement('a');
+    a.href = 'onboarding.html?editar=1';
+    a.className = 'text-xs font-black text-violet-500 hover:text-violet-700';
+    a.textContent = 'Contar agora →';
+    vazio.appendChild(a);
+    alvo.appendChild(vazio);
+    return;
+  }
+  linhas.forEach(l => alvo.appendChild(l));
+}
+
+(function carregarSobreMim() {
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem('capySession') || 'null'); } catch (e) {}
+  if (!session || !session.id || session.id === 'guest' || !window.Auth || typeof Auth.fetchProfile !== 'function') {
+    const card = document.getElementById('sobre-mim-card');
+    if (card) card.hidden = true;
+    return;
+  }
+  Promise.resolve(Auth.fetchProfile(session.id)).then(renderSobreMim).catch(() => renderSobreMim(null));
+})();

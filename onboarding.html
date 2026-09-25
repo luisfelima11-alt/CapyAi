@@ -55,9 +55,14 @@
   if (!Auth.isLoggedIn()) {
     window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
   }
+  // ?editar=1 = "Sobre mim": o aluno voltou para ATUALIZAR do que gosta. Antes
+  // o guard abaixo mandava todo mundo que ja tinha feito o onboarding para a
+  // home — o link "Refazer onboarding" da conta nunca funcionou, e a Yara
+  // ficava para sempre com os gostos do primeiro dia.
+  window.CAPY_EDITANDO = /[?&]editar=1(?:&|$)/.test(location.search);
   // If already completed, go to learn
   const session = Auth.getSession();
-  if (session && session.id !== 'guest') {
+  if (session && session.id !== 'guest' && !window.CAPY_EDITANDO) {
     Auth.fetchProfile(session.id).then(p => {
       // Already onboarded: send them home, not into a lesson — firstLessonUrl()
       // reads profile.level, which is still empty this early in the page.
@@ -83,8 +88,8 @@
         <img src="yara-avatar.png?v=3" alt="Yara" class="w-full h-full object-cover"
              onerror="this.style.display='none';this.parentElement.innerHTML='🐾'"/>
       </div>
-      <h1 class="text-3xl font-black text-white mb-1">Oi! Eu sou a Yara! 🌿</h1>
-      <p class="text-emerald-300 font-semibold">Vou personalizar seu inglês. Responde 5 perguntinhas!</p>
+      <h1 id="onb-titulo" class="text-3xl font-black text-white mb-1">Oi! Eu sou a Yara! 🌿</h1>
+      <p id="onb-sub" class="text-emerald-300 font-semibold">Vou personalizar seu inglês. Responde 5 perguntinhas!</p>
     </div>
 
     <!-- Progress bar -->
@@ -251,7 +256,7 @@
           <div>
             <textarea id="interests-detail-input"
               maxlength="200"
-              placeholder="Ex: BTS, Harry Potter, Flamengo, Studio Ghibli, Call of Duty..."
+              placeholder="Ex.: trabalho com vendas, torço pro Flamengo, amo BTS, quero conhecer o Canadá..."
               class="w-full bg-white/10 border-2 border-white/20 focus:border-emerald-400 rounded-2xl px-5 py-4 text-white placeholder-white/40 font-semibold resize-none transition-all focus:outline-none leading-relaxed"
               rows="4"
               oninput="document.getElementById('detail-count').textContent = this.value.length + '/200'"
@@ -260,6 +265,7 @@
               <p class="text-white/40 text-xs">Opcional — pode pular se preferir</p>
               <p id="detail-count" class="text-white/40 text-xs">0/200</p>
             </div>
+            <p class="text-emerald-200/80 text-xs mt-3 leading-relaxed">💬 Conte também <strong>o que você faz</strong> (trabalho, estudo). A Yara usa isso para puxar assunto nas ligações — em vez de ficar no "tudo bem?".</p>
           </div>
         </div>
       </div>
@@ -497,7 +503,9 @@ async function saveProfile() {
       return;
     }
 
-    await Auth.saveProfile(session.id, {
+    // saveProfile devolve false em vez de lancar erro: sem esta checagem a tela
+    // dizia "Pronto!" mesmo quando nada tinha sido salvo.
+    const salvou = await Auth.saveProfile(session.id, {
       english_level: profile.level,
       goals: profile.goals,
       interests: profile.interests,
@@ -505,6 +513,7 @@ async function saveProfile() {
       daily_goal_minutes: profile.minutes,
       onboarding_complete: true
     });
+    if (salvou === false) throw new Error('perfil nao salvo');
 
     // Update Store locally
     if (window.Store) {
@@ -519,6 +528,13 @@ async function saveProfile() {
     // Mark placement as done so learn.html doesn't redirect to test
     localStorage.setItem('capyPlacementDone', '1');
 
+    // Editando o "Sobre mim": volta para a conta, nao para a primeira licao.
+    if (window.CAPY_EDITANDO) {
+      btn.textContent = '✓ Salvo!';
+      setTimeout(() => { window.location.href = 'account.html?salvo=1'; }, 700);
+      return;
+    }
+
     // Success animation
     btn.textContent = '✓ Pronto! Bem-vinda à floresta!';
     btn.className = btn.className.replace('from-emerald-500 to-teal-400', 'from-green-500 to-emerald-400');
@@ -529,13 +545,51 @@ async function saveProfile() {
 
   } catch(e) {
     btn.disabled = false;
-    btn.textContent = 'Começar! 🌿';
+    btn.textContent = window.CAPY_EDITANDO ? 'Salvar ✓' : 'Começar! 🌿';
     alert('Erro ao salvar. Tente novamente.');
   }
 }
 
+// ── "Sobre mim": editar o que ja foi respondido ────────────────
+// Vem preenchido com o perfil salvo: o aluno so muda o que quiser e avanca.
+function preencherPerfil(p) {
+  const marcar = (seletor, valores) => {
+    const achados = [];
+    document.querySelectorAll(seletor).forEach(b => {
+      if (valores.includes(b.dataset.value)) { b.classList.add('selected'); achados.push(b.dataset.value); }
+    });
+    return achados;
+  };
+  if (p.english_level) profile.level = marcar('.level-btn', [p.english_level])[0] || null;
+  if (Array.isArray(p.goals)) profile.goals = marcar('.goal-btn', p.goals);
+  if (Array.isArray(p.interests)) profile.interests = marcar('.interest-btn', p.interests);
+  if (p.interests_detail) {
+    const campo = document.getElementById('interests-detail-input');
+    campo.value = String(p.interests_detail).slice(0, 200);
+    profile.interestsDetail = campo.value;
+    document.getElementById('detail-count').textContent = campo.value.length + '/200';
+  }
+  const min = Number(p.daily_goal_minutes);
+  if (min > 0) {
+    const perto = [5, 10, 20, 30].reduce((a, b) => (Math.abs(b - min) < Math.abs(a - min) ? b : a));
+    marcar('.time-btn', [String(perto)]);
+    profile.minutes = perto;
+  }
+  showStep(currentStep);
+}
+
+function prepararEdicao() {
+  document.getElementById('onb-titulo').textContent = 'O que a Yara sabe de você 🌿';
+  document.getElementById('onb-sub').textContent = 'Atualize seu nível e do que você gosta — a Yara usa isso nas conversas e nas ligações.';
+  document.getElementById('btn-save').textContent = 'Salvar ✓';
+  const s = Auth.getSession();
+  if (!s || s.id === 'guest') return;
+  Promise.resolve(Auth.fetchProfile(s.id)).then(p => { if (p) preencherPerfil(p); }).catch(() => {});
+}
+
 // Initialize
 showStep(1);
+if (window.CAPY_EDITANDO) prepararEdicao();
 </script>
 
 </body>

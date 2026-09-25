@@ -3012,15 +3012,26 @@ Respond ONLY with valid JSON, no markdown:
     if (req.method === 'POST' && url === '/api/profile') {
         assertCsrf(req);
         const identity = await requireAppUser(req, res);
-        const body = await readBody(req);
-        const profileData = {
-            english_level: sanitizeStoredJson(String(body.english_level || '').slice(0, 32)) || null,
-            goals: Array.isArray(body.goals) ? body.goals.slice(0, 12).map(v => sanitizeStoredJson(String(v).slice(0, 80))) : [],
-            interests: Array.isArray(body.interests) ? body.interests.slice(0, 12).map(v => sanitizeStoredJson(String(v).slice(0, 80))) : [],
-            interests_detail: sanitizeStoredJson(String(body.interests_detail || '').slice(0, 500)),
-            daily_goal_minutes: Math.max(5, Math.min(180, Number(body.daily_goal_minutes) || 10)),
-            onboarding_complete: Boolean(body.onboarding_complete),
-        };
+        const body = (await readBody(req)) || {};
+        // PARCIAL: grava so as chaves que vieram. Antes gravava sempre as seis,
+        // entao o teste de nivelamento salvando so o nivel apagaria os gostos do
+        // aluno e desmarcaria o onboarding. O upsert com merge-duplicates do
+        // PostgREST so atualiza as colunas presentes no corpo.
+        const veio = k => Object.prototype.hasOwnProperty.call(body, k);
+        const profileData = {};
+        if (veio('english_level')) {
+            // Lista fechada: o nivel vira faixa da Yara (faixaDeNivel) e um valor
+            // livre aqui so viraria 'desconhecido' em silencio.
+            const nivel = String(body.english_level || '').trim().toLowerCase();
+            if (['beginner', 'elementary', 'intermediate', 'advanced'].includes(nivel)) profileData.english_level = nivel;
+            else if (!nivel) profileData.english_level = null;
+        }
+        if (veio('goals')) profileData.goals = Array.isArray(body.goals) ? body.goals.slice(0, 12).map(v => sanitizeStoredJson(String(v).slice(0, 80))) : [];
+        if (veio('interests')) profileData.interests = Array.isArray(body.interests) ? body.interests.slice(0, 12).map(v => sanitizeStoredJson(String(v).slice(0, 80))) : [];
+        if (veio('interests_detail')) profileData.interests_detail = sanitizeStoredJson(String(body.interests_detail || '').slice(0, 500));
+        if (veio('daily_goal_minutes')) profileData.daily_goal_minutes = Math.max(5, Math.min(180, Number(body.daily_goal_minutes) || 10));
+        if (veio('onboarding_complete')) profileData.onboarding_complete = Boolean(body.onboarding_complete);
+        if (!Object.keys(profileData).length) { res.status(400).json({ error: 'nada_para_salvar' }); return; }
         await sbUser(identity, '/user_profiles', {
             method: 'POST',
             headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
