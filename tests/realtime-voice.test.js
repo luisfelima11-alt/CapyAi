@@ -379,43 +379,8 @@ test('upstream total deadline terminates a stalled credential request', async ()
   assert.equal(h.timers.size, 0);
 });
 
-function installBrowserVoiceMocks() {
-  const mock = window.__voiceMock = { mode: 'success', tracks: [], peers: [], micCalls: 0, resolveMic: null };
-  function stream() {
-    const track = { enabled: true, stopped: false, stop() { this.stopped = true; } };
-    mock.tracks.push(track);
-    return { getTracks: () => [track], getAudioTracks: () => [track] };
-  }
-  Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: async () => {
-    mock.micCalls++;
-    if (mock.mode === 'denied') throw new DOMException('Permission denied', 'NotAllowedError');
-    if (mock.mode === 'pending') return new Promise(resolve => { mock.resolveMic = () => resolve(stream()); });
-    return stream();
-  } } });
-  class Channel extends EventTarget {
-    constructor() { super(); this.readyState = 'connecting'; this.sent = []; }
-    send(value) { this.sent.push(JSON.parse(value)); }
-    close() { this.readyState = 'closed'; this.dispatchEvent(new Event('close')); }
-    message(value) { this.dispatchEvent(new MessageEvent('message', { data: JSON.stringify(value) })); }
-  }
-  window.RTCPeerConnection = class Peer extends EventTarget {
-    constructor() { super(); this.connectionState = 'new'; this.channel = new Channel(); mock.peers.push(this); }
-    addTrack() {}
-    createDataChannel() { return this.channel; }
-    async createOffer() { return { type: 'offer', sdp: 'mock-browser-offer' }; }
-    async setLocalDescription() {}
-    async setRemoteDescription() {
-      setTimeout(() => {
-        this.connectionState = 'connected';
-        this.dispatchEvent(new Event('connectionstatechange'));
-        if (this.onconnectionstatechange) this.onconnectionstatechange({});
-        this.channel.readyState = 'open'; this.channel.dispatchEvent(new Event('open'));
-        if (this.channel.onopen) this.channel.onopen({});
-      }, 5);
-    }
-    close() { this.connectionState = 'closed'; this.closed = true; }
-  };
-}
+// Movido para um helper: o teste do widget das aulas usa o mesmo mock.
+const { installBrowserVoiceMocks } = require('./helpers/voz-mock');
 
 test('actual voice pages work at mobile and desktop with only simulated microphone and transport', { timeout: 60_000 }, async () => {
   const { chromium } = require('playwright');
