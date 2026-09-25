@@ -120,6 +120,8 @@ test('dentro das aulas: o chat manda a aula, a ligacao conduz a aula, e o layout
           await page.waitForFunction(() => document.getElementById('yw-panel').classList.contains('open'));
           const sub = (await page.locator('#yw-sub').innerText()).trim();
           assert.ok(sub.length >= 3 && !/&amp;/.test(sub), onde + ': subtitulo "' + sub + '"');
+          // O <br> do <h1> nao pode colar palavras ("Hello,I'm Luan").
+          assert.doesNotMatch(sub, /[,a-z][A-Z]/, onde + ': palavras coladas no titulo "' + sub + '"');
 
           // Layout: painel inteiro na tela, sem rolagem horizontal.
           const box = await page.evaluate(() => {

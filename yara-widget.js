@@ -46,7 +46,15 @@
     const l = NA_TRILHA && licaoDaTrilha();
     if (l && l.title) return String(l.title);
     const h1 = document.querySelector('h1');
-    const doH1 = h1 ? h1.textContent.replace(/[\p{Extended_Pictographic}‍️]/gu, '').replace(/\s+/g, ' ').trim() : '';
+    // Os <h1> das aulas quebram linha com <br> ("How Many<br>Hectares?"), e o
+    // textContent cola as palavras ("How ManyHectares?"). Troca o <br> por
+    // espaco numa copia antes de ler.
+    let doH1 = '';
+    if (h1) {
+      const copia = h1.cloneNode(true);
+      copia.querySelectorAll('br').forEach(br => br.replaceWith(' '));
+      doH1 = copia.textContent.replace(/[\p{Extended_Pictographic}‍️]/gu, '').replace(/\s+/g, ' ').trim();
+    }
     return doH1 || String(cfg.lessonTitle || '');
   }
 
