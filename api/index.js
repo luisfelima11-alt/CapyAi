@@ -2475,7 +2475,7 @@ module.exports = async (req, res) => {
         const corpoQuiz = await readBody(req);
         const deckLabel = textoLivreParaPrompt(corpoQuiz.deckLabel, 60);
         const words = listaParaPrompt(corpoQuiz.words, 20, 40);
-        const prompt = `You are creating a fun English quiz for children aged 5-8.\nThe child just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nGenerate exactly 4 multiple-choice questions. Each has 4 options, one correct answer.\nRespond ONLY with a valid JSON array:\n[{"question":"What is this? 🍎","image_hint":"Apple","options":["Apple","River","Bird","Tree"],"correct":"Apple"}]`;
+        const prompt = `You are writing an English vocabulary quiz for Brazilian teens and adults (16+).\nThey just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nWrite exactly 4 multiple-choice questions that test these words in everyday adult contexts. Each has 4 real, plausible options and one correct answer.\nRespond ONLY with a valid JSON array. Each item has: "question" (the question text; it may include one emoji), "image_hint" (one English word naming what the question is about), "options" (4 strings), "correct" (the exact text of one of the options).`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.7, res, req); return;
     }
 
@@ -2637,36 +2637,36 @@ Respond ONLY with valid JSON, no markdown:
 
     if (req.method === 'POST' && url === '/api/story') {
         const corpoSt = await readBody(req);
-        const childName = textoLivreParaPrompt(corpoSt.name, 40) || 'Explorer';
+        const nomeAluno = textoLivreParaPrompt(corpoSt.name, 40) || 'Explorer';
         const listaSt = listaParaPrompt(corpoSt.words, 12, 30);
         const wordList  = (listaSt.length ? listaSt : ['apple','tree','bird']).join(', ');
-        const prompt = `Write a short fun English story for a child named ${childName} aged 5-8.\nMUST use these words: ${wordList}.\nMax 5 sentences. Simple English. Feature capybara Yara. Happy ending. 1-2 emojis per sentence.\nRespond ONLY with valid JSON:\n{"title":"...","sentences":["..."],"moral":"..."}`;
+        const prompt = `Write a short, light English story for a Brazilian learner (16+) named ${nomeAluno}, with Yara the capybara in it.\nUse every one of these words: ${wordList}.\nAt most 5 sentences of simple English (A1-A2), 1-2 emojis per sentence, and an upbeat ending.\nRespond ONLY with valid JSON with these fields: "title" (short), "sentences" (array with the story sentences), "moral" (one short sentence).`;
         callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req); return;
     }
 
     if (req.method === 'GET' && url === '/api/word-of-day') {
         const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Pick ONE interesting English word for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"word":"Butterfly","emoji":"🦋","pronunciation":"/ˈbʌt.ə.flaɪ/","partOfSpeech":"noun","simpleMeaning":"A beautiful insect with big colourful wings.","exampleSentence":"I saw a butterfly in the garden today.","funFact":"Butterflies taste with their feet!"}`;
+        const prompt = `Today is ${today}. Pick ONE useful, interesting English word for Brazilian teens and adults (16+) at A2-B1 level; vary it from day to day.\nRespond ONLY with valid JSON with these fields: "word", "emoji" (one), "pronunciation" (IPA between slashes), "partOfSpeech", "simpleMeaning" (one short English sentence), "exampleSentence" (one sentence from everyday adult life), "funFact" (one short curiosity about the word).`;
         callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req); return;
     }
 
     if (req.method === 'GET' && url === '/api/daily-challenge') {
         const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Create ONE fun English challenge for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"type":"sentence","emoji":"🦁","title":"Use a Brave Word!","instruction":"Use the word 'brave' in a sentence about an animal.","hint":"Think about what a brave animal might do.","example":"The brave lion protected its cubs.","xp":20}`;
+        const prompt = `Today is ${today}. Create ONE short English writing challenge for Brazilian teens and adults (16+) at A2-B1 level, set in everyday adult life (work, travel, study, home).\nRespond ONLY with valid JSON with these fields: "type" (one of "sentence", "describe", "translate"), "emoji" (one), "title" (short), "instruction" (what to write), "hint" (one short tip), "example" (one model answer), "xp" (20).`;
         callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/flashcard-deck') {
         const { topic } = await readBody(req);
         const t = textoLivreParaPrompt(topic, 60) || 'animals';
-        const prompt = `Create 10 English vocabulary flashcards for "${t}" for children aged 5-8.\nRespond ONLY with a valid JSON array:\n[{"word":"Sun","emoji":"☀️","pronunciation":"/sʌn/","hint":"It shines in the sky","example":"The sun is bright today."}]`;
+        const prompt = `Create 10 English vocabulary flashcards about "${t}" for Brazilian teens and adults (16+).\nRespond ONLY with a valid JSON array. Each item has: "word", "emoji" (one), "pronunciation" (IPA between slashes), "hint" (a short English clue that does not contain the word), "example" (one sentence from everyday adult life).`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.8, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/dialogue-scene') {
         const { topic } = await readBody(req);
         const t = textoLivreParaPrompt(topic, 60) || 'pets';
-        const prompt = `Create a short English grammar dialogue for children aged 5-8 about "${t}".\nRespond ONLY with valid JSON:\n{"emoji":"🐶","scene":"...","intro":"...","grammarFocus":"...","questions":[{"prompt":"___ dog is fluffy.","choices":["My","Me","I"],"answer":"My","explanation":"We use My to show the dog belongs to me."}]}\nProvide exactly 6 questions, each with 3 choices.`;
+        const prompt = `Create a short English grammar dialogue about "${t}" for Brazilian teens and adults (16+) at A1-A2 level.\nRespond ONLY with valid JSON with these fields: "emoji" (one), "scene" (one sentence setting the scene), "intro" (one sentence introducing the dialogue), "grammarFocus" (the grammar point practised), "questions" (exactly 6 items, each with "prompt" (a sentence with ___ where the missing word goes), "choices" (3 options), "answer" (the exact text of one choice) and "explanation" (one short sentence)).`;
         callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req); return;
     }
 
@@ -2677,7 +2677,7 @@ Respond ONLY with valid JSON, no markdown:
         const badges = Array.isArray(corpoPr.badges) ? corpoPr.badges : [];
         const lessons = Array.isArray(corpoPr.lessons) ? corpoPr.lessons : [];
         const recentDate = textoLivreParaPrompt(corpoPr.recentDate, 30);
-        const prompt = `Act as an educational analyst for a children's language app.\nChild: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for parents celebrating effort and giving one practical offline tip.\nRespond ONLY with valid JSON:\n{"title":"Weekly Progress Report for ${name||'Your Child'}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}`;
+        const prompt = `Act as an educational analyst for a language app for teens and adults.\nStudent: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for a parent or guardian, celebrating effort and giving one practical tip to support study at home.\nRespond ONLY with valid JSON with these fields: "title" ("Weekly Progress Report for ${name||'your student'}"), "summary" (the 2-3 paragraphs, separated by a blank line), "parentTip" (the tip).`;
         callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req); return;
     }
 
