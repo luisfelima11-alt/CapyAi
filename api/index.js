@@ -2716,15 +2716,32 @@ Respond ONLY with valid JSON, no markdown:
         }
         const message = messageRaw.trim();
         const vocab = listaParaPrompt(vocabRaw, 30, 40);
-        const history = (Array.isArray(historyRaw) ? historyRaw.slice(-20) : [])
-            .map(m => ({ role: m?.role, text: String(m?.text ?? '').slice(0, 2000) }));
-        const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
         const temaLimpo = textoParaPrompt(lessonTopic, 120);
-        const system = `You are Yara, a friendly capybara teaching ${targetLanguage} to Brazilian students.\nLesson: "${temaLimpo}". Vocabulary: ${(vocab||[]).join(', ')}.\nRules: under 2 sentences per reply; use beginner ${targetLanguage}; end with a question; be warm and encouraging. Answer in Brazilian Portuguese when the student asks for meaning, translation, or says they are stuck. Explain briefly in Portuguese, then give the ${targetLanguage} again so they can try.`;
+        // Same Yara as /api/chat: the persona catalogue sets tone, level and the
+        // Portuguese-help rule; this route only adds the lesson. Its own copy
+        // had drifted and pinned every student at "beginner".
+        const persona = personaDe('conversa');
+        const ctx = {
+            idioma: idiomaDe(lang),
+            faixa: await nivelDoAluno(req._securityIdentity?.appUserId || null),
+            fracas: [], tema: temaLimpo, vocab, cargo: '', abertura: [],
+        };
+        const system = [
+            ...persona.nucleo(ctx),
+            ...persona.texto_modo(ctx),
+            temaLimpo ? `This chat practises the lesson "${temaLimpo}".` : '',
+            vocab.length ? `Use the lesson vocabulary naturally: ${vocab.join(', ')}.` : '',
+        ].filter(Boolean).join(' ');
         const messages = [{ role: 'system', content: system }];
-        (history||[]).forEach(m => messages.push({ role: m.role==='model'?'assistant':'user', content: m.text }));
+        (Array.isArray(historyRaw) ? historyRaw.slice(-20) : []).forEach(m => {
+            // lessons.html and self-study.js send {role:'model', text}; accept
+            // {role:'assistant', content} too, as /api/chat does.
+            const text = String(m?.content ?? m?.text ?? '').slice(0, 2000);
+            const papel = (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user';
+            if (text) messages.push({ role: papel, content: text });
+        });
         messages.push({ role: 'user', content: message });
-        callOpenAI(messages, 120, 0.85, res, req); return;
+        callOpenAI(messages, 150, 0.85, res, req); return;
     }
 
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
