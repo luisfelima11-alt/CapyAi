@@ -117,8 +117,10 @@ test('self-study: pronúncia com 15s+ mostra o que foi ouvido, não "Não ouvi n
     await page.waitForFunction(() => [...document.querySelectorAll('#speak-grid button')].some(b => b.textContent === '⏹ Parar'));
 
     await page.clock.runFor(15_000);
-    await page.waitForFunction(f => document.body.innerText.includes(f), FALA);
-    const pagina = await page.evaluate(() => document.body.innerText);
+    // textContent, não innerText: com o Tailwind carregado a seção de pronúncia
+    // pode estar numa aba escondida, e innerText pula o que está escondido.
+    await page.waitForFunction(f => document.body.textContent.includes(f), FALA);
+    const pagina = await page.evaluate(() => document.body.textContent);
     assert.match(pagina, /Ouvi: "I can hear you/);
     assert.doesNotMatch(pagina, /Não ouvi nada/);
     assert.equal(transcricoes.length, 1);
@@ -158,7 +160,9 @@ test('contrato do CapyMic: trava guarda o áudio, transcreve uma vez, respeita c
     await page.evaluate(() => CapyMic.start());
     await page.clock.runFor(15_000);
     assert.equal(await page.evaluate(() => CapyMic.isRecording()), false);
-    assert.equal(await micsAbertos(page), 0, 'a trava solta o microfone');
+    // O mic é solto no onstop, que chega uma tarefa depois do stop() — como no
+    // navegador. Conferir na hora falhava com a máquina carregada.
+    await page.waitForFunction(() => window.__mic.tracks.every(t => t.stopped), null, { timeout: 5_000 });
     await new Promise(r => setTimeout(r, 500)); // tempo real para um fetch que saísse chegar à rota
     assert.equal(transcricoes.length, 0, 'ninguém pediu o texto ainda: nada é cobrado');
     assert.deepEqual(await page.evaluate(() => CapyMic.stopAndTranscribe({ lang: 'fr' })), { text: FALA, empty: false });
