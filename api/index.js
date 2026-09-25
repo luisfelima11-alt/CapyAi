@@ -216,6 +216,8 @@ async function checkRateLimit(req, key, _untrustedUserId) {
                 limit: minuteLimit,
                 used: Number(minuteResult.used) || minuteLimit,
                 plan,
+                guest: isGuest,
+                janela: 'minuto',
             };
             req._rateLimitResults[key] = info;
             return info;
@@ -233,6 +235,7 @@ async function checkRateLimit(req, key, _untrustedUserId) {
             limit,
             used: Number(result.used) || 0,
             plan,
+            guest: isGuest,
         };
         req._rateLimitResults[key] = info;
         return info;
@@ -245,12 +248,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         if (entry.count >= limit) {
             const now = new Date();
             const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan };
+            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan, guest: isGuest };
             req._rateLimitResults[key] = info;
             return info;
         }
         entry.count += 1;
-        const info = { ok: true, limit, used: entry.count, plan };
+        const info = { ok: true, limit, used: entry.count, plan, guest: isGuest };
         req._rateLimitResults[key] = info;
         return info;
     }
@@ -261,12 +264,22 @@ function rateLimitedResponse(res, info) {
     res.setHeader('X-RateLimit-Limit', String(info.limit));
     res.setHeader('X-RateLimit-Used',  String(info.used));
     res.setHeader('X-RateLimit-Plan',  info.plan);
+    // A burst (per-minute window) is not the daily cap; a visitor at the daily
+    // cap is invited to a free account (it is what turns on streaks and saved
+    // progress), not to Pro.
+    const convite = Boolean(info.guest) && info.janela !== 'minuto';
+    const message = info.janela === 'minuto'
+        ? 'Muitas mensagens seguidas. Espere um minuto e tente de novo.'
+        : convite
+            ? `Você usou os ${info.limit} usos de IA de hoje como visitante. Crie sua conta grátis para continuar: leva 1 minuto e salva seu progresso.`
+            : info.plan === 'free'
+                ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
+                : 'Limite diário do seu plano atingido. Tente novamente amanhã.';
     res.status(429).json({
         error: 'rate_limited',
-        message: info.plan === 'free'
-            ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
-            : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
+        message,
         limit: info.limit, used: info.used, plan: info.plan, retryAfter: info.retryAfter,
+        ...(convite ? { signup: true } : {}),
     });
 }
 
@@ -4741,5 +4754,5 @@ Rules:
 
 // Pure helpers, exposed for tests/security.test.js only.
 module.exports._internos = {
-    caminhoInterno, textoLivreParaPrompt, listaParaPrompt, limparCorpoIa, senhaVazada,
+    caminhoInterno, textoLivreParaPrompt, listaParaPrompt, limparCorpoIa, senhaVazada, rateLimitedResponse,
 };
