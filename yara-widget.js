@@ -373,7 +373,9 @@ Rules:
         }),
       });
       const data = await res.json();
+      // A limit answer is {error:'rate_limited', message}: show the message.
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+        || data?.message
         || data?.error?.message
         || (IS_FR ? 'Désolée, une erreur s\'est produite.' : 'Sorry, something went wrong.');
 

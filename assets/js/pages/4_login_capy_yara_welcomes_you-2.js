@@ -339,6 +339,8 @@ spawnParticles();
 /* ── init tab bar position ──────────────────────── */
 document.getElementById('tab-bar').style.setProperty('--tab-left',  '0%');
 document.getElementById('tab-bar').style.setProperty('--tab-width', '50%');
+// "Criar conta grátis" links (the AI-limit invitation in auth-secure.js) open signup.
+if (location.hash === '#signup') switchTab('signup');
 
 /* ── keyboard enter support ─────────────────────── */
 document.addEventListener('keydown', e => {
