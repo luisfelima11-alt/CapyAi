@@ -298,3 +298,77 @@ test('no student personal data is tracked, and security.txt ships', () => {
   assert.ok(config.builds.some(build => build.src === '.well-known/security.txt'));
   assert.match(fs.readFileSync(path.join(ROOT, '.well-known', 'security.txt'), 'utf8'), /^Contact: mailto:/m);
 });
+
+// ── Etapa 1b: prompts for 16+, JSON mode, lesson chat, guest limits (2026-09-25) ──
+
+test('site prompts are written for teens and adults, not small children', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  assert.doesNotMatch(api, /children aged|for a child|a child named|children's language app/i);
+  // quiz, word-of-day, daily-challenge, flashcard-deck, dialogue-scene; story and parent-report word it their own way
+  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 5);
+  assert.match(api, /for a Brazilian learner \(16\+\) named/);
+  assert.match(api, /language app for teens and adults/);
+  // Single gold examples with real values are what this model copies.
+  assert.doesNotMatch(api, /"word":"Butterfly"|"title":"Use a Brave Word!"|"word":"Sun"|___ dog is fluffy|\["Apple","River","Bird","Tree"\]/);
+});
+
+test('routes that answer one JSON object use the API JSON mode', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  assert.match(api, /if \(opts\.json\) corpo\.response_format = \{ type: 'json_object' \}/);
+  for (const rota of ['translate', 'story', 'word-of-day', 'daily-challenge', 'dialogue-scene', 'parent-report']) {
+    const inicio = api.indexOf(`url === '/api/${rota}'`);
+    assert.ok(inicio > 0, rota);
+    const chamada = api.slice(inicio, api.indexOf('callOpenAI(', inicio) + 200);
+    assert.match(chamada, /\{ json: true \}\); return;/, rota);
+  }
+});
+
+test('lesson chat is built from the Yara persona catalogue', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const rota = api.slice(api.indexOf("url === '/api/lesson-chat'"), api.indexOf('// ── DB endpoints'));
+  assert.match(rota, /personaDe\('conversa'\)/);
+  assert.match(rota, /nivelDoAluno\(/);
+  assert.doesNotMatch(rota, /use beginner/);
+});
+
+test('a visitor at the daily AI cap is invited to a free account; bursts say wait a minute', () => {
+  const { rateLimitedResponse } = apiHandler._internos;
+  const responder = info => {
+    const res = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.statusCode = c; return this; }, json(b) { this.body = b; return this; } };
+    rateLimitedResponse(res, info);
+    return res;
+  };
+  const visitante = responder({ guest: true, limit: 3, used: 3, plan: 'free', retryAfter: 100 });
+  assert.equal(visitante.statusCode, 429);
+  assert.equal(visitante.body.signup, true);
+  assert.match(visitante.body.message, /conta grátis/);
+  const rajada = responder({ guest: true, janela: 'minuto', limit: 2, used: 2, plan: 'free', retryAfter: 30 });
+  assert.match(rajada.body.message, /Espere um minuto/);
+  assert.equal(rajada.body.signup, undefined);
+  const gratis = responder({ guest: false, limit: 20, used: 20, plan: 'free', retryAfter: 100 });
+  assert.match(gratis.body.message, /Assine Pro/);
+});
+
+test('CLAUDE.md no longer teaches the retired design', () => {
+  const guia = fs.readFileSync(path.join(ROOT, 'CLAUDE.md'), 'utf8');
+  assert.doesNotMatch(guia, /base64|C:\\Users|git push origin main|database\.json|'plus'/);
+  assert.match(guia, /## Security rules/);
+});
+
+test('every page shows the free-account invitation when a visitor hits the AI cap', () => {
+  const auth = fs.readFileSync(path.join(ROOT, 'auth-secure.js'), 'utf8');
+  // One central place (the fetch wrapper every page loads), on 429 + signup:true only.
+  assert.match(auth, /response\.status === 429/);
+  assert.match(auth, /data\.signup === true/);
+  assert.match(auth, /text\.textContent = message/);
+  assert.match(auth, /4_Login_Capy_Yara_Welcomes_You\.html#signup/);
+  const login = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', '4_login_capy_yara_welcomes_you-2.js'), 'utf8');
+  assert.match(login, /location\.hash === '#signup'\) switchTab\('signup'\)/);
+  // The widget shows the server's limit message instead of "Sorry, something went wrong."
+  assert.match(fs.readFileSync(path.join(ROOT, 'yara-widget.js'), 'utf8'), /\|\| data\?\.message\n/);
+  // Browsers must fetch the new files: no page may keep the old cache tags.
+  for (const pagina of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
+    const html = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
+    assert.doesNotMatch(html, /auth-secure\.js\?v=auth20260918|yara-widget\.js\?v=yw5\b|welcomes_you-2\.js\?v=auth20260918/, pagina);
+  }
+});
