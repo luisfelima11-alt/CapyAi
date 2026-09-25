@@ -30,45 +30,30 @@ O `flappy_yara` fica fora de propósito (a partida termina numa colisão seguida
 ## Dev Server
 
 ```bash
-node scripts/dev-server.js   # starts on http://localhost:8765
+node scripts/dev-server.js   # http://localhost:8765 — pages + every /api/* through api/index.js
 ```
 
-Requires `.env`:
-```
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini   # optional, this is the default
-PORT=8765                   # optional
-```
+`scripts/dev-server.js` serves the pages and hands every `/api/*` request to the production
+handler (`api/index.js`); change the API there, never by adding routes to the dev server.
+Local `.env` (never committed): `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
+`SUPABASE_SECRET_KEY`, `SESSION_COOKIE_SECRET`, `APP_ORIGIN`; optional `OPENAI_MODEL`
+(default `gpt-4o-mini`), `OPENROUTER_API_KEY`, `PORT`.
 
-The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
+Tests: `npm run test:security` (node --test, no network or keys needed); `npm run security:check`
+adds `npm audit`. Add a case to `tests/security.test.js` for every security-relevant change.
 
-## Deployment
+## Deployment and branches
 
-Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**
+Vercel project `capy-yara-adventures`, production https://capyenglish.com.br. **The owner
+publishes production.** Don't run `vercel --prod` or push to `main` unless the owner asks for it
+in the session: work on a branch and open a PR (`sync/estado-producao` mirrors what is live).
 
-```bash
-npx vercel --prod --force   # always use --force to bypass cache
-```
-
-`vercel.json` rewrites:
-- `/api/*` → `/api/index.js`
-- `/` → `4_Login_Capy_Yara_Welcomes_You.html`
-
-Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
-
-## GitHub
-
-```
-https://github.com/luisfelima11-alt/CapyAi.git
-```
-
-Typical push after changes:
-```bash
-git add <files>
-git commit -m "description"
-git push origin main
-npx vercel --prod --force
-```
+- `vercel.json` sends `/api/*` to `api/index.js` and `/` to `landing.html`, and sets the security
+  headers and two CSPs: strict for the six hardened pages (login, set-password, account, admin,
+  admin-metrics, teacher_homework — no inline script, local Tailwind), compatibility for the rest.
+- SQL in `supabase/migrations/` runs in the Supabase SQL editor **before** the code that needs it.
+  Release steps and owner actions live in `SECURITY-ROLLOUT.md`.
+- `scripts/`, `tests/`, `supabase/` and `*.md` never ship (`.vercelignore`).
 
 ## Architecture
 
@@ -87,7 +72,9 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
-**⚠️ Cache busting:** All pages reference `components.js?v=3`. When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+**Cache busting:** pages load shared files as `name.js?v=<tag>`. After changing a shared JS/CSS file
+(`components.js`, `store.js`, `auth-secure.js`…), run `npm run bump` (rewrites every `?v=` to the
+current commit SHA) and commit the result.
 
 **⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
@@ -95,51 +82,51 @@ Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'
 
 Global state in `localStorage` key `capyYaraState_{userId}`:
 - `xp`, `badges[]`, `completedLessons[]`, `completedMinis[]`
-- `planType`: `'free'` | `'plus'` | `'pro'`
+- `planType`: `'free'` | `'pro'` | `'super'` — a UI hint synced from `/api/me`; the server enforces plans
 - `starBerries`, `streakDays`, `aiUsageToday`
 
 Key methods: `Store.addXP(n)`, `Store.completeLesson(id)`, `Store.completeMini(lessonId, miniNum)`, `Store.consumeAI()`.
 
 Fires DOM events: `stateChanged`, `levelUp`, `badgeUnlocked`, `streakMilestone`.
 
-### Auth (`auth.js`)
+### Auth and sessions (`auth-secure.js` + `/api/auth/*`)
 
-Session in `localStorage.capySession` = `{id, name, email, avatar}`.
-```js
-Auth.requireAuth()      // redirects to login if no session
-Auth.getSession()       // returns session object or null
-Auth.continueAsGuest()  // guest session: {id:'guest', name:'Explorer'}
-```
-Passwords are base64-encoded (not production-grade). User data stored in Supabase (see below).
+Supabase Auth behind the API: tokens live only in HttpOnly `__Host-` cookies set by `api/security.js`.
+`localStorage.capySession` is a display cache, never proof of identity.
 
-### Backend — Supabase (`api/index.js`)
+- `auth-secure.js` wraps `window.fetch`: same-origin writes carry `X-CSRF-Token` (double-submit with
+  the `__Host-capy-csrf` cookie), so pages just call `fetch('/api/...')`.
+- `Auth.login / signUp / logout / refreshSession / ready / continueAsGuest` → `/api/auth/*`. Magic link,
+  e-mail confirmation and password recovery come back through `/api/auth/callback`. Passwords are
+  Supabase's (bcrypt), 12+ characters, checked against HaveIBeenPwned.
+- Guests get a signed session cookie (`/api/auth/guest`). Plans are `free | pro | super`, written only
+  by the Kiwify webhook and admin routes.
+- Roles come from `app_metadata.role` (set with the Supabase admin API). Admin routes accept only an
+  admin session (`isAdminReq`); with `ADMIN_REQUIRE_MFA=true` it must be `aal2` (TOTP enrolled at
+  `/admin.html`). `CRON_SECRET` only opens the two cron routes.
 
-The API uses Supabase Postgres for persistent user data. Env vars required on Vercel:
-```
-SUPABASE_URL=https://kxihhowppupmfanufkim.supabase.co
-SUPABASE_KEY=<service role key>   # server-side only, never expose client-side
-```
+### Data (Supabase Postgres, from `api/index.js`)
 
-API calls Supabase REST API directly via `fetch()` — no npm package needed:
-```js
-async function sb(path, opts = {}) {
-  const r = await fetch(`${SB_URL}/rest/v1${path}`, {
-    ...opts,
-    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`,
-                'Content-Type': 'application/json', ...(opts.headers||{}) },
-  });
-  if (r.status === 204) return null;
-  const text = await r.text();
-  return text ? JSON.parse(text) : null;
-}
-```
+The API calls Supabase REST with the service key (`sb()`, `SUPABASE_SECRET_KEY`), server-side only.
+RLS is on for every table, and column grants keep plan/role out of the browser's reach. Main tables:
+`accounts` (`auth_user_id` → Supabase Auth), `user_state` (jsonb per user, plus server rows such as
+`__voz_*`), `user_profiles` (level, goals, plan), `webhook_events`, `rate_limit_*`,
+`api_metrics_daily` (requests and tokens per endpoint/day), `security_audit_log`,
+`homework_submissions`, `push_subscriptions`.
 
-**Supabase tables:**
-- `accounts` — `id, name, email, password, avatar, created_at`
-- `user_state` — `user_id (PK), data (jsonb), updated_at`
+### Security rules (keep them when adding features)
 
-`/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
-Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
+- Identity only from the session (`getRequestIdentity` / `resolveSecurityIdentity`), never from a
+  `userId` sent by the browser.
+- Text a student or an outside service controls (names, AI output, song titles) goes into HTML escaped
+  or through `textContent`, never inside `onclick="…"` strings: use listeners with indexes / `data-*`.
+- Student text going into a prompt passes `textoLivreParaPrompt` / `listaParaPrompt` (`textoParaPrompt`
+  for titles and slugs); AI responses leave through `sanitizeAiOutput`.
+- Every AI route is listed in `AI_ROUTE_KEYS`: the central gate identifies the student and applies the
+  plan's daily limit (guests: 3 AI uses a day).
+- Writes need an allowed `Origin`; no per-handler `Access-Control-Allow-Origin`; provider errors go to
+  the log, not to the response.
+- Pure helpers are exported for tests as `module.exports._internos`.
 
 ### Lesson Architecture
 
@@ -365,33 +352,16 @@ function markSection(s) { if (_done.has(s)) return; _done.add(s); Store.addXP(20
 
 ---
 
-### ⚠️ Critical Bugs — Known Issues in Old-Template Aulas
+### Old-template aulas (`lesson-engine.js`): two required fixes
 
-#### 1. result-overlay backdrop trap (lesson-engine.js aulas)
-
-**Pattern:** `<div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">` WITHOUT an `onclick` handler.
-
-**Symptom:** After completing the practice quiz, the overlay shows at `z-50`. Clicking outside the white modal does nothing. The overlay stays, covering the `z-40` sticky tab bar. ALL tabs and buttons become unclickable. User is completely stuck.
-
-**Fix:** Add `onclick="if(event.target===this){this.classList.add('hidden')}"` to the outer overlay div.
-
-**Status:**
-- ✅ Fixed: aula_20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 34
-- ✅ Not affected: aula_25 (no result-overlay), new-template aulas (different quiz pattern)
-- ⚠️ Always add this onclick when creating any new old-template aula with a result-overlay.
-
-#### 2. correct-pulse animation in old-template
-
-**Issue:** `lesson-engine.js`'s `answerPrac()` set `btn.className` directly but never added `.correct` class, so the CSS animation never triggered.
-
-**Fix applied to `lesson-engine.js`:** Added `btn.classList.add('correct')` after the `btn.className =` line on correct answers.
-
-**Required CSS in each old-template aula** (add after `@keyframes shake{...}`):
+- `#result-overlay` needs `onclick="if(event.target===this){this.classList.add('hidden')}"` on the outer
+  div. Without it, the `z-50` overlay stays over the `z-40` tab bar after the practice quiz and the
+  student can't click anything.
+- Add the correct-answer animation after `@keyframes shake{...}` (`answerPrac()` adds `.correct`):
 ```css
 @keyframes correct-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 .opt-btn.correct{animation:correct-pulse .3s ease}
 ```
-Added to: aula_20–24, 26–27, 29–32, 34.
 
 ## Escuta sem texto: a resposta certa SEMPRE aparece escrita
 
@@ -418,13 +388,6 @@ termina o exercício com 100% de acerto e sem ter aprendido a forma escrita.
 2. Aparece também no erro.
 3. O tempo até avançar dá para ler (≥1,5s; no erro, mais).
 4. Use `textContent`, não `innerHTML`, para escrever a palavra revelada.
-
-⚠️ **Armadilha ao mexer nisso:** a linha
-`if (window.CapySound) isCorrect ? CapySound.correct() : CapySound.wrong();`
-aparece **5 vezes** no `lessons.html`, em funções diferentes (`answerReview`,
-`answerQuiz`, `answerListen`…). Um replace pela primeira ocorrência cai na
-função errada e o código não roda — aconteceu aqui. Ancore pelo
-`function answerListen(` antes de substituir.
 
 ## Confirmação de acerto e de erro (regra do Luis, 13/set/2026)
 
@@ -456,72 +419,31 @@ Se for mexer: **não crie jogo novo**. Os painéis que já leem o vocabulário d
 lição são `panel-listen`, `panel-typing`, `panel-speed`, `panel-scramble` e
 `panel-build`.
 
-## Quiz de IA do modo guiado (corrigido 14/set/2026)
+## Quiz de IA do modo guiado
 
-No modo guiado (trilha diaria), `loadAIQuiz()` substitui o quiz estatico da licao
-por 5 perguntas geradas pela IA via `POST /api/lesson-quiz`. Tinha quatro defeitos,
-todos medidos:
+`loadAIQuiz()` troca o quiz estático da lição por 5 perguntas de `POST /api/lesson-quiz`. O nível vem de
+`nivelDaLicao(lesson)` (faixa de id = curso), a gramática da lição vai junto e o `explain` alimenta a
+caixa de feedback. Cache no navegador: `capyAIQuiz_v2_<id>_<data>`; mude o `v2` quando o formato das
+perguntas mudar.
 
-| Defeito | Efeito |
-|---|---|
-| o prompt dizia **"for children"** | perguntas infantis para tecnicos de GPS adultos e para candidato a vaga |
-| o cliente mandava **`level: 'beginner'` fixo** | licao B1 do curso de entrevista recebia pergunta de iniciante |
-| o exemplo de JSON usava **`opts: ["A","B","C","D"]`** | o modelo copiava literal e o aluno lia *"a resposta e A"* |
-| o prompt pedia **`explain`** e o cliente jogava fora | a explicacao existia e nunca chegava ao aluno |
+Limitação: mesmo pedindo 2 de 5 perguntas de gramática, o modelo tende a perguntar sobre o tema. Se
+incomodar, misture 2–3 perguntas estáticas de gramática com 2–3 da IA.
 
-**Hoje:** o nivel vem de `nivelDaLicao(lesson)` (derivado da faixa de id, que e o
-curso), a gramatica da licao vai junto, o prompt proibe opcoes "A"/"B"/"C"/"D" e diz
-que os alunos sao **adultos brasileiros**. O `explain` alimenta a caixa de feedback.
+Prompts do site: o público é **brasileiro de 16+**. Descreva os campos do JSON em vez de dar um exemplo
+com valores reais — este modelo copia o exemplo (já aconteceu com opções "A/B/C/D"). Rota que responde
+um objeto usa o modo JSON da API (`callOpenAI(..., { json: true })`); rota que responde uma lista não pode.
 
-A chave de cache virou `capyAIQuiz_v2_<id>_<data>` — sem isso as perguntas ruins
-ficariam salvas no navegador do aluno ate o dia virar.
+## Custo da ligação por voz
 
-🟡 **Limitação que fica:** mesmo pedindo "at least 2 of the 5 questions must test
-the grammar point", o modelo em geral gera perguntas sobre o TEMA, nao sobre a
-gramatica. Verificado em producao na licao 605. Se isso incomodar, o caminho e
-misturar: manter 2-3 perguntas estaticas (escritas a mao, que testam gramatica) e
-deixar a IA gerar so as outras 2-3.
-
-⚠️ Existem outros tres prompts com "for children aged 5-8" em `api/index.js`
-(`/api/quiz`, `/api/flashcard-deck`, `/api/dialogue-scene`). **Nao foram tocados** —
-a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
-defeito vale para eles.
-
-## Custo da ligacao por voz: calculado e guardado (14/set/2026)
-
-**O que existia:** o `conversa-core.js` ja contava os tokens reais de cada
-resposta (descontando cache), e o `aoDesligar` entregava `{ uso, transcricao,
-duracaoMs }`. A `conversa.html` mostrava o custo na tela e **esquecia ao fechar a
-aba**; a `entrevista.html` recebia os tokens e **jogava fora**. Resultado: nunca
-houve um numero medido de quanto custa um minuto de ligacao.
-
-**O que passa a existir:** a `entrevista.html` manda `uso` + `duracaoMs` junto com
-a transcricao para `POST /api/conversa-feedback`. O servidor calcula com a tabela
-de precos **dele** e grava o custo na linha que ja existia
-(`conversa_<userId>_<dia>` em `user_state`), alem de devolver em `custo` na
-resposta.
-
-```js
-// api/index.js — a tabela mora no SERVIDOR: preco e regra de negocio, e o numero
-// que vira relatorio nao pode depender do que o navegador mandou.
-const PRECO_VOZ = { audioIn: 10, audioOut: 20, cache: 0.30, textoIn: 0.60, textoOut: 2.40 }; // USD / 1M tokens
-```
-
-Os tokens vem do cliente (o `usage` da OpenAI chega pelo canal de dados WebRTC),
-entao sao **sanitizados com teto** antes de entrar na conta.
-
-🟡 **O numero real ainda nao existe.** A estimativa de papel escrita no codigo era
-**~R$0,06/min**. Um teste com tokens inventados (24k audio in / 18k out em 5 min)
-deu R$0,62/min — o que so prova que a conta roda, nao quanto custa. **Basta uma
-ligacao real de 2 minutos para o numero medido aparecer gravado.**
-
-⚠️ **Armadilha que me pegou aqui:** a linha
-`const cargo = sanitizeStoredJson(String(body.cargo || '').slice(0, 60)) || '';`
-existe em **dois** handlers (`/api/realtime-token` e `/api/conversa-feedback`).
-Um `String.replace` com ela como ancora cai no primeiro — foi o que fiz, e o bloco
-do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declaracao
-(TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
-linha que pode se repetir.
+- Voz em tempo real só para o plano Super (`VOZ_MINUTOS_MES`) e para o admin; teto global em dólar no
+  mês (`VOZ_TETO_USD_MES`).
+- Ao emitir o token (`/api/realtime-token`), o servidor **reserva** `min(minutos restantes, 30 min)`
+  numa linha `__voz_<aluno>_<data>_reserva` (`reservarVoz`).
+- Ao desligar, o navegador manda `uso` + `duracaoMs` para `/api/conversa-uso` (via `sendBeacon`); o
+  servidor **liquida** a reserva com o maior valor entre o relato e o relógio dele desde a emissão
+  (`liquidarReservaVoz`). Sem relato, a reserva inteira fica cobrada.
+- Preço por token na tabela `PRECO_VOZ` do servidor; o `/api/conversa-feedback` (entrevista) calcula com
+  a mesma função (`calcularCustoVoz`).
 
 ## Design System
 
@@ -551,16 +473,7 @@ Chapter accent colors (hero gradients):
 Present: `aula_01` – `aula_44` (**44 lessons total**). All lessons are available and linked in `classes.html`.
 
 
-**Homework status (all aulas now have homework):**
-- aulas 01–19: always had homework (new template)
-- aulas 20–24: homework **added** (old template, `initLesson` tabs updated to include `'homework'`)
-- aulas 25–28: homework was already present
-- aulas 29–32: homework **added** (old template, 7 tabs total)
-- aulas 33–42: always had homework (new template)
-- aulas 43, 44: homework included (communicative template)
-
-Lesson content data for aulas 29–37: `C:\Users\Win10\lesson-pdfs\lessons-data.js`
-Custom dialogues for aulas 29–37: `C:\Users\Win10\lesson-pdfs\generate-html.js` (`DIALOGUES` object, keys 29–37)
+All 44 aulas have a homework tab (new, old and communicative templates).
 
 ## Homework Tab Pattern (standard for all aula pages)
 
@@ -626,8 +539,6 @@ initLesson({
 });
 ```
 
-⚠️ When creating any old-template aula, **always add the onclick backdrop fix** to the result-overlay div. See "Critical Bugs" section above.
-
 ### Homework interactive task types (use 4–5 per lesson)
 
 **1. Word Order (Duolingo-style)** — shuffle word tiles, drag/tap to reconstruct a sentence.
@@ -691,16 +602,23 @@ document.querySelectorAll('.fill-check').forEach(inp => {
 
 ---
 
-## API Endpoints (`scripts/dev-server.js`)
+## API endpoints (`api/index.js`)
 
-- `POST /api/chat` — Free-form Yara conversation
-- `POST /api/quiz` — AI quiz generation
-- `POST /api/translate` — Word translation
-- `POST /api/lesson-chat` — Yara chat scoped to lesson topic
-- `POST /api/dialogue-scene` — AI grammar dialogue generator
-- `POST /api/flashcard-deck` — Vocabulary deck generation
-- `POST /api/story` — AI story generation
-- `GET /api/word-of-day` — Daily vocabulary word
-- `GET /api/daily-challenge` — Daily challenge prompt
-- `GET/POST /api/db` — Local JSON user state (reads/writes `database.json`)
-- `GET /api/db/leaderboard` — Top 20 users by XP
+Source of truth: the `if (req.method === … && url === …)` blocks in `api/index.js`.
+
+- **Auth:** `POST /api/auth/signup | login | logout | guest | magic-link | request-reset | set-password`,
+  `GET /api/auth/session`, `GET /api/auth/callback`, `GET /api/auth/mfa/status`,
+  `POST /api/auth/mfa/enroll | verify`.
+- **Student data (session):** `/api/db` (state), `/api/profile`, `/api/me`, `/api/homework`,
+  `POST /api/track`, `GET /api/db/leaderboard` (public, names without markup).
+- **AI (per-plan limits, `AI_ROUTE_KEYS`):** `/api/chat`, `/api/lesson-chat`, `/api/quiz`,
+  `/api/lesson-quiz`, `/api/translate`, `/api/story`, `/api/flashcard-deck`, `/api/dialogue-scene`,
+  `/api/parent-report`, `/api/word-of-day`, `/api/daily-challenge`, `/api/newsline`, `/api/historyline`,
+  `/api/youtube`, `/api/personalize`, `/api/correct-writing`, `/api/study-plan`, `/api/music`,
+  `/api/lyrics-search`, `/api/lyrics`, `/api/transcribe`, `GET /api/tts`.
+- **Voice:** `POST /api/realtime-token`, `/api/conversa-uso`, `/api/conversa-feedback`, `GET /api/personas`.
+- **Admin (admin session, aal2 with `ADMIN_REQUIRE_MFA=true`):** `/api/admin/*` — overview, students,
+  courtesies, grant-plan, revoke-plan, login-link, set-password, broadcast, campaign, funnel, voz,
+  brief, stats, gpstronic-results, email-test.
+- **Server-to-server:** `POST /api/kiwify-webhook` (HMAC signature in `?signature=` or header);
+  crons `GET /api/send-reminders` and `GET /api/teacher-brief` (`Authorization: Bearer $CRON_SECRET`).
