@@ -287,10 +287,15 @@ async function loadStudents() {
           <td class="p-3 text-right mono">${a.streakDays > 0 ? '🔥' + a.streakDays : '—'}</td>
           <td class="p-3 text-center">${a.hasPush ? '🔔' : '<span class="text-white/20">—</span>'}</td>
           <td class="p-3 text-right">
-            <button data-link-email="${escapeHtml(a.email)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">link de acesso</button>
+            <button data-link-email="${escapeHtml(a.email)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">link de acesso</button><br>
+            <button data-lembra-id="${escapeHtml(a.id)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">memória</button>
           </td>
         </tr>`;
     }).join('');
+
+    rows.querySelectorAll('[data-lembra-id]').forEach(btn => {
+      btn.addEventListener('click', () => mostrarLembrancas(btn));
+    });
 
     // Enquanto o e-mail do site não sai (Resend com domínio não verificado),
     // este botão é o ÚNICO jeito de um aluno que não consegue entrar voltar a
@@ -299,6 +304,49 @@ async function loadStudents() {
       btn.addEventListener('click', () => gerarLinkDeAcesso(btn));
     });
   } catch (e) { if (e.message !== 'unauthorized') toast('Erro ao carregar alunos.', 'error'); }
+}
+
+// A memória da Yara de UM aluno, numa linha que abre embaixo dele: o que ele
+// contou nas conversas livres. É a ficha para a conversa de retenção do Luis
+// ("e a viagem para Orlando, deu certo?"). O fato veio da fala do aluno, então
+// entra por textContent, nunca por innerHTML.
+async function mostrarLembrancas(btn) {
+  const tr = btn.closest('tr');
+  const aberta = tr.nextElementSibling;
+  if (aberta && aberta.dataset.lembrancas === btn.dataset.lembraId) { aberta.remove(); return; }
+  const linha = document.createElement('tr');
+  linha.dataset.lembrancas = btn.dataset.lembraId;
+  linha.className = 'border-b border-white/5';
+  const td = document.createElement('td');
+  td.colSpan = 7;
+  td.className = 'p-3';
+  td.textContent = 'Carregando…';
+  linha.appendChild(td);
+  tr.after(linha);
+  try {
+    const d = await api('/api/admin/lembrancas?aluno=' + encodeURIComponent(btn.dataset.lembraId));
+    const fatos = Array.isArray(d.fatos) ? d.fatos : [];
+    td.textContent = '';
+    if (!fatos.length) {
+      const vazio = document.createElement('p');
+      vazio.className = 'text-[10px] text-white/30 font-normal';
+      vazio.textContent = 'A Yara ainda não anotou nada das conversas com este aluno.';
+      td.appendChild(vazio);
+      return;
+    }
+    fatos.slice().reverse().forEach(f => {                   // mais recente primeiro
+      const fato = document.createElement('p');
+      fato.className = 'text-white';
+      fato.textContent = '• ' + f.texto;
+      const meta = document.createElement('p');
+      meta.className = 'text-[10px] text-white/30 font-normal';
+      meta.textContent = [f.tipo, f.quando, f.em ? new Date(f.em).toLocaleDateString('pt-BR') : '', f.canal === 'texto' ? 'chat' : 'ligação']
+        .filter(Boolean).join(' · ');
+      td.append(fato, meta);
+    });
+  } catch (e) {
+    if (e.message !== 'unauthorized') td.textContent = 'Não consegui carregar a memória agora.';
+  }
 }
 
 async function gerarLinkDeAcesso(btn) {

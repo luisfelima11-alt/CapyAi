@@ -508,6 +508,9 @@ function aplicarPersona(id, comHistoria) {
   // `destino` é a persona que não é conversada aqui: o menu navega para a página
   // que já tem a simulação inteira (recrutador, devolutiva, clipe).
   if (p && p.destino) { location.href = p.destino; return; }
+  // Trocou de capivara: o que foi conversado até aqui era com a ANTERIOR — anota
+  // antes de trocar. (No boot o histórico ainda nem existe; o try segura.)
+  if ((p ? p.id : 'conversa') !== personaAtual) { try { anotarMemoria('texto'); } catch (_) {} }
   personaAtual = p ? p.id : 'conversa';
   $('btn-persona-rotulo').textContent = p ? p.rotulo : 'Yara';
   const arte = (p && p.arte) || ARTE_PADRAO;
@@ -667,6 +670,38 @@ const userName = (sessao && sessao.name) || 'Explorer';
 // digita "como se escreve isso?" e ela sabe do que ele está falando.
 const historia = [];
 
+// ── Memória da Yara ──────────────────────────────────────────────────────────
+// Quando uma conversa livre termina (desligou, trocou de capivara, saiu da
+// página), o trecho NOVO do histórico vai para o servidor, que anota o que o
+// aluno contou da vida dele e a Yara retoma na próxima conversa. Só o trecho
+// novo: sem isso a mesma conversa seria lida duas vezes. O servidor é quem
+// decide o que vale (persona, visitante, tamanho); a lista aqui só evita mandar
+// cena e entrevista à toa. Cada fala vai cortada em 400 caracteres porque o
+// sendBeacon não aceita mais que 64 KB.
+const PERSONAS_COM_MEMORIA = ['conversa', 'maia', 'iniciante'];
+let memoriaEnviadaAte = 0;
+function anotarMemoria(canal) {
+  const novo = historia.slice(memoriaEnviadaAte);
+  if (!PERSONAS_COM_MEMORIA.includes(personaAtual) || !sessao.id || sessao.id === 'guest' || sessao.role === 'guest') {
+    memoriaEnviadaAte = historia.length;
+    return;
+  }
+  if (novo.filter(m => m.role === 'user').length < 3) return;
+  memoriaEnviadaAte = historia.length;
+  try {
+    const transcricao = novo.slice(-80).map(m => ({ role: m.role, content: String(m.content || '').slice(0, 400) }));
+    const corpo = JSON.stringify({ canal, persona: personaAtual, transcricao });
+    const blob = new Blob([corpo], { type: 'application/json' });
+    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/lembrancas', blob))) {
+      fetch('/api/lembrancas', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: corpo, keepalive: true, credentials: 'same-origin',
+      }).catch(() => {});
+    }
+  } catch (_) { /* anotar é bônus: nunca atrapalha o aluno */ }
+}
+window.addEventListener('pagehide', () => anotarMemoria('texto'));
+
 // ── A ligação ────────────────────────────────────────────────────────────────
 const chamada = CapyChamada({
   aoEstado(e) {
@@ -704,6 +739,7 @@ const chamada = CapyChamada({
   aoErro(msg) { avisar(msg, true); controles(); },
   aoDesligar(motivo, dados) {
     registrarUso(dados.uso, dados.duracaoMs);
+    anotarMemoria('voz');
     controles();
     $('cron').textContent = '';
     if (motivo === 'silencio') avisar('Encerrei depois de 3 minutos de silêncio.');

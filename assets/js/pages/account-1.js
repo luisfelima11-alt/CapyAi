@@ -286,3 +286,90 @@ function renderSobreMim(perfil) {
   }
   Promise.resolve(Auth.fetchProfile(session.id)).then(renderSobreMim).catch(() => renderSobreMim(null));
 })();
+
+// ── Das nossas conversas: a memória da Yara ────────────────────────────────
+// O que a Yara anotou das conversas livres (POST /api/lembrancas). O aluno vê e
+// apaga cada item: o dado é dele. Montado todo aqui, com textContent — o fato
+// veio da fala do aluno — e só com classes que a página já usa (o CSS desta
+// página é pré-compilado; classe nova não existe nele). O fetch leva o token
+// CSRF sozinho: o auth-secure.js embrulha o fetch da página.
+function montarLembrancas(fatos) {
+  const card = document.getElementById('sobre-mim-card');
+  if (!card || card.hidden) return;
+  let bloco = document.getElementById('yara-lembra');
+  if (!bloco) {
+    bloco = document.createElement('div');
+    bloco.id = 'yara-lembra';
+    bloco.className = 'mt-4 border-t border-slate-100';
+    card.appendChild(bloco);
+  }
+  bloco.textContent = '';
+
+  const topo = document.createElement('div');
+  topo.className = 'flex items-center justify-between mt-4 mb-2';
+  const titulo = document.createElement('p');
+  titulo.className = 'text-slate-500 text-xs font-black uppercase tracking-widest';
+  titulo.textContent = 'Das nossas conversas';
+  topo.appendChild(titulo);
+  if (fatos.length) {
+    const tudo = document.createElement('button');
+    tudo.type = 'button';
+    tudo.className = 'text-xs font-black text-violet-500 hover:text-violet-700 cursor-pointer';
+    tudo.textContent = 'Apagar tudo';
+    tudo.addEventListener('click', () => {
+      if (window.confirm('Apagar tudo o que a Yara anotou das conversas? Ela não vai mais lembrar disso.')) apagarLembranca({ tudo: true });
+    });
+    topo.appendChild(tudo);
+  }
+  bloco.appendChild(topo);
+
+  const aviso = document.createElement('p');
+  aviso.className = 'text-xs text-slate-400 leading-relaxed mb-2';
+  aviso.textContent = fatos.length
+    ? 'A Yara anota o que você conta nas conversas para lembrar na próxima. Você pode apagar qualquer item. O professor Luis também vê.'
+    : 'Converse com a Yara e ela vai lembrando do que você contar: família, trabalho, seus planos. Tudo aparece aqui, e você apaga quando quiser.';
+  bloco.appendChild(aviso);
+  if (!fatos.length) return;
+
+  const lista = document.createElement('ul');
+  lista.className = 'space-y-2';
+  fatos.slice().reverse().forEach(f => {            // mais recente primeiro
+    const li = document.createElement('li');
+    li.className = 'flex items-start gap-2 text-sm text-slate-600';
+    const texto = document.createElement('span');
+    texto.className = 'flex-1 leading-relaxed';
+    texto.textContent = f.texto;
+    const apagar = document.createElement('button');
+    apagar.type = 'button';
+    apagar.className = 'flex-shrink-0 text-slate-300 hover:text-slate-600 text-xs font-bold px-2 py-1 rounded-lg hover:bg-slate-50 cursor-pointer';
+    apagar.textContent = '✕';
+    apagar.setAttribute('aria-label', 'Apagar: ' + f.texto);
+    apagar.addEventListener('click', () => apagarLembranca({ id: f.id }));
+    li.append(texto, apagar);
+    lista.appendChild(li);
+  });
+  bloco.appendChild(lista);
+}
+
+async function apagarLembranca(corpo) {
+  try {
+    const r = await fetch('/api/lembrancas/apagar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo),
+    });
+    const d = await r.json().catch(() => null);
+    if (!r.ok || !d || !Array.isArray(d.fatos)) throw new Error('apagar_falhou');
+    montarLembrancas(d.fatos);
+  } catch (e) {
+    window.alert('Não consegui apagar agora. Tente de novo em instantes.');
+  }
+}
+
+(function carregarLembrancas() {
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem('capySession') || 'null'); } catch (e) {}
+  if (!session || !session.id || session.id === 'guest') return;
+  fetch('/api/lembrancas', { credentials: 'same-origin' })
+    .then(r => (r.ok ? r.json() : null))
+    .then(d => { if (d && Array.isArray(d.fatos)) montarLembrancas(d.fatos); })
+    .catch(() => { /* sem memória na tela: o resto da conta segue */ });
+})();
