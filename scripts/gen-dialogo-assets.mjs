@@ -90,6 +90,24 @@ async function gerarImagem(slug, refSlug) {
 // ── Áudio ──────────────────────────────────────────────────────────────────
 // Um mp3 por fala, não um arquivo concatenado: o botão 🔊 de cada bolha
 // reaproveita o mesmo arquivo, dá pra destacar a fala tocando, e pular é trivial.
+// Modelo de voz. Até 25/set/2026 era o `tts-1`, o mais simples da OpenAI. O
+// Luis pediu áudio melhor, e comparamos as mesmas falas em três versões: tts-1,
+// gpt-4o-mini-tts e ElevenLabs via Higgsfield. Ficou o gpt-4o-mini-tts: bem mais
+// natural, mantém as vozes do curso (nova/onyx) e aceita INSTRUÇÃO — dá para
+// pedir inglês claro e um pouco mais lento, o que importa para aluno A2.
+// O `speed` só existe no tts-1; no modelo novo o ritmo vai pela instrução.
+// Áudio já gerado continua como está: o script não regrava arquivo existente.
+const MODELO_TTS = process.env.CAPY_TTS_MODEL || 'gpt-4o-mini-tts';
+const INSTRUCAO_TTS = 'Speak in clear, natural American English, a little slower than normal, '
+    + 'warm and friendly, like a real conversation at work. '
+    + 'The listeners are Brazilian adults learning English at a basic level.';
+function corpoTTS(voz, texto) {
+    const corpo = { model: MODELO_TTS, voice: voz, input: texto };
+    if (MODELO_TTS === 'tts-1' || MODELO_TTS === 'tts-1-hd') corpo.speed = 0.95;
+    else corpo.instructions = INSTRUCAO_TTS;
+    return corpo;
+}
+
 async function gerarAudio(slug) {
     const d = carregar(slug);
     const dir = path.join(RAIZ, 'assets/audio', pastaAudio(d));
@@ -105,7 +123,7 @@ async function gerarAudio(slug) {
         const r = await fetch('https://api.openai.com/v1/audio/speech', {
             method: 'POST',
             headers: { Authorization: `Bearer ${CHAVE}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'tts-1', voice: voz, input: linha.en, speed: 0.95 }),
+            body: JSON.stringify(corpoTTS(voz, linha.en)),
         });
         if (!r.ok) { console.error(`  ✗ ${nome}: HTTP ${r.status} ${(await r.text()).slice(0, 120)}`); falhas++; continue; }
         fs.writeFileSync(destino, Buffer.from(await r.arrayBuffer()));

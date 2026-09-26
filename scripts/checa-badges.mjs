@@ -15,6 +15,8 @@ const CURSOS = {
     Intermediate: () => porPrefixo('intermediate_aula_'),
     Advanced:     () => porPrefixo('advanced_aula_'),
     'GPS Tronic': () => porPrefixo('gpstronic_aula_'),
+    'Agro English': () => porPrefixo('agro_aula_'),
+    'Entrevista': () => porPrefixo('interview_aula_'),
     'Français':   () => porPrefixo('fr_aula_'),
     'Türkçe':     () => (fs.readFileSync('lessons_tr_data.js', 'utf8').match(/\bid:\s*\d+/g) || []).length,
 };
