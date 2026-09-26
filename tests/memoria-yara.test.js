@@ -177,13 +177,25 @@ function rotas(options = {}) {
   };
   const banco = { [options.aluno || 'grant-luan']: options.guardados || [] };
   const escritas = [], chamadasIA = [], leituras = [];
-  const identidade = options.aluno === null ? null : { kind: 'user', appUserId: options.aluno || 'grant-luan' };
+  // O FORMATO REAL: o getRequestIdentity (api/security.js) devolve so o LOGIN
+  // — { kind, authUserId, session } — sem appUserId. Quem liga o login a
+  // CONTA do aluno e o resolveSecurityIdentity. A primeira versao deste teste
+  // dava appUserId de graca no getRequestIdentity e deixou passar a memoria
+  // (e a voz, e a devolutiva) sem gravar nada em producao.
+  const login = options.aluno === null ? null : { kind: 'user', authUserId: 'auth-' + (options.aluno || 'grant-luan'), session: { user: {} } };
+  const resolver = async () => {
+    if (!login) throw new Security.HttpError(401, 'authentication_required');
+    const identidade = { ...login, appUserId: options.aluno || 'grant-luan' };
+    req._securityIdentity = identidade;
+    return identidade;
+  };
   const context = vm.createContext({
     ...C, console: { error() {} }, JSON, String, Array, Number, Promise, Date, URL, Set, Object,
     req, res, url: req.url.split('?')[0], crypto,
     assertOrigin: Security.assertOrigin, assertCsrf: Security.assertCsrf,
-    getRequestIdentity: async () => { if (!identidade) throw new Security.HttpError(401, 'unauthorized'); return identidade; },
-    requireAppUser: async () => { if (!identidade) throw new Security.HttpError(401, 'unauthorized'); return identidade; },
+    getRequestIdentity: async () => login,
+    resolveSecurityIdentity: resolver,
+    requireAppUser: resolver,
     isAdminReq: async () => Boolean(options.admin),
     readBody: async () => options.body || {},
     checkRateLimit: async () => ({ ok: !options.limitado }),
@@ -289,6 +301,21 @@ test('POST /api/lembrancas/apagar: exige CSRF, apaga um e mantem os outros, ou a
   await tudo.rodar();
   assert.equal(tudo.banco['grant-luan'].length, 0);   // array do vm: comparar tamanho, nao prototipo
   assert.equal(tudo.res.body.fatos.length, 0);
+});
+
+// A familia do bug de 26/set: getRequestIdentity nao traz appUserId. Quem ler
+// `.appUserId` dele recebe undefined e nao grava nada, em silencio — foi assim
+// que a voz, a devolutiva da entrevista e a memoria ficaram sem registro.
+test('ninguem le appUserId do getRequestIdentity: a conta so vem do resolveSecurityIdentity', () => {
+  const linhas = FONTE.split('\n');
+  const suspeitas = [];
+  linhas.forEach((l, i) => {
+    const m = /(?:const|let)\s+(\w+)\s*=\s*await\s+getRequestIdentity\(/.exec(l);
+    if (!m) return;
+    const trecho = linhas.slice(i, i + 6).join('\n');
+    if (new RegExp(`\\b${m[1]}(\\?)?\\.appUserId`).test(trecho)) suspeitas.push(`api/index.js:${i + 1}`);
+  });
+  assert.deepEqual(suspeitas, [], 'use resolveSecurityIdentity para chegar na conta do aluno');
 });
 
 test('GET /api/admin/lembrancas: so admin, e o id do aluno em lista fechada de caracteres', async () => {

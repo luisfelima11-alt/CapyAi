@@ -2563,7 +2563,11 @@ module.exports = async (req, res) => {
     // (ver `ehAluno`), entao a linha nao conta como aluno no roster.
     async function gravarUsoVoz(req, res, corpo, custo) {
         try {
-            const identity = await getRequestIdentity(req, res, { allowGuest: true });
+            // resolveSecurityIdentity, e NAO getRequestIdentity: so ele liga o
+            // login a CONTA do aluno (appUserId). Com o getRequestIdentity o
+            // appUserId vinha sempre vazio e nenhuma ligacao foi gravada de 13 a
+            // 26/set — o teto de minutos e o freio de US$ ficaram cegos.
+            const identity = await resolveSecurityIdentity(req, res, { allowGuest: true });
             if (!identity || !identity.appUserId) return false;
             const agora = new Date().toISOString();
             await sb('/user_state', {
@@ -2646,7 +2650,9 @@ module.exports = async (req, res) => {
         // padrão de `mem_<id>` — e com sb(), não sbUser(): a RLS de user_state
         // exige user_id = current_account_id() e rejeitaria esta linha.
         try {
-            const identity = await getRequestIdentity(req, res, { allowGuest: true });
+            // resolveSecurityIdentity: o getRequestIdentity nao traz appUserId, e
+            // por isso nenhuma devolutiva tinha sido guardada ate 26/set.
+            const identity = await resolveSecurityIdentity(req, res, { allowGuest: true });
             if (identity?.appUserId) {
                 const dia = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
                 await sb('/user_state', {
@@ -2683,9 +2689,12 @@ module.exports = async (req, res) => {
         assertOrigin(req);
         let appUserId = null;
         try {
-            const identity = await getRequestIdentity(req, res, { allowGuest: false });
+            // resolveSecurityIdentity: e ele que liga o login a CONTA. O
+            // getRequestIdentity nao traz appUserId (foi o que deixou a voz e a
+            // devolutiva sem gravar nada ate 26/set).
+            const identity = await resolveSecurityIdentity(req, res, { allowGuest: false });
             if (identity && identity.kind === 'user') appUserId = identity.appUserId || null;
-        } catch (e) { /* sem sessao: visitante nao tem memoria */ }
+        } catch (e) { /* sem sessao ou conta nao ligada: nao ha memoria para gravar */ }
         const body = (await readBody(req)) || {};
         if (!appUserId || !PERSONAS_COM_MEMORIA.includes(String(body.persona || '')) || falasDoAluno(body.transcricao) < 3) {
             res.status(204).end();
