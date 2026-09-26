@@ -42,14 +42,56 @@ async function api(path, opts = {}, _jaTentou) {
     }
   }
 
-  if (r.status === 401 || r.status === 403) { showGate(true); throw new Error('unauthorized'); }
+  if (r.status === 401 || r.status === 403) { showGate(motivoDoPortao()); throw new Error('unauthorized'); }
   return r.json();
 }
 
-function showGate(err) {
+// ── Portão ───────────────────────────────────────────────────────────────
+// Antes, TODA falha virava "Chave inválida. Tente novamente." — frase da versão
+// antiga do admin, que pedia uma chave. Sem campo de chave na tela, o Luis
+// ficava apertando "Entrar" achando que tinha errado uma senha que nem existe,
+// quando o caso era outro: o navegador logado com a conta de um aluno (o
+// celular dele ficou com o login do Luan), a sessão vencida ou o servidor fora
+// do ar. Cada caso agora tem a sua frase e a sua saída.
+const FRASE_DO_PORTAO = {
+  nao_admin: 'Esta conta não é de administrador.',
+  sessao: 'Sua sessão venceu. Entre de novo.',
+  falha: 'Não consegui falar com o servidor. Tente de novo em instantes.',
+};
+
+// A página de login devolve para cá depois de entrar — só para destinos de
+// uma lista fechada, que fica lá.
+const LOGIN_COM_VOLTA = '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html';
+
+// 401 numa rota de admin não diz se a sessão venceu ou se a conta é de aluno:
+// quem desempata é a sessão que o navegador conhece.
+function motivoDoPortao() {
+  const s = Auth.getSession();
+  if (!s || s.role === 'guest') return 'deslogado';
+  return s.role === 'admin' ? 'sessao' : 'nao_admin';
+}
+
+function showGate(motivo) {
+  const m = motivo || 'deslogado';
   document.getElementById('gate').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
-  document.getElementById('gate-error').classList.toggle('hidden', !err);
+
+  const erro = document.getElementById('gate-error');
+  erro.textContent = FRASE_DO_PORTAO[m] || '';
+  erro.classList.toggle('hidden', !FRASE_DO_PORTAO[m]);
+
+  // Mostrar QUEM está logado é o que responde "por que não entra?".
+  const s = Auth.getSession();
+  const conta = s && s.role !== 'guest' ? [s.name, s.email && `(${s.email})`].filter(Boolean).join(' ') : '';
+  const quem = document.getElementById('gate-quem');
+  quem.textContent = m === 'nao_admin' && conta ? `Você está conectado como ${conta}.` : '';
+  quem.classList.toggle('hidden', !quem.textContent);
+
+  // Conta errada: a saída é sair e entrar com a certa. Nos outros casos, entrar.
+  document.getElementById('gate-trocar').classList.toggle('hidden', m !== 'nao_admin');
+  const btn = document.getElementById('gate-btn');
+  btn.classList.toggle('hidden', m === 'nao_admin');
+  btn.textContent = m === 'falha' ? 'Tentar de novo' : 'Entrar com conta administrativa';
 }
 
 function showApp() {
@@ -58,12 +100,25 @@ function showApp() {
   loadAll();
 }
 
-document.getElementById('gate-btn').addEventListener('click', async () => {
-  const user = await Auth.ready();
-  if (!user) { window.location.href = '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html'; return; }
-  if (user.role !== 'admin') { showGate(true); return; }
+async function entrarNoAdmin() {
   try { await api('/api/admin/overview'); showApp(); }
-  catch (e) { if (e.message !== 'unauthorized') toast('Falha de rede.', 'error'); }
+  catch (e) { if (e.message !== 'unauthorized') showGate('falha'); }
+}
+
+document.getElementById('gate-btn').addEventListener('click', async () => {
+  // refreshSession, não ready(): o ready() guarda a PRIMEIRA resposta da página
+  // para sempre, e quem acabou de entrar em outra aba continuaria "deslogado".
+  const user = await Auth.refreshSession();
+  if (!user || user.role === 'guest') { window.location.href = LOGIN_COM_VOLTA; return; }
+  if (user.role !== 'admin') { showGate('nao_admin'); return; }
+  entrarNoAdmin();
+});
+
+document.getElementById('gate-trocar').addEventListener('click', () => {
+  // O Auth.logout() sempre manda para o login SEM `next`. Este recado o login lê
+  // uma vez, e devolve para cá depois que a conta certa entrar.
+  try { sessionStorage.setItem('capyDepoisDoLogin', 'admin.html'); } catch (e) { /* sem storage: volta pela home */ }
+  Auth.logout();
 });
 document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
 
@@ -151,7 +206,7 @@ async function loadCampaign() {
   campaignData = null;
   try {
     const response = await fetch('/api/admin/campaign', { credentials: 'same-origin', cache: 'no-store' });
-    if (response.status === 401 || response.status === 403) { showGate(true); throw new Error('unauthorized'); }
+    if (response.status === 401 || response.status === 403) { showGate(motivoDoPortao()); throw new Error('unauthorized'); }
     if (!response.ok) throw new Error('campaign_unavailable');
     const data = await response.json();
     if (!Array.isArray(data.participants) || !data.campaign || !data.summary) throw new Error('invalid_campaign');
@@ -792,8 +847,9 @@ document.getElementById('bc-send-btn').addEventListener('click', async () => {
 
 // ── Boot ─────────────────────────────────────────────────────────────────
 Auth.ready().then(user => {
-  if (user?.role === 'admin') api('/api/admin/overview').then(showApp).catch(() => showGate(true));
-  else showGate(Boolean(user));
+  if (!user || user.role === 'guest') showGate('deslogado');
+  else if (user.role !== 'admin') showGate('nao_admin');
+  else entrarNoAdmin();
 });
 
 document.getElementById('alunos-reload').addEventListener('click', loadStudents);

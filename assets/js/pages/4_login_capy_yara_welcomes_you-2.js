@@ -110,6 +110,30 @@ function updateStrength() {
   document.getElementById('strength-label').textContent = pw.length ? labels[score - 1] || '' : '';
 }
 
+/* ── para onde voltar depois de entrar ──────────── */
+// O admin manda para cá com ?next=admin.html — ou deixa o recado no
+// sessionStorage quando precisa sair de outra conta antes, porque o
+// Auth.logout() sempre chega aqui sem `next`. Antes este arquivo ignorava o
+// `next`: quem entrava pelo admin caía na home, e quem já estava logado era
+// jogado para a home sem poder trocar de conta.
+// Lista FECHADA: aceitar qualquer `next` da URL viraria redirecionamento aberto.
+const DESTINOS_DEPOIS_DO_LOGIN = ['admin.html'];
+
+function destinoDepoisDoLogin() {
+  let pedido = '';
+  try {
+    pedido = new URLSearchParams(window.location.search).get('next')
+      || sessionStorage.getItem('capyDepoisDoLogin') || '';
+  } catch (e) { pedido = ''; }
+  pedido = String(pedido).trim().replace(/^\/+/, '');
+  return DESTINOS_DEPOIS_DO_LOGIN.includes(pedido) ? pedido : null;
+}
+
+function irParaDestino(destino) {
+  try { sessionStorage.removeItem('capyDepoisDoLogin'); } catch (e) { /* segue */ }
+  window.location.href = destino;
+}
+
 /* ── success splash ─────────────────────────────── */
 function showSuccess(name, isNew = false) {
   const overlay = document.getElementById('success-overlay');
@@ -127,6 +151,8 @@ function showSuccess(name, isNew = false) {
     setTimeout(async () => {
       const session = Auth.getSession();
       if (session && session.role !== 'guest' && session.id !== 'guest') {
+        const destino = destinoDepoisDoLogin();
+        if (destino) { irParaDestino(destino); return; }
         const profile = await Auth.fetchProfile(session.id);
         if (!profile || !profile.onboarding_complete) {
           window.location.href = 'onboarding.html';
@@ -352,6 +378,10 @@ document.addEventListener('keydown', e => {
 // to stay here and sign into their registered account.
 Auth.ready().then(session => {
   if (session && session.role !== 'guest' && session.id !== 'guest') {
-    window.location.href = '6_Home_Forest_Expedition.html';
+    // Já logado e vindo do admin: volta para lá. Se a conta não for de admin,
+    // o portão do admin mostra quem está logado e oferece trocar de conta.
+    const destino = destinoDepoisDoLogin();
+    if (destino) irParaDestino(destino);
+    else window.location.href = '6_Home_Forest_Expedition.html';
   }
 }).catch(() => { /* Keep the login form available during a network outage. */ });
