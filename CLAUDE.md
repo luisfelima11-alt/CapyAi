@@ -47,8 +47,19 @@ The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
 Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**
 
 ```bash
-npx vercel --prod --force   # always use --force to bypass cache
+npx vercel --prod --force                 # always use --force to bypass cache
+npx vercel promote <deployment-url>       # OBRIGATORIO: sem isto o deploy nao vira producao oficial
+npx vercel crons ls --format json         # conferir: os 2 crons com host = o deploy novo, "undeployed": []
 ```
+
+**Por que o promote (26/set/2026):** neste projeto o `vercel --prod` cria o deploy mas NAO o promove.
+Os dominios e os **crons** ficam presos no ultimo deploy promovido. O `alias set` manual movia so
+os dominios, entao os crons ficaram num deploy antigo por semanas:
+- o `/api/teacher-brief` (resumo da aba Agente) nunca foi registrado;
+- o `/api/send-reminders` rodava codigo velho.
+
+O `vercel promote` move os dominios e os crons de uma vez. O `vercel alias set` nos dois dominios
+fica so como reforco, se o `curl` no www nao mostrar o conteudo novo.
 
 `vercel.json` rewrites:
 - `/api/*` → `/api/index.js`
