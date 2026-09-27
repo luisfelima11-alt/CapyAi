@@ -37,27 +37,33 @@ const Components = {
 
         return `
             <nav id="top-nav-bar" class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm border-b border-slate-100 dark:border-slate-800" style="transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);">
-                <div class="flex justify-between items-center w-full px-5 py-3 max-w-screen-2xl mx-auto font-['Plus_Jakarta_Sans'] antialiased">
+                <div class="flex justify-between items-center w-full px-3 sm:px-5 py-3 max-w-screen-2xl mx-auto font-['Plus_Jakarta_Sans'] antialiased">
 
-                <!-- Logo -->
-                <div class="flex items-center gap-2.5 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
+                <!-- Logo. Abaixo de 640px encolhe e, no aperto, corta com "…" (min-w-0 +
+                     truncate) em vez de empurrar o avatar para fora da tela. A partir de
+                     sm o overflow volta a visible: o truncate cortaria 1px do "h" final. -->
+                <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 cursor-pointer" onclick="window.location.href='6_Home_Forest_Expedition.html'">
                     <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-pink-400/60 shadow-md flex-shrink-0 bg-pink-100 flex items-center justify-center">
                         <img src="logo-capy.png?v=lg2" alt="Yara" class="w-full h-full object-cover"
                              onerror="this.style.display='none';this.parentElement.innerHTML='🐾'"/>
                     </div>
-                    <span class="text-xl font-black tracking-tight text-navy dark:text-blue-100">Capy Yara English</span>
+                    <span class="text-base sm:text-xl font-black tracking-tight text-navy dark:text-blue-100 truncate sm:overflow-visible">Capy Yara English</span>
                 </div>
 
-                <!-- Right: streak + XP + avatar -->
-                <div class="flex items-center gap-2.5">
+                <!-- Right: streak + XP + avatar.
+                     Os ícones têm largura travada: enquanto a fonte Material Symbols não
+                     chega (ou se o Google Fonts falhar) o span mostra o nome do ícone em
+                     texto — "local_fire_department" tem ~160px e jogava a barra 21px
+                     para fora da tela em 320px. -->
+                <div class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
                     <!-- Streak compact pill -->
-                    <div class="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 px-3 py-1.5 rounded-full">
-                        <span class="material-symbols-outlined text-orange-500 text-base" style="font-variation-settings:'FILL' 1;font-size:16px">local_fire_department</span>
+                    <div class="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 px-2.5 sm:px-3 py-1.5 rounded-full">
+                        <span class="material-symbols-outlined text-orange-500 text-base" style="font-variation-settings:'FILL' 1;font-size:16px;display:inline-block;width:16px;overflow:hidden;white-space:nowrap;flex-shrink:0">local_fire_department</span>
                         <span id="nav-streak" class="font-black text-xs text-orange-500">${streakDays}</span>
                     </div>
                     <!-- XP + Level pill -->
                     <div id="nav-xp-pill" class="hidden sm:flex items-center gap-1.5 bg-amber-50 dark:bg-yellow-500/10 border border-amber-100 dark:border-yellow-400/20 px-3 py-1.5 rounded-full cursor-pointer hover:bg-amber-100 transition-colors" onclick="window.location.href='progress.html'">
-                        <span class="material-symbols-outlined text-amber-500 dark:text-yellow-400" style="font-variation-settings:'FILL' 1;font-size:14px">star</span>
+                        <span class="material-symbols-outlined text-amber-500 dark:text-yellow-400" style="font-variation-settings:'FILL' 1;font-size:14px;display:inline-block;width:14px;overflow:hidden;white-space:nowrap;flex-shrink:0">star</span>
                         <span id="nav-level" class="font-black text-amber-700 dark:text-yellow-300 text-xs">Lv.1</span>
                         <span class="text-slate-300 text-xs">·</span>
                         <span id="nav-xp" class="font-bold text-slate-600 dark:text-white/70 text-xs">0 XP</span>
@@ -77,18 +83,18 @@ const Components = {
                                 <p class="text-xs text-slate-400 mt-0.5">Explorer</p>
                             </div>` : ''}
                             <a href="account.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
-                                <span class="material-symbols-outlined text-orange-500 text-base" style="font-variation-settings:'FILL' 1;">workspace_premium</span> Minha conta
+                                <span class="material-symbols-outlined text-orange-500 text-base" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;font-variation-settings:'FILL' 1;">workspace_premium</span> Minha conta
                             </a>
                             <a href="progress.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
-                                <span class="material-symbols-outlined text-emerald-500 text-base" style="font-variation-settings:'FILL' 1;">military_tech</span> My Progress
+                                <span class="material-symbols-outlined text-emerald-500 text-base" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;font-variation-settings:'FILL' 1;">military_tech</span> My Progress
                             </a>
                             <a href="settings.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
-                                <span class="material-symbols-outlined text-slate-400 text-base">settings</span> Settings
+                                <span class="material-symbols-outlined text-slate-400 text-base" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;">settings</span> Settings
                             </a>
                             <div class="border-t border-slate-100 dark:border-slate-800">
                                 <button onclick="(function(){ try{ var a=window.Auth||null; if(a){ a.logout(); } else { localStorage.removeItem('capySession'); window.location.href='4_Login_Capy_Yara_Welcomes_You.html'; } }catch(e){ localStorage.removeItem('capySession'); window.location.href='4_Login_Capy_Yara_Welcomes_You.html'; } })()"
                                         class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-sm transition-colors text-left">
-                                    <span class="material-symbols-outlined text-base">logout</span> Sign Out
+                                    <span class="material-symbols-outlined text-base" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;">logout</span> Sign Out
                                 </button>
                             </div>
                         </div>
@@ -226,28 +232,35 @@ const Components = {
     },
 
     renderMobileNav(activeTab) {
+        // Largura travada em 1em nos ícones: enquanto a fonte Material Symbols
+        // não chega (ou se o Google Fonts falhar) o span mostra o NOME do ícone
+        // em texto ("calendar_month" ≈ 170px) e as abas saíam da tela. Com a
+        // fonte, o glifo mede exatamente 1em — nada muda. Atributo style (e não
+        // <style>) porque a CSP estrita de account.html/login bloqueia <style>.
+        const ico = 'display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;';
+        const cheio = on => on ? "font-variation-settings:'FILL' 1;" : '';
         return `
             <!-- Bottom Nav (5 tabs) -->
             <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2 py-3 flex justify-around items-center z-50 border-t border-slate-100 dark:border-slate-800">
                 <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="${activeTab === 'home' ? 'text-pink-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'home' ? 'bg-pink-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" ${activeTab === 'home' ? 'style="font-variation-settings:\'FILL\' 1;"' : ''}>home</span>
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'home')}">home</span>
                     <span class="text-[10px] font-black">Início</span>
                 </button>
                 <button onclick="window.location.href='classes.html'" class="${activeTab === 'classes' ? 'text-violet-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'classes' ? 'bg-violet-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" ${activeTab === 'classes' ? 'style="font-variation-settings:\'FILL\' 1;"' : ''}>menu_book</span>
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'classes')}">menu_book</span>
                     <span class="text-[10px] font-black">Cursos</span>
                 </button>
                 <button onclick="window.location.href='learn.html'" class="${activeTab === 'lessons' ? 'text-amber-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'lessons' ? 'bg-amber-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" ${activeTab === 'lessons' ? 'style="font-variation-settings:\'FILL\' 1;"' : ''}>route</span>
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'lessons')}">route</span>
                     <span class="text-[10px] font-black">Trilha</span>
                 </button>
                 <button onclick="window.location.href='ai_chat.html'" class="${activeTab === 'ai' ? 'text-pink-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl relative ${activeTab === 'ai' ? 'bg-pink-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(true)}">auto_awesome</span>
                     <span class="text-[10px] font-black">Yara AI</span>
                     <span class="absolute top-0.5 right-2 w-2 h-2 bg-pink-500 rounded-full animate-pulse"></span>
                 </button>
                 <button onclick="openMoreSheet()" class="${['games','youtube','music','studyplan','flashcards','quadro','leaderboard','progress','settings'].includes(activeTab) ? 'text-slate-700' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl">
-                    <span class="material-symbols-outlined text-2xl">grid_view</span>
+                    <span class="material-symbols-outlined text-2xl" style="${ico}">grid_view</span>
                     <span class="text-[10px] font-black">Mais</span>
                 </button>
             </nav>
@@ -265,27 +278,27 @@ const Components = {
                 <!-- Feature grid -->
                 <div class="grid grid-cols-4 gap-3 mb-5">
                     <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="flex flex-col items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'games' ? 'ring-2 ring-emerald-400' : ''}">
-                        <span class="material-symbols-outlined text-emerald-500 text-2xl" style="font-variation-settings:'FILL' 1;">sports_esports</span>
+                        <span class="material-symbols-outlined text-emerald-500 text-2xl" style="${ico}${cheio(true)}">sports_esports</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Jogos</span>
                     </button>
                     <button onclick="window.location.href='youtube_lab.html'" class="flex flex-col items-center gap-2 bg-red-50 dark:bg-red-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'youtube' ? 'ring-2 ring-red-400' : ''}">
-                        <span class="material-symbols-outlined text-red-500 text-2xl" style="font-variation-settings:'FILL' 1;">smart_display</span>
+                        <span class="material-symbols-outlined text-red-500 text-2xl" style="${ico}${cheio(true)}">smart_display</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">YouTube</span>
                     </button>
                     <button onclick="window.location.href='music_lab.html'" class="flex flex-col items-center gap-2 bg-purple-50 dark:bg-purple-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'music' ? 'ring-2 ring-purple-400' : ''}">
-                        <span class="material-symbols-outlined text-purple-500 text-2xl" style="font-variation-settings:'FILL' 1;">music_note</span>
+                        <span class="material-symbols-outlined text-purple-500 text-2xl" style="${ico}${cheio(true)}">music_note</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Music Lab</span>
                     </button>
                     <button onclick="window.location.href='study_plan.html'" class="flex flex-col items-center gap-2 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'studyplan' ? 'ring-2 ring-indigo-400' : ''}">
-                        <span class="material-symbols-outlined text-indigo-500 text-2xl" style="font-variation-settings:'FILL' 1;">calendar_month</span>
+                        <span class="material-symbols-outlined text-indigo-500 text-2xl" style="${ico}${cheio(true)}">calendar_month</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Meu Plano</span>
                     </button>
                     <button onclick="window.location.href='2_Flashcard_Journey_Expedition_Edition.html'" class="flex flex-col items-center gap-2 bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'flashcards' ? 'ring-2 ring-cyan-400' : ''}">
-                        <span class="material-symbols-outlined text-cyan-500 text-2xl" style="font-variation-settings:'FILL' 1;">style</span>
+                        <span class="material-symbols-outlined text-cyan-500 text-2xl" style="${ico}${cheio(true)}">style</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">🃏 Flashcards</span>
                     </button>
                     <button onclick="window.location.href='quadro.html'" class="flex flex-col items-center gap-2 bg-lime-50 dark:bg-lime-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'quadro' ? 'ring-2 ring-lime-400' : ''}">
-                        <span class="material-symbols-outlined text-lime-500 text-2xl" style="font-variation-settings:'FILL' 1;">stylus</span>
+                        <span class="material-symbols-outlined text-lime-500 text-2xl" style="${ico}${cheio(true)}">stylus</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">🖊️ Quadro</span>
                     </button>
                 </div>
@@ -293,10 +306,10 @@ const Components = {
                 <!-- Utility links -->
                 <div class="border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center justify-around">
                     <a href="progress.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
-                        <span class="material-symbols-outlined text-emerald-500 text-lg" style="font-variation-settings:'FILL' 1;">military_tech</span> Progresso
+                        <span class="material-symbols-outlined text-emerald-500 text-lg" style="${ico}${cheio(true)}">military_tech</span> Progresso
                     </a>
                     <a href="settings.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
-                        <span class="material-symbols-outlined text-slate-400 text-lg">settings</span> Ajustes
+                        <span class="material-symbols-outlined text-slate-400 text-lg" style="${ico}">settings</span> Ajustes
                     </a>
                 </div>
             </div>

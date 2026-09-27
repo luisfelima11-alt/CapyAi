@@ -118,7 +118,10 @@
   </aside>
 
   <!-- ── Main content ───────────────────────────────────── -->
-  <main class="flex-1 md:ml-72 px-4 md:px-8 py-8 max-w-4xl">
+  <!-- min-w-0: sem ele o main (item de flex) não encolhe abaixo do <select>
+       de lições do celular, que mede o título mais longo (~864px), e a página
+       rolava de lado em 320/360px. -->
+  <main class="flex-1 min-w-0 md:ml-72 px-4 md:px-8 py-8 max-w-4xl">
 
     <!-- ── GUIDED MODE HEADER (hidden in free mode) ── -->
     <div id="guided-header" class="hidden mb-6">
@@ -280,7 +283,7 @@
 <script src="memory.js?v=mem1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=push2"></script>
+<script src="components.js?v=nav320"></script>
 <script src="celebration.js?v=cel3"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script>
@@ -300,7 +303,7 @@ const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta se
 async function carregarIndice() {
   if (LESSON_INDEX.length) return LESSON_INDEX;
   try {
-    const r = await fetch('data/lessons-index.json?v=med816');
+    const r = await fetch('data/lessons-index.json?v=en112');
     if (r.ok) LESSON_INDEX = await r.json();
   } catch (e) { /* offline: segue com o que der */ }
   return LESSON_INDEX;
@@ -311,7 +314,7 @@ async function garantirLicao(id) {
   const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
   if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
   try {
-    const r = await fetch('data/lessons/' + id + '.json?v=med816');
+    const r = await fetch('data/lessons/' + id + '.json?v=en112');
     if (!r.ok) return null;
     const licao = await r.json();
     LICOES_CARREGADAS.set(id, licao);
@@ -1171,6 +1174,8 @@ const TRAIL_GAMES = {
   "108": "grammar_lab.html",
   "109": "word_scramble_game.html",
   "110": "sentence_builder_game.html",
+  "111": "fill_blank_game.html",
+  "112": "matching_pairs_game.html",
   "301": "word_match_game.html",
   "302": "matching_pairs_game.html",
   "303": "sentence_builder_game.html",
