@@ -128,12 +128,16 @@ test('security-sensitive source does not restore wildcard CORS, shared admin key
   assert.doesNotMatch(api, /const\s*\{[^}]*systemOverride/);
   assert.doesNotMatch(admin, /ADMIN_KEY|capyAdminKey|Authorization['"]:\s*['"]Bearer/);
   assert.match(adminScript, /function escapeHtml\(/);
+  // O admin novo monta a tela só por textContent: nome de aluno, fato da
+  // memória e anotação nunca viram HTML.
+  const adminNovo = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', 'admin-v2.js'), 'utf8');
+  assert.doesNotMatch(adminNovo, /innerHTML|outerHTML|insertAdjacentHTML/);
 });
 
 test('sensitive pages use local scripts and contain no executable inline handlers', () => {
   const pages = [
     '4_Login_Capy_Yara_Welcomes_You.html', 'set-password.html', 'account.html',
-    'admin.html', 'admin-metrics.html', 'teacher_homework.html',
+    'admin.html', 'admin-antigo.html', 'admin-metrics.html', 'teacher_homework.html',
   ];
   for (const page of pages) {
     const source = fs.readFileSync(path.join(ROOT, page), 'utf8');

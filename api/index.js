@@ -631,6 +631,42 @@ function chatComplete(messages, opts = {}) {
 // Quem esta ativo, quem sumiu, quem nunca comecou. Extraido do
 // /api/admin/students para que a aba do admin e o briefing diario leiam a
 // MESMA segmentacao — se bifurcar, os dois passam a discordar na cara do Luis.
+// Um aluno em uma linha: a conta + o estado do app + o perfil. A lista do admin
+// (buildStudentRoster), o briefing do professor e a ficha do aluno leem o aluno
+// por AQUI — uma regra so para "praticou hoje", "sumido" e "nunca comecou".
+function resumoDoAluno(a, st, prof, today) {
+    const d = (st && st.data) || {};
+    const p = prof || {};
+    const xp = Number(d.xp) || 0;
+    const streakDays = Number(d.streakDays) || 0;
+    const neverStarted = xp === 0 && streakDays === 0;
+    // `lastQuestDate` é gravado por MERA VISITA ao app — usá-lo sozinho
+    // contava como "praticou hoje" quem só abriu e não estudou, inflando
+    // o número de ativos no painel e no briefing do professor.
+    // `lastPracticeDate` é o campo novo; o fallback cobre quem ainda não
+    // abriu o app depois do deploy da correção de fuso.
+    const praticou = d.lastPracticeDate || (d.streakActive ? d.lastQuestDate : '');
+    let daysSincePractice = null;
+    if (praticou) {
+        const then = new Date(praticou + (praticou.length === 10 ? 'T00:00:00Z' : ''));
+        if (!isNaN(then)) daysSincePractice = Math.max(0, Math.floor((new Date(today + 'T00:00:00Z') - then) / 86400000));
+    }
+    return {
+        id: a.id,
+        name: a.name || String(a.email || '').split('@')[0],
+        email: a.email || '',
+        plan: p.plan || 'free',
+        level: p.english_level || null,
+        xp,
+        streakDays,
+        lastPractice: praticou || null,
+        daysSincePractice,
+        hasPush: Boolean(d.pushSub && d.pushSub.endpoint),
+        neverStarted,
+        status: neverStarted ? 'never_started' : praticou === today ? 'active_today' : 'idle',
+    };
+}
+
 async function buildStudentRoster() {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
     const [accounts, states, profiles] = await Promise.all([
@@ -641,42 +677,8 @@ async function buildStudentRoster() {
     const stateById = Object.fromEntries((states || []).map(s => [String(s.user_id), s]));
     const profById  = Object.fromEntries((profiles || []).map(p => [String(p.id), p]));
 
-    const daysBetween = (iso) => {
-        if (!iso) return null;
-        const then = new Date(iso + (iso.length === 10 ? 'T00:00:00Z' : ''));
-        if (isNaN(then)) return null;
-        return Math.max(0, Math.floor((new Date(today + 'T00:00:00Z') - then) / 86400000));
-    };
-
-    const students = (accounts || []).map(a => {
-        const st = stateById[String(a.id)];
-        const d = (st && st.data) || {};
-        const prof = profById[String(a.id)] || {};
-        const xp = Number(d.xp) || 0;
-        const streakDays = Number(d.streakDays) || 0;
-        const neverStarted = xp === 0 && streakDays === 0;
-        // `lastQuestDate` é gravado por MERA VISITA ao app — usá-lo sozinho
-        // contava como "praticou hoje" quem só abriu e não estudou, inflando
-        // o número de ativos no painel e no briefing do professor.
-        // `lastPracticeDate` é o campo novo; o fallback cobre quem ainda não
-        // abriu o app depois do deploy da correção de fuso.
-        const praticou = d.lastPracticeDate || (d.streakActive ? d.lastQuestDate : '');
-        const practisedToday = praticou === today;
-        return {
-            id: a.id,
-            name: a.name || String(a.email || '').split('@')[0],
-            email: a.email || '',
-            plan: prof.plan || 'free',
-            level: prof.english_level || null,
-            xp,
-            streakDays,
-            lastPractice: praticou || null,
-            daysSincePractice: daysBetween(praticou),
-            hasPush: Boolean(d.pushSub && d.pushSub.endpoint),
-            neverStarted,
-            status: neverStarted ? 'never_started' : practisedToday ? 'active_today' : 'idle',
-        };
-    });
+    const students = (accounts || []).map(a =>
+        resumoDoAluno(a, stateById[String(a.id)], profById[String(a.id)], today));
 
     // Most useful ordering for the teacher: who needs attention first.
     const rank = { never_started: 0, idle: 1, active_today: 2 };
@@ -758,6 +760,45 @@ async function trackCampaignProgress(identity, state) {
 }
 
 const TEACHER_BRIEF_PREFIX = '__teacher_brief_';
+
+// Batimento das tarefas agendadas (crons da Vercel). Ate 26/set elas ficaram
+// semanas presas num deploy antigo sem ninguem perceber: nenhuma rota dizia
+// quando tinha rodado pela ultima vez. Agora cada uma grava `__cron_<nome>` ao
+// terminar (tambem quando falha), e a tela Hoje do admin mostra a ultima vez.
+const CRONS_DO_SITE = [
+    { nome: 'teacher-brief', rotulo: 'Resumo da Yara para o professor', horario: '06:00' },
+    { nome: 'send-reminders', rotulo: 'Lembrete para quem nao praticou', horario: '19:00' },
+];
+
+// Os cursos que a tela Conteudo do admin lista. O numero de aulas NAO fica
+// aqui: sai do catalogo das aulas (api/aulas-contexto.json), que e gerado das
+// proprias paginas — contagem escrita a mao ja ficou velha no hub do GPS.
+const CURSOS_DO_ADMIN = [
+    { familia: 'gpstronic_aula', nome: 'GPS Tronic', legenda: 'Inglês técnico · turma exclusiva' },
+    { familia: 'aula', nome: 'Starter', legenda: 'Inglês do zero' },
+    { familia: 'intermediate_aula', nome: 'Intermediate', legenda: 'Conversação' },
+    { familia: 'business_aula', nome: 'Business', legenda: 'Trabalho' },
+    { familia: 'travel_aula', nome: 'Travel', legenda: 'Viagem' },
+    { familia: 'advanced_aula', nome: 'Advanced', legenda: 'Avançado' },
+    { familia: 'agro_aula', nome: 'Agro English', legenda: 'Agronomia' },
+    { familia: 'interview_aula', nome: 'Entrevista', legenda: 'Entrevista de emprego' },
+    { familia: 'med_aula', nome: 'Medical English', legenda: 'Saúde' },
+    { familia: 'fr_aula', nome: 'Français', legenda: 'Francês' },
+    { familia: 'trilha_en', nome: 'Trilha diária', legenda: 'Mini-aulas de inglês' },
+    { familia: 'trilha_fr', nome: 'Trilha em francês', legenda: 'Mini-aulas' },
+    { familia: 'trilha_tr', nome: 'Türkçe', legenda: 'Mini-aulas de turco' },
+];
+
+async function registrarCron(nome, resultado) {
+    try {
+        const em = new Date().toISOString();
+        await sb('/user_state', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify({ user_id: `__cron_${nome}`, data: { em, ...resultado }, updated_at: em }),
+        });
+    } catch (e) { /* o batimento nunca derruba a tarefa */ }
+}
 
 // CSV terso, ~12 tokens por aluno. Sem e-mail: o modelo nao precisa de PII, e a
 // UI religa pelo id. Nome so pra ele conseguir escrever "a Ana sumiu".
@@ -937,9 +978,11 @@ function rotulosDe(lista, mapa) {
 // para Orlando e, na ligacao seguinte, ela perguntava "what do you do?" de novo.
 //
 // Depois de cada conversa LIVRE, a IA anota ate 5 fatos curtos que o aluno
-// contou da propria vida. Moram em `user_state`, linha `fatos_<appUserId>`
-// (mesmo padrao de `mem_<id>`): a RLS barra o aluno de ler ou gravar direto, so
-// o servidor mexe. O aluno ve e apaga cada um na conta; o Luis ve no admin.
+// contou da propria vida. Moram em `user_state`, linha `__fatos_<appUserId>`:
+// a RLS barra o aluno de ler ou gravar direto, so o servidor mexe, e o `__` na
+// frente e o que faz o lembrete diario (ehAluno) e as outras varreduras de
+// user_state nao confundirem a linha com um aluno. O aluno ve e apaga cada fato
+// na conta; o Luis ve no admin.
 //
 // Tudo aqui e funcao pura, para os testes rodarem o codigo de verdade. As rotas
 // (/api/lembrancas) moram no handler.
@@ -2474,22 +2517,43 @@ module.exports = async (req, res) => {
     }
 
     // O que a Yara anotou das conversas (ver "Memoria da Yara", no catalogo).
-    // sb() e nao sbUser(): `fatos_<id>` e linha sintetica, e a RLS de user_state
+    // sb() e nao sbUser(): `__fatos_<id>` e linha sintetica, e a RLS de user_state
     // exige user_id = current_account_id(). Quem garante o isolamento e o
     // appUserId, que vem da sessao. Falha de leitura = sem memoria, nunca erro.
     async function memoriaDoAluno(appUserId) {
         if (!appUserId) return [];
         try {
-            const linhas = await sb(`/user_state?user_id=eq.${encodeURIComponent('fatos_' + appUserId)}&select=data`);
+            const linhas = await sb(`/user_state?user_id=eq.${encodeURIComponent('__fatos_' + appUserId)}&select=data`);
             return fatosLimpos(linhas && linhas[0] && linhas[0].data && linhas[0].data.fatos);
         } catch (e) { return []; }
+    }
+
+    // Anotacoes do professor sobre um aluno (ficha do admin novo). So o admin le
+    // e escreve; o aluno nunca ve. Linha sintetica `__notas_<id>`: o `__` tira a
+    // linha de toda varredura que procura alunos em user_state.
+    async function lerNotas(appUserId) {
+        try {
+            const linhas = await sb(`/user_state?user_id=eq.${encodeURIComponent('__notas_' + appUserId)}&select=data`);
+            const lista = linhas && linhas[0] && linhas[0].data && linhas[0].data.notas;
+            return (Array.isArray(lista) ? lista : [])
+                .filter(n => n && /^n_[a-f0-9]{12}$/.test(String(n.id || '')) && typeof n.texto === 'string')
+                .map(n => ({ id: n.id, texto: n.texto.slice(0, 1000), em: typeof n.em === 'string' ? n.em : null }));
+        } catch (e) { return []; }
+    }
+
+    async function gravarNotas(appUserId, notas) {
+        await sb('/user_state', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify({ user_id: `__notas_${appUserId}`, data: { notas }, updated_at: new Date().toISOString() }),
+        });
     }
 
     async function gravarMemoria(appUserId, fatos) {
         await sb('/user_state', {
             method: 'POST',
             headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({ user_id: `fatos_${appUserId}`, data: { fatos }, updated_at: new Date().toISOString() }),
+            body: JSON.stringify({ user_id: `__fatos_${appUserId}`, data: { fatos }, updated_at: new Date().toISOString() }),
         });
     }
 
@@ -4420,6 +4484,136 @@ Rules:
         return;
     }
 
+    // ── Admin novo (26/set) ───────────────────────────────────────────────────
+    // O que o admin pensado para o celular usa alem das rotas que ja existiam:
+    // a ficha de um aluno, as anotacoes do professor, a saude do site e os
+    // cursos. Tudo atras do isAdminReq; nada aqui chama IA.
+
+    // GET /api/admin/aluno?id=<appUserId> → a ficha: conta, plano, progresso,
+    // perfil, voz do mes, memoria da Yara e anotacoes do professor.
+    if (req.method === 'GET' && url === '/api/admin/aluno') {
+        if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
+        const id = String(new URL(req.url, 'http://localhost').searchParams.get('id') || '');
+        if (!/^[A-Za-z0-9_-]{1,80}$/.test(id)) { res.status(400).json({ error: 'aluno_invalido' }); return; }
+        const enc = encodeURIComponent(id);
+        const [contas, estados, perfis, campanha, notas, fatos, voz] = await Promise.all([
+            sb(`/accounts?id=eq.${enc}&select=id,name,email,created_at`),
+            sb(`/user_state?user_id=eq.${enc}&select=data,updated_at`),
+            sb(`/user_profiles?id=eq.${enc}&select=plan,plan_expires_at,kiwify_subscription_id,english_level,goals,interests,interests_detail`),
+            sb(`/user_state?user_id=eq.${encodeURIComponent(`__campaign_${CAMPAIGN_TRACKER.id}_${id}`)}&select=data`),
+            lerNotas(id),
+            memoriaDoAluno(id),
+            consumoVozDoMes(id),
+        ]);
+        const conta = contas && contas[0];
+        if (!conta) { res.status(404).json({ error: 'aluno_nao_encontrado' }); return; }
+        const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+        const perfil = (perfis && perfis[0]) || {};
+        const estado = estados && estados[0];
+        const d = (estado && estado.data) || {};
+        const resumo = resumoDoAluno(conta, estado, perfil, hoje);
+        // O app nao guarda historico dia a dia; a Corrida XP guarda (dailyXp)
+        // durante a campanha. Fora dela, so o dia da ultima pratica acende.
+        const dailyXp = (campanha && campanha[0] && campanha[0].data && campanha[0].data.dailyXp) || {};
+        const dias = [];
+        for (let i = 13; i >= 0; i--) {
+            const dia = new Date(new Date(hoje + 'T12:00:00Z') - i * 86400000).toISOString().slice(0, 10);
+            dias.push({ dia, praticou: Number(dailyXp[dia]) > 0 || resumo.lastPractice === dia });
+        }
+        const tamanho = v => (Array.isArray(v) ? v.length : 0);
+        const plano = perfil.plan || 'free';
+        res.status(200).json({
+            aluno: { ...resumo, criadoEm: conta.created_at || null },
+            plano: {
+                plano, expira: perfil.plan_expires_at || null,
+                cortesia: plano !== 'free' && !perfil.kiwify_subscription_id,
+            },
+            progresso: { aulas: tamanho(d.completedLessons), minis: tamanho(d.completedMinis), medalhas: tamanho(d.badges), dias },
+            perfil: {
+                nivel: perfil.english_level || null,
+                objetivos: Array.isArray(perfil.goals) ? perfil.goals.slice(0, 12) : [],
+                gostos: Array.isArray(perfil.interests) ? perfil.interests.slice(0, 12) : [],
+                detalhe: String(perfil.interests_detail || '').slice(0, 500),
+            },
+            voz: { minutos: voz ? Number(voz.minutos.toFixed(1)) : null, cota: VOZ_MINUTOS_MES[plano] || 0 },
+            memoria: fatos.map(f => ({ id: f.id, texto: f.texto, tipo: f.tipo, em: f.em, canal: f.canal })),
+            notas,
+        });
+        return;
+    }
+
+    // POST /api/admin/notas {aluno, texto} → anota; /api/admin/notas/apagar {aluno, id} → apaga.
+    if (req.method === 'POST' && (url === '/api/admin/notas' || url === '/api/admin/notas/apagar')) {
+        assertCsrf(req);
+        if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
+        const body = (await readBody(req)) || {};
+        const aluno = String(body.aluno || '');
+        if (!/^[A-Za-z0-9_-]{1,80}$/.test(aluno)) { res.status(400).json({ error: 'aluno_invalido' }); return; }
+        const notas = await lerNotas(aluno);
+        let novas;
+        if (url === '/api/admin/notas') {
+            const texto = sanitizeStoredJson(String(body.texto || '').trim().slice(0, 1000));
+            if (!texto) { res.status(400).json({ error: 'nota_vazia' }); return; }
+            novas = [{ id: 'n_' + crypto.randomBytes(6).toString('hex'), texto, em: new Date().toISOString() }, ...notas].slice(0, 200);
+        } else {
+            const alvo = String(body.id || '');
+            if (!notas.some(n => n.id === alvo)) { res.status(404).json({ error: 'nao_encontrada' }); return; }
+            novas = notas.filter(n => n.id !== alvo);
+        }
+        await gravarNotas(aluno, novas);
+        res.status(200).json({ ok: true, notas: novas });
+        return;
+    }
+
+    // GET /api/admin/saude → a ultima vez de cada tarefa agendada, o resumo de
+    // hoje, as compras que a Kiwify mandou e o gasto de voz do mes.
+    if (req.method === 'GET' && url === '/api/admin/saude') {
+        if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
+        const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+        const [batimentos, resumo, compras, voz] = await Promise.all([
+            sb('/user_state?user_id=like.__cron_*&select=user_id,data').catch(() => []),
+            lerBrief(hoje).catch(() => null),
+            sb('/webhook_events?select=received_at&order=received_at.desc&limit=500').catch(() => null),
+            consumoVozDoMes(null),
+        ]);
+        const porNome = {};
+        for (const r of Array.isArray(batimentos) ? batimentos : []) {
+            const uid = String(r.user_id || '');
+            if (uid.startsWith('__cron_')) porNome[uid.slice('__cron_'.length)] = r.data || {};
+        }
+        res.status(200).json({
+            hoje,
+            crons: CRONS_DO_SITE.map(c => ({
+                ...c,
+                ultima: (porNome[c.nome] && porNome[c.nome].em) || null,
+                ok: porNome[c.nome] ? porNome[c.nome].ok !== false : null,
+                detalhe: String((porNome[c.nome] && porNome[c.nome].detalhe) || '').slice(0, 160),
+            })),
+            resumoHoje: { gerado: Boolean(resumo), em: (resumo && resumo.generatedAt) || null },
+            kiwify: Array.isArray(compras)
+                ? { eventos: compras.length, ultima: (compras[0] && compras[0].received_at) || null }
+                : { eventos: null, ultima: null },
+            voz: voz
+                ? { usd: Number(voz.usd.toFixed(2)), minutos: Number(voz.minutos.toFixed(1)), tetoUsd: VOZ_TETO_USD_MES }
+                : { usd: null, minutos: null, tetoUsd: VOZ_TETO_USD_MES },
+        });
+        return;
+    }
+
+    // GET /api/admin/conteudo → os cursos e quantas aulas cada um tem hoje.
+    if (req.method === 'GET' && url === '/api/admin/conteudo') {
+        if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
+        const contagem = {};
+        for (const a of Object.values(aulasContexto() || {})) {
+            if (a && a.familia) contagem[a.familia] = (contagem[a.familia] || 0) + 1;
+        }
+        res.status(200).json({
+            cursos: CURSOS_DO_ADMIN.map(c => ({ ...c, aulas: contagem[c.familia] || 0 })).filter(c => c.aulas > 0),
+        });
+        return;
+    }
+    // ── fim do admin novo ─────────────────────────────────────────────────────
+
     if (req.method === 'GET' && url === '/api/admin/campaign') {
         if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
         const prefix = `__campaign_${CAMPAIGN_TRACKER.id}_`;
@@ -4657,6 +4851,7 @@ Rules:
         const ontem = new Date(new Date(hoje + 'T12:00:00Z') - 86400000).toISOString().slice(0, 10);
 
         if (!roster.students.length) {
+            await registrarCron('teacher-brief', { ok: true, detalhe: 'sem alunos' });
             res.status(200).json({ ok: true, skipped: 'sem_alunos' }); return;
         }
 
@@ -4687,7 +4882,10 @@ Rules:
             erro = String(e.message || e).slice(0, 200);
         }
 
-        if (!brief) { res.status(200).json({ ok: false, error: erro || 'sem_resposta' }); return; }
+        if (!brief) {
+            await registrarCron('teacher-brief', { ok: false, detalhe: String(erro || 'sem resposta da IA').slice(0, 120) });
+            res.status(200).json({ ok: false, error: erro || 'sem_resposta' }); return;
+        }
 
         const data = {
             date: hoje,
@@ -4701,6 +4899,7 @@ Rules:
             headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
             body: JSON.stringify({ user_id: TEACHER_BRIEF_PREFIX + hoje, data, updated_at: new Date().toISOString() }),
         });
+        await registrarCron('teacher-brief', { ok: true, detalhe: `resumo de ${hoje}` });
         res.status(200).json({ ok: true, date: hoje, usage });
         return;
     }
@@ -4858,6 +5057,7 @@ Rules:
         }
         if (podadas) console.warn(`[send-reminders] ${podadas} inscricao(oes) morta(s) removida(s)`);
 
+        await registrarCron('send-reminders', { ok: true, detalhe: `${pushed} notificacao(oes), ${emailed} e-mail(s), ${errors} erro(s)` });
         if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({
             ok: true, date: today, pushed, emailed, skipped, errors, podadas,

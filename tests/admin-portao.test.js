@@ -34,8 +34,11 @@ function elemento(id, escondido) {
   };
 }
 
-// Sobe o admin-1.js com a sessão e a resposta do /api/admin/overview pedidas.
-async function abrirAdmin({ sessao = null, overview = { status: 200 } } = {}) {
+// Sobe o script do admin com a sessão e a resposta do /api/admin/overview pedidas.
+// Os DOIS admins (o novo, admin-v2.js, e o antigo, admin-1.js) têm o mesmo portão.
+const SCRIPTS_DO_ADMIN = [['admin novo', 'assets/js/pages/admin-v2.js'], ['admin antigo', 'assets/js/pages/admin-1.js']];
+
+async function abrirAdmin({ script = 'assets/js/pages/admin-v2.js', sessao = null, overview = { status: 200 } } = {}) {
   const els = new Map();
   const ESCONDIDOS_NO_HTML = ['app', 'gate-quem', 'gate-trocar', 'gate-error'];
   const el = id => {
@@ -57,6 +60,7 @@ async function abrirAdmin({ sessao = null, overview = { status: 200 } } = {}) {
     setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0,
     location, Auth,
     navigator: {},
+    addEventListener() {},
     sessionStorage: { getItem: k => (guardado.has(k) ? guardado.get(k) : null), setItem: (k, v) => guardado.set(k, String(v)), removeItem: k => guardado.delete(k) },
     localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
     document: {
@@ -81,65 +85,67 @@ async function abrirAdmin({ sessao = null, overview = { status: 200 } } = {}) {
   };
   context.window = context;
   vm.createContext(context);
-  vm.runInContext(fs.readFileSync(path.join(ROOT, 'assets/js/pages/admin-1.js'), 'utf8'), context, { filename: 'admin-1.js' });
+  vm.runInContext(fs.readFileSync(path.join(ROOT, script), 'utf8'), context, { filename: script });
   await flush();
   const visivel = id => !el(id).classList.contains('hidden');
   return { el, visivel, guardado, chamadas, location };
 }
 
-test('aluno logado no admin: diz QUEM está logado e oferece trocar de conta, sem "Chave inválida"', async () => {
-  const a = await abrirAdmin({ sessao: { id: 'grant-1', role: 'student', name: 'Luan', email: 'luan@exemplo.com' } });
-  assert.equal(a.visivel('gate'), true);
-  assert.equal(a.visivel('app'), false);
-  assert.equal(a.el('gate-error').textContent, 'Esta conta não é de administrador.');
-  assert.equal(a.el('gate-quem').textContent, 'Você está conectado como Luan (luan@exemplo.com).');
-  assert.equal(a.visivel('gate-quem'), true);
-  assert.equal(a.visivel('gate-trocar'), true);
-  assert.equal(a.visivel('gate-btn'), false, 'apertar "Entrar" com a conta errada não resolve nada');
-  assert.ok(!a.chamadas.fetch.includes('/api/admin/overview'), 'conta de aluno nem chama a rota de admin');
-});
+for (const [nome, script] of SCRIPTS_DO_ADMIN) {
+  test(`${nome}: aluno logado no admin: diz QUEM está logado e oferece trocar de conta, sem "Chave inválida"`, async () => {
+    const a = await abrirAdmin({ script, sessao: { id: 'grant-1', role: 'student', name: 'Luan', email: 'luan@exemplo.com' } });
+    assert.equal(a.visivel('gate'), true);
+    assert.equal(a.visivel('app'), false);
+    assert.equal(a.el('gate-error').textContent, 'Esta conta não é de administrador.');
+    assert.equal(a.el('gate-quem').textContent, 'Você está conectado como Luan (luan@exemplo.com).');
+    assert.equal(a.visivel('gate-quem'), true);
+    assert.equal(a.visivel('gate-trocar'), true);
+    assert.equal(a.visivel('gate-btn'), false, 'apertar "Entrar" com a conta errada não resolve nada');
+    assert.ok(!a.chamadas.fetch.includes('/api/admin/overview'), 'conta de aluno nem chama a rota de admin');
+  });
 
-test('trocar de conta: sai e deixa o recado para o login voltar ao admin', async () => {
-  const a = await abrirAdmin({ sessao: { id: 'grant-1', role: 'student', name: 'Luan', email: 'luan@exemplo.com' } });
-  await a.el('gate-trocar').disparar('click');
-  assert.equal(a.chamadas.logout, 1);
-  assert.equal(a.guardado.get('capyDepoisDoLogin'), 'admin.html');
-});
+  test(`${nome}: trocar de conta: sai e deixa o recado para o login voltar ao admin`, async () => {
+    const a = await abrirAdmin({ script, sessao: { id: 'grant-1', role: 'student', name: 'Luan', email: 'luan@exemplo.com' } });
+    await a.el('gate-trocar').disparar('click');
+    assert.equal(a.chamadas.logout, 1);
+    assert.equal(a.guardado.get('capyDepoisDoLogin'), 'admin.html');
+  });
 
-test('deslogado: só o botão de entrar, e ele leva ao login COM a volta para o admin', async () => {
-  const a = await abrirAdmin({ sessao: null });
-  assert.equal(a.visivel('gate'), true);
-  assert.equal(a.visivel('gate-error'), false);
-  assert.equal(a.visivel('gate-btn'), true);
-  assert.equal(a.visivel('gate-trocar'), false);
-  await a.el('gate-btn').disparar('click');
-  assert.equal(a.location.href, '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html');
-});
+  test(`${nome}: deslogado: só o botão de entrar, e ele leva ao login COM a volta para o admin`, async () => {
+    const a = await abrirAdmin({ script, sessao: null });
+    assert.equal(a.visivel('gate'), true);
+    assert.equal(a.visivel('gate-error'), false);
+    assert.equal(a.visivel('gate-btn'), true);
+    assert.equal(a.visivel('gate-trocar'), false);
+    await a.el('gate-btn').disparar('click');
+    assert.equal(a.location.href, '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html');
+  });
 
-test('admin com sessão válida entra direto no painel', async () => {
-  const a = await abrirAdmin({ sessao: { id: 'luis', role: 'admin', name: 'Luis', email: 'luis@exemplo.com' } });
-  assert.equal(a.visivel('app'), true);
-  assert.equal(a.visivel('gate'), false);
-});
+  test(`${nome}: admin com sessão válida entra direto no painel`, async () => {
+    const a = await abrirAdmin({ script, sessao: { id: 'luis', role: 'admin', name: 'Luis', email: 'luis@exemplo.com' } });
+    assert.equal(a.visivel('app'), true);
+    assert.equal(a.visivel('gate'), false);
+  });
 
-test('admin com sessão vencida (401): pede para entrar de novo', async () => {
-  const a = await abrirAdmin({ sessao: { id: 'luis', role: 'admin', name: 'Luis' }, overview: { status: 401 } });
-  assert.equal(a.visivel('gate'), true);
-  assert.equal(a.el('gate-error').textContent, 'Sua sessão venceu. Entre de novo.');
-  assert.equal(a.visivel('gate-btn'), true);
-});
+  test(`${nome}: admin com sessão vencida (401): pede para entrar de novo`, async () => {
+    const a = await abrirAdmin({ script, sessao: { id: 'luis', role: 'admin', name: 'Luis' }, overview: { status: 401 } });
+    assert.equal(a.visivel('gate'), true);
+    assert.equal(a.el('gate-error').textContent, 'Sua sessão venceu. Entre de novo.');
+    assert.equal(a.visivel('gate-btn'), true);
+  });
 
-test('servidor fora do ar: diz que a falha é de conexão, não de senha', async () => {
-  const a = await abrirAdmin({ sessao: { id: 'luis', role: 'admin', name: 'Luis' }, overview: { rede: true } });
-  assert.equal(a.visivel('gate'), true);
-  assert.match(a.el('gate-error').textContent, /servidor/);
-  assert.equal(a.el('gate-btn').textContent, 'Tentar de novo');
-});
+  test(`${nome}: servidor fora do ar: diz que a falha é de conexão, não de senha`, async () => {
+    const a = await abrirAdmin({ script, sessao: { id: 'luis', role: 'admin', name: 'Luis' }, overview: { rede: true } });
+    assert.equal(a.visivel('gate'), true);
+    assert.match(a.el('gate-error').textContent, /servidor/);
+    assert.equal(a.el('gate-btn').textContent, 'Tentar de novo');
+  });
+}
 
 test('a frase da versão antiga saiu da página e do script', () => {
   // Comentário pode citar a frase (é o histórico do bug); o que vai para a tela, não.
   const semComentarios = s => s.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-  for (const arq of ['admin.html', 'assets/js/pages/admin-1.js']) {
+  for (const arq of ['admin.html', 'admin-antigo.html', 'assets/js/pages/admin-1.js', 'assets/js/pages/admin-v2.js']) {
     assert.ok(!semComentarios(fs.readFileSync(path.join(ROOT, arq), 'utf8')).includes('Chave inválida'), arq);
   }
 });
