@@ -3422,19 +3422,29 @@ Respond ONLY with valid JSON, no markdown:
         const appOrigin = String(process.env.APP_ORIGIN || 'https://www.capyenglish.com.br').replace(/\/$/, '');
         const nextPath = '/learn.html';
 
-        // ── Honestidade da resposta ──────────────────────────────────────────
-        // Este endpoint devolvia `ok:true` SEMPRE, inclusive quando nenhum
-        // e-mail saía. A tela então dizia "enviamos seu link" para quem nunca
-        // ia receber nada — o funil mentia, e a falha só aparecia como um aluno
-        // sumido. Foi assim que o problema de entrega ficou meses invisível.
+        // ── Só quem JÁ tem conta recebe link (decisão do Luis, 23/set) ────────
+        // O generate_link do tipo magiclink CRIA usuário no Auth para qualquer
+        // e-mail digitado: dava conta fantasma (review-test@example.com, ...) e
+        // mandava e-mail para endereço inventado — os retornos derrubaram a
+        // reputação de envio. Cadastro novo é pela aba "Criar conta".
         //
-        // `entregue`: algum provedor ACEITOU a mensagem.
-        // `contaConfirmada`: o generate_link funcionou, ou seja, a conta
-        //   existe. Isso importa para a privacidade: só podemos admitir falha
-        //   de envio quando já sabemos que a conta existe — caso contrário a
-        //   mensagem de erro viraria um oráculo de "este e-mail tem cadastro?".
+        // A resposta é a MESMA com ou sem conta, e quem não tem conta espera um
+        // tempo parecido com o de um envio: nem o texto nem o relógio dizem se
+        // o e-mail tem cadastro. Falha na consulta = trata como sem conta.
+        let temConta = false;
+        try {
+            const contas = await sb(`/accounts?email=eq.${encodeURIComponent(norm)}&select=id&limit=1`);
+            temConta = Array.isArray(contas) && contas.length > 0;
+        } catch (e) { console.error('[magic-link] consulta de conta falhou:', e.message); }
+        if (!temConta) {
+            await new Promise(resolve => setTimeout(resolve, 700 + Math.floor(Math.random() * 600)));
+            res.status(200).json({ ok: true });
+            return;
+        }
+
+        // `entregue`: algum provedor ACEITOU a mensagem. Não muda a resposta
+        // (ver o fim do handler); só vai para o log.
         let entregue = false;
-        let contaConfirmada = false;
 
         try {
             const generated = await authRequest('/auth/v1/admin/generate_link', {
@@ -3448,7 +3458,7 @@ Respond ONLY with valid JSON, no markdown:
 
             const tokenHash = generated?.hashed_token || generated?.properties?.hashed_token;
             if (!tokenHash) throw new Error('magiclink token hash was not returned');
-            contaConfirmada = true;
+
 
             const verifyUrl = `${appOrigin}/api/auth/callback?token_hash=${encodeURIComponent(tokenHash)}`
                 + `&type=magiclink&next=${encodeURIComponent(nextPath)}`;
@@ -3539,25 +3549,13 @@ Respond ONLY with valid JSON, no markdown:
             }
         }
 
-        if (entregue) { res.status(200).json({ ok: true }); return; }
-
-        if (contaConfirmada) {
-            // O generate_link funcionou, então a conta EXISTE — admitir a falha
-            // aqui não revela nada que o visitante já não pudesse descobrir. E
-            // é a diferença entre o aluno esperar um e-mail que nunca vem e
-            // saber, na hora, que precisa chamar o professor.
-            console.error('[magic-link] nenhum provedor entregou');
-            res.status(503).json({
-                ok: false,
-                error: 'email_indisponivel',
-                message: 'Não conseguimos enviar seu link de acesso agora. Fale com seu professor para receber o acesso.',
-            });
-            return;
-        }
-
-        // Não sabemos se esse endereço tem conta. Resposta genérica de
-        // propósito: qualquer erro específico aqui viraria um oráculo de
-        // "este e-mail está cadastrado?".
+        // Resposta UNIFORME (26/set). De 23 a 26/set, conta existente + nenhum
+        // provedor entregando dava 503 "fale com seu professor". Com o link só
+        // para quem tem conta, esse 503 viraria oráculo ("este e-mail tem
+        // cadastro?"). A honestidade foi para o texto da tela, que vale para
+        // todo mundo: se tiver cadastro chega em 1 minuto; não chegou, fale
+        // com o professor. A falha de entrega fica no log.
+        if (!entregue) console.error('[magic-link] nenhum provedor entregou');
         res.status(200).json({ ok: true });
         return;
     }

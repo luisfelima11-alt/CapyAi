@@ -55,7 +55,7 @@ function harness(options = {}) {
       return response(200, USER);
     }
     if (url.pathname === '/rest/v1/rpc/consume_rate_limit') return response(200, [{ allowed: true, used: 1, retry_after: 60 }]);
-    if (url.pathname === '/rest/v1/accounts' && String(init.method || 'GET').toUpperCase() === 'GET') return response(200, [ACCOUNT]);
+    if (url.pathname === '/rest/v1/accounts' && String(init.method || 'GET').toUpperCase() === 'GET') return response(200, options.semConta ? [] : [ACCOUNT]);
     // Any unplanned write is a regression, including the unreachable legacy
     // home-made magic-link token/account implementation.
     unexpected.push(url.pathname + ' ' + (init.method || 'GET'));
@@ -65,7 +65,11 @@ function harness(options = {}) {
     Buffer, URL, URLSearchParams, TextEncoder, AbortController,
     process: { env, nextTick: process.nextTick.bind(process) }, fetch: mockFetch,
     console: Object.fromEntries(['log', 'warn', 'error'].map(name => [name, (...args) => logs.push(args.join(' '))])),
-    setTimeout: () => ({ unref() {} }), clearTimeout() {},
+    // O relogio falso nunca dispara, exceto quando o teste pede — e ai so a
+    // espera do e-mail sem conta (700 a 1300 ms, tempo parecido com o de um
+    // envio). O resto (o flush das metricas, por exemplo) continua parado.
+    setTimeout: (fn, ms) => { if (options.timersImediatos && ms >= 700 && ms < 1300) Promise.resolve().then(fn); return { unref() {} }; },
+    clearTimeout() {},
   };
   function load(filename, security) {
     const module = { exports: {} };
@@ -131,6 +135,17 @@ function assertOtpPkce(h, res) {
   assert.equal(redirect.searchParams.get('next'), '/learn.html');
   return verifier;
 }
+
+// 26/set: link mágico só para quem JÁ tem conta. O generate_link do tipo
+// magiclink criava usuário para qualquer e-mail digitado (contas fantasma e
+// e-mail para endereço inventado). E a resposta é a mesma com ou sem conta.
+test('e-mail sem conta: nada e gerado nem enviado, e a resposta e identica', { timeout: 5_000 }, async () => {
+  const h = harness({ semConta: true, timersImediatos: true }); const res = await h.call();
+  uniformSuccess(res);
+  assert.equal(h.calls.some(call => call.url.pathname === '/auth/v1/admin/generate_link'), false, 'não pode criar usuário');
+  assert.equal(h.calls.some(call => call.url.pathname === '/auth/v1/otp'), false);
+  assert.equal(h.calls.some(call => call.url.hostname === 'api.resend.com'), false);
+});
 
 test('missing Resend key falls back to PKCE Supabase OTP with a uniform private response', { timeout: 5_000 }, async () => {
   const h = harness({ resendKey: false }); const res = await h.call();

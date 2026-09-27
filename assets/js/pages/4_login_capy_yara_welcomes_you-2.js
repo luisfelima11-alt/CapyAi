@@ -302,9 +302,9 @@ async function forgotPassword() {
       return;
     }
     if (!r.ok) {
-      // `message` vem do 503 `email_indisponivel`, quando NENHUM provedor
-      // aceitou a mensagem. Antes o endpoint respondia ok:true mesmo nesse
-      // caso e a tela dizia "link enviado" para quem nunca ia receber nada.
+      // Só sobra erro de pedido (e-mail inválido, muitas tentativas): desde
+      // 26/set o servidor não responde 503 por falha de entrega, porque isso
+      // revelaria quais e-mails têm cadastro. O texto de sucesso cobre o caso.
       modal.innerHTML = renderMagicModal('⚠️', 'Não conseguimos enviar',
         data.message || data.details || 'Tente novamente em alguns minutos.');
       return;
@@ -325,7 +325,9 @@ async function forgotPassword() {
     }
 
     // Normal: success
-    modal.innerHTML = renderMagicModal('✉️', 'Confira seu e-mail', `Se o endereço estiver habilitado, você receberá um link de acesso em ${email}. Use o link uma única vez.\n\nAbra o link no mesmo navegador em que fez a solicitação. Não chegou? Verifique a caixa de spam.`);
+    // O servidor responde igual com ou sem conta (26/set): o texto é que diz a
+    // verdade para todo mundo, inclusive o que fazer quando o link não chega.
+    modal.innerHTML = renderMagicModal('✉️', 'Confira seu e-mail', `Se ${email} tiver cadastro, o link de acesso chega em até 1 minuto. Use o link uma única vez, no mesmo navegador.\n\nNão chegou? Veja o spam. Ainda nada? Fale com seu professor: ele libera seu acesso na hora.\n\nAinda não tem conta? Use a aba Criar conta.`);
   } catch (e) {
     modal.innerHTML = renderMagicModal('⚠️', 'Falha de rede', 'Verifique sua conexão e tente novamente.');
   }
