@@ -380,3 +380,11 @@ test('every page shows the free-account invitation when a visitor hits the AI ca
     assert.doesNotMatch(html, /auth-secure\.js\?v=auth20260918|yara-widget\.js\?v=yw[56]\b|welcomes_you-2\.js\?v=(?:auth20260918|next2)\b|components\.js\?v=(?:nav320|sec1)\b|admin-1\.js\?v=adm8\b/, pagina);
   }
 });
+
+test('profile text ("Sobre mim") reaches the personalize prompt only through the prompt filters', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const rota = api.slice(api.indexOf("url === '/api/personalize'"), api.indexOf('const prompt =', api.indexOf("url === '/api/personalize'")));
+  assert.match(rota, /textoLivreParaPrompt\(p\.interests_detail, \d+\)/);
+  assert.match(rota, /listaParaPrompt\(p\.interests, \d+, \d+\)/);
+  assert.doesNotMatch(rota, /=\s*p\.interests_detail\s*\|\|/);
+});

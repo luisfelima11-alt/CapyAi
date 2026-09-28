@@ -4125,9 +4125,11 @@ Rules:
             const rows = await sbUser(req._securityIdentity, `/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
             const p = rows?.[0];
             if (p) {
-                interests = (p.interests || []).join(', ') || interests;
-                detail    = p.interests_detail || '';
-                level     = p.english_level    || level;
+                // Profile text is the student's own writing ("Sobre mim"): it goes
+                // into the prompt through the same filters as any student text.
+                interests = listaParaPrompt(p.interests, 10, 40).join(', ') || interests;
+                detail    = textoLivreParaPrompt(p.interests_detail, 300);
+                level     = textoParaPrompt(p.english_level, 20) || level;
             }
         }
 
