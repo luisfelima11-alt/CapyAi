@@ -80,6 +80,10 @@ async function abrirAdmin({ script = 'assets/js/pages/admin-v2.js', sessao = nul
       if (String(url) === '/api/auth/mfa/status') {
         return { status: 200, ok: true, json: async () => mfa, clone() { return this; } };
       }
+      if (String(url) === '/api/auth/mfa/verify') {
+        mfa.aal = 'aal2';   // código certo: a sessão sobe para aal2
+        return { status: 200, ok: true, json: async () => ({ ok: true, aal: 'aal2' }), clone() { return this; } };
+      }
       if (String(url) === '/api/auth/mfa/enroll') {
         return { status: 200, ok: true, json: async () => ({ factorId: 'f-novo', qrCode: 'data:image/svg+xml;utf8,x', secret: 'JBSWY3DPEHPK3PXP' }), clone() { return this; } };
       }
@@ -204,3 +208,38 @@ test('login: sem next e sem recado segue o caminho de sempre; storage bloqueado 
   assert.equal(destinoCom().destino, null);
   assert.equal(destinoCom({ storageQuebrado: true }).destino, null);
 });
+
+// ── Verificação em 2 etapas nos dois admins ─────────────────────────────────
+// Com ADMIN_REQUIRE_MFA=true o servidor recusa sessão aal1; a tela tem que
+// pedir o código (ou abrir a ativação) em vez de mostrar "sessão venceu".
+const ADMIN = { id: 'adm-1', role: 'admin', name: 'Luis', email: 'dono@exemplo.com' };
+for (const [nome, script] of SCRIPTS_DO_ADMIN) {
+  test(`${nome}: com app autenticador cadastrado, pede o código antes de abrir o painel`, async () => {
+    const mfa = { aal: 'aal1', enforced: true, factors: [{ id: 'f1', status: 'verified' }] };
+    const a = await abrirAdmin({ script, sessao: ADMIN, mfa });
+    assert.equal(a.visivel('mfa-code-form'), true);
+    assert.equal(a.visivel('app'), false);
+    assert.equal(a.visivel('gate-btn'), false);
+    assert.ok(!a.chamadas.fetch.includes('/api/admin/overview'), 'o painel não pode carregar antes do código');
+    a.el('mfa-code').value = '123456';
+    await a.el('mfa-code-form').disparar('submit');
+    await flush();
+    assert.ok(a.chamadas.fetch.includes('/api/auth/mfa/verify'));
+    assert.equal(a.visivel('app'), true);
+    assert.equal(a.visivel('mfa-code-form'), false);
+  });
+
+  test(`${nome}: MFA obrigatório e nenhum app cadastrado: abre a ativação, não o painel`, async () => {
+    const a = await abrirAdmin({ script, sessao: ADMIN, mfa: { aal: 'aal1', enforced: true, factors: [] } });
+    assert.equal(a.visivel('mfa-setup'), true);
+    assert.equal(a.visivel('mfa-setup-cancel'), false, 'obrigatório não tem "Agora não"');
+    assert.equal(a.el('mfa-secret').textContent, 'JBSWY3DPEHPK3PXP');
+    assert.ok(!a.chamadas.fetch.includes('/api/admin/overview'));
+  });
+
+  test(`${nome}: MFA ainda opcional e nenhum app cadastrado: abre o painel com o aviso "Ativar agora"`, async () => {
+    const a = await abrirAdmin({ script, sessao: ADMIN });
+    assert.equal(a.visivel('app'), true);
+    assert.equal(a.visivel('mfa-banner'), true);
+  });
+}
