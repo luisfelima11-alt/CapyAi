@@ -220,7 +220,7 @@ test('the compatibility CSP never reaches a hardened page and allows no npm/GitH
 
 test('admin routes refuse static keys; cron routes still accept CRON_SECRET', async () => {
   process.env.ADMIN_KEY = 'test-admin-key-1234567890';
-  process.env.CRON_SECRET = 'test-cron-secret-1234567890';
+  process.env.CRON_SECRET = 'test-cron-secret-1234567890';   // gitleaks:allow (fixture)
   try {
     for (const key of [process.env.ADMIN_KEY, process.env.CRON_SECRET]) {
       const response = await callApi({ url: '/api/admin/students', headers: { authorization: `Bearer ${key}` } });
