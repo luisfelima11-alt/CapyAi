@@ -1,5 +1,39 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
+
+**Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
+mesmo defeito, sem ninguém notar: o Desafio Diário caía em erro, e a voz Nova
+(TTS) virava a voz robótica do navegador para quem estava logado ou era visitante.
+
+**Causa raiz:** o portão das rotas de IA (`AI_ROUTE_KEYS`, em `api/index.js`)
+chamava `assertCsrf` em TODA rota quando havia cookie de sessão, inclusive nas
+de GET (`/api/lyrics-search`, `/api/lyrics`, `/api/tts`, `/api/daily-challenge`,
+`/api/word-of-day`). O `assertCsrf` começa pelo `assertOrigin`, e em produção
+`isAllowedOrigin('')` é `false`. Só que o navegador **não manda `Origin` num GET
+da mesma origem**, e o `auth-secure.js` só põe o token CSRF em escrita. Resultado:
+403 `invalid_origin` para todo aluno com cookie. Sem cookie (anônimo) funcionava,
+e nos testes também: fora de produção o `Origin` vazio passa.
+
+**Correcao:** escrita continua exigindo CSRF. Leitura (GET/HEAD) com cookie passa
+pelo `Sec-Fetch-Site` que o navegador manda sempre: `same-origin` ou `none` passam,
+outro site leva 403. A página agora separa "o serviço não respondeu" de "nenhuma
+música encontrada", e os proxies de letra ganharam prazo (7 s) e resposta validada.
+
+**Como pegar isso de novo:** teste em modo produção, porque é lá que o `Origin`
+vazio é recusado:
+```bash
+npm run test:security   # "in production, reads from our own pages pass the AI gate…"
+# à mão: NODE_ENV=production node -e "…" chamando uma rota GET de IA com cookie e sem Origin
+```
+
+**Por que aconteceu:** a regra de CSRF foi escrita pensando em escrita, e ninguém
+testou uma rota GET com cookie em modo produção. E a página transformava qualquer
+falha em "Nenhuma música encontrada", o que escondeu o 403 por dias: **mensagem de
+"não existe" só quando a resposta veio vazia de verdade.**
+
+---
+
 ## 2026-09-20 — `\uXXXX` dentro de CSS vira `u00E7` na tela
 
 **Sintoma:** a legenda vazia do palco de voz mostrava

@@ -136,9 +136,13 @@ RLS is on for every table, and column grants keep plan/role out of the browser's
 - Student text going into a prompt passes `textoLivreParaPrompt` / `listaParaPrompt` (`textoParaPrompt`
   for titles and slugs); AI responses leave through `sanitizeAiOutput`.
 - Every AI route is listed in `AI_ROUTE_KEYS`: the central gate identifies the student and applies the
-  plan's daily limit (guests: 3 AI uses a day).
-- Writes need an allowed `Origin`; no per-handler `Access-Control-Allow-Origin`; provider errors go to
-  the log, not to the response.
+  plan's daily limit (guests: 3 AI uses a day). The lyrics proxies (`ROTAS_SEM_IA`) use their own limit
+  and never spend a guest's AI uses.
+- Writes need an allowed `Origin` and, with session cookies, the CSRF token. Reads (GET) never get
+  either: a same-origin fetch sends no `Origin`, so a GET route with cookies is checked by
+  `Sec-Fetch-Site` instead (`assertLeituraDoProprioSite`). Test such rules in production mode
+  (`NODE_ENV=production`): outside production a missing `Origin` passes and hides the bug.
+- No per-handler `Access-Control-Allow-Origin`; provider errors go to the log, not to the response.
 - Pure helpers are exported for tests as `module.exports._internos`.
 
 ### Lesson Architecture

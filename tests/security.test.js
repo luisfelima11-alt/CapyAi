@@ -395,3 +395,47 @@ test('the parents page and its AI route are gone, and nothing points at them', (
   const citam = tracked.filter(f => /parent_dashboard|\/api\/parent-report/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
   assert.deepEqual(citam, []);
 });
+
+test('in production, reads from our own pages pass the AI gate with cookies; other sites and unsigned writes do not', () => {
+  // Production refuses a missing Origin, and a same-origin fetch GET sends none.
+  // The gate used assertCsrf for every AI route, so every signed-in student and
+  // guest got 403 on the Music Lab search, lyrics, TTS and daily challenge (28/set).
+  // IS_PRODUCTION is read at load time: run the handler in a child process.
+  const script = `
+    const { EventEmitter } = require('events');
+    const api = require('./api/index');
+    function res() {
+      const r = new EventEmitter(); r.statusCode = 200; r.headers = {}; r.body = ''; r.headersSent = false;
+      r.setHeader = (k, v) => { r.headers[String(k).toLowerCase()] = v; }; r.getHeader = k => r.headers[String(k).toLowerCase()];
+      r.status = c => { r.statusCode = c; return r; };
+      r.json = v => { r.setHeader('Content-Type', 'application/json'); return r.end(JSON.stringify(v)); };
+      r.end = v => { if (v) r.body += String(v); r.headersSent = true; r.emit('finish'); return r; };
+      return r;
+    }
+    async function chamar(method, url, headers, body) {
+      const req = new EventEmitter(); req.method = method; req.url = url; req.headers = headers;
+      req.socket = { remoteAddress: '127.0.0.1' }; req.destroy = () => {};
+      const r = res(); const p = api(req, r);
+      process.nextTick(() => { if (body) req.emit('data', Buffer.from(body)); req.emit('end'); });
+      await p; let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
+      return { status: r.statusCode, erro };
+    }
+    (async () => {
+      const guest = '__Host-capy-guest=qualquer';
+      const saida = {
+        mesmoSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'same-origin' }),
+        outroSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'cross-site' }),
+        escritaSemCsrf: await chamar('POST', '/api/chat', { cookie: guest, origin: 'https://www.capyenglish.com.br', 'content-type': 'application/json' }, '{"message":"hi"}'),
+      };
+      console.log(JSON.stringify(saida));
+    })();
+  `;
+  const env = { ...process.env, NODE_ENV: 'production', OPENAI_API_KEY: '', OPENROUTER_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '', SUPABASE_KEY: '' };
+  const saida = JSON.parse(execFileSync(process.execPath, ['-e', script], { cwd: ROOT, env, encoding: 'utf8' }).trim().split('\n').pop());
+  assert.notEqual(saida.mesmoSite.status, 403, JSON.stringify(saida.mesmoSite));
+  assert.equal(saida.mesmoSite.status, 503);          // got past the gate: only the missing AI key stops it
+  assert.equal(saida.outroSite.status, 403);
+  assert.equal(saida.outroSite.erro, 'invalid_origin');
+  assert.equal(saida.escritaSemCsrf.status, 403);
+  assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
+});

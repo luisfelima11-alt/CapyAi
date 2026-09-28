@@ -225,11 +225,13 @@ let searchTimer    = null;
 
 function onSearchInput(val) {
   clearTimeout(searchTimer);
-  if (val.length < 2) {
+  if (val.trim().length < 3) {
     document.getElementById('search-results').classList.add('hidden');
     return;
   }
-  searchTimer = setTimeout(() => searchSongs(val), 350);
+  // 600 ms: busca quando o aluno para de digitar, não a cada pausa (cada busca
+  // conta no limite do dia).
+  searchTimer = setTimeout(() => searchSongs(val.trim()), 600);
 }
 
 async function searchSongs(query) {
@@ -237,30 +239,45 @@ async function searchSongs(query) {
   document.getElementById('search-results').classList.add('hidden');
   try {
     const res = await fetch(`/api/lyrics-search?q=${encodeURIComponent(query)}`);
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     // 429 = limite do plano acabou. Antes isso caía no "Nenhuma música
     // encontrada" e o aluno achava que a música não existia.
     if (res.status === 429 || data.error === 'rate_limited') {
       mostrarLimite(data);
       return;
     }
+    // Qualquer outra falha é do serviço, não da música: dizer "nenhuma
+    // encontrada" aqui escondeu por dias um 403 da API (28/set).
+    if (!res.ok) { mostrarFalhaDaBusca(data); return; }
     renderSearchResults(data.data || []);
   } catch(e) {
-    renderSearchResults([]);
+    mostrarFalhaDaBusca({});
   } finally {
     document.getElementById('search-loading').classList.add('hidden');
   }
 }
 
-// Explica o motivo real quando o limite diário acaba, e mostra a saída.
+function mostrarFalhaDaBusca(data) {
+  const box = document.getElementById('search-results');
+  const p = document.createElement('p');
+  p.className = 'text-center text-red-500 text-sm py-4 font-bold';
+  // Só a mensagem escrita para o aluno; erro técnico (403 etc.) vira a frase padrão.
+  p.textContent = (data && data.error === 'music_search_unavailable' && data.message)
+    || 'Não consegui buscar agora: o serviço de músicas não respondeu. Tente de novo em instantes.';
+  box.replaceChildren(p);
+  box.classList.remove('hidden');
+}
+
+// Explica o motivo real quando o limite acaba, e mostra a saída.
 function mostrarLimite(data) {
   const box = document.getElementById('search-results');
   const plano = (data && data.plan) === 'free' ? 'grátis' : ((data && data.plan) || 'atual');
-  const quanto = (data && data.limit) ? ` (${data.used || data.limit}/${data.limit} hoje)` : '';
+  // O servidor sabe se foi o limite do dia ou só buscas demais em um minuto.
+  const explicacao = (data && data.message) || `Não é a música que está faltando — é o limite do plano ${plano}. Ele volta amanhã.`;
   box.innerHTML = `
     <div class="p-5 bg-amber-50 border-2 border-amber-200 rounded-2xl">
-      <p class="font-black text-amber-800 text-sm mb-1">🎵 Seu limite de músicas de hoje acabou${quanto}</p>
-      <p class="text-amber-700 text-xs mb-3">Não é a música que está faltando — é o limite do plano ${plano}. Ele volta amanhã.</p>
+      <p class="font-black text-amber-800 text-sm mb-1">🎵 Limite de buscas</p>
+      <p class="text-amber-700 text-xs mb-3">${escHtml(explicacao)}</p>
       <div class="flex gap-2 flex-wrap">
         <a href="landing.html#pricing" class="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs px-4 py-2 rounded-xl">Ver planos</a>
         <a href="4_Login_Capy_Yara_Welcomes_You.html?next=music_lab.html" class="bg-white border-2 border-amber-300 text-amber-700 font-black text-xs px-4 py-2 rounded-xl">Entrar na conta</a>
@@ -344,13 +361,10 @@ async function selectSong(artist, title, cover, album) {
   // Fetch lyrics
   try {
     const res = await fetch(`/api/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     // Limite do plano não é "letra inexistente" — dizer isso confunde o aluno.
     if (res.status === 429 || data.error === 'rate_limited') {
-      document.getElementById('lyrics-loading').classList.add('hidden');
-      document.getElementById('lyrics-err').textContent = '⏳ Limite diário atingido — volta amanhã';
-      document.getElementById('lyrics-err').classList.remove('hidden');
-      document.getElementById('analyze-btn').disabled = true;
+      mostrarErroDaLetra(data.message || '⏳ Limite diário atingido — volta amanhã');
       return;
     }
     if (data.lyrics && data.lyrics.length > 20) {
@@ -358,14 +372,21 @@ async function selectSong(artist, title, cover, album) {
       document.getElementById('lyrics-loading').classList.add('hidden');
       document.getElementById('lyrics-ok').classList.remove('hidden');
       document.getElementById('analyze-btn').disabled = false;
+    } else if (res.status === 404 || res.ok) {
+      mostrarErroDaLetra('⚠️ Não achamos a letra desta música. Tente outra versão.');
     } else {
-      throw new Error('not found');
+      mostrarErroDaLetra('⚠️ O serviço de letras não respondeu. Tente de novo em instantes.');
     }
   } catch(e) {
-    document.getElementById('lyrics-loading').classList.add('hidden');
-    document.getElementById('lyrics-err').classList.remove('hidden');
-    document.getElementById('analyze-btn').disabled = true;
+    mostrarErroDaLetra('⚠️ O serviço de letras não respondeu. Tente de novo em instantes.');
   }
+}
+
+function mostrarErroDaLetra(texto) {
+  document.getElementById('lyrics-loading').classList.add('hidden');
+  document.getElementById('lyrics-err').textContent = texto;
+  document.getElementById('lyrics-err').classList.remove('hidden');
+  document.getElementById('analyze-btn').disabled = true;
 }
 
 function clearSelection() {
