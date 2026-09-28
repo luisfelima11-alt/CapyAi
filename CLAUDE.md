@@ -624,7 +624,7 @@ Source of truth: the `if (req.method === … && url === …)` blocks in `api/ind
   `POST /api/track`, `GET /api/db/leaderboard` (public, names without markup).
 - **AI (per-plan limits, `AI_ROUTE_KEYS`):** `/api/chat`, `/api/lesson-chat`, `/api/quiz`,
   `/api/lesson-quiz`, `/api/translate`, `/api/story`, `/api/flashcard-deck`, `/api/dialogue-scene`,
-  `/api/parent-report`, `/api/word-of-day`, `/api/daily-challenge`, `/api/newsline`, `/api/historyline`,
+  `/api/word-of-day`, `/api/daily-challenge`, `/api/newsline`, `/api/historyline`,
   `/api/youtube`, `/api/personalize`, `/api/correct-writing`, `/api/study-plan`, `/api/music`,
   `/api/lyrics-search`, `/api/lyrics`, `/api/transcribe`, `GET /api/tts`.
 - **Voice:** `POST /api/realtime-token`, `/api/conversa-uso`, `/api/conversa-feedback`, `GET /api/personas`.

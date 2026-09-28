@@ -47,7 +47,7 @@ const AI_ROUTE_KEYS = new Map([
     ['/api/chat', 'chat'], ['/api/quiz', 'quiz'], ['/api/translate', 'translate'],
     ['/api/newsline', 'newsline'], ['/api/historyline', 'historyline'], ['/api/story', 'story'], ['/api/word-of-day', 'quiz'],
     ['/api/daily-challenge', 'quiz'], ['/api/flashcard-deck', 'quiz'],
-    ['/api/dialogue-scene', 'quiz'], ['/api/parent-report', 'quiz'],
+    ['/api/dialogue-scene', 'quiz'],
     ['/api/lesson-quiz', 'quiz'], ['/api/lesson-chat', 'chat'], ['/api/youtube', 'youtube'],
     ['/api/personalize', 'personalize'], ['/api/transcribe', 'transcribe'],
     ['/api/correct-writing', 'chat'], ['/api/study-plan', 'study-plan'], ['/api/music', 'music'],
@@ -3460,17 +3460,6 @@ Respond ONLY with valid JSON, no markdown:
         const t = textoLivreParaPrompt(topic, 60) || 'pets';
         const prompt = `Create a short English grammar dialogue about "${t}" for Brazilian teens and adults (16+) at A1-A2 level.\nRespond ONLY with valid JSON with these fields: "emoji" (one), "scene" (one sentence setting the scene), "intro" (one sentence introducing the dialogue), "grammarFocus" (the grammar point practised), "questions" (exactly 6 items, each with "prompt" (a sentence with ___ where the missing word goes), "choices" (3 options), "answer" (the exact text of one choice) and "explanation" (one short sentence)).`;
         callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req, { json: true }); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/parent-report') {
-        const corpoPr = await readBody(req);
-        const name = textoLivreParaPrompt(corpoPr.name, 40);
-        const xp = Math.max(0, Math.min(1e9, Number(corpoPr.xp) || 0));
-        const badges = Array.isArray(corpoPr.badges) ? corpoPr.badges : [];
-        const lessons = Array.isArray(corpoPr.lessons) ? corpoPr.lessons : [];
-        const recentDate = textoLivreParaPrompt(corpoPr.recentDate, 30);
-        const prompt = `Act as an educational analyst for a language app for teens and adults.\nStudent: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for a parent or guardian, celebrating effort and giving one practical tip to support study at home.\nRespond ONLY with valid JSON with these fields: "title" ("Weekly Progress Report for ${name||'your student'}"), "summary" (the 2-3 paragraphs, separated by a blank line), "parentTip" (the tip).`;
-        callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {

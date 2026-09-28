@@ -350,7 +350,6 @@ const Components = {
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="privacidade.html">Privacidade</a>
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="termos.html">Termos</a>
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="privacidade.html#seguranca">Segurança</a>
-                    <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="parent_dashboard.html">Pais</a>
                 </div>
                 <div class="text-emerald-300">© 2026 Capy Yara English</div>
                 <div class="flex gap-4">

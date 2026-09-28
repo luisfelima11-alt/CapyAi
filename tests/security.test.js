@@ -312,10 +312,9 @@ test('no student personal data is tracked, and security.txt ships', () => {
 test('site prompts are written for teens and adults, not small children', () => {
   const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
   assert.doesNotMatch(api, /children aged|for a child|a child named|children's language app/i);
-  // quiz, word-of-day, daily-challenge, flashcard-deck, dialogue-scene; story and parent-report word it their own way
+  // quiz, word-of-day, daily-challenge, flashcard-deck, dialogue-scene; story words it its own way
   assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 5);
   assert.match(api, /for a Brazilian learner \(16\+\) named/);
-  assert.match(api, /language app for teens and adults/);
   // Single gold examples with real values are what this model copies.
   assert.doesNotMatch(api, /"word":"Butterfly"|"title":"Use a Brave Word!"|"word":"Sun"|___ dog is fluffy|\["Apple","River","Bird","Tree"\]/);
 });
@@ -323,7 +322,7 @@ test('site prompts are written for teens and adults, not small children', () => 
 test('routes that answer one JSON object use the API JSON mode', () => {
   const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
   assert.match(api, /if \(opts\.json\) corpo\.response_format = \{ type: 'json_object' \}/);
-  for (const rota of ['translate', 'story', 'word-of-day', 'daily-challenge', 'dialogue-scene', 'parent-report']) {
+  for (const rota of ['translate', 'story', 'word-of-day', 'daily-challenge', 'dialogue-scene']) {
     const inicio = api.indexOf(`url === '/api/${rota}'`);
     assert.ok(inicio > 0, rota);
     const chamada = api.slice(inicio, api.indexOf('callOpenAI(', inicio) + 200);
@@ -387,4 +386,12 @@ test('profile text ("Sobre mim") reaches the personalize prompt only through the
   assert.match(rota, /textoLivreParaPrompt\(p\.interests_detail, \d+\)/);
   assert.match(rota, /listaParaPrompt\(p\.interests, \d+, \d+\)/);
   assert.doesNotMatch(rota, /=\s*p\.interests_detail\s*\|\|/);
+});
+
+test('the parents page and its AI route are gone, and nothing points at them', () => {
+  assert.equal(fs.existsSync(path.join(ROOT, 'parent_dashboard.html')), false);
+  const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n')
+    .filter(f => /\.(html|js|json|txt|xml|md)$/.test(f) && !f.startsWith('tests/'));
+  const citam = tracked.filter(f => /parent_dashboard|\/api\/parent-report/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+  assert.deepEqual(citam, []);
 });
