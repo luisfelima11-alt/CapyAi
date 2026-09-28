@@ -152,6 +152,12 @@ async function sb(path, opts = {}) {
 `/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
 Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
 
+**AI routes: reads vs writes (28/set/2026).** Writes need an allowed `Origin` and, with session cookies,
+the CSRF token. A same-origin GET sends neither, so a GET AI route with cookies (lyrics search, lyrics,
+TTS, daily challenge, word of the day) is checked by `Sec-Fetch-Site` instead (`assertLeituraDoProprioSite`).
+Test such rules with `NODE_ENV=production`: outside production a missing `Origin` passes and hides the bug.
+The lyrics proxies (`ROTAS_SEM_IA`) have their own limit and never spend a guest's AI uses.
+
 ### Lesson Architecture
 
 Trail defined in `learn.html` (`TRAIL` array, 24 lessons, 4 chapters). Each lesson has 4 mini-lessons × 6 steps (Listen, Quiz, Game, Build, Speak, Chat). Progress key: `localStorage.capyGuidedStep_{lessonId}_m{miniNum}`.

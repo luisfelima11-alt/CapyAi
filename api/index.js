@@ -183,6 +183,25 @@ function privacySafeIpKey(req) {
     return crypto.createHmac('sha256', salt).update(requestIp(req)).digest('hex').slice(0, 32);
 }
 
+// Routes in AI_ROUTE_KEYS that call no AI: the proxies to the lyrics catalogue.
+// A visitor's 3 daily AI uses are for AI. Searching a song and fetching its
+// lyrics have their own limit (the free plan's), so the Music Lab analysis is
+// still reachable after the search (decision of 28/set).
+const ROTAS_SEM_IA = new Set(['lyrics-search', 'lyrics']);
+
+// A read (GET/HEAD) carrying our cookies. Browsers send Sec-Fetch-Site on every
+// request (Chrome 76+, Firefox 90+, Safari 16.4+): only our own pages
+// ("same-origin") or the student typing the URL ("none") may use the cookies,
+// so another site can't spend a student's quota. Without the header (old
+// browser, script) the read goes through: anyone may already call these routes
+// without cookies, under the per-IP limit.
+function assertLeituraDoProprioSite(req) {
+    const site = String(req.headers['sec-fetch-site'] || '').toLowerCase();
+    if (site && site !== 'same-origin' && site !== 'none') {
+        throw new HttpError(403, 'invalid_origin', 'Request origin is not allowed.');
+    }
+}
+
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
@@ -195,11 +214,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         : trusted?.kind === 'guest'
             ? `g:${trusted.guestId}|ip:${privacySafeIpKey(req)}`
             : `ip:${privacySafeIpKey(req)}`;
-    const effectiveKey = isGuest ? 'guest-ai' : key;
+    const guestAi = isGuest && !ROTAS_SEM_IA.has(key);
+    const effectiveKey = guestAi ? 'guest-ai' : key;
     const bucket = `${identityKey}|${effectiveKey}|${today}`;
     const plan = isGuest ? 'free' : await getUserPlan(appUserId);
-    const limit = isGuest ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
-    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
+    const limit = guestAi ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
+    const minuteLimit = guestAi ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
 
     // Prefer the atomic Supabase RPC (consume_rate_limit) when it's available.
     // If the migration for that RPC hasn't been applied yet, fall back to a
@@ -1784,6 +1804,31 @@ function sanitizeAiOutput(value, depth = 0) {
     return value;
 }
 
+// ── GET to an outside JSON API, with a deadline ─────────────────────────────
+// Resolves { status, json } (json is null when the body is not JSON, e.g. an
+// HTML error page) and rejects only on a network error or when the deadline
+// passes, so a route can tell "not found" from "provider down".
+function buscarJsonExterno(alvo, { timeoutMs = 7000 } = {}) {
+    return new Promise((resolve, reject) => {
+        let pronto = false;
+        let prazo = null;
+        const fim = (erro, valor) => { if (pronto) return; pronto = true; clearTimeout(prazo); if (erro) reject(erro); else resolve(valor); };
+        const pedido = https.get(alvo, { headers: { 'User-Agent': 'CapyEnglish/1.0 (+https://capyenglish.com.br)', Accept: 'application/json' } }, r => {
+            let corpo = '';
+            r.setEncoding('utf8');
+            r.on('data', c => { corpo += c; if (corpo.length > 2000000) pedido.destroy(new Error('resposta_grande_demais')); });
+            r.on('end', () => {
+                let json = null;
+                try { json = JSON.parse(corpo); } catch (e) { json = null; }
+                fim(null, { status: r.statusCode, json });
+            });
+            r.on('error', erro => fim(erro));
+        });
+        prazo = setTimeout(() => { pedido.destroy(new Error('timeout')); fim(new Error('timeout')); }, timeoutMs);
+        pedido.on('error', erro => fim(erro));
+    });
+}
+
 // ── GET with redirect following (Google News RSS 302s on some hl/gl combos) ─
 function httpsGetFollow(urlStr, maxRedirects = 3) {
     return new Promise((resolve, reject) => {
@@ -2178,8 +2223,17 @@ module.exports = async (req, res) => {
     if (aiKey && url !== '/api/realtime-token') {
         // Requests carrying session cookies must prove same-session intent.
         // Anonymous visitors retain the existing rate-limited access.
+        // Writes prove it with the CSRF token. Reads (lyrics search, lyrics,
+        // TTS, daily challenge, word of the day) come from a same-origin fetch,
+        // which sends neither Origin nor the token: assertCsrf refused every one
+        // of them in production (403 invalid_origin), so a signed-in student saw
+        // "Nenhuma música encontrada" in the Music Lab and lost the Nova voice.
+        // For reads the browser's Sec-Fetch-Site tells who is asking.
         const sessionCookies = parseCookies(req);
-        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) {
+            if (req.method === 'GET' || req.method === 'HEAD') assertLeituraDoProprioSite(req);
+            else assertCsrf(req);
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
@@ -5275,39 +5329,45 @@ Rules:
     }
 
     // ── Lyrics Proxy ──────────────────────────────────────────────────────────
+    // Both routes used to pass lyrics.ovh's status and body straight through,
+    // with no deadline: a slow provider held the function until Vercel killed
+    // it, and an HTML error page reached a client that expects JSON. Now each
+    // call has a deadline, the answer is checked, and a failure is a JSON error
+    // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
-        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+        const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
-        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`, { timeoutMs: 7000 });
+            if (status !== 200 || !Array.isArray(json?.data)) throw new Error(`lyrics_ovh_${status}`);
+            res.status(200).json({ data: json.data.slice(0, 7) });
+        } catch (e) {
+            console.error('[lyrics-search]', e.message);
+            res.status(502).json({ error: 'music_search_unavailable', message: 'O serviço de músicas não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
         const p = new URL(`https://x.com${req.url}`).searchParams;
-        const artist = p.get('artist') || '';
-        const title  = p.get('title')  || '';
+        const artist = String(p.get('artist') || '').trim().slice(0, 100);
+        const title  = String(p.get('title')  || '').trim().slice(0, 150);
         if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
-        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeoutMs: 7000 });
+            const lyrics = typeof json?.lyrics === 'string' ? json.lyrics.trim() : '';
+            if (status === 200 && lyrics) { res.status(200).json({ lyrics }); return; }
+            if (status === 404 || (status === 200 && !lyrics)) {
+                res.status(404).json({ error: 'lyrics_not_found', message: 'Não achamos a letra desta música.' });
+                return;
+            }
+            throw new Error(`lyrics_ovh_${status}`);
+        } catch (e) {
+            console.error('[lyrics]', e.message);
+            res.status(502).json({ error: 'lyrics_unavailable', message: 'O serviço de letras não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
@@ -5446,3 +5506,6 @@ Rules:
     }
   }
 };
+
+// Pure helpers, exposed for tests only.
+module.exports._internos = { buscarJsonExterno, checkRateLimit };
