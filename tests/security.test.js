@@ -391,7 +391,7 @@ test('profile text ("Sobre mim") reaches the personalize prompt only through the
 test('the parents page and its AI route are gone, and nothing points at them', () => {
   assert.equal(fs.existsSync(path.join(ROOT, 'parent_dashboard.html')), false);
   const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n')
-    .filter(f => /\.(html|js|json|txt|xml|md)$/.test(f) && !f.startsWith('tests/'));
+    .filter(f => /\.(html|js|json|txt|xml)$/.test(f) && !f.startsWith('tests/'));   // shipped code; docs may record the removal
   const citam = tracked.filter(f => /parent_dashboard|\/api\/parent-report/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
   assert.deepEqual(citam, []);
 });

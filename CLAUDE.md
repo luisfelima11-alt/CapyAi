@@ -84,8 +84,10 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
 **Cache busting:** pages load shared files as `name.js?v=<tag>`. After changing a shared JS/CSS file
-(`components.js`, `store.js`, `auth-secure.js`…), run `npm run bump` (rewrites every `?v=` to the
-current commit SHA) and commit the result.
+(`components.js`, `store.js`, `auth-secure.js`…), give it a new tag on every page that loads it (a
+Node `fs` loop over the `.html` files, not sed); `npm run bump` rewrites every tag to the commit SHA
+if you prefer. Hardened pages use the prebuilt `assets/css/security-pages.css`: after adding
+Tailwind classes to them, rebuild it (`npm run build:security-assets`, or only its `tailwindcss` step).
 
 **⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
