@@ -2881,7 +2881,10 @@ module.exports = async (req, res) => {
     // back to recording the report as before.
     async function liquidarReservaVoz(req, res, corpo, custo) {
         try {
-            const identity = await getRequestIdentity(req, res, { allowGuest: true });
+            // resolveSecurityIdentity, as in gravarUsoVoz: getRequestIdentity has
+            // no appUserId, so the reservation was never found and stayed open
+            // (counted as 30 min) on top of the recorded report.
+            const identity = await resolveSecurityIdentity(req, res, { allowGuest: true });
             if (!identity || !identity.appUserId) return false;
             const mes = new Date().toISOString().slice(0, 7);
             const padrao = encodeURIComponent(`__voz_${identity.appUserId}_${mes}*_reserva`);
