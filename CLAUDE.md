@@ -56,6 +56,9 @@ in the session: work on a branch and open a PR (`sync/estado-producao` mirrors w
 - SQL in `supabase/migrations/` runs in the Supabase SQL editor **before** the code that needs it.
   Release steps and owner actions live in `SECURITY-ROLLOUT.md`.
 - `scripts/`, `tests/`, `supabase/` and `*.md` never ship (`.vercelignore`).
+- A Preview runs in production mode from its own `*.vercel.app` URLs. Writes accept `APP_ORIGIN` and,
+  only when `VERCEL_ENV=preview`, the deployment's `VERCEL_URL` / `VERCEL_BRANCH_URL` (`PREVIEW_ORIGINS`
+  in `api/security.js`). Sign in there with a password: magic links and e-mails point to `APP_ORIGIN`.
 - Publishing (owner): `vercel --prod` creates the deployment but does **not** promote it; the domains
   and the two crons stay on the last promoted one. Found 26/set/2026: `/api/teacher-brief` had never
   been registered and `/api/send-reminders` ran old code for weeks.

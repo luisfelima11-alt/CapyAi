@@ -396,11 +396,10 @@ test('the parents page and its AI route are gone, and nothing points at them', (
   assert.deepEqual(citam, []);
 });
 
-test('in production, reads from our own pages pass the AI gate with cookies; other sites and unsigned writes do not', () => {
-  // Production refuses a missing Origin, and a same-origin fetch GET sends none.
-  // The gate used assertCsrf for every AI route, so every signed-in student and
-  // guest got 403 on the Music Lab search, lyrics, TTS and daily challenge (28/set).
-  // IS_PRODUCTION is read at load time: run the handler in a child process.
+// IS_PRODUCTION, the cookie names and the Preview origins are read when the API
+// loads, so a test that needs another environment runs the handler in a child
+// process. `corpo` calls chamar(method, url, headers, body) and prints one JSON line.
+function rodarApiEm(env, corpo) {
   const script = `
     const { EventEmitter } = require('events');
     const api = require('./api/index');
@@ -420,22 +419,55 @@ test('in production, reads from our own pages pass the AI gate with cookies; oth
       await p; let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
       return { status: r.statusCode, erro };
     }
+    ${corpo}
+  `;
+  const saida = execFileSync(process.execPath, ['-e', script], { cwd: ROOT, env, encoding: 'utf8' });
+  return JSON.parse(saida.trim().split('\n').pop());
+}
+const SEM_CHAVES = { OPENAI_API_KEY: '', OPENROUTER_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '', SUPABASE_KEY: '' };
+
+test('in production, reads from our own pages pass the AI gate with cookies; other sites and unsigned writes do not', () => {
+  // Production refuses a missing Origin, and a same-origin fetch GET sends none.
+  // The gate used assertCsrf for every AI route, so every signed-in student and
+  // guest got 403 on the Music Lab search, lyrics, TTS and daily challenge (28/set).
+  const saida = rodarApiEm({ ...process.env, NODE_ENV: 'production', ...SEM_CHAVES }, `
     (async () => {
       const guest = '__Host-capy-guest=qualquer';
-      const saida = {
+      console.log(JSON.stringify({
         mesmoSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'same-origin' }),
         outroSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'cross-site' }),
         escritaSemCsrf: await chamar('POST', '/api/chat', { cookie: guest, origin: 'https://www.capyenglish.com.br', 'content-type': 'application/json' }, '{"message":"hi"}'),
-      };
-      console.log(JSON.stringify(saida));
+      }));
     })();
-  `;
-  const env = { ...process.env, NODE_ENV: 'production', OPENAI_API_KEY: '', OPENROUTER_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '', SUPABASE_KEY: '' };
-  const saida = JSON.parse(execFileSync(process.execPath, ['-e', script], { cwd: ROOT, env, encoding: 'utf8' }).trim().split('\n').pop());
+  `);
   assert.notEqual(saida.mesmoSite.status, 403, JSON.stringify(saida.mesmoSite));
   assert.equal(saida.mesmoSite.status, 503);          // got past the gate: only the missing AI key stops it
   assert.equal(saida.outroSite.status, 403);
   assert.equal(saida.outroSite.erro, 'invalid_origin');
   assert.equal(saida.escritaSemCsrf.status, 403);
   assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
+});
+
+test('a Vercel Preview accepts sign-in from its own URLs; production still accepts only APP_ORIGIN', () => {
+  // A Preview runs in production mode from *.vercel.app. With APP_ORIGIN alone,
+  // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
+  // could be tested signed in before going live (28/set).
+  const env = {
+    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
+    VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
+  };
+  delete env.APP_ORIGIN;
+  const corpo = `
+    (async () => {
+      const visitante = async origin => (await chamar('POST', '/api/auth/guest', { origin, 'content-type': 'application/json' }, '{}')).status;
+      console.log(JSON.stringify({
+        deploy: await visitante('https://capy-abc123-time.vercel.app'),
+        branch: await visitante('https://capy-git-minha-branch-time.vercel.app/'),
+        outroPreview: await visitante('https://capy-git-outra-branch-time.vercel.app'),
+        site: await visitante('https://www.capyenglish.com.br'),
+      }));
+    })();
+  `;
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
 });

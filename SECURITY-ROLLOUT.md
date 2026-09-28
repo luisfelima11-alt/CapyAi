@@ -98,7 +98,9 @@ Deploy order:
 2. Then run `supabase/migrations/202609260001_permissoes_por_coluna.sql` (column
    grants on accounts, user_profiles and user_state; written on production on
    26/set and still unapplied). The two files are independent, in filename order.
-3. Deploy to Preview, then production: `npx vercel --prod --force`, then
+3. Deploy to Preview and sign in there with a password (magic links go to
+   `APP_ORIGIN`); check the Music Lab search and lyrics while signed in.
+   Then production: `npx vercel --prod --force`, then
    `npx vercel promote <deployment-url>` (without it the domains and the two crons
    stay on the previous deployment) and `npx vercel crons ls`. `ADMIN_KEY` is no
    longer read (delete it); `CRON_SECRET` only opens the two cron routes now.
