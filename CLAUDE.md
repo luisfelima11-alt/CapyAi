@@ -67,6 +67,10 @@ fica so como reforco, se o `curl` no www nao mostrar o conteudo novo.
 
 Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
 
+A Preview runs in production mode from its own `*.vercel.app` URLs. Writes accept `APP_ORIGIN` and,
+only when `VERCEL_ENV=preview`, the deployment's `VERCEL_URL` / `VERCEL_BRANCH_URL` (`PREVIEW_ORIGINS`
+in `api/security.js`). Sign in there with a password: magic links and e-mails point to `APP_ORIGIN`.
+
 ## GitHub
 
 ```

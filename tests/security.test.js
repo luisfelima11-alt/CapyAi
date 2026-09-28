@@ -211,3 +211,27 @@ test('in production, reads from our own pages pass the AI gate with cookies; oth
   assert.equal(saida.escritaSemCsrf.status, 403);
   assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
 });
+
+test('a Vercel Preview accepts sign-in from its own URLs; production still accepts only APP_ORIGIN', () => {
+  // A Preview runs in production mode from *.vercel.app. With APP_ORIGIN alone,
+  // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
+  // could be tested signed in before going live (28/set).
+  const env = {
+    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
+    VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
+  };
+  delete env.APP_ORIGIN;
+  const corpo = `
+    (async () => {
+      const visitante = async origin => (await chamar('POST', '/api/auth/guest', { origin, 'content-type': 'application/json' }, '{}')).status;
+      console.log(JSON.stringify({
+        deploy: await visitante('https://capy-abc123-time.vercel.app'),
+        branch: await visitante('https://capy-git-minha-branch-time.vercel.app/'),
+        outroPreview: await visitante('https://capy-git-outra-branch-time.vercel.app'),
+        site: await visitante('https://www.capyenglish.com.br'),
+      }));
+    })();
+  `;
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
+});
