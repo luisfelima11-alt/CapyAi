@@ -118,10 +118,15 @@ test('trail and runner expose Turkish without replacing English or French', () =
   assert.equal(new Set(ids).size, ids.length, 'ids duplicados em data/lessons-index.json');
 
   // As três faixas convivem no mesmo índice: turco inteiro, sem comer nada do
-  // inglês base (1-110, antes da faixa francesa) nem do francês (201-212).
+  // inglês base (1 até antes da faixa francesa) nem do francês (201-212).
   assert.deepEqual(idsOf('tr'), range(301, 336));
   assert.deepEqual(idsOf('fr'), range(201, 212));
-  assert.deepEqual(idsOf('en').filter(id => id < 201), range(1, 110));
+  // O inglês base CRESCE (a rotina diária acrescenta lições — 111 e 112 em
+  // 26/set), então o teste não fixa o fim: exige que seja contíguo a partir
+  // de 1, sem buraco, e que nunca encolha abaixo das 110 que já existiam.
+  const inglesBase = idsOf('en').filter(id => id < 201);
+  assert.ok(inglesBase.length >= 110, `o inglês base perdeu lições: ${inglesBase.length}`);
+  assert.deepEqual(inglesBase, range(1, inglesBase.length));
 
   // E cada lição turca do índice tem mesmo o arquivo que a trilha vai baixar,
   // com o schema esperado e igual à fonte — build desatualizado é falha.

@@ -42,14 +42,57 @@ async function api(path, opts = {}, _jaTentou) {
     }
   }
 
-  if (r.status === 401 || r.status === 403) { showGate(true); throw new Error('unauthorized'); }
+  if (r.status === 401 || r.status === 403) { showGate(motivoDoPortao()); throw new Error('unauthorized'); }
   return r.json();
 }
 
-function showGate(err) {
+// ── Portão ───────────────────────────────────────────────────────────────
+// Antes, TODA falha virava "Chave inválida. Tente novamente." — frase da versão
+// antiga do admin, que pedia uma chave. Sem campo de chave na tela, o Luis
+// ficava apertando "Entrar" achando que tinha errado uma senha que nem existe,
+// quando o caso era outro: o navegador logado com a conta de um aluno (o
+// celular dele ficou com o login do Luan), a sessão vencida ou o servidor fora
+// do ar. Cada caso agora tem a sua frase e a sua saída.
+const FRASE_DO_PORTAO = {
+  nao_admin: 'Esta conta não é de administrador.',
+  sessao: 'Sua sessão venceu. Entre de novo.',
+  falha: 'Não consegui falar com o servidor. Tente de novo em instantes.',
+};
+
+// A página de login devolve para cá depois de entrar — só para destinos de
+// uma lista fechada, que fica lá.
+const LOGIN_COM_VOLTA = '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html';
+
+// 401 numa rota de admin não diz se a sessão venceu ou se a conta é de aluno:
+// quem desempata é a sessão que o navegador conhece.
+function motivoDoPortao() {
+  const s = Auth.getSession();
+  if (!s || s.role === 'guest') return 'deslogado';
+  return s.role === 'admin' ? 'sessao' : 'nao_admin';
+}
+
+function showGate(motivo) {
+  const m = motivo || 'deslogado';
+  document.getElementById('mfa-code-form')?.classList.add('hidden');
   document.getElementById('gate').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
-  document.getElementById('gate-error').classList.toggle('hidden', !err);
+
+  const erro = document.getElementById('gate-error');
+  erro.textContent = FRASE_DO_PORTAO[m] || '';
+  erro.classList.toggle('hidden', !FRASE_DO_PORTAO[m]);
+
+  // Mostrar QUEM está logado é o que responde "por que não entra?".
+  const s = Auth.getSession();
+  const conta = s && s.role !== 'guest' ? [s.name, s.email && `(${s.email})`].filter(Boolean).join(' ') : '';
+  const quem = document.getElementById('gate-quem');
+  quem.textContent = m === 'nao_admin' && conta ? `Você está conectado como ${conta}.` : '';
+  quem.classList.toggle('hidden', !quem.textContent);
+
+  // Conta errada: a saída é sair e entrar com a certa. Nos outros casos, entrar.
+  document.getElementById('gate-trocar').classList.toggle('hidden', m !== 'nao_admin');
+  const btn = document.getElementById('gate-btn');
+  btn.classList.toggle('hidden', m === 'nao_admin');
+  btn.textContent = m === 'falha' ? 'Tentar de novo' : 'Entrar com conta administrativa';
 }
 
 function showApp() {
@@ -57,12 +100,6 @@ function showApp() {
   document.getElementById('app').classList.remove('hidden');
   loadAll();
 }
-
-document.getElementById('gate-btn').addEventListener('click', async () => {
-  const user = await Auth.ready();
-  if (!user) { window.location.href = '4_Login_Capy_Yara_Welcomes_You.html?next=admin.html'; return; }
-  entrarNoPainel(user);
-});
 
 // ── Verificação em 2 etapas (MFA) ─────────────────────────────────────────────
 // Depois da senha a sessão é "aal1". Com um app autenticador cadastrado, o
@@ -104,8 +141,8 @@ function mensagemMfa(e) {
   return 'Código não confere. Confira o relógio do celular e tente o código novo.';
 }
 
-async function entrarNoPainel(user) {
-  if (user?.role !== 'admin') { showGate(Boolean(user)); return; }
+// Admin confirmado: antes de abrir o painel, a verificação em 2 etapas.
+async function entrarNoAdmin() {
   const st = await mfaStatus().catch(() => null);
   const verificados = (st?.factors || []).filter(f => f.status === 'verified');
   if (st && st.aal !== 'aal2' && verificados.length) { pedirCodigoMfa(verificados[0].id); return; }
@@ -114,7 +151,7 @@ async function entrarNoPainel(user) {
     await api('/api/admin/overview');
     showApp();
     document.getElementById('mfa-banner').classList.toggle('hidden', Boolean(!st || verificados.length));
-  } catch (e) { if (e.message !== 'unauthorized') toast('Falha de rede.', 'error'); }
+  } catch (e) { if (e.message !== 'unauthorized') showGate('falha'); }
 }
 
 function pedirCodigoMfa(factorId) {
@@ -122,6 +159,8 @@ function pedirCodigoMfa(factorId) {
   document.getElementById('gate').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('gate-btn').classList.add('hidden');
+  document.getElementById('gate-trocar').classList.add('hidden');
+  document.getElementById('gate-quem').classList.add('hidden');
   document.getElementById('gate-error').classList.add('hidden');
   document.getElementById('mfa-code-form').classList.remove('hidden');
   document.getElementById('mfa-code').focus();
@@ -196,6 +235,22 @@ document.getElementById('mfa-setup-form').addEventListener('submit', async (ev) 
     erroEl.textContent = mensagemMfa(e);
     erroEl.classList.remove('hidden');
   } finally { btn.disabled = false; }
+});
+
+document.getElementById('gate-btn').addEventListener('click', async () => {
+  // refreshSession, não ready(): o ready() guarda a PRIMEIRA resposta da página
+  // para sempre, e quem acabou de entrar em outra aba continuaria "deslogado".
+  const user = await Auth.refreshSession();
+  if (!user || user.role === 'guest') { window.location.href = LOGIN_COM_VOLTA; return; }
+  if (user.role !== 'admin') { showGate('nao_admin'); return; }
+  entrarNoAdmin();
+});
+
+document.getElementById('gate-trocar').addEventListener('click', () => {
+  // O Auth.logout() sempre manda para o login SEM `next`. Este recado o login lê
+  // uma vez, e devolve para cá depois que a conta certa entrar.
+  try { sessionStorage.setItem('capyDepoisDoLogin', 'admin.html'); } catch (e) { /* sem storage: volta pela home */ }
+  Auth.logout();
 });
 document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
 
@@ -283,7 +338,7 @@ async function loadCampaign() {
   campaignData = null;
   try {
     const response = await fetch('/api/admin/campaign', { credentials: 'same-origin', cache: 'no-store' });
-    if (response.status === 401 || response.status === 403) { showGate(true); throw new Error('unauthorized'); }
+    if (response.status === 401 || response.status === 403) { showGate(motivoDoPortao()); throw new Error('unauthorized'); }
     if (!response.ok) throw new Error('campaign_unavailable');
     const data = await response.json();
     if (!Array.isArray(data.participants) || !data.campaign || !data.summary) throw new Error('invalid_campaign');
@@ -364,10 +419,15 @@ async function loadStudents() {
           <td class="p-3 text-right mono">${a.streakDays > 0 ? '🔥' + a.streakDays : '—'}</td>
           <td class="p-3 text-center">${a.hasPush ? '🔔' : '<span class="text-white/20">—</span>'}</td>
           <td class="p-3 text-right">
-            <button data-link-email="${escapeHtml(a.email)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">link de acesso</button>
+            <button data-link-email="${escapeHtml(a.email)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">link de acesso</button><br>
+            <button data-lembra-id="${escapeHtml(a.id)}" class="text-[10px] font-black text-[#2EC4B6] hover:text-white transition-colors whitespace-nowrap">memória</button>
           </td>
         </tr>`;
     }).join('');
+
+    rows.querySelectorAll('[data-lembra-id]').forEach(btn => {
+      btn.addEventListener('click', () => mostrarLembrancas(btn));
+    });
 
     // Enquanto o e-mail do site não sai (Resend com domínio não verificado),
     // este botão é o ÚNICO jeito de um aluno que não consegue entrar voltar a
@@ -376,6 +436,49 @@ async function loadStudents() {
       btn.addEventListener('click', () => gerarLinkDeAcesso(btn));
     });
   } catch (e) { if (e.message !== 'unauthorized') toast('Erro ao carregar alunos.', 'error'); }
+}
+
+// A memória da Yara de UM aluno, numa linha que abre embaixo dele: o que ele
+// contou nas conversas livres. É a ficha para a conversa de retenção do Luis
+// ("e a viagem para Orlando, deu certo?"). O fato veio da fala do aluno, então
+// entra por textContent, nunca por innerHTML.
+async function mostrarLembrancas(btn) {
+  const tr = btn.closest('tr');
+  const aberta = tr.nextElementSibling;
+  if (aberta && aberta.dataset.lembrancas === btn.dataset.lembraId) { aberta.remove(); return; }
+  const linha = document.createElement('tr');
+  linha.dataset.lembrancas = btn.dataset.lembraId;
+  linha.className = 'border-b border-white/5';
+  const td = document.createElement('td');
+  td.colSpan = 7;
+  td.className = 'p-3';
+  td.textContent = 'Carregando…';
+  linha.appendChild(td);
+  tr.after(linha);
+  try {
+    const d = await api('/api/admin/lembrancas?aluno=' + encodeURIComponent(btn.dataset.lembraId));
+    const fatos = Array.isArray(d.fatos) ? d.fatos : [];
+    td.textContent = '';
+    if (!fatos.length) {
+      const vazio = document.createElement('p');
+      vazio.className = 'text-[10px] text-white/30 font-normal';
+      vazio.textContent = 'A Yara ainda não anotou nada das conversas com este aluno.';
+      td.appendChild(vazio);
+      return;
+    }
+    fatos.slice().reverse().forEach(f => {                   // mais recente primeiro
+      const fato = document.createElement('p');
+      fato.className = 'text-white';
+      fato.textContent = '• ' + f.texto;
+      const meta = document.createElement('p');
+      meta.className = 'text-[10px] text-white/30 font-normal';
+      meta.textContent = [f.tipo, f.quando, f.em ? new Date(f.em).toLocaleDateString('pt-BR') : '', f.canal === 'texto' ? 'chat' : 'ligação']
+        .filter(Boolean).join(' · ');
+      td.append(fato, meta);
+    });
+  } catch (e) {
+    if (e.message !== 'unauthorized') td.textContent = 'Não consegui carregar a memória agora.';
+  }
 }
 
 async function gerarLinkDeAcesso(btn) {
@@ -923,7 +1026,11 @@ document.getElementById('bc-send-btn').addEventListener('click', async () => {
 });
 
 // ── Boot ─────────────────────────────────────────────────────────────────
-Auth.ready().then(entrarNoPainel);
+Auth.ready().then(user => {
+  if (!user || user.role === 'guest') showGate('deslogado');
+  else if (user.role !== 'admin') showGate('nao_admin');
+  else entrarNoAdmin();
+});
 
 document.getElementById('alunos-reload').addEventListener('click', loadStudents);
 

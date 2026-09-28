@@ -49,11 +49,22 @@ publishes production.** Don't run `vercel --prod` or push to `main` unless the o
 in the session: work on a branch and open a PR (`sync/estado-producao` mirrors what is live).
 
 - `vercel.json` sends `/api/*` to `api/index.js` and `/` to `landing.html`, and sets the security
-  headers and two CSPs: strict for the six hardened pages (login, set-password, account, admin,
-  admin-metrics, teacher_homework — no inline script, local Tailwind), compatibility for the rest.
+  headers and two CSPs: strict for the hardened pages (login, set-password, account, admin,
+  admin-antigo, admin-metrics, teacher_homework — no inline script, local Tailwind), compatibility
+  for the rest. The strict rule's page list and the compatibility rule's exclusion must stay equal
+  (`tests/security.test.js` checks it).
 - SQL in `supabase/migrations/` runs in the Supabase SQL editor **before** the code that needs it.
   Release steps and owner actions live in `SECURITY-ROLLOUT.md`.
 - `scripts/`, `tests/`, `supabase/` and `*.md` never ship (`.vercelignore`).
+- Publishing (owner): `vercel --prod` creates the deployment but does **not** promote it; the domains
+  and the two crons stay on the last promoted one. Found 26/set/2026: `/api/teacher-brief` had never
+  been registered and `/api/send-reminders` ran old code for weeks.
+  ```bash
+  npx vercel --prod --force
+  npx vercel promote <deployment-url>     # moves the domains and the crons together
+  npx vercel crons ls --format json       # both crons on the new deployment, "undeployed": []
+  ```
+  `vercel alias set` on both domains is only a fallback, if `curl` on www still shows old content.
 
 ## Architecture
 

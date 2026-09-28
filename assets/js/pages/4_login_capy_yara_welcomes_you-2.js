@@ -110,6 +110,30 @@ function updateStrength() {
   document.getElementById('strength-label').textContent = pw.length ? labels[score - 1] || '' : '';
 }
 
+/* ── para onde voltar depois de entrar ──────────── */
+// O admin manda para cá com ?next=admin.html — ou deixa o recado no
+// sessionStorage quando precisa sair de outra conta antes, porque o
+// Auth.logout() sempre chega aqui sem `next`. Antes este arquivo ignorava o
+// `next`: quem entrava pelo admin caía na home, e quem já estava logado era
+// jogado para a home sem poder trocar de conta.
+// Lista FECHADA: aceitar qualquer `next` da URL viraria redirecionamento aberto.
+const DESTINOS_DEPOIS_DO_LOGIN = ['admin.html'];
+
+function destinoDepoisDoLogin() {
+  let pedido = '';
+  try {
+    pedido = new URLSearchParams(window.location.search).get('next')
+      || sessionStorage.getItem('capyDepoisDoLogin') || '';
+  } catch (e) { pedido = ''; }
+  pedido = String(pedido).trim().replace(/^\/+/, '');
+  return DESTINOS_DEPOIS_DO_LOGIN.includes(pedido) ? pedido : null;
+}
+
+function irParaDestino(destino) {
+  try { sessionStorage.removeItem('capyDepoisDoLogin'); } catch (e) { /* segue */ }
+  window.location.href = destino;
+}
+
 /* ── success splash ─────────────────────────────── */
 function showSuccess(name, isNew = false) {
   const overlay = document.getElementById('success-overlay');
@@ -127,6 +151,8 @@ function showSuccess(name, isNew = false) {
     setTimeout(async () => {
       const session = Auth.getSession();
       if (session && session.role !== 'guest' && session.id !== 'guest') {
+        const destino = destinoDepoisDoLogin();
+        if (destino) { irParaDestino(destino); return; }
         const profile = await Auth.fetchProfile(session.id);
         if (!profile || !profile.onboarding_complete) {
           window.location.href = 'onboarding.html';
@@ -276,9 +302,9 @@ async function forgotPassword() {
       return;
     }
     if (!r.ok) {
-      // `message` vem do 503 `email_indisponivel`, quando NENHUM provedor
-      // aceitou a mensagem. Antes o endpoint respondia ok:true mesmo nesse
-      // caso e a tela dizia "link enviado" para quem nunca ia receber nada.
+      // Só sobra erro de pedido (e-mail inválido, muitas tentativas): desde
+      // 26/set o servidor não responde 503 por falha de entrega, porque isso
+      // revelaria quais e-mails têm cadastro. O texto de sucesso cobre o caso.
       modal.innerHTML = renderMagicModal('⚠️', 'Não conseguimos enviar',
         data.message || data.details || 'Tente novamente em alguns minutos.');
       return;
@@ -299,7 +325,9 @@ async function forgotPassword() {
     }
 
     // Normal: success
-    modal.innerHTML = renderMagicModal('✉️', 'Confira seu e-mail', `Se o endereço estiver habilitado, você receberá um link de acesso em ${email}. Use o link uma única vez.\n\nAbra o link no mesmo navegador em que fez a solicitação. Não chegou? Verifique a caixa de spam.`);
+    // O servidor responde igual com ou sem conta (26/set): o texto é que diz a
+    // verdade para todo mundo, inclusive o que fazer quando o link não chega.
+    modal.innerHTML = renderMagicModal('✉️', 'Confira seu e-mail', `Se ${email} tiver cadastro, o link de acesso chega em até 1 minuto. Use o link uma única vez, no mesmo navegador.\n\nNão chegou? Veja o spam. Ainda nada? Fale com seu professor: ele libera seu acesso na hora.\n\nAinda não tem conta? Use a aba Criar conta.`);
   } catch (e) {
     modal.innerHTML = renderMagicModal('⚠️', 'Falha de rede', 'Verifique sua conexão e tente novamente.');
   }
@@ -354,6 +382,10 @@ document.addEventListener('keydown', e => {
 // to stay here and sign into their registered account.
 Auth.ready().then(session => {
   if (session && session.role !== 'guest' && session.id !== 'guest') {
-    window.location.href = '6_Home_Forest_Expedition.html';
+    // Já logado e vindo do admin: volta para lá. Se a conta não for de admin,
+    // o portão do admin mostra quem está logado e oferece trocar de conta.
+    const destino = destinoDepoisDoLogin();
+    if (destino) irParaDestino(destino);
+    else window.location.href = '6_Home_Forest_Expedition.html';
   }
 }).catch(() => { /* Keep the login form available during a network outage. */ });

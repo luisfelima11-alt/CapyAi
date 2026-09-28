@@ -266,7 +266,11 @@
     }
 
     if (micAtivo) return; // já tem outra frase gravando
-    const started = await CapyMic.start({ onError: () => { btn.textContent = '🎤 Falar'; micAtivo = null; } });
+    const started = await CapyMic.start({
+      onError: () => { btn.textContent = '🎤 Falar'; micAtivo = null; },
+      // A trava de 15s parou o gravador: segue como se o aluno tivesse tocado em "Parar".
+      onAutoStop: () => { if (micAtivo === btn) gravar(alvo, btn, box); },
+    });
     if (started) { micAtivo = btn; btn.textContent = '⏹ Parar'; }
   }
 

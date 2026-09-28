@@ -130,12 +130,16 @@ test('security-sensitive source does not restore wildcard CORS, shared admin key
   assert.doesNotMatch(api, /const\s*\{[^}]*systemOverride/);
   assert.doesNotMatch(admin, /ADMIN_KEY|capyAdminKey|Authorization['"]:\s*['"]Bearer/);
   assert.match(adminScript, /function escapeHtml\(/);
+  // O admin novo monta a tela só por textContent: nome de aluno, fato da
+  // memória e anotação nunca viram HTML.
+  const adminNovo = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', 'admin-v2.js'), 'utf8');
+  assert.doesNotMatch(adminNovo, /innerHTML|outerHTML|insertAdjacentHTML/);
 });
 
 test('sensitive pages use local scripts and contain no executable inline handlers', () => {
   const pages = [
     '4_Login_Capy_Yara_Welcomes_You.html', 'set-password.html', 'account.html',
-    'admin.html', 'admin-metrics.html', 'teacher_homework.html',
+    'admin.html', 'admin-antigo.html', 'admin-metrics.html', 'teacher_homework.html',
   ];
   for (const page of pages) {
     const source = fs.readFileSync(path.join(ROOT, page), 'utf8');
@@ -198,11 +202,15 @@ test('AI output is sanitized even when the runtime hands res.end a Buffer', () =
   assert.equal(Number(res.getHeader('content-length')), Buffer.byteLength(out));
 });
 
-test('the compatibility CSP never reaches the six hardened pages and allows no npm/GitHub CDN', () => {
+test('the compatibility CSP never reaches a hardened page and allows no npm/GitHub CDN', () => {
   const raw = fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8');
   const config = JSON.parse(raw);
   assert.doesNotMatch(raw, /cdn\.jsdelivr\.net|unpkg\.com/);
-  const hardened = ['4_Login_Capy_Yara_Welcomes_You.html', 'set-password.html', 'account.html', 'admin.html', 'admin-metrics.html', 'teacher_homework.html'];
+  // The strict rule's own page list: a page added there (admin-antigo, 26/set)
+  // must also leave the compatibility rule, or its later header wins.
+  const strict = config.headers.find(group => /^\/:page\(/.test(group.source));
+  const hardened = strict.source.slice('/:page('.length, -1).split('|');
+  assert.ok(hardened.includes('admin-antigo.html') && hardened.length >= 7, hardened.join(','));
   const laxRules = config.headers.filter(group => (group.headers || []).some(h => h.key === 'Content-Security-Policy' && /unsafe-inline' https:\/\/cdn\.tailwindcss\.com/.test(h.value)));
   assert.equal(laxRules.length, 1);
   const lax = new RegExp(`^${laxRules[0].source}$`);
@@ -365,10 +373,10 @@ test('every page shows the free-account invitation when a visitor hits the AI ca
   const login = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', '4_login_capy_yara_welcomes_you-2.js'), 'utf8');
   assert.match(login, /location\.hash === '#signup'\) switchTab\('signup'\)/);
   // The widget shows the server's limit message instead of "Sorry, something went wrong."
-  assert.match(fs.readFileSync(path.join(ROOT, 'yara-widget.js'), 'utf8'), /\|\| data\?\.message\n/);
+  assert.match(fs.readFileSync(path.join(ROOT, 'yara-widget.js'), 'utf8'), /typeof data\?\.message === 'string' \? data\.message/);
   // Browsers must fetch the new files: no page may keep the old cache tags.
   for (const pagina of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
     const html = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
-    assert.doesNotMatch(html, /auth-secure\.js\?v=auth20260918|yara-widget\.js\?v=yw5\b|welcomes_you-2\.js\?v=auth20260918/, pagina);
+    assert.doesNotMatch(html, /auth-secure\.js\?v=auth20260918|yara-widget\.js\?v=yw[56]\b|welcomes_you-2\.js\?v=(?:auth20260918|next2)\b|components\.js\?v=(?:nav320|sec1)\b|admin-1\.js\?v=adm8\b/, pagina);
   }
 });

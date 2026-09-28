@@ -16,7 +16,7 @@ test('game pavilion exposes all game tiles and the expanded game set', () => {
   assert.match(pavilion, /dialogue_quest_game\.html/);
   assert.match(pavilion, /verb_voyage_game\.html/);
   assert.match(pavilion, /preposition_picnic_game\.html/);
-  assert.match(pavilion, />25 games</);
+  assert.match(pavilion, />25 jogos</);
   assert.match(pavilion, /id="game-search"/);
   assert.match(pavilion, /id="daily-mission-btn"/);
   assert.match(pavilion, /id="surprise-game-btn"/);

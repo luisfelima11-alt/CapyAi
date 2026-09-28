@@ -27,7 +27,7 @@
 <script src="streak-overlay.js?v=land1"></script>
   <script src="badge-toast.js?v=c52d7db"></script>
   <script src="levelup-overlay.js?v=land1"></script>
-  <script src="components.js?v=sec1"></script>
+  <script src="components.js?v=m0928"></script>
   <script src="lessons_tr_data.js?v=tr2"></script>
   <script>
     tailwind.config = {
@@ -199,8 +199,12 @@
 </main>
 
 <!-- ── LESSON POPUP ─────────────────────────────────────── -->
-<div id="lesson-popup" class="hidden fixed inset-0 z-50 flex items-end md:items-center justify-center p-4" style="background:rgba(0,0,0,.6);backdrop-filter:blur(6px)">
-  <div class="bg-[#0d2240] border border-white/15 rounded-3xl w-full max-w-sm p-6 relative">
+<!-- z-[80], não z-50: o menu de baixo do celular também é z-50 e vem DEPOIS no
+     HTML, então ficava por cima da parte de baixo desta janela — exatamente
+     onde está o "Start Lesson" (27/set: o toque no botão caía no menu). A
+     janela também respeita a área segura do iPhone e nunca passa da tela. -->
+<div id="lesson-popup" class="hidden fixed inset-0 z-[80] flex items-end md:items-center justify-center p-4" style="background:rgba(0,0,0,.6);backdrop-filter:blur(6px);padding-bottom:calc(1rem + env(safe-area-inset-bottom))">
+  <div class="bg-[#0d2240] border border-white/15 rounded-3xl w-full max-w-sm p-6 relative overflow-y-auto" style="max-height:calc(100dvh - 2rem)">
     <button onclick="closePopup()" class="absolute top-4 right-4 text-slate-500 hover:text-white text-xl">✕</button>
     <div id="popup-emoji"    class="text-5xl mb-3 text-center"></div>
     <h3 id="popup-title"     class="font-black text-xl text-white text-center mb-1"></h3>
@@ -1199,6 +1203,22 @@ const TRAIL = [
     "chapter": 35,
     "game": "sentence_builder_game.html",
     "xp": 365
+  },
+  {
+    "id": 111,
+    "emoji": "🌐",
+    "title": "British, American & Australian English",
+    "chapter": 36,
+    "game": "fill_blank_game.html",
+    "xp": 370
+  },
+  {
+    "id": 112,
+    "emoji": "🎩",
+    "title": "Formal vs Informal Register",
+    "chapter": 36,
+    "game": "matching_pairs_game.html",
+    "xp": 375
   }
 ];
 
@@ -1562,6 +1582,17 @@ const CHAPTERS = [
     "lessons": [
       109,
       110
+    ]
+  },
+  {
+    "id": 36,
+    "name": "Global English & Register",
+    "color": "from-sky-600 to-cyan-500",
+    "icon": "🌐",
+    "iconKey": "globe",
+    "lessons": [
+      111,
+      112
     ]
   },
   {
@@ -2406,6 +2437,6 @@ setTrailLang(currentTrailLang);
 scrollToNextMini();
 </script>
 <script>window.YARA_WIDGET = { lang: currentTrailLang, lessonTitle: 'Trilha Diária', lessonNum: '' };</script>
-<script src="yara-widget.js?v=yw6"></script>
+<script src="yara-widget.js?v=yw7"></script>
 </body>
 </html>

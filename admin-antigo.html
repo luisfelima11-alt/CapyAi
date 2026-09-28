@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Capy English · Admin antigo</title>
+<link rel="stylesheet" href="assets/css/security-pages.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<link rel="stylesheet" href="assets/css/pages/admin-1.css">
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/admin.html"/>
+<meta property="og:title" content="Capy English · Admin"/>
+<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Capy English · Admin"/>
+<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="min-h-screen text-white">
+
+<!-- ── Password gate ─────────────────────────────────────────────────────── -->
+<div id="gate" class="fixed inset-0 z-50 flex items-center justify-center px-5 bg-[#000e1c]">
+  <div class="card rounded-3xl p-8 w-full max-w-sm fade-up text-center">
+    <span class="material-symbols-outlined text-5xl text-[#FF9F1C]" style="font-variation-settings:'FILL' 1">lock</span>
+    <h1 class="font-black text-xl mt-3 mb-1">Capy English · Admin</h1>
+    <p class="text-xs text-white/50 mb-5">Acesso restrito ao dono do negócio.</p>
+    <p id="gate-quem" class="hidden text-sm text-white/80 font-bold mb-4"></p>
+    <button id="gate-btn" class="w-full bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Entrar com conta administrativa</button>
+    <button id="gate-trocar" class="hidden w-full bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Sair e entrar como administrador</button>
+    <p id="gate-error" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    <!-- MFA: code from an authenticator that is already set up -->
+    <form id="mfa-code-form" class="hidden mt-5 text-left" autocomplete="off">
+      <p class="text-xs text-white/60 mb-2">Digite o código de 6 dígitos do seu app autenticador.</p>
+      <input id="mfa-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 text-center tracking-[0.4em] mono">
+      <button id="mfa-code-btn" type="submit" class="w-full mt-3 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Confirmar</button>
+      <p id="mfa-code-erro" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    </form>
+  </div>
+</div>
+
+
+<!-- ── MFA enrolment (QR code) ────────────────────────────────────────────── -->
+<div id="mfa-setup" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-5 bg-[#000e1c]/95">
+  <div class="card rounded-3xl p-8 w-full max-w-sm fade-up text-center">
+    <span class="material-symbols-outlined text-5xl text-[#FF9F1C]" style="font-variation-settings:'FILL' 1">phonelink_lock</span>
+    <h2 class="font-black text-lg mt-2 mb-1">Verificação em 2 etapas</h2>
+    <p class="text-xs text-white/60 mb-4">Escaneie o QR code com o Google Authenticator, Authy ou 1Password e digite o código de 6 dígitos que aparecer.</p>
+    <img id="mfa-qr" alt="QR code para o app autenticador" class="hidden mx-auto w-48 h-48 bg-white rounded-xl p-2">
+    <p class="text-[11px] text-white/50 mt-3">Sem câmera? Digite esta chave no app (guarde uma cópia num gerenciador de senhas):</p>
+    <code id="mfa-secret" class="block text-xs break-all bg-white/5 rounded-lg p-2 mt-1 select-all mono"></code>
+    <form id="mfa-setup-form" class="mt-4" autocomplete="off">
+      <input id="mfa-setup-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 text-center tracking-[0.4em] mono">
+      <button id="mfa-setup-btn" type="submit" class="w-full mt-3 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Ativar</button>
+    </form>
+    <p id="mfa-setup-erro" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    <button id="mfa-setup-cancel" type="button" class="mt-4 text-xs font-bold text-white/50 hover:text-white">Agora não</button>
+  </div>
+</div>
+
+<!-- ── App shell ──────────────────────────────────────────────────────────── -->
+<div id="app" class="hidden">
+  <div id="mfa-banner" class="hidden bg-[#FF9F1C]/15 border-b border-[#FF9F1C]/30 text-xs">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-3">
+      <p class="text-[#FFD08A] font-bold">Proteja o painel: ative a verificação em 2 etapas. Sem ela, quem descobrir sua senha entra aqui.</p>
+      <button id="mfa-banner-btn" type="button" class="bg-[#FF9F1C] text-navy font-black px-3 py-1.5 rounded-lg whitespace-nowrap">Ativar agora</button>
+    </div>
+  </div>
+
+  <!-- Admin antigo (26/set): o novo e o admin.html. Este fica no ar enquanto
+       CRM, GPS Tronic, Corrida XP e Metricas nao passam para o novo. -->
+  <div style="background:#FDF0E1;color:#7A3A04;padding:10px 16px;font-size:13px;font-weight:700;text-align:center">
+    Este é o admin antigo. <a href="admin.html" style="color:#7A3A04;text-decoration:underline">Abrir o admin novo</a>
+  </div>
+
+  <header class="border-b border-white/10 sticky top-0 z-30 bg-[#001a33]/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#FF9F1C]" style="font-variation-settings:'FILL' 1">admin_panel_settings</span>
+        <h1 class="font-black text-base sm:text-lg">Capy English · Admin</h1>
+      </div>
+      <button id="logout-btn" class="text-xs font-bold text-white/50 hover:text-white flex items-center gap-1">
+        <span class="material-symbols-outlined text-base">logout</span> sair
+      </button>
+    </div>
+    <!-- Tabs -->
+    <nav class="max-w-6xl mx-auto px-4 pb-2 flex gap-2 overflow-x-auto">
+      <button data-tab="dashboard" class="tab-btn active whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition">📊 Dashboard</button>
+      <button data-tab="cortesias" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🎁 Cortesias</button>
+      <button data-tab="metas" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🎯 Metas</button>
+      <button data-tab="crm" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">📇 CRM</button>
+      <button data-tab="gps" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🛰️ GPS Tronic</button>
+      <button data-tab="avisos" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🔔 Avisos</button>
+      <button data-tab="funil" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">📉 Funil</button>
+      <button data-tab="campanha" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🏁 Corrida XP</button>
+      <button data-tab="alunos" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🧑‍🎓 Alunos</button>
+      <button data-tab="agente" class="tab-btn whitespace-nowrap px-4 py-2 rounded-full text-xs font-black transition bg-white/5">🐾 Agente</button>
+    </nav>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+
+    <div id="toast" class="hidden fixed top-4 right-4 z-40 px-4 py-3 rounded-xl font-bold text-sm shadow-lg fade-up"></div>
+
+    <!-- ══════════════════ DASHBOARD ══════════════════ -->
+    <section id="tab-dashboard" class="tab-panel">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Alunos</p>
+          <p id="kpi-total" class="font-black text-3xl mono">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Novos 7d</p>
+          <p id="kpi-new7" class="font-black text-3xl mono text-[#2EC4B6]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Novos 30d</p>
+          <p id="kpi-new30" class="font-black text-3xl mono text-[#2EC4B6]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Pro</p>
+          <p id="kpi-pro" class="font-black text-3xl mono text-[#FF9F1C]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Super</p>
+          <p id="kpi-super" class="font-black text-3xl mono text-[#FF3E81]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Cortesias</p>
+          <p id="kpi-courtesy" class="font-black text-3xl mono">—</p>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-4 mb-3 text-xs text-white/50 font-bold" id="ai-today-wrap">
+        🤖 Chamadas de IA hoje: <span id="kpi-ai" class="mono text-white">—</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card rounded-2xl p-5 fade-up">
+          <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Meta de faturamento (mês)</p>
+          <div class="flex items-baseline justify-between mb-2">
+            <span id="rev-current" class="font-black text-2xl mono text-[#FF9F1C]">R$ 0</span>
+            <span id="rev-target" class="text-xs text-white/40 mono">meta: R$ 0</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-white/10 overflow-hidden">
+            <div id="rev-bar" class="progress-bar h-full bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81]" style="width:0%"></div>
+          </div>
+          <p class="text-[10px] text-white/30 mt-2">Estimado: assinantes Pro/Super ativos × preço + lançamentos manuais do mês.</p>
+        </div>
+        <div class="card rounded-2xl p-5 fade-up">
+          <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Meta de alunos</p>
+          <div class="flex items-baseline justify-between mb-2">
+            <span id="stu-current" class="font-black text-2xl mono text-[#2EC4B6]">0</span>
+            <span id="stu-target" class="text-xs text-white/40 mono">meta: 0</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-white/10 overflow-hidden">
+            <div id="stu-bar" class="progress-bar h-full bg-gradient-to-r from-[#2EC4B6] to-[#3b82f6]" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-5 mt-4 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Cadastros (últimos 30 dias)</p>
+        <div id="signups-chart" class="flex items-end gap-[2px] h-32"></div>
+        <div id="signups-labels" class="flex justify-between text-[9px] text-white/30 mono mt-1"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ CORTESIAS ══════════════════ -->
+    <section id="tab-cortesias" class="tab-panel hidden">
+      <div class="card rounded-2xl p-5 mb-5 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Conceder cortesia</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="grant-email" type="email" placeholder="email@aluno.com" class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30">
+          <select id="grant-plan" class="px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white">
+            <option value="pro">Pro</option>
+            <option value="super">Super</option>
+          </select>
+          <button id="grant-btn" class="bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Conceder</button>
+        </div>
+
+        <!-- O endpoint sempre devolveu um link de acesso de 7 dias e a tela
+             jogava fora. Como o e-mail do Resend está com o domínio sem
+             verificar, o aluno não recebia nada: a cortesia era concedida e
+             parecia que nada tinha acontecido. -->
+        <div id="grant-result" class="hidden mt-4 rounded-xl bg-[#2EC4B6]/10 border border-[#2EC4B6]/30 p-4">
+          <p class="font-black text-sm text-[#2EC4B6] mb-1" id="grant-result-title"></p>
+          <p class="text-xs text-white/60 mb-3">O e-mail automático não está saindo (domínio ainda não verificado no DNS). Mande este link para a pessoa — é de <strong>uso único e curta duração</strong>, então mande assim que gerar. Ela entra já logada.</p>
+          <div class="flex gap-2">
+            <input id="grant-link" type="text" readonly class="flex-1 px-3 py-2 rounded-lg bg-black/30 border border-white/10 text-xs text-white/80 mono">
+            <button id="grant-copy" class="bg-[#2EC4B6] text-navy font-black px-4 py-2 rounded-lg text-xs whitespace-nowrap">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Definir senha do aluno.
+           O link mágico depende de e-mail e é de uso único: o do Luan expirou
+           duas vezes antes de ele clicar. Senha não expira, não é de uso único
+           e nenhum robô de pré-visualização queima. É o acesso que funciona com
+           o e-mail fora do ar.
+           A senha é digitada AQUI pelo professor e vai direto para o Supabase;
+           não é registrada em log nem devolvida pela API. -->
+      <div class="card rounded-2xl p-5 mb-5 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-1">Definir senha de um aluno</p>
+        <p class="text-xs text-white/50 mb-3">Funciona sem e-mail. Você escolhe a senha e passa para o aluno; ele entra por <strong>e-mail + senha</strong> na tela de login, quantas vezes quiser.</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="pwd-email" type="email" placeholder="email@aluno.com" autocomplete="off"
+                 class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30">
+          <input id="pwd-senha" type="text" placeholder="senha (mín. 12 caracteres)" autocomplete="new-password"
+                 class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 mono">
+          <button id="pwd-set" class="bg-[#FF9F1C] text-navy font-black px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Definir</button>
+        </div>
+        <p id="pwd-result" class="hidden mt-3 text-xs rounded-xl p-3"></p>
+      </div>
+
+      <div class="card rounded-2xl overflow-hidden fade-up">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between">
+          <p class="font-black text-sm uppercase tracking-widest text-white/50">Cortesias ativas</p>
+          <div class="flex items-center gap-4">
+            <button id="all-super-btn" class="text-xs font-black text-[#FF3E81] flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">upgrade</span> Todos → Super
+            </button>
+            <button id="courtesy-csv-btn" class="text-xs font-black text-[#2EC4B6] flex items-center gap-1">
+              <span class="material-symbols-outlined text-base">download</span> Exportar CSV
+            </button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-white/5 text-white/40 uppercase text-[10px] font-black tracking-widest">
+              <tr><th class="text-left px-4 py-2.5">Nome</th><th class="text-left px-4 py-2.5">E-mail</th><th class="text-left px-4 py-2.5">Plano</th><th class="text-left px-4 py-2.5">Expira</th><th class="px-4 py-2.5"></th></tr>
+            </thead>
+            <tbody id="courtesy-rows" class="font-bold"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ METAS ══════════════════ -->
+    <section id="tab-metas" class="tab-panel hidden">
+      <div class="grid md:grid-cols-2 gap-4 mb-5">
+        <div class="card rounded-2xl p-5 fade-up">
+          <label class="text-xs font-black uppercase tracking-widest text-white/50 block mb-2">Meta de faturamento mensal (R$)</label>
+          <input id="goal-revenue" type="number" min="0" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono">
+        </div>
+        <div class="card rounded-2xl p-5 fade-up">
+          <label class="text-xs font-black uppercase tracking-widest text-white/50 block mb-2">Meta de alunos</label>
+          <input id="goal-students" type="number" min="0" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono">
+        </div>
+      </div>
+
+      <div class="card rounded-2xl p-5 mb-3 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Lançamentos manuais de faturamento</p>
+        <div class="flex flex-col sm:flex-row gap-2 mb-4">
+          <input id="rev-month" type="month" class="px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono">
+          <input id="rev-amount" type="number" min="0" placeholder="Valor (R$)" class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono">
+          <input id="rev-note" type="text" placeholder="Nota (opcional)" class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white">
+          <button id="rev-add-btn" class="bg-white/10 hover:bg-white/20 font-black px-4 py-2.5 rounded-xl text-sm whitespace-nowrap">+ Adicionar</button>
+        </div>
+        <div id="manual-rev-list" class="space-y-2 text-sm"></div>
+      </div>
+
+      <button id="goals-save-btn" class="bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black px-6 py-2.5 rounded-xl text-sm">Salvar metas</button>
+    </section>
+
+    <!-- ══════════════════ CRM ══════════════════ -->
+    <section id="tab-crm" class="tab-panel hidden">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <div class="flex gap-2 overflow-x-auto" id="crm-filters">
+          <button data-status="todos" class="crm-chip active px-3 py-1.5 rounded-full text-xs font-black bg-white/10">Todos</button>
+          <button data-status="lead" class="crm-chip px-3 py-1.5 rounded-full text-xs font-black bg-white/5">Lead</button>
+          <button data-status="conversando" class="crm-chip px-3 py-1.5 rounded-full text-xs font-black bg-white/5">Conversando</button>
+          <button data-status="aluno" class="crm-chip px-3 py-1.5 rounded-full text-xs font-black bg-white/5">Aluno</button>
+          <button data-status="pausado" class="crm-chip px-3 py-1.5 rounded-full text-xs font-black bg-white/5">Pausado</button>
+        </div>
+        <div class="flex gap-2">
+          <button id="lead-csv-btn" class="text-xs font-black text-[#2EC4B6] flex items-center gap-1 px-2">
+            <span class="material-symbols-outlined text-base">download</span> Exportar CSV
+          </button>
+          <button id="lead-new-btn" class="bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black px-4 py-2 rounded-xl text-xs whitespace-nowrap">+ Novo lead</button>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl overflow-hidden fade-up">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-white/5 text-white/40 uppercase text-[10px] font-black tracking-widest">
+              <tr>
+                <th class="text-left px-4 py-2.5">Nome</th><th class="text-left px-4 py-2.5">Contato</th>
+                <th class="text-left px-4 py-2.5">Origem</th><th class="text-left px-4 py-2.5">Status</th>
+                <th class="text-left px-4 py-2.5">Próxima ação</th><th class="px-4 py-2.5"></th>
+              </tr>
+            </thead>
+            <tbody id="lead-rows" class="font-bold"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════ GPS TRONIC ══════════════════ -->
+    <section id="tab-gps" class="tab-panel hidden">
+      <div id="gps-cards" class="grid md:grid-cols-2 gap-4"></div>
+      <p id="gps-empty" class="hidden text-center text-white/40 text-sm py-10">Nenhum resultado de teste ainda.</p>
+    </section>
+
+    <!-- ══════════════════ AVISOS (broadcast push) ══════════════════ -->
+    <section id="tab-avisos" class="tab-panel hidden">
+      <div class="card rounded-2xl p-5 mb-4 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Enviar aviso push pra todos os inscritos</p>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-black uppercase tracking-widest text-white/40 block mb-1">Título <span id="bc-title-count" class="text-white/30">(0/60)</span></label>
+            <input id="bc-title" type="text" maxlength="60" placeholder="🐾 Título do aviso" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30">
+          </div>
+          <div>
+            <label class="text-xs font-black uppercase tracking-widest text-white/40 block mb-1">Mensagem <span id="bc-body-count" class="text-white/30">(0/160)</span></label>
+            <textarea id="bc-body" maxlength="160" rows="3" placeholder="Mensagem curta e motivadora..." class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30"></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-black uppercase tracking-widest text-white/40 block mb-1">URL de destino (opcional)</label>
+            <input id="bc-url" type="text" placeholder="/learn.html" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono placeholder-white/30">
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-xl bg-black/30 border border-white/10">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Prévia</p>
+          <div class="flex items-start gap-3">
+            <img src="/icon-192.png" class="w-8 h-8 rounded-full flex-shrink-0" alt="">
+            <div class="min-w-0">
+              <p id="bc-preview-title" class="font-black text-sm truncate">Título do aviso</p>
+              <p id="bc-preview-body" class="text-xs text-white/60 line-clamp-2">Mensagem curta e motivadora...</p>
+            </div>
+          </div>
+        </div>
+
+        <button id="bc-send-btn" class="mt-4 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black px-6 py-2.5 rounded-xl text-sm">Enviar aviso</button>
+      </div>
+      <div id="bc-result" class="hidden card rounded-2xl p-4 text-sm font-bold fade-up"></div>
+    </section>
+
+    <!-- ══════════════════ FUNIL ══════════════════ -->
+    <section id="tab-funil" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-4 gap-2 flex-wrap">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50">Funil de conversão da trilha</p>
+        <select id="funil-days" class="px-3 py-2 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-xs text-white mono">
+          <option value="7">últimos 7 dias</option>
+          <option value="14" selected>últimos 14 dias</option>
+          <option value="30">últimos 30 dias</option>
+          <option value="90">últimos 90 dias</option>
+        </select>
+      </div>
+
+      <!-- KPIs de destaque -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Minis iniciadas</p>
+          <p id="funil-kpi-start" class="font-black text-3xl mono">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Minis completadas</p>
+          <p id="funil-kpi-complete" class="font-black text-3xl mono text-[#2EC4B6]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up col-span-2 md:col-span-1 border-2 border-[#FF3E81]/40">
+          <p class="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Taxa de abandono</p>
+          <p id="funil-kpi-drop" class="font-black text-3xl mono text-[#FF3E81]">—</p>
+        </div>
+      </div>
+
+      <!-- Funil visual -->
+      <div class="card rounded-2xl p-5 mb-4 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-4">Funil: início → conclusão → quiz</p>
+        <div id="funil-bars" class="space-y-3"></div>
+        <p id="funil-empty" class="hidden text-center text-white/40 text-sm py-6">Ainda sem dados — os eventos começam a aparecer conforme os alunos usam a trilha.</p>
+      </div>
+
+      <!-- Top lições -->
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div class="card rounded-2xl p-5 fade-up">
+          <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Top 5 lições iniciadas</p>
+          <div id="funil-top-started" class="space-y-2"></div>
+        </div>
+        <div class="card rounded-2xl p-5 fade-up">
+          <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Top 5 lições completadas</p>
+          <div id="funil-top-completed" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Série temporal -->
+      <div class="card rounded-2xl p-5 fade-up">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50 mb-3">Minis iniciadas por dia</p>
+        <div id="funil-chart" class="flex items-end gap-[2px] h-32"></div>
+        <div id="funil-chart-labels" class="flex justify-between text-[9px] text-white/30 mono mt-1"></div>
+      </div>
+    </section>
+
+
+    <!-- ── Campanha: corrida de XP auditável ──────────────────────────────── -->
+    <section id="tab-campanha" class="tab-panel hidden">
+      <div class="race-head rounded-[2rem] p-5 md:p-7 mb-5 overflow-hidden relative">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+          <div><p class="race-kicker">MONITOR DE PROGRESSO · TEMPO DE BRASÍLIA</p><h2 class="text-3xl md:text-5xl font-black tracking-tight mt-2">Corrida de XP</h2><p id="camp-period" class="text-sm text-white/60 mt-2 mono">Carregando período…</p></div>
+          <div class="flex gap-2"><button id="camp-export" class="px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-xs font-black">Exportar placar</button><button id="camp-reload" class="px-4 py-2.5 rounded-xl bg-[#2EC4B6] text-navy text-xs font-black">Atualizar agora</button></div>
+        </div>
+        <div class="race-track" aria-hidden="true"><span id="camp-runner">🐾</span></div>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div class="card rounded-2xl p-4"><p class="race-label">Monitorados</p><p id="camp-tracked" class="race-number text-[#2EC4B6]">—</p></div>
+        <div class="card rounded-2xl p-4"><p class="race-label">Aumento de XP sincronizado</p><p id="camp-xp" class="race-number text-[#FF9F1C]">—</p></div>
+        <div class="card rounded-2xl p-4"><p class="race-label">Com aumento recebido hoje</p><p id="camp-active" class="race-number">—</p></div>
+        <div class="card rounded-2xl p-4"><p class="race-label">Pedir revisão</p><p id="camp-review" class="race-number text-[#FF3E81]">—</p></div>
+      </div>
+      <div id="camp-leader" class="card rounded-3xl p-5 mb-4 hidden"></div>
+      <div class="card rounded-2xl overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead class="text-[10px] uppercase tracking-widest text-white/40 border-b border-white/10"><tr><th class="text-left p-3">Posição</th><th class="text-left p-3">Aluno</th><th class="text-right p-3">Aumento de XP sincronizado</th><th class="text-right p-3">Dias com aumento</th><th class="text-right p-3">Sequência atual no período</th><th class="text-right p-3">Melhor sequência no período</th><th class="text-left p-3">Situação</th></tr></thead>
+        <tbody id="camp-rows" class="font-bold"></tbody>
+      </table></div></div>
+      <p class="mt-3 text-sm leading-relaxed text-white/60">Acompanhamento parcial: contamos aumentos de XP recebidos após a primeira sincronização de cada aluno. Os dias indicam quando o aumento chegou ao servidor; estudo offline pode chegar depois. O saldo vem do navegador e ainda não comprova a conclusão de cada atividade. Alertas pedem revisão e não comprovam fraude. O CSV inclui as datas de acompanhamento.</p>
+    </section>
+
+    <!-- ── Alunos: quem esta ativo, quem sumiu ──────────────────────────────── -->
+    <section id="tab-alunos" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <p class="font-black text-sm uppercase tracking-widest text-white/50">Quem esta praticando</p>
+        <button id="alunos-reload" class="text-xs font-black text-[#2EC4B6]">Atualizar</button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1">Praticaram hoje</p>
+          <p id="al-kpi-hoje" class="font-black text-3xl mono text-[#2EC4B6]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1">Sumidos</p>
+          <p id="al-kpi-idle" class="font-black text-3xl mono text-[#FF9F1C]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up border-2 border-[#FF3E81]/40">
+          <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1">Nunca comecaram</p>
+          <p id="al-kpi-novos" class="font-black text-3xl mono text-[#FF3E81]">—</p>
+        </div>
+        <div class="card rounded-2xl p-4 fade-up">
+          <p class="text-[10px] uppercase tracking-widest text-white/50 mb-1">Com push ativo</p>
+          <p id="al-kpi-push" class="font-black text-3xl mono">—</p>
+        </div>
+      </div>
+
+      <div class="card rounded-2xl overflow-hidden fade-up">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="text-[10px] uppercase tracking-widest text-white/40 border-b border-white/10">
+              <tr>
+                <th class="text-left p-3">Aluno</th>
+                <th class="text-left p-3">Situacao</th>
+                <th class="text-right p-3">Sem praticar</th>
+                <th class="text-right p-3">XP</th>
+                <th class="text-right p-3">Streak</th>
+                <th class="text-center p-3">Push</th><th class="text-right p-3">Acesso</th>
+              </tr>
+            </thead>
+            <tbody id="alunos-rows" class="font-bold"></tbody>
+          </table>
+        </div>
+      </div>
+      <p id="alunos-vazio" class="hidden text-xs text-white/30 italic mt-4">Nenhum aluno ainda.</p>
+    </section>
+
+    <!-- ── Agente: briefing diário do professor ────────────────────────────── -->
+    <section id="tab-agente" class="tab-panel hidden">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <p class="font-black text-sm uppercase tracking-widest text-white/50">Briefing do dia</p>
+          <p id="ag-data" class="text-[11px] text-white/30 mono mt-0.5">—</p>
+        </div>
+        <button id="ag-reload" class="text-xs font-black text-[#2EC4B6]">Atualizar</button>
+      </div>
+
+      <div id="ag-carregando" class="text-xs text-white/40 italic">Lendo o briefing...</div>
+
+      <div id="ag-vazio" class="hidden card rounded-2xl p-5 fade-up">
+        <p class="font-black text-sm mb-1">O briefing de hoje ainda não foi gerado.</p>
+        <p class="text-xs text-white/40 leading-relaxed">Ele é montado todo dia às 06:00. Enquanto isso, os números crus da turma:</p>
+        <div id="ag-vazio-nums" class="mono text-xs text-white/60 mt-3"></div>
+      </div>
+
+      <div id="ag-conteudo" class="hidden space-y-4">
+        <div class="card rounded-2xl p-5 fade-up border-2 border-[#2EC4B6]/30">
+          <p id="ag-manchete" class="font-black text-base leading-snug"></p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="card rounded-2xl p-5 fade-up">
+            <p class="text-[10px] uppercase tracking-widest text-[#FF3E81] font-black mb-3">Risco de sumir</p>
+            <ul id="ag-churn" class="space-y-2 text-sm font-bold text-white/85"></ul>
+          </div>
+          <div class="card rounded-2xl p-5 fade-up">
+            <p class="text-[10px] uppercase tracking-widest text-[#FF9F1C] font-black mb-3">Ações de hoje</p>
+            <ul id="ag-acoes" class="space-y-2 text-sm font-bold text-white/85"></ul>
+          </div>
+        </div>
+
+        <div class="card rounded-2xl p-5 fade-up">
+          <p class="text-[10px] uppercase tracking-widest text-[#2EC4B6] font-black mb-3">Cobrir na próxima aula</p>
+          <ul id="ag-conteudo-lista" class="space-y-2 text-sm font-bold text-white/85"></ul>
+        </div>
+
+        <p id="ag-animo" class="text-sm italic text-white/50 px-1"></p>
+        <p id="ag-custo" class="text-[10px] text-white/25 mono px-1"></p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── Lead modal ─────────────────────────────────────────────────────────── -->
+<div id="lead-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center px-4 bg-black/60">
+  <div class="card bg-[#001a33] rounded-3xl p-6 w-full max-w-md fade-up">
+    <h3 class="font-black text-lg mb-4" id="lead-modal-title">Novo lead</h3>
+    <div class="space-y-3">
+      <input id="lead-name" type="text" placeholder="Nome" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white placeholder-white/30">
+      <input id="lead-contact" type="text" placeholder="Contato (email / WhatsApp)" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white placeholder-white/30">
+      <input id="lead-source" type="text" placeholder="Origem (Instagram, indicação...)" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white placeholder-white/30">
+      <select id="lead-status" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white">
+        <option value="lead">Lead</option>
+        <option value="conversando">Conversando</option>
+        <option value="aluno">Aluno</option>
+        <option value="pausado">Pausado</option>
+      </select>
+      <textarea id="lead-notes" placeholder="Notas..." rows="2" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white placeholder-white/30"></textarea>
+      <input id="lead-next-action" type="text" placeholder="Próxima ação" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white placeholder-white/30">
+      <input id="lead-next-date" type="date" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 outline-none text-sm text-white mono">
+    </div>
+    <div class="flex gap-2 mt-5">
+      <button id="lead-cancel-btn" class="flex-1 bg-white/10 font-black py-2.5 rounded-xl text-sm">Cancelar</button>
+      <button id="lead-save-btn" class="flex-1 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-2.5 rounded-xl text-sm">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="auth-secure.js?v=sec2"></script>
+<script src="assets/js/pages/admin-1.js?v=m0928"></script>
+
+  <script src="assets/js/secure-inline-events.js"></script>
+</body>
+</html>

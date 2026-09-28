@@ -298,8 +298,8 @@
 
 <script src="auth-secure.js?v=sec2"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=1"></script>
-<script src="components.js?v=sec1"></script>
+<script src="streak-overlay.js?v=land1"></script>
+<script src="components.js?v=m0928"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -441,7 +441,7 @@ function convCheckDone(){CONV_DATA.forEach((c,i)=>{const ta=document.getElementB
 async function convMicToggle(i,btn){if(!window.CapyMic){btn.textContent='🎤 Indisponível';return;}
   if(convMicActive===i){btn.textContent='⏳ Processando...';const {text,empty,error}=await CapyMic.stopAndTranscribe({lang:'en'});convMicActive=null;btn.textContent='🎤 Falar resposta';if(error||empty)return;const ta=document.getElementById('conv-ta-'+i);if(ta){ta.value=(ta.value.trim()?ta.value.trim()+' ':'')+text;convCheckDone();}return;}
   if(convMicActive!==null)return;
-  const started=await CapyMic.start({onError:()=>{btn.textContent='🎤 Falar resposta';}});
+  const started=await CapyMic.start({onError:()=>{btn.textContent='🎤 Falar resposta';},onAutoStop:()=>{if(convMicActive===i)convMicToggle(i,btn);}});
   if(started){convMicActive=i;btn.textContent='⏹ Parar e enviar';}
 }
 buildConversation();
@@ -502,8 +502,8 @@ function checkErrorGps7(){const inp=document.getElementById('err-gps7'),fb=docum
 function submitHomeworkGps7(){markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps7()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
 </script>
 <script src="tts-en.js?v=c52d7db"></script>
-<script>window.YARA_WIDGET={lang:'en',lessonTitle:'Explaining the Repair',lessonNum:3,course:'gpstronic'};</script>
-<script src="yara-widget.js?v=yw6"></script>
+<script>window.YARA_WIDGET={lang:'en',lessonTitle:'Price and Payment',lessonNum:7,course:'gpstronic'};</script>
+<script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
 <script src="listening-lab.js?v=lb1"></script>
 <script src="self-study.js?v=ss4"></script>

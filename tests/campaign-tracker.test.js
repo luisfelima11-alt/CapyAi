@@ -87,7 +87,7 @@ test('campaign tracker records period deltas separately from lifetime XP', () =>
   assert.match(api, /large_jump/); assert.match(api, /daily_limit/);
 });
 test('admin has race dashboard, review state and CSV export', () => {
-  const html = fs.readFileSync(path.join(ROOT, 'admin.html'), 'utf8');
+  const html = fs.readFileSync(path.join(ROOT, 'admin-antigo.html'), 'utf8');
   const js = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', 'admin-1.js'), 'utf8');
   assert.match(html, /data-tab="campanha"/); assert.match(html, /id="camp-rows"/);
   assert.match(js, /loadCampaign/); assert.match(js, /corrida-xp\.csv/); assert.match(js, /Aguardando sincronização/);
@@ -185,7 +185,7 @@ test('campaign endpoint reports phase using inclusive Brasilia campaign dates', 
 });
 
 test('campaign UI labels distinguish synchronized increases and both streak metrics', () => {
-  const html = fs.readFileSync(path.join(ROOT, 'admin.html'), 'utf8');
+  const html = fs.readFileSync(path.join(ROOT, 'admin-antigo.html'), 'utf8');
   const js = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', 'admin-1.js'), 'utf8');
   const campaign = html.slice(html.indexOf('<section id="tab-campanha"'), html.indexOf('<!-- ── Alunos:', html.indexOf('<section id="tab-campanha"')));
   for (const label of ['Aumento de XP sincronizado', 'Com aumento recebido hoje', 'Dias com aumento', 'Sequência atual no período', 'Melhor sequência no período']) assert.ok(campaign.includes(label));

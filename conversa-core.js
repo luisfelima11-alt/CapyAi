@@ -43,7 +43,10 @@ function CapyChamada(opcoes) {
     emit('aoEstado','desconectado'); emit('aoUso',{...usage});
     if (s.connected) emit('aoDesligar',reason || 'manual',{uso:{...usage},transcricao:transcript.map(t=>({...t})),duracaoMs:duration});
   }
-  function fail(s,msg) { if (active(s)) { end(s,'erro'); emit('aoErro',msg); } }
+  // O 2o argumento diz POR QUE falhou ({status, erro} da resposta do token).
+  // O widget das aulas usa para dizer "faz parte do plano Super" em vez do
+  // generico; quem so le a mensagem (ai_chat, entrevista) nao muda nada.
+  function fail(s,msg) { if (active(s)) { end(s,'erro'); emit('aoErro',msg,{status:s.status||0,erro:s.erro||''}); } }
   // Pedaco de fala chegando. Nao entra no `transcript` — so a versao final entra,
   // senao a devolutiva da Yara receberia a frase repetida em pedacos.
   function parcial(who,id,pedaco) {
@@ -127,6 +130,7 @@ function CapyChamada(opcoes) {
       const cred=await r.json();
       if(!active(s)) return;
       if(!r.ok||!cred||typeof cred.value!=='string'||!cred.value) {
+        s.status=r.status; s.erro=cred&&typeof cred.error==='string'?cred.error.slice(0,40):'';
         messageError=({401:'Entre na sua conta para iniciar a chamada.',403:'Esta chamada não está disponível para sua conta. Confira seu acesso.',429:'Você atingiu o limite de chamadas. Tente mais tarde ou fale com o professor.',503:'A voz está indisponível no momento. Tente novamente mais tarde.'})[r.status] || 'Não foi possível abrir a chamada. Tente novamente.';
         throw Error('token unavailable');
       }

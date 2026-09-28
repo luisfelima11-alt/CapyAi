@@ -101,17 +101,17 @@
   <div class="rota-trilho"><div class="rota-preenche" id="rota-preenche" style="width:0%"></div></div>
   <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3">
     <button id="rota-indice-btn" type="button" onclick="toggleIndice()" class="flex items-center gap-1.5 text-slate-500 hover:text-emerald-600 font-black text-xs px-2 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors" aria-expanded="false" aria-controls="rota-indice">
-      <span class="material-symbols-outlined text-lg">menu</span> Índice
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">menu</span> Índice
     </button>
     <div class="flex-1 min-w-0">
       <p class="font-black text-navy text-sm truncate" id="rota-titulo">🎭 Diálogo</p>
       <p class="text-[11px] text-slate-400 font-bold" id="rota-passo">Passo 1 de 8</p>
     </div>
     <button type="button" onclick="passoAnterior()" id="rota-voltar" class="w-9 h-9 rounded-xl border-2 border-slate-200 text-slate-400 hover:border-emerald-300 hover:text-emerald-600 flex items-center justify-center transition-colors disabled:opacity-30" aria-label="Seção anterior">
-      <span class="material-symbols-outlined text-lg">chevron_left</span>
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">chevron_left</span>
     </button>
     <button type="button" onclick="proximoPasso()" id="rota-avancar" class="w-9 h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-30" aria-label="Próxima seção">
-      <span class="material-symbols-outlined text-lg">chevron_right</span>
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">chevron_right</span>
     </button>
   </div>
   <div id="rota-indice" class="hidden border-t border-slate-100 bg-white">
@@ -352,8 +352,8 @@
 
 <script src="auth-secure.js?v=sec2"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=1"></script>
-<script src="components.js?v=sec1"></script>
+<script src="streak-overlay.js?v=land1"></script>
+<script src="components.js?v=m0928"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -681,7 +681,7 @@ function convCheckDone(){CONV_DATA.forEach((c,i)=>{const ta=document.getElementB
 async function convMicToggle(i,btn){if(!window.CapyMic){btn.textContent='🎤 Indisponível';return;}
   if(convMicActive===i){btn.textContent='⏳ Processando...';const {text,empty,error}=await CapyMic.stopAndTranscribe({lang:'en'});convMicActive=null;btn.textContent='🎤 Falar resposta';if(error||empty)return;const ta=document.getElementById('conv-ta-'+i);if(ta){ta.value=(ta.value.trim()?ta.value.trim()+' ':'')+text;convCheckDone();}return;}
   if(convMicActive!==null)return;
-  const started=await CapyMic.start({onError:()=>{btn.textContent='🎤 Falar resposta';}});
+  const started=await CapyMic.start({onError:()=>{btn.textContent='🎤 Falar resposta';},onAutoStop:()=>{if(convMicActive===i)convMicToggle(i,btn);}});
   if(started){convMicActive=i;btn.textContent='⏹ Parar e enviar';}
 }
 buildConversation();
@@ -777,7 +777,7 @@ function submitHomeworkAgro7(){if(hwEntregue)return;hwEntregue=true;markSection(
 </script>
 <script src="tts-en.js?v=c52d7db"></script>
 <script>window.YARA_WIDGET={lang:'en',lessonTitle:"Every Day at Six",lessonNum:7,course:'agro'};</script>
-<script src="yara-widget.js?v=yw6"></script>
+<script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
 <script src="listening-lab.js?v=lb1"></script>
 <script src="self-study.js?v=ss4"></script>
