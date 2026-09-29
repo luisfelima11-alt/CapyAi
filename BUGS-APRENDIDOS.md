@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
+
+**Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante
+respondiam 403 `invalid_origin`. Nenhum PR podia ser testado logado antes de ir ao ar.
+
+**Causa raiz:** o Preview roda em modo produção (`VERCEL=1`), e o `isAllowedOrigin`
+(`api/security.js`) só aceitava o `APP_ORIGIN`, que é o domínio de produção. A página
+do Preview manda `Origin: https://<preview>.vercel.app`.
+
+**Correcao:** só quando `VERCEL_ENV=preview`, as URLs do próprio deploy (`VERCEL_URL`
+e `VERCEL_BRANCH_URL`) também contam como origem do site (`PREVIEW_ORIGINS`). A
+produção continua aceitando só o `APP_ORIGIN`. No Preview, entre com senha: o link
+mágico e os e-mails levam ao `APP_ORIGIN`.
+
+**Como pegar isso de novo:**
+```bash
+npm run test:security   # "a Vercel Preview accepts sign-in from its own URLs…"
+```
+
+---
+
 ## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
 
 **Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
