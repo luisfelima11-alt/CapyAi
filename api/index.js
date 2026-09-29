@@ -322,9 +322,7 @@ const _metrics = {}; // key: 'YYYY-MM-DD|/api/chat' → { requests, errors, tota
 const _rateLimitMemory = {}; // fallback for checkRateLimit when the Supabase RPC is unavailable
 let _persistTimer = null;
 function bumpMetrics(url, status, ms) {
-    const day = new Date().toISOString().slice(0, 10);
-    const key = `${day}|${url}`;
-    const m = _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+    const m = linhaDeMetricas(url);
     m.requests++;
     if (status >= 500) m.errors++;
     m.total_ms += ms;
@@ -333,14 +331,86 @@ function bumpMetrics(url, status, ms) {
         _persistTimer.unref?.();
     }
 }
-// Tokens per endpoint and day, next to the request counts. Without them no
-// cost per route can be measured — the base for any AI spending cap.
-function bumpTokens(endpoint, usage) {
-    if (!endpoint || !usage) return;
+// ── What each AI call costs ─────────────────────────────────────────────────
+// List prices in US$ per 1M tokens, checked on 29/set/2026. They feed the cost
+// per route the admin shows; the provider's bill is what counts. A model set in
+// OPENAI_MODEL / OPENROUTER_MODEL that is not listed here costs zero in the
+// admin, and the log says so once.
+const PRECOS_IA = {
+    'gpt-4o-mini':                  { entrada: 0.15,  saida: 0.60 },
+    'openai/gpt-4o-mini':           { entrada: 0.15,  saida: 0.60 },
+    'google/gemini-2.5-flash-lite': { entrada: 0.10,  saida: 0.40 },
+    'google/gemini-3.1-flash-lite': { entrada: 0.125, saida: 0.75 },
+};
+const PRECO_TTS_POR_MILHAO_DE_CARACTERES = 15;   // tts-1; gpt-4o-mini-tts comes close (~US$ 0.015/min)
+const PRECO_TRANSCRICAO_POR_MINUTO = 0.006;      // whisper-1
+const _modelosSemPreco = new Set();
+
+// Dated ids (gpt-4o-mini-2024-07-18) cost the same as the alias.
+function precoDoModelo(modelo) {
+    const base = String(modelo || '').trim().replace(/-\d{4}-\d{2}-\d{2}$/, '');
+    return Object.prototype.hasOwnProperty.call(PRECOS_IA, base) ? PRECOS_IA[base] : null;
+}
+
+// US$ of one chat call, or null when the model has no price. OpenRouter can
+// report what it actually charged (usage.cost); that wins over the list price.
+function custoDaChamada(modelo, usage) {
+    if (!usage) return null;
+    if (typeof usage.cost === 'number' && Number.isFinite(usage.cost)) return usage.cost;
+    const preco = precoDoModelo(modelo);
+    if (!preco) return null;
+    const entrada = Number(usage.prompt_tokens ?? usage.input_tokens) || 0;
+    const saida = Number(usage.completion_tokens ?? usage.output_tokens) || 0;
+    return (entrada * preco.entrada + saida * preco.saida) / 1e6;
+}
+
+function linhaDeMetricas(endpoint) {
     const key = `${new Date().toISOString().slice(0, 10)}|${endpoint}`;
-    const m = _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+    return _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+}
+
+// Tokens and US$ per endpoint and day, next to the request counts. The cost is
+// worked out when the call happens, with the model that answered it, so the
+// history stays right when a route moves to another model.
+function bumpTokens(endpoint, usage, modelo) {
+    if (!endpoint || !usage) return;
+    const m = linhaDeMetricas(endpoint);
     m.tokens_in  = (m.tokens_in  || 0) + (Number(usage.prompt_tokens     ?? usage.input_tokens)  || 0);
     m.tokens_out = (m.tokens_out || 0) + (Number(usage.completion_tokens ?? usage.output_tokens) || 0);
+    if (!modelo) return;
+    const usd = custoDaChamada(modelo, usage);
+    if (usd === null) {
+        if (!_modelosSemPreco.has(modelo)) {
+            _modelosSemPreco.add(modelo);
+            console.error('[custo] modelo sem preço em PRECOS_IA:', String(modelo).slice(0, 80));
+        }
+        return;
+    }
+    bumpCustoIa(endpoint, usd);
+}
+
+// For calls priced by something other than tokens (TTS characters, minutes of
+// transcription).
+function bumpCustoIa(endpoint, usd) {
+    if (!endpoint || !(Number(usd) > 0)) return;
+    const m = linhaDeMetricas(endpoint);
+    m.cost_usd = (m.cost_usd || 0) + Number(usd);
+}
+
+// A request the shared cache answered. It stays one request of the route (the
+// logging middleware counts it), so the admin's totals are not counted twice.
+function bumpCacheIa(endpoint) {
+    if (!endpoint) return;
+    const m = linhaDeMetricas(endpoint);
+    m.cache_hits = (m.cache_hits || 0) + 1;
+}
+
+function gravarLinhaDeMetricas(linha) {
+    return sb('/api_metrics_daily', {
+        method: 'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(linha),
+    });
 }
 
 async function persistMetrics() {
@@ -360,15 +430,64 @@ async function persistMetrics() {
                 total_ms: prev.total_ms + row.total_ms,
                 tokens_in:  (prev.tokens_in  || 0) + (row.tokens_in  || 0),
                 tokens_out: (prev.tokens_out || 0) + (row.tokens_out || 0),
+                cost_usd:   Number(((Number(prev.cost_usd) || 0) + (row.cost_usd || 0)).toFixed(6)),
+                cache_hits: (Number(prev.cache_hits) || 0) + (row.cache_hits || 0),
             } : row;
-            await sb('/api_metrics_daily', {
-                method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                body: JSON.stringify(merged),
-            });
+            try {
+                await gravarLinhaDeMetricas(merged);
+            } catch (e) {
+                // cost_usd and cache_hits arrive with their own migration: until
+                // it runs, keep the counts instead of losing the whole row.
+                const { cost_usd: _custo, cache_hits: _cache, ...semColunasNovas } = merged;
+                await gravarLinhaDeMetricas(semColunasNovas);
+            }
         } catch (e) { /* swallow — metrics are best-effort */ }
     }
     Object.keys(_metrics).forEach(k => delete _metrics[k]);
+}
+
+// What AI cost this month, per route, plus the requests the shared cache
+// answered and roughly what they would have cost. Voice has its own measure
+// (consumoVozDoMes). { faltaMigration: true } until cost_usd/cache_hits exist.
+async function custoIaDoMes() {
+    const mes = new Date().toISOString().slice(0, 7);
+    // Only the AI rows, page by page: Supabase caps a read at 1000 rows, and a
+    // month of every route (404s from scanners included) goes past that.
+    const linhas = [];
+    for (let offset = 0; offset < 50000;) {
+        const pagina = await sb(`/api_metrics_daily?day=gte.${mes}-01&or=(cost_usd.gt.0,cache_hits.gt.0)`
+            + `&select=endpoint,requests,cost_usd,cache_hits&order=day.asc,endpoint.asc&limit=1000&offset=${offset}`);
+        if (pagina && !Array.isArray(pagina) && pagina.code === '42703') return { faltaMigration: true };
+        if (!Array.isArray(pagina)) return null;
+        if (!pagina.length) break;
+        linhas.push(...pagina);
+        offset += pagina.length;
+    }
+    const porRota = {};
+    for (const l of linhas) {
+        const rota = String(l.endpoint || '');
+        const r = porRota[rota] = porRota[rota] || { rota, chamadas: 0, usd: 0, doCache: 0 };
+        r.chamadas += Number(l.requests) || 0;
+        r.usd += Number(l.cost_usd) || 0;
+        r.doCache += Number(l.cache_hits) || 0;
+    }
+    let evitadas = 0, economiaUsd = 0;
+    for (const r of Object.values(porRota)) {
+        if (!r.doCache) continue;
+        evitadas += r.doCache;
+        // The route's requests include the cached answers; the average cost of
+        // the ones that did reach the AI prices the ones that didn't.
+        const pagas = r.chamadas - r.doCache;
+        if (pagas > 0) economiaUsd += r.doCache * (r.usd / pagas);
+    }
+    const rotas = Object.values(porRota).filter(r => r.usd > 0).sort((a, b) => b.usd - a.usd);
+    const arred = n => Number(n.toFixed(4));
+    return {
+        usd: arred(rotas.reduce((t, r) => t + r.usd, 0)),
+        rotas: rotas.slice(0, 8).map(r => ({ rota: r.rota, chamadas: r.chamadas, usd: arred(r.usd) })),
+        evitadas,
+        economiaUsd: arred(economiaUsd),
+    };
 }
 
 // ── Supabase ──────────────────────────────────────────────────────────────────
@@ -601,47 +720,135 @@ function chatHeaders(contentLength) {
     return h;
 }
 
-function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
-    if (!CHAT_KEY) {
-        res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
-        return;
+// ── AI answers that are the same for every student ──────────────────────────
+// The word of the day, the daily challenge, a lesson's quiz and the translation
+// of a word don't depend on who asks, yet each visit paid for a new generation
+// (and each student even got a different "word of the day"). Now the first
+// request generates and the answer is kept in the ai_cache table for the
+// route's validity. The key hashes the whole request (route, model, prompt and
+// parameters): a new prompt or model starts a new entry. Its own table, not
+// user_state rows: the student scans read user_state without paging.
+const HORA_MS = 3600 * 1000;
+const CACHE_IA_GUARDA_DIAS = 31;   // past the longest validity (translations, 30 days)
+
+function chaveDoCacheIa(rota, corpo) {
+    return crypto.createHash('sha256').update(`${rota}\n${JSON.stringify(corpo)}`).digest('hex');
+}
+
+async function lerCacheIa(chave, validadeMs) {
+    const desde = new Date(Date.now() - validadeMs).toISOString();
+    const linhas = await sb(`/ai_cache?cache_key=eq.${chave}&created_at=gte.${encodeURIComponent(desde)}&select=answer`);
+    const texto = Array.isArray(linhas) && linhas[0] ? linhas[0].answer : null;
+    return typeof texto === 'string' && texto ? texto : null;
+}
+
+async function guardarCacheIa(chave, rota, texto) {
+    await sb('/ai_cache', {
+        method: 'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ cache_key: chave, route: rota, answer: texto, created_at: new Date().toISOString() }),
+    });
+    // Now and then, drop the entries no route can use any more. No cron
+    // needed, and a failure here costs nothing.
+    if (Math.random() < 0.02) {
+        const limite = new Date(Date.now() - CACHE_IA_GUARDA_DIAS * 24 * HORA_MS).toISOString();
+        sb(`/ai_cache?created_at=lt.${encodeURIComponent(limite)}`, { method: 'DELETE' }).catch(() => {});
     }
-    const corpo = { model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature };
-    // API JSON mode for routes that answer one JSON object (same as chatComplete,
-    // newsline and music). The prompt must still say "JSON". Routes that answer
-    // an array (quiz, flashcard-deck, lesson-quiz) can't use it.
-    if (opts.json) corpo.response_format = { type: 'json_object' };
-    const postData = JSON.stringify(corpo);
-    const options = {
-        hostname: CHAT_HOST,
-        path:     CHAT_PATH,
-        method:   'POST',
-        headers:  chatHeaders(Buffer.byteLength(postData))
+}
+
+// Only a well-formed answer is kept: a broken one would reach every student
+// until it expires. An object must carry the fields its page shows.
+function objetoComCampos(...campos) {
+    return texto => {
+        try {
+            const v = JSON.parse(texto);
+            return Boolean(v) && typeof v === 'object' && !Array.isArray(v)
+                && campos.every(c => typeof v[c] === 'string' && v[c].trim() !== '');
+        } catch (e) { return false; }
     };
-    const apiReq = https.request(options, apiRes => {
-        let data = '';
-        apiRes.on('data', chunk => data += chunk);
-        apiRes.on('end', () => {
-            res.setHeader('Content-Type', 'application/json');
-            if (apiRes.statusCode !== 200) {
-                // The provider's message can name the org, key or model: log it, answer generically.
-                console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
+}
+// Same cleanup the lesson page does before JSON.parse (lessons.html, loadAIQuiz).
+function ehQuizDaLicao(texto) {
+    try {
+        const v = JSON.parse(String(texto).replace(/```json\n?|\n?```/g, '').trim());
+        return Array.isArray(v) && v.length >= 3 && v.every(p => p && typeof p.q === 'string'
+            && Array.isArray(p.opts) && p.opts.length >= 2 && p.opts.includes(p.a));
+    } catch (e) { return false; }
+}
+// The routes of the day carry the date in the prompt, so each day is a new entry.
+const CACHE_PALAVRA_DO_DIA = { validadeMs: 36 * HORA_MS, valida: objetoComCampos('word') };
+const CACHE_DESAFIO_DO_DIA = { validadeMs: 36 * HORA_MS, valida: objetoComCampos('instruction') };
+const CACHE_DO_QUIZ        = { validadeMs: 24 * HORA_MS, valida: ehQuizDaLicao };   // new questions every day, as the page's own cache
+const CACHE_TRADUCAO       = { validadeMs: 30 * 24 * HORA_MS, valida: objetoComCampos('translation') };
+
+function aceitaNoCache(cache, texto) {
+    try { return Boolean(texto) && cache.valida(texto); } catch (e) { return false; }
+}
+
+// opts.json: API JSON mode for routes that answer one JSON object (same as
+// chatComplete, newsline and music). The prompt must still say "JSON". Routes
+// that answer an array (quiz, flashcard-deck, lesson-quiz) can't use it.
+// opts.cache: { validadeMs, valida } for answers that are the same for everyone.
+// Callers don't await this: it must never reject, or Node ends the process.
+async function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
+    try {
+        if (!CHAT_KEY) {
+            res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
+            return;
+        }
+        const corpo = { model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature };
+        if (opts.json) corpo.response_format = { type: 'json_object' };
+        const rota = req?.url?.split('?')[0];
+        const chave = opts.cache && rota ? chaveDoCacheIa(rota, corpo) : null;
+        if (chave) {
+            const guardado = await lerCacheIa(chave, opts.cache.validadeMs).catch(() => null);
+            if (guardado !== null) {
+                bumpCacheIa(rota);
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).end(JSON.stringify({ candidates: [{ content: { parts: [{ text: guardado }] } }] }));
                 return;
             }
-            try {
-                const parsed = JSON.parse(data);
-                bumpTokens(req?.url?.split('?')[0], parsed?.usage);
-                const text = parsed?.choices?.[0]?.message?.content || '';
+        }
+        const postData = JSON.stringify(corpo);
+        const options = {
+            hostname: CHAT_HOST,
+            path:     CHAT_PATH,
+            method:   'POST',
+            headers:  chatHeaders(Buffer.byteLength(postData))
+        };
+        const apiReq = https.request(options, apiRes => {
+            let data = '';
+            apiRes.on('data', chunk => data += chunk);
+            apiRes.on('end', async () => {
+                res.setHeader('Content-Type', 'application/json');
+                if (apiRes.statusCode !== 200) {
+                    // The provider's message can name the org, key or model: log it, answer generically.
+                    console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
+                    res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
+                    return;
+                }
+                let text = '';
+                try {
+                    const parsed = JSON.parse(data);
+                    bumpTokens(rota, parsed?.usage, parsed?.model || CHAT_MODEL);
+                    text = parsed?.choices?.[0]?.message?.content || '';
+                } catch(e) {
+                    res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Failed to parse OpenAI response' } }));
+                    return;
+                }
+                // Awaited before answering: on Vercel the function can freeze
+                // once the response ends, and the write would be lost.
+                if (chave && aceitaNoCache(opts.cache, text)) await guardarCacheIa(chave, rota, text).catch(() => {});
                 res.status(200).end(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
-            } catch(e) {
-                res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Failed to parse OpenAI response' } }));
-            }
+            });
         });
-    });
-    apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
-    apiReq.write(postData);
-    apiReq.end();
+        apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
+        apiReq.write(postData);
+        apiReq.end();
+    } catch (e) {
+        console.error('[ai] callOpenAI', e && e.message);
+        if (!res.headersSent) res.status(500).json({ error: { code: 500, message: 'Erro de conexão com a IA.' } });
+    }
 }
 
 // Igual ao callOpenAI, mas DEVOLVE o texto em vez de escrever no res. O
@@ -678,7 +885,7 @@ function chatComplete(messages, opts = {}) {
                 }
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(opts.rota, parsed?.usage);
+                    bumpTokens(opts.rota, parsed?.usage, parsed?.model || corpo.model);
                     resolve({
                         text:  parsed?.choices?.[0]?.message?.content || '',
                         usage: parsed?.usage || null,
@@ -3115,7 +3322,7 @@ module.exports = async (req, res) => {
             const r = await chatComplete([
                 { role: 'system', content: PROMPT_MEMORIA },
                 { role: 'user', content: `HOJE: ${hoje}\n\nFATOS JA GUARDADOS:\n${guardados}\n\nCONVERSA:\n${dialogoParaMemoria(body.transcricao)}` },
-            ], { json: true, temperature: 0.2, maxTokens: 500 });
+            ], { json: true, temperature: 0.2, maxTokens: 500, rota: '/api/lembrancas' });
             const novos = fatosDaExtracao(sanitizeAiOutput(JSON.parse(r.text)), existentes);
             if (novos.length) {
                 await gravarMemoria(appUserId, mesclarFatos(existentes, novos, {
@@ -3332,7 +3539,7 @@ module.exports = async (req, res) => {
         const context = textoLivreParaPrompt(corpoTr.context, 300);
         const ctxLine = context ? `\nUse this sentence for context (the word may be inflected there): "${context}"` : '';
         const prompt = `Translate the word "${word}" into ${targetLang}.${ctxLine}\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${targetLang})."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req, { json: true }); return;
+        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req, { json: true, cache: CACHE_TRADUCAO }); return;
     }
 
     // ── Newsline: real news headlines rewritten at the student's level ────────
@@ -3394,7 +3601,7 @@ Return exactly ${items.length} articles, in the same order as the items above.`;
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const aiArticles = Array.isArray(obj.articles) ? obj.articles : [];
@@ -3464,7 +3671,7 @@ Respond ONLY with valid JSON, no markdown:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const article = {
@@ -3493,13 +3700,13 @@ Respond ONLY with valid JSON, no markdown:
     if (req.method === 'GET' && url === '/api/word-of-day') {
         const today = new Date().toISOString().slice(0, 10);
         const prompt = `Today is ${today}. Pick ONE useful, interesting English word for Brazilian teens and adults (16+) at A2-B1 level; vary it from day to day.\nRespond ONLY with valid JSON with these fields: "word", "emoji" (one), "pronunciation" (IPA between slashes), "partOfSpeech", "simpleMeaning" (one short English sentence), "exampleSentence" (one sentence from everyday adult life), "funFact" (one short curiosity about the word).`;
-        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req, { json: true }); return;
+        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req, { json: true, cache: CACHE_PALAVRA_DO_DIA }); return;
     }
 
     if (req.method === 'GET' && url === '/api/daily-challenge') {
         const today = new Date().toISOString().slice(0, 10);
         const prompt = `Today is ${today}. Create ONE short English writing challenge for Brazilian teens and adults (16+) at A2-B1 level, set in everyday adult life (work, travel, study, home).\nRespond ONLY with valid JSON with these fields: "type" (one of "sentence", "describe", "translate"), "emoji" (one), "title" (short), "instruction" (what to write), "hint" (one short tip), "example" (one model answer), "xp" (20).`;
-        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req, { json: true }); return;
+        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req, { json: true, cache: CACHE_DESAFIO_DO_DIA }); return;
     }
 
     if (req.method === 'POST' && url === '/api/flashcard-deck') {
@@ -3536,7 +3743,7 @@ Respond ONLY with valid JSON, no markdown:
             'Return ONLY a valid JSON array of 5 objects:',
             '[{"q":"question","opts":["real option","real option","real option","real option"],"a":"exact text of the correct option","explain":"uma linha curta em portugues do Brasil dizendo por que"}]',
         ].filter(Boolean).join(String.fromCharCode(10));
-        callOpenAI([{ role: 'user', content: prompt }], 700, 0.7, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 700, 0.7, res, req, { cache: CACHE_DO_QUIZ }); return;
     }
 
     if (req.method === 'POST' && url === '/api/lesson-chat') {
@@ -4137,7 +4344,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const learning = JSON.parse(content);
                     res.status(200).json({ videoId, transcript: transcriptSnippet, ...learning });
@@ -4217,7 +4424,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar aula personalizada.' }); }
@@ -4275,6 +4482,11 @@ Rules:
                     const parsed = JSON.parse(data);
                     bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     if (parsed.error) { console.error('[transcribe] upstream', String(parsed.error.message || '').slice(0, 300)); res.status(502).json({ error: 'Erro na transcrição.' }); return; }
+                    // whisper-1 bills by the minute and reports usage as {type:'duration', seconds}.
+                    // Without it, estimate from the size (the recorders send ~32 kbps, 4 KB/s).
+                    const segundosDeAudio = parsed?.usage?.type === 'duration' && Number(parsed.usage.seconds) > 0
+                        ? Number(parsed.usage.seconds) : audioBuf.length / 4000;
+                    bumpCustoIa(req?.url?.split('?')[0], (segundosDeAudio / 60) * PRECO_TRANSCRICAO_POR_MINUTO);
                     res.status(200).json({ text: (parsed.text || '').trim() });
                 } catch (e) { res.status(500).json({ error: 'Erro ao processar a transcrição.' }); }
             });
@@ -4845,11 +5057,12 @@ Rules:
     if (req.method === 'GET' && url === '/api/admin/saude') {
         if (!(await isAdminReq(req, res))) { res.status(401).json({ error: 'unauthorized' }); return; }
         const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-        const [batimentos, resumo, compras, voz] = await Promise.all([
+        const [batimentos, resumo, compras, voz, ia] = await Promise.all([
             sb('/user_state?user_id=like.__cron_*&select=user_id,data').catch(() => []),
             lerBrief(hoje).catch(() => null),
             sb('/webhook_events?select=received_at&order=received_at.desc&limit=500').catch(() => null),
             consumoVozDoMes(null),
+            custoIaDoMes().catch(() => null),
         ]);
         const porNome = {};
         for (const r of Array.isArray(batimentos) ? batimentos : []) {
@@ -4871,6 +5084,7 @@ Rules:
             voz: voz
                 ? { usd: Number(voz.usd.toFixed(2)), minutos: Number(voz.minutos.toFixed(1)), tetoUsd: VOZ_TETO_USD_MES }
                 : { usd: null, minutos: null, tetoUsd: VOZ_TETO_USD_MES },
+            ia,
         });
         return;
     }
@@ -5396,7 +5610,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const out = JSON.parse(content);
                     out.score = Math.min(5, Math.max(1, parseInt(out.score, 10) || 3));
@@ -5470,7 +5684,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar cronograma.' }); }
@@ -5539,7 +5753,7 @@ Rules:
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
-                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage, parsed?.model || CHAT_MODEL);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao analisar a letra.' }); }
@@ -5641,8 +5855,16 @@ Rules:
                     });
                     return;
                 }
+                bumpCustoIa('/api/tts', (text.length / 1e6) * PRECO_TTS_POR_MILHAO_DE_CARACTERES);
                 res.setHeader('Content-Type', 'audio/mpeg');
                 res.setHeader('Cache-Control', 'public, max-age=86400');
+                if (typeof res.removeHeader === 'function') res.removeHeader('Pragma');
+                // The same text, voice and language always give the same audio,
+                // so Vercel's CDN can keep it for every student: the next request
+                // for that phrase never reaches OpenAI (a new deployment starts
+                // an empty cache). Never with a cookie: a Set-Cookie kept at the
+                // CDN would hand one student's session to the next.
+                if (!res.getHeader('Set-Cookie')) res.setHeader('Vercel-CDN-Cache-Control', 'max-age=31536000');
                 ttsRes.pipe(res);
             });
             ttsReq.on('error', e => { console.error('[tts] request', e.message); res.status(502).json({ error: 'tts_unavailable' }); });
@@ -5733,4 +5955,6 @@ Rules:
 module.exports._internos = {
     caminhoInterno, textoLivreParaPrompt, listaParaPrompt, limparCorpoIa, senhaVazada, rateLimitedResponse,
     buscarJsonExterno, checkRateLimit,
+    precoDoModelo, custoDaChamada, bumpTokens, bumpCustoIa, bumpCacheIa, persistMetrics, custoIaDoMes,
+    chaveDoCacheIa, objetoComCampos, ehQuizDaLicao,
 };
