@@ -88,12 +88,39 @@
            backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;
            flex:none;transition:transform .15s}
   .redondo:active{transform:scale(.9)}
-  #cracha{display:flex;align-items:center;gap:.5rem;background:rgba(5,12,24,.45);
-          backdrop-filter:blur(10px);border:1px solid var(--borda);border-radius:999px;
-          padding:.35rem .75rem;min-width:0}
-  #cracha img{width:22px;height:22px;border-radius:50%;object-fit:cover;flex:none}
-  #titulo{font-size:.8rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #estado{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.55);white-space:nowrap;flex:none}
+  /* O botao da capivara (28/set): maior que o antigo cracha, em duas linhas
+     (nome / estado), com o avatar grande e um pontinho de "online". O cronometro
+     e a cota da ligacao ficam na linha 2: a largura nao cresce durante a chamada. */
+  #btn-capivara{position:relative;display:flex;align-items:center;gap:.6rem;min-width:0;max-width:100%;
+          min-height:48px;background:rgba(5,12,24,.5);backdrop-filter:blur(10px);
+          border:1px solid var(--borda);border-radius:999px;padding:.3rem .8rem .3rem .3rem;
+          text-align:left;cursor:pointer;transition:background .15s,border-color .15s}
+  #btn-capivara:hover{background:rgba(5,12,24,.65);border-color:rgba(255,255,255,.3)}
+  #btn-capivara:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  #btn-capivara .avatar{position:relative;flex:none;width:34px;height:34px}
+  #btn-capivara .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;
+          border:2px solid rgba(255,255,255,.85);display:block}
+  #btn-capivara .avatar::after{content:'';position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;
+          border-radius:50%;background:#22c55e;border:2px solid #0b1220}
+  #btn-capivara[data-estado="ia_falando"] .avatar::after{background:var(--rosa)}
+  #btn-capivara .nomes{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+  #btn-capivara .linha2{display:flex;align-items:center;gap:.45rem;min-width:0}
+  #btn-capivara .chev{flex:none;opacity:.7;transition:transform .2s}
+  #btn-capivara[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  #btn-capivara.travado{cursor:default}
+  #btn-capivara.travado .chev{display:none}
+  /* Pulso ate o aluno abrir o menu pela 1a vez: brilho no box-shadow, nunca
+     transform (transform ocupa largura e criava rolagem lateral em 320px). */
+  #btn-capivara.chamar{animation:chamaCapivara 8s ease-out 1.5s infinite}
+  @keyframes chamaCapivara{
+    0%{box-shadow:0 0 0 0 rgba(236,72,153,.7)}
+    9%{box-shadow:0 0 0 10px rgba(236,72,153,0)}
+    10%{box-shadow:0 0 0 0 rgba(236,72,153,.6)}
+    19%{box-shadow:0 0 0 10px rgba(236,72,153,0)}
+    100%{box-shadow:0 0 0 0 rgba(236,72,153,0)}}
+  .espaco{width:36px;flex:none}
+  #titulo{font-size:.9rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #estado{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.6);white-space:nowrap;flex:none}
   #cron{font-variant-numeric:tabular-nums;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.7);flex:none}
   #cron:empty{display:none}
   #cota{font-size:.68rem;font-weight:700;color:#FFC48A;flex:none}
@@ -115,6 +142,14 @@
                          border-bottom-left-radius:.3rem}
   #fio p[data-quem="eu"]{align-self:flex-end;background:rgba(236,72,153,.92);color:#fff;
                          border-bottom-right-radius:.3rem}
+  /* Os estilos (28/set) mandam listas: "3 expressoes", partes da historia. */
+  #fio p[data-quem="ia"]{white-space:pre-line}
+  /* "Agora: 🔥 Intensivo · 🎭 Encenação" — aviso da pagina, nao fala de ninguem. */
+  #fio p[data-quem="sistema"]{align-self:center;max-width:min(92%,30rem);text-align:center;
+         background:rgba(5,12,24,.55);color:rgba(255,255,255,.85);font-size:.8rem;font-weight:700;
+         border:1px solid var(--borda);border-radius:999px;padding:.45rem .9rem}
+  #fio p[data-quem="sistema"] button{margin-left:.5rem;min-height:36px;padding:0 .9rem;border-radius:999px;
+         background:var(--rosa);color:#fff;font-weight:800;font-size:.8rem}
   /* Marca quem veio da ligação, para o aluno distinguir o que ele falou do que
      ele escreveu sem precisar de duas listas. */
   #fio p[data-canal="voz"]::before{content:'';display:inline-block;width:.7em;height:.7em;
@@ -148,13 +183,16 @@
   #entrada::placeholder{color:rgba(255,255,255,.45);font-weight:500}
   .acoes{display:flex;align-items:center;gap:.5rem;margin-top:.45rem}
   .cresce{flex:1}
-  #btn-persona{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);
-               border:1px solid var(--borda);border-radius:999px;padding:.35rem .7rem;
-               font-size:.78rem;font-weight:800;min-width:0;flex:0 1 auto;transition:background .15s}
-  #btn-persona:hover{background:rgba(255,255,255,.18)}
-  #btn-persona span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #btn-persona svg{flex:none;transition:transform .2s}
-  #btn-persona[aria-expanded="true"] svg{transform:rotate(180deg)}
+  /* Dificuldade + estilo (28/set), no lugar onde ficava a capivara. */
+  #btn-modo{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.1);
+            border:1px solid var(--borda);border-radius:999px;padding:.35rem .75rem;min-height:38px;
+            font-size:.78rem;font-weight:800;min-width:0;flex:0 1 auto;transition:background .15s}
+  #btn-modo:not(:disabled):hover{background:rgba(255,255,255,.18)}
+  #btn-modo .modo-emoji{flex:none;white-space:nowrap}
+  #btn-modo .modo-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  #btn-modo svg{flex:none;transition:transform .2s}
+  #btn-modo[aria-expanded="true"] svg{transform:rotate(180deg)}
+  @media(max-width:359px){#btn-modo .modo-txt{display:none}}
   .acao{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
         justify-content:center;flex:none;transition:transform .15s,background .15s}
   .acao:not(:disabled):active{transform:scale(.9)}
@@ -192,26 +230,52 @@
   /* Com as IAs dos cursos o menu passou de 5 para 10 opções (~600px). Sem
      teto de altura, num celular de 667px as primeiras ficavam fora da tela e
      sem como rolar até elas. */
-  #menu-persona{position:fixed;z-index:41;background:#0d1626;border:1px solid var(--borda);
-                box-shadow:0 20px 60px rgba(0,0,0,.5);
-                max-height:min(34rem,calc(100dvh - 7rem));overflow-y:auto;overscroll-behavior:contain}
-  #menu-persona[hidden]{display:none}
+  /* .painel = o que os dois menus (capivara e dificuldade/estilo) tem em comum. */
+  .painel{position:fixed;z-index:41;background:#0d1626;border:1px solid var(--borda);
+          box-shadow:0 20px 60px rgba(0,0,0,.5);
+          max-height:min(34rem,calc(100dvh - 7rem));overflow-y:auto;overscroll-behavior:contain}
+  .painel[hidden]{display:none}
+  .painel .painel-titulo{font-size:.78rem;font-weight:800;color:rgba(255,255,255,.55);
+          text-transform:uppercase;letter-spacing:.06em;padding:.35rem .75rem .5rem}
   /* Celular: folha subindo de baixo, onde o polegar alcança. */
   @media(max-width:767px){
-    #menu-persona{left:0;right:0;bottom:0;border-radius:1.4rem 1.4rem 0 0;
-                  padding:.6rem .6rem calc(.6rem + env(safe-area-inset-bottom,0px));
-                  animation:folhaSobe .24s cubic-bezier(.34,1.3,.64,1) both}
+    .painel{left:0;right:0;bottom:0;border-radius:1.4rem 1.4rem 0 0;
+            padding:.6rem .6rem calc(.6rem + env(safe-area-inset-bottom,0px));
+            animation:folhaSobe .24s cubic-bezier(.34,1.3,.64,1) both}
     @keyframes folhaSobe{from{transform:translateY(100%)}to{transform:none}}
-    #menu-persona::before{content:'';display:block;width:36px;height:4px;border-radius:99px;
+    .painel::before{content:'';display:block;width:36px;height:4px;border-radius:99px;
       background:rgba(255,255,255,.25);margin:.2rem auto .6rem}
   }
-  /* Desktop: popover ancorado acima da pílula. */
+  /* Desktop: o de capivaras desce do botao do topo, o de modo sobe da pilula. */
   @media(min-width:768px){
-    #menu-persona{left:50%;bottom:6.2rem;transform:translateX(-50%);width:min(24rem,calc(100vw - 2rem));
-                  border-radius:1.1rem;padding:.4rem;
-                  animation:popEntra .18s cubic-bezier(.34,1.3,.64,1) both}
+    #menu-persona{left:50%;top:4.9rem;transform:translateX(-50%);width:min(24rem,calc(100vw - 2rem));
+                  border-radius:1.1rem;padding:.4rem;max-height:min(34rem,calc(100dvh - 6rem));
+                  animation:desceEntra .18s cubic-bezier(.34,1.3,.64,1) both}
+    @keyframes desceEntra{from{opacity:0;transform:translateX(-50%) translateY(-6px)}to{opacity:1;transform:translateX(-50%)}}
+    #menu-modo{left:50%;bottom:6.2rem;transform:translateX(-50%);width:min(44rem,calc(100vw - 2rem));
+               border-radius:1.1rem;padding:.5rem .5rem 0;
+               animation:popEntra .18s cubic-bezier(.34,1.3,.64,1) both}
     @keyframes popEntra{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
+    #menu-modo .grupos{display:grid;grid-template-columns:1fr 1fr;gap:.25rem .75rem}
   }
+  /* Menu de dificuldade e estilo: dois grupos de opcoes de escolha unica. */
+  #menu-modo .grupo h3{font-size:.78rem;font-weight:800;color:rgba(255,255,255,.55);
+          text-transform:uppercase;letter-spacing:.06em;padding:.5rem .75rem .35rem}
+  #menu-modo .grupo-motivo{font-size:.75rem;font-weight:600;color:#FFD9A8;line-height:1.4;
+          padding:0 .75rem .4rem}
+  #menu-modo .grupo-motivo[hidden]{display:none}
+  #menu-modo .opcao{min-height:52px}
+  /* "🇧🇷→🇺🇸" no Windows vira "BR→US" em letras: sem nowrap quebrava em 3 linhas. */
+  #menu-modo .opcao .ic{font-size:1.25rem;min-width:30px;text-align:center;flex:none;white-space:nowrap}
+  #menu-modo .opcao .ic.bandeiras{font-size:.95rem}
+  #menu-modo .opcao .ok{flex:none;opacity:0;color:var(--rosa);font-weight:900}
+  #menu-modo .opcao[aria-checked="true"]{background:rgba(236,72,153,.16)}
+  #menu-modo .opcao[aria-checked="true"] .ok{opacity:1}
+  #menu-modo .opcao:disabled{opacity:.4}
+  #menu-modo .rodape{position:sticky;bottom:0;display:flex;justify-content:flex-end;
+          padding:.6rem .25rem .6rem;background:linear-gradient(to top,#0d1626 70%,rgba(13,22,38,0))}
+  #modo-pronto{min-height:44px;padding:0 1.4rem;border-radius:999px;background:var(--rosa);
+          font-weight:800;font-size:.9rem}
   .opcao{display:flex;align-items:center;gap:.75rem;width:100%;text-align:left;
          padding:.7rem .75rem;border-radius:.9rem;transition:background .15s}
   .opcao:hover{background:rgba(255,255,255,.07)}
@@ -237,17 +301,20 @@
 
   @media(min-width:768px){
     #fio p{font-size:1.02rem;padding:.75rem 1rem}
-    #titulo{font-size:.9rem}
-    #cracha{padding:.45rem .9rem}
-    #cracha img{width:26px;height:26px}
+    #titulo{font-size:.98rem}
+    #btn-capivara{min-height:52px}
+    #btn-capivara .avatar{width:38px;height:38px}
     .redondo{width:40px;height:40px}
     #entrada{font-size:1.05rem}
     .acao{width:42px;height:42px}
-    #btn-persona{font-size:.84rem;padding:.42rem .85rem}
+    #btn-modo{font-size:.84rem;padding:.42rem .9rem}
   }
   /* Tela de toque (tablet, celular): nao ha Enter nem Shift+Enter para ensinar. */
   @media(hover:none){.dica-teclado{display:none}}
   @media(max-width:480px){
+    /* Celular: o botao da capivara encosta a esquerda, como no WhatsApp. */
+    .espaco{display:none}
+    #btn-capivara{margin-right:auto}
     #fio p{font-size:.9rem;max-width:90%}
     #entrada{font-size:1rem}   /* nunca abaixo de 16px: o iOS dá zoom no foco */
     .dica{margin-top:.4rem;font-size:.68rem}
@@ -291,14 +358,23 @@
   <button class="redondo" type="button" onclick="capyVoltar()" aria-label="Voltar">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
-  <div id="cracha">
-    <img id="cracha-arte" src="yara-quadrado-v1.jpg" alt=""/>
-    <span id="titulo">Yara AI</span>
-    <span id="estado" role="status" aria-live="polite">online</span>
-    <span id="cron"></span>
-    <span id="cota"></span>
-  </div>
-  <div style="width:36px;flex:none"></div>
+  <!-- Trocar de capivara e AQUI em cima desde 28/set (pedido do Luis: "onde
+       esta escrito capivara tal online"). Antes era uma pilula no compositor, e
+       aquele lugar virou o de dificuldade e estilo. -->
+  <button id="btn-capivara" type="button" aria-haspopup="listbox" aria-expanded="false"
+          aria-controls="menu-persona" aria-label="Trocar de capivara. Agora: Yara">
+    <span class="avatar"><img id="cracha-arte" src="yara-quadrado-v1.jpg" alt=""/></span>
+    <span class="nomes">
+      <span id="titulo">Yara AI</span>
+      <span class="linha2">
+        <span id="estado" role="status" aria-live="polite">online</span>
+        <span id="cron"></span>
+        <span id="cota"></span>
+      </span>
+    </span>
+    <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="espaco" aria-hidden="true"></div>
 </header>
 
 <main id="fio" role="log" aria-live="polite" aria-label="Conversa com a Yara">
@@ -318,10 +394,12 @@
               placeholder="Escreva uma mensagem…"
               aria-label="Escreva uma mensagem para a Yara"></textarea>
     <div class="acoes">
-      <button id="btn-persona" type="button" aria-haspopup="listbox"
-              aria-expanded="false" aria-controls="menu-persona">
-        <span id="btn-persona-rotulo">Yara</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      <!-- Dificuldade e estilo da conversa (28/set). A capivara foi para o topo. -->
+      <button id="btn-modo" type="button" aria-haspopup="dialog"
+              aria-expanded="false" aria-controls="menu-modo" disabled>
+        <span class="modo-emoji" aria-hidden="true">✨ 💬</span>
+        <span class="modo-txt">Auto · Livre</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <span class="cresce"></span>
       <button id="silenciar" class="acao" type="button" aria-pressed="false"
@@ -346,11 +424,12 @@
 </form>
 
 <div id="veu" hidden></div>
-<div id="menu-persona" role="listbox" aria-label="Com quem você quer falar" hidden></div>
+<div id="menu-persona" class="painel" role="listbox" aria-label="Com quem você quer falar" hidden></div>
+<div id="menu-modo" class="painel" role="dialog" aria-modal="false" aria-labelledby="modo-titulo" hidden></div>
 <div id="toast" role="status" hidden></div>
 
 <script src="auth-secure.js?v=auth20260918"></script>
-<script src="store.js?v=xpfix"></script>
+<script src="store.js?v=modo20260928"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="conversa-core.js?v=aula20260924"></script>
 <script>
@@ -458,15 +537,82 @@ function pensando(liga) {
 let PERSONAS = [];
 let personaAtual = 'conversa';
 
+// Dificuldade e estilo (28/set). Tambem vem do /api/personas: NIVEIS, ESTILOS
+// e APELIDOS (capivaras que sairam do menu, mas cujo link ainda vale).
+let NIVEIS = [], ESTILOS = [], APELIDOS = [];
+let nivelEscolhido = 'auto', estiloEscolhido = 'livre';
+// So grava nivel/estilo no Store depois de ler o catalogo: no boot, antes
+// dele, os valores padrao apagariam a preferencia salva do aluno.
+let modoCarregado = false;
+
+const temId = (lista, id) => lista.some(x => x.id === id);
+function nivelDaUrl() {
+  try { const n = new URLSearchParams(location.search).get('nivel'); return temId(NIVEIS, n) ? n : null; } catch (_) { return null; }
+}
+
 function personaInicial() {
+  let id = 'conversa';
   try {
     const daUrl = new URLSearchParams(location.search).get('persona');
-    if (daUrl) return daUrl;
+    if (daUrl) id = daUrl;
+    else if (window.Store && Store.state && Store.state.aiPersona) id = Store.state.aiPersona;
   } catch (_) {}
+  // "Capivara para iniciantes" saiu do menu: o link antigo vira Yara + Total
+  // iniciante (a nao ser que a URL ja traga um nivel).
+  const apelido = APELIDOS.find(a => a.id === id);
+  if (apelido) {
+    id = apelido.persona;
+    if (!nivelDaUrl() && temId(NIVEIS, apelido.nivel)) nivelEscolhido = apelido.nivel;
+  }
+  return id;
+}
+
+// Nivel e estilo salvos: URL primeiro (link compartilhado), depois o Store.
+function carregarModo() {
+  let q = null, sn = null, se = null;
+  try { q = new URLSearchParams(location.search); } catch (_) {}
+  try { if (window.Store && Store.state) { sn = Store.state.aiNivel; se = Store.state.aiEstilo; } } catch (_) {}
+  nivelEscolhido = [q && q.get('nivel'), sn].find(x => temId(NIVEIS, x)) || 'auto';
+  estiloEscolhido = [q && q.get('estilo'), se].find(x => temId(ESTILOS, x)) || 'livre';
+  modoCarregado = true;
+}
+
+// O que a capivara atual aceita. A Maia tem o jeito dela; a paciente, so nivel.
+function personaAceita(campo) {
+  const p = dadosDaPersona(personaAtual);
+  return !p || p[campo] !== false;
+}
+const nivelEfetivo = () => (personaAceita('niveis') && temId(NIVEIS, nivelEscolhido) ? nivelEscolhido : 'auto');
+const estiloEfetivo = () => (personaAceita('estilos') && temId(ESTILOS, estiloEscolhido) ? estiloEscolhido : 'livre');
+const dadosNivel = id => NIVEIS.find(n => n.id === id) || null;
+const dadosEstilo = id => ESTILOS.find(e => e.id === id) || null;
+// Na capivara francesa, "Como se diz?" e com a bandeira da Franca.
+function emojiDoEstilo(e) {
+  if (!e) return '';
+  if (e.id !== 'comosediz') return e.emoji;
+  const p = dadosDaPersona(personaAtual);
+  const lang = p && p.lang;
+  return lang === 'fr' ? '🇧🇷→🇫🇷' : lang === 'tr' ? '🇧🇷→🇹🇷' : '🇧🇷→🇺🇸';
+}
+
+// Persona, nivel e estilo na URL de uma vez, sem os valores padrao. replaceState:
+// trocar nao pode empilhar historico, senao o botao voltar vira um labirinto.
+function gravarUrl() {
   try {
-    if (window.Store && Store.state && Store.state.aiPersona) return Store.state.aiPersona;
+    const u = new URL(location.href);
+    const por = (k, v, padrao) => { if (!v || v === padrao) u.searchParams.delete(k); else u.searchParams.set(k, v); };
+    por('persona', personaAtual, 'conversa');
+    if (modoCarregado) { por('nivel', nivelEscolhido, 'auto'); por('estilo', estiloEscolhido, 'livre'); }
+    history.replaceState(null, '', u.pathname + u.search);
   } catch (_) {}
-  return 'conversa';
+}
+function salvarPreferencias() {
+  try {
+    if (!window.Store || !Store.state) return;
+    Store.state.aiPersona = personaAtual;
+    if (modoCarregado) { Store.state.aiNivel = nivelEscolhido; Store.state.aiEstilo = estiloEscolhido; }
+    Store.save();
+  } catch (_) {}
 }
 
 function dadosDaPersona(id) {
@@ -512,29 +658,26 @@ function aplicarPersona(id, comHistoria) {
   // antes de trocar. (No boot o histórico ainda nem existe; o try segura.)
   if ((p ? p.id : 'conversa') !== personaAtual) { try { anotarMemoria('texto'); } catch (_) {} }
   personaAtual = p ? p.id : 'conversa';
-  $('btn-persona-rotulo').textContent = p ? p.rotulo : 'Yara';
   const arte = (p && p.arte) || ARTE_PADRAO;
   trocarArte(arte, comHistoria);
   $('cracha-arte').src = arte;
   $('titulo').textContent = p ? p.rotulo : 'Yara AI';
-  if (comHistoria) {
-    try {
-      const u = new URL(location.href);
-      if (personaAtual === 'conversa') u.searchParams.delete('persona');
-      else u.searchParams.set('persona', personaAtual);
-      // replaceState: trocar de capivara não pode empilhar uma entrada de
-      // histórico a cada clique, senão o botão voltar vira um labirinto.
-      history.replaceState(null, '', u.pathname + u.search);
-    } catch (_) {}
-  }
-  try {
-    if (window.Store && Store.state) { Store.state.aiPersona = personaAtual; Store.save(); }
-  } catch (_) {}
+  $('btn-capivara').setAttribute('aria-label', 'Trocar de capivara. Agora: ' + (p ? p.rotulo : 'Yara'));
+  if (comHistoria) gravarUrl();
+  // Sem catalogo (boot, ou /api/personas fora do ar) nao grava: a persona salva
+  // pode ser um apelido ("iniciante") que so o catalogo sabe resolver.
+  if (PERSONAS.length) salvarPreferencias();
+  pintarModo();
 }
 
 function montarMenu() {
   const m = $('menu-persona');
   m.textContent = '';
+  const titulo = document.createElement('div');
+  titulo.className = 'painel-titulo';
+  titulo.setAttribute('role', 'presentation');
+  titulo.textContent = 'Com quem você quer falar?';
+  m.appendChild(titulo);
   for (const p of PERSONAS) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -559,33 +702,235 @@ function montarMenu() {
       seta.textContent = '↗';
       b.appendChild(seta);
     }
-    b.addEventListener('click', () => { fecharMenu(); aplicarPersona(p.id, true); });
+    b.addEventListener('click', () => { fecharMenus(); aplicarPersona(p.id, true); });
     m.appendChild(b);
   }
 }
 
+// ── O chamariz: o botao da capivara pulsa ate o aluno descobrir o menu ──────
+// Pedido do Luis: "que fique pulsando as vezes, para a pessoa saber que da pra
+// apertar". Pulsa ate a 1a vez que o menu abre, e volta se entrar capivara nova.
+const CHAVE_VISTAS = 'capyCapivarasVistas';
+function capivarasVistas() {
+  try { const v = JSON.parse(localStorage.getItem(CHAVE_VISTAS) || 'null'); return v && Array.isArray(v.ids) ? v.ids : null; }
+  catch (_) { return null; }
+}
+function marcarVistas() {
+  try { localStorage.setItem(CHAVE_VISTAS, JSON.stringify({ ids: PERSONAS.map(p => p.id), em: Date.now() })); } catch (_) {}
+}
+function pintarChamariz() {
+  const vistas = capivarasVistas();
+  const novidade = PERSONAS.length > 1 && (!vistas || PERSONAS.some(p => !vistas.includes(p.id)));
+  const ocupado = chamada.ligado() || chamada.pendente() || gravando() || gravacao.transcrevendo;
+  $('btn-capivara').classList.toggle('chamar', novidade && !ocupado && $('menu-persona').hidden);
+}
+
 function abrirMenu() {
   if (!PERSONAS.length) return;
+  fecharMenus(false);
   montarMenu();
+  marcarVistas();
   $('menu-persona').hidden = false;
   $('veu').hidden = false;
   requestAnimationFrame(() => $('veu').classList.add('aberto'));
-  $('btn-persona').setAttribute('aria-expanded', 'true');
-  const sel = $('menu-persona').querySelector('[aria-selected="true"]') || $('menu-persona').firstElementChild;
+  $('btn-capivara').setAttribute('aria-expanded', 'true');
+  pintarChamariz();
+  const sel = $('menu-persona').querySelector('[aria-selected="true"]') || $('menu-persona').querySelector('.opcao');
   if (sel) sel.focus();
 }
-function fecharMenu() {
+
+// ── Dificuldade e estilo (28/set) ───────────────────────────────────────────
+// A pilula do compositor mostra o que vale agora ("🌿 🧭 Iniciante · Guiada").
+function pintarModo() {
+  const b = $('btn-modo');
+  const temCatalogo = NIVEIS.length > 0 && ESTILOS.length > 0;
+  b.hidden = !temCatalogo;
+  if (!temCatalogo) return;
+  const aceitaN = personaAceita('niveis'), aceitaE = personaAceita('estilos');
+  const n = dadosNivel(nivelEfetivo()), e = dadosEstilo(estiloEfetivo());
+  let emojis = '🐾', texto = 'Do jeito dela';
+  if (aceitaN || aceitaE) {
+    const em = [], tx = [];
+    if (aceitaN && n) { em.push(n.emoji); tx.push(n.curto); }
+    // Na pilula so a bandeira do idioma-alvo: "🇧🇷→🇺🇸" nao cabe (e no Windows vira letras).
+    if (aceitaE && e) { em.push(e.id === 'comosediz' ? emojiDoEstilo(e).split('→').pop() : emojiDoEstilo(e)); tx.push(e.curto); }
+    emojis = em.join(' '); texto = tx.join(' · ');
+  }
+  b.querySelector('.modo-emoji').textContent = emojis;
+  b.querySelector('.modo-txt').textContent = texto;
+  b.setAttribute('aria-label', aceitaN || aceitaE
+    ? 'Dificuldade: ' + (aceitaN && n ? n.rotulo : 'do jeito dela') + '. Estilo: ' + (aceitaE && e ? e.rotulo : 'do jeito dela') + '. Toque para mudar.'
+    : 'Esta capivara tem o jeito dela. Toque para ver.');
+}
+
+function opcaoDeModo(tipo, item, marcado, aceita) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'opcao';
+  b.setAttribute('role', 'radio');
+  b.setAttribute('aria-checked', String(marcado));
+  b.tabIndex = marcado ? 0 : -1;
+  b.disabled = !aceita;
+  b.dataset.tipo = tipo;
+  b.dataset.id = item.id;
+  const ic = document.createElement('span');
+  ic.className = 'ic'; ic.setAttribute('aria-hidden', 'true');
+  ic.textContent = tipo === 'estilo' ? emojiDoEstilo(item) : item.emoji;
+  if (tipo === 'estilo' && item.id === 'comosediz') ic.classList.add('bandeiras');
+  const txt = document.createElement('div');
+  txt.className = 'txt';
+  const nome = document.createElement('b');
+  nome.textContent = item.rotulo;
+  const leg = document.createElement('small');
+  leg.textContent = item.legenda || '';
+  txt.appendChild(nome); txt.appendChild(leg);
+  const ok = document.createElement('span');
+  ok.className = 'ok'; ok.setAttribute('aria-hidden', 'true'); ok.textContent = '✓';
+  b.appendChild(ic); b.appendChild(txt); b.appendChild(ok);
+  b.addEventListener('click', () => escolherModo(tipo, item.id));
+  return b;
+}
+
+function grupoDeModo(titulo, tipo, lista, atual, aceita) {
+  const sec = document.createElement('section');
+  sec.className = 'grupo';
+  const h = document.createElement('h3');
+  h.id = 'grupo-' + tipo; h.textContent = titulo;
+  sec.appendChild(h);
+  const motivo = document.createElement('p');
+  motivo.className = 'grupo-motivo';
+  const p = dadosDaPersona(personaAtual);
+  motivo.textContent = (p && p.motivo) || 'Esta capivara tem o jeito dela.';
+  motivo.hidden = aceita;
+  sec.appendChild(motivo);
+  const rg = document.createElement('div');
+  rg.setAttribute('role', 'radiogroup');
+  rg.setAttribute('aria-labelledby', h.id);
+  for (const item of lista) rg.appendChild(opcaoDeModo(tipo, item, item.id === atual, aceita));
+  // Setas andam entre as opcoes do grupo e ja escolhem (padrao de radio).
+  rg.addEventListener('keydown', ev => {
+    const passo = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[ev.key];
+    if (!passo) return;
+    const botoes = Array.from(rg.querySelectorAll('[role="radio"]:not(:disabled)'));
+    const i = botoes.indexOf(document.activeElement);
+    if (i < 0) return;
+    ev.preventDefault();
+    const alvo = botoes[(i + passo + botoes.length) % botoes.length];
+    alvo.focus();
+    escolherModo(tipo, alvo.dataset.id);
+  });
+  sec.appendChild(rg);
+  return sec;
+}
+
+function montarMenuModo() {
+  const m = $('menu-modo');
+  m.textContent = '';
+  const t = document.createElement('div');
+  t.className = 'painel-titulo'; t.id = 'modo-titulo';
+  t.textContent = 'Como vai ser a conversa?';
+  m.appendChild(t);
+  const grupos = document.createElement('div');
+  grupos.className = 'grupos';
+  grupos.appendChild(grupoDeModo('Dificuldade', 'nivel', NIVEIS, nivelEscolhido, personaAceita('niveis')));
+  grupos.appendChild(grupoDeModo('Estilo', 'estilo', ESTILOS, estiloEscolhido, personaAceita('estilos')));
+  m.appendChild(grupos);
+  const rod = document.createElement('div');
+  rod.className = 'rodape';
+  const pronto = document.createElement('button');
+  pronto.type = 'button'; pronto.id = 'modo-pronto'; pronto.textContent = 'Pronto';
+  pronto.addEventListener('click', () => fecharMenus(true));
+  rod.appendChild(pronto);
+  m.appendChild(rod);
+}
+
+// Escolher NAO fecha: o aluno escolhe dificuldade E estilo e toca em Pronto.
+function escolherModo(tipo, id) {
+  if (tipo === 'estilo' && id !== estiloEscolhido) {
+    // O que foi conversado ate aqui era no estilo ANTERIOR: anota antes.
+    try { anotarMemoria('texto'); } catch (_) {}
+  }
+  if (tipo === 'nivel') nivelEscolhido = id; else estiloEscolhido = id;
+  $('menu-modo').querySelectorAll('[data-tipo="' + tipo + '"]').forEach(b => {
+    const on = b.dataset.id === id;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+  });
+  pintarModo();
+  gravarUrl();
+  salvarPreferencias();
+}
+
+let modoAoAbrir = null;
+function abrirMenuModo() {
+  if (!NIVEIS.length || !ESTILOS.length) return;
+  fecharMenus(false);
+  modoAoAbrir = nivelEfetivo() + '|' + estiloEfetivo();
+  montarMenuModo();
+  $('menu-modo').hidden = false;
+  $('veu').hidden = false;
+  requestAnimationFrame(() => $('veu').classList.add('aberto'));
+  $('btn-modo').setAttribute('aria-expanded', 'true');
+  const sel = $('menu-modo').querySelector('[aria-checked="true"]:not(:disabled)') || $('modo-pronto');
+  if (sel) sel.focus();
+}
+
+// "Agora: 🔥 Intensivo · 🎭 Encenação" no fio. Aviso da PAGINA: nao entra no
+// historico que vai para a IA.
+function linhaDeSistema() {
+  const partes = [];
+  const n = dadosNivel(nivelEfetivo()), e = dadosEstilo(estiloEfetivo());
+  if (personaAceita('niveis') && n) partes.push(n.emoji + ' ' + n.rotulo);
+  if (personaAceita('estilos') && e) partes.push(emojiDoEstilo(e) + ' ' + e.rotulo);
+  if (!partes.length) return;
+  const p = document.createElement('p');
+  p.dataset.quem = 'sistema';
+  p.appendChild(document.createTextNode('Agora: ' + partes.join(' · ')));
+  if (estiloEfetivo() !== 'livre' && !chamada.ligado() && !chamada.pendente()) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = '▶ Começar';
+    b.addEventListener('click', () => {
+      b.remove();
+      if (chamada.ligado() || chamada.pendente() || gravando()) return;
+      entrada.value = 'Vamos começar!';
+      ajustarAltura();
+      enviar();
+    });
+    p.appendChild(b);
+  }
+  $('fio-coluna').appendChild(p);
+  rolar();
+}
+
+// Fecha os dois menus. `devolverFoco`: volta o foco para o botao que abriu.
+function fecharMenus(devolverFoco) {
+  const eraCapivara = !$('menu-persona').hidden, eraModo = !$('menu-modo').hidden;
   $('menu-persona').hidden = true;
+  $('menu-modo').hidden = true;
   $('veu').hidden = true;
   $('veu').classList.remove('aberto');
-  $('btn-persona').setAttribute('aria-expanded', 'false');
+  $('btn-capivara').setAttribute('aria-expanded', 'false');
+  $('btn-modo').setAttribute('aria-expanded', 'false');
+  if (eraModo && modoAoAbrir !== null && modoAoAbrir !== nivelEfetivo() + '|' + estiloEfetivo()) linhaDeSistema();
+  if (eraModo) modoAoAbrir = null;
+  if (devolverFoco) (eraModo ? $('btn-modo') : eraCapivara ? $('btn-capivara') : null)?.focus();
+  pintarChamariz();
 }
-$('btn-persona').addEventListener('click', () => {
-  $('btn-persona').getAttribute('aria-expanded') === 'true' ? fecharMenu() : abrirMenu();
+
+$('btn-capivara').addEventListener('click', () => {
+  if ($('btn-capivara').getAttribute('aria-disabled') === 'true') {
+    toast(gravando() || gravacao.transcrevendo ? 'Termine o áudio primeiro.' : 'Desligue a ligação para trocar de capivara.');
+    return;
+  }
+  $('btn-capivara').getAttribute('aria-expanded') === 'true' ? fecharMenus(true) : abrirMenu();
 });
-$('veu').addEventListener('click', fecharMenu);
+$('btn-modo').addEventListener('click', () => {
+  $('btn-modo').getAttribute('aria-expanded') === 'true' ? fecharMenus(true) : abrirMenuModo();
+});
+$('veu').addEventListener('click', () => fecharMenus(false));
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !$('menu-persona').hidden) { fecharMenu(); $('btn-persona').focus(); }
+  if (e.key === 'Escape' && (!$('menu-persona').hidden || !$('menu-modo').hidden)) fecharMenus(true);
 });
 
 // ── O vídeo ──────────────────────────────────────────────────────────────────
@@ -678,11 +1023,15 @@ const historia = [];
 // decide o que vale (persona, visitante, tamanho); a lista aqui só evita mandar
 // cena e entrevista à toa. Cada fala vai cortada em 400 caracteres porque o
 // sendBeacon não aceita mais que 64 KB.
-const PERSONAS_COM_MEMORIA = ['conversa', 'maia', 'iniciante'];
+const PERSONAS_COM_MEMORIA = ['conversa', 'maia'];
 let memoriaEnviadaAte = 0;
 function anotarMemoria(canal) {
   const novo = historia.slice(memoriaEnviadaAte);
-  if (!PERSONAS_COM_MEMORIA.includes(personaAtual) || !sessao.id || sessao.id === 'guest' || sessao.role === 'guest') {
+  // Encenacao e exercicio (28/set) nao sao a vida do aluno: nao viram lembranca.
+  // O servidor confere de novo; aqui so evita mandar a toa.
+  const estilo = estiloEfetivo();
+  const estiloGuarda = !ESTILOS.length || (dadosEstilo(estilo) || {}).memoria !== false;
+  if (!estiloGuarda || !PERSONAS_COM_MEMORIA.includes(personaAtual) || !sessao.id || sessao.id === 'guest' || sessao.role === 'guest') {
     memoriaEnviadaAte = historia.length;
     return;
   }
@@ -690,7 +1039,7 @@ function anotarMemoria(canal) {
   memoriaEnviadaAte = historia.length;
   try {
     const transcricao = novo.slice(-80).map(m => ({ role: m.role, content: String(m.content || '').slice(0, 400) }));
-    const corpo = JSON.stringify({ canal, persona: personaAtual, transcricao });
+    const corpo = JSON.stringify({ canal, persona: personaAtual, estilo, transcricao });
     const blob = new Blob([corpo], { type: 'application/json' });
     if (!(navigator.sendBeacon && navigator.sendBeacon('/api/lembrancas', blob))) {
       fetch('/api/lembrancas', {
@@ -753,7 +1102,11 @@ const chamada = CapyChamada({
 // metade do gasto real.
 function registrarUso(uso, duracaoMs) {
   try {
-    const corpo = JSON.stringify({ cenario: personaAtual, uso, duracaoMs });
+    // No admin o uso aparece como "travel:encenacao:intensivo" quando o aluno
+    // escolheu nivel ou estilo. Sem escolha, so a persona, como sempre foi.
+    const n = nivelEfetivo(), e = estiloEfetivo();
+    const cenario = n === 'auto' && e === 'livre' ? personaAtual : [personaAtual, e, n].join(':');
+    const corpo = JSON.stringify({ cenario, uso, duracaoMs });
     const blob = new Blob([corpo], { type: 'application/json' });
     if (!(navigator.sendBeacon && navigator.sendBeacon('/api/conversa-uso', blob))) {
       fetch('/api/conversa-uso', {
@@ -794,7 +1147,15 @@ function controles() {
   // Digitar no meio de uma ligacao de voz nao tem semantica: a sessao Realtime
   // nao recebe o texto. Desabilitar e mais honesto que aceitar e engolir.
   $('entrada').disabled = emChamada || rec || transc;
-  $('btn-persona').disabled = emChamada || rec || transc;
+  // Durante ligacao ou audio nao se troca capivara nem modo. O botao do topo
+  // NAO fica `disabled`: a regra global apagaria o estado e o cronometro da
+  // ligacao, que moram nele. Fica "travado" (aria-disabled) e explica no toque.
+  const ocupado = emChamada || rec || transc;
+  $('btn-modo').disabled = ocupado || !NIVEIS.length;
+  const capi = $('btn-capivara');
+  capi.classList.toggle('travado', ocupado || PERSONAS.length < 2);
+  if (ocupado) capi.setAttribute('aria-disabled', 'true'); else capi.removeAttribute('aria-disabled');
+  if (ocupado) fecharMenus(false);
   document.querySelector('.caixa').classList.toggle('gravando', rec);
   document.querySelector('.caixa').classList.toggle('transcrevendo', !!transc);
 
@@ -803,6 +1164,7 @@ function controles() {
   mudo.setAttribute('aria-pressed', String(chamada.mudo()));
   mudo.className = 'acao' + (chamada.mudo() ? ' desligar' : '');
   mudo.title = chamada.mudo() ? 'Ativar o microfone' : 'Silenciar';
+  pintarChamariz();
 }
 
 $('silenciar').addEventListener('click', () => { chamada.silenciar(!chamada.mudo()); controles(); });
@@ -811,9 +1173,10 @@ $('ligar').addEventListener('click', async () => {
   if (chamada.ligado() || chamada.pendente()) { chamada.desligar(); return; }
   if (gravando() || gravacao.transcrevendo) return;
   avisar('');
-  fecharMenu();
+  fecharMenus(false);
   controles();
-  const ok = await chamada.ligar({ cenario: personaAtual, lang: 'en' });
+  // Nivel e estilo sao ids de lista fechada: o servidor valida e monta o prompt.
+  const ok = await chamada.ligar({ cenario: personaAtual, lang: 'en', nivel: nivelEfetivo(), estilo: estiloEfetivo() });
   controles();
   if (ok) avisar('Você está falando com uma IA. Fale no seu ritmo — toque no telefone vermelho para encerrar.');
 });
@@ -894,8 +1257,12 @@ async function transcrever(blob, tipo) {
   // A lingua em que o ALUNO fala com esta capivara: a francesa transcreve
   // frances; a Maia e a de iniciantes, que recebem portugues, detectam sozinhas
   // (escuta null) — forcar ingles embaralhava o portugues do aluno.
+  // Total iniciante / iniciante (28/set): o aluno fala portugues, entao tambem
+  // detecta sozinho, com qualquer capivara.
   const p = dadosDaPersona(personaAtual);
-  const escuta = p && Object.prototype.hasOwnProperty.call(p, 'escuta') ? p.escuta : ((p && p.lang) || 'en');
+  const nivelPt = (dadosNivel(nivelEfetivo()) || {}).portugues === true;
+  const escuta = nivelPt ? null
+    : p && Object.prototype.hasOwnProperty.call(p, 'escuta') ? p.escuta : ((p && p.lang) || 'en');
   const r = await fetch('/api/transcribe', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
     body: JSON.stringify(escuta ? { audioBase64: base64, mimeType: tipo, lang: escuta } : { audioBase64: base64, mimeType: tipo }),
@@ -908,7 +1275,7 @@ async function transcrever(blob, tipo) {
 
 $('gravar').addEventListener('click', () => {
   if (gravacao.transcrevendo) return;
-  if (gravando()) pararGravacao(false); else { fecharMenu(); comecarGravacao(); }
+  if (gravando()) pararGravacao(false); else { fecharMenus(false); comecarGravacao(); }
 });
 $('cancelar-gravacao').addEventListener('click', () => pararGravacao(true));
 // Sair da pagina gravando: solta o microfone (a luz vermelha do navegador apaga).
@@ -940,7 +1307,7 @@ async function enviar(canal) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
-      body: JSON.stringify({ message: texto, userId, persona: personaAtual, history: historia.slice(-10) }),
+      body: JSON.stringify({ message: texto, userId, persona: personaAtual, nivel: nivelEfetivo(), estilo: estiloEfetivo(), history: historia.slice(-10) }),
     });
     const d = await r.json();
     const resposta = d.reply || d.message
@@ -968,10 +1335,20 @@ async function enviar(canal) {
       const d = await r.json();
       if (Array.isArray(d.personas) && d.personas.length) {
         PERSONAS = d.personas;
+        NIVEIS = Array.isArray(d.niveis) ? d.niveis : [];
+        ESTILOS = Array.isArray(d.estilos) ? d.estilos : [];
+        APELIDOS = Array.isArray(d.apelidos) ? d.apelidos : [];
+        if (NIVEIS.length && ESTILOS.length) carregarModo();
+        const pedida = (() => { try { return new URLSearchParams(location.search).get('persona') || (window.Store && Store.state && Store.state.aiPersona) || ''; } catch (_) { return ''; } })();
         aplicarPersona(personaInicial(), false);
+        // Link antigo (?persona=iniciante) ou preferencia antiga: a URL e o Store
+        // passam a mostrar o que vale agora (Yara + Total iniciante).
+        if (APELIDOS.some(a => a.id === pedida)) { gravarUrl(); salvarPreferencias(); }
+        else if (modoCarregado) gravarUrl();
       }
     }
   } catch (_) { /* sem menu, mas a página funciona */ }
+  controles();
 
   // Mensagem escrita na home, entregue por sessionStorage. Consumida na leitura
   // (removeItem antes de usar): recarregar não reenvia a mesma frase.
@@ -981,7 +1358,10 @@ async function enviar(canal) {
     sessionStorage.removeItem('capyPrimeiraMensagem');
   } catch (_) { primeira = ''; }
 
-  dizer('ia', 'texto', 'Olá, ' + userName + '! 🐾 Escreva pra mim, grave um áudio no 🎤 ou me ligue no 📞.');
+  // Quem ainda nao descobriu o menu (o botao do topo esta pulsando) ganha a dica.
+  const dicaCapivara = $('btn-capivara').classList.contains('chamar')
+    ? ' Toque no meu nome lá em cima para trocar de capivara.' : '';
+  dizer('ia', 'texto', 'Olá, ' + userName + '! 🐾 Escreva pra mim, grave um áudio no 🎤 ou me ligue no 📞.' + dicaCapivara);
 
   if (primeira) {
     entrada.value = primeira.slice(0, 300);
