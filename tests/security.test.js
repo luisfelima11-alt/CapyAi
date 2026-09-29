@@ -453,7 +453,7 @@ test('a Vercel Preview accepts sign-in from its own URLs; production still accep
   // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
   // could be tested signed in before going live (28/set).
   const env = {
-    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'segredo-de-teste-com-mais-de-32-caracteres',
+    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'x'.repeat(40),
     VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
   };
   delete env.APP_ORIGIN;
