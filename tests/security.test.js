@@ -335,8 +335,21 @@ test('lesson chat is built from the Yara persona catalogue', () => {
   const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
   const rota = api.slice(api.indexOf("url === '/api/lesson-chat'"), api.indexOf('// ── DB endpoints'));
   assert.match(rota, /personaDe\('conversa'\)/);
-  assert.match(rota, /nivelDoAluno\(/);
+  assert.match(rota, /perfilDoAluno\(/);   // the same student profile /api/chat reads
   assert.doesNotMatch(rota, /use beginner/);
+});
+
+test('lesson chat runs end to end: it reaches the AI call instead of a 500', () => {
+  // The merge with production renamed the level helper, and lesson-chat kept
+  // calling nivelDoAluno(), which no longer existed: every lesson chat answered
+  // 500 (found 30/set, before it shipped). The test above only read the source.
+  const saida = rodarApiEm({ ...process.env, ...SEM_CHAVES }, `
+    (async () => {
+      console.log(JSON.stringify(await chamar('POST', '/api/lesson-chat', { 'content-type': 'application/json' },
+        JSON.stringify({ message: 'Hello!', lessonTopic: 'Greetings', vocab: ['hello'] }))));
+    })();
+  `);
+  assert.equal(saida.status, 503, JSON.stringify(saida));   // no AI key here: only that stops it
 });
 
 test('a visitor at the daily AI cap is invited to a free account; bursts say wait a minute', () => {
@@ -413,11 +426,14 @@ function rodarApiEm(env, corpo) {
       return r;
     }
     async function chamar(method, url, headers, body) {
-      const req = new EventEmitter(); req.method = method; req.url = url; req.headers = headers;
-      req.socket = { remoteAddress: '127.0.0.1' }; req.destroy = () => {};
-      const r = res(); const p = api(req, r);
-      process.nextTick(() => { if (body) req.emit('data', Buffer.from(body)); req.emit('end'); });
-      await p; let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
+      // A real stream keeps the body until the API reads it: routes that pass
+      // the rate limit first would miss an event emitted earlier.
+      const req = require('stream').Readable.from(body ? [Buffer.from(body)] : []);
+      req.method = method; req.url = url; req.headers = headers;
+      req.socket = { remoteAddress: '127.0.0.1' };
+      const r = res(); const fim = new Promise(ok => r.once('finish', ok));
+      await api(req, r); await fim;
+      let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
       return { status: r.statusCode, erro };
     }
     ${corpo}
