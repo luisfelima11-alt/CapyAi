@@ -1,5 +1,34 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
+
+**Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
+ouvir — CSRF validation failed." Com a página aberta tempo suficiente, **todo POST** falhava: o
+microfone, as rotas de IA e, em silêncio, o `POST /api/db` (XP e progresso, porque o `store.js`
+engole o erro). Recarregar a página resolvia até a próxima hora.
+
+**Causa raiz:** o access token dura cerca de 1 h. A primeira requisição depois disso (por exemplo,
+"Ouvir exemplo", `GET /api/tts`) renova a sessão em `getAuthenticatedSession`, e o
+`setSessionCookies` gerava ali um cookie `__Host-capy-csrf` **novo**. A aba tinha lido o token uma
+vez só, ao abrir (`Auth.ready()` → `/api/auth/session` → `sessionStorage.capyCsrf`), e o
+`auth-secure.js` continuou mandando o antigo. Cookie novo e cabeçalho velho: `assertCsrf` → 403.
+
+**Correção:** na renovação silenciosa, `setSessionCookies(res, sessao, { keepCsrf })` regrava o
+**mesmo** token que o navegador já tem. Login, cadastro, MFA e link de e-mail continuam gerando um
+token novo: eles devolvem o token à página ou recarregam a página.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="silent session refresh" tests/security.test.js
+```
+
+**Por que aconteceu:** a correção antiga "CSRF renovado acompanha os novos cookies" (entrada de
+setembro sobre a tela de entrada) só entregava o token novo ao `/api/auth/session`, que a página
+chama uma vez. Qualquer outra rota renovava a sessão e trocava o cookie sem a página saber. Quem
+mexer na renovação de sessão tem que testar uma página que **continua aberta** depois dela.
+
+---
+
 ## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
 
 **Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante
