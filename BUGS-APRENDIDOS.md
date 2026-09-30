@@ -1,5 +1,37 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-30 — O Desafio Diário dava 2 estrelas para toda resposta
+
+**Sintoma:** qualquer resposta no `daily_challenge.html` (certa, errada ou fora do tema) ganhava 2
+estrelas. O "feedback" era uma resposta de conversa da Yara, não uma avaliação.
+
+**Causa raiz:** a página mandava a avaliação para `/api/chat` num campo `systemOverride` (o prompt
+pedia "STARS:X"). Desde a blindagem, o `/api/chat` ignora esse campo, e com razão: é um prompt vindo do
+navegador. Sem "STARS:", a página caía no padrão de 2 estrelas. E o prompt ainda falava com "crianças
+de 5 a 8 anos".
+
+**Correção:** rota `POST /api/daily-challenge/avaliar` (no `AI_ROUTE_KEYS`), com o prompt no
+servidor, para 16+, em modo JSON: `{ stars, feedback }`. A página chama essa rota. Ao lado, o Jev dá
+a nota dele, que só fica registrada em `jev_decisions`.
+
+**Como pegar isso de novo:**
+```bash
+grep -rn "systemOverride" --include=*.html --include=*.js . | grep -v "node_modules\|^./api/\|^./scripts/\|^./tests/"
+```
+Toda linha na saída é uma página que depende de um prompt que o servidor joga fora.
+
+**Achado vizinho, NÃO corrigido (30/set):** a mesma saída ainda lista três páginas.
+- `lessons.html`: o chat do "boss" no fim da lição.
+- `youtube_lab.html`: o chat sobre o vídeo; a Yara responde sem saber o vídeo.
+- `reading_room.html`: espera uma história em JSON do `/api/chat` e cai no `catch`.
+
+Cada uma precisa de uma rota própria no servidor, como o desafio ganhou.
+
+**Por que aconteceu:** a blindagem fechou o `systemOverride` no servidor sem varrer quem o mandava.
+Mesma lição do CSRF: guarda novo no servidor exige procurar os chamadores.
+
+---
+
 ## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
 
 **Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
