@@ -1,5 +1,31 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-30 — O chat da lição (`/api/lesson-chat`) respondia 500 no PR #1 (não chegou à produção)
+
+**Sintoma:** qualquer mensagem no chat de uma lição dava 500. Apareceu ao escrever o primeiro teste
+que chama a rota de verdade, antes de a branch ser publicada.
+
+**Causa raiz:** a rota montava o aluno com `nivelDoAluno()`. No merge com a produção (27/set), essa
+função saiu, porque a produção já lia o aluno com `perfilDoAluno()`. Só que a chamada ficou.
+`ReferenceError` dentro do handler, e daí o 500. O teste que existia só procurava o nome
+`nivelDoAluno(` no código-fonte, então passava.
+
+**Correção:** a rota usa `perfilDoAluno(appUserId, conta)`, igual ao `/api/chat`. Um teste chama a
+rota inteira num processo separado e espera o 503 de "sem chave de IA", não o 500.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="lesson chat runs end to end" tests/security.test.js
+# e, para qualquer nome que um merge deixou sem definição:
+npx eslint --no-config-lookup --rule '{"no-undef":"error"}' --global require,module,process,Buffer,__dirname,console,setTimeout,clearTimeout,setImmediate,URL,fetch,AbortController api/index.js api/security.js
+```
+
+**Por que aconteceu:** um teste que lê o código-fonte confere que o texto existe, não que ele roda.
+Rota nova ou refeita ganha pelo menos um teste que a executa. Depois de um merge grande, rode o
+`no-undef`.
+
+---
+
 ## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
 
 **Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para

@@ -3550,10 +3550,14 @@ Respond ONLY with valid JSON, no markdown:
         // Same Yara as /api/chat: the persona catalogue sets tone, level and the
         // Portuguese-help rule; this route only adds the lesson. Its own copy
         // had drifted and pinned every student at "beginner".
+        // The student comes from perfilDoAluno, as in /api/chat. A lost helper
+        // (nivelDoAluno) made this route answer 500 after the merge (30/set).
         const persona = personaDe('conversa');
+        const perfil = await perfilDoAluno(req._securityIdentity?.appUserId || null,
+            req._securityIdentity && req._securityIdentity.appAccount);
         const ctx = {
             idioma: idiomaDe(lang),
-            faixa: await nivelDoAluno(req._securityIdentity?.appUserId || null),
+            faixa: perfil.faixa, perfil,
             fracas: [], tema: temaLimpo, vocab, cargo: '', abertura: [],
         };
         const system = [
