@@ -55,6 +55,28 @@ mexer na renovação de sessão tem que testar uma página que **continua aberta
 
 ---
 
+## 2026-09-29 — A "palavra do dia" era diferente para cada aluno, e cada visita pagava a IA
+
+**Sintoma:** dois alunos no mesmo dia viam palavras do dia diferentes. O mesmo valia para o desafio
+do dia, e o quiz de IA de uma lição era gerado de novo para cada aluno.
+
+**Causa raiz:** `/api/word-of-day` e `/api/daily-challenge` chamavam a IA a cada pedido, com
+temperatura alta (0,9 e 1,0), sem guardar nada. O quiz da lição e a tradução também. Nenhuma dessas
+respostas depende do aluno, então era custo repetido e, no caso do "do dia", produto errado. E ninguém
+via isso, porque o admin não mostrava custo por rota.
+
+**Correção:** `callOpenAI(..., { cache: CACHE_* })` gera uma vez e guarda na tabela `ai_cache`,
+com a validade da rota: 36 h, 24 h ou 30 dias. Só entra resposta que passa no validador. Cada
+chamada grava o custo em `api_metrics_daily.cost_usd`, e cada acerto do cache em `cache_hits` da
+mesma linha. O admin mostra "IA neste mês", com o que o cache evitou.
+
+**Como pegar isso de novo:**
+```bash
+node --test tests/custo-ia.test.js   # "word of the day: generated once, then the same word for everyone…"
+```
+
+---
+
 ## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
 
 **Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante

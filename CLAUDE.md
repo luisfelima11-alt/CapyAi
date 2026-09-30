@@ -127,7 +127,7 @@ The API calls Supabase REST with the service key (`sb()`, `SUPABASE_SECRET_KEY`)
 RLS is on for every table, and column grants keep plan/role out of the browser's reach. Main tables:
 `accounts` (`auth_user_id` → Supabase Auth), `user_state` (jsonb per user, plus server rows such as
 `__voz_*`), `user_profiles` (level, goals, plan), `webhook_events`, `rate_limit_*`,
-`api_metrics_daily` (requests and tokens per endpoint/day), `security_audit_log`,
+`api_metrics_daily` (requests, tokens, US$ and cache hits per endpoint/day), `ai_cache`, `security_audit_log`,
 `homework_submissions`, `push_subscriptions`.
 
 ### Security rules (keep them when adding features)
@@ -464,6 +464,23 @@ um objeto usa o modo JSON da API (`callOpenAI(..., { json: true })`); rota que r
   (`liquidarReservaVoz`). Sem relato, a reserva inteira fica cobrada.
 - Preço por token na tabela `PRECO_VOZ` do servidor; o `/api/conversa-feedback` (entrevista) calcula com
   a mesma função (`calcularCustoVoz`).
+
+## Custo da IA de texto e cache compartilhado (29/set/2026)
+
+- Toda chamada de IA grava o custo em `api_metrics_daily.cost_usd`. Chat: `bumpTokens(rota, usage, modelo)`
+  com o preço de `PRECOS_IA`. Voz Nova e transcrição: `bumpCustoIa`, por caractere e por minuto.
+  **Modelo novo no `OPENAI_MODEL`/`OPENROUTER_MODEL` entra em `PRECOS_IA`**; sem isso ele custa zero no
+  admin, e o log avisa uma vez. O admin mostra o total em "IA neste mês" (`custoIaDoMes`).
+- Resposta que não depende do aluno é gerada uma vez e guardada: `callOpenAI(..., { cache: CACHE_* })`
+  (palavra do dia, desafio do dia, quiz da lição, tradução). Fica na tabela `ai_cache`, só do servidor,
+  e não em `user_state`: as varreduras de aluno leem `user_state` sem paginar, e o Supabase corta cada
+  leitura em 1000 linhas. A chave é o hash de rota + modelo + prompt + parâmetros, e só entra resposta
+  que passa no validador da rota. **Nunca ponha no cache uma rota cujo prompt leve dado do aluno.**
+- O acerto do cache conta na linha da própria rota (`cache_hits`), nunca numa linha nova: a página de
+  métricas soma todas as linhas do dia. Colunas e tabela vêm de `202609290001_custo_ia.sql`, que roda
+  antes do deploy.
+- A voz Nova vai para a CDN da Vercel (`Vercel-CDN-Cache-Control`) só quando a resposta não tem
+  `Set-Cookie`.
 
 ## Design System
 
