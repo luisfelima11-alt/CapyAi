@@ -86,3 +86,84 @@ History rewriting and force-pushing are repository-owner operations. After the
 encrypted evidence copy is verified, use a reviewed history-rewrite procedure,
 coordinate with every collaborator, invalidate existing clones, and run secret
 scanning against the rewritten full history before reopening pushes.
+
+## Release 5 — 2026-09-24 audit (branch `claude/security-hardening`)
+
+Deploy order:
+
+1. Run `supabase/migrations/202609240001_release1_hardening.sql` in the Supabase
+   SQL editor **before** deploying: markup check on `accounts.name/avatar`,
+   `revoke execute on current_account_id() from anon`, and the
+   `tokens_in/tokens_out` columns the metrics code now writes.
+2. Then run `supabase/migrations/202609260001_permissoes_por_coluna.sql` (column
+   grants on accounts, user_profiles and user_state; written on production on
+   26/set and still unapplied). The two files are independent, in filename order.
+3. Deploy to Preview and sign in there with a password (magic links go to
+   `APP_ORIGIN`); check the Music Lab search and lyrics while signed in.
+   Then production: `npx vercel --prod --force`, then
+   `npx vercel promote <deployment-url>` (without it the domains and the two crons
+   stay on the previous deployment) and `npx vercel crons ls`. `ADMIN_KEY` is no
+   longer read (delete it); `CRON_SECRET` only opens the two cron routes now.
+   Optional knobs: `VOZ_SESSAO_MAX_MIN` (default 30) and `VOZ_USD_POR_MIN_PISO`
+   (default 0.02).
+4. Open `/admin.html` (or `/admin-antigo.html`; both have it), use the "Ativar agora" banner to enrol an authenticator
+   and keep its secret in a password manager. Then set `ADMIN_REQUIRE_MFA=true`
+   and redeploy: admin routes require `aal2` from then on. Lost phone: delete
+   the factor in Supabase (Authentication → Users) and enrol again.
+
+Checks after deploy:
+
+- `curl -sI https://www.capyenglish.com.br/admin.html | grep -i content-security`
+  shows `script-src 'self';` (the compatibility CSP no longer matches the six
+  hardened pages).
+- A Kiwify test webhook lands in `webhook_events` (signature is read from
+  `?signature=` or the header).
+- `/.well-known/security.txt` is served; `voice-test.html` and
+  `pixel_preview.html` are not.
+
+Owner actions outside the code: make the GitHub repository private (the old
+history still holds student e-mails), MFA on every platform account, SPF/DKIM
+(Resend) and DMARC `p=none` on the domain plus MX forwarding for
+`contato@`/`privacidade@` (published on the site, currently undeliverable),
+"Confirm email" on in Supabase Auth, and a monthly spending limit at OpenAI.
+
+## Release 5b — prompts for 16+ and the visitor invitation (2026-09-25, same branch)
+
+No migration. It ships together with Release 5.
+
+Checks after deploy (the AI text itself can only be judged with the real key):
+
+- Open `ai_quiz.html`, `story_time.html`, `daily_challenge.html`,
+  `3_Dialogue_Expedition_Yara_Turn.html` and the flashcards page (AI deck +
+  translate). Content is written for adults and no page falls back to its
+  error state.
+- The word of the day and the daily challenge vary from day to day; the old
+  single examples ("Butterfly", "Use a Brave Word!") are gone from the prompts.
+- In a private window, continue as a visitor and use AI 3 times, with more
+  than a minute before the 3rd (visitors get 2 per minute). The 4th use shows
+  the "Criar conta grátis" invitation, and its button opens the signup tab.
+
+Env note: the API reads `SUPABASE_SECRET_KEY` and falls back to `SUPABASE_KEY`
+(`api/index.js`, `api/security.js`). Delete `SUPABASE_KEY` on Vercel only after
+confirming that `SUPABASE_SECRET_KEY` is set for Production and Preview:
+otherwise every database call fails.
+
+## Release 5c — merged with production of 24–27/set (2026-09-28, same branch)
+
+No new migration beyond the two above.
+
+- The parents page (`parent_dashboard.html`, footer link "Pais") and
+  `/api/parent-report` are gone: `/parent_dashboard.html` answers 404.
+- Both admins ask for the authenticator code (the mobile `admin.html` and
+  `admin-antigo.html`); `ADMIN_REQUIRE_MFA=true` no longer locks the owner out
+  of the new one.
+- Voice: the reservation made when a call starts is now settled on the student's
+  account when it ends (before, it stayed open and counted as 30 minutes).
+
+Checks after deploy:
+
+- The footer has no "Pais" link, and `curl -sI https://www.capyenglish.com.br/parent_dashboard.html` gives 404.
+- On the phone, `/admin.html` asks for the 6-digit code after login once an
+  authenticator is enrolled.
+- After a short Super voice call, the student's card in the admin shows the
+  real minutes, not 30.

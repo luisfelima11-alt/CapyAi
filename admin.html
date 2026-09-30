@@ -11,7 +11,7 @@
      passam para cá. CSP estrita: nada de script inline nem onclick — tudo em
      assets/js/pages/admin-v2.js; estilo em assets/css/admin-v2.css. -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="assets/css/admin-v2.css?v=adm2-1"/>
+<link rel="stylesheet" href="assets/css/admin-v2.css?v=adm2-mfa"/>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
@@ -28,6 +28,31 @@
     <button id="gate-btn" type="button" class="botao botao--principal botao--largo">Entrar com conta administrativa</button>
     <button id="gate-trocar" type="button" class="botao botao--principal botao--largo hidden">Sair e entrar como administrador</button>
     <p id="gate-error" class="portao__erro hidden"></p>
+    <!-- Verificação em 2 etapas: o código do app autenticador já cadastrado. -->
+    <form id="mfa-code-form" class="campo mfa hidden" autocomplete="off">
+      <label for="mfa-code">Digite o código de 6 dígitos do seu app autenticador.</label>
+      <input id="mfa-code" class="mfa__codigo" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"/>
+      <button id="mfa-code-btn" type="submit" class="botao botao--principal botao--largo">Confirmar</button>
+      <p id="mfa-code-erro" class="portao__erro hidden" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ── Ativar a verificação em 2 etapas (QR code) ────────────────────────────── -->
+<div id="mfa-setup" class="portao portao--sobre hidden" role="dialog" aria-modal="true" aria-labelledby="mfa-setup-titulo">
+  <div class="portao__cartao">
+    <h1 id="mfa-setup-titulo">Verificação em 2 etapas</h1>
+    <p class="portao__sub">Escaneie o QR code com o Google Authenticator, Authy ou 1Password e digite o código de 6 dígitos que aparecer.</p>
+    <img id="mfa-qr" class="mfa__qr hidden" alt="QR code para o app autenticador"/>
+    <p class="portao__sub">Está no celular? Digite esta chave no app e guarde uma cópia num gerenciador de senhas:</p>
+    <code id="mfa-secret" class="mfa__chave"></code>
+    <form id="mfa-setup-form" class="campo mfa" autocomplete="off">
+      <label for="mfa-setup-code">Código de 6 dígitos</label>
+      <input id="mfa-setup-code" class="mfa__codigo" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"/>
+      <button id="mfa-setup-btn" type="submit" class="botao botao--principal botao--largo">Ativar</button>
+    </form>
+    <p id="mfa-setup-erro" class="portao__erro hidden" role="alert"></p>
+    <button id="mfa-setup-cancel" type="button" class="botao botao--largo">Agora não</button>
   </div>
 </div>
 
@@ -43,6 +68,10 @@
         <button id="menu-btn" type="button" class="topo__avatar" aria-haspopup="true" aria-expanded="false" aria-controls="menu" aria-label="Menu">L</button>
       </div>
     </header>
+    <div id="mfa-banner" class="aviso mfa-aviso hidden" role="status">
+      <p>Proteja o admin: ative a verificação em 2 etapas. Sem ela, quem descobrir sua senha entra aqui.</p>
+      <button id="mfa-banner-btn" type="button" class="botao botao--principal botao--pequeno">Ativar agora</button>
+    </div>
     <div id="menu" class="menu hidden">
       <a href="admin-antigo.html">Admin antigo: CRM, GPS, Corrida XP</a>
       <a href="admin-metrics.html">Métricas técnicas</a>
@@ -78,7 +107,7 @@
 
 <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-<script src="auth-secure.js?v=auth20260918"></script>
-<script src="assets/js/pages/admin-v2.js?v=adm2-1"></script>
+<script src="auth-secure.js?v=sec2"></script>
+<script src="assets/js/pages/admin-v2.js?v=adm2-mfa"></script>
 </body>
 </html>

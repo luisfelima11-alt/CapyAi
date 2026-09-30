@@ -47,7 +47,7 @@ const AI_ROUTE_KEYS = new Map([
     ['/api/chat', 'chat'], ['/api/quiz', 'quiz'], ['/api/translate', 'translate'],
     ['/api/newsline', 'newsline'], ['/api/historyline', 'historyline'], ['/api/story', 'story'], ['/api/word-of-day', 'quiz'],
     ['/api/daily-challenge', 'quiz'], ['/api/flashcard-deck', 'quiz'],
-    ['/api/dialogue-scene', 'quiz'], ['/api/parent-report', 'quiz'],
+    ['/api/dialogue-scene', 'quiz'],
     ['/api/lesson-quiz', 'quiz'], ['/api/lesson-chat', 'chat'], ['/api/youtube', 'youtube'],
     ['/api/personalize', 'personalize'], ['/api/transcribe', 'transcribe'],
     ['/api/correct-writing', 'chat'], ['/api/study-plan', 'study-plan'], ['/api/music', 'music'],
@@ -127,6 +127,14 @@ const VOZ_MINUTOS_MES = { free: 0, pro: 0, super: 60 };
 // nao so contra aluno. Estourou, ninguem liga ate o dono liberar.
 const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 
+// Server-side floor for voice billing (reservarVoz / liquidarReservaVoz): the
+// longest session booked up front when a token is issued, and the minimum
+// cost per minute when the browser's own report is missing or lower. The
+// browser reports tokens and duration itself, so without a floor a report of
+// "0" meant unlimited voice.
+const VOZ_SESSAO_MAX_SEG = Math.max(60, Number(process.env.VOZ_SESSAO_MAX_MIN || 30) * 60);
+const VOZ_USD_POR_MIN_PISO = Number(process.env.VOZ_USD_POR_MIN_PISO || 0.02);
+
 const RATE_LIMITS = {
     chat:         { free:  20, pro: 200, super: 500 },  // per day
     music:        { free:   3, pro:  50, super: 150 },
@@ -152,6 +160,7 @@ const RATE_LIMITS = {
     homework:     { free:  20, pro: 100, super: 200 },
     'auth-login': { free:  20, pro:  20, super:  20 },
     'auth-signup':{ free:   5, pro:   5, super:   5 },
+    mfa:          { free:  20, pro:  20, super:  20 },  // admin MFA enroll/verify attempts per day
     track:        { free: 200, pro: 200, super: 200 },  // per IP per day (analytics beacon)
     // Memoria da Yara: uma extracao curta por conversa livre. Balde proprio para
     // nao gastar a cota de chat do aluno com uma coisa que ele nem ve acontecer.
@@ -183,6 +192,25 @@ function privacySafeIpKey(req) {
     return crypto.createHmac('sha256', salt).update(requestIp(req)).digest('hex').slice(0, 32);
 }
 
+// Routes in AI_ROUTE_KEYS that call no AI: the proxies to the lyrics catalogue.
+// A visitor's 3 daily AI uses are for AI. Searching a song and fetching its
+// lyrics have their own limit (the free plan's), so the Music Lab analysis is
+// still reachable after the search (decision of 28/set).
+const ROTAS_SEM_IA = new Set(['lyrics-search', 'lyrics']);
+
+// A read (GET/HEAD) carrying our cookies. Browsers send Sec-Fetch-Site on every
+// request (Chrome 76+, Firefox 90+, Safari 16.4+): only our own pages
+// ("same-origin") or the student typing the URL ("none") may use the cookies,
+// so another site can't spend a student's quota. Without the header (old
+// browser, script) the read goes through: anyone may already call these routes
+// without cookies, under the per-IP limit.
+function assertLeituraDoProprioSite(req) {
+    const site = String(req.headers['sec-fetch-site'] || '').toLowerCase();
+    if (site && site !== 'same-origin' && site !== 'none') {
+        throw new HttpError(403, 'invalid_origin', 'Request origin is not allowed.');
+    }
+}
+
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
@@ -195,11 +223,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         : trusted?.kind === 'guest'
             ? `g:${trusted.guestId}|ip:${privacySafeIpKey(req)}`
             : `ip:${privacySafeIpKey(req)}`;
-    const effectiveKey = isGuest ? 'guest-ai' : key;
+    const guestAi = isGuest && !ROTAS_SEM_IA.has(key);
+    const effectiveKey = guestAi ? 'guest-ai' : key;
     const bucket = `${identityKey}|${effectiveKey}|${today}`;
     const plan = isGuest ? 'free' : await getUserPlan(appUserId);
-    const limit = isGuest ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
-    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
+    const limit = guestAi ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
+    const minuteLimit = guestAi ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
 
     // Prefer the atomic Supabase RPC (consume_rate_limit) when it's available.
     // If the migration for that RPC hasn't been applied yet, fall back to a
@@ -221,6 +250,8 @@ async function checkRateLimit(req, key, _untrustedUserId) {
                 limit: minuteLimit,
                 used: Number(minuteResult.used) || minuteLimit,
                 plan,
+                guest: isGuest,
+                janela: 'minuto',
             };
             req._rateLimitResults[key] = info;
             return info;
@@ -238,6 +269,7 @@ async function checkRateLimit(req, key, _untrustedUserId) {
             limit,
             used: Number(result.used) || 0,
             plan,
+            guest: isGuest,
         };
         req._rateLimitResults[key] = info;
         return info;
@@ -250,12 +282,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         if (entry.count >= limit) {
             const now = new Date();
             const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan };
+            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan, guest: isGuest };
             req._rateLimitResults[key] = info;
             return info;
         }
         entry.count += 1;
-        const info = { ok: true, limit, used: entry.count, plan };
+        const info = { ok: true, limit, used: entry.count, plan, guest: isGuest };
         req._rateLimitResults[key] = info;
         return info;
     }
@@ -266,12 +298,22 @@ function rateLimitedResponse(res, info) {
     res.setHeader('X-RateLimit-Limit', String(info.limit));
     res.setHeader('X-RateLimit-Used',  String(info.used));
     res.setHeader('X-RateLimit-Plan',  info.plan);
+    // A burst (per-minute window) is not the daily cap; a visitor at the daily
+    // cap is invited to a free account (it is what turns on streaks and saved
+    // progress), not to Pro.
+    const convite = Boolean(info.guest) && info.janela !== 'minuto';
+    const message = info.janela === 'minuto'
+        ? 'Muitas mensagens seguidas. Espere um minuto e tente de novo.'
+        : convite
+            ? `Você usou os ${info.limit} usos de IA de hoje como visitante. Crie sua conta grátis para continuar: leva 1 minuto e salva seu progresso.`
+            : info.plan === 'free'
+                ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
+                : 'Limite diário do seu plano atingido. Tente novamente amanhã.';
     res.status(429).json({
         error: 'rate_limited',
-        message: info.plan === 'free'
-            ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
-            : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
+        message,
         limit: info.limit, used: info.used, plan: info.plan, retryAfter: info.retryAfter,
+        ...(convite ? { signup: true } : {}),
     });
 }
 
@@ -291,6 +333,16 @@ function bumpMetrics(url, status, ms) {
         _persistTimer.unref?.();
     }
 }
+// Tokens per endpoint and day, next to the request counts. Without them no
+// cost per route can be measured — the base for any AI spending cap.
+function bumpTokens(endpoint, usage) {
+    if (!endpoint || !usage) return;
+    const key = `${new Date().toISOString().slice(0, 10)}|${endpoint}`;
+    const m = _metrics[key] = _metrics[key] || { requests: 0, errors: 0, total_ms: 0 };
+    m.tokens_in  = (m.tokens_in  || 0) + (Number(usage.prompt_tokens     ?? usage.input_tokens)  || 0);
+    m.tokens_out = (m.tokens_out || 0) + (Number(usage.completion_tokens ?? usage.output_tokens) || 0);
+}
+
 async function persistMetrics() {
     _persistTimer = null;
     const snapshot = Object.entries(_metrics).map(([k, v]) => {
@@ -306,6 +358,8 @@ async function persistMetrics() {
                 requests: prev.requests + row.requests,
                 errors:   prev.errors   + row.errors,
                 total_ms: prev.total_ms + row.total_ms,
+                tokens_in:  (prev.tokens_in  || 0) + (row.tokens_in  || 0),
+                tokens_out: (prev.tokens_out || 0) + (row.tokens_out || 0),
             } : row;
             await sb('/api_metrics_daily', {
                 method: 'POST',
@@ -397,7 +451,12 @@ async function sbPublic(path, opts = {}) {
   return data;
 }
 
-async function accountForAuthUser(authUser) {
+// Claiming an unlinked account row by e-mail (legacy accounts, courtesy plans
+// granted to an address before signup) needs proof that this person owns the
+// inbox. Only the e-mailed-link callback gives that proof; anywhere else an
+// unconfirmed (or auto-confirmed) signup could take someone else's plan and
+// progress just by typing their address.
+async function accountForAuthUser(authUser, { podeReivindicarPorEmail = false } = {}) {
     if (!authUser?.id) return null;
     let rows = await sb(`/accounts?auth_user_id=eq.${encodeURIComponent(authUser.id)}&select=id,name,email,avatar,auth_user_id&limit=2`);
     if (Array.isArray(rows) && rows.length === 1) return rows[0];
@@ -417,6 +476,9 @@ async function accountForAuthUser(authUser) {
     if (legacy.auth_user_id && legacy.auth_user_id !== authUser.id) {
         throw new HttpError(409, 'account_already_linked', 'This account is already linked to another identity.');
     }
+    if (!podeReivindicarPorEmail || !authUser.email_confirmed_at) {
+        throw new HttpError(409, 'email_claim_required', 'This account already exists. Open the link we e-mail you to recover it.');
+    }
     await sb(`/accounts?id=eq.${encodeURIComponent(legacy.id)}`, {
         method: 'PATCH',
         headers: { 'Prefer': 'return=minimal' },
@@ -425,8 +487,8 @@ async function accountForAuthUser(authUser) {
     return { ...legacy, auth_user_id: authUser.id };
 }
 
-async function ensureAppAccount(authUser, requested = {}) {
-    let account = await accountForAuthUser(authUser);
+async function ensureAppAccount(authUser, requested = {}, opcoes = {}) {
+    let account = await accountForAuthUser(authUser, opcoes);
     if (account) return account;
     const name = sanitizeStoredJson(String(requested.name || authUser?.user_metadata?.name || authUser?.email?.split('@')[0] || 'Student').trim().slice(0, 80));
     const avatar = sanitizeStoredJson(String(requested.avatar || authUser?.user_metadata?.avatar || '🐾').slice(0, 32));
@@ -483,23 +545,21 @@ async function writeSecurityAudit(req, action, targetType, targetId = '') {
 }
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
-// Two independent ways in: (1) Bearer ADMIN_KEY/CRON_SECRET — used by scripts,
-// cron jobs, and admin.html's older key-prompt flow; (2) a cookie-based Supabase
-// session whose app_metadata.role is 'admin' — used by the newer admin.html
-// login flow (auth-secure.js), which never sends an Authorization header.
-// MFA is intentionally not required here (unlike requireRole) since no admin
-// account has enrolled MFA yet — tighten this once that's set up.
+// The only way in is a Supabase session whose app_metadata.role is 'admin'
+// (admin.html via auth-secure.js). Static keys are gone: ADMIN_KEY/CRON_SECRET
+// opened every admin route — including "log in as a student" and "set any
+// password" — to whoever held a string from a .env file. CRON_SECRET still
+// guards the two cron routes, which check it themselves.
+//
+// MFA: required (aal2) once ADMIN_REQUIRE_MFA=true. It stays opt-in so that
+// shipping the enrolment screen can't lock the owner out: enrol first at
+// /admin.html, then set the variable (see SECURITY-ROLLOUT).
 async function isAdminReq(req, res) {
-    const auth = req.headers['authorization'] || '';
-    const m = /^Bearer\s+(.+)$/i.exec(auth);
-    if (m) {
-        const token = m[1].trim();
-        const validKeys = [process.env.ADMIN_KEY, process.env.CRON_SECRET].filter(Boolean);
-        if (validKeys.some(k => safeEqual(token, k))) return true;
-    }
     try {
         const identity = await getRequestIdentity(req, res, { allowGuest: false });
-        if (identity?.kind === 'user' && identity.session.user?.app_metadata?.role === 'admin') return true;
+        if (identity?.kind !== 'user' || identity.session.user?.app_metadata?.role !== 'admin') return false;
+        if (process.env.ADMIN_REQUIRE_MFA === 'true' && identity.session.jwt?.aal !== 'aal2') return false;
+        return true;
     } catch (e) { /* no valid session — fall through to false */ }
     return false;
 }
@@ -541,13 +601,17 @@ function chatHeaders(contentLength) {
     return h;
 }
 
-function callOpenAI(messages, maxTokens, temperature, res, req) {
+function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
     if (!CHAT_KEY) {
         res.status(503).json({ error: { code: 503, message: 'AI features require OPENAI_API_KEY.', status: 'UNAVAILABLE' } });
         return;
     }
-    const origin = req?.headers?.origin || '';
-    const postData = JSON.stringify({ model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature });
+    const corpo = { model: CHAT_MODEL, messages, max_tokens: maxTokens, temperature };
+    // API JSON mode for routes that answer one JSON object (same as chatComplete,
+    // newsline and music). The prompt must still say "JSON". Routes that answer
+    // an array (quiz, flashcard-deck, lesson-quiz) can't use it.
+    if (opts.json) corpo.response_format = { type: 'json_object' };
+    const postData = JSON.stringify(corpo);
     const options = {
         hostname: CHAT_HOST,
         path:     CHAT_PATH,
@@ -558,15 +622,16 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
-            if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
             res.setHeader('Content-Type', 'application/json');
             if (apiRes.statusCode !== 200) {
-                let errBody; try { errBody = JSON.parse(data); } catch { errBody = { error: { message: data } }; }
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: errBody?.error?.message || data } }));
+                // The provider's message can name the org, key or model: log it, answer generically.
+                console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
+                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
                 return;
             }
             try {
                 const parsed = JSON.parse(data);
+                bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                 const text = parsed?.choices?.[0]?.message?.content || '';
                 res.status(200).end(JSON.stringify({ candidates: [{ content: { parts: [{ text }] } }] }));
             } catch(e) {
@@ -574,7 +639,7 @@ function callOpenAI(messages, maxTokens, temperature, res, req) {
             }
         });
     });
-    apiReq.on('error', err => { res.status(500).end(JSON.stringify({ error: { code: 500, message: err.message } })); });
+    apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
     apiReq.write(postData);
     apiReq.end();
 }
@@ -613,6 +678,7 @@ function chatComplete(messages, opts = {}) {
                 }
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(opts.rota, parsed?.usage);
                     resolve({
                         text:  parsed?.choices?.[0]?.message?.content || '',
                         usage: parsed?.usage || null,
@@ -854,6 +920,63 @@ function readBody(req, maxBytes = MAX_JSON_BODY) {
 // Aqui e lista de PERMISSAO, nao de bloqueio: letra (com acento), digito,
 // espaco, hifen, barra, ponto e virgula. Todo o resto vira espaco. Nome de
 // vaga e tema de aula cabem nisso; instrucao disfarcada, nao.
+// Leaked-password check (HaveIBeenPwned, k-anonymity): only the first 5 hex
+// characters of the SHA-1 leave the server. Supabase has this built in only on
+// the Pro plan. Fails open: an HIBP outage must not block sign-ups.
+async function senhaVazada(senha) {
+    const hash = crypto.createHash('sha1').update(String(senha), 'utf8').digest('hex').toUpperCase();
+    const prefixo = hash.slice(0, 5);
+    const sufixo = hash.slice(5);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    try {
+        const r = await fetch(`https://api.pwnedpasswords.com/range/${prefixo}`, {
+            headers: { 'Add-Padding': 'true', 'User-Agent': 'capy-english-password-check' },
+            signal: ctrl.signal,
+        });
+        if (!r.ok) return false;
+        const texto = await r.text();
+        return texto.split('\n').some(linha => {
+            const [suf, qtd] = linha.trim().split(':');
+            return suf === sufixo && Number(qtd) > 0;
+        });
+    } catch (e) { return false; }
+    finally { clearTimeout(timer); }
+}
+
+const MSG_SENHA_VAZADA = 'Essa senha já apareceu em vazamentos de dados na internet. Escolha outra.';
+
+// Where to send the browser after the auth callback: only a path on this same
+// site. `startsWith('/')` alone is not enough — browsers read "\" as "/", so
+// "/\evil.com" becomes "//evil.com", an off-site redirect.
+function caminhoInterno(valor) {
+    const bruto = String(valor || '');
+    if (!bruto.startsWith('/') || bruto.startsWith('//') || bruto.includes('\\')) return null;
+    try {
+        const base = 'https://capy.invalid';
+        const alvo = new URL(bruto, base);
+        if (alvo.origin !== base) return null;
+        return alvo.pathname + alvo.search + alvo.hash;
+    } catch (e) { return null; }
+}
+
+// Free text from the student that ends up inside a prompt (a name, a topic,
+// a sentence). Unlike textoParaPrompt (slugs and titles) it keeps ordinary
+// punctuation, but drops markup, backticks, braces and control characters,
+// folds newlines (no fake "system:" lines) and clips the length.
+function textoLivreParaPrompt(valor, limite) {
+    return String(valor == null ? '' : valor)
+        .slice(0, limite)
+        .replace(/[\u0000-\u001F\u007F<>`{}\[\]\\]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function listaParaPrompt(valor, maxItens, limite) {
+    return (Array.isArray(valor) ? valor : []).slice(0, maxItens)
+        .map(v => textoLivreParaPrompt(v, limite)).filter(Boolean);
+}
+
 function textoParaPrompt(valor, limite) {
     return String(valor == null ? '' : valor)
         .slice(0, limite)
@@ -1784,6 +1907,31 @@ function sanitizeAiOutput(value, depth = 0) {
     return value;
 }
 
+// ── GET to an outside JSON API, with a deadline ─────────────────────────────
+// Resolves { status, json } (json is null when the body is not JSON, e.g. an
+// HTML error page) and rejects only on a network error or when the deadline
+// passes, so a route can tell "not found" from "provider down".
+function buscarJsonExterno(alvo, { timeoutMs = 7000 } = {}) {
+    return new Promise((resolve, reject) => {
+        let pronto = false;
+        let prazo = null;
+        const fim = (erro, valor) => { if (pronto) return; pronto = true; clearTimeout(prazo); if (erro) reject(erro); else resolve(valor); };
+        const pedido = https.get(alvo, { headers: { 'User-Agent': 'CapyEnglish/1.0 (+https://capyenglish.com.br)', Accept: 'application/json' } }, r => {
+            let corpo = '';
+            r.setEncoding('utf8');
+            r.on('data', c => { corpo += c; if (corpo.length > 2000000) pedido.destroy(new Error('resposta_grande_demais')); });
+            r.on('end', () => {
+                let json = null;
+                try { json = JSON.parse(corpo); } catch (e) { json = null; }
+                fim(null, { status: r.statusCode, json });
+            });
+            r.on('error', erro => fim(erro));
+        });
+        prazo = setTimeout(() => { pedido.destroy(new Error('timeout')); fim(new Error('timeout')); }, timeoutMs);
+        pedido.on('error', erro => fim(erro));
+    });
+}
+
 // ── GET with redirect following (Google News RSS 302s on some hl/gl combos) ─
 function httpsGetFollow(urlStr, maxRedirects = 3) {
     return new Promise((resolve, reject) => {
@@ -1825,6 +1973,24 @@ function parseNewsRSS(xml, limit) {
 }
 
 
+// AI responses are sanitized on their way out (sanitizeAiOutput). The runtime's
+// res.json/res.send may hand res.end a Buffer (larger bodies, ETag path)
+// instead of a string: handle both, or the longest AI answers would go out
+// untouched. Content-Length was computed for the original body; a stale value
+// makes the client wait for bytes that never come.
+function limparCorpoIa(body, res) {
+    const contentType = String(res.getHeader?.('Content-Type') || '');
+    const ehBuffer = Buffer.isBuffer(body);
+    if (!(typeof body === 'string' || ehBuffer) || !/application\/json/i.test(contentType)) return body;
+    try {
+        const limpo = JSON.stringify(sanitizeAiOutput(JSON.parse(ehBuffer ? body.toString('utf8') : body)));
+        if (!res.headersSent && res.getHeader?.('Content-Length') !== undefined) {
+            res.setHeader('Content-Length', Buffer.byteLength(limpo));
+        }
+        return limpo;
+    } catch (_) { return body; }
+}
+
 module.exports = async (req, res) => {
   try {
     applyApiHeaders(res);
@@ -1832,13 +1998,7 @@ module.exports = async (req, res) => {
 
     if (AI_ROUTE_KEYS.has(url)) {
         const originalEnd = res.end.bind(res);
-        res.end = (body, ...args) => {
-            const contentType = String(res.getHeader?.('Content-Type') || '');
-            if (typeof body === 'string' && /application\/json/i.test(contentType)) {
-                try { body = JSON.stringify(sanitizeAiOutput(JSON.parse(body))); } catch (_) {}
-            }
-            return originalEnd(body, ...args);
-        };
+        res.end = (body, ...args) => originalEnd(limparCorpoIa(body, res), ...args);
     }
 
     // ── Logging middleware ────────────────────────────────────────────────
@@ -1865,7 +2025,12 @@ module.exports = async (req, res) => {
         let claimedEventId = null;
         try {
             const rawBody = await readRawBody(req);
-            const signature = req.headers['x-kiwify-signature'] || '';
+            // Kiwify signs the body (HMAC-SHA1 with the webhook token) and sends
+            // the signature as ?signature= on the webhook URL; some setups send
+            // it as a header. Accept either — reading only the header made every
+            // real purchase fail in silence.
+            const assinaturaNaUrl = new URL(req.url, 'http://localhost').searchParams.get('signature') || '';
+            const signature = String(req.headers['x-kiwify-signature'] || assinaturaNaUrl);
             const secret = process.env.KIWIFY_WEBHOOK_SECRET || '';
             // Validate signature (HMAC-SHA1 per Kiwify docs)
             if (!secret) {
@@ -1889,8 +2054,14 @@ module.exports = async (req, res) => {
             const productName = payload.Product?.product_name || payload.product_name || '';
             const subscriptionId = payload.Subscription?.id || payload.subscription_id
                                 || payload.order_id || payload.order_ref || null;
+            // Idempotency key. Never the subscription id alone: it is the same
+            // on every renewal, so the 2nd renewal was dropped as a "duplicate"
+            // and the student lost the plan they paid for. The order id is per
+            // charge; the body hash differs between charges and only repeats on
+            // a genuine redelivery.
             const providerEventId = String(
-                payload.event_id || payload.id || `${event}:${subscriptionId || crypto.createHash('sha256').update(rawBody).digest('hex')}`
+                payload.event_id || payload.id
+                || `${event}:${payload.order_id || payload.order_ref || crypto.createHash('sha256').update(rawBody).digest('hex')}`
             ).slice(0, 200);
             const claimResponse = await sb('/rpc/claim_webhook_event', {
                 method: 'POST',
@@ -2031,6 +2202,12 @@ module.exports = async (req, res) => {
         }
     }
 
+    // Writes must come from our own pages. Browsers always send Origin on
+    // POST/PUT/PATCH/DELETE (sendBeacon included); the only server-to-server
+    // writer, the Kiwify webhook, is handled above this point. (Outside
+    // production assertOrigin lets a missing Origin through, for local tools.)
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) assertOrigin(req);
+
     // Same-origin CORS. Credentials are never exposed to arbitrary origins.
     const origin = req.headers.origin || '';
     if (origin) {
@@ -2058,8 +2235,10 @@ module.exports = async (req, res) => {
         const limited = await checkRateLimit(req, 'auth-login', null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
         const session = await signInWithPassword(norm, password);
-        const csrfToken = setSessionCookies(res, session);
+        // Resolve the app account first: if it can't be (email_claim_required),
+        // no half-working session cookie is left behind.
         const account = await ensureAppAccount(session.user, {});
+        const csrfToken = setSessionCookies(res, session);
         res.status(200).json({ ok: true, user: publicUser(session.user, account), csrfToken });
         return;
     }
@@ -2074,11 +2253,16 @@ module.exports = async (req, res) => {
         if (typeof password !== 'string' || password.length < 12) throw new HttpError(400, 'weak_password', 'Password must contain at least 12 characters.');
         const limited = await checkRateLimit(req, 'auth-signup', null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        if (await senhaVazada(password)) throw new HttpError(400, 'pwned_password', MSG_SENHA_VAZADA);
         const codeChallenge = createPkceChallenge(res);
         const result = await signUpWithPassword(norm, password, { name: cleanName, avatar: String(avatar || '🐾').slice(0, 32) }, codeChallenge);
         const authUser = result.user;
-        if (authUser) await ensureAppAccount(authUser, { name: cleanName, avatar });
-        if (result.access_token && result.refresh_token) {
+        let reivindicarPorEmail = false;
+        if (authUser) {
+            try { await ensureAppAccount(authUser, { name: cleanName, avatar }); }
+            catch (e) { if (e && e.code === 'email_claim_required') reivindicarPorEmail = true; else throw e; }
+        }
+        if (result.access_token && result.refresh_token && !reivindicarPorEmail) {
             clearPkceCookie(res);
             const csrfToken = setSessionCookies(res, result);
             const account = await accountForAuthUser(authUser);
@@ -2120,9 +2304,11 @@ module.exports = async (req, res) => {
             session = await verifyEmailToken(tokenHash, type);
         }
         setSessionCookies(res, session);
-        if (session.user) await ensureAppAccount(session.user, {});
+        // The e-mailed link proves inbox ownership: the only place allowed to
+        // claim an existing account row by e-mail.
+        if (session.user) await ensureAppAccount(session.user, {}, { podeReivindicarPorEmail: true });
         const requestedNext = qs.get('next') || '/account.html?reset=1';
-        const next = requestedNext.startsWith('/') && !requestedNext.startsWith('//') ? requestedNext : '/account.html';
+        const next = caminhoInterno(requestedNext) || '/account.html';
         res.statusCode = 302;
         res.setHeader('Location', next);
         res.end();
@@ -2139,11 +2325,83 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // ── Admin MFA (TOTP) ─────────────────────────────────────────────────────
+    // GET  /api/auth/mfa/status               → { aal, enforced, factors:[{id,status,friendlyName}] }
+    // POST /api/auth/mfa/enroll               → { factorId, qrCode, secret, uri }
+    // POST /api/auth/mfa/verify {factorId, code} → { ok, aal:'aal2', csrfToken }
+    // Admins only. Enrolling at aal1 is allowed only while the account has no
+    // verified factor; after that a new one needs aal2, or a stolen password
+    // could register the thief's own phone.
+    if (url.startsWith('/api/auth/mfa/')) {
+        const identity = await getRequestIdentity(req, res, { allowGuest: false });
+        if (!identity || identity.kind !== 'user' || identity.session.user?.app_metadata?.role !== 'admin') {
+            throw new HttpError(403, 'admin_only', 'Only administrators manage MFA here.');
+        }
+        const sessao = identity.session;
+        const fatores = (Array.isArray(sessao.user?.factors) ? sessao.user.factors : [])
+            .filter(f => f && f.factor_type === 'totp');
+        const verificados = fatores.filter(f => f.status === 'verified');
+        const aal = sessao.jwt?.aal || 'aal1';
+
+        if (req.method === 'GET' && url === '/api/auth/mfa/status') {
+            res.status(200).json({
+                aal,
+                enforced: process.env.ADMIN_REQUIRE_MFA === 'true',
+                factors: fatores.map(f => ({ id: f.id, status: f.status, friendlyName: f.friendly_name || '' })),
+            });
+            return;
+        }
+
+        if (req.method === 'POST' && (url === '/api/auth/mfa/enroll' || url === '/api/auth/mfa/verify')) {
+            assertCsrf(req);
+            const limited = await checkRateLimit(req, 'mfa', null);
+            if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        }
+
+        if (req.method === 'POST' && url === '/api/auth/mfa/enroll') {
+            if (verificados.length && aal !== 'aal2') {
+                throw new HttpError(403, 'mfa_required', 'Confirm the code from your current authenticator first.');
+            }
+            // Half-finished enrolments pile up (and Supabase caps them): clear them.
+            for (const f of fatores.filter(f => f.status !== 'verified')) {
+                try { await Security.mfaUnenroll(sessao.accessToken, f.id); } catch (e) { /* keep going */ }
+            }
+            const nome = `Capy Admin ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`;
+            const r = await Security.mfaEnroll(sessao.accessToken, nome);
+            const qr = String(r?.totp?.qr_code || '');
+            res.status(200).json({
+                factorId: r?.id || '',
+                qrCode: qr.startsWith('data:image/') ? qr : (qr ? `data:image/svg+xml;utf8,${encodeURIComponent(qr)}` : ''),
+                secret: r?.totp?.secret || '',
+                uri: r?.totp?.uri || '',
+            });
+            return;
+        }
+
+        if (req.method === 'POST' && url === '/api/auth/mfa/verify') {
+            const { factorId, code } = await readBody(req);
+            const id = String(factorId || '');
+            const codigo = String(code || '').replace(/\s+/g, '');
+            if (!fatores.some(f => f.id === id)) throw new HttpError(400, 'invalid_factor', 'Unknown authenticator.');
+            if (!/^\d{6}$/.test(codigo)) throw new HttpError(400, 'invalid_code', 'The code has 6 digits.');
+            const nova = await Security.mfaChallengeAndVerify(sessao.accessToken, id, codigo);
+            if (!nova?.access_token || !nova?.refresh_token) throw new HttpError(502, 'mfa_failed', 'Could not confirm the code.');
+            const csrfToken = setSessionCookies(res, nova);
+            await writeSecurityAudit(req, 'admin.mfa.verified', 'account', identity.appUserId || sessao.user?.id || '');
+            res.status(200).json({ ok: true, aal: 'aal2', csrfToken });
+            return;
+        }
+
+        res.status(404).json({ error: 'not_found' });
+        return;
+    }
+
     if (req.method === 'POST' && url === '/api/auth/set-password') {
         assertCsrf(req);
         const identity = await requireAppUser(req, res);
         const { password } = await readBody(req);
         if (typeof password !== 'string' || password.length < 12) throw new HttpError(400, 'weak_password', 'Password must contain at least 12 characters.');
+        if (await senhaVazada(password)) throw new HttpError(400, 'pwned_password', MSG_SENHA_VAZADA);
         await updatePassword(identity.session.accessToken, password);
         res.status(204).end();
         return;
@@ -2178,15 +2436,31 @@ module.exports = async (req, res) => {
     if (aiKey && url !== '/api/realtime-token') {
         // Requests carrying session cookies must prove same-session intent.
         // Anonymous visitors retain the existing rate-limited access.
+        // Writes prove it with the CSRF token. Reads (lyrics search, lyrics,
+        // TTS, daily challenge, word of the day) come from a same-origin fetch,
+        // which sends neither Origin nor the token: assertCsrf refused every one
+        // of them in production (403 invalid_origin), so a signed-in student saw
+        // "Nenhuma música encontrada" in the Music Lab and lost the Nova voice.
+        // For reads the browser's Sec-Fetch-Site tells who is asking.
         const sessionCookies = parseCookies(req);
-        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) {
+            if (req.method === 'GET' || req.method === 'HEAD') assertLeituraDoProprioSite(req);
+            else assertCsrf(req);
+        }
+        // Identify the student BEFORE counting. checkRateLimit caches the first
+        // result per key, so a count made here without identity was the one
+        // every route reused: all calls were plan "free" by IP — paying
+        // students hit the free cap, and a school behind one IP shared one
+        // quota. A broken cookie degrades to anonymous, as in /api/chat.
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.refresh] || sessionCookies[COOKIE_NAMES.guest]) {
+            try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { req._securityIdentity = null; }
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
 
-    // /api/admin/* routes use their own Bearer-token check (isAdminReq(),
-    // ADMIN_KEY/CRON_SECRET) inside each handler — not the cookie-based
-    // Supabase role system, which the admin.html dashboard doesn't speak.
+    // /api/admin/* routes call isAdminReq() inside each handler: an admin
+    // Supabase session (aal2 once ADMIN_REQUIRE_MFA=true), no static keys.
 
     // ── Realtime config for the shared whiteboard ─────────────────────────────
     // GET /api/realtime-config → { url, key }
@@ -2466,6 +2740,13 @@ module.exports = async (req, res) => {
         if (typeof valor !== 'string' || !valor.trim()) { res.status(502).json({ error: 'realtime_unavailable' }); return; }
         const expiresAt = dados.expires_at || (dados.client_secret && dados.client_secret.expires_at);
 
+        // Book the minutes now, on the server. The browser's report at hang-up
+        // only settles this reservation (liquidarReservaVoz), never erases it.
+        if (!ehAdmin && req._securityIdentity && req._securityIdentity.appUserId && req._vozRestante != null) {
+            const reserva = Math.max(60, Math.min(VOZ_SESSAO_MAX_SEG, Math.round(req._vozRestante * 60)));
+            await reservarVoz(req._securityIdentity.appUserId, String(body.cenario || 'conversa').slice(0, 40), reserva);
+        }
+
         res.status(200).json({ minutosRestantes: req._vozRestante == null ? null : Number(req._vozRestante.toFixed(1)),
             value: valor,
             expiresAt: Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null,
@@ -2625,6 +2906,64 @@ module.exports = async (req, res) => {
     // chave por dia que existia antes fazia a segunda ligacao apagar a primeira.
     // O prefixo `__` ja e excluido por todos os filtros de linha sintetica
     // (ver `ehAluno`), entao a linha nao conta como aluno no roster.
+    async function reservarVoz(appUserId, cenario, segundos) {
+        try {
+            const agora = new Date().toISOString();
+            await sb('/user_state', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({
+                    user_id: `__voz_${appUserId}_${agora}_reserva`,
+                    data: {
+                        cenario, reserva: true, emitidoEm: Date.now(), em: agora,
+                        custo: { segundos, usd: Number((segundos / 60 * VOZ_USD_POR_MIN_PISO).toFixed(4)) },
+                    },
+                    updated_at: agora,
+                }),
+            });
+            return true;
+        } catch (e) {
+            // Same stance as consumoVozDoMes: failing to measure doesn't block the call.
+            console.error('[voz] reserva nao gravada', e && e.message);
+            return false;
+        }
+    }
+
+    // Settles the newest open reservation with max(browser report, server clock
+    // since the token was issued), capped at what was reserved. Returns false
+    // when there is nothing to settle (admin, old client), so the caller falls
+    // back to recording the report as before.
+    async function liquidarReservaVoz(req, res, corpo, custo) {
+        try {
+            // resolveSecurityIdentity, as in gravarUsoVoz: getRequestIdentity has
+            // no appUserId, so the reservation was never found and stayed open
+            // (counted as 30 min) on top of the recorded report.
+            const identity = await resolveSecurityIdentity(req, res, { allowGuest: true });
+            if (!identity || !identity.appUserId) return false;
+            const mes = new Date().toISOString().slice(0, 7);
+            const padrao = encodeURIComponent(`__voz_${identity.appUserId}_${mes}*_reserva`);
+            const abertas = await sb(`/user_state?user_id=like.${padrao}&data->>reserva=eq.true&select=user_id,data&order=updated_at.desc&limit=1`) || [];
+            const alvo = abertas[0];
+            if (!alvo || !alvo.data) return false;
+            const reservados = Number(alvo.data.custo && alvo.data.custo.segundos) || 0;
+            const decorridos = Math.max(0, Math.round((Date.now() - (Number(alvo.data.emitidoEm) || Date.now())) / 1000));
+            const segundos = Math.max(custo.segundos, Math.min(decorridos, reservados));
+            const usd = Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO);
+            const agora = new Date().toISOString();
+            await sb(`/user_state?user_id=eq.${encodeURIComponent(alvo.user_id)}`, {
+                method: 'PATCH',
+                headers: { 'Prefer': 'return=minimal' },
+                body: JSON.stringify({
+                    data: { ...alvo.data, reserva: false, liquidadoEm: agora,
+                            cenario: String((corpo && corpo.cenario) || alvo.data.cenario || 'conversa').slice(0, 40),
+                            custo: { ...custo, segundos, usd: Number(usd.toFixed(4)) } },
+                    updated_at: agora,
+                }),
+            });
+            return true;
+        } catch (e) { return false; }
+    }
+
     async function gravarUsoVoz(req, res, corpo, custo) {
         try {
             // resolveSecurityIdentity, e NAO getRequestIdentity: so ele liga o
@@ -2660,8 +2999,11 @@ module.exports = async (req, res) => {
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
         const corpo = await readBody(req);
         const custo = calcularCustoVoz(corpo);
-        // Ligacao de 0 segundo nao vira linha: o aluno desistiu antes de conectar.
-        if (custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
+        // With a reservation from /api/realtime-token, settle it (the server's
+        // clock is the floor). Without one, record the report as before; a
+        // 0-second call is not recorded — the student gave up before connecting.
+        const liquidou = await liquidarReservaVoz(req, res, corpo, custo);
+        if (!liquidou && custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
         res.status(204).end();
         return;
     }
@@ -2702,7 +3044,7 @@ module.exports = async (req, res) => {
                         + 'Seja honesta: se ele foi mal, diga com gentileza mas sem inventar elogio.',
                 },
                 { role: 'user', content: (cargo ? `Vaga: ${cargo}\n\n` : '') + dialogo },
-            ], { json: true, temperature: 0.3, maxTokens: 900 });
+            ], { json: true, temperature: 0.3, maxTokens: 900, rota: req.url.split('?')[0] });
             feedback = sanitizeAiOutput(JSON.parse(r.text));
         } catch (e) {
             console.error('[conversa-feedback]', e.message);
@@ -2838,8 +3180,9 @@ module.exports = async (req, res) => {
         const name = String(body.name || '').trim().slice(0, 80);
         if (!name) { res.status(400).json({ error: 'invalid_name' }); return; }
 
-        // Slug must match what the page derives, so re-taking the test updates
-        // the same row instead of piling up duplicates.
+        // The slug is derived from the typed name, so anyone could send someone
+        // else's. Each attempt is therefore its own row (slug + time): a retake
+        // shows up as a new attempt and nobody can overwrite another result.
         const slug = String(body.slug || '').trim().toLowerCase();
         if (!/^[a-z0-9_]{1,60}$/.test(slug)) { res.status(400).json({ error: 'invalid_slug' }); return; }
 
@@ -2865,9 +3208,9 @@ module.exports = async (req, res) => {
         try {
             await sb('/user_state', {
                 method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                headers: { 'Prefer': 'return=minimal' },
                 body: JSON.stringify({
-                    user_id: 'gpstronic_test_' + slug,
+                    user_id: `gpstronic_test_${slug}_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`,
                     data: clean,
                     updated_at: new Date().toISOString(),
                 }),
@@ -2927,7 +3270,8 @@ module.exports = async (req, res) => {
         // Cookie invalido nao derruba a conversa: degrada para anonimo, que e
         // exatamente o que acontecia antes deste bloco existir.
         const cookiesChat = parseCookies(req);
-        if (cookiesChat[COOKIE_NAMES.access] || cookiesChat[COOKIE_NAMES.refresh] || cookiesChat[COOKIE_NAMES.guest]) {
+        // The central AI gate already tried; don't ask Supabase twice.
+        if (!req._securityIdentity && (cookiesChat[COOKIE_NAMES.access] || cookiesChat[COOKIE_NAMES.refresh] || cookiesChat[COOKIE_NAMES.guest])) {
             try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { /* segue anonimo */ }
         }
         const userId = req._securityIdentity?.appUserId || null;
@@ -2974,16 +3318,21 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST' && url === '/api/quiz') {
-        const { words, deckLabel } = await readBody(req);
-        const prompt = `You are creating a fun English quiz for children aged 5-8.\nThe child just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nGenerate exactly 4 multiple-choice questions. Each has 4 options, one correct answer.\nRespond ONLY with a valid JSON array:\n[{"question":"What is this? 🍎","image_hint":"Apple","options":["Apple","River","Bird","Tree"],"correct":"Apple"}]`;
+        const corpoQuiz = await readBody(req);
+        const deckLabel = textoLivreParaPrompt(corpoQuiz.deckLabel, 60);
+        const words = listaParaPrompt(corpoQuiz.words, 20, 40);
+        const prompt = `You are writing an English vocabulary quiz for Brazilian teens and adults (16+).\nThey just studied these words from the "${deckLabel}" deck: ${(words||[]).join(', ')}.\nWrite exactly 4 multiple-choice questions that test these words in everyday adult contexts. Each has 4 real, plausible options and one correct answer.\nRespond ONLY with a valid JSON array. Each item has: "question" (the question text; it may include one emoji), "image_hint" (one English word naming what the question is about), "options" (4 strings), "correct" (the exact text of one of the options).`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.7, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/translate') {
-        const { word, targetLang, context } = await readBody(req);
+        const corpoTr = await readBody(req);
+        const word = textoLivreParaPrompt(corpoTr.word, 60);
+        const targetLang = textoLivreParaPrompt(corpoTr.targetLang, 30) || 'Portuguese';
+        const context = textoLivreParaPrompt(corpoTr.context, 300);
         const ctxLine = context ? `\nUse this sentence for context (the word may be inflected there): "${context}"` : '';
         const prompt = `Translate the word "${word}" into ${targetLang}.${ctxLine}\nRespond ONLY with valid JSON:\n{"translation": "...", "example": "A simple sentence using the translation (in ${targetLang})."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req); return;
+        callOpenAI([{ role: 'user', content: prompt }], 80, 0.3, res, req, { json: true }); return;
     }
 
     // ── Newsline: real news headlines rewritten at the student's level ────────
@@ -3042,10 +3391,10 @@ Return exactly ${items.length} articles, in the same order as the items above.`;
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const aiArticles = Array.isArray(obj.articles) ? obj.articles : [];
@@ -3112,10 +3461,10 @@ Respond ONLY with valid JSON, no markdown:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const obj = JSON.parse(content);
                     const article = {
@@ -3133,47 +3482,46 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/story') {
-        const { words, name } = await readBody(req);
-        const childName = name || 'Explorer';
-        const wordList  = (words || ['apple','tree','bird']).join(', ');
-        const prompt = `Write a short fun English story for a child named ${childName} aged 5-8.\nMUST use these words: ${wordList}.\nMax 5 sentences. Simple English. Feature capybara Yara. Happy ending. 1-2 emojis per sentence.\nRespond ONLY with valid JSON:\n{"title":"...","sentences":["..."],"moral":"..."}`;
-        callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req); return;
+        const corpoSt = await readBody(req);
+        const nomeAluno = textoLivreParaPrompt(corpoSt.name, 40) || 'Explorer';
+        const listaSt = listaParaPrompt(corpoSt.words, 12, 30);
+        const wordList  = (listaSt.length ? listaSt : ['apple','tree','bird']).join(', ');
+        const prompt = `Write a short, light English story for a Brazilian learner (16+) named ${nomeAluno}, with Yara the capybara in it.\nUse every one of these words: ${wordList}.\nAt most 5 sentences of simple English (A1-A2), 1-2 emojis per sentence, and an upbeat ending.\nRespond ONLY with valid JSON with these fields: "title" (short), "sentences" (array with the story sentences), "moral" (one short sentence).`;
+        callOpenAI([{ role: 'user', content: prompt }], 400, 0.85, res, req, { json: true }); return;
     }
 
     if (req.method === 'GET' && url === '/api/word-of-day') {
         const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Pick ONE interesting English word for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"word":"Butterfly","emoji":"🦋","pronunciation":"/ˈbʌt.ə.flaɪ/","partOfSpeech":"noun","simpleMeaning":"A beautiful insect with big colourful wings.","exampleSentence":"I saw a butterfly in the garden today.","funFact":"Butterflies taste with their feet!"}`;
-        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req); return;
+        const prompt = `Today is ${today}. Pick ONE useful, interesting English word for Brazilian teens and adults (16+) at A2-B1 level; vary it from day to day.\nRespond ONLY with valid JSON with these fields: "word", "emoji" (one), "pronunciation" (IPA between slashes), "partOfSpeech", "simpleMeaning" (one short English sentence), "exampleSentence" (one sentence from everyday adult life), "funFact" (one short curiosity about the word).`;
+        callOpenAI([{ role: 'user', content: prompt }], 200, 0.9, res, req, { json: true }); return;
     }
 
     if (req.method === 'GET' && url === '/api/daily-challenge') {
         const today = new Date().toISOString().slice(0, 10);
-        const prompt = `Today is ${today}. Create ONE fun English challenge for a child aged 5-8.\nRespond ONLY with valid JSON:\n{"type":"sentence","emoji":"🦁","title":"Use a Brave Word!","instruction":"Use the word 'brave' in a sentence about an animal.","hint":"Think about what a brave animal might do.","example":"The brave lion protected its cubs.","xp":20}`;
-        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req); return;
+        const prompt = `Today is ${today}. Create ONE short English writing challenge for Brazilian teens and adults (16+) at A2-B1 level, set in everyday adult life (work, travel, study, home).\nRespond ONLY with valid JSON with these fields: "type" (one of "sentence", "describe", "translate"), "emoji" (one), "title" (short), "instruction" (what to write), "hint" (one short tip), "example" (one model answer), "xp" (20).`;
+        callOpenAI([{ role: 'user', content: prompt }], 150, 1.0, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/flashcard-deck') {
         const { topic } = await readBody(req);
-        const t = topic || 'animals';
-        const prompt = `Create 10 English vocabulary flashcards for "${t}" for children aged 5-8.\nRespond ONLY with a valid JSON array:\n[{"word":"Sun","emoji":"☀️","pronunciation":"/sʌn/","hint":"It shines in the sky","example":"The sun is bright today."}]`;
+        const t = textoLivreParaPrompt(topic, 60) || 'animals';
+        const prompt = `Create 10 English vocabulary flashcards about "${t}" for Brazilian teens and adults (16+).\nRespond ONLY with a valid JSON array. Each item has: "word", "emoji" (one), "pronunciation" (IPA between slashes), "hint" (a short English clue that does not contain the word), "example" (one sentence from everyday adult life).`;
         callOpenAI([{ role: 'user', content: prompt }], 600, 0.8, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/dialogue-scene') {
         const { topic } = await readBody(req);
-        const t = topic || 'pets';
-        const prompt = `Create a short English grammar dialogue for children aged 5-8 about "${t}".\nRespond ONLY with valid JSON:\n{"emoji":"🐶","scene":"...","intro":"...","grammarFocus":"...","questions":[{"prompt":"___ dog is fluffy.","choices":["My","Me","I"],"answer":"My","explanation":"We use My to show the dog belongs to me."}]}\nProvide exactly 6 questions, each with 3 choices.`;
-        callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req); return;
-    }
-
-    if (req.method === 'POST' && url === '/api/parent-report') {
-        const { name, xp, badges, lessons, recentDate } = await readBody(req);
-        const prompt = `Act as an educational analyst for a children's language app.\nChild: ${name||'Student'}, XP: ${xp||0}, Badges: ${badges?badges.length:0}, Lessons: ${lessons?lessons.length:0}, Last active: ${recentDate||'Recently'}.\nWrite a warm 2-3 paragraph summary for parents celebrating effort and giving one practical offline tip.\nRespond ONLY with valid JSON:\n{"title":"Weekly Progress Report for ${name||'Your Child'}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}`;
-        callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res, req); return;
+        const t = textoLivreParaPrompt(topic, 60) || 'pets';
+        const prompt = `Create a short English grammar dialogue about "${t}" for Brazilian teens and adults (16+) at A1-A2 level.\nRespond ONLY with valid JSON with these fields: "emoji" (one), "scene" (one sentence setting the scene), "intro" (one sentence introducing the dialogue), "grammarFocus" (the grammar point practised), "questions" (exactly 6 items, each with "prompt" (a sentence with ___ where the missing word goes), "choices" (3 options), "answer" (the exact text of one choice) and "explanation" (one short sentence)).`;
+        callOpenAI([{ role: 'user', content: prompt }], 700, 0.8, res, req, { json: true }); return;
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {
-        const { topic, vocab, level, grammar } = await readBody(req);
+        const corpoLq = await readBody(req);
+        const topic = textoLivreParaPrompt(corpoLq.topic, 120);
+        const vocab = listaParaPrompt(corpoLq.vocab, 30, 40);
+        const level = /^(A1|A2|B1|B2|C1|C2)$/i.test(String(corpoLq.level || '')) ? String(corpoLq.level).toUpperCase() : '';
+        const grammar = textoLivreParaPrompt(corpoLq.grammar, 200);
         // O prompt antigo dizia "for children" e travava o nivel em 'beginner'.
         // Os alunos sao ADULTOS (tecnicos de GPS agricola, candidato a vaga,
         // profissionais). E o exemplo de JSON usava opts ["A","B","C","D"]:
@@ -3192,21 +3540,44 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/lesson-chat') {
-        const { history, message, lessonTopic, vocab, lang = 'en' } = await readBody(req);
-        const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
+        const { history: historyRaw, message: messageRaw, lessonTopic, vocab: vocabRaw, lang = 'en' } = await readBody(req);
+        if (typeof messageRaw !== 'string' || !messageRaw.trim() || messageRaw.length > 2000) {
+            throw new HttpError(400, 'invalid_message', 'Message must contain 1 to 2000 characters.');
+        }
+        const message = messageRaw.trim();
+        const vocab = listaParaPrompt(vocabRaw, 8, 40);
         const temaLimpo = textoParaPrompt(lessonTopic, 120);
-        // O vocab vinha do cliente e entrava CRU no prompt, sem limite de
-        // tamanho — o mesmo buraco que o lessonTopic tinha. Mesmo filtro dele.
-        const vocabLimpo = (Array.isArray(vocab) ? vocab : []).slice(0, 8)
-            .map(v => textoParaPrompt(v, 40)).filter(Boolean);
-        const system = `You are Yara, a friendly capybara teaching ${targetLanguage} to Brazilian students.\nLesson: "${temaLimpo}". Vocabulary: ${vocabLimpo.join(', ')}.\nRules: under 2 sentences per reply; use beginner ${targetLanguage}; end with a question; be warm and encouraging. Answer in Brazilian Portuguese when the student asks for meaning, translation, or says they are stuck. Explain briefly in Portuguese, then give the ${targetLanguage} again so they can try.`;
+        // Same Yara as /api/chat: the persona catalogue sets tone, level and the
+        // Portuguese-help rule; this route only adds the lesson. Its own copy
+        // had drifted and pinned every student at "beginner".
+        // The student comes from perfilDoAluno, as in /api/chat. A lost helper
+        // (nivelDoAluno) made this route answer 500 after the merge (30/set).
+        const persona = personaDe('conversa');
+        const perfil = await perfilDoAluno(req._securityIdentity?.appUserId || null,
+            req._securityIdentity && req._securityIdentity.appAccount);
+        const ctx = {
+            idioma: idiomaDe(lang),
+            faixa: perfil.faixa, perfil,
+            fracas: [], tema: temaLimpo, vocab, cargo: '', abertura: [],
+        };
+        const system = [
+            ...persona.nucleo(ctx),
+            ...persona.texto_modo(ctx),
+            temaLimpo ? `This chat practises the lesson "${temaLimpo}".` : '',
+            vocab.length ? `Use the lesson vocabulary naturally: ${vocab.join(', ')}.` : '',
+        ].filter(Boolean).join(' ');
         const messages = [{ role: 'system', content: system }];
-        (Array.isArray(history) ? history.slice(-12) : []).forEach(m => {
-            const texto = String(m?.content ?? m?.text ?? '').slice(0, 500);
-            if (texto) messages.push({ role: (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user', content: texto });
+        // Last 12 turns, 500 characters each: enough context for a lesson chat,
+        // and a client can't inflate the prompt (production's caps, 26/set).
+        (Array.isArray(historyRaw) ? historyRaw.slice(-12) : []).forEach(m => {
+            // lessons.html and self-study.js send {role:'model', text}; accept
+            // {role:'assistant', content} too, as /api/chat does.
+            const text = String(m?.content ?? m?.text ?? '').slice(0, 500);
+            const papel = (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user';
+            if (text) messages.push({ role: papel, content: text });
         });
-        messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
-        callOpenAI(messages, 120, 0.85, res, req); return;
+        messages.push({ role: 'user', content: message });
+        callOpenAI(messages, 150, 0.85, res, req); return;
     }
 
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
@@ -3216,7 +3587,14 @@ Respond ONLY with valid JSON, no markdown:
         const board = await sbPublic('/rpc/public_leaderboard', {
             method: 'POST', body: JSON.stringify({ p_limit: 20 }),
         });
-        res.status(200).json(board); return;
+        // Names/avatars are typed by students and shown to everyone: no markup
+        // leaves the server, whatever the page does with it.
+        const limpo = Array.isArray(board) ? board.map(r => ({
+            ...r,
+            name: String(r?.name ?? '').replace(/[<>]/g, '').slice(0, 80),
+            avatar: String(r?.avatar ?? '').replace(/[<>]/g, '').slice(0, 32) || '🐾',
+        })) : board;
+        res.status(200).json(limpo); return;
     }
 
     // Permanently retired: this endpoint previously exposed password material.
@@ -3560,107 +3938,6 @@ Respond ONLY with valid JSON, no markdown:
         return;
     }
 
-    // ── Magic Link Auth ──────────────────────────────────────────────────────
-    // POST /api/auth/magic-link  body: { email }
-    // Creates account if needed, generates 15-min token, sends email via Resend.
-    if (req.method === 'POST' && url === '/api/auth/magic-link') {
-        const { email } = await readBody(req);
-        const norm = (email || '').toLowerCase().trim();
-        if (!norm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) {
-            res.status(400).json({ error: 'invalid_email' }); return;
-        }
-        // Abuse limit (5/day for free, scales with plan)
-        const _rl = await checkRateLimit(req, 'magic-link', null);
-        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
-
-        // Find or create account
-        const found = await sb(`/accounts?email=eq.${encodeURIComponent(norm)}&select=id,name`);
-        let userId   = found?.[0]?.id;
-        let userName = found?.[0]?.name;
-        let isNewUser = false;
-        if (!userId) {
-            userId   = 'magic-' + crypto.randomBytes(8).toString('hex');
-            userName = norm.split('@')[0];
-            await sb('/accounts', {
-                method: 'POST',
-                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-                body: JSON.stringify({
-                    id: userId, name: userName, email: norm,
-                    password: '__magic__' + crypto.randomBytes(8).toString('hex'),
-                    avatar: '🐾', pending_setup: false,
-                    created_at: new Date().toISOString(),
-                }),
-            });
-            isNewUser = true;
-        }
-
-        // Generate token (15-min expiry)
-        const token = crypto.randomBytes(24).toString('base64url');
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-        await sb('/magic_link_tokens', {
-            method: 'POST',
-            headers: { 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ token, email: norm, user_id: userId, expires_at: expiresAt }),
-        });
-
-        const verifyUrl = `https://www.capyenglish.com.br/verify.html?token=${token}`;
-        const RESEND_KEY = process.env.RESEND_API_KEY;
-
-        // Dev mode: no Resend key → return link directly so testing still works
-        if (!RESEND_KEY) {
-            console.warn('[magic-link] RESEND_API_KEY not set — returning link in response (dev mode)');
-            res.status(200).json({
-                ok: true, isNewUser, devLink: verifyUrl,
-                warning: 'RESEND_API_KEY not configured. Showing link directly (dev mode only).',
-            });
-            return;
-        }
-
-        // Send email via Resend
-        const html = `<!DOCTYPE html><html lang="pt-BR"><body style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f8fafc;padding:24px;margin:0">
-<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 30px rgba(0,0,0,.06)">
-  <div style="text-align:center;font-size:48px;margin-bottom:8px">🐾</div>
-  <h1 style="color:#001f3f;font-weight:900;font-size:22px;margin:0 0 12px;text-align:center">Seu link de acesso</h1>
-  <p style="font-size:15px;color:#475569;line-height:1.6;text-align:center;margin:0 0 24px">Olá, <strong>${userName}</strong>! Clique no botão abaixo para entrar na Capy English. O link expira em 15 minutos.</p>
-  <div style="text-align:center;margin:28px 0">
-    <a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg,#FF9F1C,#fb923c);color:#fff;font-weight:900;padding:15px 32px;border-radius:14px;text-decoration:none;font-size:15px;box-shadow:0 8px 20px rgba(249,115,22,.3)">⚡ Entrar agora</a>
-  </div>
-  <p style="font-size:12px;color:#94a3b8;line-height:1.6;text-align:center;margin:24px 0 8px">Se você não solicitou esse link, é só ignorar.</p>
-  <p style="font-size:11px;color:#cbd5e1;line-height:1.5;text-align:center;word-break:break-all;margin:0">Ou copie e cole no navegador:<br>${verifyUrl}</p>
-  <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0">
-  <p style="font-size:11px;color:#94a3b8;text-align:center;margin:0">Capy English · Aprenda inglês com a Yara 🌿</p>
-</div></body></html>`;
-
-        try {
-            const sendRes = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + RESEND_KEY,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    from: process.env.EMAIL_FROM || 'Capy English <contato@capyenglish.com.br>',
-                    to: [norm],
-                    subject: '🐾 Seu link de acesso · Capy English',
-                    html,
-                }),
-            });
-            if (!sendRes.ok) {
-                const errText = await sendRes.text();
-                console.error('[magic-link] Resend error:', sendRes.status, errText.slice(0, 300));
-                res.status(502).json({ error: 'email_send_failed', details: errText.slice(0, 200) });
-                return;
-            }
-            console.log('[legacy-magic-link] message sent');
-            res.status(200).json({ ok: true, isNewUser });
-            return;
-        } catch (e) {
-            console.error('[magic-link] fetch error:', e.message);
-            res.status(500).json({ error: 'email_send_failed', details: e.message });
-            return;
-        }
-    }
-
     // POST /api/auth/verify  body: { token }
     // Validates token, marks used, returns user object for client to save as session.
     if (req.method === 'POST' && url === '/api/auth/verify') {
@@ -3861,10 +4138,10 @@ Rules:
             let data = '';
             aiRes.on('data', c => data += c);
             aiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const learning = JSON.parse(content);
                     res.status(200).json({ videoId, transcript: transcriptSnippet, ...learning });
@@ -3883,7 +4160,9 @@ Rules:
 
     // POST /api/personalize → AI mini-lesson themed around user interests
     if (req.method === 'POST' && url === '/api/personalize') {
-        const { topic, vocab } = await readBody(req);
+        const corpoPe = await readBody(req);
+        const topic = textoLivreParaPrompt(corpoPe.topic, 120);
+        const vocab = listaParaPrompt(corpoPe.vocab, 20, 40);
         const userId = req._securityIdentity?.appUserId || null;
         const _rl = await checkRateLimit(req, 'personalize', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
@@ -3893,9 +4172,11 @@ Rules:
             const rows = await sbUser(req._securityIdentity, `/user_profiles?id=eq.${encodeURIComponent(userId)}&select=*`);
             const p = rows?.[0];
             if (p) {
-                interests = (p.interests || []).join(', ') || interests;
-                detail    = p.interests_detail || '';
-                level     = p.english_level    || level;
+                // Profile text is the student's own writing ("Sobre mim"): it goes
+                // into the prompt through the same filters as any student text.
+                interests = listaParaPrompt(p.interests, 10, 40).join(', ') || interests;
+                detail    = textoLivreParaPrompt(p.interests_detail, 300);
+                level     = textoParaPrompt(p.english_level, 20) || level;
             }
         }
 
@@ -3937,10 +4218,10 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar aula personalizada.' }); }
@@ -3994,10 +4275,10 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 try {
                     const parsed = JSON.parse(data);
-                    if (parsed.error) { res.status(502).json({ error: parsed.error.message || 'Erro na transcrição.' }); return; }
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
+                    if (parsed.error) { console.error('[transcribe] upstream', String(parsed.error.message || '').slice(0, 300)); res.status(502).json({ error: 'Erro na transcrição.' }); return; }
                     res.status(200).json({ text: (parsed.text || '').trim() });
                 } catch (e) { res.status(500).json({ error: 'Erro ao processar a transcrição.' }); }
             });
@@ -4007,11 +4288,11 @@ Rules:
     }
 
     // ── Admin: conceder plano por e-mail (cortesias) ─────────────────────────
-    // POST /api/admin/grant-plan {email, plan?, expiresAt?} · Auth: Bearer CRON_SECRET
+    // POST /api/admin/grant-plan {email, plan?, expiresAt?} · Auth: admin session (isAdminReq)
     if (req.method === 'POST' && url === '/api/admin/grant-plan') {
         assertCsrf(req);
         // Same auth path as every other /api/admin/* route: a session whose
-        // app_metadata.role === 'admin', or Bearer ADMIN_KEY/CRON_SECRET.
+        // app_metadata.role === 'admin' (aal2 once ADMIN_REQUIRE_MFA=true).
         // requireRole() is deliberately not used here because it also demands
         // MFA (aal2), which no admin account has enrolled — that made granting
         // courtesies impossible from admin.html. Owner-authorised 30/jul.
@@ -4085,7 +4366,6 @@ Rules:
             console.error('[grant-plan] nao consegui gerar o link de acesso:', e.message);
         }
 
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({
             ok: true, userId, accountCreated: created, profile: check?.[0] || null, loginUrl,
         });
@@ -4431,7 +4711,8 @@ Rules:
         const norm = String(email || '').toLowerCase().trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(norm)) { res.status(400).json({ error: 'invalid_email' }); return; }
         const senha = String(password || '');
-        if (senha.length < 8) { res.status(400).json({ error: 'senha_curta', message: 'A senha precisa ter pelo menos 8 caracteres.' }); return; }
+        if (senha.length < 12) { res.status(400).json({ error: 'senha_curta', message: 'A senha precisa ter pelo menos 12 caracteres.' }); return; }
+        if (await senhaVazada(senha)) { res.status(400).json({ error: 'pwned_password', message: MSG_SENHA_VAZADA }); return; }
 
         // O log de auditoria registra QUEM e QUANDO, nunca a senha.
         await writeSecurityAudit(req, 'admin.password.set', 'account', norm);
@@ -4779,7 +5060,7 @@ Rules:
             completedAt: r.data?.completedAt || r.updated_at,
             score: r.data?.score ?? null,
             byBand: r.data?.byBand || {},
-        }));
+        })).sort((a, b) => String(b.completedAt || '').localeCompare(String(a.completedAt || '')));
         res.status(200).json({ results });
         return;
     }
@@ -4828,7 +5109,6 @@ Rules:
 
     // GET /api/push-public-key → VAPID public key for client subscription
     if (req.method === 'GET' && url === '/api/push-public-key') {
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({ key: process.env.VAPID_PUBLIC_KEY || null });
         return;
     }
@@ -4873,7 +5153,7 @@ Rules:
             const r = await chatComplete([
                 { role: 'system', content: 'Você é o assistente de um professor de inglês brasileiro. Responda SEMPRE em português do Brasil, direto e sem enrolação, como quem fala com o professor no café. Devolva APENAS um objeto JSON com estas chaves: "manchete" (uma frase sobre o dia), "churn" (array de até 5 strings: quem está em risco de sumir e o que fazer), "acoes" (array de até 4 strings: o que o professor faz hoje), "conteudo" (array de até 3 strings: o que cobrir na próxima aula), "animo" (uma frase de incentivo honesta, sem bajulação). Não invente dados que não estão no relatório.' },
                 { role: 'user', content: prompt },
-            ], { json: true, temperature: 0.3, maxTokens: 700 });
+            ], { json: true, temperature: 0.3, maxTokens: 700, rota: req.url.split('?')[0] });
             usage = r.usage;
             brief = sanitizeAiOutput(JSON.parse(r.text));
         } catch (e) {
@@ -5056,7 +5336,6 @@ Rules:
         if (podadas) console.warn(`[send-reminders] ${podadas} inscricao(oes) morta(s) removida(s)`);
 
         await registrarCron('send-reminders', { ok: true, detalhe: `${pushed} notificacao(oes), ${emailed} e-mail(s), ${errors} erro(s)` });
-        if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
         res.status(200).json({
             ok: true, date: today, pushed, emailed, skipped, errors, podadas,
             nudgedNewcomers, totalUsers: states.filter(s => ehAluno(s.user_id)).length,
@@ -5074,7 +5353,6 @@ Rules:
 
         const student = String(text || '').slice(0, 2000).trim();
         if (!student || student.split(/\s+/).length < 3) {
-            if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
             res.status(400).json({ error: 'Escreva pelo menos uma frase para a Yara corrigir.' }); return;
         }
 
@@ -5119,10 +5397,10 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     const out = JSON.parse(content);
                     out.score = Math.min(5, Math.max(1, parseInt(out.score, 10) || 3));
@@ -5143,10 +5421,10 @@ Rules:
         const _rl = await checkRateLimit(req, 'study-plan', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
-        const mins    = dailyGoalMinutes || 10;
-        const intList = (interests || []).join(', ') || 'various';
-        const lvl     = level || 'beginner';
-        const lesson  = currentLesson || 1;
+        const mins    = Math.max(5, Math.min(180, Number(dailyGoalMinutes) || 10));
+        const intList = listaParaPrompt(interests, 10, 40).join(', ') || 'various';
+        const lvl     = textoLivreParaPrompt(level, 30) || 'beginner';
+        const lesson  = textoLivreParaPrompt(currentLesson, 40) || 1;
 
         const prompt = `You are an expert English study planner for Brazilian learners. Create a 7-day personalized weekly study schedule.
 
@@ -5193,10 +5471,10 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao gerar cronograma.' }); }
@@ -5210,7 +5488,8 @@ Rules:
 
     // POST /api/music → analyze song lyrics, generate vocab/chunks/quiz
     if (req.method === 'POST' && url === '/api/music') {
-        const { lyrics, artist } = await readBody(req);
+        const { lyrics, artist: artistRaw } = await readBody(req);
+        const artist = textoLivreParaPrompt(artistRaw, 80);
         const userId = req._securityIdentity?.appUserId || null;
         const _rl = await checkRateLimit(req, 'music', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
@@ -5261,10 +5540,10 @@ Rules:
             let data = '';
             apiRes.on('data', c => data += c);
             apiRes.on('end', () => {
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 res.setHeader('Content-Type', 'application/json');
                 try {
                     const parsed = JSON.parse(data);
+                    bumpTokens(req?.url?.split('?')[0], parsed?.usage);
                     const content = parsed?.choices?.[0]?.message?.content || '{}';
                     res.status(200).json(JSON.parse(content));
                 } catch(e) { res.status(500).json({ error: 'Erro ao analisar a letra.' }); }
@@ -5275,39 +5554,45 @@ Rules:
     }
 
     // ── Lyrics Proxy ──────────────────────────────────────────────────────────
+    // Both routes used to pass lyrics.ovh's status and body straight through,
+    // with no deadline: a slow provider held the function until Vercel killed
+    // it, and an HTML error page reached a client that expects JSON. Now each
+    // call has a deadline, the answer is checked, and a failure is a JSON error
+    // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
-        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+        const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
-        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`, { timeoutMs: 7000 });
+            if (status !== 200 || !Array.isArray(json?.data)) throw new Error(`lyrics_ovh_${status}`);
+            res.status(200).json({ data: json.data.slice(0, 7) });
+        } catch (e) {
+            console.error('[lyrics-search]', e.message);
+            res.status(502).json({ error: 'music_search_unavailable', message: 'O serviço de músicas não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
         const p = new URL(`https://x.com${req.url}`).searchParams;
-        const artist = p.get('artist') || '';
-        const title  = p.get('title')  || '';
+        const artist = String(p.get('artist') || '').trim().slice(0, 100);
+        const title  = String(p.get('title')  || '').trim().slice(0, 150);
         if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
-        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeoutMs: 7000 });
+            const lyrics = typeof json?.lyrics === 'string' ? json.lyrics.trim() : '';
+            if (status === 200 && lyrics) { res.status(200).json({ lyrics }); return; }
+            if (status === 404 || (status === 200 && !lyrics)) {
+                res.status(404).json({ error: 'lyrics_not_found', message: 'Não achamos a letra desta música.' });
+                return;
+            }
+            throw new Error(`lyrics_ovh_${status}`);
+        } catch (e) {
+            console.error('[lyrics]', e.message);
+            res.status(502).json({ error: 'lyrics_unavailable', message: 'O serviço de letras não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
@@ -5319,10 +5604,12 @@ Rules:
         const qs2 = new URL(req.url, 'http://localhost').searchParams;
         const text = (qs2.get('text') || '').slice(0, 500);
         if (!text.trim()) { res.status(400).json({ error: 'text required' }); return; }
-        const voice = qs2.get('voice') || 'nova';
+        // Fixed voice list (the six every TTS model we use accepts); anything
+        // else falls back to the one the site uses.
+        const VOZES_TTS = new Set(['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer']);
+        const voice = VOZES_TTS.has(qs2.get('voice')) ? qs2.get('voice') : 'nova';
         const lang  = qs2.get('lang')  || 'en';
-        const _ttsUserId = qs2.get('userId');
-        const _rl = await checkRateLimit(req, 'tts', _ttsUserId);
+        const _rl = await checkRateLimit(req, 'tts', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         const isFr = lang === 'fr';
@@ -5352,18 +5639,17 @@ Rules:
                     let d = '';
                     ttsRes.on('data', c => d += c);
                     ttsRes.on('end', () => {
-                        let detail = d;
-                        try { detail = JSON.parse(d)?.error?.message || d; } catch {}
-                        res.status(502).json({ error: 'OpenAI TTS error', detail: String(detail).slice(0, 400) });
+                        // The provider's text can name the org/key or the model: log it, don't send it.
+                        console.error('[tts] upstream', ttsRes.statusCode, String(d).slice(0, 300));
+                        res.status(502).json({ error: 'tts_unavailable' });
                     });
                     return;
                 }
                 res.setHeader('Content-Type', 'audio/mpeg');
                 res.setHeader('Cache-Control', 'public, max-age=86400');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
                 ttsRes.pipe(res);
             });
-            ttsReq.on('error', e => res.status(502).json({ error: e.message }));
+            ttsReq.on('error', e => { console.error('[tts] request', e.message); res.status(502).json({ error: 'tts_unavailable' }); });
             ttsReq.write(body);
             ttsReq.end();
         }
@@ -5445,4 +5731,10 @@ Rules:
       res.end();
     }
   }
+};
+
+// Pure helpers, exposed for tests/security.test.js only.
+module.exports._internos = {
+    caminhoInterno, textoLivreParaPrompt, listaParaPrompt, limparCorpoIa, senhaVazada, rateLimitedResponse,
+    buscarJsonExterno, checkRateLimit,
 };

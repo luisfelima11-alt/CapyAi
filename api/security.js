@@ -7,6 +7,14 @@ const SUPABASE_PUBLIC_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY || '';
 const APP_ORIGIN = (process.env.APP_ORIGIN || 'https://www.capyenglish.com.br').replace(/\/$/, '');
 const IS_PRODUCTION = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+// A Vercel Preview runs in production mode but is served from its own URLs, so
+// with APP_ORIGIN alone nobody could sign in there to test a PR (28/set). Only
+// in Preview, the deployment's URLs count as our own origin too.
+const PREVIEW_ORIGINS = process.env.VERCEL_ENV === 'preview'
+  ? [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+      .filter(Boolean)
+      .map(host => `https://${String(host).replace(/^https?:\/\//, '').replace(/\/$/, '')}`)
+  : [];
 
 const COOKIE_NAMES = IS_PRODUCTION
   ? {
@@ -75,7 +83,13 @@ function setCsrfCookie(res, token) {
   }));
 }
 
-function setSessionCookies(res, session) {
+// A silent renewal keeps the CSRF token the tab already holds: the page reads it
+// once, at load, and a new value here made every later POST from that tab fail
+// with 403 invalid_csrf until a reload (29/set). A new session (login, sign-up,
+// MFA, e-mail link) still gets a new token.
+const CSRF_TOKEN_FORMAT = /^[A-Za-z0-9_-]{43}$/;
+
+function setSessionCookies(res, session, { keepCsrf } = {}) {
   if (!session?.access_token || !session?.refresh_token) {
     throw new HttpError(502, 'invalid_auth_response', 'Authentication provider returned an invalid session.');
   }
@@ -83,7 +97,8 @@ function setSessionCookies(res, session) {
   appendSetCookie(res, cookie(COOKIE_NAMES.access, session.access_token, { maxAge: accessMaxAge }));
   appendSetCookie(res, cookie(COOKIE_NAMES.refresh, session.refresh_token, { maxAge: 30 * 24 * 60 * 60 }));
   clearCookie(res, COOKIE_NAMES.guest);
-  const csrfToken = crypto.randomBytes(32).toString('base64url');
+  const csrfToken = CSRF_TOKEN_FORMAT.test(String(keepCsrf || ''))
+    ? keepCsrf : crypto.randomBytes(32).toString('base64url');
   setCsrfCookie(res, csrfToken);
   return csrfToken;
 }
@@ -115,7 +130,8 @@ function safeEqual(a, b) {
 
 function isAllowedOrigin(origin) {
   if (!origin) return !IS_PRODUCTION;
-  if (origin.replace(/\/$/, '') === APP_ORIGIN) return true;
+  const normalized = origin.replace(/\/$/, '');
+  if (normalized === APP_ORIGIN || PREVIEW_ORIGINS.includes(normalized)) return true;
   if (!IS_PRODUCTION && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return true;
   return false;
 }
@@ -241,6 +257,44 @@ async function refreshSession(refreshToken) {
   }
 }
 
+// ── MFA (TOTP) — Supabase Auth factors API, called with the user's own token ──
+// Verifying a code returns a new aal2 session (and Supabase signs the user's
+// other sessions out), which the caller stores with setSessionCookies.
+function bearer(accessToken) {
+  if (!accessToken) throw new HttpError(401, 'authentication_required', 'Authentication required.');
+  return { Authorization: `Bearer ${accessToken}` };
+}
+
+async function mfaEnroll(accessToken, friendlyName) {
+  return authRequest('/auth/v1/factors', {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({ factor_type: 'totp', friendly_name: friendlyName }),
+  });
+}
+
+async function mfaUnenroll(accessToken, factorId) {
+  return authRequest(`/auth/v1/factors/${encodeURIComponent(factorId)}`, {
+    method: 'DELETE',
+    headers: bearer(accessToken),
+  });
+}
+
+async function mfaChallengeAndVerify(accessToken, factorId, code) {
+  const id = encodeURIComponent(factorId);
+  const challenge = await authRequest(`/auth/v1/factors/${id}/challenge`, {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({}),
+  });
+  if (!challenge?.id) throw new HttpError(502, 'mfa_challenge_failed', 'Could not start the MFA challenge.');
+  return authRequest(`/auth/v1/factors/${id}/verify`, {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({ challenge_id: challenge.id, code }),
+  });
+}
+
 function decodeJwtPayload(token) {
   try {
     const part = String(token).split('.')[1];
@@ -256,7 +310,7 @@ async function getAuthenticatedSession(req, res) {
   if (!user && cookies[COOKIE_NAMES.refresh]) {
     const refreshed = await refreshSession(cookies[COOKIE_NAMES.refresh]);
     if (refreshed?.access_token) {
-      req._capyCsrfToken = setSessionCookies(res, refreshed);
+      req._capyCsrfToken = setSessionCookies(res, refreshed, { keepCsrf: cookies[COOKIE_NAMES.csrf] });
       accessToken = refreshed.access_token;
       user = refreshed.user || await getUser(accessToken);
     }
@@ -343,13 +397,21 @@ async function requireRole(req, res, allowedRoles) {
   return { ...identity, role };
 }
 
+// Name and avatar are student-controlled (the account row and the Supabase
+// user_metadata are both writable by their owner) and the browser caches them
+// for the nav and the leaderboard. Strip markup here so no page has to be the
+// last line of defence.
+function semMarcacao(value, max) {
+  return String(value == null ? '' : value).replace(/[<>]/g, '').slice(0, max);
+}
+
 function publicUser(user, appUser = null) {
   return {
     id: appUser?.id || user?.id,
     authUserId: user?.id,
-    name: appUser?.name || user?.user_metadata?.name || '',
+    name: semMarcacao(appUser?.name || user?.user_metadata?.name || '', 80),
     email: user?.email || '',
-    avatar: appUser?.avatar || user?.user_metadata?.avatar || '🐾',
+    avatar: semMarcacao(appUser?.avatar || user?.user_metadata?.avatar || '🐾', 32) || '🐾',
     role: user?.app_metadata?.role || 'student',
   };
 }
@@ -376,6 +438,9 @@ module.exports = {
   getAuthenticatedSession,
   getRequestIdentity,
   exchangePkceCode,
+  mfaChallengeAndVerify,
+  mfaEnroll,
+  mfaUnenroll,
   parseCookies,
   publicUser,
   requestPasswordReset,

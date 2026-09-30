@@ -986,41 +986,6 @@ Provide exactly 6 questions. Keep language very simple. Each question has exactl
         return;
     }
 
-    // ── POST /api/parent-report  (AI Progress Analysis) ──────────────────────
-    if (req.method === 'POST' && req.url === '/api/parent-report') {
-        let body = '';
-        req.on('data', c => body += c);
-        req.on('end', () => {
-            try {
-                const { name, xp, badges, lessons, recentDate } = JSON.parse(body);
-                const prompt = `Act as an encouraging, professional educational analyst for a children's language app.
-Review this child's progress data:
-- Name: ${name || 'The student'}
-- Total XP: ${xp || 0}
-- Badges Earned: ${badges ? badges.length : 0}
-- Flashcards/Decks completed: ${lessons ? lessons.length : 0}
-- Last active: ${recentDate || 'Recently'}
-
-Write a 2-3 paragraph summary for the parents.
-Focus on:
-1. Celebrating their effort and consistency.
-2. Highlighting their engagement with the app.
-3. Providing one constructive, practical tip for the parent to practice English with them offline this week (e.g. at the dinner table).
-
-Keep the tone extremely warm, positive, and concise.
-Respond ONLY with valid JSON — no markdown, no code block.
-Format exactly:
-{"title":"Weekly Progress Report for ${name || 'Your Child'}","summary":"[Paragraph 1]\\n\\n[Paragraph 2]","parentTip":"[The tip]"}
-`;
-                callOpenAI([{ role: 'user', content: prompt }], 500, 0.7, res);
-            } catch (e) {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Bad request' }));
-            }
-        });
-        return;
-    }
-
     // ── POST /api/lesson-quiz  (AI quiz questions for a lesson topic) ─────────
     if (req.method === 'POST' && req.url === '/api/lesson-quiz') {
         let body = '';

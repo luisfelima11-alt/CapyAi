@@ -32,7 +32,10 @@ const Components = {
         let sessionAvatar = '🐾';
         try {
             const sess = JSON.parse(localStorage.getItem('capySession') || 'null');
-            if (sess) { sessionName = sess.name || ''; sessionAvatar = sess.avatar || '🐾'; }
+            // Both end up inside HTML below (a title attribute and text), and the
+            // name is whatever the student typed: escape before interpolating.
+            const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            if (sess) { sessionName = esc(sess.name || ''); sessionAvatar = esc(sess.avatar || '🐾'); }
         } catch(e) {}
 
         return `
@@ -347,7 +350,6 @@ const Components = {
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="privacidade.html">Privacidade</a>
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="termos.html">Termos</a>
                     <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="privacidade.html#seguranca">Segurança</a>
-                    <a class="text-emerald-100/70 hover:text-white transition-all cursor-pointer hover:translate-y-[-2px]" href="parent_dashboard.html">Pais</a>
                 </div>
                 <div class="text-emerald-300">© 2026 Capy Yara English</div>
                 <div class="flex gap-4">

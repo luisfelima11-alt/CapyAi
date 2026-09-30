@@ -90,7 +90,9 @@ test('Sobre mim no navegador: editar sem ser expulso, cartao na conta e nivel do
   await new Promise((resolve, reject) => server.listen(0, '127.0.0.1', resolve).once('error', reject));
   const base = 'http://127.0.0.1:' + server.address().port;
   const cspConta = cspDe('account.html');
-  const cspGeral = cspDe('/(.*)');
+  // A CSP das paginas comuns mora na regra que EXCLUI as paginas endurecidas
+  // (/((?!...).*)); a /(.*) ficou so com os outros cabecalhos de seguranca.
+  const cspGeral = cspDe('/((?!');
   let browser;
   try {
     browser = await chromium.launch({ headless: true });
