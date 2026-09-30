@@ -537,25 +537,19 @@ async function sendChat() {
   addTypingIndicator();
 
   try {
-    const session = Auth.getSession();
-    const systemPrompt = `You are Yara, a friendly capybara English teacher. The student just watched a YouTube video.
-Video summary: "${labData?.summary || 'a YouTube video'}"
-Key vocabulary covered: ${(labData?.vocabulary||[]).map(v=>v.word).join(', ')}
-
-Rules:
-- Keep replies to 2-3 sentences.
-- Discuss the video content, help with vocabulary, correct grammar gently.
-- Always end with a question to keep the conversation going.
-- Be warm, encouraging, and use 1-2 emojis.`;
-
-    const res = await fetch('/api/chat', {
+    // Yara chats through /api/lesson-chat with the video summary as context. The
+    // page used to send its own prompt to /api/chat, which ignores it: Yara
+    // answered without knowing the video (29/set).
+    const res = await fetch('/api/lesson-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         history: chatHistory.slice(0, -1),
         message: msg,
-        systemOverride: systemPrompt,
-        userId: session?.id
+        lessonTopic: 'the YouTube video the student just watched',
+        vocab: (labData?.vocabulary || []).map(v => v.word),
+        contexto: labData?.summary || '',
+        lang: 'en'
       })
     });
 

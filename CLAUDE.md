@@ -139,6 +139,10 @@ RLS is on for every table, and column grants keep plan/role out of the browser's
   or through `textContent`, never inside `onclick="…"` strings: use listeners with indexes / `data-*`.
 - Student text going into a prompt passes `textoLivreParaPrompt` / `listaParaPrompt` (`textoParaPrompt`
   for titles and slugs); AI responses leave through `sanitizeAiOutput`.
+- A page never sends its own prompt: `/api/chat` ignores `systemOverride`, and a test fails if a page
+  mentions it. A page that needs a prompt of its own gets a server route (the daily challenge, chapter
+  challenge and Reading Room have one); a chat about something the student studied uses
+  `/api/lesson-chat` with `lessonTopic`, `vocab` and the optional `contexto` (filtered, framed as data).
 - Every AI route is listed in `AI_ROUTE_KEYS`: the central gate identifies the student and applies the
   plan's daily limit (guests: 3 AI uses a day). The lyrics proxies (`ROTAS_SEM_IA`) use their own limit
   and never spend a guest's AI uses.
@@ -668,7 +672,8 @@ Source of truth: the `if (req.method === … && url === …)` blocks in `api/ind
   `POST /api/track`, `GET /api/db/leaderboard` (public, names without markup).
 - **AI (per-plan limits, `AI_ROUTE_KEYS`):** `/api/chat`, `/api/lesson-chat`, `/api/quiz`,
   `/api/lesson-quiz`, `/api/translate`, `/api/story`, `/api/flashcard-deck`, `/api/dialogue-scene`,
-  `/api/word-of-day`, `/api/daily-challenge`, `POST /api/daily-challenge/avaliar`, `/api/newsline`, `/api/historyline`,
+  `/api/word-of-day`, `/api/daily-challenge`, `POST /api/daily-challenge/avaliar`, `POST /api/boss-chat/avaliar`,
+  `POST /api/reading-story`, `/api/newsline`, `/api/historyline`,
   `/api/youtube`, `/api/personalize`, `/api/correct-writing`, `/api/study-plan`, `/api/music`,
   `/api/lyrics-search`, `/api/lyrics`, `/api/transcribe`, `GET /api/tts`.
 - **Voice:** `POST /api/realtime-token`, `/api/conversa-uso`, `/api/conversa-feedback`, `GET /api/personas`.

@@ -312,8 +312,9 @@ test('no student personal data is tracked, and security.txt ships', () => {
 test('site prompts are written for teens and adults, not small children', () => {
   const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
   assert.doesNotMatch(api, /children aged|for a child|a child named|children's language app/i);
-  // quiz, word-of-day, daily-challenge and its grading, flashcard-deck, dialogue-scene; story words it its own way
-  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 6);
+  // quiz, word-of-day, daily-challenge and its grading, flashcard-deck, dialogue-scene, the chapter
+  // challenge verdict and the Reading Room story; story words it its own way
+  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 8);
   assert.match(api, /for a Brazilian learner \(16\+\) named/);
   // Single gold examples with real values are what this model copies.
   assert.doesNotMatch(api, /"word":"Butterfly"|"title":"Use a Brave Word!"|"word":"Sun"|___ dog is fluffy|\["Apple","River","Bird","Tree"\]/);
@@ -546,4 +547,21 @@ test('a silent session refresh keeps the tab\'s CSRF token, so the next POST sti
   assert.equal(r.cookieCsrf, 'A'.repeat(43), 'the renewal must keep the CSRF token the tab holds');
   assert.equal(r.post, 'passa');
   assert.equal(r.loginTrocou, true, 'a new session (login) still gets a new token');
+});
+
+test('no page sends its own prompt: /api/chat ignores systemOverride, so a page relying on it breaks in silence', () => {
+  // Found 29-30/set: the daily challenge, the chapter challenge, the YouTube Lab
+  // chat and the Reading Room all did, and each looked fine until it was used.
+  // A page that needs a prompt of its own gets a server route.
+  const arquivos = [];
+  (function andar(dir) {
+    for (const nome of fs.readdirSync(dir)) {
+      if (['node_modules', '.git', 'api', 'scripts', 'tests', 'supabase'].includes(nome)) continue;
+      const cheio = path.join(dir, nome);
+      if (fs.statSync(cheio).isDirectory()) andar(cheio);
+      else if (/\.(html|js)$/.test(nome)) arquivos.push(cheio);
+    }
+  })(ROOT);
+  const culpados = arquivos.filter(f => fs.readFileSync(f, 'utf8').includes('systemOverride')).map(f => path.relative(ROOT, f));
+  assert.deepEqual(culpados, []);
 });
