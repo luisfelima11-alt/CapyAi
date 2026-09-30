@@ -67,6 +67,10 @@ fica so como reforco, se o `curl` no www nao mostrar o conteudo novo.
 
 Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
 
+A Preview runs in production mode from its own `*.vercel.app` URLs. Writes accept `APP_ORIGIN` and,
+only when `VERCEL_ENV=preview`, the deployment's `VERCEL_URL` / `VERCEL_BRANCH_URL` (`PREVIEW_ORIGINS`
+in `api/security.js`). Sign in there with a password: magic links and e-mails point to `APP_ORIGIN`.
+
 ## GitHub
 
 ```
@@ -151,6 +155,12 @@ async function sb(path, opts = {}) {
 
 `/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
 Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
+
+**AI routes: reads vs writes (28/set/2026).** Writes need an allowed `Origin` and, with session cookies,
+the CSRF token. A same-origin GET sends neither, so a GET AI route with cookies (lyrics search, lyrics,
+TTS, daily challenge, word of the day) is checked by `Sec-Fetch-Site` instead (`assertLeituraDoProprioSite`).
+Test such rules with `NODE_ENV=production`: outside production a missing `Origin` passes and hides the bug.
+The lyrics proxies (`ROTAS_SEM_IA`) have their own limit and never spend a guest's AI uses.
 
 ### Lesson Architecture
 
