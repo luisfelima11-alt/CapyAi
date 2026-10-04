@@ -40,7 +40,9 @@ Local `.env` (never committed): `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_PUBL
 (default `gpt-4o-mini`), `OPENROUTER_API_KEY`, `PORT`.
 
 Tests: `npm run test:security` (node --test, no network or keys needed); `npm run security:check`
-adds `npm audit`. Add a case to `tests/security.test.js` for every security-relevant change.
+adds `scripts/audit.js`, which the CI runs too: `npm audit` at high, where the production dependencies
+get no exception and an advisory only the dev tools reach (Tailwind, Playwright) can get a dated one in
+`EXCECOES`. Add a case to `tests/security.test.js` for every security-relevant change.
 
 ## Deployment and branches
 
