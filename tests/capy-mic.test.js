@@ -226,7 +226,7 @@ function transcribeHarness(body) {
     req: { method: 'POST' }, res, url: '/api/transcribe', origin: null, https, crypto, Buffer, JSON, Math,
     readBody: async () => body, checkRateLimit: async () => ({ ok: true }), rateLimitedResponse() {},
     // A rota conta os tokens do Whisper (bumpTokens) e manda o erro do provedor para o log.
-    bumpTokens() {}, console,
+    bumpTokens() {}, bumpCustoIa() {}, PRECO_TRANSCRICAO_POR_MINUTO: 0.006, console,
     MAX_AUDIO_BODY: 8 * 1024 * 1024, CHAT_KEY: 'k', API_KEY: 'k',
     TRANSCRIBE_LANGS: vm.runInNewContext(langs[1]),
   });
