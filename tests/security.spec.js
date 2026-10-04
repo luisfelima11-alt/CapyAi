@@ -125,7 +125,8 @@ test('continue as signed guest goes home without profile lookup or onboarding', 
   const calls = await mockLoginApi(page, { status: 401, guest });
   await page.goto(LOGIN_PAGE);
   await page.evaluate(() => window.Auth.ready());
-  await page.getByRole('button', { name: 'Continue as Guest' }).click();
+  // O botao foi traduzido na tela de login ("Entrar como visitante").
+  await page.getByRole('button', { name: /Entrar como visitante/ }).click();
   await expect(page).toHaveURL(new RegExp(HOME_PAGE.replace(/\./g, '\\.') + '$'));
   expect(calls.filter(call => call.path === '/api/auth/guest')).toEqual([
     { path: '/api/auth/guest', method: 'POST' },

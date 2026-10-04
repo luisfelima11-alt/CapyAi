@@ -13,11 +13,13 @@ test.beforeEach(async ({ page }) => {
 
 test('Turkish course exposes nine chapters and links to its own trail', async ({ page }) => {
   await page.goto('/classes_tr.html');
-  await expect(page.getByRole('heading', { name: /Türkçe Başlangıç/ })).toBeVisible();
+  // The page was redesigned: its heading is now "Türkçe, passo a passo."
+  await expect(page.getByRole('heading', { name: /Türkçe,\s*passo a passo/ })).toBeVisible();
   await expect(page.locator('#chapter-tabs button')).toHaveCount(9);
   await expect(page.locator('#tr-lessons > a')).toHaveCount(4);
   await expect(page.locator('body')).toContainText('144 minilições');
-  await expect(page.locator('a[href="learn.html?lang=tr"]')).toBeVisible();
+  // Two links lead to the trail since the redesign (hero button and card).
+  await expect(page.locator('a[href="learn.html?lang=tr"]').first()).toBeVisible();
 });
 
 test('Turkish daily trail is separate and opens Turkish guided content', async ({ page }) => {

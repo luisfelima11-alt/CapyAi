@@ -41,11 +41,43 @@
     <button id="gate-btn" class="w-full bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Entrar com conta administrativa</button>
     <button id="gate-trocar" class="hidden w-full bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Sair e entrar como administrador</button>
     <p id="gate-error" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    <!-- MFA: code from an authenticator that is already set up -->
+    <form id="mfa-code-form" class="hidden mt-5 text-left" autocomplete="off">
+      <p class="text-xs text-white/60 mb-2">Digite o código de 6 dígitos do seu app autenticador.</p>
+      <input id="mfa-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 text-center tracking-[0.4em] mono">
+      <button id="mfa-code-btn" type="submit" class="w-full mt-3 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Confirmar</button>
+      <p id="mfa-code-erro" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    </form>
+  </div>
+</div>
+
+
+<!-- ── MFA enrolment (QR code) ────────────────────────────────────────────── -->
+<div id="mfa-setup" class="hidden fixed inset-0 z-[60] flex items-center justify-center px-5 bg-[#000e1c]/95">
+  <div class="card rounded-3xl p-8 w-full max-w-sm fade-up text-center">
+    <span class="material-symbols-outlined text-5xl text-[#FF9F1C]" style="font-variation-settings:'FILL' 1">phonelink_lock</span>
+    <h2 class="font-black text-lg mt-2 mb-1">Verificação em 2 etapas</h2>
+    <p class="text-xs text-white/60 mb-4">Escaneie o QR code com o Google Authenticator, Authy ou 1Password e digite o código de 6 dígitos que aparecer.</p>
+    <img id="mfa-qr" alt="QR code para o app autenticador" class="hidden mx-auto w-48 h-48 bg-white rounded-xl p-2">
+    <p class="text-[11px] text-white/50 mt-3">Sem câmera? Digite esta chave no app (guarde uma cópia num gerenciador de senhas):</p>
+    <code id="mfa-secret" class="block text-xs break-all bg-white/5 rounded-lg p-2 mt-1 select-all mono"></code>
+    <form id="mfa-setup-form" class="mt-4" autocomplete="off">
+      <input id="mfa-setup-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="w-full px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 text-center tracking-[0.4em] mono">
+      <button id="mfa-setup-btn" type="submit" class="w-full mt-3 bg-gradient-to-r from-[#FF9F1C] to-[#FF3E81] text-navy font-black py-3 rounded-xl text-sm">Ativar</button>
+    </form>
+    <p id="mfa-setup-erro" class="hidden text-red-400 text-xs font-bold mt-3"></p>
+    <button id="mfa-setup-cancel" type="button" class="mt-4 text-xs font-bold text-white/50 hover:text-white">Agora não</button>
   </div>
 </div>
 
 <!-- ── App shell ──────────────────────────────────────────────────────────── -->
 <div id="app" class="hidden">
+  <div id="mfa-banner" class="hidden bg-[#FF9F1C]/15 border-b border-[#FF9F1C]/30 text-xs">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-3">
+      <p class="text-[#FFD08A] font-bold">Proteja o painel: ative a verificação em 2 etapas. Sem ela, quem descobrir sua senha entra aqui.</p>
+      <button id="mfa-banner-btn" type="button" class="bg-[#FF9F1C] text-navy font-black px-3 py-1.5 rounded-lg whitespace-nowrap">Ativar agora</button>
+    </div>
+  </div>
 
   <!-- Admin antigo (26/set): o novo e o admin.html. Este fica no ar enquanto
        CRM, GPS Tronic, Corrida XP e Metricas nao passam para o novo. -->
@@ -186,7 +218,7 @@
         <div class="flex flex-col sm:flex-row gap-2">
           <input id="pwd-email" type="email" placeholder="email@aluno.com" autocomplete="off"
                  class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30">
-          <input id="pwd-senha" type="text" placeholder="senha (mín. 8 caracteres)" autocomplete="new-password"
+          <input id="pwd-senha" type="text" placeholder="senha (mín. 12 caracteres)" autocomplete="new-password"
                  class="flex-1 px-3 py-2.5 rounded-xl bg-white/5 border-2 border-white/10 focus:border-[#FF9F1C] outline-none text-sm text-white placeholder-white/30 mono">
           <button id="pwd-set" class="bg-[#FF9F1C] text-navy font-black px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">Definir</button>
         </div>
@@ -515,8 +547,8 @@
   </div>
 </div>
 
-<script src="auth-secure.js?v=auth20260918"></script>
-<script src="assets/js/pages/admin-1.js?v=adm8"></script>
+<script src="auth-secure.js?v=sec2"></script>
+<script src="assets/js/pages/admin-1.js?v=m0928"></script>
 
   <script src="assets/js/secure-inline-events.js"></script>
 </body>

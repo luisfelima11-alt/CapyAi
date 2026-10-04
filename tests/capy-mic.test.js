@@ -225,6 +225,8 @@ function transcribeHarness(body) {
   const context = vm.createContext({
     req: { method: 'POST' }, res, url: '/api/transcribe', origin: null, https, crypto, Buffer, JSON, Math,
     readBody: async () => body, checkRateLimit: async () => ({ ok: true }), rateLimitedResponse() {},
+    // A rota conta os tokens do Whisper (bumpTokens) e manda o erro do provedor para o log.
+    bumpTokens() {}, console,
     MAX_AUDIO_BODY: 8 * 1024 * 1024, CHAT_KEY: 'k', API_KEY: 'k',
     TRANSCRIBE_LANGS: vm.runInNewContext(langs[1]),
   });

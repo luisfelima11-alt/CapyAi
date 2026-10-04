@@ -165,6 +165,34 @@
     },
   };
 
+  // A visitor at the daily AI cap gets a 429 with {signup:true} (rateLimitedResponse
+  // in api/index.js). Each AI page shows its own generic error, so the invitation
+  // to a free account is shown here, once per page, for every AI feature.
+  let signupInviteShown = false;
+  function showSignupInvite(message) {
+    if (signupInviteShown || !document.body) return;
+    signupInviteShown = true;
+    const box = document.createElement('div');
+    box.id = 'capy-signup-invite';
+    box.setAttribute('role', 'alert');
+    box.setAttribute('translate', 'no');
+    box.style.cssText = 'position:fixed;left:16px;right:16px;bottom:' + (window.innerWidth < 768 ? '96px' : '24px') + ';z-index:9999;max-width:480px;margin:0 auto;background:#001f3f;color:#fff;border-radius:1.5rem;padding:16px 20px;box-shadow:0 12px 32px rgba(0,0,0,.35);font-family:"Plus Jakarta Sans",sans-serif;font-size:14px;line-height:1.45';
+    const text = document.createElement('p');
+    text.style.margin = '0 0 12px';
+    text.textContent = message || 'Crie sua conta grátis para continuar usando a IA hoje.';
+    const cta = document.createElement('a');
+    cta.href = '4_Login_Capy_Yara_Welcomes_You.html#signup';
+    cta.textContent = 'Criar conta grátis';
+    cta.style.cssText = 'display:inline-block;background:#ec4899;color:#fff;font-weight:800;padding:10px 20px;border-radius:9999px;text-decoration:none';
+    const later = document.createElement('button');
+    later.type = 'button';
+    later.textContent = 'Agora não';
+    later.style.cssText = 'margin-left:12px;background:none;border:0;color:rgba(255,255,255,.75);font:inherit;cursor:pointer';
+    later.addEventListener('click', () => box.remove());
+    box.append(text, cta, later);
+    document.body.appendChild(box);
+  }
+
   // Legacy pages use fetch directly. Inject credentials and CSRF centrally.
   window.fetch = function capySecureFetch(input, init = {}) {
     const url = typeof input === 'string' ? input : input?.url || '';
@@ -176,7 +204,14 @@
       const csrf = Auth.getCsrfToken();
       if (csrf) headers.set('X-CSRF-Token', csrf);
     }
-    return nativeFetch(input, { ...init, headers, credentials: 'same-origin' });
+    return nativeFetch(input, { ...init, headers, credentials: 'same-origin' }).then(response => {
+      if (response.status === 429) {
+        response.clone().json()
+          .then(data => { if (data && data.signup === true) showSignupInvite(String(data.message || '')); })
+          .catch(() => {});
+      }
+      return response;
+    });
   };
 
   Auth._session = Auth._readDisplayCache();
