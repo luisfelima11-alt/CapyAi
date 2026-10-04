@@ -634,6 +634,7 @@ let lastBossLessons  = '';
 let bossHistory      = [];   // [{role:'user'|'model', text}]
 let bossTurns        = 0;    // number of student turns sent
 let bossVocab        = [];
+let bossChapterTitle = '';   // the chapter's lesson titles, the topic of the conversation
 const BOSS_TOTAL_TURNS = 6;
 
 async function initBossMode(chapterId, lessonIdsParam) {
@@ -678,6 +679,7 @@ async function initBossMode(chapterId, lessonIdsParam) {
   bossVocab = words;
 
   const chapterTitle = chapterLessons.length ? chapterLessons.map(l => l.title).join(', ') : 'this chapter';
+  bossChapterTitle = chapterTitle;
 
   let container = document.getElementById('boss-container');
   if (!container) {
@@ -737,13 +739,20 @@ function appendBossMsg(who, text) {
   const el = document.getElementById('boss-messages');
   if (!el) return;
   const div = document.createElement('div');
+  const balao = document.createElement('div');
+  // The student's own text and the AI's reply: textContent, never HTML.
+  balao.textContent = text;
   if (who === 'yara') {
     div.className = 'flex gap-2 items-start';
-    div.innerHTML = `<span class="text-xl mt-0.5 flex-shrink-0">🐾</span>
-      <div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]">${text}</div>`;
+    const pata = document.createElement('span');
+    pata.className = 'text-xl mt-0.5 flex-shrink-0';
+    pata.textContent = '🐾';
+    balao.className = 'bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]';
+    div.append(pata, balao);
   } else {
     div.className = 'flex gap-2 items-start justify-end';
-    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]">${text}</div>`;
+    balao.className = 'bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]';
+    div.append(balao);
   }
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
@@ -768,33 +777,44 @@ async function sendBossMessage() {
   el.scrollTop = el.scrollHeight;
 
   const isFinalTurn = bossTurns >= BOSS_TOTAL_TURNS;
-  const systemPrompt = isFinalTurn
-    ? `You are Yara evaluating a chapter challenge. Chapter vocabulary: ${bossVocab.join(', ')}. The conversation is now over. Based on the student's participation, respond ONLY with valid JSON (no markdown fences): {"passed": true/false, "feedback": "a short warm message in English, 1-2 sentences", "wordsUsed": N}. "passed" should be generous — true if the student engaged with English replies that were minimally relevant to the topic.`
-    : `You are Yara evaluating a chapter challenge. Chapter vocabulary: ${bossVocab.join(', ')}. Have a natural 6-turn conversation in simple English about these topics. Encourage the student to use the vocabulary. Keep replies short (2-3 sentences) and friendly.`;
+  const lang = CUR_TTS_LANG === 'fr-FR' ? 'fr' : CUR_TTS_LANG === 'tr-TR' ? 'tr' : 'en';
 
+  // The conversation goes through /api/lesson-chat (Yara with the chapter as the
+  // lesson) and the verdict through /api/boss-chat/avaliar. The page used to send
+  // its own prompt to /api/chat, which ignores it: Yara did not know the chapter
+  // and the verdict never came (29/set).
   try {
-    const resp = await fetch('/api/chat', {
+    if (isFinalTurn) {
+      const resp = await fetch('/api/boss-chat/avaliar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vocab: bossVocab, respostas: bossHistory.filter(h => h.role === 'user').map(h => h.text), lang })
+      });
+      const data = await resp.json().catch(() => null);
+      typing.remove();
+      finishBossChallenge(resp.ok ? data : null);
+      return;
+    }
+
+    const resp = await fetch('/api/lesson-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         history: bossHistory.slice(0, -1).slice(-8),
-        message: isFinalTurn ? (msg + '\n\n[SYSTEM: conversation over — respond with the JSON evaluation now]') : msg,
-        systemOverride: systemPrompt,
-        userId: (JSON.parse(localStorage.getItem('capySession') || 'null') || {}).id || 'guest'
+        message: msg,
+        lessonTopic: bossChapterTitle,
+        vocab: bossVocab,
+        lang
       })
     });
     const data = await resp.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!reply) throw new Error('empty_reply');
     typing.remove();
-
-    if (isFinalTurn) {
-      finishBossChallenge(reply);
-    } else {
-      appendBossMsg('yara', reply);
-      bossHistory.push({ role: 'model', text: reply });
-      input.disabled = false;
-      input.focus();
-    }
+    appendBossMsg('yara', reply);
+    bossHistory.push({ role: 'model', text: reply });
+    input.disabled = false;
+    input.focus();
   } catch (e) {
     typing.remove();
     appendBossMsg('yara', 'Oops, I lost my train of thought! Try again? 🐾');
@@ -803,14 +823,15 @@ async function sendBossMessage() {
   }
 }
 
-function finishBossChallenge(rawReply) {
+// resultado: {passed, feedback, wordsUsed} from /api/boss-chat/avaliar, or null
+// when the verdict could not be made (then the page's own generous rule decides).
+function finishBossChallenge(resultado) {
   let passed, feedback;
-  try {
-    const clean = rawReply.replace(/```json\n?|\n?```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    passed = !!parsed.passed;
-    feedback = parsed.feedback || '';
-  } catch (e) {
+  const wordsUsed = Number(resultado && resultado.wordsUsed) || 0;
+  if (resultado && typeof resultado.passed === 'boolean' && resultado.feedback) {
+    passed = resultado.passed;
+    feedback = String(resultado.feedback);
+  } else {
     // Fallback: generous heuristic — passed if ≥4 student replies with ≥4 words each
     const studentReplies = bossHistory.filter(h => h.role === 'user');
     passed = studentReplies.length >= 4 && studentReplies.filter(r => r.text.trim().split(/\s+/).length >= 4).length >= 4;
@@ -838,7 +859,7 @@ function finishBossChallenge(rawReply) {
       <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
         <div class="text-7xl mb-3">👑</div>
         <h2 class="text-2xl font-black text-navy mb-2">Capítulo dominado!</h2>
-        <p class="text-slate-500 text-sm mb-5">${feedback}</p>
+        <p id="boss-feedback" class="text-slate-500 text-sm mb-5"></p>
         <div class="bg-yellow-50 border border-yellow-200 rounded-2xl px-6 py-3 mb-6 inline-block">
           <p class="font-black text-yellow-700">+50 XP</p>
         </div>
@@ -849,10 +870,16 @@ function finishBossChallenge(rawReply) {
       <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
         <div class="text-6xl mb-3">💪</div>
         <h2 class="text-xl font-black text-navy mb-2">Quase lá!</h2>
-        <p class="text-slate-500 text-sm mb-6">${feedback}</p>
+        <p id="boss-feedback" class="text-slate-500 text-sm mb-6"></p>
         <button onclick="initBossMode(bossChapterId, lastBossLessons)" class="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px] mb-2">🔁 Tentar de novo</button>
         <button onclick="window.location.href='learn.html'" class="w-full bg-slate-100 hover:bg-slate-200 text-navy font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
       </div>`;
+  }
+  // Yara's feedback is AI text: it goes in as text, never as HTML.
+  const fb = document.getElementById('boss-feedback');
+  if (fb) {
+    fb.textContent = feedback;
+    if (wordsUsed > 0) fb.textContent += ` (Você usou ${wordsUsed} palavra${wordsUsed > 1 ? 's' : ''} do capítulo.)`;
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

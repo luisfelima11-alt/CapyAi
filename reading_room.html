@@ -112,14 +112,14 @@ tailwind.config={
 
     <!-- Topic chips -->
     <div class="flex flex-wrap gap-3 fade-up" id="topic-chips">
-      <button class="topic-chip" onclick="selectTopic(this,'🦁 Wild Animals')">🦁 Wild Animals</button>
-      <button class="topic-chip" onclick="selectTopic(this,'🌳 The Magic Forest')">🌳 Magic Forest</button>
-      <button class="topic-chip" onclick="selectTopic(this,'🚀 Space Adventure')">🚀 Space Adventure</button>
-      <button class="topic-chip" onclick="selectTopic(this,'🏰 Fairy Tale Kingdom')">🏰 Fairy Tale</button>
-      <button class="topic-chip" onclick="selectTopic(this,'🌊 Ocean Wonders')">🌊 Ocean Wonders</button>
-      <button class="topic-chip" onclick="selectTopic(this,'🍕 Food Festival')">🍕 Food Festival</button>
-      <button class="topic-chip" onclick="selectTopic(this,'❄️ Winter Wonderland')">❄️ Winter</button>
-      <button class="topic-chip selected" onclick="selectTopic(this,'🌈 Rainbow Valley')">🌈 Rainbow Valley</button>
+      <button class="topic-chip selected" onclick="selectTopic(this,'trabalho')">💼 Work</button>
+      <button class="topic-chip" onclick="selectTopic(this,'viagem')">✈️ Travel</button>
+      <button class="topic-chip" onclick="selectTopic(this,'entrevista')">🤝 Job Interview</button>
+      <button class="topic-chip" onclick="selectTopic(this,'restaurante')">🍽️ Restaurant</button>
+      <button class="topic-chip" onclick="selectTopic(this,'saude')">🩺 Health</button>
+      <button class="topic-chip" onclick="selectTopic(this,'tecnologia')">📱 Technology</button>
+      <button class="topic-chip" onclick="selectTopic(this,'esporte')">⚽ Sports</button>
+      <button class="topic-chip" onclick="selectTopic(this,'cidade')">🏙️ City Life</button>
     </div>
 
     <!-- Difficulty -->
@@ -255,7 +255,7 @@ tailwind.config={
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
 // ── State ──────────────────────────────────────────────────────────────────────
-let selectedTopic = '🌈 Rainbow Valley';
+let selectedTopic = 'trabalho';   // a key of TEMAS_LEITURA on the server
 let difficulty    = 'easy';
 let storyData     = null;   // {title, emoji, sentences[], moral, questions[]}
 let quizIdx       = 0;
@@ -285,65 +285,46 @@ function setDiff(btn, diff) {
   btn.classList.remove('bg-white/6','border-white/10','text-slate-400');
 }
 
-// ── Load story from OpenAI ─────────────────────────────────────────────────────
+// ── Load the story ─────────────────────────────────────────────────────────────
+// The server writes it (/api/reading-story) from a fixed topic and level, and
+// keeps one per topic and level a day for everyone. The page used to send its own
+// children's-author prompt to /api/chat, which ignores it: no story ever came.
 async function loadStory() {
   showState('loading');
-
-  const diffDesc = difficulty === 'easy' ? 'very simple A1 English for a 5-6 year old'
-                 : difficulty === 'medium' ? 'simple A2 English for a 7-8 year old'
-                 : 'intermediate B1 English for a 9-10 year old';
-
-  const prompt = `Write a short children's story about "${selectedTopic}" using ${diffDesc}.
-Feature Yara the capybara as the main character. Include 5 sentences, each with 1-2 emojis.
-Then create 3 multiple-choice comprehension questions about the story (4 options each, only 1 correct).
-
-Respond ONLY with valid JSON, no markdown fences:
-{
-  "title": "The Brave Rainbow",
-  "emoji": "🌈",
-  "sentences": ["Yara saw a beautiful rainbow. 🌈✨", "..."],
-  "moral": "Always look for colour after rain!",
-  "questions": [
-    {
-      "q": "What did Yara see?",
-      "options": ["A rainbow","A dragon","A cake","A boat"],
-      "correct": "A rainbow",
-      "explanation": "The story says Yara saw a beautiful rainbow."
-    }
-  ]
-}`;
-
   try {
-    const res  = await fetch('/api/chat', {
+    const res  = await fetch('/api/reading-story', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        history: [],
-        message: prompt,
-        systemOverride: 'You are a creative children\'s author. Return only valid JSON as instructed.'
-      })
+      body: JSON.stringify({ topic: selectedTopic, level: difficulty })
     });
     const json = await res.json();
     let raw = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
     raw = raw.replace(/```json|```/g, '').trim();
     storyData = JSON.parse(raw);
+    if (!Array.isArray(storyData.sentences) || !Array.isArray(storyData.questions)) throw new Error('story_format');
     renderStory();
   } catch(e) {
     console.error(e);
     showState('setup');
-    alert('Could not load story. Please check the server is running and try again.');
+    alert('Não consegui gerar a história agora. Tente de novo em instantes.');
   }
 }
 
 function renderStory() {
   document.getElementById('story-emoji').textContent = storyData.emoji || '📖';
-  document.getElementById('story-title').textContent = storyData.title || 'Yara\'s Adventure';
+  document.getElementById('story-title').textContent = storyData.title || 'Yara\'s Story';
   document.getElementById('story-moral').textContent = storyData.moral || '';
 
+  // AI text goes in as text, never as HTML.
   const body = document.getElementById('story-body');
-  body.innerHTML = (storyData.sentences || []).map((s, i) =>
-    `<p class="story-sentence reveal" style="animation-delay:${i * 0.1}s">${s}</p>`
-  ).join('');
+  body.textContent = '';
+  (storyData.sentences || []).forEach((s, i) => {
+    const p = document.createElement('p');
+    p.className = 'story-sentence reveal';
+    p.style.animationDelay = `${i * 0.1}s`;
+    p.textContent = s;
+    body.appendChild(p);
+  });
 
   showState('story');
 }
@@ -383,13 +364,18 @@ function showQuestion() {
   document.getElementById('q-feedback').classList.add('hidden');
   document.getElementById('next-q-btn').classList.add('hidden');
 
-  // Shuffle options
+  // Shuffle options. The options are AI text: buttons get it as text and a
+  // listener, never inside an onclick string.
   const opts = [...q.options].sort(() => Math.random() - 0.5);
-  document.getElementById('q-options').innerHTML = opts.map(opt =>
-    `<button class="quiz-opt" onclick="answerQ(this, '${opt.replace(/'/g,"\\'")}', '${q.correct.replace(/'/g,"\\'")}', '${(q.explanation||'').replace(/'/g,"\\'")}')">
-      ${opt}
-    </button>`
-  ).join('');
+  const lista = document.getElementById('q-options');
+  lista.textContent = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = String(opt);
+    btn.addEventListener('click', () => answerQ(btn, String(opt), String(q.correct), String(q.explanation || '')));
+    lista.appendChild(btn);
+  });
 
   renderProgress();
 
@@ -419,8 +405,8 @@ function answerQ(btn, chosen, correct, explanation) {
   // Feedback
   document.getElementById('feedback-emoji').textContent  = isCorrect ? '✅' : '💡';
   document.getElementById('feedback-text').textContent   = isCorrect
-    ? 'Correct! Great reading! 🌟'
-    : `Not quite. ${explanation}`;
+    ? `Correct! Great reading! 🌟 ${explanation}`.trim()
+    : `Not quite — the answer is "${correct}". ${explanation}`.trim();
   document.getElementById('q-feedback').classList.remove('hidden');
   document.getElementById('next-q-btn').classList.remove('hidden');
   document.getElementById('next-q-btn').textContent = quizIdx + 1 < storyData.questions.length
