@@ -37,7 +37,8 @@ node scripts/dev-server.js   # http://localhost:8765 — pages + every /api/* th
 handler (`api/index.js`); change the API there, never by adding routes to the dev server.
 Local `.env` (never committed): `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
 `SUPABASE_SECRET_KEY`, `SESSION_COOKIE_SECRET`, `APP_ORIGIN`; optional `OPENAI_MODEL`
-(default `gpt-4o-mini`), `OPENROUTER_API_KEY`, `PORT`.
+(default `gpt-4o-mini`), `OPENROUTER_API_KEY` (turns on Jev only; the text routes move to OpenRouter
+with `OPENROUTER_TEXTO=1`), `JEV_NOTAS=off`, `JEV_MODELO`, `PORT`.
 
 Tests: `npm run test:security` (node --test, no network or keys needed); `npm run security:check`
 adds `scripts/audit.js`, which the CI runs too: `npm audit` at high, where the production dependencies
@@ -129,7 +130,7 @@ The API calls Supabase REST with the service key (`sb()`, `SUPABASE_SECRET_KEY`)
 RLS is on for every table, and column grants keep plan/role out of the browser's reach. Main tables:
 `accounts` (`auth_user_id` → Supabase Auth), `user_state` (jsonb per user, plus server rows such as
 `__voz_*`), `user_profiles` (level, goals, plan), `webhook_events`, `rate_limit_*`,
-`api_metrics_daily` (requests, tokens, US$ and cache hits per endpoint/day), `ai_cache`, `security_audit_log`,
+`api_metrics_daily` (requests, tokens, US$ and cache hits per endpoint/day), `ai_cache`, `jev_decisions`, `security_audit_log`,
 `homework_submissions`, `push_subscriptions`.
 
 ### Security rules (keep them when adding features)
@@ -484,6 +485,23 @@ um objeto usa o modo JSON da API (`callOpenAI(..., { json: true })`); rota que r
 - A voz Nova vai para a CDN da Vercel (`Vercel-CDN-Cache-Control`) só quando a resposta não tem
   `Set-Cookie`.
 
+## Jev observando (30/set/2026)
+
+- O Jev (TypeSafe, pela OpenRouter) não escreve texto: recebe um estado e perguntas tipadas e devolve
+  probabilidades e confiança. `decidirJev(estado, perguntas, { rota })` nunca rejeita e tem prazo de 1,5 s,
+  porque roda **ao lado** da IA e a resposta ao aluno espera pelos dois.
+- A `OPENROUTER_API_KEY` sozinha liga só o Jev (`textoPelaOpenRouter`). Rota de texto só troca de
+  fornecedor com `OPENROUTER_TEXTO=1`, e a regra do Luis é trocar rota a rota, depois do teste cego.
+- Por ora ele **só observa** (`JEV_NOTAS=sombra`, o padrão com a chave): dá nota ao Desafio Diário
+  (`/api/daily-challenge/avaliar`, régua de 3) e à redação em inglês (`/api/correct-writing`, régua de 5).
+  A dupla de notas vai para `jev_decisions`, **sem texto e sem aluno**, e o aluno vê só a IA. O admin
+  mostra quanto os dois concordam. O Jev só decide sozinho em outro PR, depois desses números.
+- Jev é bom em inglês: francês e turco ficam só com a IA. O texto do aluno entra no `state` pelo
+  `textoLivreParaPrompt`. A régua do Jev (`RUBRICA_*`) é a mesma que a IA recebe na rota.
+- O formato da API alpha ainda não foi visto em produção: `respostaDoJev` e `nivelDoScore` aceitam as
+  variantes plausíveis, e o que não reconhecem vira `error: 'formato'` na tabela. Veja no admin antes
+  de ligar qualquer decisão.
+
 ## Design System
 
 Full spec in `1_Design_System.md`. Key constraints:
@@ -652,7 +670,7 @@ Source of truth: the `if (req.method === … && url === …)` blocks in `api/ind
   `POST /api/track`, `GET /api/db/leaderboard` (public, names without markup).
 - **AI (per-plan limits, `AI_ROUTE_KEYS`):** `/api/chat`, `/api/lesson-chat`, `/api/quiz`,
   `/api/lesson-quiz`, `/api/translate`, `/api/story`, `/api/flashcard-deck`, `/api/dialogue-scene`,
-  `/api/word-of-day`, `/api/daily-challenge`, `/api/newsline`, `/api/historyline`,
+  `/api/word-of-day`, `/api/daily-challenge`, `POST /api/daily-challenge/avaliar`, `/api/newsline`, `/api/historyline`,
   `/api/youtube`, `/api/personalize`, `/api/correct-writing`, `/api/study-plan`, `/api/music`,
   `/api/lyrics-search`, `/api/lyrics`, `/api/transcribe`, `GET /api/tts`.
 - **Voice:** `POST /api/realtime-token`, `/api/conversa-uso`, `/api/conversa-feedback`, `GET /api/personas`.

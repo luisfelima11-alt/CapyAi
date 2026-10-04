@@ -432,33 +432,21 @@ async function submitAnswer() {
   document.getElementById('example-box').classList.add('hidden');
   document.getElementById('comeback-box').classList.add('hidden');
 
-  // Ask Yara to grade the answer
-  const systemPrompt = `You are Yara the capybara, a warm and encouraging English tutor for young children (age 5-8).
-The child was given this challenge: "${challenge.instruction}"
-Their answer was: "${answer}"
-In exactly 2 sentences: give warm, encouraging feedback and gently correct any mistakes.
-Then on a new line write: STARS:X where X is 1, 2, or 3 (3=excellent, 2=good, 1=needs improvement).
-Be kind and use simple words.`;
-
+  // Yara grades the answer on the server (/api/daily-challenge/avaliar). The page
+  // used to send its own prompt to /api/chat, which ignores it: every answer got
+  // 2 stars and a chat reply instead of a grade (29/set).
   try {
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/daily-challenge/avaliar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: answer, history: [], systemOverride: systemPrompt })
+      body: JSON.stringify({ instruction: challenge.instruction || challenge.title || '', answer })
     });
     const data = await res.json();
-    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text
-              || data?.reply
-              || "Great try! Keep practising and you'll get even better! 🌟";
-
-    // Parse stars
-    const starsMatch = raw.match(/STARS:(\d)/i);
-    const stars = starsMatch ? Math.min(3, Math.max(1, parseInt(starsMatch[1]))) : 2;
-    const feedbackText = raw.replace(/STARS:\d/i, '').trim();
-
-    showFeedback(feedbackText, stars);
+    if (!res.ok || !data || typeof data.feedback !== 'string' || !data.feedback) throw new Error('grading_failed');
+    const stars = Math.min(3, Math.max(1, parseInt(data.stars, 10) || 2));
+    showFeedback(data.feedback, stars);
   } catch (e) {
-    showFeedback("Amazing effort! You're doing so well — keep it up! 🌟", 2);
+    showFeedback('Não consegui avaliar sua resposta agora. Compare com o exemplo abaixo. 🌟', 2);
   }
 }
 
