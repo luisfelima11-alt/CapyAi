@@ -531,3 +531,39 @@ test('a silent session refresh keeps the tab\'s CSRF token, so the next POST sti
   assert.equal(r.post, 'passa');
   assert.equal(r.loginTrocou, true, 'a new session (login) still gets a new token');
 });
+
+test('npm audit gate: production gets no exception; a dev-only one holds only until its date', () => {
+  // 04/out: a high advisory for braces (no fixed release) reached us only through
+  // tailwindcss 3, a dev tool, and failed every CI run. scripts/audit.js keeps
+  // npm audit at high, with dated exceptions for what only the dev tools reach.
+  const { avaliar } = require('../scripts/audit.js')._internos;
+  const relatorio = (...avisos) => ({ vulnerabilities: Object.fromEntries(avisos.map(([pacote, id, gravidade = 'high'], i) =>
+    [`${pacote}${i}`, { via: [{ name: pacote, title: `${pacote} issue`, url: `https://github.com/advisories/${id}`, severity: gravidade }, 'quem-usa'] }])) });
+  const nada = relatorio();
+  const excecoes = [{ id: 'GHSA-aaaa', pacote: 'braces', ate: '2026-12-31', motivo: 'dev only' }];
+  const motivos = (completo, producao, hoje) => avaliar(completo, producao, hoje, excecoes).map(f => f.porque);
+
+  assert.deepEqual(motivos(relatorio(['braces', 'GHSA-aaaa']), nada, '2026-10-04'), []);
+  assert.deepEqual(motivos(relatorio(['braces', 'GHSA-aaaa']), relatorio(['braces', 'GHSA-aaaa']), '2026-10-04'),
+    ['it reaches the production dependencies']);
+  assert.deepEqual(motivos(relatorio(['braces', 'GHSA-aaaa']), nada, '2027-01-01'), ['the exception ended on 2026-12-31']);
+  assert.deepEqual(motivos(relatorio(['outro', 'GHSA-aaaa']), nada, '2026-10-04'), ['no exception'], 'the exception names one package');
+  assert.deepEqual(motivos(relatorio(['x', 'GHSA-bbbb', 'critical']), nada, '2026-10-04'), ['no exception']);
+  assert.deepEqual(motivos(relatorio(['x', 'GHSA-cccc', 'moderate']), nada, '2026-10-04'), []);
+  // An audit that could not run (registry down) fails instead of passing empty.
+  assert.deepEqual(motivos({ error: { summary: 'registry unreachable' } }, nada, '2026-10-04'), ['registry unreachable']);
+  assert.equal(avaliar(nada, undefined, '2026-10-04', excecoes).length, 1);
+});
+
+test('the CI and npm run security:check run the audit gate; every exception has a package, a date and a reason', () => {
+  const { EXCECOES } = require('../scripts/audit.js')._internos;
+  const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/security.yml'), 'utf8');
+  assert.match(workflow, /- run: node scripts\/audit\.js\n/);
+  assert.doesNotMatch(workflow, /npm audit/);
+  assert.match(require('../package.json').scripts['security:check'], /^node scripts\/audit\.js && /);
+  for (const ex of EXCECOES) {
+    assert.match(ex.id, /^GHSA(-[0-9a-z]{4}){3}$/);
+    assert.ok(ex.pacote && ex.motivo.length > 40, ex.id);
+    assert.match(ex.ate, /^\d{4}-\d{2}-\d{2}$/, ex.id);
+  }
+});
