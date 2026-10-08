@@ -341,18 +341,9 @@
 <meta name="twitter:title" content="Yara AI — Capy Yara English"/>
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<link rel="stylesheet" href="assets/css/capy-presence.css?v=presence1">
 </head>
 <body>
-
-<div id="palco" data-estado="desconectado">
-  <div class="fundo" id="fundo" aria-hidden="true"></div>
-  <video class="retrato" id="yara-video" poster="yara-quadrado-v1.jpg"
-         muted loop playsinline preload="none" aria-hidden="true"></video>
-  <div class="anel" aria-hidden="true"></div>
-  <div class="halo" aria-hidden="true"></div>
-  <div class="medidor" id="medidor" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="pontinhos" aria-hidden="true"><i></i><i></i><i></i></div>
-</div>
 
 <header id="topo">
   <button class="redondo" type="button" onclick="capyVoltar()" aria-label="Voltar">
@@ -377,8 +368,35 @@
   <div class="espaco" aria-hidden="true"></div>
 </header>
 
-<main id="fio" role="log" aria-live="polite" aria-label="Conversa com a Yara">
-  <div class="coluna" id="fio-coluna"></div>
+<main id="presence-layout">
+  <section class="presence-stage" aria-label="Sua companhia de conversa">
+    <div class="presence-toolbar">
+      <span class="presence-eyebrow">UM PAPO COM A CAPY</span>
+      <button id="presence-motion" type="button" aria-pressed="true">Pausar movimento</button>
+    </div>
+    <div id="palco" data-estado="desconectado">
+      <div class="fundo" id="fundo" aria-hidden="true"></div>
+      <video class="retrato" id="yara-video" poster="yara-quadrado-v1.jpg"
+             muted loop playsinline preload="none" aria-hidden="true"></video>
+      <div class="anel" aria-hidden="true"></div>
+      <div class="halo" aria-hidden="true"></div>
+      <div class="medidor" id="medidor" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pontinhos" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+    <div class="presence-caption" aria-label="Última fala; texto completo no histórico">
+      <span id="presence-speaker">Yara AI</span>
+      <p id="presence-caption">Um espaço para falar, errar e tentar de novo.</p>
+    </div>
+  </section>
+  <section id="presence-transcript" aria-labelledby="presence-history-title">
+    <div class="presence-history-heading">
+      <div><h1 id="presence-history-title">Nossa conversa</h1><p>Voz e texto, no mesmo lugar.</p></div>
+      <button id="presence-history-toggle" type="button" aria-expanded="false" aria-controls="fio">Ver histórico</button>
+    </div>
+    <div id="fio" role="log" aria-live="polite" aria-label="Conversa com a Yara">
+      <div class="coluna" id="fio-coluna"></div>
+    </div>
+  </section>
 </main>
 
 <div id="aviso" role="status" aria-live="polite" hidden></div>
@@ -428,14 +446,15 @@
 <div id="menu-modo" class="painel" role="dialog" aria-modal="false" aria-labelledby="modo-titulo" hidden></div>
 <div id="toast" role="status" hidden></div>
 
-<script src="auth-secure.js?v=auth20260918"></script>
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=modo20260928"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="conversa-core.js?v=aula20260924"></script>
+<script src="capy-presence.js?v=presence1"></script>
 <script>
 'use strict';
 const $ = id => document.getElementById(id);
-const CLIPE = 'yara-chat.mp4';
 const ARTE_PADRAO = 'yara-quadrado-v1.jpg';
 
 const ROTULOS = {
@@ -502,6 +521,7 @@ function escrever(reg, texto) {
   s.textContent = novo;   // textContent, nunca innerHTML: é fala transcrita.
   reg.corpo.appendChild(s);
   reg.texto = texto;
+  window.CapyPresence?.caption(reg.p.dataset.quem, texto, $('titulo').textContent);
 }
 
 function dizer(quem, canal, texto) {
@@ -514,6 +534,8 @@ function dizer(quem, canal, texto) {
 }
 
 function pensando(liga) {
+  $('palco').dataset.estado = liga ? 'pensando' : 'desconectado';
+  window.CapyPresence?.sync();
   const velho = $('fio-coluna').querySelector('p[data-pensando]');
   if (velho) velho.remove();
   if (!liga) return;
@@ -626,6 +648,7 @@ function dadosDaPersona(id) {
 let trocaDaVez = 0;
 function trocarArte(arte, animar) {
   const v = $('yara-video'), fundo = $('fundo');
+  window.CapyPresence?.setPersona(arte);
   // Um <video> com clipe carregado mostra o QUADRO do clipe, nao o poster.
   // Depois de uma ligacao com a Yara, o clipe dela ficava no palco e trocar
   // para a viajante continuava mostrando a Yara. Descarrega o clipe.
@@ -940,26 +963,10 @@ document.addEventListener('keydown', e => {
 // com movimento reduzido nem carrega — vídeo em loop é exatamente o que essa
 // preferência pede para parar.
 function ligarVideo() {
-  const v = $('yara-video');
-  // O clipe é da Yara padrão. Persona com arte própria fica no retrato parado
-  // com a animação `respira`: tocar a Yara de sempre por baixo de uma capivara
-  // de mala na mão é pior do que não tocar nada.
-  const p = dadosDaPersona(personaAtual);
-  if (p && p.arte && p.arte !== ARTE_PADRAO) return;
-  if (!v || v.dataset.pronto === '1' || semMovimento()) return;
-  v.dataset.pronto = '1';
-  fetch(CLIPE, { method: 'HEAD' }).then(r => {
-    if (!r.ok) throw 0;
-    v.src = CLIPE;
-    try { v.load(); } catch (_) {}
-  }).catch(() => {});
+  window.CapyPresence?.sync();
 }
 function tocarVideo(tocar) {
-  const v = $('yara-video');
-  if (!v || !v.getAttribute('src')) return;
-  if (!tocar) { try { v.pause(); } catch (_) {} return; }
-  const p = v.play();
-  if (p && p.catch) p.catch(() => {});
+  window.CapyPresence?.sync();
 }
 // O navegador não inicia mídia em aba oculta: o play() resolve e o vídeo fica
 // parado. Quem troca de aba no meio da ligação voltava e a achava congelada.

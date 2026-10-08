@@ -1,6 +1,7 @@
 const https = require('https');
 const crypto = require('crypto');
 const Security = require('./security');
+const CapySkins = require('../capy-skins');
 
 // Material das aulas para a ligacao guiada (scripts/gera-contexto-aulas.js).
 // So carrega quando alguem liga de dentro de uma aula: ~320 KB que as outras
@@ -3669,6 +3670,27 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     // ── User Profile ──────────────────────────────────────────────────────────
+
+    // Only the authenticated account may change its own skin. Return the
+    // persisted row so a denied/empty update never appears successful.
+    if (req.method === 'POST' && url === '/api/account/avatar') {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const body = (await readBody(req)) || {};
+        if (!CapySkins.valid(body.avatar)) {
+            throw new HttpError(400, 'invalid_avatar', 'Escolha uma skin da coleção Capy.');
+        }
+        const rows = await sbUser(identity, `/accounts?id=eq.${encodeURIComponent(identity.appUserId)}&select=id,avatar`, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify({ avatar: body.avatar }),
+        });
+        if (!Array.isArray(rows) || rows.length !== 1 || rows[0].id !== identity.appUserId || rows[0].avatar !== body.avatar) {
+            throw new HttpError(502, 'avatar_not_saved', 'Não foi possível salvar sua skin. Tente novamente.');
+        }
+        res.status(200).json({ ok: true, avatar: rows[0].avatar });
+        return;
+    }
 
     // GET /api/profile?userId=xxx → returns user_profiles row
     if (req.method === 'GET' && url.startsWith('/api/profile')) {
