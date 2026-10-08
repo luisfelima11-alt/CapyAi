@@ -171,7 +171,7 @@ function construir(n) {
     // 3. Seções com conteúdo
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
     t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
-        c.gramatica.slides ? blocoGramaticaSlides(c) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
@@ -279,7 +279,7 @@ function validar({ t, d, c, n, nn }) {
     if (!img) console.log(`    ⚠ imagem ainda não gerada: ${d.imagem.arquivo} (node scripts/gen-dialogo-assets.mjs --imagem agro${nn})`);
 
     // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
-    checarSlides(c, ok, { teto: c.tetoPalavras || 14 });
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `agro${nn}`, raiz: RAIZ });
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
