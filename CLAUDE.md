@@ -42,6 +42,11 @@ PORT=8765                   # optional
 
 The server also exports a `handler` used by Vercel serverless (`/api/index.js`).
 
+Tests: `npm run test:security` (node --test, no network or keys needed); `npm run security:check`
+adds `scripts/audit.js`, which the CI runs too: `npm audit` at high, where the production dependencies
+get no exception and an advisory only the dev tools reach (Tailwind, Playwright) can get a dated one in
+`EXCECOES`. Add a case to `tests/security.test.js` for every security-relevant change.
+
 ## Deployment
 
 Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**

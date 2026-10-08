@@ -26,6 +26,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -190,7 +191,8 @@ function construir(n) {
 
     // 3. Seções com conteúdo
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
-    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION', blocoGramatica(c));
+    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
@@ -344,6 +346,9 @@ function validar({ t, d, c, n, nn }) {
 
     const img = fs.existsSync(path.join(RAIZ, d.imagem.arquivo));
     if (!img) console.log(`    ⚠ imagem ainda não gerada: ${d.imagem.arquivo} — gere pelo HIGGSFIELD (regra do Luis, 19/set/2026), nunca com --imagem`);
+
+    // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `med${nn}`, raiz: RAIZ });
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {

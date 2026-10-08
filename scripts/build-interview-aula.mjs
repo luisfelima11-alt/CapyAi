@@ -20,6 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -193,7 +194,8 @@ function construir(n) {
             `      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">${x}</span>`).join('\n') + '\n');
 
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
-    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION', blocoGramatica(c));
+    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 2b. Aula sem verbo no vocabulário (a 06 é só substantivo e preposição):
     //     não anunciar "Verbos" nem explicar uma cor que não aparece na tela.
@@ -299,6 +301,9 @@ function validar({ t, d, c, n, nn, sufixo }) {
     ok(t.includes('id="speak-grid"'), '#speak-grid presente (listening-lab)');
 
     // cada <script> inline tem que compilar
+    // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `interview${nn}`, raiz: RAIZ });
+
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
         scripts++;
