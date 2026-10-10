@@ -149,7 +149,8 @@ const MIME_TYPES = {
     '.svg':  'image/svg+xml',
     '.json': 'application/json',
     '.md':   'text/markdown',
-    '.ico':  'image/x-icon'
+    '.ico':  'image/x-icon',
+    '.mp4':  'video/mp4'
 };
 
 // ── OpenAI API helper ─────────────────────────────────────────────────────────

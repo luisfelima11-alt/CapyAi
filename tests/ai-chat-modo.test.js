@@ -65,6 +65,15 @@ test('ai_chat: capivara no topo, dificuldade e estilo no compositor', { timeout:
       const d = await page.evaluate(() => ({ w: innerWidth, s: document.documentElement.scrollWidth }));
       assert.ok(d.s <= d.w + 1, onde + ': rolagem lateral ' + JSON.stringify(d));
     };
+    // O Luis nao quer emoji na interface ("fica infantil"; no Windows a bandeira
+    // vira letra). Confere topo, pilula, menus, dica, linha "Agora:" e saudacao.
+    // Devolve os trechos com emoji (vazio = ok).
+    const semEmoji = page => page.evaluate(() => {
+      const re = /\p{Extended_Pictographic}|\p{Regional_Indicator}/u;
+      const alvos = ['#topo', '#btn-modo', '#menu-persona', '#menu-modo', '.dica', '#fio p[data-quem="sistema"]', '#fio p[data-quem="ia"]'];
+      return alvos.flatMap(sel => Array.from(document.querySelectorAll(sel)))
+        .map(el => el.textContent).filter(t => re.test(t)).map(t => t.trim().slice(0, 60));
+    });
 
     for (const width of [320, 390, 768, 1440]) {
       const onde = '@' + width;
@@ -104,7 +113,10 @@ test('ai_chat: capivara no topo, dificuldade e estilo no compositor', { timeout:
         await page.locator('#fio p[data-quem="sistema"]', { hasText: 'Agora:' }).waitFor();
         assert.match(page.url(), /nivel=intensivo/);
         assert.match(page.url(), /estilo=encenacao/);
-        assert.match(await page.locator('#btn-modo').innerText(), /🔥/);
+        // Icones de linha no lugar dos emojis (8/out).
+        assert.equal(await page.locator('#btn-modo [data-icone="nivel-4"]').count(), 1, onde + ': icone do intensivo');
+        assert.equal(await page.locator('#btn-modo [data-icone="mascaras"]').count(), 1, onde + ': icone da encenacao');
+        assert.deepEqual(await semEmoji(page), [], onde + ': emoji na interface');
 
         // ── A mensagem seguinte leva nivel e estilo; o aviso nao vai no historico ──
         await page.locator('#entrada').fill('Hello!');
@@ -129,8 +141,9 @@ test('ai_chat: capivara no topo, dificuldade e estilo no compositor', { timeout:
         // ── Maia: o jeito dela ──
         await capi.click();
         await page.locator('#menu-persona [data-id="maia"]').click();
-        // textContent: abaixo de 360px o texto some de proposito (so os emojis).
-        assert.match(await page.locator('#btn-modo').textContent(), /🐾.*Do jeito dela/s);
+        // textContent: abaixo de 360px o texto some de proposito (so o icone).
+        assert.match(await page.locator('#btn-modo').textContent(), /Do jeito dela/);
+        assert.equal(await page.locator('#btn-modo [data-icone="jeito"]').count(), 1, onde + ': icone do jeito dela');
         await page.locator('#btn-modo').click();
         assert.equal(await page.locator('#menu-modo [role="radio"]:not(:disabled)').count(), 0, onde + ': Maia aceitou nivel/estilo');
         assert.match(await page.locator('#menu-modo').innerText(), /jeito dela/);
@@ -150,6 +163,11 @@ test('ai_chat: capivara no topo, dificuldade e estilo no compositor', { timeout:
       const nova = await abrir('ai_chat.html', 390, { vistas: todas.filter(id => id !== 'travel') });
       assert.equal(await nova.page.locator('#btn-capivara').evaluate(b => b.classList.contains('chamar')), true, 'capivara nova nao fez pulsar');
       await nova.context.close();
+      // O pulso tem que ANIMAR de verdade: a outra sessao (7/out) tinha posto
+      // `animation:none` nele e a classe continuava la, sem efeito nenhum.
+      const viva = await abrir('ai_chat.html', 390, { movimento: true });
+      assert.equal(await viva.page.locator('#btn-capivara').evaluate(b => getComputedStyle(b).animationName), 'chamaCapivara', 'o botao da capivara nao pulsa');
+      await viva.context.close();
     }
 
     // ── Link antigo da capivara de iniciantes: Yara + Total iniciante ──
@@ -158,7 +176,7 @@ test('ai_chat: capivara no topo, dificuldade e estilo no compositor', { timeout:
       try {
         await page.waitForFunction(() => /nivel=zero/.test(location.search));
         assert.doesNotMatch(page.url(), /persona=iniciante/);
-        assert.match(await page.locator('#btn-modo').innerText(), /🌱/);
+        assert.equal(await page.locator('#btn-modo [data-icone="nivel-1"]').count(), 1, 'icone do total iniciante');
         assert.match(await page.locator('#titulo').innerText(), /Yara/);
         await page.locator('#entrada').fill('oi');
         await page.locator('#btn-enviar').click();

@@ -44,6 +44,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Pedido com Range (o Safari pede video assim): passa direto. Devolver o
+    // arquivo inteiro do cache (200) num pedido de faixa faz o Safari recusar o
+    // video, e uma resposta 206 nem pode ser guardada no cache.
+    if (req.headers.has('range')) return;
+
     // Imagens e mídia: cache-first (seguro — assets trocam de nome/versão)
     if (/\.(png|jpg|jpeg|gif|webp|svg|ico|mp3|mp4)$/.test(url.pathname)) {
         event.respondWith((async () => {

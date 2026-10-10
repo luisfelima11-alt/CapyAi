@@ -1267,6 +1267,9 @@ const PERSONAS = {
     conversa: {
         rotulo: 'Yara', legenda: 'Conversa livre sobre o dia a dia',
         voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: null,
+        // Sem `fala`: o yara-chat.mp4 (16:9) nao fecha o loop nem bate com a foto.
+        // Ate gerar um, ela fala com o parada; o halo e as ondas mostram que e ela.
+        clipes: { parada: 'yara-parada-v1.mp4', ouvindo: 'yara-ouvindo-v1.mp4' },
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
         ],
@@ -1306,6 +1309,7 @@ const PERSONAS = {
     maia: {
         rotulo: 'Maia, a zoeira', legenda: 'Aprende rindo: ela zoa seu inglês (com carinho)',
         voz: 'coral', arte: 'yara-maia-v1.jpg', destino: null, curso: null, lang: 'en',
+        clipes: { parada: 'persona-maia-parada-v1.mp4', fala: 'persona-maia-fala-v1.mp4' },
         // Formato proprio (comedia, portugues primeiro, para iniciante): o menu
         // de dificuldade e estilo nao se aplica a ela.
         niveis: false, estilos: false,
@@ -1364,6 +1368,7 @@ const PERSONAS = {
     travel: {
         rotulo: 'Capivara viajante', legenda: 'Aeroporto, hotel, pedir informação',
         voz: 'marin', arte: 'yara-travel-v1.jpg', destino: null, curso: 'travel',
+        clipes: { parada: 'persona-travel-parada-v1.mp4', fala: 'persona-travel-fala-v1.mp4' },
         mundo: 'the world of travel, like airports, hotels, restaurants and asking for directions',
         nucleo: c => [
             `You are Yara, a capybara who has travelled a lot and is helping a Brazilian student survive a trip in ${c.idioma}.`,
@@ -1390,6 +1395,7 @@ const PERSONAS = {
     business: {
         rotulo: 'Capivara de negócios', legenda: 'Reunião, e-mail, apresentação',
         voz: 'marin', arte: 'yara-business-v1.jpg', destino: null, curso: 'business',
+        clipes: { parada: 'persona-business-parada-v1.mp4', fala: 'persona-business-fala-v1.mp4' },
         mundo: 'the world of work, like meetings, calls with clients, e-mails and deadlines',
         nucleo: c => [
             `You are Yara, a capybara coaching a Brazilian professional to work in ${c.idioma}.`,
@@ -1424,6 +1430,7 @@ const PERSONAS = {
     agro: {
         rotulo: 'Capivara do agro', legenda: 'Lavoura, maquinário, visita técnica',
         voz: 'marin', arte: 'yara-agro-v1.jpg', destino: null, curso: 'agro', lang: 'en',
+        clipes: { parada: 'persona-agro-parada-v1.mp4', fala: 'persona-agro-fala-v1.mp4' },
         mundo: 'farm work, like crops, machines, suppliers and field visits',
         nucleo: c => [
             `You are Yara, a capybara who helps Brazilian agriculture professionals work in ${c.idioma}.`,
@@ -1449,6 +1456,7 @@ const PERSONAS = {
     med: {
         rotulo: 'Capivara da saúde', legenda: 'Consulta, sintomas, plantão',
         voz: 'marin', arte: 'yara-med-v1.jpg', destino: null, curso: 'med', lang: 'en',
+        clipes: { parada: 'persona-med-parada-v1.mp4', fala: 'persona-med-fala-v1.mp4' },
         // O formato e a consulta. O nivel vale (ela fala mais simples ou mais
         // rapido); o estilo nao.
         estilos: false,
@@ -1479,6 +1487,7 @@ const PERSONAS = {
     francais: {
         rotulo: 'Capivara francesa', legenda: 'Conversa em francês, do zero',
         voz: 'marin', arte: 'yara-francais-v1.jpg', destino: null, curso: 'francais', lang: 'fr',
+        clipes: { parada: 'persona-francais-parada-v1.mp4', fala: 'persona-francais-fala-v1.mp4' },
         // No nivel Automatico: o english_level do perfil fala do INGLES do aluno.
         // Quem e avancado em ingles recebia 'advanced' em frances.
         faixaAuto: 'desconhecido',
@@ -1505,6 +1514,7 @@ const PERSONAS = {
     turkish: {
         rotulo: 'Capivara turca', legenda: 'Conversa em turco, do zero',
         voz: 'marin', arte: 'yara-turkish-v1.jpg', destino: null, curso: 'turkish', lang: 'tr',
+        clipes: { parada: 'persona-turkish-parada-v1.mp4', fala: 'persona-turkish-fala-v1.mp4' },
         faixaAuto: 'desconhecido',
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
@@ -1529,6 +1539,7 @@ const PERSONAS = {
     gpstronic: {
         rotulo: 'Capivara da oficina', legenda: 'Dia a dia do conserto de GPS agrícola',
         voz: 'marin', arte: 'yara-gpstronic-v1.jpg', destino: null, curso: 'gpstronic', lang: 'en',
+        clipes: { parada: 'persona-gpstronic-parada-v1.mp4', fala: 'persona-gpstronic-fala-v1.mp4' },
         mundo: 'a GPS repair workshop and ordinary life',
         nucleo: c => [
             `You are Yara, a capybara talking with an adult who repairs agricultural GPS equipment and needs ${c.idioma} for work and for life.`,
@@ -1609,6 +1620,8 @@ function personasPublicas() {
     return Object.entries(PERSONAS).map(([id, p]) => ({
         id, rotulo: p.rotulo, legenda: p.legenda,
         arte: p.arte || null, destino: p.destino || null, curso: p.curso || null,
+        // Clipes do palco (8/out): parada, fala e, so na Yara, ouvindo. Sem eles, a foto respira.
+        clipes: p.clipes || null,
         lang: p.lang || 'en',
         // Em que lingua transcrever o aluno (o microfone do chat usa isto).
         // null = detectar sozinho, para quem fala portugues com a capivara.

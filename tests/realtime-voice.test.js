@@ -673,7 +673,31 @@ test('o catalogo publico nao vaza prompt nenhum', () => {
   for (const p of lista) {
     // niveis/estilos/motivo: o menu de dificuldade e estilo (28/set) precisa
     // saber o que cada capivara aceita.
-    assert.deepEqual(Object.keys(p).sort(), ['arte', 'curso', 'destino', 'escuta', 'estilos', 'id', 'lang', 'legenda', 'motivo', 'niveis', 'rotulo']);
+    // clipes (8/out): o palco anima cada capivara com os clipes dela.
+    assert.deepEqual(Object.keys(p).sort(), ['arte', 'clipes', 'curso', 'destino', 'escuta', 'estilos', 'id', 'lang', 'legenda', 'motivo', 'niveis', 'rotulo']);
+  }
+});
+
+// Pedido do Luis (7/out): "veja se todas as IAs de conversa tem animacao, a do
+// agro ja vi que nao tem". Toda capivara conversada aqui tem clipe parado e
+// falando, publicado (raiz: o vercel.json so publica *.mp4 da raiz), leve, com
+// a versao no nome (o sw.js faz cache-first de midia) e nunca o yara-chat.mp4
+// de 3,8 MB, que era o que a pagina baixava antes.
+test('toda capivara de conversa tem clipe parada e falando, leve e versionado', () => {
+  const { personasPublicas } = catalogoReal();
+  const raiz = path.join(__dirname, '..');
+  for (const p of personasPublicas()) {
+    if (p.destino) { assert.equal(p.clipes, null, p.id + ': atalho nao tem palco'); continue; }
+    assert.ok(p.clipes && p.clipes.parada, p.id + ' sem clipe parado: fica foto');
+    const estados = p.id === 'conversa' ? ['parada', 'ouvindo'] : ['parada', 'fala'];
+    for (const estado of estados) {
+      const nome = p.clipes[estado];
+      assert.match(String(nome), /^[a-z0-9-]+-v\d+\.mp4$/, p.id + '.' + estado + ': nome sem versao ou fora da raiz');
+      assert.notEqual(nome, 'yara-chat.mp4', p.id + ': o clipe 16:9 de 3,8 MB voltou');
+      const arq = path.join(raiz, nome);
+      assert.ok(fs.existsSync(arq), p.id + '.' + estado + ': ' + nome + ' nao existe');
+      assert.ok(fs.statSync(arq).size <= 600 * 1024, nome + ' passou de 600 KB');
+    }
   }
 });
 

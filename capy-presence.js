@@ -1,74 +1,222 @@
-/* Presentation only: no microphone, network conversation, quota or auth changes. */
+/* capy-presence.js — a capivara "viva" no palco da ai_chat.html (8/out).
+ *
+ * So apresentacao: nao mexe em microfone, rede da conversa, cota nem login.
+ * Le o data-estado do #palco (que a pagina e o CapyChamada atualizam) e decide
+ * qual clipe toca:
+ *   ia_falando, ou resposta escrita aparecendo ........ fala
+ *   aluno na vez dele na ligacao (se houver `ouvindo`) . ouvindo
+ *   qualquer outro ..................................... parada
+ * Cada capivara traz os clipes dela no /api/personas (`clipes`). Antes so a Yara
+ * padrao se mexia: a capivara do agro ficava foto parada (relato do Luis, 7/out).
+ *
+ * Rede e bateria:
+ *   - zero bytes de video antes do 1o toque ou tecla do aluno;
+ *   - nada com movimento reduzido, economia de dados ou conexao 2g;
+ *   - clipe que deu erro nao e tentado de novo nesta visita (fica a foto);
+ *   - pausa com a aba oculta, no pagehide e depois de 90 s sem interacao
+ *     (fora de ligacao).
+ *
+ * Dois <video> se revezam: o proximo clipe carrega por baixo e so aparece no
+ * `playing`, com fusao. Trocar o src do mesmo <video> mostrava um quadro preto.
+ */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const video = $('yara-video'), stage = $('palco'), motion = $('presence-motion');
-  if (!video || !stage || !motion) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mobile = window.matchMedia('(max-width: 767px)');
-  const defaultArt = 'yara-quadrado-v1.jpg';
-  const clips = { idle: 'yara-presence-idle.mp4', listen: 'yara-presence-listen.mp4', speak: 'yara-chat.mp4' };
-  let art = defaultArt, enabled = !reduced.matches && !navigator.connection?.saveData;
-  let active = '', revision = 0, interacted = false;
-  const failed = new Set();
-  try { if (localStorage.getItem('capyPresenceMotion') === 'off') enabled = false; } catch (_) {}
-  function pause() { try { video.pause(); } catch (_) {} }
-  function reset() { revision++; pause(); active = ''; video.removeAttribute('src'); video.load(); }
-  function sync() {
-    const allowed = enabled && !reduced.matches;
-    motion.setAttribute('aria-pressed', String(allowed));
-    motion.textContent = reduced.matches ? 'Movimento reduzido' : allowed ? 'Pausar movimento' : 'Animar Capy';
-    motion.disabled = reduced.matches;
-    document.body.dataset.presencePaused = String(!allowed);
-    if (!allowed || document.hidden || art !== defaultArt || !interacted) { pause(); return; }
-    const state = stage.dataset.estado;
-    const clip = clips[state === 'ia_falando' ? 'speak' : ['ouvindo', 'falando'].includes(state) ? 'listen' : 'idle'];
-    if (failed.has(clip)) { pause(); return; }
-    if (active !== clip) { revision++; pause(); active = clip; video.src = clip; video.load(); }
-    const version = revision;
-    const promise = video.play();
-    if (promise?.catch) promise.catch(() => { if (version === revision) pause(); });
+  const palco = $('palco');
+  const videos = palco ? Array.prototype.slice.call(palco.querySelectorAll('.quadro video')) : [];
+  const botao = $('btn-movimento');
+  if (!palco || videos.length < 2) return;
+
+  const CHAVE = 'capyPresenceMotion';   // a mesma chave de antes: quem pausou continua pausado
+  const OCIOSO_MS = 90000;
+  const CLIPE_VALIDO = /^[a-z0-9-]+\.mp4$/;
+  const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const conexao = navigator.connection || null;
+  const economia = () => !!(conexao && (conexao.saveData || /(^|-)2g$/.test(conexao.effectiveType || '')));
+
+  let arte = videos[0].getAttribute('poster') || '';
+  let clipes = null;
+  let ligado = true;
+  try { if (localStorage.getItem(CHAVE) === 'off') ligado = false; } catch (_) {}
+  let interagiu = false;
+  let visivel = 0;
+  let revisao = 0;
+  let falaAte = 0, falaTimer = 0;
+  let ultimoToque = Date.now(), ociosoTimer = 0;
+  const falhou = new Set();
+
+  // iOS so toca sem gesto se `muted` estiver no atributo E na propriedade.
+  videos.forEach(v => { v.muted = true; v.defaultMuted = true; v.setAttribute('muted', ''); v.playsInline = true; });
+
+  // So aceita nome de arquivo da raiz: o catalogo e nosso, mas e barato conferir.
+  function normalizar(c) {
+    if (!c || typeof c !== 'object') return null;
+    const ok = {};
+    ['parada', 'fala', 'ouvindo'].forEach(k => { if (typeof c[k] === 'string' && CLIPE_VALIDO.test(c[k])) ok[k] = c[k]; });
+    return ok.parada ? ok : null;
   }
-  video.addEventListener('error', () => { if (active) failed.add(active); reset(); });
-  motion.addEventListener('click', () => {
-    enabled = !enabled; interacted = true;
-    try { localStorage.setItem('capyPresenceMotion', enabled ? 'on' : 'off'); } catch (_) {}
+
+  const disponivel = () => !reduzido.matches && !economia() && !!clipes;
+  const emLigacao = () => ['microfone', 'conectando', 'ouvindo', 'falando', 'ia_falando'].indexOf(palco.dataset.estado) >= 0;
+  const ocioso = () => Date.now() - ultimoToque > OCIOSO_MS && !emLigacao() && Date.now() >= falaAte;
+
+  function clipeDesejado() {
+    if (!clipes) return '';
+    const usavel = c => !!c && !falhou.has(c);
+    const e = palco.dataset.estado;
+    if ((e === 'ia_falando' || Date.now() < falaAte) && usavel(clipes.fala)) return clipes.fala;
+    if ((e === 'ouvindo' || e === 'falando') && usavel(clipes.ouvindo)) return clipes.ouvindo;
+    return usavel(clipes.parada) ? clipes.parada : '';
+  }
+
+  function pintarBotao() {
+    palco.dataset.movimento = ligado ? 'on' : 'off';
+    if (!botao) return;
+    botao.hidden = !disponivel();
+    botao.setAttribute('aria-pressed', String(ligado));
+    botao.title = ligado ? 'Pausar o movimento' : 'Animar a capivara';
+  }
+
+  function mostrar(i) {
+    visivel = i;
+    videos[i].style.opacity = '1';
+    videos[1 - i].style.opacity = '0';
+  }
+
+  function carregar(v, clipe) {
+    v.onplaying = null;
+    v.dataset.clipe = clipe;
+    v.poster = arte;
+    v.preload = 'auto';
+    v.src = clipe;
+    try { v.load(); } catch (_) {}
+  }
+
+  function descarregar(v) {
+    v.onplaying = null;
+    try { v.pause(); } catch (_) {}
+    delete v.dataset.clipe;
+    if (v.getAttribute('src')) {
+      v.removeAttribute('src');
+      try { v.load(); } catch (_) {}
+    }
+  }
+
+  // play() recusado (iOS em pouca energia, autoplay bloqueado): fica a foto.
+  function tocar(v, rev) {
+    let p = null;
+    try { p = v.play(); } catch (_) {}
+    if (p && p.catch) p.catch(() => { if (rev === revisao && v === videos[visivel]) palco.dataset.video = 'off'; });
+  }
+
+  // Com o `parada` no ar, o `fala` ja vai carregando no <video> de tras: assim a
+  // 1a resposta dela nao espera download. Com economia de dados, nao.
+  function preCarregar() {
+    if (!clipes || !clipes.fala || falhou.has(clipes.fala) || economia()) return;
+    const frente = videos[visivel], tras = videos[1 - visivel];
+    if (frente.dataset.clipe === clipes.fala || tras.dataset.clipe === clipes.fala) return;
+    carregar(tras, clipes.fala);
+  }
+
+  function sync() {
+    pintarBotao();
+    const alvo = ligado && disponivel() && interagiu && !document.hidden && !ocioso() ? clipeDesejado() : '';
+    if (!alvo) {
+      revisao++;
+      videos.forEach(v => { v.onplaying = null; try { v.pause(); } catch (_) {} });
+      palco.dataset.video = 'off';
+      return;
+    }
+    const iFrente = visivel, iTras = 1 - visivel;
+    const frente = videos[iFrente], tras = videos[iTras];
+    const rev = ++revisao;
+    if (frente.dataset.clipe === alvo) {
+      tras.onplaying = null;
+      try { tras.pause(); } catch (_) {}
+      tocar(frente, rev);
+      return;
+    }
+    if (tras.dataset.clipe !== alvo) carregar(tras, alvo);
+    tras.onplaying = () => {
+      tras.onplaying = null;
+      if (rev !== revisao) return;
+      mostrar(iTras);
+      palco.dataset.video = 'on';
+      setTimeout(() => { if (rev === revisao) { try { frente.pause(); } catch (_) {} } }, 240);
+      preCarregar();
+    };
+    tocar(tras, rev);
+  }
+
+  videos.forEach((v, i) => {
+    v.addEventListener('playing', () => { if (i === visivel) palco.dataset.video = 'on'; });
+    v.addEventListener('error', () => {
+      const c = v.dataset.clipe;
+      if (!c || !v.getAttribute('src')) return;
+      falhou.add(c);
+      descarregar(v);
+      if (i === visivel) palco.dataset.video = 'off';
+      sync();
+    });
+  });
+
+  // 1o toque libera o video; cada toque adia a pausa por ociosidade.
+  function toque(ev) {
+    const noBotao = ev.target && ev.target.closest && ev.target.closest('#btn-movimento');
+    const estavaOcioso = ocioso();
+    ultimoToque = Date.now();
+    clearTimeout(ociosoTimer);
+    ociosoTimer = setTimeout(sync, OCIOSO_MS + 50);
+    if (!interagiu && !noBotao) { interagiu = true; sync(); }
+    else if (estavaOcioso) sync();
+  }
+  document.addEventListener('pointerdown', toque, true);
+  document.addEventListener('keydown', toque, true);
+  document.addEventListener('touchstart', toque, { capture: true, passive: true });
+  document.addEventListener('wheel', toque, { capture: true, passive: true });
+
+  if (botao) botao.addEventListener('click', () => {
+    ligado = !ligado;
+    interagiu = true;
+    try { localStorage.setItem(CHAVE, ligado ? 'on' : 'off'); } catch (_) {}
     sync();
   });
-  // Lazy clips: zero video bytes until the learner interacts with the page.
-  function activate(event) {
-    if (event.target.closest('#presence-motion')) return;
-    interacted = true; sync();
-    document.removeEventListener('pointerdown', activate);
-    document.removeEventListener('keydown', activate);
-  }
-  document.addEventListener('pointerdown', activate);
-  document.addEventListener('keydown', activate);
   document.addEventListener('visibilitychange', sync);
-  window.addEventListener('pagehide', pause);
-  reduced.addEventListener('change', sync);
-  const toggle = $('presence-history-toggle');
-  function history(open) {
-    document.body.dataset.historyOpen = String(open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.textContent = open ? 'Voltar à Capy' : 'Ver histórico';
-    $('fio').inert = mobile.matches && !open;
-    if (open) $('fio').scrollTop = $('fio').scrollHeight;
-  }
-  toggle.addEventListener('click', () => history(document.body.dataset.historyOpen !== 'true'));
-  mobile.addEventListener('change', () => history(document.body.dataset.historyOpen === 'true'));
-  document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.dataset.historyOpen === 'true') { history(false); toggle.focus(); } });
+  window.addEventListener('pagehide', () => videos.forEach(v => { try { v.pause(); } catch (_) {} }));
+  if (reduzido.addEventListener) reduzido.addEventListener('change', sync);
+  if (conexao && conexao.addEventListener) conexao.addEventListener('change', sync);
+
   window.CapyPresence = Object.freeze({
     sync,
-    setPersona(nextArt) {
-      if (nextArt !== art) { reset(); art = nextArt; }
+    // Aceita { arte, clipes } ou so a arte (string), como a versao anterior.
+    setPersona(p) {
+      const novaArte = typeof p === 'string' ? p : (p && p.arte) || arte;
+      const novos = typeof p === 'string' ? null : normalizar(p && p.clipes);
+      const mudou = novaArte !== arte || JSON.stringify(novos) !== JSON.stringify(clipes);
+      arte = novaArte;
+      clipes = novos;
+      videos.forEach(v => { v.poster = arte; });
+      if (mudou) {
+        revisao++;
+        videos.forEach(descarregar);
+        mostrar(0);
+        falaAte = 0;
+        palco.dataset.video = 'off';
+      }
       sync();
     },
-    caption(who, text, name) {
-      if (who !== 'eu' && who !== 'ia') return;
-      $('presence-speaker').textContent = who === 'eu' ? 'Você' : name || 'Yara AI';
-      $('presence-caption').textContent = text;
+    // Resposta ESCRITA: o clipe falando toca pelo tempo de leitura,
+    // entre 2,2 s e 7 s (55 ms por caractere).
+    falarTexto(texto) {
+      const ms = Math.min(7000, Math.max(2200, 55 * String(texto || '').length));
+      falaAte = Date.now() + ms;
+      clearTimeout(falaTimer);
+      falaTimer = setTimeout(sync, ms + 20);
+      sync();
     },
   });
-  history(false); sync();
+
+  palco.dataset.video = 'off';
+  mostrar(0);
+  sync();
 })();
