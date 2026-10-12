@@ -689,7 +689,7 @@ test('toda capivara de conversa tem clipe parada e falando, leve e versionado', 
   for (const p of personasPublicas()) {
     if (p.destino) { assert.equal(p.clipes, null, p.id + ': atalho nao tem palco'); continue; }
     assert.ok(p.clipes && p.clipes.parada, p.id + ' sem clipe parado: fica foto');
-    const estados = p.id === 'conversa' ? ['parada', 'ouvindo'] : ['parada', 'fala'];
+    const estados = p.id === 'conversa' ? ['parada', 'ouvindo', 'fala'] : ['parada', 'fala'];
     for (const estado of estados) {
       const nome = p.clipes[estado];
       assert.match(String(nome), /^[a-z0-9-]+-v\d+\.mp4$/, p.id + '.' + estado + ': nome sem versao ou fora da raiz');

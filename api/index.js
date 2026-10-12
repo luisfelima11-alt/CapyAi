@@ -1267,9 +1267,9 @@ const PERSONAS = {
     conversa: {
         rotulo: 'Yara', legenda: 'Conversa livre sobre o dia a dia',
         voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: null,
-        // Sem `fala`: o yara-chat.mp4 (16:9) nao fecha o loop nem bate com a foto.
-        // Ate gerar um, ela fala com o parada; o halo e as ondas mostram que e ela.
-        clipes: { parada: 'yara-parada-v1.mp4', ouvindo: 'yara-ouvindo-v1.mp4' },
+        // So a Yara tem `ouvindo` (clipe antigo dela). O `fala` foi gerado em
+        // 12/out: o yara-chat.mp4 (16:9) nao fechava o loop nem batia com a foto.
+        clipes: { parada: 'yara-parada-v1.mp4', ouvindo: 'yara-ouvindo-v1.mp4', fala: 'yara-fala-v1.mp4' },
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
         ],
