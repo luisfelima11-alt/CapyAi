@@ -35,6 +35,22 @@ test('cada PDF tem uma página só', () => {
     }
 });
 
+test('a página de cada curso lista as folhas logo abaixo de "Todas as aulas"', () => {
+    const hubs = { gpstronic_aula: 'classes_gpstronic.html', agro_aula: 'classes_agro.html',
+        intermediate_aula: 'classes_intermediate.html', interview_aula: 'classes_interview.html' };
+    for (const [fam, hub] of Object.entries(hubs)) {
+        const html = fs.readFileSync(path.join(RAIZ, hub), 'utf8');
+        const nav = html.indexOf('</nav>', html.indexOf('<!-- SEO:indice-aulas -->'));
+        const ini = html.indexOf('<!-- FOLHAS:inicio');
+        assert.ok(ini > nav, `${hub}: lista de folhas fora do lugar`);
+        const bloco = html.slice(ini, html.indexOf('<!-- FOLHAS:fim -->'));
+        for (const pdf of pdfs.filter(p => p.startsWith(fam + '_'))) {
+            assert.ok(bloco.includes(`href="assets/pdf/${pdf}"`), `${hub} sem ${pdf}`);
+        }
+        assert.ok(!/&amp;#|&amp;amp;/.test(bloco), `${hub}: título escapado duas vezes`);
+    }
+});
+
 test('a Vercel publica assets/**/*.pdf', () => {
     const v = JSON.parse(fs.readFileSync(path.join(RAIZ, 'vercel.json'), 'utf8'));
     assert.ok(v.builds.some(b => b.src === 'assets/**/*.pdf' && b.use === '@vercel/static'));

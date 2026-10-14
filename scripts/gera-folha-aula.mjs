@@ -228,6 +228,61 @@ async function gerar(navegador, arquivo) {
     throw new Error(`${slug}: não coube em 1 página nem cortando exemplos`);
 }
 
+// A aula ganha o cartão "Folha da aula" (folha-da-aula.js) se ainda não tiver.
+function garantirCartao(arquivo) {
+    const slug = path.basename(arquivo, '.html');
+    let html = fs.readFileSync(arquivo, 'utf8');
+    if (html.includes('folha-da-aula.js')) return;
+    if ((html.match(/<\/body>/g) || []).length !== 1) throw new Error(`${slug}: </body> ambíguo`);
+    html = html.replace('</body>', `<script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/${slug}-folha.pdf"></script>\n</body>`);
+    fs.writeFileSync(arquivo, html);
+    console.log(`  + cartão da folha em ${slug}.html`);
+}
+
+// Na página do curso (classes_*.html), logo abaixo de "Todas as aulas do curso", a lista das
+// folhas para baixar. O bloco entre os marcadores FOLHAS é reescrito inteiro a cada geração.
+function atualizarHub(familia) {
+    const hub = fs.readdirSync(RAIZ).filter(f => /^classes.*\.html$/.test(f)).find(f => {
+        const t = fs.readFileSync(path.join(RAIZ, f), 'utf8');
+        const i = t.indexOf('<!-- SEO:indice-aulas -->');
+        return i >= 0 && new RegExp(`href="${familia}_\\d+\\.html`).test(t.slice(i, t.indexOf('</nav>', i)));
+    });
+    if (!hub) { console.log(`  (sem página de curso para ${familia})`); return; }
+    const caminho = path.join(RAIZ, hub);
+    let html = fs.readFileSync(caminho, 'utf8');
+    const ini = html.indexOf('<!-- SEO:indice-aulas -->');
+    const fimNav = html.indexOf('</nav>', ini) + '</nav>'.length;
+    const titulos = new Map([...html.slice(ini, fimNav).matchAll(/href="([^"]+)\.html"[^>]*>([^<]+)</g)].map(m => [m[1], m[2].trim()]));
+    const folhas = fs.readdirSync(SAIDA).filter(f => new RegExp(`^${familia}_\\d+-folha\\.pdf$`).test(f)).sort();
+    if (!folhas.length) return;
+    const itens = folhas.map(f => {
+        const slug = f.replace('-folha.pdf', '');
+        const n = Number(slug.match(/(\d+)$/)[1]);
+        const titulo = semEmoji(semTags(titulos.get(slug) || '')); // o índice já vem com &amp; e &#39;
+        return `      <li><a href="assets/pdf/${f}" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula ${n}${titulo ? ' · ' + esc(titulo) : ''} (PDF)</a></li>`;
+    }).join('\n');
+    const bloco = `<!-- FOLHAS:inicio (gerado por scripts/gera-folha-aula.mjs) -->
+<section aria-label="Folhas das aulas para imprimir" class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
+  <div class="bg-white/60 border border-slate-200 rounded-2xl p-5">
+    <h2 class="font-black text-navy text-sm">📄 Folhas das aulas para imprimir (${folhas.length})</h2>
+    <p class="text-slate-500 text-xs mt-1">Uma página por aula, com o vocabulário, os padrões e espaço para as suas frases e anotações. Baixe, imprima e acompanhe a aula.</p>
+    <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1.5 text-xs">
+${itens}
+    </ul>
+  </div>
+</section>
+<!-- FOLHAS:fim -->`;
+    const a = html.indexOf('<!-- FOLHAS:inicio');
+    if (a >= 0) {
+        const b = html.indexOf('<!-- FOLHAS:fim -->', a) + '<!-- FOLHAS:fim -->'.length;
+        html = html.slice(0, a) + bloco + html.slice(b);
+    } else {
+        html = html.slice(0, fimNav) + '\n\n' + bloco + html.slice(fimNav);
+    }
+    fs.writeFileSync(caminho, html);
+    console.log(`  ✓ ${hub}: ${folhas.length} folhas na página do curso`);
+}
+
 const args = process.argv.slice(2);
 let arquivos = args.filter(a => !a.startsWith('--'));
 const iCurso = args.indexOf('--curso');
@@ -237,11 +292,18 @@ if (iCurso >= 0) {
 }
 if (!arquivos.length) { console.error('uso: node scripts/gera-folha-aula.mjs <aula>.html | --curso <familia>'); process.exit(1); }
 
+// --hub: só reescreve a lista de folhas na página do curso, sem gerar PDF de novo.
+if (args.includes('--hub')) {
+    for (const fam of new Set(arquivos.map(f => familiaDe(f).familia))) atualizarHub(fam);
+    process.exit(0);
+}
+
 const navegador = await chromium.launch();
 let falhas = 0;
 for (const f of arquivos) {
-    try { await gerar(navegador, path.resolve(RAIZ, f)); }
+    try { await gerar(navegador, path.resolve(RAIZ, f)); garantirCartao(path.resolve(RAIZ, f)); }
     catch (e) { falhas++; console.error(`✗ ${e.message}`); }
 }
 await navegador.close();
+for (const fam of new Set(arquivos.map(f => familiaDe(f).familia))) atualizarHub(fam);
 process.exit(falhas ? 1 : 0);
