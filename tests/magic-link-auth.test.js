@@ -56,6 +56,9 @@ function harness(options = {}) {
     }
     if (url.pathname === '/rest/v1/rpc/consume_rate_limit') return response(200, [{ allowed: true, used: 1, retry_after: 60 }]);
     if (url.pathname === '/rest/v1/accounts' && String(init.method || 'GET').toUpperCase() === 'GET') return response(200, options.semConta ? [] : [ACCOUNT]);
+    if (options.skinWrite && url.pathname === '/rest/v1/accounts' && init.method === 'PATCH') {
+      return response(200, options.emptySkinWrite ? [] : [{ id: ACCOUNT.id, avatar: body.avatar }]);
+    }
     // Any unplanned write is a regression, including the unreachable legacy
     // home-made magic-link token/account implementation.
     unexpected.push(url.pathname + ' ' + (init.method || 'GET'));
@@ -75,6 +78,7 @@ function harness(options = {}) {
     const module = { exports: {} };
     const context = vm.createContext({ ...common, module, exports: module.exports,
       require(name) {
+        if (name === '../capy-skins') return require('../capy-skins');
         if (name === 'crypto') return crypto;
         if (name === './security' && security) return security;
         if (name === 'https') return { request() { unexpected.push('https.request'); throw new Error('Unexpected HTTPS request'); } };
@@ -108,6 +112,28 @@ function harness(options = {}) {
 }
 
 function cookies(res) { return Array.from(res.headers['set-cookie'] || []); }
+test('skin save uses authenticated account and JWT, ignoring arbitrary IDs and extra fields', async () => {
+  const h = harness({ skinWrite: true });
+  const headers = { cookie: `${h.names.access}=mock-access-token; ${h.names.csrf}=test-csrf`, 'x-csrf-token': 'test-csrf' };
+  const res = await h.call({ url: '/api/account/avatar', headers, body: { avatar: 'capy-gymbot', userId: 'victim', xp: 999999 } });
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(JSON.parse(res.body), { ok: true, avatar: 'capy-gymbot' });
+  const write = h.calls.find(c => c.init.method === 'PATCH');
+  assert.equal(write.url.searchParams.get('id'), 'eq.' + ACCOUNT.id);
+  assert.deepEqual(write.body, { avatar: 'capy-gymbot' });
+  assert.equal(write.init.headers.Authorization, 'Bearer mock-access-token');
+  assert.equal(write.init.headers.apikey, 'mock-public-key');
+});
+test('skin save rejects missing CSRF, missing auth, unknown skin and empty database result', async () => {
+  for (const scenario of ['csrf', 'auth', 'invalid', 'empty']) {
+    const h = harness({ skinWrite: true, emptySkinWrite: scenario === 'empty' });
+    const headers = { cookie: `${scenario === 'auth' ? '' : h.names.access + '=mock-access-token; '}${h.names.csrf}=test-csrf` };
+    if (scenario !== 'csrf') headers['x-csrf-token'] = 'test-csrf';
+    const res = await h.call({ url: '/api/account/avatar', headers, body: { avatar: scenario === 'invalid' ? '<img onerror=alert(1)>' : 'capy-bee' } });
+    assert.equal(res.statusCode, { csrf:403, auth:401, invalid:400, empty:502 }[scenario], scenario);
+    if (scenario !== 'empty') assert.equal(h.calls.some(c => c.init.method === 'PATCH'), false);
+  }
+});
 function cookieValue(res, name) {
   const values = cookies(res).filter(item => item.startsWith(name + '='));
   return values.length ? decodeURIComponent(values[values.length - 1].split(';')[0].slice(name.length + 1)) : '';

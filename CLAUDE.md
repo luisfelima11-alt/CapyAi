@@ -16,6 +16,42 @@ depois de corrigir.
 O ciclo: **capy-bughunter** acha o sintoma → **capy-debugger** prova a causa raiz →
 **capy-fixer** corrige e escreve a lição de volta no arquivo.
 
+## Toda aula nova sai com a Folha da aula em PDF (regra do Luis, 12/out/2026)
+
+Toda aula nova de curso vem com uma **folha de apoio em PDF** para o aluno imprimir e
+acompanhar a aula. A aula só está pronta quando a folha existe.
+
+- **Uma página A4, e só uma.** O aluno vai imprimir, então é enxuto.
+- **Preto no branco.** Cor só nos títulos das partes (a cor do curso). Sem fundo colorido, sem
+  emoji, sem enfeite.
+- **O que vai, nesta ordem:**
+  1. cabeçalho com curso, número e título;
+  2. vocabulário (palavra, tradução e uma frase curta de exemplo);
+  3. o padrão da aula em 3–4 exemplos, nunca regra;
+  4. as frases-chave;
+  5. **Minhas frases**, com 3 linhas para o aluno escrever os próprios exemplos antes da aula;
+  6. **Notas**, com o espaço que sobrar.
+- **Gerada por script, nunca à mão:** `node scripts/gera-folha-aula.mjs <aula>.html`. Ela sai
+  em `assets/pdf/<slug>-folha.pdf`. O script falha se passar de 1 página.
+- **Na aula,** depois do Homework, entra o cartão "📄 Folha da aula" com o botão de baixar (que
+  funciona no celular). O link também aparece no hub do curso.
+- `assets/**/*.pdf` tem que estar nos builds do `vercel.json`. Fora da lista, o PDF dá 404 sem
+  nenhum erro.
+
+## Proibido: "gramática" e "grammar" (regra do Luis, 12/out/2026)
+
+O foco do site não é gramática, é **aprender com exemplos**. Por isso, as palavras
+"gramática", "gramatical" e "grammar" **não aparecem em nada que o aluno vê**: texto, título,
+botão, SEO, PDF ou fala da Yara.
+
+- O nome da seção é **🧩 Patterns** (em português, "padrão"). O botão é "Entendi o padrão! (+20 XP)".
+  "Corrija o erro gramatical" vira "Corrija a frase".
+- Na seção Patterns, o ensino vem dos exemplos: 3–4 frases do diálogo, o contraste
+  certo/errado e, no máximo, uma linha de explicação. Nada de tabela de regra.
+- Os ids internos (`tab-grammar`, `'grammar'` na `ROTA`) continuam como estão: o aluno não os
+  vê, e o `self-study.js` e o `listening-lab.js` dependem deles.
+- Os prompts da Yara mandam ensinar com exemplos e nunca dizer "grammar" ou "gramática".
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
