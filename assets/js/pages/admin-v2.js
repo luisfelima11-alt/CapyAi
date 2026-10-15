@@ -505,6 +505,24 @@ function linhaDaIa(ia, voz, ativos) {
     (maiores || 'Nenhuma chamada paga ainda') + porAluno + cache);
 }
 
+// Jev só observa: dá a nota ao lado da IA, e o aluno vê só a da IA. Esta linha
+// diz quanto os dois concordam, para decidir se ele pode dar a nota sozinho.
+function linhaDoJev(jev) {
+  if (!jev || (jev.modo === 'off' && !Object.keys(jev.usos || {}).length)) return null;
+  if (jev.faltaMigration) {
+    return linhaIcone('alerta', 'tom-atencao', 'Jev: falta rodar a migration', 'supabase/migrations/202609300001_jev.sql');
+  }
+  const nomes = { desafio: 'desafio', redacao: 'redação' };
+  const pct = (a, b) => b ? `${Math.round(100 * a / b)}%` : '—';
+  const usos = Object.entries(jev.usos || {});
+  const total = usos.reduce((t, [, u]) => t + u.notas, 0);
+  const falhas = usos.reduce((t, [, u]) => t + u.falhas, 0);
+  const partes = usos.map(([nome, u]) => `${nomes[nome] || nome}: concorda com a IA em ${pct(u.concorda, u.comparadas)} de ${numero(u.comparadas)}`
+    + (u.confiantes ? ` (confiante em ${pct(u.confiantes, u.comparadas)}; nessas, ${pct(u.concordaConfiantes, u.confiantes)})` : ''));
+  const sub = (partes.join(' · ') || 'Nenhuma nota ainda') + (falhas ? ` · ${numero(falhas)} falha(s)` : '') + ` · ${dolaresFinos(jev.usd)}`;
+  return linhaIcone('brilho', total && falhas > total / 2 ? 'tom-atencao' : 'tom-ok', `Jev observando: ${numero(total)} nota(s) neste mês`, sub);
+}
+
 function linhasDoSite(saude, ativosNoMes) {
   const itens = [];
   const voz = saude.voz || {};
@@ -512,6 +530,8 @@ function linhasDoSite(saude, ativosNoMes) {
     voz.usd == null ? 'Voz: não consegui medir agora' : `Voz neste mês: ${dolares(voz.usd)} de ${dolares(voz.tetoUsd)}`,
     voz.minutos == null ? 'O freio de gasto usa esta medição' : `${numero(voz.minutos)} min em ligações · teto por aluno: 60 min no Super`));
   itens.push(linhaDaIa(saude.ia, saude.voz, ativosNoMes));
+  const jev = linhaDoJev(saude.jev);
+  if (jev) itens.push(jev);
   const crons = saude.crons || [];
   const emDia = crons.filter(cronEmDia).length;
   itens.push(linhaIcone('sino', emDia === crons.length ? 'tom-ok' : 'tom-atencao',

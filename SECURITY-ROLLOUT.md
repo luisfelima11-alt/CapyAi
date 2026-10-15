@@ -100,7 +100,9 @@ Deploy order:
    26/set and still unapplied). The two files are independent, in filename order.
    With the AI cost PR, also run `supabase/migrations/202609290001_custo_ia.sql`
    (the `cost_usd` and `cache_hits` columns and the server-only `ai_cache` table),
-   after 202609240001.
+   after 202609240001. With the Jev PR, also run
+   `supabase/migrations/202609300001_jev.sql` (the server-only `jev_decisions`
+   table), after 202609290001.
 3. Deploy to Preview and sign in there with a password (magic links go to
    `APP_ORIGIN`); check the Music Lab search and lyrics while signed in.
    Then production: `npx vercel --prod --force`, then
@@ -170,3 +172,22 @@ Checks after deploy:
   authenticator is enrolled.
 - After a short Super voice call, the student's card in the admin shows the
   real minutes, not 30.
+
+## Release 6 — Jev observing (2026-09-30, branch `claude/jev-notas`)
+
+Migration: `supabase/migrations/202609300001_jev.sql`, after 202609290001.
+
+Owner actions:
+- In OpenRouter: a credit limit on the key, and data collection/training off in
+  the privacy settings. Then add `OPENROUTER_API_KEY` to Vercel (Production and
+  Preview). The key alone turns on only Jev; the text routes stay on OpenAI
+  unless `OPENROUTER_TEXTO=1`. `JEV_NOTAS=off` plus a redeploy turns Jev off, no code change.
+- The privacy page now lists OpenRouter and TypeSafe as processors.
+
+Checks after deploy:
+- The daily challenge gives 1, 2 or 3 stars according to the answer (it used to
+  give 2 to everyone) and the feedback talks about the answer.
+- After a few grades, Admin → Hoje shows "Jev observando" with the agreement.
+  Many rows with `error = 'formato'` mean Jev's response format differs from the
+  one the code reads: the log line `[jev] formato inesperado` shows the shape (keys
+  only, no values). Fix the reader before letting Jev decide anything.
