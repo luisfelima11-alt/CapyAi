@@ -147,6 +147,37 @@ test('sensitive pages use local scripts and contain no executable inline handler
   }
 });
 
+test('the prebuilt CSS of the hardened pages covers every file that renders on them, and is up to date', t => {
+  // As páginas da CSP estrita não carregam o Tailwind do CDN: usam o
+  // security-pages.css, gerado só a partir dos arquivos do `content`. Em 15/10
+  // a "Minha Conta" abriu com a Capy de 324 px e o menu do usuário sempre
+  // aberto, porque a barra de cima (components.js) não estava na lista.
+  const config = require('../tailwind.security.config.js');
+  const content = new Set(config.content.map(entry => entry.replace(/^\.\//, '')));
+  const pages = fs.readdirSync(ROOT).filter(name => name.endsWith('.html'))
+    .filter(name => /assets\/css\/security-pages\.css/.test(fs.readFileSync(path.join(ROOT, name), 'utf8')));
+  assert.ok(pages.includes('account.html'), 'account.html should use the prebuilt CSS');
+  for (const page of pages) {
+    assert.ok(content.has(page), `${page} uses security-pages.css but is not in tailwind.security.config.js`);
+    const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+    const scripts = [...html.matchAll(/<script\b[^>]*\bsrc="([^"?#]+)/gi)].map(match => match[1])
+      .filter(src => !/^(https?:)?\/\//.test(src) && !src.includes('/'));
+    for (const script of scripts) {
+      assert.ok(content.has(script), `${page} loads ${script}, which is not in tailwind.security.config.js`);
+    }
+  }
+  const cli = path.join(ROOT, 'node_modules', '.bin', 'tailwindcss');
+  if (!fs.existsSync(cli)) return t.skip('tailwindcss is not installed');
+  const fresh = path.join(require('node:os').tmpdir(), `security-pages-${process.pid}.css`);
+  require('node:child_process').execFileSync(cli, [
+    '-c', 'tailwind.security.config.js', '-i', 'assets/css/security-pages.input.css', '-o', fresh, '--minify',
+  ], { cwd: ROOT, stdio: 'ignore' });
+  const committed = fs.readFileSync(path.join(ROOT, 'assets', 'css', 'security-pages.css'), 'utf8');
+  const rebuilt = fs.readFileSync(fresh, 'utf8');
+  fs.rmSync(fresh, { force: true });
+  assert.equal(committed, rebuilt, 'assets/css/security-pages.css is stale: run the tailwindcss step of npm run build:security-assets');
+});
+
 test('local server blocks traversal and private files', async t => {
   const devHandler = require('../scripts/dev-server');
   const server = http.createServer(devHandler);
