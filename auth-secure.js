@@ -22,9 +22,13 @@
         email: String(user.email || ''), avatar: String(user.avatar || '🐾'),
         role: String(user.role || 'student'),
       } : null;
+      if (safe && safe.role === 'guest' && window.CapySkins) {
+        try { safe.avatar = CapySkins.normalize(localStorage.getItem('capyGuestSkin:' + safe.id) || safe.avatar); } catch {}
+      }
       this._session = safe;
       if (safe) localStorage.setItem(this.SESSION_KEY, JSON.stringify(safe));
       else localStorage.removeItem(this.SESSION_KEY);
+      window.dispatchEvent(new CustomEvent('capy:session', { detail: safe }));
     },
     _setCsrf(token) {
       if (token) sessionStorage.setItem(this.CSRF_KEY, token);
@@ -139,6 +143,21 @@
     },
     async fetchProfile() {
       try { return await this._request('/api/profile'); } catch { return null; }
+    },
+    async saveAvatar(avatar) {
+      if (!window.CapySkins || !CapySkins.valid(avatar)) throw new Error('Escolha uma skin da coleção Capy.');
+      const verified = await this.ready();
+      if (!verified) throw new Error('Entre na sua conta para salvar sua skin.');
+      const user = this.getSession();
+      if (user.role === 'guest') {
+        localStorage.setItem('capyGuestSkin:' + user.id, avatar);
+      } else {
+        const data = await this._request('/api/account/avatar', { method: 'POST', body: JSON.stringify({ avatar }) });
+        if (data.avatar !== avatar) throw new Error('Não foi possível salvar sua skin. Tente novamente.');
+      }
+      this._saveDisplayCache({ ...user, avatar });
+      this._readyPromise = Promise.resolve(this._session);
+      return this._session;
     },
     async saveProfile(_userId, profileData) {
       try {
