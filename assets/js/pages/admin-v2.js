@@ -175,6 +175,7 @@ let appAberto = false;
 function showGate(motivo) {
   const m = motivo || 'deslogado';
   appAberto = false;
+  $('mfa-code-form').classList.add('hidden');
   $('gate').classList.remove('hidden');
   $('app').classList.add('hidden');
 
@@ -201,15 +202,137 @@ function showApp() {
   render();
 }
 
+// ── Verificação em 2 etapas (MFA) ──────────────────────────────────────────
+// O mesmo fluxo e as mesmas rotas do admin antigo (admin-1.js). Depois da senha
+// a sessão é "aal1": com um app autenticador cadastrado, o admin pede o código
+// (a sessão vira "aal2") antes de abrir. Sem cadastro, abre com o aviso para
+// ativar, até ADMIN_REQUIRE_MFA=true, quando ativar vira obrigatório.
+let mfaFatorPendente = '';
+let mfaCadastroObrigatorio = false;
+
+async function mfaStatus() {
+  const r = await fetch('/api/auth/mfa/status', { credentials: 'same-origin', cache: 'no-store' });
+  if (!r.ok) return null;
+  return r.json();
+}
+
+async function mfaPost(path, corpo, _jaTentou) {
+  const r = await fetch(path, {
+    method: 'POST',
+    credentials: 'same-origin',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(corpo || {}),
+  });
+  let dados = {};
+  try { dados = await r.json(); } catch (e) { /* corpo vazio */ }
+  // Mesmo caso do api(): aba reaberta perde o token CSRF (sessionStorage).
+  if (r.status === 403 && dados.error === 'invalid_csrf' && !_jaTentou && window.Auth && Auth.refreshSession) {
+    try { await Auth.refreshSession(); } catch (e) { /* deixa o erro aparecer */ }
+    return mfaPost(path, corpo, true);
+  }
+  if (!r.ok) {
+    const erro = new Error(dados.message || dados.error || 'falha');
+    erro.code = dados.error;
+    throw erro;
+  }
+  return dados;
+}
+
+function mensagemMfa(e) {
+  if (e && (e.code === 'rate_limited' || /limit/i.test(e.message))) return 'Muitas tentativas. Espere um minuto.';
+  if (e && e.code === 'invalid_code') return 'O código tem 6 dígitos.';
+  return 'Código não confere. Confira o relógio do celular e tente o código novo.';
+}
+
+function pedirCodigoMfa(factorId) {
+  mfaFatorPendente = factorId;
+  appAberto = false;
+  $('gate').classList.remove('hidden');
+  $('app').classList.add('hidden');
+  for (const id of ['gate-btn', 'gate-trocar', 'gate-quem', 'gate-error', 'mfa-code-erro']) $(id).classList.add('hidden');
+  $('mfa-code').value = '';
+  $('mfa-code-form').classList.remove('hidden');
+  $('mfa-code').focus();
+}
+
+async function confirmarCodigoMfa(code) {
+  const dados = await mfaPost('/api/auth/mfa/verify', { factorId: mfaFatorPendente, code });
+  if (dados.csrfToken && Auth._setCsrf) Auth._setCsrf(dados.csrfToken);
+  try { await Auth.refreshSession(); } catch (e) { /* o cookie novo já vale */ }
+}
+
+async function abrirCadastroMfa(obrigatorio) {
+  mfaCadastroObrigatorio = Boolean(obrigatorio);
+  $('mfa-setup-cancel').classList.toggle('hidden', mfaCadastroObrigatorio);
+  $('mfa-setup-erro').classList.add('hidden');
+  $('mfa-setup').classList.remove('hidden');
+  try {
+    const d = await mfaPost('/api/auth/mfa/enroll');
+    mfaFatorPendente = d.factorId;
+    if (d.qrCode) { $('mfa-qr').src = d.qrCode; $('mfa-qr').classList.remove('hidden'); }
+    $('mfa-secret').textContent = d.secret || '';
+    $('mfa-setup-code').focus();
+  } catch (e) {
+    $('mfa-setup-erro').textContent = e.code === 'mfa_required'
+      ? 'Confirme primeiro o código do app que você já cadastrou.'
+      : 'Não deu para gerar o QR code agora. Tente de novo em instantes.';
+    $('mfa-setup-erro').classList.remove('hidden');
+  }
+}
+
+// Admin confirmado: antes de abrir, a verificação em 2 etapas.
 async function entrarNoAdmin() {
+  const st = await mfaStatus().catch(() => null);
+  const verificados = ((st && st.factors) || []).filter(f => f.status === 'verified');
+  if (st && st.aal !== 'aal2' && verificados.length) { pedirCodigoMfa(verificados[0].id); return; }
+  if (st && !verificados.length && st.enforced) { abrirCadastroMfa(true); return; }
   try {
     const visao = await api('/api/admin/overview');
     cache.visao = Promise.resolve(visao);
     showApp();
+    $('mfa-banner').classList.toggle('hidden', Boolean(!st || verificados.length));
   } catch (e) {
     if (e.message !== 'unauthorized') showGate('falha');
   }
 }
+
+$('mfa-code-form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const btn = $('mfa-code-btn');
+  $('mfa-code-erro').classList.add('hidden');
+  btn.disabled = true;
+  try {
+    await confirmarCodigoMfa($('mfa-code').value.trim());
+    $('mfa-code-form').classList.add('hidden');
+    $('gate-btn').classList.remove('hidden');
+    await entrarNoAdmin();
+  } catch (e) {
+    if (e.message === 'unauthorized') return;
+    $('mfa-code-erro').textContent = mensagemMfa(e);
+    $('mfa-code-erro').classList.remove('hidden');
+  } finally { btn.disabled = false; }
+});
+
+$('mfa-banner-btn').addEventListener('click', () => abrirCadastroMfa(false));
+$('mfa-setup-cancel').addEventListener('click', () => $('mfa-setup').classList.add('hidden'));
+$('mfa-setup-form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const btn = $('mfa-setup-btn');
+  $('mfa-setup-erro').classList.add('hidden');
+  btn.disabled = true;
+  try {
+    await confirmarCodigoMfa($('mfa-setup-code').value.trim());
+    $('mfa-setup').classList.add('hidden');
+    $('mfa-banner').classList.add('hidden');
+    toast('Verificação em 2 etapas ativada.');
+    if (mfaCadastroObrigatorio || !appAberto) await entrarNoAdmin();
+  } catch (e) {
+    if (e.message === 'unauthorized') return;
+    $('mfa-setup-erro').textContent = mensagemMfa(e);
+    $('mfa-setup-erro').classList.remove('hidden');
+  } finally { btn.disabled = false; }
+});
 
 $('gate-btn').addEventListener('click', async () => {
   // refreshSession, não ready(): o ready() guarda a PRIMEIRA resposta da página.

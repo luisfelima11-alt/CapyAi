@@ -180,11 +180,11 @@ tailwind.config = {
 <div id="mobile-nav-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
-<script src="auth-secure.js?v=skins1"></script>
+<script src="auth-secure.js?v=m1015"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=m1015"></script>
 <script>
   Components.mount('top-nav-placeholder', Components.renderTopNav('leaderboard'));
   Components.mount('side-nav-placeholder', Components.renderSideNav('leaderboard'));
@@ -200,6 +200,12 @@ tailwind.config = {
     if (!str) return AV_COLS[0];
     const sum = Array.from(str).reduce((a,c) => a + c.charCodeAt(0), 0);
     return AV_COLS[sum % AV_COLS.length];
+  }
+
+  // Names and avatars are typed by other students and rendered for everyone
+  // who opens the ranking: always escape them before they go into innerHTML.
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   // ── Get current player from Store ──────────────────────────────────────────
@@ -293,7 +299,7 @@ tailwind.config = {
             ${CapySkins.image(user.avatar, 56)}
             ${youBadge}
           </div>
-          <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${user.name}</p>
+          <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${escHtml(user.name)}</p>
           <p class="font-label text-xs text-slate-400">${user.xp.toLocaleString()} XP</p>
         </div>
         <!-- Block -->
@@ -346,7 +352,7 @@ tailwind.config = {
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-headline font-bold text-sm ${user.isYou ? 'text-pink-300' : 'text-white'} truncate">
-              ${user.name}${user.isYou ? ' <span class="font-label text-xs text-pink-400/70">(You)</span>' : ''}
+              ${escHtml(user.name)}${user.isYou ? ' <span class="font-label text-xs text-pink-400/70">(You)</span>' : ''}
             </p>
             <p class="font-body text-xs text-slate-500">${user.badgesCount} badge${user.badgesCount !== 1 ? 's' : ''} earned</p>
           </div>

@@ -6,6 +6,7 @@ module.exports = {
     './set-password.html',
     './account.html',
     './admin.html',
+    './admin-antigo.html',   // the old admin moved here (26/set); admin.html is the new one
     './admin-metrics.html',
     './teacher_homework.html',
     './assets/js/pages/*.js',
