@@ -42,16 +42,15 @@ a nota dele, que só fica registrada em `jev_decisions`.
 
 **Como pegar isso de novo:**
 ```bash
-grep -rn "systemOverride" --include=*.html --include=*.js . | grep -v "node_modules\|^./api/\|^./scripts/\|^./tests/"
+node --test --test-name-pattern="no page sends its own prompt" tests/security.test.js
 ```
-Toda linha na saída é uma página que depende de um prompt que o servidor joga fora.
+O teste falha se qualquer página (fora de `api/`, `scripts/` e `tests/`) mencionar `systemOverride`.
 
-**Achado vizinho, NÃO corrigido (30/set):** a mesma saída ainda lista três páginas.
-- `lessons.html`: o chat do "boss" no fim da lição.
-- `youtube_lab.html`: o chat sobre o vídeo; a Yara responde sem saber o vídeo.
-- `reading_room.html`: espera uma história em JSON do `/api/chat` e cai no `catch`.
-
-Cada uma precisa de uma rota própria no servidor, como o desafio ganhou.
+**As páginas vizinhas, corrigidas em 30/set:** tinham o mesmo defeito.
+- `lessons.html`, o Desafio da Yara no fim do capítulo: os turnos vão para o `/api/lesson-chat`
+  com o capítulo, e a nota vai para o `/api/boss-chat/avaliar`.
+- `youtube_lab.html`: o chat vai para o `/api/lesson-chat`, com o resumo do vídeo no `contexto`.
+- `reading_room.html`: a história vem do `/api/reading-story`, com temas adultos de uma lista fixa.
 
 **Por que aconteceu:** a blindagem fechou o `systemOverride` no servidor sem varrer quem o mandava.
 Mesma lição do CSRF: guarda novo no servidor exige procurar os chamadores.
