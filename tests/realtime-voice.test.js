@@ -638,7 +638,10 @@ function catalogoReal() {
   return new Function(fonte.slice(i, j) +
     '\nreturn { PERSONAS, personaDe, personasPublicas, aberturaTexto, REGRAS_TEXTO, idiomaDe,' +
     ' textoParaPrompt, faixaDeNivel, perfilLimpo, ganchoDe, linhasDoAluno, planoDeConversa, alunoNaCena,' +
-    ' falaParaPrompt, cenarioParaLog, AULA_FAMILIAS, aulaDe, faixaDaAula, instrucoesDaAula };')();
+    ' falaParaPrompt, cenarioParaLog, AULA_FAMILIAS, aulaDe, faixaDaAula, instrucoesDaAula,' +
+    // Dificuldade e estilo da conversa (28/set): os handlers usam estes nomes.
+    ' NIVEIS_CONVERSA, ESTILOS_CONVERSA, PERSONA_ANTIGA, pedidoDeConversa, faixaDoPedido, alunoFalaPortugues,' +
+    ' instrucoesDaPersona, modoDoEstilo, regraDeNivel, tokensDoChat, catalogoDeModos, estiloGuardaMemoria };')();
 }
 
 // O catalogo de aulas de verdade, o mesmo arquivo que vai para producao.
@@ -692,7 +695,33 @@ test('o catalogo publico nao vaza prompt nenhum', () => {
     assert.ok(!bruto.includes(proibido), 'vazou "' + proibido + '" no /api/personas');
   }
   for (const p of lista) {
-    assert.deepEqual(Object.keys(p).sort(), ['arte', 'curso', 'destino', 'escuta', 'id', 'lang', 'legenda', 'rotulo']);
+    // niveis/estilos/motivo: o menu de dificuldade e estilo (28/set) precisa
+    // saber o que cada capivara aceita.
+    // clipes (8/out): o palco anima cada capivara com os clipes dela.
+    assert.deepEqual(Object.keys(p).sort(), ['arte', 'clipes', 'curso', 'destino', 'escuta', 'estilos', 'id', 'lang', 'legenda', 'motivo', 'niveis', 'rotulo']);
+  }
+});
+
+// Pedido do Luis (7/out): "veja se todas as IAs de conversa tem animacao, a do
+// agro ja vi que nao tem". Toda capivara conversada aqui tem clipe parado e
+// falando, publicado (raiz: o vercel.json so publica *.mp4 da raiz), leve, com
+// a versao no nome (o sw.js faz cache-first de midia) e nunca o yara-chat.mp4
+// de 3,8 MB, que era o que a pagina baixava antes.
+test('toda capivara de conversa tem clipe parada e falando, leve e versionado', () => {
+  const { personasPublicas } = catalogoReal();
+  const raiz = path.join(__dirname, '..');
+  for (const p of personasPublicas()) {
+    if (p.destino) { assert.equal(p.clipes, null, p.id + ': atalho nao tem palco'); continue; }
+    assert.ok(p.clipes && p.clipes.parada, p.id + ' sem clipe parado: fica foto');
+    const estados = p.id === 'conversa' ? ['parada', 'ouvindo', 'fala'] : ['parada', 'fala'];
+    for (const estado of estados) {
+      const nome = p.clipes[estado];
+      assert.match(String(nome), /^[a-z0-9-]+-v\d+\.mp4$/, p.id + '.' + estado + ': nome sem versao ou fora da raiz');
+      assert.notEqual(nome, 'yara-chat.mp4', p.id + ': o clipe 16:9 de 3,8 MB voltou');
+      const arq = path.join(raiz, nome);
+      assert.ok(fs.existsSync(arq), p.id + '.' + estado + ': ' + nome + ' nao existe');
+      assert.ok(fs.statSync(arq).size <= 600 * 1024, nome + ' passou de 600 KB');
+    }
   }
 });
 
@@ -718,14 +747,19 @@ test('as personas novas chegam ao prompt da ligacao, cada uma com o seu assunto'
   assert.doesNotMatch(pn.session.instructions, /airport/i, 'negocios nao pode herdar o prompt de viagem');
 });
 
-test('a capivara de iniciantes abre em portugues mesmo para quem o perfil diz avancado', async () => {
-  // Quem escolhe essa persona esta dizendo que se sente iniciante — isso vale
-  // mais que o english_level do perfil, que pode estar velho ou otimista.
+test('link antigo da capivara de iniciantes vira Yara + Total iniciante, mesmo com perfil avancado', async () => {
+  // A persona saiu do menu em 28/set (o nivel Total iniciante faz o papel dela),
+  // mas ?persona=iniciante e preferencias salvas continuam valendo. Quem a
+  // escolhia estava dizendo que se sente iniciante — isso vale mais que o
+  // english_level do perfil, que pode estar velho ou otimista.
   const h = tokenHarness({ body: { cenario: 'iniciante' }, nivel: 'avancado' });
   await h.run();
-  const p = JSON.parse(h.requests[0].payload).session.instructions;
-  assert.match(p, /Open in Brazilian PORTUGUESE/);
-  assert.doesNotMatch(p, /Do not simplify/, 'a abertura de avancado nao pode vazar para esta persona');
+  const s = JSON.parse(h.requests[0].payload).session;
+  assert.match(s.instructions, /Open the call in Brazilian PORTUGUESE/);
+  assert.match(s.instructions, /from ZERO/);
+  assert.doesNotMatch(s.instructions, /Do not simplify/, 'a abertura de avancado nao pode vazar para o Total iniciante');
+  assert.equal(s.audio.output.voice, 'marin');
+  assert.ok(!('language' in s.audio.input.transcription), 'o iniciante fala portugues: transcricao sem idioma forcado');
 });
 
 // ── Uma IA por curso ────────────────────────────────────────────────────────
@@ -821,7 +855,7 @@ function chatHarness(options = {}) {
   const start = source.indexOf("    if (req.method === 'POST' && url === '/api/chat') {");
   const end = source.indexOf("    if (req.method === 'POST' && url === '/api/quiz') {", start);
   assert.ok(start > 0 && end > start, 'a rota /api/chat precisa continuar existindo');
-  const enviadas = [];
+  const enviadas = [], tetos = [];
   const req = { method: 'POST', headers: {} };
   const res = { statusCode: 200, body: null, status(c) { this.statusCode = c; return this; }, json(b) { this.body = b; return this; } };
   const context = vm.createContext({
@@ -836,10 +870,10 @@ function chatHarness(options = {}) {
     perfilDoAluno: perfilFalso(options),
     aulasContexto: aulasContextoReal,
     palavrasFracas: async () => options.fracas || [],
-    callOpenAI: mensagens => { enviadas.push(mensagens); },
+    callOpenAI: (mensagens, maxTokens) => { enviadas.push(mensagens); tetos.push(maxTokens); },
   });
   vm.runInContext('async function runRoute() {\n' + source.slice(start, end) + '\n}', context);
-  return { run: () => context.runRoute(), enviadas, res };
+  return { run: () => context.runRoute(), enviadas, tetos, res };
 }
 const sistemaDo = h => (h.enviadas[0] || []).find(m => m.role === 'system').content;
 
@@ -975,7 +1009,8 @@ test('quem fala portugues com a capivara nao tem a fala forcada para ingles na t
   // E o catalogo publico avisa o microfone do chat a mesma coisa.
   const pub = Object.fromEntries(catalogoReal().personasPublicas().map(p => [p.id, p.escuta]));
   assert.equal(pub.maia, null);
-  assert.equal(pub.iniciante, null);
+  // A capivara de iniciantes saiu do menu (28/set): virou o nivel Total iniciante.
+  assert.ok(!('iniciante' in pub), 'a capivara de iniciantes voltou para o menu');
   assert.equal(pub.francais, 'fr');
 });
 
@@ -1238,4 +1273,213 @@ test('o chat do painel dentro da aula sabe a aula, e systemOverride continua ign
   await fr.run();
   assert.match(sistemaDo(fr), /give the French again/);
   assert.doesNotMatch(sistemaDo(fr), /give the English again/);
+});
+
+// ── Dificuldade e estilo da conversa (28/set) ────────────────────────────────
+// A capivara foi para o topo; no compositor o aluno escolhe o NIVEL e o ESTILO.
+// Listas fechadas no servidor, como as personas: o cliente manda so o id.
+
+const NIVEIS = ['auto', 'zero', 'iniciante', 'medio', 'intensivo'];
+const ESTILOS = ['livre', 'guiada', 'encenacao', 'repete', 'comosediz', 'revisao', 'historia'];
+
+test('o catalogo publico de niveis e estilos tem so rotulos, nunca prompt', () => {
+  const { catalogoDeModos } = catalogoReal();
+  const cat = JSON.parse(JSON.stringify(catalogoDeModos()));
+  assert.deepEqual(cat.niveis.map(n => n.id), NIVEIS);
+  assert.deepEqual(cat.estilos.map(e => e.id), ESTILOS);
+  for (const n of cat.niveis) assert.deepEqual(Object.keys(n).sort(), ['curto', 'emoji', 'id', 'legenda', 'portugues', 'rotulo']);
+  for (const e of cat.estilos) assert.deepEqual(Object.keys(e).sort(), ['curto', 'emoji', 'id', 'legenda', 'memoria', 'rotulo']);
+  const bruto = JSON.stringify(cat);
+  for (const proibido of ['FORMAT', 'LEVEL RULE', 'You are', 'voz', 'texto']) {
+    assert.ok(!bruto.includes(proibido), 'vazou "' + proibido + '" no catalogo de modos');
+  }
+  assert.deepEqual(cat.apelidos, [{ id: 'iniciante', persona: 'conversa', nivel: 'zero' }]);
+  assert.deepEqual(cat.niveis.filter(n => n.portugues).map(n => n.id), ['zero', 'iniciante']);
+  assert.deepEqual(cat.estilos.filter(e => e.memoria).map(e => e.id), ['livre', 'guiada']);
+});
+
+test('cada capivara diz o que aceita: a Maia tem jeito proprio, a paciente aceita so nivel', () => {
+  const { personasPublicas } = catalogoReal();
+  const pub = Object.fromEntries(personasPublicas().map(p => [p.id, p]));
+  assert.ok(!('iniciante' in pub));
+  assert.equal(pub.maia.niveis, false);
+  assert.equal(pub.maia.estilos, false);
+  assert.match(pub.maia.motivo, /jeito dela/);
+  assert.equal(pub.med.niveis, true);
+  assert.equal(pub.med.estilos, false);
+  assert.match(pub.med.motivo, /paciente/);
+  assert.equal(pub.conversa.niveis, true);
+  assert.equal(pub.conversa.estilos, true);
+  assert.equal(pub.entrevista.niveis, false, 'a entrevista navega para outra pagina');
+  for (const id of ['travel', 'business', 'agro', 'francais', 'turkish', 'gpstronic']) {
+    assert.equal(pub[id].niveis && pub[id].estilos, true, id);
+  }
+});
+
+test('pedido de conversa: so id da lista, e o que a capivara nao aceita cai no padrao', () => {
+  const { pedidoDeConversa } = catalogoReal();
+  const lixos = ['__proto__', 'constructor', 'toString', 'x', '', null, 0, {}, ['zero'], { toString() { return 'zero'; } }];
+  for (const lixo of lixos) {
+    const p = pedidoDeConversa('conversa', lixo, lixo);
+    assert.equal(p.nivel, 'auto', 'nivel ' + String(lixo));
+    assert.equal(p.estilo, 'livre', 'estilo ' + String(lixo));
+    assert.equal(pedidoDeConversa(lixo, 'medio', 'guiada').id, 'conversa', 'persona ' + String(lixo));
+  }
+  const antigo = pedidoDeConversa('iniciante');
+  assert.deepEqual([antigo.id, antigo.nivel, antigo.estilo], ['conversa', 'zero', 'livre']);
+  assert.equal(pedidoDeConversa('iniciante', 'medio').nivel, 'medio', 'nivel escolhido vale mais que o apelido');
+  const maia = pedidoDeConversa('maia', 'intensivo', 'guiada');
+  assert.deepEqual([maia.nivel, maia.estilo], ['auto', 'livre']);
+  const med = pedidoDeConversa('med', 'zero', 'comosediz');
+  assert.deepEqual([med.nivel, med.estilo], ['zero', 'livre']);
+  const rh = pedidoDeConversa('entrevista', 'zero', 'historia');
+  assert.deepEqual([rh.nivel, rh.estilo], ['auto', 'livre']);
+});
+
+test('o nivel escolhido manda na faixa da ligacao, e quem fala portugues nao tem transcricao forcada', async () => {
+  const avancado = { perfilLinha: { english_level: 'advanced' } };
+  const zero = tokenHarness({ body: { cenario: 'conversa', nivel: 'zero' }, ...avancado });
+  await zero.run();
+  const sz = JSON.parse(zero.requests[0].payload).session;
+  assert.match(sz.instructions, /from ZERO/);
+  assert.match(sz.instructions, /LEVEL RULE/);
+  assert.doesNotMatch(sz.instructions, /Do not simplify/);
+  assert.ok(!('language' in sz.audio.input.transcription));
+
+  const medio = tokenHarness({ body: { cenario: 'conversa', nivel: 'medio' }, perfilLinha: { english_level: 'beginner' } });
+  await medio.run();
+  const sm = JSON.parse(medio.requests[0].payload).session;
+  assert.match(sm.instructions, /intermediate level/);
+  assert.doesNotMatch(sm.instructions, /TRUE BEGINNER/);
+  assert.equal(sm.audio.input.transcription.language, 'en');
+
+  const intensivo = tokenHarness({ body: { cenario: 'conversa', nivel: 'intensivo' } });
+  await intensivo.run();
+  const si = JSON.parse(intensivo.requests[0].payload).session;
+  assert.match(si.instructions, /INTENSIVE mode/);
+  assert.match(si.instructions, /Correct EVERY mistake/);
+  // A regra de nivel vem por ULTIMO: prevalece sobre o "beginner-friendly" da persona.
+  assert.ok(si.instructions.lastIndexOf('INTENSIVE') > si.instructions.indexOf('beginner-friendly'));
+  assert.equal(si.audio.input.transcription.language, 'en');
+
+  // Automatico + perfil iniciante: ela ja convida a responder em portugues.
+  const auto = tokenHarness({ body: { cenario: 'conversa' }, perfilLinha: { english_level: 'beginner' } });
+  await auto.run();
+  assert.ok(!('language' in JSON.parse(auto.requests[0].payload).session.audio.input.transcription));
+});
+
+test('o nivel escolhido tambem manda no chat escrito', async () => {
+  const zero = chatHarness({ body: { message: 'oi', persona: 'conversa', nivel: 'zero' }, perfilLinha: { english_level: 'advanced' } });
+  await zero.run();
+  assert.match(sistemaDo(zero), /from ZERO/);
+  assert.match(sistemaDo(zero), /LEVEL RULE/);
+  const intensivo = chatHarness({ body: { message: 'hi', persona: 'conversa', nivel: 'intensivo' } });
+  await intensivo.run();
+  assert.match(sistemaDo(intensivo), /INTENSIVE mode/);
+  assert.match(sistemaDo(intensivo), /✏️/);
+});
+
+test('cada estilo troca o formato da conversa, na ligacao e no chat, com a Yara e com a viajante', async () => {
+  for (const estilo of ESTILOS.filter(e => e !== 'livre')) {
+    for (const cenario of ['conversa', 'travel']) {
+      const voz = tokenHarness({ body: { cenario, estilo }, ...ANA });
+      await voz.run();
+      const iv = JSON.parse(voz.requests[0].payload).session.instructions;
+      const texto = chatHarness({ body: { message: 'oi', persona: cenario, estilo }, ...ANA });
+      await texto.run();
+      for (const [canal, prompt] of [['voz', iv], ['texto', sistemaDo(texto)]]) {
+        const onde = cenario + '/' + estilo + '/' + canal;
+        assert.match(prompt, /FORMAT - /, onde + ': sem o formato');
+        assert.doesNotMatch(prompt, /HOW TO RUN THIS CALL/, onde + ': o plano da conversa livre ficou junto');
+        assert.match(prompt, /first name is Ana/, onde + ': perdeu quem e o aluno');
+        if (cenario === 'travel' && estilo !== 'revisao') assert.match(prompt, /the world of travel/, onde + ': o estilo ignorou o mundo da persona');
+      }
+    }
+  }
+  // O livre continua exatamente o de hoje.
+  const livre = tokenHarness({ body: { cenario: 'conversa', estilo: 'livre' }, ...ANA });
+  await livre.run();
+  assert.match(JSON.parse(livre.requests[0].payload).session.instructions, /HOW TO RUN THIS CALL/);
+});
+
+test('a revisao usa as palavras que o aluno erra, e sem elas revisa o basico', async () => {
+  const com = tokenHarness({ body: { cenario: 'conversa', estilo: 'revisao' }, fracas: ['although', 'cheap'] });
+  await com.run();
+  const pc = JSON.parse(com.requests[0].payload).session.instructions;
+  assert.match(pc, /Words this student has been getting wrong lately: although, cheap\. Review them ONE at a time/);
+  assert.equal((pc.match(/although/g) || []).length, 1, 'a lista de palavras fracas veio duplicada');
+  const sem = tokenHarness({ body: { cenario: 'conversa', estilo: 'revisao' } });
+  await sem.run();
+  assert.match(JSON.parse(sem.requests[0].payload).session.instructions, /There is no list of weak words yet/);
+});
+
+test('quem tem formato proprio ignora o estilo: Maia, paciente, entrevista e aula guiada', async () => {
+  const maia = tokenHarness({ body: { cenario: 'maia', estilo: 'guiada', nivel: 'intensivo' } });
+  await maia.run();
+  const im = JSON.parse(maia.requests[0].payload).session.instructions;
+  assert.doesNotMatch(im, /FORMAT - |LEVEL RULE/);
+  assert.match(im, /DO the accents/);
+  const med = tokenHarness({ body: { cenario: 'med', estilo: 'comosediz' } });
+  await med.run();
+  const imd = JSON.parse(med.requests[0].payload).session.instructions;
+  assert.match(imd, /PATIENT/);
+  assert.doesNotMatch(imd, /FORMAT - /);
+  const rh = tokenHarness({ body: { cenario: 'entrevista', nivel: 'zero', estilo: 'historia' } });
+  await rh.run();
+  assert.doesNotMatch(JSON.parse(rh.requests[0].payload).session.instructions, /LEVEL RULE|FORMAT - /);
+  const aula = tokenHarness({ body: { aula: 'agro_aula_01', nivel: 'intensivo', estilo: 'historia' } });
+  await aula.run();
+  const ia = JSON.parse(aula.requests[0].payload).session.instructions;
+  assert.match(ia, /GUIDED LESSON/);
+  assert.doesNotMatch(ia, /LEVEL RULE|FORMAT - /);
+});
+
+test('toda capivara x nivel x estilo x canal fica limpa e dentro do teto', () => {
+  const { PERSONAS, pedidoDeConversa, faixaDoPedido, instrucoesDaPersona, perfilLimpo } = catalogoReal();
+  const fatos = Array.from({ length: 12 }, (_, i) => ({ id: 'f' + i, texto: 'mora em Dourados e trabalha com vendas ' + i, tipo: 'trabalho', quando: null, em: '2026-09-01' }));
+  const perfil = perfilLimpo({ english_level: 'intermediate', interests: ['sports', 'series'], goals: ['travel'], interests_detail: 'Flamengo, The Office' }, 'Ana Clara', 'ana@x.com', fatos);
+  const fracas = ['although', 'cheap', 'borrow', 'lend', 'since', 'for', 'during', 'while'];
+  let casos = 0;
+  for (const pid of Object.keys(PERSONAS).filter(id => !PERSONAS[id].destino)) {
+    for (const nivel of NIVEIS) {
+      for (const estilo of ESTILOS) {
+        for (const canal of ['voz', 'texto']) {
+          const pedido = pedidoDeConversa(pid, nivel, estilo);
+          const faixa = faixaDoPedido(pedido, perfil);
+          const c = { idioma: 'English', faixa, perfil, fracas, tema: '', vocab: [], cargo: '', abertura: ['Open the call.'] };
+          const texto = instrucoesDaPersona(pedido, c, canal).filter(Boolean).join(' ');
+          const onde = [pid, nivel, estilo, canal].join('/');
+          assert.doesNotMatch(texto, /[<>{};]/, onde + ': caractere estrutural no prompt');
+          assert.ok(texto.length <= 7000, onde + ': ' + texto.length + ' caracteres');
+          casos++;
+        }
+      }
+    }
+  }
+  assert.ok(casos >= 600, 'combinacoes demais sumiram: ' + casos);
+});
+
+test('historia e conversa guiada ganham mais espaco no chat escrito', async () => {
+  const { tokensDoChat, pedidoDeConversa } = catalogoReal();
+  assert.equal(tokensDoChat(pedidoDeConversa('conversa', 'auto', 'historia')), 260);
+  assert.equal(tokensDoChat(pedidoDeConversa('conversa', 'auto', 'guiada')), 260);
+  assert.equal(tokensDoChat(pedidoDeConversa('conversa', 'auto', 'livre')), 150);
+  assert.equal(tokensDoChat(null), 150, 'aula guiada continua com o teto de sempre');
+  const h = chatHarness({ body: { message: 'oi', persona: 'conversa', estilo: 'historia' } });
+  await h.run();
+  assert.equal(h.tetos[0], 260);
+});
+
+test('frances e turco no Automatico nao herdam o nivel de INGLES do perfil', async () => {
+  const h = tokenHarness({ body: { cenario: 'francais' }, perfilLinha: { english_level: 'advanced' } });
+  await h.run();
+  const s = JSON.parse(h.requests[0].payload).session;
+  assert.match(s.instructions, /do NOT know this student level/);
+  assert.doesNotMatch(s.instructions, /This student is advanced/);
+  assert.equal(s.audio.input.transcription.language, 'fr');
+});
+
+test('o log de uso guarda persona, estilo e nivel', () => {
+  const { cenarioParaLog } = catalogoReal();
+  assert.equal(cenarioParaLog('travel:encenacao:intensivo'), 'travel:encenacao:intensivo');
 });

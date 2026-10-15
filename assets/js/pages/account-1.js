@@ -10,12 +10,12 @@ Components.mount('footer-placeholder', Components.renderFooter());
   if (!session || !session.id || session.id === 'guest') {
     document.getElementById('profile-name').textContent = 'Visitante';
     document.getElementById('profile-email').textContent = 'Você não está logado';
-    document.getElementById('profile-avatar').textContent = '👤';
+    document.getElementById('profile-avatar').innerHTML = CapySkins.image(CapySkins.defaultId, 64);
     return;
   }
   document.getElementById('profile-name').textContent = session.name || 'Sem nome';
   document.getElementById('profile-email').textContent = session.email || '—';
-  document.getElementById('profile-avatar').textContent = session.avatar || '🐾';
+  document.getElementById('profile-avatar').innerHTML = CapySkins.image(session.avatar, 64);
 })();
 
 // ── Load plan ────────────────────────────────────────────────────────────

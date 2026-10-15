@@ -55,6 +55,7 @@ tailwind.config = {
 <meta name="twitter:title" content="Ajustes — Capy English"/>
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<link rel="stylesheet" href="assets/css/capy-skins.css?v=skins1">
 </head>
 <body class="bg-slate-50 dark:bg-[#001f3f] font-body text-slate-900 dark:text-white min-h-screen transition-colors duration-300">
 
@@ -104,9 +105,15 @@ tailwind.config = {
     </label>
 
     <!-- Avatar picker -->
-    <span class="font-label text-xs text-slate-500 dark:text-slate-400 uppercase tracking-widest block mb-3">Escolha o avatar</span>
-    <div class="flex gap-3 flex-wrap" id="avatar-grid">
-      <!-- injected by JS -->
+    <div id="capy-wardrobe" class="capy-wardrobe">
+      <h2 class="font-headline text-xl font-black mb-2">Guarda-roupa da Capy</h2>
+      <p class="text-sm text-slate-500 dark:text-slate-300 mb-5">A mesma Capy. Quinze jeitos de ser você.</p>
+      <div class="capy-skin-stage">
+        <div id="skin-preview" class="capy-skin-portrait"></div>
+        <div><h3 id="skin-name"></h3><p>Escolha sua favorita e toque em Salvar.</p></div>
+      </div>
+      <div class="capy-skin-grid" id="avatar-grid" aria-label="Skins da Capy"></div>
+      <p id="skin-status" class="capy-skin-status" role="status" aria-live="polite"></p>
     </div>
   </section>
 
@@ -312,11 +319,12 @@ tailwind.config = {
   </div>
 </div>
 
-<script src="auth-secure.js?v=sec2"></script>
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=m1015"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=m0928b"></script>
+<script src="components.js?v=m1015"></script>
 <script>
   Components.mount('top-nav-placeholder', Components.renderTopNav(''));
   Components.mount('side-nav-placeholder', Components.renderSideNav(''));
@@ -326,12 +334,13 @@ tailwind.config = {
 
 <script>
 // ── Avatars ───────────────────────────────────────────────────────────────────
-const AVATARS = ['🐾','🐱','🐶','🦊','🐸','🐼','🐨','🦁','🐯','🐻'];
-let selectedAvatar = '🐾';
+const AVATARS = CapySkins.items;
+let selectedAvatar = CapySkins.defaultId;
 let settings = {};
+let skinTouched = false;
 
 // ── Load ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('capySettings');
   settings = saved ? JSON.parse(saved) : { sfx:true, tts:true, ai:true, difficulty:'medium', avatar:'🐾', darkMode:false };
 
@@ -339,7 +348,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('name-input').value = Store.state.playerName || '';
 
   // Avatar
-  selectedAvatar = settings.avatar || '🐾';
+  selectedAvatar = CapySkins.normalize(Auth.getSession()?.avatar);
   renderAvatars();
 
   // Toggles
@@ -357,22 +366,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Account
   loadAccountInfo();
+  await Auth.ready();
+  if (!skinTouched) {
+    selectedAvatar = CapySkins.normalize(Auth.getSession()?.avatar);
+    renderAvatars();
+  }
+  loadAccountInfo();
+  document.getElementById('skin-status').textContent = Auth.getSession()?.role === 'guest'
+    ? 'Como visitante, sua skin fica neste navegador.' : 'Sua skin acompanha sua conta nos outros dispositivos.';
 });
 
 function renderAvatars() {
   document.getElementById('avatar-grid').innerHTML = AVATARS.map(a =>
-    `<button onclick="pickAvatar('${a}')" id="av-${a.codePointAt(0)}"
-             class="avatar-opt text-4xl w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-full
-                    ${a===selectedAvatar?'selected':''}">
-       ${a}
+    `<button type="button" onclick="pickAvatar('${a.id}')" id="av-${a.id}"
+             class="capy-skin-option" aria-pressed="${a.id === selectedAvatar}" aria-label="${a.name}">
+       ${CapySkins.image(a.id, 100)}<span>${a.name}</span>
      </button>`
   ).join('');
+  renderSkinPreview();
 }
 
 function pickAvatar(a) {
+  if (!CapySkins.valid(a)) return;
+  skinTouched = true;
   selectedAvatar = a;
-  document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
-  document.getElementById(`av-${a.codePointAt(0)}`)?.classList.add('selected');
+  document.querySelectorAll('#avatar-grid button').forEach(el => el.setAttribute('aria-pressed', String(el.id === 'av-' + a)));
+  renderSkinPreview();
+  document.getElementById('skin-status').textContent = 'Toque em Salvar para usar esta skin.';
+}
+
+function renderSkinPreview() {
+  document.getElementById('skin-preview').innerHTML = CapySkins.image(selectedAvatar, 112);
+  document.getElementById('skin-name').textContent = CapySkins.get(selectedAvatar).name;
 }
 
 // ── Toggles ───────────────────────────────────────────────────────────────────
@@ -405,7 +430,22 @@ function setDiff(level) {
 }
 
 // ── Save ──────────────────────────────────────────────────────────────────────
-function saveAll() {
+async function saveAll() {
+  const button = document.getElementById('save-btn');
+  if (button.disabled) return;
+  const status = document.getElementById('skin-status');
+  button.disabled = true;
+  button.textContent = 'Salvando…';
+  status.dataset.error = 'false';
+  try {
+    await Auth.saveAvatar(selectedAvatar);
+  } catch (error) {
+    status.dataset.error = 'true';
+    status.textContent = error.message || 'Não foi possível salvar. Tente novamente.';
+    button.disabled = false;
+    button.textContent = 'Salvar';
+    return;
+  }
   const name = document.getElementById('name-input').value.trim();
   if (name.length >= 2) Store.setPlayerName(name);
 
@@ -424,15 +464,10 @@ function saveAll() {
   // Apply dark mode immediately
   Components.applyDarkMode();
 
-  // Save to backend asynchronously
-  const sess = Auth.getSession();
-  if (sess && sess.id && sess.id !== 'guest') {
-    fetch('/api/db', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'settings', userId: sess.id, payload: settings })
-    }).catch(e => {});
-  }
+  loadAccountInfo();
+  status.textContent = Auth.getSession()?.role === 'guest' ? 'Skin salva neste navegador.' : 'Skin salva na sua conta!';
+  button.disabled = false;
+  button.textContent = 'Salvar';
 
   // Show toast
   const toast = document.getElementById('save-toast');
@@ -444,11 +479,11 @@ function saveAll() {
 function loadAccountInfo() {
   const sess = Auth.getSession();
   if (!sess) return;
-  document.getElementById('acc-avatar').textContent = sess.avatar || '🐾';
+  document.getElementById('acc-avatar').innerHTML = CapySkins.image(sess.avatar, 56);
   document.getElementById('acc-name').textContent   = sess.name  || 'Explorer';
   document.getElementById('acc-email').textContent  = sess.email || 'Guest session';
   const badge = document.getElementById('acc-badge');
-  if (sess.id === 'guest') {
+  if (sess.id === 'guest' || sess.role === 'guest') {
     badge.textContent = 'Guest';
     badge.className   = 'font-label text-xs font-bold px-3 py-1 rounded-full bg-slate-200 dark:bg-slate-500/20 text-slate-500 dark:text-slate-300 border border-slate-300 dark:border-slate-500/30';
   } else {

@@ -1,0 +1,25 @@
+.capy-wardrobe { --skin-navy:#001f3f; --skin-pink:#ec4899; scroll-margin-top:100px; }
+.capy-skin-stage { display:flex; align-items:center; gap:20px; padding:20px; margin-bottom:20px; background:#f4eafa; border-radius:24px; color:var(--skin-navy); }
+.capy-skin-portrait { width:112px; height:112px; border-radius:28px; flex-shrink:0; overflow:hidden; box-shadow:0 10px 24px #001f3f12; transform:rotate(-4deg); }
+.capy-skin-stage h3 { margin:0 0 6px; font-weight:900; font-size:20px; line-height:1.2; }
+.capy-skin-stage p { margin:0; font-size:13px; line-height:1.6; color:#526178; }
+.capy-skin-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.capy-skin-option { appearance:none; border:0; margin:0; padding:8px 8px 10px; background:#f1f5f9; border-radius:20px; color:#334155; cursor:pointer; min-width:0; position:relative; font:inherit; text-align:center; transition:transform .18s,box-shadow .18s,background .18s; }
+.capy-skin-option img { aspect-ratio:1; width:100%; height:auto!important; object-fit:cover; border-radius:14px!important; display:block; }
+.capy-skin-option span { display:block; margin-top:8px; font-size:11px; font-weight:800; line-height:1.35; min-height:30px; }
+.capy-skin-option:hover { transform:translateY(-3px); background:#fce7f3; }
+.capy-skin-option[aria-pressed="true"] { background:#fce7f3; box-shadow:0 0 0 3px var(--skin-pink); color:#9d174d; }
+.capy-skin-option[aria-pressed="true"]::after { content:'✓'; position:absolute; top:3px; right:3px; width:23px; height:23px; display:grid; place-items:center; background:var(--skin-pink); color:white; border-radius:50%; font-weight:900; font-size:14px; }
+.capy-skin-option:focus-visible { outline:3px solid #001f3f; outline-offset:4px; }
+.capy-skin-status { min-height:22px; margin:12px 0 0; font-size:13px; line-height:1.5; }
+.capy-skin-status[data-error="true"] { color:#ba1a1a; }
+.capy-signup-skins { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; width:100%; max-height:235px; overflow-y:auto; padding:5px; }
+.capy-signup-skins .capy-skin-option { padding:4px; border-radius:14px; }
+.capy-signup-skins .capy-skin-option span { font-size:9px; min-height:25px; }
+.dark .capy-skin-stage { background:#17334f; color:white; }
+.dark .capy-skin-stage p { color:#cbd5e1; }
+.dark .capy-skin-option { background:#17334f; color:#e2e8f0; }
+.dark .capy-skin-option[aria-pressed="true"] { background:#532c4b; color:white; }
+@media(min-width:520px) { .capy-skin-grid { grid-template-columns:repeat(5,minmax(0,1fr)); } }
+@media(max-width:359px) { .capy-skin-stage { gap:12px; padding:14px; } .capy-skin-portrait { width:84px; height:84px; } .capy-skin-stage h3 { font-size:17px; } }
+@media(prefers-reduced-motion:reduce) { .capy-skin-option { transition:none; } .capy-skin-option:hover { transform:none; } }

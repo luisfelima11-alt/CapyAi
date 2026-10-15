@@ -126,7 +126,8 @@ const Store = {
                 }
             }
             // Perfil: o servidor só preenche o que aqui está vazio.
-            for (const k of ['englishLevel', 'playerName', 'aiPersona']) {
+            // aiNivel/aiEstilo: dificuldade e estilo da conversa com a Yara (28/set).
+            for (const k of ['englishLevel', 'playerName', 'aiPersona', 'aiNivel', 'aiEstilo']) {
                 if (!this.state[k] && remoto[k]) { this.state[k] = remoto[k]; mudou = true; }
             }
             for (const k of ['goals', 'interests']) {
