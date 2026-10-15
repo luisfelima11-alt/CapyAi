@@ -61,6 +61,7 @@ function rota(options = {}) {
     gravarNotas: async (id, lista) => { notas[id] = lista; },
     memoriaDoAluno: async () => options.memoria || [],
     consumoVozDoMes: async quem => (quem === null ? options.vozGeral : options.vozAluno) || { segundos: 0, minutos: 0, usd: 0 },
+    custoIaDoMes: async () => options.ia || null,
     lerBrief: async () => options.resumo || null,
     aulasContexto: () => require('../api/aulas-contexto.json'),
   });
@@ -174,6 +175,7 @@ test('saude: ultima vez de cada tarefa agendada, resumo de hoje, Kiwify e voz', 
     },
     resumo: { generatedAt: '2026-09-26T09:00:05Z' },
     vozGeral: { segundos: 1800, minutos: 30, usd: 1.234 },
+    ia: { usd: 0.021, rotas: [{ rota: '/api/chat', chamadas: 10, usd: 0.02 }], evitadas: 4, economiaUsd: 0.004 },
   });
   await h.rodar();
   const s = h.res.body;
@@ -185,6 +187,8 @@ test('saude: ultima vez de cada tarefa agendada, resumo de hoje, Kiwify e voz', 
   assert.equal(s.resumoHoje.gerado, true);
   assert.deepEqual({ ...s.kiwify }, { eventos: 0, ultima: null });
   assert.deepEqual({ ...s.voz }, { usd: 1.23, minutos: 30, tetoUsd: 50 });
+  assert.equal(s.ia.usd, 0.021);      // AI cost of the month, next to voice (29/set)
+  assert.equal(s.ia.evitadas, 4);
 });
 
 test('saude: tarefa que nunca bateu aparece como "nunca", nao some', async () => {

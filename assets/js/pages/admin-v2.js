@@ -488,12 +488,30 @@ function linhaIcone(nomeIcone, tom, titulo, sub) {
 // Uma tarefa agendada "está rodando" se bateu nas últimas 26 horas.
 const cronEmDia = c => Boolean(c.ultima) && Date.now() - new Date(c.ultima).getTime() < 26 * 3600 * 1000;
 
-function linhasDoSite(saude) {
+// AI costs are often fractions of a cent: three decimals below US$ 1.
+const dolaresFinos = n => Number(n || 0) >= 1 ? dolares(n)
+  : 'US$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+
+function linhaDaIa(ia, voz, ativos) {
+  if (!ia) return linhaIcone('alerta', 'tom-atencao', 'IA: não consegui medir agora', 'O custo por rota vem das métricas do site');
+  if (ia.faltaMigration) {
+    return linhaIcone('alerta', 'tom-atencao', 'IA: falta rodar a migration de custo', 'supabase/migrations/202609290001_custo_ia.sql');
+  }
+  const maiores = (ia.rotas || []).slice(0, 3).map(r => `${String(r.rota).replace('/api/', '')} ${dolaresFinos(r.usd)}`).join(' · ');
+  const total = Number(ia.usd || 0) + Number((voz && voz.usd) || 0);
+  const porAluno = ativos > 0 ? ` · ${dolaresFinos(total / ativos)} por aluno ativo (IA + voz)` : '';
+  const cache = ia.evitadas ? ` · o cache evitou ${numero(ia.evitadas)} chamadas (~${dolaresFinos(ia.economiaUsd)})` : '';
+  return linhaIcone('brilho', 'tom-ok', `IA neste mês: ${dolaresFinos(ia.usd)}`,
+    (maiores || 'Nenhuma chamada paga ainda') + porAluno + cache);
+}
+
+function linhasDoSite(saude, ativosNoMes) {
   const itens = [];
   const voz = saude.voz || {};
   itens.push(linhaIcone('mic', 'tom-ok',
     voz.usd == null ? 'Voz: não consegui medir agora' : `Voz neste mês: ${dolares(voz.usd)} de ${dolares(voz.tetoUsd)}`,
     voz.minutos == null ? 'O freio de gasto usa esta medição' : `${numero(voz.minutos)} min em ligações · teto por aluno: 60 min no Super`));
+  itens.push(linhaDaIa(saude.ia, saude.voz, ativosNoMes));
   const crons = saude.crons || [];
   const emDia = crons.filter(cronEmDia).length;
   itens.push(linhaIcone('sino', emDia === crons.length ? 'tom-ok' : 'tom-atencao',
@@ -545,7 +563,13 @@ async function telaHoje() {
     bloco('Quem precisa de você', { href: '#alunos', texto: 'Ver todos' },
       precisam.length ? el('ul', { class: 'lista' }, precisam.map(a => linhaDeAluno(a, true)))
         : el('p', { class: 'vazio', text: 'Todo mundo praticou hoje.' })),
-    bloco('O site', null, linhasDoSite(saude)));
+    bloco('O site', null, linhasDoSite(saude, ativosNoMes(alunos.students))));
+}
+
+// Practiced at least once since the 1st of the month.
+function ativosNoMes(alunos) {
+  const diaDoMes = new Date().getDate();
+  return (alunos || []).filter(a => a.daysSincePractice != null && a.daysSincePractice < diaDoMes).length;
 }
 
 // ══ ALUNOS ════════════════════════════════════════════════════════════════

@@ -98,6 +98,9 @@ Deploy order:
 2. Then run `supabase/migrations/202609260001_permissoes_por_coluna.sql` (column
    grants on accounts, user_profiles and user_state; written on production on
    26/set and still unapplied). The two files are independent, in filename order.
+   With the AI cost PR, also run `supabase/migrations/202609290001_custo_ia.sql`
+   (the `cost_usd` and `cache_hits` columns and the server-only `ai_cache` table),
+   after 202609240001.
 3. Deploy to Preview and sign in there with a password (magic links go to
    `APP_ORIGIN`); check the Music Lab search and lyrics while signed in.
    Then production: `npx vercel --prod --force`, then
