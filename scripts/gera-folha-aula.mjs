@@ -262,11 +262,11 @@ function atualizarHub(familia) {
         return `      <li><a href="assets/pdf/${f}" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula ${n}${titulo ? ' · ' + esc(titulo) : ''} (PDF)</a></li>`;
     }).join('\n');
     const bloco = `<!-- FOLHAS:inicio (gerado por scripts/gera-folha-aula.mjs) -->
-<section aria-label="Folhas das aulas para imprimir" class="max-w-7xl mx-auto px-4 md:px-6 pb-12">
-  <div class="bg-white/60 border border-slate-200 rounded-2xl p-5">
+<section aria-label="Folhas das aulas para imprimir" class="max-w-4xl mx-auto px-4 md:px-6 pb-12">
+  <div class="bg-white/60 border border-slate-200 rounded-2xl p-5 text-center">
     <h2 class="font-black text-navy text-sm">📄 Folhas das aulas para imprimir (${folhas.length})</h2>
     <p class="text-slate-500 text-xs mt-1">Uma página por aula, com o vocabulário, os padrões e espaço para as suas frases e anotações. Baixe, imprima e acompanhe a aula.</p>
-    <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1.5 text-xs">
+    <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
 ${itens}
     </ul>
   </div>
