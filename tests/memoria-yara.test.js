@@ -23,7 +23,7 @@ function catalogo() {
   return new Function(FONTE.slice(i, j) +
     '\nreturn { PERSONAS, PERSONAS_COM_MEMORIA, PROMPT_MEMORIA, TIPOS_DE_FATO, fatosLimpos, fatoEhSensivel,' +
     ' fatoParaRetomar, perfilLimpo, linhasDoAluno, planoDeConversa, falasDoAluno, dialogoParaMemoria,' +
-    ' fatosDaExtracao, mesclarFatos };')();
+    ' fatosDaExtracao, mesclarFatos, estiloGuardaMemoria };')();
 }
 const C = catalogo();
 const ESTRUTURAL = /["<>{};]/;
@@ -249,6 +249,9 @@ test('POST /api/lembrancas: visitante, cena, conversa curta e cota estourada nao
     { body: { persona: 'travel', transcricao: CONVERSA } },
     { body: { persona: 'conversa', transcricao: CONVERSA.slice(0, 4) } },
     { limitado: true, body: { persona: 'conversa', transcricao: CONVERSA } },
+    // Estilos de exercicio e encenacao (28/set) nao sao a vida do aluno.
+    { body: { persona: 'conversa', estilo: 'encenacao', transcricao: CONVERSA } },
+    { body: { persona: 'conversa', estilo: 'comosediz', transcricao: CONVERSA } },
   ];
   for (const caso of casos) {
     const h = rotas(caso);
@@ -256,6 +259,14 @@ test('POST /api/lembrancas: visitante, cena, conversa curta e cota estourada nao
     assert.equal(h.res.statusCode, 204, JSON.stringify(caso));
     assert.equal(h.chamadasIA.length, 0, JSON.stringify(caso));
     assert.equal(h.escritas.length, 0, JSON.stringify(caso));
+  }
+});
+
+test('POST /api/lembrancas: a conversa guiada tambem vira lembranca (e sobre a vida do aluno)', async () => {
+  for (const estilo of ['guiada', 'livre', undefined, 'estilo-que-nao-existe']) {
+    const h = rotas({ body: { persona: 'conversa', estilo, transcricao: CONVERSA }, ia: { fatos: [] } });
+    await h.rodar();
+    assert.equal(h.chamadasIA.length, 1, String(estilo));
   }
 });
 

@@ -179,11 +179,12 @@ tailwind.config = {
 <div id="footer-placeholder"></div>
 <div id="mobile-nav-placeholder"></div>
 
-<script src="auth-secure.js?v=sec2"></script>
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=m1015"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=m0928b"></script>
+<script src="components.js?v=m1015"></script>
 <script>
   Components.mount('top-nav-placeholder', Components.renderTopNav('leaderboard'));
   Components.mount('side-nav-placeholder', Components.renderSideNav('leaderboard'));
@@ -258,7 +259,7 @@ tailwind.config = {
       const youIdx = merged.findIndex(u => u.isYou);
       if (youIdx >= 0) {
         document.getElementById('your-pill').classList.remove('hidden');
-        document.getElementById('your-avatar').textContent = local.avatar;
+        document.getElementById('your-avatar').innerHTML = '<span style="display:block;width:32px;height:32px;border-radius:50%">' + CapySkins.image(local.avatar, 32) + '</span>';
         document.getElementById('your-name').textContent   = local.name;
         document.getElementById('your-xp').textContent     = `${local.xp} XP`;
         document.getElementById('your-rank').textContent   = youIdx + 1;
@@ -295,7 +296,7 @@ tailwind.config = {
         <!-- Avatar -->
         <div class="flex flex-col items-center mb-3 pop-in" style="animation-delay:${(rank-1)*0.1}s">
           <div class="relative ${col} w-14 h-14 md:w-18 md:h-18 rounded-full flex items-center justify-center text-2xl md:text-3xl shadow-xl ${rings[rank-1]} mb-1">
-            ${escHtml(user.avatar)}
+            ${CapySkins.image(user.avatar, 56)}
             ${youBadge}
           </div>
           <p class="font-headline font-bold text-white text-xs md:text-sm text-center truncate w-28 px-1 ${user.isYou ? 'text-pink-300' : ''}">${escHtml(user.name)}</p>
@@ -346,7 +347,7 @@ tailwind.config = {
         <div class="px-5 py-4 flex gap-3 items-center transition-colors ${youCls}" style="animation:fadeUp 0.4s ease ${i*0.05}s both;">
           <div class="w-8 text-center font-headline font-black text-slate-500 text-sm">${rank}</div>
           <div class="${col} w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 shadow-inner relative">
-            ${escHtml(user.avatar)}
+            ${CapySkins.image(user.avatar, 40)}
             ${user.isYou ? '<span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-pink-500 rounded-full border border-navy"></span>' : ''}
           </div>
           <div class="flex-1 min-w-0">

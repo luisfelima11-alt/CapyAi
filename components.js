@@ -73,10 +73,10 @@ const Components = {
                     </div>
                     <!-- Avatar + dropdown -->
                     <div class="relative group/user">
-                        <div class="w-9 h-9 rounded-full bg-slate-700 border-2 border-pink-400/60 flex items-center justify-center cursor-pointer active:scale-95 transition-transform text-xl hover:border-pink-400 select-none"
-                             title="${sessionName || 'Profile'}">
-                            ${sessionAvatar}
-                        </div>
+                        <a href="settings.html#capy-wardrobe" aria-label="Escolher minha skin da Capy" class="w-9 h-9 rounded-full bg-slate-700 border-2 border-pink-400/60 flex items-center justify-center overflow-hidden cursor-pointer active:scale-95 transition-transform hover:border-pink-400 select-none"
+                             data-capy-avatar>
+                            ${CapySkins.image(sessionAvatar, 36)}
+                        </a>
                         <div class="invisible group-hover/user:visible opacity-0 group-hover/user:opacity-100 transition-all duration-200
                                     absolute top-full right-0 mt-2 w-52
                                     bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 z-50 overflow-hidden">
@@ -85,6 +85,7 @@ const Components = {
                                 <p class="font-black text-sm text-navy dark:text-white truncate">${sessionName}</p>
                                 <p class="text-xs text-slate-400 mt-0.5">Explorer</p>
                             </div>` : ''}
+                            <a href="settings.html#capy-wardrobe" class="flex items-center gap-3 px-4 py-3 text-pink-500 hover:bg-pink-50 font-bold text-sm transition-colors">Trocar skin da Capy</a>
                             <a href="account.html" class="flex items-center gap-3 px-4 py-3 text-navy dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-sm transition-colors">
                                 <span class="material-symbols-outlined text-orange-500 text-base" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;font-variation-settings:'FILL' 1;">workspace_premium</span> Minha conta
                             </a>
