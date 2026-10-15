@@ -28,7 +28,7 @@ test('clicking a slide opens it fullscreen and the arrows move both views', asyn
   await expect(foco(page)).toBeVisible();
   await expect(contador(page)).toHaveText('1 / 6');
   await expect(page.locator('body')).toHaveClass(/gs-travado/);
-  await expect(page.locator('#gs-foco .gs-img')).toHaveAttribute('src', 'assets/img/gramatica/agro01-0.webp');
+  await expect(page.locator('#gs-foco .gs-img')).toHaveAttribute('src', /^assets\/img\/gramatica\/agro01-0\.webp\?v=[0-9a-f]{10}$/);
 
   await page.keyboard.press('ArrowRight');
   await expect(contador(page)).toHaveText('2 / 6');

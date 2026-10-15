@@ -81,6 +81,27 @@ test('every slide carries its image and a fullscreen button, and the behaviour c
   assert.throws(() => blocoGramaticaSlides(aula()), /slug/, 'without the slug there is no image name');
 });
 
+test('with the repo root, each image address carries a version taken from the file, so a new image is never served from an old cache', async () => {
+  // sw.js serves images cache-first: on 15/out the pilot swapped its provisional
+  // images at the same address, and a Preview already opened kept the old ones.
+  const { blocoGramaticaSlides, enderecoDaImagem } = await modulo();
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'gs-v-'));
+  fs.mkdirSync(path.join(raiz, 'assets/img/gramatica'), { recursive: true });
+  const grava = (k, conteudo) => fs.writeFileSync(path.join(raiz, `assets/img/gramatica/agro09-${k}.webp`), conteudo);
+  for (let k = 0; k < 5; k++) grava(k, `imagem ${k}`);
+  const antes = enderecoDaImagem('agro09', 1, raiz);
+  assert.match(antes, /^assets\/img\/gramatica\/agro09-1\.webp\?v=[0-9a-f]{10}$/);
+  grava(1, 'imagem nova');
+  const depois = enderecoDaImagem('agro09', 1, raiz);
+  assert.notEqual(depois, antes, 'a new image gets a new address');
+  assert.equal(enderecoDaImagem('agro09', 2, raiz), enderecoDaImagem('agro09', 2, raiz), 'the same file keeps its address');
+  assert.equal(enderecoDaImagem('agro09', 1), 'assets/img/gramatica/agro09-1.webp', 'without the root, the plain path');
+  assert.equal(enderecoDaImagem('agro09', 7, raiz), 'assets/img/gramatica/agro09-7.webp', 'a missing file is left to the validator');
+  const html = blocoGramaticaSlides(aula(), { slug: 'agro09', raiz });
+  assert.ok(html.includes(`src="${depois}"`), 'the deck uses the versioned address');
+  fs.rmSync(raiz, { recursive: true, force: true });
+});
+
 test('the validator takes a good deck and refuses short patterns, missing parts, long sentences and old accordions', async () => {
   assert.deepEqual(await falhas(aula()), []);
   const msg = async m => (await falhas(aula(m))).join(' | ');
@@ -148,7 +169,9 @@ test('every converted lesson passes the validator, has its images and ships the 
     assert.equal((aba.match(/<img class="gs-img/g) || []).length, total, arquivo + ': one image per slide');
     for (let k = 0; k < total; k++) {
       const img = path.join(ROOT, `assets/img/gramatica/${slug}-${k}.webp`);
-      assert.ok(aba.includes(`src="assets/img/gramatica/${slug}-${k}.webp"`), `${arquivo}: slide ${k} points to its image`);
+      // The ?v= is the start of the file's hash: an image swapped without regenerating the page fails here.
+      const v = require('node:crypto').createHash('sha256').update(fs.readFileSync(img)).digest('hex').slice(0, 10);
+      assert.ok(aba.includes(`src="assets/img/gramatica/${slug}-${k}.webp?v=${v}"`), `${arquivo}: slide ${k} points to the current version of its image`);
       const cabeca = fs.readFileSync(img).subarray(0, 12);
       assert.ok(cabeca.subarray(0, 4).toString() === 'RIFF' && cabeca.subarray(8, 12).toString() === 'WEBP', `${slug}-${k}: a real WebP`);
       assert.ok(fs.statSync(img).size <= MAX_KB_IMAGEM * 1024, `${slug}-${k}: up to ${MAX_KB_IMAGEM} KB`);

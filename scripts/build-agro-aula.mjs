@@ -171,7 +171,7 @@ function construir(n) {
     // 3. Seções com conteúdo
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
     t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
-        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio, raiz: RAIZ }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);

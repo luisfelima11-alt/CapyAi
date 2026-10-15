@@ -27,6 +27,7 @@
  * vale para todas as aulas sem regerar nenhuma.
  */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -52,6 +53,18 @@ export const MAX_KB_IMAGEM = 200;
 
 /** O arquivo da imagem do slide k (0 = abertura, o último = revisão). */
 export const imagemDoSlide = (slug, k) => `${PASTA_IMAGENS}/${slug}-${k}.webp`;
+
+// O endereço da imagem na página leva ?v= com o começo do hash do arquivo. O
+// sw.js serve imagem do cache sem conferir de novo: trocar a imagem sem trocar
+// o endereço deixava quem já tinha aberto a aula com a antiga (visto em 15/10,
+// na troca das provisórias do piloto). Com o hash, a versão muda sozinha.
+export function enderecoDaImagem(slug, k, raiz) {
+    const rel = imagemDoSlide(slug, k);
+    if (!raiz) return rel;
+    const abs = path.join(raiz, rel);
+    if (!fs.existsSync(abs)) return rel;   // o validador (checarSlides) acusa a falta
+    return `${rel}?v=${crypto.createHash('sha256').update(fs.readFileSync(abs)).digest('hex').slice(0, 10)}`;
+}
 
 /** As cenas na ordem dos slides: abertura, uma por padrão, revisão. */
 export const cenasDoDeck = g => [g.cenaAbertura, ...(g.slides || []).map(p => p.cena), g.cenaRevisao];
@@ -116,14 +129,15 @@ function slide(i, total, imagem, rotulo, titulo, corpo) {
 /**
  * A aba #tab-grammar inteira, do <div> de abertura até antes do <!-- CONVERSATION.
  * slug: o nome da aula nas imagens (gps14, agro01, med05, interview03).
+ * raiz: a raiz do repositório, para versionar o endereço de cada imagem.
  */
-export function blocoGramaticaSlides(c, { slug } = {}) {
+export function blocoGramaticaSlides(c, { slug, raiz } = {}) {
     if (!slug) throw new Error('blocoGramaticaSlides: falta o slug da aula (ex.: agro01), que dá o nome das imagens');
     const g = c.gramatica;
     const padroes = g.slides;
     const total = padroes.length + 2;
     const nFrases = padroes.reduce((n, p) => n + p.frases.length, 0) + g.revisao.length;
-    const img = k => imagemDoSlide(slug, k);
+    const img = k => enderecoDaImagem(slug, k, raiz);
 
     const abertura = slide(0, total, img(0), 'Nesta aula', esc(semPrefixo(g.titulo)),
         `
