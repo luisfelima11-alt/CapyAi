@@ -126,7 +126,7 @@
     <!-- ── GUIDED MODE HEADER (hidden in free mode) ── -->
     <div id="guided-header" class="hidden mb-6">
       <div class="flex items-center gap-3 mb-4">
-        <button onclick="window.location.href='learn.html'" class="flex items-center gap-1 text-slate-400 hover:text-navy text-sm font-bold transition-colors">
+        <button onclick="window.location.href=trilhaDoCurso()" class="flex items-center gap-1 text-slate-400 hover:text-navy text-sm font-bold transition-colors">
           <span class="material-symbols-outlined text-base">arrow_back</span> Learning Path
         </button>
         <span class="text-slate-300">·</span>
@@ -197,7 +197,7 @@
               class="bg-navy text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all mb-3 w-full max-w-xs">
         Next Lesson →
       </button>
-      <button onclick="window.location.href='learn.html'"
+      <button onclick="window.location.href=trilhaDoCurso()"
               class="bg-pink-500 text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all w-full max-w-xs">
         🗺️ Back to Learning Path
       </button>
@@ -304,7 +304,7 @@ const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta se
 async function carregarIndice() {
   if (LESSON_INDEX.length) return LESSON_INDEX;
   try {
-    const r = await fetch('data/lessons-index.json?v=en112');
+    const r = await fetch('data/lessons-index.json?v=gps24');
     if (r.ok) LESSON_INDEX = await r.json();
   } catch (e) { /* offline: segue com o que der */ }
   return LESSON_INDEX;
@@ -315,7 +315,7 @@ async function garantirLicao(id) {
   const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
   if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
   try {
-    const r = await fetch('data/lessons/' + id + '.json?v=en112');
+    const r = await fetch('data/lessons/' + id + '.json?v=gps24');
     if (!r.ok) return null;
     const licao = await r.json();
     LICOES_CARREGADAS.set(id, licao);
@@ -346,6 +346,18 @@ function faixaDoCurso(id) {
   const ini = INICIOS_DE_CURSO.filter(s => id >= s).pop() || INICIOS_DE_CURSO[0];
   const prox = INICIOS_DE_CURSO.find(s => s > ini);
   return { ini, fim: prox ? prox - 1 : Infinity };
+}
+
+function trilhaDoCurso(id) {
+  const n = Number(id || (currentLesson && currentLesson.id) || (new URLSearchParams(location.search).get('lesson')) || 1);
+  if (n >= 801) return 'learn_med.html';
+  if (n >= 701) return 'learn_agro.html';
+  if (n >= 601) return 'learn_interview.html';
+  if (n >= 501) return 'learn_gpstronic.html';
+  if (n >= 401) return 'learn_intermediate.html';
+  if (n >= 301) return 'learn_tr.html';
+  if (n >= 201) return 'learn_fr.html';
+  return 'learn.html';
 }
 
 // {pos, total} da lição dentro do curso dela — ex.: a 508 vira {pos: 8, total: 8}.
@@ -898,6 +910,7 @@ let chatExchanges = 0;
 // O nivel vem da FAIXA DE ID, que e o curso. Sem isto todo quiz saia 'beginner'.
 function nivelDaLicao(lesson) {
   const id = Number(lesson.id);
+  if (id >= 701) return 'A1';   // Agro English (701-728) e Medical (801-816)
   if (id >= 601) return 'B1';   // entrevista de emprego
   if (id >= 501) return 'A2';   // GPS Tronic
   if (id >= 401) return 'B1';   // intermediate
@@ -1243,7 +1256,8 @@ const GUIDED_VERSION = 'v2';
 function _lessonLanguage() { return (currentLesson && currentLesson.lang) || 'en'; }
 function _nextLessonInCurrentLanguage() {
   const language = _lessonLanguage();
-  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language);
+  const { ini, fim } = faixaDoCurso(currentLesson.id);
+  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language && lesson.id >= ini && lesson.id <= fim);
   const currentIndex = languageLessons.findIndex(lesson => lesson.id === currentLesson.id);
   return currentIndex >= 0 ? (languageLessons[currentIndex + 1] || null) : null;
 }

@@ -51,14 +51,14 @@
         <span class="text-4xl">🌱</span>
         <div>
           <h1 class="text-2xl font-black">Prática Diária Agro English</h1>
-          <p class="text-emerald-200/80 text-sm font-bold">Cinco minutos por dia — do bom-dia ao que é isso</p>
+          <p class="text-emerald-200/80 text-sm font-bold">28 unidades · 112 mini-lições do básico ao campo, GPS e agronomia</p>
         </div>
       </div>
       <div class="flex items-center gap-3 mt-4">
         <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
           <div id="agro-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-green-300 rounded-full transition-all" style="width:0%"></div>
         </div>
-        <span id="agro-progress-label" class="text-xs font-black text-emerald-200">0 / 48</span>
+        <span id="agro-progress-label" class="text-xs font-black text-emerald-200">0 / 112</span>
       </div>
     </div>
 
@@ -82,7 +82,7 @@
     <div id="agro-done" class="hidden card-in bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-3xl p-8 text-center mt-6">
       <div class="text-5xl mb-3">🏆</div>
       <p class="font-black text-xl mb-1">Prática completa!</p>
-      <p class="text-emerald-100 text-sm">Você treinou todo o conteúdo das aulas. Continue revisitando pra manter o inglês afiado!</p>
+      <p class="text-emerald-100 text-sm">Você treinou todas as 28 unidades (112 mini-lições). Continue revisitando pra manter o inglês afiado!</p>
     </div>
 
   </div>
@@ -101,20 +101,36 @@ Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha Agro English: 12 lições × 4 minis = 48 nós ─────────────────────
+// ── Trilha Agro English: 28 lições × 4 minis = 112 nós ────────────────────
 const TRAIL_AGRO = [
-  { id:701, emoji:'👋', title:'Hello & Good Morning' },
+  { id:701, emoji:'👋', title:'Hello & Good Morning', block:'Bloco 1 · Primeiros Passos (Aulas 1–3)' },
   { id:702, emoji:'😊', title:'How Are You?' },
   { id:703, emoji:'👉', title:'What Is This? What Is That?' },
   { id:704, emoji:'🔢', title:'Numbers 1 to 12' },
   { id:705, emoji:'🎨', title:'Colors' },
   { id:706, emoji:'🔤', title:'My Name Is… (the alphabet)' },
-  { id:707, emoji:'🏡', title:'The Farm and the Workshop' },
+  { id:707, emoji:'🏡', title:'The Farm and the Workshop', block:'Bloco 2 · Fazenda, Rotina & Máquinas (Aulas 4–8)' },
   { id:708, emoji:'⏰', title:'Days and Time' },
   { id:709, emoji:'👨‍👩‍👧', title:'Family and People' },
   { id:710, emoji:'🍽️', title:'Food and the Crops' },
   { id:711, emoji:'🔧', title:'Tools and Machines' },
   { id:712, emoji:'🙏', title:'Please, Thank You and Sorry' },
+  { id:713, emoji:'💼', title:'What Do You Do? (Work & Study)', block:'Bloco 3 · Trabalho, Lazer, Clima & Cabine (Aulas 5–12)' },
+  { id:714, emoji:'🌅', title:'Every Day at Six (Daily Routine)' },
+  { id:715, emoji:'⚽', title:'Do You Like Soccer? (Sports & Free Time)' },
+  { id:716, emoji:'🎸', title:'Country Music, Movies & Friends' },
+  { id:717, emoji:'🚜', title:'Can You Drive a Tractor?' },
+  { id:718, emoji:'🌦️', title:'The Weather Today (Sun, Rain & Frost)' },
+  { id:719, emoji:'📡', title:'GPS & Screens in the Cab' },
+  { id:720, emoji:'🚛', title:'Trucks, Tires & the Road' },
+  { id:721, emoji:'🔧', title:"I'm Working Right Now", block:'Bloco 4 · Agronomia, Peças, Passado & Futuro (Aulas 11–20)' },
+  { id:722, emoji:'🌱', title:'Planting, Seeds & the Soil' },
+  { id:723, emoji:'💦', title:'Spraying & Crop Protection' },
+  { id:724, emoji:'💰', title:'How Much Is This Part?' },
+  { id:725, emoji:'📅', title:'Yesterday at the Farm (Was & Were)' },
+  { id:726, emoji:'🛻', title:'I Went to the Field (Past Actions)' },
+  { id:727, emoji:'🏁', title:'Faster, Bigger, Better (Comparing Machines)' },
+  { id:728, emoji:'🎓', title:'Next Harvest & My Future in Agronomy' },
 ];
 const TOTAL_NODES = TRAIL_AGRO.length * 4;
 const DAY_SUBS = ['Listen & Quiz','Game','Build & Speak','Chat with Yara'];
@@ -139,7 +155,10 @@ function render() {
   const next = nextMini();
   let done = 0, html = '';
 
-  TRAIL_AGRO.forEach(l => {
+  TRAIL_AGRO.forEach((l, idx) => {
+    if (l.block) {
+      html += `<div class="pt-4 pb-1 px-2"><span class="inline-block text-xs font-black uppercase tracking-wider text-emerald-700 bg-emerald-100/80 border border-emerald-200 px-3 py-1 rounded-full">${l.block}</span></div>`;
+    }
     let rows = '';
     for (let m = 1; m <= 4; m++) {
       const isDone = miniDone(l.id, m);
@@ -163,6 +182,7 @@ function render() {
       <div class="card-in bg-white/70 border border-emerald-100 rounded-3xl p-4">
         <div class="flex items-center gap-2 mb-3 px-1">
           <span class="text-2xl">${l.emoji}</span>
+          <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">#${idx + 1}</span>
           <span class="font-black text-navy">${l.title}</span>
         </div>
         <div class="space-y-2">${rows}</div>
