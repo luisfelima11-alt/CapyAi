@@ -241,7 +241,7 @@ const completed = getGpsCompleted();
 const total = LESSONS.length;
 const doneCount = completed.filter(n => LESSONS.some(l => l.n === n)).length;
 document.getElementById('progress-bar').style.width = `${Math.round(doneCount/total*100)}%`;
-document.getElementById('progress-label').textContent = `${doneCount} of ${total} lesson completed`;
+document.getElementById('progress-label').textContent = `${doneCount} de ${total} aulas concluídas`;
 
 const grid = document.getElementById('lessons-grid');
 
@@ -266,7 +266,7 @@ const grid = document.getElementById('lessons-grid');
         </div>
       </div>
       <button class="w-full bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 active:scale-95 font-black text-sm py-2.5 rounded-xl transition-all shadow-sm">
-        ${testDone ? 'Review →' : 'Começar →'}
+        ${testDone ? 'Revisar questionário →' : 'Começar →'}
       </button>
     </div>
     <div class="h-1 shine bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400"></div>
@@ -286,7 +286,7 @@ LESSONS.forEach((l, i) => {
     ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-200 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Em breve</div>`
     : isDone
     ? `<div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-black shadow-sm shadow-green-300/50">✓</div>`
-    : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Start</div>`;
+    : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Começar</div>`;
 
   card.innerHTML = `
     <div class="relative p-5">
@@ -300,12 +300,11 @@ LESSONS.forEach((l, i) => {
         </div>
       </div>
       <button class="w-full ${isAvailable ? 'bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} font-black text-sm py-2.5 rounded-xl transition-all shadow-sm">
-        ${!isAvailable ? '🔜 Em breve' : isDone ? 'Review Lesson →' : 'Start Lesson →'}
+        ${!isAvailable ? '🔜 Em breve' : isDone ? 'Revisar aula →' : 'Começar aula →'}
       </button>
     </div>
     <div class="h-1 shine bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400"></div>
   `;
-
   grid.appendChild(card);
 });
 
