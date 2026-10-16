@@ -1257,7 +1257,7 @@ function _lessonLanguage() { return (currentLesson && currentLesson.lang) || 'en
 function _nextLessonInCurrentLanguage() {
   const language = _lessonLanguage();
   const { ini, fim } = faixaDoCurso(currentLesson.id);
-  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language && lesson.id >= ini && lesson.id <= fim);
+  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language).filter(lesson => lesson.id >= ini && lesson.id <= fim);
   const currentIndex = languageLessons.findIndex(lesson => lesson.id === currentLesson.id);
   return currentIndex >= 0 ? (languageLessons[currentIndex + 1] || null) : null;
 }
