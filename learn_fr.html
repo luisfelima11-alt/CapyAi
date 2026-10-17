@@ -5,7 +5,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Prática Diária de Francês | Capy English</title>
-<meta name="description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 lições do zero ao passé composé."/>
+<meta name="description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
+<link rel="canonical" href="https://www.capyenglish.com.br/learn_fr.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -27,14 +28,14 @@
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/learn_fr.html"/>
 <meta property="og:title" content="Prática Diária de Francês | Capy English"/>
-<meta property="og:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 lições do zero ao passé composé."/>
+<meta property="og:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Prática Diária de Francês | Capy English"/>
-<meta name="twitter:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 lições do zero ao passé composé."/>
+<meta name="twitter:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/40 min-h-screen">
@@ -46,13 +47,13 @@
   <div class="max-w-2xl mx-auto px-4">
 
     <!-- Header -->
-    <a href="classes_fr.html" class="inline-flex items-center gap-1 text-slate-400 hover:text-blue-600 text-sm font-bold transition-colors mb-4">← Voltar ao curso</a>
+    <a href="classes_fr.html" class="inline-flex items-center gap-1 text-slate-500 hover:text-blue-600 text-sm font-bold transition-colors mb-4">← Voltar ao Curso de Francês</a>
     <div class="bg-gradient-to-br from-navy via-blue-950 to-indigo-900 text-white rounded-3xl p-6 mb-6 card-in">
       <div class="flex items-center gap-3 mb-2">
         <span class="text-4xl">🇫🇷</span>
         <div>
           <h1 class="text-2xl font-black">Prática Diária de Francês</h1>
-          <p class="text-blue-200/80 text-sm font-bold">Un peu chaque jour — treine o que viu nas leçons</p>
+          <p class="text-blue-200/85 text-sm font-bold">Un peu chaque jour — 12 unidades · 48 mini-lições de 5 minutos</p>
         </div>
       </div>
       <div class="flex items-center gap-3 mt-4">
@@ -64,17 +65,20 @@
     </div>
 
     <!-- Continue card -->
-    <div id="fr-continue" class="hidden card-in bg-white border-2 border-blue-200 rounded-3xl p-5 mb-8 shadow-sm">
-      <p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Continuar de onde parou</p>
+    <div id="fr-continue" class="hidden card-in bg-white border-2 border-blue-200 rounded-3xl p-5 mb-6 shadow-sm">
+      <p id="fr-cont-kicker" class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Continuar de onde parou</p>
       <div class="flex items-center gap-3">
         <span id="fr-cont-emoji" class="text-4xl">👋</span>
         <div class="flex-1 min-w-0">
           <p id="fr-cont-title" class="font-black text-navy truncate"></p>
-          <p id="fr-cont-sub" class="text-xs text-slate-400 font-bold"></p>
+          <p id="fr-cont-sub" class="text-xs text-slate-500 font-bold"></p>
         </div>
         <button id="fr-cont-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all">▶ Continuar</button>
       </div>
     </div>
+
+    <!-- Block Filter Pills -->
+    <div id="fr-filters" class="flex flex-wrap gap-2 mb-6"></div>
 
     <!-- Trail -->
     <div id="fr-trail" class="space-y-4"></div>
@@ -82,8 +86,8 @@
     <!-- All done -->
     <div id="fr-done" class="hidden card-in bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-3xl p-8 text-center mt-6">
       <div class="text-5xl mb-3">🏆</div>
-      <p class="font-black text-xl mb-1">Pratique complète !</p>
-      <p class="text-blue-100 text-sm">Você treinou todo o conteúdo das leçons. Revisite sempre pra manter o francês afiado!</p>
+      <p class="font-black text-xl mb-1">Félicitations ! Prática completa!</p>
+      <p class="text-blue-100 text-sm">Você completou todas as 48 mini-lições de francês! Revisite sempre para manter a pronúncia e o vocabulário afiados.</p>
     </div>
 
   </div>
@@ -96,35 +100,51 @@
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="components.js?v=skins1"></script>
+<script>window.YARA_WIDGET={lang:'fr',lessonTitle:'Prática Diária de Francês'};</script>
 <script src="yara-widget.js?v=yw7"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha de Francês: 12 lições × 4 minis ─────────────────────────────────
-// Os ids batem com LESSONS_FR (lessons_fr_data.js, ids 201-212), que já é
-// carregado por lessons.html — esta página só é a porta de entrada que faltava.
-const TRAIL_FR = [
-  { id:201, emoji:'👋', title:'Les Salutations' },
-  { id:202, emoji:'🔢', title:'Les Chiffres (1-10)' },
-  { id:203, emoji:'🎨', title:'Les Couleurs' },
-  { id:204, emoji:'👨‍👩‍👧‍👦', title:'La Famille' },
-  { id:205, emoji:'✨', title:'Être & Avoir' },
-  { id:206, emoji:'🥐', title:'La Nourriture' },
-  { id:207, emoji:'📅', title:'Les Jours et les Mois' },
-  { id:208, emoji:'⏰', title:"L'Heure" },
-  { id:209, emoji:'🌦️', title:'La Météo' },
-  { id:210, emoji:'🧭', title:'Les Directions' },
-  { id:211, emoji:'🛍️', title:'Les Vêtements' },
-  { id:212, emoji:'⏪', title:'Le Passé Composé' },
+// ── Trilha de Francês: 12 unidades × 4 mini-lições (48 etapas) ─────────────
+const BLOCKS = [
+  { id: 'all', label: 'Todas (12)' },
+  { id: 'b1',  label: 'Bloco 1 · Primeiros Passos (1–4)' },
+  { id: 'b2',  label: 'Bloco 2 · Cotidiano na França (5–8)' },
+  { id: 'b3',  label: 'Bloco 3 · Viagem & Passado (9–12)' },
 ];
+
+const TRAIL_FR = [
+  { id:201, num:1,  block:'b1', emoji:'👋', title:'Les Salutations',       sub:'Saudações, Tu vs. Vous e Apresentações',   aula:'fr_aula_01.html' },
+  { id:202, num:2,  block:'b1', emoji:'🔢', title:'Les Chiffres (1–20)',   sub:'Números de 1 a 20, Idade e Preços',        aula:'fr_aula_02.html' },
+  { id:203, num:3,  block:'b1', emoji:'🎨', title:'Les Couleurs',          sub:'Cores, Gênero e Posição dos Adjetivos',    aula:'fr_aula_03.html' },
+  { id:204, num:4,  block:'b1', emoji:'👨‍👩‍👧‍👦', title:'La Famille',         sub:'A Família e Possessivos (Mon, Ma, Mes)',   aula:'fr_aula_04.html' },
+  { id:205, num:5,  block:'b2', emoji:'✨', title:'Être & Avoir',          sub:'Ser, Estar, Ter e Sensações Físicas',      aula:'fr_aula_05.html' },
+  { id:206, num:6,  block:'b2', emoji:'🥐', title:'La Nourriture',         sub:'Comida, Café Parisiense e Partitivos',     aula:'fr_aula_06.html' },
+  { id:207, num:7,  block:'b2', emoji:'📅', title:'Les Jours et les Mois', sub:'Dias da Semana, Meses, Datas e Agenda',    aula:'fr_aula_07.html' },
+  { id:208, num:8,  block:'b2', emoji:'⏰', title:"L'Heure",               sub:'As Horas, Relógio 24h e Rotina Diária',    aula:'fr_aula_08.html' },
+  { id:209, num:9,  block:'b3', emoji:'🌦️', title:'La Météo',              sub:'O Clima, o Tempo e as Quatro Estações',    aula:'fr_aula_09.html' },
+  { id:210, num:10, block:'b3', emoji:'🧭', title:'Les Directions',        sub:'Direções, Lugares da Cidade e Transporte', aula:'fr_aula_10.html' },
+  { id:211, num:11, block:'b3', emoji:'🛍️', title:'Les Vêtements',         sub:'Roupas, Compras e Demonstrativos',         aula:'fr_aula_11.html' },
+  { id:212, num:12, block:'b3', emoji:'⏪', title:'Le Passé Composé',      sub:'Falando do Passado com Avoir e Être',      aula:'fr_aula_12.html' },
+];
+
 const TOTAL_NODES = TRAIL_FR.length * 4;
-const DAY_SUBS = ['Écoute & Quiz','Jeu','Construis & Parle','Chat avec Yara'];
+const DAY_SUBS = [
+  'Escuta, Vocabulário & Quiz',
+  'Jogo de Pares & Lacunas',
+  'Monte Frases & Pronúncia',
+  'Conversa Guiada com a Yara',
+];
+
+let activeBlock = 'all';
 
 function miniDone(lessonId, miniNum) {
-  if (window.Store && Store.state.completedLessons && Store.state.completedLessons.includes(lessonId)) return true;
-  return window.Store ? Store.isMiniDone(lessonId, miniNum) : false;
+  if (!window.Store) return false;
+  if (Store.isLessonDone && (Store.isLessonDone(lessonId, 'fr') || Store.isLessonDone(lessonId))) return true;
+  if (Store.isMiniDone && (Store.isMiniDone(lessonId, miniNum, 'fr') || Store.isMiniDone(lessonId, miniNum))) return true;
+  return false;
 }
 
 function nextMini() {
@@ -137,23 +157,44 @@ function openMini(lessonId, miniNum) {
   window.location.href = `lessons.html?lesson=${lessonId}&mini=${miniNum}&guided=1`;
 }
 
+function setBlock(b) {
+  activeBlock = b;
+  render();
+}
+
+function renderFilters() {
+  const wrap = document.getElementById('fr-filters');
+  wrap.innerHTML = BLOCKS.map(b => {
+    const active = b.id === activeBlock;
+    return `<button onclick="setBlock('${b.id}')" class="px-3.5 py-2 rounded-full text-xs font-black transition-all ${active ? 'bg-blue-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-300'}">${b.label}</button>`;
+  }).join('');
+}
+
 function render() {
+  renderFilters();
   const cont = document.getElementById('fr-trail');
   const next = nextMini();
-  let done = 0, html = '';
+  let doneTotal = 0;
 
   TRAIL_FR.forEach(l => {
-    let rows = '';
+    for (let m = 1; m <= 4; m++) if (miniDone(l.id, m)) doneTotal++;
+  });
+
+  const visibleLessons = activeBlock === 'all' ? TRAIL_FR : TRAIL_FR.filter(l => l.block === activeBlock);
+  let html = '';
+
+  visibleLessons.forEach(l => {
+    let rows = '', unitDone = 0;
     for (let m = 1; m <= 4; m++) {
       const isDone = miniDone(l.id, m);
-      if (isDone) done++;
+      if (isDone) unitDone++;
       const isCurrent = next && next.lesson.id === l.id && next.mini === m;
       rows += `
         <button onclick="openMini(${l.id},${m})"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all active:scale-[.98]
-            ${isDone ? 'bg-blue-50 border-blue-200' : isCurrent ? 'bg-white border-blue-400 node-current' : 'bg-white border-slate-100 hover:border-blue-200'}">
+            ${isDone ? 'bg-blue-50 border-blue-200' : isCurrent ? 'bg-white border-blue-500 node-current' : 'bg-white border-slate-100 hover:border-blue-200'}">
           <span class="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0
-            ${isDone ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}">
+            ${isDone ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'}">
             ${isDone ? '✓' : 'J' + m}
           </span>
           <span class="flex-1 min-w-0">
@@ -163,27 +204,37 @@ function render() {
         </button>`;
     }
     html += `
-      <div class="card-in bg-white/70 border border-blue-100 rounded-3xl p-4">
-        <div class="flex items-center gap-2 mb-3 px-1">
-          <span class="text-2xl">${l.emoji}</span>
-          <span class="font-black text-navy">${l.title}</span>
+      <div class="card-in bg-white/90 border-2 ${unitDone === 4 ? 'border-emerald-200' : 'border-blue-100'} rounded-3xl p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-2 mb-3 px-1">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">${l.emoji}</span>
+            <div>
+              <div class="text-[10px] font-black uppercase tracking-widest text-blue-600">Unidade ${String(l.num).padStart(2,'0')}</div>
+              <div class="font-black text-navy leading-tight">${l.title}</div>
+              <div class="text-xs text-slate-500 font-semibold">${l.sub}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <a href="${l.aula}" class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-full">📖 Aula ${l.num}</a>
+            <span class="text-xs font-black px-2.5 py-1 rounded-full ${unitDone === 4 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${unitDone}/4</span>
+          </div>
         </div>
         <div class="space-y-2">${rows}</div>
       </div>`;
   });
 
   cont.innerHTML = html;
-  document.getElementById('fr-progress-bar').style.width = Math.round(done / TOTAL_NODES * 100) + '%';
-  document.getElementById('fr-progress-label').textContent = done + ' / ' + TOTAL_NODES;
+  document.getElementById('fr-progress-bar').style.width = Math.round(doneTotal / TOTAL_NODES * 100) + '%';
+  document.getElementById('fr-progress-label').textContent = doneTotal + ' / ' + TOTAL_NODES;
 
   if (next) {
     const c = document.getElementById('fr-continue');
     c.classList.remove('hidden');
     document.getElementById('fr-cont-emoji').textContent = next.lesson.emoji;
-    document.getElementById('fr-cont-title').textContent = next.lesson.title;
+    document.getElementById('fr-cont-title').textContent = `Unidade ${String(next.lesson.num).padStart(2,'0')} · ${next.lesson.title}`;
     document.getElementById('fr-cont-sub').textContent = `Jour ${next.mini} — ${DAY_SUBS[next.mini-1]}`;
     document.getElementById('fr-cont-btn').onclick = () => openMini(next.lesson.id, next.mini);
-    if (done === 0) document.querySelector('#fr-continue p').textContent = 'Comece por aqui';
+    document.getElementById('fr-cont-kicker').textContent = doneTotal === 0 ? 'Comece por aqui' : 'Continuar de onde parou';
   } else {
     document.getElementById('fr-done').classList.remove('hidden');
   }

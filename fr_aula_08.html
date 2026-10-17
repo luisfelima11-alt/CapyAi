@@ -3,46 +3,48 @@
 <head>
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>L'Heure em francês — Lição 8 | Capy English</title>
-<meta name="description" content="Aprenda L'Heure em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 8 da Capy English, com a Yara."/>
+<title>L'Heure (As Horas, Horários Oficiais e Rotina Diária) — Lição 8 de Francês | Capy English</title>
+<meta name="description" content="Aprenda L&#39;Heure (As Horas, Horários Oficiais e Rotina Diária) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 8 da Capy English, com a Yara."/>
 <link rel="canonical" href="https://www.capyenglish.com.br/fr_aula_08.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
 <style>
 *{font-family:'Plus Jakarta Sans',sans-serif}
-@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
 @keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
-.float{animation:floatUp 3s ease-in-out infinite}
-.fade-in{animation:fadeIn .4s ease both}
 .xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
-.flip-card{perspective:800px;min-height:120px;cursor:pointer}
-.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card{perspective:800px;min-height:132px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
-.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;flex-direction:column;gap:4px}
-.flip-front{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.flip-back{background:linear-gradient(135deg,#1e40af,#3730a3);transform:rotateY(180deg)}
-.tab-btn{position:relative;font-weight:700;transition:color .2s}
-.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#4f46e5);border-radius:99px;transition:width .25s}
-.tab-btn.active{color:#1d4ed8}
-.tab-btn.active::after{width:80%}
-.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
-.prog-dot.done{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
-.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
-.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}
-.opt-btn.correct{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important}
-.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
-.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#1d4ed8;background:#eff6ff}
-.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#2563eb,#4f46e5);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#1d4ed8;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.4rem .8rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#2563eb;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #cbd5e1;border-radius:1rem}
 .wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
-.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}.mp-btn.selected{border-color:#1d4ed8;background:#dbeafe}.mp-btn.matched{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
-.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:130px;text-align:center}.fill-inp:focus{border-color:#1d4ed8}.fill-inp.ok{border-color:#1d4ed8;background:#dbeafe;color:#1e3a8a}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
-.btn-blue{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;font-weight:900;border-radius:1rem;transition:all .15s}
-.btn-blue:hover{transform:scale(1.05)}.btn-blue:active{transform:scale(.95)}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.6rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.mp-btn.selected{border-color:#2563eb;background:#dbeafe}
+.mp-btn.matched{border-color:#10b981!important;background:#ecfdf5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #cbd5e1;border-radius:.75rem;padding:.35rem .8rem;font-size:.9rem;font-weight:700;transition:border .2s;outline:none;min-width:130px;text-align:center}
+.fill-inp:focus{border-color:#2563eb}
+.fill-inp.ok{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.dlg-playing{ring:3px solid #3b82f6;transform:scale(1.01)}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -52,211 +54,354 @@
 <meta property="og:site_name" content="Capy Yara English"/>
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/fr_aula_08.html"/>
-<meta property="og:title" content="L'Heure em francês — Lição 8 | Capy English"/>
-<meta property="og:description" content="Aprenda L"/>
+<meta property="og:title" content="L&#39;Heure (As Horas, Horários Oficiais e Rotina Diária) — Lição 8 de Francês | Capy English"/>
+<meta property="og:description" content="Aprenda L&#39;Heure (As Horas, Horários Oficiais e Rotina Diária) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 8 da Capy English, com a Yara."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="L'Heure em francês — Lição 8 | Capy English"/>
-<meta name="twitter:description" content="Aprenda L"/>
+<meta name="twitter:title" content="L&#39;Heure (As Horas, Horários Oficiais e Rotina Diária) — Lição 8 de Francês | Capy English"/>
+<meta name="twitter:description" content="Aprenda L&#39;Heure (As Horas, Horários Oficiais e Rotina Diária) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 8 da Capy English, com a Yara."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
 <main class="md:pl-24 pb-32 md:pb-10">
 
-  <!-- Hero -->
-  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
-    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
-      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">⏰</span>
-      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🇫🇷</span>
-      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">🕐</span>
-      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">⌚</span>
-      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🐾</span>
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-blue-900 to-indigo-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:10%;left:3%;animation-delay:0s">⏰</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:60%;left:7%;animation-delay:.7s">⌚</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:20%;left:15%;animation-delay:1.3s">🚆</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:70%;left:22%;animation-delay:.4s">🌅</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:8%;right:22%;animation-delay:.9s">🌙</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:55%;right:15%;animation-delay:1.6s">☕</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:30%;right:5%;animation-delay:.2s">🇫🇷</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:75%;right:28%;animation-delay:1s">🐾</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="fr_aula_07.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">← Leçon 07</a>
+      <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">🇫🇷 Curso de Francês</a>
+      <a href="fr_aula_09.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1 rounded-full transition-colors">Leçon 09 →</a>
     </div>
-    <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <div class="flex items-center gap-3 flex-wrap mb-5">
-        <a href="fr_aula_07.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Leçon 7</a>
-        <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Cours de Français</a>
-        <a href="fr_aula_09.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Leçon 9 →</a>
-      </div>
-      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🇫🇷 Leçon 8 · Débutant</div>
-      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">L'Heure<br><span class="text-blue-300">Telling the Time</span></h1>
-      <p class="text-white/70 mb-6 max-w-lg">Jamais en retard! Learn to ask and tell the time in French — hours, quarters, halves, and the moments of the day.</p>
-      <div class="flex items-center gap-2 flex-wrap">
-        <div id="hero-dots" class="flex gap-2"></div>
-        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
-      </div>
+    <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1 text-sm font-black text-blue-200 mb-3">🇫🇷 Leçon 08 · Português → Francês</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">⏰ L'Heure — <br><span class="text-blue-300">As Horas, Horários Oficiais e Rotina Diária</span></h1>
+    <p class="text-white/75 text-base mb-5 max-w-xl">Aprenda a perguntar e dizer as horas em francês (et quart, et demie, moins le quart, midi, minuit), usar o relógio de 24h e descrever sua rotina com verbos reflexivos.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Horas &amp; Horários</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Rotina Diária</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">A1 · Débutant</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/60 text-xs font-bold" id="section-label">0 / 8 etapas concluídas</span>
     </div>
   </div>
+</div>
 
-  <!-- Tabs -->
-  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
-    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
-      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbes</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
     </div>
   </div>
+</div>
 
-  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
-    <!-- VOCAB -->
-    <div id="tab-vocab" class="fade-in">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">⏰ L'Heure — Time Words</h2><p class="text-slate-500 text-sm">Flip each card — front = English, back = French. The essential time vocabulary!</p></div>
-      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6"></div>
-      <button onclick="markSection('vocab')" class="btn-blue px-8 py-3">✓ I know the time words! +20 XP</button>
+<!-- VOCAB TAB -->
+<div id="tab-vocab" class="tab-content fade-in">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h2 class="text-2xl font-black text-navy">📚 Vocabulário Essencial</h2>
+      <p class="text-slate-500 text-sm mt-1">Clique no card para virar (ou abrir em tela cheia) e no botão 🔊 para ouvir a pronúncia francesa.</p>
     </div>
-
-    <!-- EXPRESSIONS -->
-    <div id="tab-expressions" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">How to ask and talk about time in French. Click to expand.</p></div>
-      <div id="expr-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('expressions')" class="btn-blue px-8 py-3">✓ Got the expressions! +20 XP</button>
+    <div class="text-right">
+      <div class="text-2xl font-black text-blue-600" id="vocab-count">0</div>
+      <div class="text-xs text-slate-400 font-bold">de 18 vistos</div>
     </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="vocab-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6" id="vocab-grid"></div>
+  <button onclick="markSectionBtn(this,'vocab')" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Dominei o vocabulário! (+20 XP)
+  </button>
+</div>
 
-    <!-- GRAMMAR -->
-    <div id="tab-grammar" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">How to ask the time and build any hour correctly in French.</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 mb-4 text-white">
-        <p class="text-xs font-black uppercase tracking-widest mb-3 text-blue-100">Time Formula</p>
-        <div class="text-lg font-black mb-2">Il est + [number] + heure(s) + [minutes]</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-bold mt-3">
-          <div class="bg-white/20 rounded-xl p-3">
-            <p class="font-black text-xs mb-1 text-blue-100">Examples</p>
-            <p>Il est une heure → It's 1:00</p>
-            <p>Il est trois heures → It's 3:00</p>
-            <p>Il est huit heures vingt → It's 8:20</p>
-          </div>
-          <div class="bg-white/20 rounded-xl p-3">
-            <p class="font-black text-xs mb-1 text-blue-100">Special words</p>
-            <p>et quart → :15</p>
-            <p>et demie → :30</p>
-            <p>moins le quart → :45</p>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3 mb-6">
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>1️⃣ Asking & telling the time</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Ask with <strong>"Quelle heure est-il?"</strong> (What time is it?). Answer with <strong>"Il est..."</strong>:</p>
-            <p>✅ Il est <strong>une heure</strong> (1:00) — singular: <em>une heure</em>, no -s!</p>
-            <p>✅ Il est <strong>deux heures</strong> (2:00) — plural: <em>deux heures</em>, with -s.</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 É "heure" (1h) mas "heures" (2h+). O número diz o plural!</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🕒 Minutes: et quart, et demie, moins le quart</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">For minutes, just add the number after the hour, or use the special phrases:</p>
-            <p>✅ Il est trois heures <strong>et quart</strong> (3:15 — "and a quarter")</p>
-            <p>✅ Il est trois heures <strong>et demie</strong> (3:30 — "and a half")</p>
-            <p>✅ Il est quatre heures <strong>moins le quart</strong> (3:45 — "quarter to four")</p>
-            <p>✅ Il est huit heures <strong>vingt</strong> (8:20 — just say the number)</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 "moins le quart" = 15 para a hora seguinte. 3:45 = "quatre heures moins le quart".</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🌅 Moments of the day & the 24h clock</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Add the moment of day to be clear (like AM/PM):</p>
-            <p>✅ huit heures <strong>du matin</strong> (8 in the morning)</p>
-            <p>✅ trois heures <strong>de l'après-midi</strong> (3 in the afternoon)</p>
-            <p>✅ neuf heures <strong>du soir</strong> (9 in the evening)</p>
-            <p>✅ <strong>midi</strong> = 12:00 (noon) · <strong>minuit</strong> = 0:00 (midnight)</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 Os franceses usam muito o relógio de 24h: 14h = "deux heures de l'après-midi", 20h = "huit heures du soir".</p>
+<!-- VERBS TAB -->
+<div id="tab-verbs" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔧 Verbos em Ação</h2>
+  <p class="text-slate-500 text-sm mb-6">Conjugação com guia de pronúncia para brasileiros e frases reais com áudio.</p>
+  <div class="space-y-8" id="verbs-grid"></div>
+  <div class="mt-8 bg-white border-2 border-blue-200 rounded-2xl p-6">
+    <h3 class="font-black text-navy text-lg mb-4">✏️ Mini-Quiz: Complete com a forma verbal correta</h3>
+    <div class="space-y-4" id="verbs-quiz"></div>
+    <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+      Verificar Respostas
+    </button>
+    <div id="verbs-quiz-result" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
+  </div>
+</div>
+
+<!-- EXPRESSIONS TAB -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">💬 Expressões Prontas para Conversar</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique em cada expressão para ver quando usar, exemplo real e ouvir a pronúncia.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+  <button onclick="markSectionBtn(this,'expressions')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Pratiquei as expressões! (+20 XP)
+  </button>
+</div>
+
+<!-- PATTERNS TAB (internal id="tab-grammar" for compatibility) -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🧩 Padrões do Francês</h2>
+  <p class="text-slate-500 text-sm mb-6">Os blocos lógicos da língua para você montar frases com segurança, sem decoreba.</p>
+  <div class="space-y-4">
+
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <div class="font-black text-navy">Em Francês as Horas são SEMPRE no Singular: "Il est..."!</div>
+            <div class="text-blue-700 text-sm font-semibold">Diferente do português ("São duas horas"), o francês usa sempre "Il est" no singular</div>
           </div>
         </div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g1-arrow">expand_more</span>
+      </button>
+      <div id="g1" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ 1h00: Il est une heure.<br/>
+        ✅ 2h00, 3h00, 10h00: Il est deux heures [dø-ZŒR], il est trois heures [truá-ZŒR], il est dix heures [di-ZŒR].<br/>
+        ✅ 12h00 (meio-dia) e 00h00 (meia-noite): Il est midi / Il est minuit (sem a palavra "heures"!).<br/>
+        ❌ "Ils sont deux heures" (Nunca use o plural "Ils sont" para horas!).<br/>
+        ❌ "Il est douze heures" (Na conversa, use sempre "Il est midi" ou "Il est minuit").
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Note que a palavra "heure(s)" vai para o plural a partir de 2h, mas o verbo continua no singular: "Il est deux heures"!
+          </div>
+        </div>
       </div>
-      <button onclick="markSection('grammar')" class="btn-blue px-8 py-3">✓ Grammar understood! +20 XP</button>
     </div>
 
-    <!-- DIALOGUE -->
-    <div id="tab-dialogue" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">⏰ Asking the time and making plans. Read aloud!</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">⏰ Yara asks Leo the time and they plan to meet — listen for the hours, quarters and moments of the day!</div>
-      <div class="space-y-3 mb-6">
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Leo, excuse-moi, <strong class="text-blue-700">quelle heure est-il</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Leo, excuse me, what time is it?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Il est <strong class="text-blue-700">dix heures et quart</strong> du matin.</p><p class="text-xs text-slate-400 mt-1 italic">It's a quarter past ten in the morning.</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Déjà? Oh là là, <strong class="text-blue-700">je suis en retard</strong>! On déjeune ensemble à <strong class="text-blue-700">midi</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Already? Oh no, I'm late! Shall we have lunch together at noon?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Midi, c'est un peu tôt pour moi. À <strong class="text-blue-700">midi et demie</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Noon is a bit early for me. At half past twelve?</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Parfait! Et le film commence à <strong class="text-blue-700">huit heures du soir</strong>, n'est-ce pas?</p><p class="text-xs text-slate-400 mt-1 italic">Perfect! And the movie starts at eight in the evening, right?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Oui, à <strong class="text-blue-700">vingt heures</strong>. Ne sois pas en retard cette fois!</p><p class="text-xs text-slate-400 mt-1 italic">Yes, at 8 PM. Don't be late this time!</p></div>
+    <div class="rounded-2xl border-2 border-indigo-200 bg-indigo-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <div class="font-black text-navy">Os Minutos: Et quart (:15), Et demie (:30), Moins le quart (:45)</div>
+            <div class="text-indigo-700 text-sm font-semibold">E o sistema oficial de 24h (14h30 = quatorze heures trente)</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g2-arrow">expand_more</span>
+      </button>
+      <div id="g2" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ :15 = et quart → Il est huit heures et quart (8h15).<br/>
+        ✅ :30 = et demie → Il est huit heures et demie (8h30) · Mas: midi et demi (sem -e!).<br/>
+        ✅ :45 = hora seguinte + moins le quart → Il est neuf heures moins le quart (8h45 = 9h menos um quarto).<br/>
+        ✅ Horário de 24h (muito usado na França!): Il est quatorze heures trente (14h30), vingt heures (20h).<br/>
+        ❌ Dizer "quinze pour neuf" — em francês dizemos a hora seguinte + MOINS + minutos: "neuf heures moins dix" (8h50)!
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Na França, trens, cinemas, aulas e restaurantes usam quase sempre o formato de 24h (18h, 20h30)!
+          </div>
+        </div>
       </div>
-      <button onclick="markSection('dialogue')" class="btn-blue px-8 py-3">✓ I read the dialogue! +20 XP</button>
     </div>
 
-    <!-- PRACTICE -->
-    <div id="tab-practice" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questions on telling the time!</p></div>
-      <div id="quiz-container" class="space-y-5 mb-6"></div>
-      <div id="quiz-result" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-center mb-4">
-        <div class="text-4xl mb-2">🏆</div>
-        <p class="font-black text-blue-700 text-lg" id="quiz-score-text"></p>
-        <p class="text-blue-600 text-sm mt-1">+50 XP earned! Bravo — you can tell the time in French!</p>
-      </div>
-      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full btn-blue py-4 text-base">✓ Check Answers +50 XP</button>
-    </div>
-
-    <!-- SPEAK -->
-    <div id="tab-speak" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Read these time phrases aloud — pay attention to the liaison in "deux_heures"!</p></div>
-      <div id="speak-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('speak')" class="btn-blue px-8 py-3">✓ All phrases practiced! +20 XP</button>
-    </div>
-
-    <!-- HOMEWORK -->
-    <div id="tab-homework" class="fade-in hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Leçon 8 — L'Heure</p></div>
-          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <div class="font-black text-navy">Verbos Reflexivos da Rotina (Je me lève, Tu te couches)</div>
+            <div class="text-blue-700 text-sm font-semibold">Me, te, se, nous, vous, se antes do verbo</div>
+          </div>
         </div>
-      </div>
-      <div class="space-y-5">
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Arrange the words to form correct time sentences.</p></div></div>
-          <div id="wo1-container" class="space-y-6"></div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g3-arrow">expand_more</span>
+      </button>
+      <div id="g3" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Je me réveille à sept heures (Eu acordo às 7h).<br/>
+        ✅ Je me lève à sept heures et quart (Eu me levanto às 7h15).<br/>
+        ✅ Je me couche à vingt-trois heures (Eu vou dormir às 23h).<br/>
+        ❌ "Je lève à sept heures" — não esqueça o pronome "me"!
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Na negativa, o "ne" abraça o pronome e o verbo juntos: "Je ne me lève pas tôt le dimanche".
+          </div>
         </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Time Phrase</h3><p class="text-slate-500 text-sm mt-1">Match French to English.</p></div></div>
-          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
-          <p id="mp1-done-msg" class="hidden mt-3 text-blue-600 font-black text-sm">✅ All pairs matched! Parfait!</p>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Write the missing time word in French.</p></div></div>
-          <div class="space-y-4" id="fill1-container"></div>
-          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Write 4–6 sentences: what time it is now, the time you get up, the time you have lunch, and the time you go to bed.</p></div></div>
-          <textarea rows="6" placeholder="Il est... Je me lève à... Je déjeune à... Je me couche à..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
-        </div>
-      </div>
-      <button onclick="submitHomework()" class="mt-6 w-full btn-blue py-4 text-base">🏆 Submit Homework +100 XP</button>
-      <div id="hw-done" class="hidden mt-4 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center">
-        <div class="text-4xl mb-2">🎉</div>
-        <p class="font-black text-blue-700 text-lg">Bravo! Homework complete!</p>
-        <p class="text-blue-600 text-sm mt-1">+100 XP — On passe à la météo!</p>
       </div>
     </div>
   </div>
+  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Entendi o padrão! (+20 XP)
+  </button>
+</div>
+
+<!-- DIALOGUE TAB -->
+<div id="tab-dialogue" class="tab-content fade-in hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-2xl font-black text-navy mb-1">🎭 Na Estação de Trem (Gare de Lyon)</h2>
+      <p class="text-slate-500 text-sm">🚆 Yara confere o horário de seu trem para Nice e conta sua rotina matinal para Léo.</p>
+    </div>
+    <button id="btn-play-dialogue" onclick="playFullDialogue()" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm px-5 py-2.5 rounded-2xl shadow hover:scale-105 active:scale-95 transition-all">
+      🔊 Ouvir diálogo completo
+    </button>
+  </div>
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+  <button onclick="markSectionBtn(this,'dialogue')" class="mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li e ouvi o diálogo! (+20 XP)
+  </button>
+</div>
+
+<!-- PRACTICE TAB -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-black text-navy">✏️ Quiz Interativo</h2>
+      <p class="text-slate-500 text-sm mt-1" id="prac-subtitle">10 questões comentadas em português — L'Heure</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-black text-blue-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">acertos</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-black text-amber-500" id="prac-streak">🔥 0</div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">sequência</div>
+      </div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="prac-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div id="practice-area"></div>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Très bien !</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Refazer</button>
+        <button onclick="document.querySelector('[data-tab=\'speak\']').click();document.getElementById('result-overlay').classList.add('hidden')" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Treinar Fala →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAK TAB -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🗣️ Pronúncia &amp; Repetição em Voz Alta</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique no botão ▶️ para ouvir a frase em francês, leia a dica fonética e marque como concluída após repetir em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+</div>
+
+<!-- HOMEWORK TAB -->
+<div id="tab-homework" class="tab-content fade-in hidden">
+  <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-3xl p-6 mb-6 text-white">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-4xl">📝</span>
+      <div>
+        <h2 class="text-2xl font-black">Devoir de Maison (Homework)</h2>
+        <p class="text-white/80 text-sm">Leçon 08 — L'Heure (As Horas, Horários Oficiais e Rotina Diária)</p>
+      </div>
+    </div>
+    <p class="text-white/75 text-sm">Complete os 4 exercícios interativos abaixo para consolidar a lição e ganhar +75 XP!</p>
+  </div>
+
+  <!-- 1. Word Order -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">1</span>
+      <div>
+        <p class="font-black text-navy text-sm">Ordem das Palavras (Mettez dans l&#39;ordre)</p>
+        <p class="text-slate-500 text-xs">Toque nas palavras para montar as frases em francês na ordem correta.</p>
+      </div>
+    </div>
+    <div id="wo1-container" class="space-y-4"></div>
+  </div>
+
+  <!-- 2. Match Pairs -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">2</span>
+      <div>
+        <p class="font-black text-navy text-sm">Conecte os Pares (Francês ↔ Português)</p>
+        <p class="text-slate-500 text-xs">Clique em um item da esquerda e depois na tradução correspondente à direita.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div id="mp1-left" class="space-y-2"></div>
+      <div id="mp1-right" class="space-y-2"></div>
+    </div>
+    <p id="mp1-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados! Magnifique !</p>
+  </div>
+
+  <!-- 3. Fill in the Blank -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">3</span>
+      <div>
+        <p class="font-black text-navy text-sm">Complete as Lacunas</p>
+        <p class="text-slate-500 text-xs">Preencha cada espaço com a palavra francesa adequada.</p>
+      </div>
+    </div>
+    <div class="space-y-3" id="fill1-container"></div>
+    <button onclick="checkFill1()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl transition-all text-xs">
+      Verificar Lacunas ✓
+    </button>
+    <p id="fill1-fb" class="hidden mt-2 text-xs font-black"></p>
+  </div>
+
+  <!-- 4. Free Writing -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">4</span>
+      <div>
+        <p class="font-black text-navy text-sm">Produção Escrita em Francês ✍️</p>
+        <p class="text-slate-500 text-xs">Conte em francês (3 a 5 frases) a sua rotina diária com horários: a que horas você se levanta ("Je me lève à..."), almoça ("Je déjeune à..."), trabalha/estuda e vai dormir ("Je me couche à...").</p>
+      </div>
+    </div>
+    <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-blue-500 focus:outline-none resize-none" placeholder="Le matin, je me lève à sept heures. Je commence le travail à huit heures et demie. À midi, je déjeune. Le soir, je dîne à vingt heures et je me couche vers vingt-trois heures !"></textarea>
+    <button id="btn-submit-hw" onclick="submitHomework()" class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black px-6 py-3.5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all w-full shadow-md">
+      🚀 Concluir Lição 08 e Receber +75 XP
+    </button>
+    <div id="hw-done-box" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+      <p class="font-black text-emerald-700 text-base">🎉 Félicitations ! Lição 08 concluída com sucesso! (+75 XP)</p>
+      <div class="flex flex-wrap justify-center gap-3 mt-3">
+        <a href="classes_fr.html" class="bg-white border-2 border-slate-200 text-navy font-black text-xs px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all">← Voltar ao Curso de Francês</a>
+        <a href="fr_aula_09.html" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-5 py-2.5 rounded-xl hover:scale-105 transition-all">Próxima: Leçon 09 — La Météo →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 </main>
 <div id="mobile-nav-placeholder"></div>
+
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="components.js?v=skins1"></script>
-<script>window.YARA_WIDGET={lang:'fr',lessonTitle:'L\'Heure',lessonNum:8};</script>
+<script>window.YARA_WIDGET={lang:'fr',lessonTitle:"L'Heure",lessonNum:8};</script>
 <script src="tts-fr.js?v=c52d7db"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
@@ -266,123 +411,1120 @@
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
-const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
-function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
-buildHeroDots();
-function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
-function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
-const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
-document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
 
-const VOCAB=[
-  ['the time / the hour','l\'heure [luhr]'],
-  ['a minute','une minute [oon mee-NOOT]'],
-  ['a second','une seconde [oon suh-GOND]'],
-  ['noon','midi [mee-DEE]'],
-  ['midnight','minuit [mee-NWEE]'],
-  ['quarter past','et quart [ay KAR]'],
-  ['half past','et demie [ay duh-MEE]'],
-  ['quarter to','moins le quart [mwan luh KAR]'],
-  ['in the morning','du matin [doo ma-TAN]'],
-  ['in the afternoon','de l\'après-midi [duh la-preh-mee-DEE]'],
-  ['in the evening','du soir [doo SWAR]'],
-  ['a watch','une montre [oon MONTR]'],
-  ['a clock','une horloge [oon or-LOZH]'],
-  ['early','tôt [TOH]'],
-  ['late','tard [TAR]'],
+const LESSON_NUM = 8;
+const TOTAL_SECTIONS = 8;
+let sectionsDone = 0;
+const doneSections = new Set();
+
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  const lb = document.getElementById('section-label');
+  if (!c) return;
+  c.innerHTML = Array.from({ length: TOTAL_SECTIONS }, (_, i) =>
+    `<div class="prog-dot ${i < sectionsDone ? 'bg-gradient-to-r from-blue-400 to-indigo-300' : 'bg-white/20'}"></div>`
+  ).join('');
+  if (lb) lb.textContent = `${sectionsDone} / ${TOTAL_SECTIONS} etapas concluídas`;
+}
+buildSectionDots();
+
+function spawnXP(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = text;
+  el.style.cssText = `left:${40 + Math.random() * 20}%;top:${30 + Math.random() * 30}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+function saveFrCompleted() {
+  try {
+    const KEY = 'capyFrCompleted';
+    const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!arr.includes(LESSON_NUM)) {
+      arr.push(LESSON_NUM);
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+    if (typeof Store !== 'undefined' && typeof Store.completeLesson === 'function') {
+      Store.completeLesson(200 + LESSON_NUM, 'fr');
+    }
+  } catch (e) {}
+}
+
+function markSection(name) {
+  if (!doneSections.has(name)) {
+    doneSections.add(name);
+    if (sectionsDone < TOTAL_SECTIONS) sectionsDone++;
+    buildSectionDots();
+    if (typeof Store !== 'undefined') Store.addXP(20);
+    spawnXP('+20 XP');
+  }
+  if (name === 'homework') saveFrCompleted();
+}
+
+function markSectionBtn(btn, name) {
+  btn.disabled = true;
+  btn.textContent = '✓ Concluído! (+20 XP)';
+  btn.classList.add('opacity-75');
+  markSection(name);
+}
+
+const TABS = ['vocab', 'verbs', 'expressions', 'grammar', 'dialogue', 'practice', 'speak', 'homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── 1. VOCABULARY ────────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  {
+    "en": "Quelle heure est-il ?",
+    "pt": "Que horas são?",
+    "phon": "[kél ŒR é-TIL?]",
+    "ex": "Excusez-moi, quelle heure est-il ?",
+    "emoji": "⌚",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Il est une heure",
+    "pt": "É uma hora (1h00)",
+    "phon": "[i-lé ü-NŒR]",
+    "ex": "Il est une heure de l'après-midi.",
+    "emoji": "🕐",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Il est deux heures",
+    "pt": "São duas horas [dø-ZŒR]",
+    "phon": "[i-lé dø-ZŒR]",
+    "ex": "Il est deux heures pile.",
+    "emoji": "🕑",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Il est midi",
+    "pt": "É meio-dia (12h00)",
+    "phon": "[i-lé mi-DI]",
+    "ex": "À midi, nous déjeunons.",
+    "emoji": "☀️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Il est minuit",
+    "pt": "É meia-noite (00h00)",
+    "phon": "[i-lé mi-NUÍ]",
+    "ex": "À minuit, tout le monde dort.",
+    "emoji": "🌙",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Et quart",
+    "pt": "E quinze (lit. e um quarto)",
+    "phon": "[ê KÁR]",
+    "ex": "Il est huit heures et quart (8h15).",
+    "emoji": "🕒",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Et demie",
+    "pt": "E meia (30 min)",
+    "phon": "[ê dã-MI]",
+    "ex": "Il est neuf heures et demie (9h30).",
+    "emoji": "🕤",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Moins le quart",
+    "pt": "Quinze para as... (lit. menos um quarto)",
+    "phon": "[muã lã KÁR]",
+    "ex": "Il est dix heures moins le quart (9h45).",
+    "emoji": "🕘",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Pile",
+    "pt": "Em ponto",
+    "phon": "[PÍL]",
+    "ex": "Le train part à sept heures pile.",
+    "emoji": "🎯",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Du matin",
+    "pt": "Da manhã",
+    "phon": "[dü ma-TÃ]",
+    "ex": "Je me lève à sept heures du matin.",
+    "emoji": "🌅",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "De l'après-midi",
+    "pt": "Da tarde",
+    "phon": "[dã la-pré-mi-DI]",
+    "ex": "J'ai cours à trois heures de l'après-midi.",
+    "emoji": "🌤️",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Du soir",
+    "pt": "Da noite",
+    "phon": "[dü SUAR]",
+    "ex": "Nous dînons à huit heures du soir.",
+    "emoji": "🌆",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "À quelle heure... ?",
+    "pt": "A que horas...?",
+    "phon": "[a kél ŒR?]",
+    "ex": "À quelle heure commence le film ?",
+    "emoji": "🎬",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Tôt / Tard",
+    "pt": "Cedo / Tarde",
+    "phon": "[TÔ / TÁR]",
+    "ex": "Je me réveille tôt le matin.",
+    "emoji": "⏳",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Se réveiller / Se lever",
+    "pt": "Acordar / Levantar-se",
+    "phon": "[sã re-vê-IÊ / sã lã-VÊ]",
+    "ex": "Je me lève à six heures et demie.",
+    "emoji": "🛌",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Se coucher",
+    "pt": "Deitar-se / Ir dormir",
+    "phon": "[sã ku-CHÊ]",
+    "ex": "Je me couche à vingt-trois heures.",
+    "emoji": "😴",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "En avance / En retard",
+    "pt": "Adiantado(a) / Atrasado(a)",
+    "phon": "[ã na-VÃS / ãn rã-TÁR]",
+    "ex": "Le bus a cinq minutes de retard.",
+    "emoji": "🏃",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Rendez-vous",
+    "pt": "Compromisso / Horário marcado / Encontro",
+    "phon": "[rãn-dê-VU]",
+    "ex": "J'ai un rendez-vous à quatorze heures.",
+    "emoji": "📌",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  }
 ];
-const vg=document.getElementById('vocab-grid');
-VOCAB.forEach(([en,fr])=>{const frC=fr.replace(/\s*\[.*?\]/g,'').trim().replace(/'/g,"&#39;");const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-xs text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${fr}</p><button onclick="event.stopPropagation();speak('${frC}')" class="mt-2 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+let vocabDone = new Set();
+function buildVocab() {
+  const grid = document.getElementById('vocab-grid');
+  VOCAB_DATA.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card h-32';
+    card.innerHTML = `
+      <div class="flip-card-inner h-full">
+        <div class="flip-front h-full border-2 ${v.bg} rounded-2xl flex flex-col items-center justify-center p-2.5 gap-1 relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center transition-all" title="Ouvir pronúncia">🔊</button>
+          <span class="text-2xl">${v.emoji}</span>
+          <span class="font-black text-navy text-sm text-center leading-tight">${v.en}</span>
+          <span class="w-2 h-2 rounded-full ${v.dot}"></span>
+        </div>
+        <div class="flip-back h-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-2.5 text-center relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].ex || VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs flex items-center justify-center transition-all" title="Ouvir exemplo">🔊</button>
+          <span class="font-black text-white text-xs leading-snug">${v.pt}<br><span class="text-blue-200 font-bold text-[10px]">${v.phon}</span>${v.ex ? `<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"${v.ex}"</em>` : ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) {
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent = vocabDone.size;
+        document.getElementById('vocab-bar').style.width = (vocabDone.size / VOCAB_DATA.length * 100) + '%';
+        if (vocabDone.size === VOCAB_DATA.length) markSection('vocab');
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+buildVocab();
 
-const EXPRS=[
-  {phrase:'Quelle heure est-il?',meaning:'What time is it?',example:'"Quelle heure est-il?" — "Il est trois heures."',use:'THE question to ask the time. Quelle = what/which, heure = hour, est-il = is it. Casual version: "Il est quelle heure?" or "T\'as l\'heure?" (Do you have the time?).'},
-  {phrase:'Il est trois heures.',meaning:'It is three o\'clock.',example:'"Il est trois heures et demie de l\'après-midi."',use:'Il est = it is. Then the number + heure(s). Remember: "une heure" (1h, singular) but "deux heures, trois heures..." (2h+, plural with -s).'},
-  {phrase:'À quelle heure?',meaning:'At what time?',example:'"À quelle heure commence le film?" — "À vingt heures."',use:'Use À (at) to ask or say WHEN something happens. "À quelle heure?" = At what time? Answer: "À huit heures." (At eight o\'clock.) Don\'t forget the À!'},
-  {phrase:'Je suis en retard.',meaning:'I am late.',example:'"Désolé, je suis en retard! Il est déjà midi!"',use:'En retard = late. The opposite is "en avance" (early) or "à l\'heure" (on time). "Je suis en retard" (I\'m late), "Tu es à l\'heure" (You\'re on time).'},
+// ── 2. VERBS ─────────────────────────────────────────────────────────────────
+const VERBS_DATA = [
+  {
+    "verb": "SE LEVER (Levantar-se — Verbo Pronominal)",
+    "emoji": "🌅",
+    "forms": [
+      {
+        "label": "Je",
+        "form": "je me lève [jã mã LÉV]",
+        "example": "Je me lève à sept heures."
+      },
+      {
+        "label": "Tu",
+        "form": "tu te lèves [tü tã LÉV]",
+        "example": "À quelle heure tu te lèves ?"
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle se lève [sã LÉV]",
+        "example": "Elle se lève tôt."
+      },
+      {
+        "label": "Nous",
+        "form": "nous nous levons [nu nu lã-VÔN]",
+        "example": "Nous nous levons à huit heures."
+      },
+      {
+        "label": "Vous",
+        "form": "vous vous levez [vu vu lã-VÊ]",
+        "example": "Vous vous levez tard le dimanche."
+      },
+      {
+        "label": "Ils / Elles",
+        "form": "ils/elles se lèvent [sã LÉV]",
+        "example": "Ils se lèvent à six heures."
+      }
+    ]
+  },
+  {
+    "verb": "SE COUCHER (Deitar-se / Ir dormir)",
+    "emoji": "🌙",
+    "forms": [
+      {
+        "label": "Je",
+        "form": "je me couche [jã mã KUCH]",
+        "example": "Je me couche vers minuit."
+      },
+      {
+        "label": "Tu",
+        "form": "tu te couches [tü tã KUCH]",
+        "example": "Tu te couches tôt ?"
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle se couche [sã KUCH]",
+        "example": "Il se couche à vingt-deux heures."
+      }
+    ]
+  },
+  {
+    "verb": "PARTIR (Partir / Sair)",
+    "emoji": "🚆",
+    "forms": [
+      {
+        "label": "Je / Tu",
+        "form": "je pars / tu pars [PÁR]",
+        "example": "Je pars au travail à huit heures."
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle part [PÁR]",
+        "example": "Le train part à quinze heures trente."
+      },
+      {
+        "label": "Nous / Vous",
+        "form": "nous partons / vous partez",
+        "example": "À quelle heure vous partez ?"
+      }
+    ]
+  }
 ];
-const exList=document.getElementById('expr-list');
-EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-blue-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-blue-50 rounded-xl p-3 italic">"${e.example}"</p><p>${e.use}</p></div>`;exList.appendChild(d);});
-
-function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
-
-const QUIZ=[
-  {q:'How do you ask "What time is it?" in French?',opts:['Quelle heure est-il?','Quel jour sommes-nous?','Quel temps fait-il?','Où est l\'heure?'],ans:0},
-  {q:'"Il est une heure." means:',opts:['It is one o\'clock.','It is an hour.','It is early.','It is 11 o\'clock.'],ans:0},
-  {q:'How do you say "3:15" in French?',opts:['trois heures et quart','trois heures et demie','trois heures moins le quart','trois heures quinze para'],ans:0},
-  {q:'"et demie" means:',opts:['half past (:30)','quarter past (:15)','quarter to (:45)','o\'clock'],ans:0},
-  {q:'How do you say "3:45" in French?',opts:['quatre heures moins le quart','trois heures et quart','trois heures et demie','quatre heures et demie'],ans:0},
-  {q:'What is "midi"?',opts:['noon (12:00)','midnight (0:00)','morning','afternoon'],ans:0},
-  {q:'What is "minuit"?',opts:['midnight (0:00)','noon (12:00)','a minute','a second'],ans:0},
-  {q:'How do you say "8 in the morning"?',opts:['huit heures du matin','huit heures du soir','huit heures de l\'après-midi','huit heures et demie'],ans:0},
-  {q:'"Je suis en retard." means:',opts:['I am late.','I am early.','I am on time.','I am tired.'],ans:0},
-  {q:'On a 24h clock, what is "14h"?',opts:['deux heures de l\'après-midi','quatre heures du matin','deux heures du matin','quatorze heures du soir'],ans:0},
+const VERBS_QUIZ_DATA = [
+  {
+    "q": "Quelle heure ___-il ? (être — il)",
+    "ans": "est"
+  },
+  {
+    "q": "Je ___ lève à sept heures du matin. (pronome reflexivo de Je)",
+    "ans": "me"
+  },
+  {
+    "q": "Le train ___ à quatorze heures. (partir — il)",
+    "ans": "part"
+  },
+  {
+    "q": "À quelle heure tu ___ couches ? (pronome reflexivo de Tu)",
+    "ans": "te"
+  },
+  {
+    "q": "Il ___ midi et demi. (être — il)",
+    "ans": "est"
+  }
 ];
-let quizSubmitted=false;
-const qc=document.getElementById('quiz-container');
-QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-blue-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
-const selected={};
-function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#1d4ed8';btn.style.background='#eff6ff';selected[qi]=parseInt(btn.dataset.oi);}
-function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
 
-const SPEAK=[
-  'Quelle heure est-il?',
-  'Il est dix heures et demie.',
-  'Je me lève à sept heures du matin.',
-  'Le film commence à huit heures du soir.',
-  'Il est midi, on déjeune?',
-  'Désolé, je suis en retard!',
-];
-const sl=document.getElementById('speak-list');
-SPEAK.forEach((s,i)=>{const sC=s.replace(/'/g,"&#39;");const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><div class="flex items-center gap-3 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all hover:border-blue-200"><button onclick="event.stopPropagation();speak('${sC}')" class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-base transition-all" title="Ouvir">🔊</button><label for="sp${i}" class="cursor-pointer flex-1 flex items-center gap-3 min-w-0"><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl flex-shrink-0">☐</span></label></div>`;sl.appendChild(d);});
-function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+function buildVerbs() {
+  const grid = document.getElementById('verbs-grid');
+  VERBS_DATA.forEach((v, vi) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-blue-200 rounded-2xl overflow-hidden';
+    div.innerHTML = `
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center gap-3">
+        <span class="text-3xl">${v.emoji}</span>
+        <span class="text-xl md:text-2xl font-black text-white">${v.verb}</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-blue-50">
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Pessoa</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma &amp; Pronúncia</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Exemplo em Francês</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${v.forms.map((f, fi) => `
+              <tr class="${fi % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+                <td class="px-4 py-2.5 font-black text-blue-600 text-xs whitespace-nowrap">${f.label}</td>
+                <td class="px-4 py-2.5 font-black text-navy text-xs whitespace-nowrap">${f.form}</td>
+                <td class="px-4 py-2.5 text-slate-600 text-xs flex items-center justify-between gap-2">
+                  <span>${f.example}</span>
+                  <button type="button" onclick="speak(VERBS_DATA[${vi}].forms[${fi}].example)" class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center" title="Ouvir exemplo">🔊</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    grid.appendChild(div);
+  });
 
-const WO1_DATA=[
-  {s:'Quelle heure est-il',w:['Quelle','heure','est-il']},
-  {s:'Il est trois heures et demie',w:['Il','est','trois','heures','et','demie']},
-  {s:'Je me lève à sept heures du matin',w:['Je','me','lève','à','sept','heures','du','matin']},
+  const qWrap = document.getElementById('verbs-quiz');
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-sm font-semibold text-navy mb-2">${i + 1}. ${q.q}</p>
+        <input id="vq-fr-${i}" data-ans="${q.ans}" type="text" placeholder="Digite a resposta em francês..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
+        <p id="vq-fr-fb${i}" class="text-xs font-black mt-1 hidden"></p>
+      </div>`;
+    qWrap.appendChild(div);
+  });
+}
+buildVerbs();
+
+function checkVerbsQuiz() {
+  let correct = 0;
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const inp = document.getElementById('vq-fr-' + i);
+    const fb = document.getElementById('vq-fr-fb' + i);
+    if (!inp || !fb) return;
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = q.ans.toLowerCase().replace(/’/g, "'");
+    fb.classList.remove('hidden');
+    if (val === ans) {
+      correct++;
+      fb.textContent = '✅ Très bien ! Resposta correta!';
+      fb.className = 'text-xs font-black mt-1 text-emerald-600';
+    } else {
+      fb.textContent = `❌ Resposta correta: ${q.ans}`;
+      fb.className = 'text-xs font-black mt-1 text-red-500';
+    }
+  });
+  const res = document.getElementById('verbs-quiz-result');
+  res.classList.remove('hidden');
+  if (correct >= 4) {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+    res.textContent = `🎉 ${correct}/${VERBS_QUIZ_DATA.length} acertos! Excelente trabalho!`;
+    markSection('verbs');
+  } else {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200';
+    res.textContent = `${correct}/${VERBS_QUIZ_DATA.length} acertos. Confira as respostas acima e tente novamente!`;
+  }
+}
+
+// ── 3. EXPRESSIONS ───────────────────────────────────────────────────────────
+const EXPR_DATA = [
+  {
+    "expr": "Excusez-moi, quelle heure est-il ?",
+    "pt": "Com licença, que horas são?",
+    "emoji": "⌚",
+    "usage": "Na fala informal você também ouvirá: \"Tu as l'heure ?\" (Você tem hora?) ou \"Il est quelle heure ?\".",
+    "example": "— Excusez-moi, quelle heure est-il ? — Il est trois heures et quart."
+  },
+  {
+    "expr": "À quelle heure... ?",
+    "pt": "A que horas...?",
+    "emoji": "⏰",
+    "usage": "Para perguntar ou dizer o horário em que algo acontece, usamos a preposição À: \"À huit heures\" (Às oito horas).",
+    "example": "— À quelle heure part le train pour Lyon ? — À quinze heures vingt."
+  },
+  {
+    "expr": "J'ai un rendez-vous à...",
+    "pt": "Eu tenho um compromisso / horário marcado às...",
+    "emoji": "📅",
+    "usage": "Atenção: em francês, \"rendez-vous\" não é só encontro romântico! É qualquer consulta médica, reunião de trabalho ou horário marcado.",
+    "example": "J'ai un rendez-vous chez le dentiste à dix heures et demie."
+  },
+  {
+    "expr": "Il est huit heures pile.",
+    "pt": "São oito horas em ponto.",
+    "emoji": "🎯",
+    "usage": "\"Pile\" significa \"em ponto / cravado\".",
+    "example": "Le cours commence à neuf heures pile."
+  },
+  {
+    "expr": "Vers huit heures",
+    "pt": "Por volta das oito horas / Lá pelas oito",
+    "emoji": "🕗",
+    "usage": "Muito útil quando você quer combinar um horário aproximado.",
+    "example": "On se retrouve au restaurant vers vingt heures ?"
+  },
+  {
+    "expr": "Faire la grasse matinée",
+    "pt": "Dormir até mais tarde (no fim de semana)",
+    "emoji": "🛌",
+    "usage": "Expressão francesa deliciosa e super comum para quando acordamos tarde no sábado ou domingo!",
+    "example": "Le dimanche, j'adore faire la grasse matinée !"
+  }
 ];
-function hwShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle(d.w),orig:d.w}));
-function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
-function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
-function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-blue-600':'text-red-500');fb.textContent=ok?'✅ Correct! Parfait!':'❌ Try again! Answer: '+WO1_DATA[si].s;fb.classList.remove('hidden');}
-function wo1Reset(si){wo1[si].bank=hwShuffle(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+let exprDone = new Set();
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPR_DATA.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'border-2 border-blue-200 bg-white rounded-2xl overflow-hidden cursor-pointer';
+    div.innerHTML = `
+      <div class="p-4 flex items-center gap-4" onclick="toggleExpr(${i})">
+        <span class="text-3xl">${e.emoji}</span>
+        <div class="flex-1 min-w-0">
+          <div class="font-black text-navy">${e.expr}</div>
+          <div class="text-blue-600 text-sm font-semibold">${e.pt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].expr)" class="w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir expressão">🔊</button>
+        <span class="material-symbols-outlined text-blue-400 transition-transform" id="expr-arrow-${i}">expand_more</span>
+      </div>
+      <div id="expr-body-${i}" class="hidden px-4 pb-4">
+        <div class="bg-blue-50 rounded-xl p-3.5 text-sm space-y-2">
+          <p><strong class="text-navy">Quando usar:</strong> ${e.usage}</p>
+          <p class="flex items-center justify-between gap-2"><span class="italic text-slate-700"><strong class="text-navy not-italic">Exemplo:</strong> "${e.example}"</span><button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].example)" class="flex-shrink-0 text-xs font-black bg-white border border-blue-200 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100">🔊 Ouvir</button></p>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function toggleExpr(i) {
+  const body = document.getElementById('expr-body-' + i);
+  const arrow = document.getElementById('expr-arrow-' + i);
+  body.classList.toggle('hidden');
+  arrow.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  exprDone.add(i);
+  if (exprDone.size === EXPR_DATA.length) markSection('expressions');
+}
+buildExpressions();
+
+// ── 4. PATTERNS ACCORDION ────────────────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  if (!el) return;
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ── 5. DIALOGUE ──────────────────────────────────────────────────────────────
+const DIALOGUE_LINES = [
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Excuse-moi Léo, quelle heure est-il ? Mon téléphone n'a plus de batterie.",
+    "pt": "Com licença Léo, que horas são? Meu celular está sem bateria."
+  },
+  {
+    "who": "other",
+    "speaker": "Léo",
+    "text": "Il est neuf heures moins le quart. À quelle heure part ton train ?",
+    "pt": "São quinze para as nove (8h45). A que horas parte o seu trem?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Mon train part à neuf heures et demie pile ! Nous sommes en avance, ouf !",
+    "pt": "Meu trem parte às nove e meia em ponto! Nós estamos adiantados, ufa!"
+  },
+  {
+    "who": "other",
+    "speaker": "Léo",
+    "text": "Oui, on a le temps de prendre un café ! Tu t'es levée tôt ce matin ?",
+    "pt": "Sim, dá tempo de tomar um café! Você se levantou cedo hoje de manhã?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Oui ! La semaine, je me réveille à six heures et demie et je me lève à sept heures.",
+    "pt": "Sim! Durante a semana, acordo às seis e meia e me levanto às sete horas."
+  },
+  {
+    "who": "other",
+    "speaker": "Léo",
+    "text": "C'est tôt ! Moi, je commence le travail à dix heures, alors je me lève à huit heures et quart.",
+    "pt": "É cedo! Eu começo o trabalho às dez horas, então me levanto às oito e quinze."
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Quelle chance ! Mais le dimanche, je fais la grasse matinée jusqu'à midi !",
+    "pt": "Que sorte! Mas no domingo eu durmo até tarde, até o meio-dia!"
+  },
+  {
+    "who": "other",
+    "speaker": "Léo",
+    "text": "Haha, tu as bien raison ! Allez, il est neuf heures dix, ton train va arriver !",
+    "pt": "Haha, você está certíssima! Vamos, são nove e dez, seu trem vai chegar!"
+  }
+];
+let dlgPlaying = false;
+
+function buildDialogue() {
+  const c = document.getElementById('dialogue-lines');
+  DIALOGUE_LINES.forEach((l, i) => {
+    const isYara = l.who === 'yara';
+    const div = document.createElement('div');
+    div.className = `flex ${isYara ? 'justify-start' : 'justify-end'} fade-in`;
+    div.innerHTML = `
+      <div id="dlg-bubble-${i}" class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all ${isYara ? 'bg-blue-50 border-2 border-blue-200 text-navy' : 'bg-navy text-white'}">
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <span class="text-xs font-black ${isYara ? 'text-blue-600' : 'text-blue-300'}">${isYara ? '🐾 ' : '🗣️ '}${l.speaker}</span>
+          <button type="button" onclick="speak(DIALOGUE_LINES[${i}].text)" class="w-7 h-7 rounded-full ${isYara ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-white/15 hover:bg-white/25 text-white'} text-xs flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir fala">🔊</button>
+        </div>
+        <p class="font-bold">${l.text}</p>
+        <span class="block text-xs mt-1 ${isYara ? 'text-slate-500' : 'text-blue-200/80'}">🇧🇷 ${l.pt}</span>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+buildDialogue();
+
+function playFullDialogue() {
+  if (!window.speechSynthesis) return;
+  const btn = document.getElementById('btn-play-dialogue');
+  if (dlgPlaying) {
+    speechSynthesis.cancel();
+    dlgPlaying = false;
+    btn.textContent = '🔊 Ouvir diálogo completo';
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    return;
+  }
+  dlgPlaying = true;
+  btn.textContent = '⏹️ Parar áudio';
+  let idx = 0;
+  function nextLine() {
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    if (!dlgPlaying || idx >= DIALOGUE_LINES.length) {
+      dlgPlaying = false;
+      btn.textContent = '🔊 Ouvir diálogo completo';
+      return;
+    }
+    const bubble = document.getElementById('dlg-bubble-' + idx);
+    if (bubble) bubble.classList.add('ring-4', 'ring-blue-400');
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(DIALOGUE_LINES[idx].text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    u.pitch = DIALOGUE_LINES[idx].who === 'yara' ? 1.08 : 0.98;
+    u.onend = () => { idx++; setTimeout(nextLine, 350); };
+    u.onerror = () => { dlgPlaying = false; btn.textContent = '🔊 Ouvir diálogo completo'; };
+    speechSynthesis.speak(u);
+  }
+  nextLine();
+}
+
+// ── 6. PRACTICE QUIZ ─────────────────────────────────────────────────────────
+const QUIZ = [
+  {
+    "q": "Como se diz \"São três horas\" corretamente em francês?",
+    "opts": [
+      "Il est trois heures.",
+      "Ils sont trois heures.",
+      "Il est trois heure.",
+      "C'est trois heures."
+    ],
+    "a": "Il est trois heures.",
+    "rule": "Em francês as horas usam sempre \"Il est...\" no singular!"
+  },
+  {
+    "q": "Que horas são quando alguém diz: \"Il est huit heures et quart\"?",
+    "opts": [
+      "8h15",
+      "8h30",
+      "8h45",
+      "7h45"
+    ],
+    "a": "8h15",
+    "rule": "\"Et quart\" = e um quarto de hora (+15 minutos): 8h15."
+  },
+  {
+    "q": "Que horas são quando alguém diz: \"Il est dix heures moins le quart\"?",
+    "opts": [
+      "9h45 (quinze para as dez)",
+      "10h15 (dez e quinze)",
+      "10h45 (quinze para as onze)",
+      "10h30 (dez e meia)"
+    ],
+    "a": "9h45 (quinze para as dez)",
+    "rule": "\"Dix heures moins le quart\" = dez horas menos um quarto = 9h45!"
+  },
+  {
+    "q": "Como os franceses dizem \"É meio-dia\" e \"É meia-noite\"?",
+    "opts": [
+      "Il est midi / Il est minuit",
+      "Il est douze heures / Il est zéro heure",
+      "C'est le jour / C'est la nuit",
+      "Midi heures / Minuit heures"
+    ],
+    "a": "Il est midi / Il est minuit",
+    "rule": "Meio-dia é \"Il est midi\" e meia-noite é \"Il est minuit\" (nunca se adiciona a palavra \"heures\" depois deles)."
+  },
+  {
+    "q": "Como você pergunta \"A que horas começa o filme?\" em francês?",
+    "opts": [
+      "À quelle heure commence le film ?",
+      "Quelle heure est le film ?",
+      "Combien d'heures le film ?",
+      "Quand heure le film ?"
+    ],
+    "a": "À quelle heure commence le film ?",
+    "rule": "\"Quelle heure est-il ?\" = Que horas são? · \"À quelle heure... ?\" = A que horas...?"
+  },
+  {
+    "q": "O que significa a palavra \"rendez-vous\" no dia a dia na França?",
+    "opts": [
+      "Qualquer horário marcado, consulta médica, reunião ou encontro",
+      "Apenas um encontro romântico",
+      "Um atraso no trem",
+      "Um despertador"
+    ],
+    "a": "Qualquer horário marcado, consulta médica, reunião ou encontro",
+    "rule": "\"Un rendez-vous\" é qualquer compromisso com hora marcada (médico, trabalho, amigos)."
+  },
+  {
+    "q": "Como se diz \"São nove e meia\" em francês?",
+    "opts": [
+      "Il est neuf heures et demie.",
+      "Il est neuf heures et quart.",
+      "Il est neuf heures moins demie.",
+      "Il est neuf et trente."
+    ],
+    "a": "Il est neuf heures et demie.",
+    "rule": "\":30\" diz-se \"et demie\" (no modo 12h) ou \"trente\" (no modo 24h: neuf heures trente)."
+  },
+  {
+    "q": "Complete a frase de rotina: \"Le matin, je ___ lève à sept heures.\"",
+    "opts": [
+      "me",
+      "te",
+      "se",
+      "nous"
+    ],
+    "a": "me",
+    "rule": "\"Se lever\" é um verbo pronominal: Je me lève, tu te lèves, il se lève."
+  },
+  {
+    "q": "O que significa a expressão \"faire la grasse matinée\"?",
+    "opts": [
+      "Dormir até tarde pela manhã",
+      "Tomar um café da manhã gorduroso",
+      "Acordar às cinco da manhã",
+      "Trabalhar no domingo"
+    ],
+    "a": "Dormir até tarde pela manhã",
+    "rule": "\"Faire la grasse matinée\" é ficar na cama até mais tarde nos dias de folga!"
+  },
+  {
+    "q": "Na estação de trem, o painel mostra 15h20. Como isso é anunciado em francês?",
+    "opts": [
+      "Quinze heures vingt",
+      "Trois heures moins vingt",
+      "Cinquante heures vingt",
+      "Quinze et vingt minutes"
+    ],
+    "a": "Quinze heures vingt",
+    "rule": "Basta dizer o número da hora + \"heures\" + o número dos minutos: quinze heures vingt."
+  }
+];
+let pracIdx = 0, pracScore = 0, pracStreak = 0, pracAnswered = false;
+
+function buildPractice() {
+  if (pracIdx >= QUIZ.length) { showResult(); return; }
+  const q = QUIZ[pracIdx];
+  document.getElementById('prac-bar').style.width = (pracIdx / QUIZ.length * 100) + '%';
+  document.getElementById('practice-area').innerHTML = `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
+      <div class="text-xs font-black text-slate-400 mb-3 uppercase tracking-wider">Questão ${pracIdx + 1} de ${QUIZ.length}</div>
+      <p class="font-black text-navy text-base mb-5 leading-relaxed">${q.q}</p>
+      <div class="grid grid-cols-1 gap-3" id="opts"></div>
+      <div id="prac-feedback" class="hidden mt-4 p-3.5 rounded-xl text-sm font-bold"></div>
+    </div>`;
+  const opts = document.getElementById('opts');
+  [...q.opts].sort(() => Math.random() - 0.5).forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-blue-400 hover:bg-blue-50 transition-all';
+    btn.textContent = o;
+    btn.onclick = () => answerQ(o, btn, q);
+    opts.appendChild(btn);
+  });
+  pracAnswered = false;
+}
+
+function answerQ(ans, btn, q) {
+  if (pracAnswered) return;
+  pracAnswered = true;
+  const correct = ans === q.a;
+  document.querySelectorAll('#opts button').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.a) b.className = 'w-full text-left border-2 border-emerald-500 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-800';
+  });
+  if (!correct) btn.className = 'w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if (correct) { pracScore++; pracStreak++; } else { pracStreak = 0; }
+  document.getElementById('prac-score').innerHTML = `${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 ' + pracStreak;
+  const fb = document.getElementById('prac-feedback');
+  fb.classList.remove('hidden');
+  fb.className = `mt-4 p-3.5 rounded-xl text-sm font-bold ${correct ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'}`;
+  fb.innerHTML = `${correct ? '✅ Très bien !' : '❌ Quase lá:'} <span class="font-normal">${q.rule}</span>`;
+  pracIdx++;
+  setTimeout(buildPractice, 1800);
+}
+
+function showResult() {
+  document.getElementById('prac-bar').style.width = '100%';
+  const goodThresh = Math.ceil(QUIZ.length * 0.75), okThresh = Math.ceil(QUIZ.length * 0.5);
+  document.getElementById('result-msg').textContent = `Você acertou ${pracScore} de ${QUIZ.length} questões.${pracScore >= goodThresh ? ' Magnifique ! 🌟' : pracScore >= okThresh ? ' Muito bom progresso!' : ' Continue praticando!'}`;
+  document.getElementById('result-emoji').textContent = pracScore >= goodThresh ? '🏆' : pracScore >= okThresh ? '🎉' : '💪';
+  document.getElementById('result-title').textContent = pracScore >= goodThresh ? 'Magnifique !' : pracScore >= okThresh ? 'Très bien !' : 'Continue assim!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection('practice');
+  if (typeof Store !== 'undefined') Store.addXP(50);
+}
+
+function restartPractice() {
+  pracIdx = 0; pracScore = 0; pracStreak = 0;
+  document.getElementById('prac-score').innerHTML = `0<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 0';
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── 7. SPEAK ─────────────────────────────────────────────────────────────────
+const SPEAK_DATA = [
+  {
+    "text": "Excusez-moi, quelle heure est-il ?",
+    "pt": "Com licença, que horas são?",
+    "phon": "[eks-kü-zê MUÁ, kél ŒR é-TIL?]"
+  },
+  {
+    "text": "Il est huit heures et quart.",
+    "pt": "São oito e quinze (8h15).",
+    "phon": "[i-lé uí-TŒR ê KÁR]"
+  },
+  {
+    "text": "Il est neuf heures et demie.",
+    "pt": "São nove e meia (9h30).",
+    "phon": "[i-lé nœ-VŒR ê dã-MI]"
+  },
+  {
+    "text": "Il est dix heures moins le quart.",
+    "pt": "São quinze para as dez (9h45).",
+    "phon": "[i-lé di-ZŒR muã lã KÁR]"
+  },
+  {
+    "text": "À midi, je déjeune avec mes collègues.",
+    "pt": "Ao meio-dia, eu almoço com meus colegas.",
+    "phon": "[a mi-DI, jã de-JŒN a-VÉK mê kô-LÉG]"
+  },
+  {
+    "text": "La semaine, je me lève à sept heures du matin.",
+    "pt": "Durante a semana, eu me levanto às sete da manhã.",
+    "phon": "[la sã-MÉN, jã mã LÉV a sé-TŒR dü ma-TÃ]"
+  },
+  {
+    "text": "J'ai un rendez-vous à quatorze heures trente.",
+    "pt": "Tenho um compromisso às 14h30.",
+    "phon": "[jê ãn rãn-dê-VU a ka-tór-ZŒR TRÃT]"
+  },
+  {
+    "text": "Le soir, je me couche vers vingt-trois heures.",
+    "pt": "À noite, vou dormir por volta das 23h.",
+    "phon": "[lã SUAR, jã mã KUCH vér vãn-truá-ZŒR]"
+  }
+];
+let speakDone = new Set();
+
+function buildSpeak() {
+  const grid = document.getElementById('speak-grid');
+  SPEAK_DATA.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-blue-300 transition-colors';
+    div.innerHTML = `
+      <button type="button" onclick="speak(SPEAK_DATA[${i}].text)" class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <div class="flex-1 min-w-0">
+        <p class="text-navy font-black text-sm leading-relaxed">${s.text}</p>
+        <span class="block text-xs text-blue-600 font-bold mt-0.5">${s.phon}</span>
+        <span class="block text-xs text-slate-500 mt-0.5">🇧🇷 ${s.pt}</span>
+      </div>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-blue-600" onchange="markSpeak(${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Feito</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+
+function markSpeak(i, cb) {
+  if (cb.checked) speakDone.add(i); else speakDone.delete(i);
+  if (speakDone.size === SPEAK_DATA.length) markSection('speak');
+}
+
+// ── 8. HOMEWORK ──────────────────────────────────────────────────────────────
+const WO1_DATA = [
+  {
+    "s": "Excusez-moi quelle heure est-il",
+    "w": [
+      "Excusez-moi",
+      "quelle",
+      "heure",
+      "est-il"
+    ],
+    "pt": "Com licença, que horas são?"
+  },
+  {
+    "s": "Il est huit heures et demie du matin",
+    "w": [
+      "Il",
+      "est",
+      "huit",
+      "heures",
+      "et",
+      "demie",
+      "du",
+      "matin"
+    ],
+    "pt": "São oito e meia da manhã"
+  },
+  {
+    "s": "Je me lève à sept heures pile",
+    "w": [
+      "Je",
+      "me",
+      "lève",
+      "à",
+      "sept",
+      "heures",
+      "pile"
+    ],
+    "pt": "Eu me levanto às sete horas em ponto"
+  }
+];
+function hwShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const wo1 = WO1_DATA.map(d => ({ ans: [], bank: hwShuffle(d.w), orig: d.w }));
+function wo1Render() {
+  const c = document.getElementById('wo1-container');
+  c.innerHTML = '';
+  WO1_DATA.forEach((d, si) => {
+    const st = wo1[si];
+    const box = document.createElement('div');
+    box.className = 'border border-slate-200 rounded-xl p-4 space-y-2 bg-slate-50/50';
+    box.innerHTML = `
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-black text-blue-600 uppercase tracking-wider">Frase ${si + 1}</p>
+        <p class="text-xs font-bold text-slate-500">🇧🇷 "${d.pt}"</p>
+      </div>
+      <div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="flex gap-2">
+        <button type="button" onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Verificar ✓</button>
+        <button type="button" onclick="wo1Reset(${si})" class="bg-slate-200 text-slate-700 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Recomeçar ↺</button>
+      </div>
+      <p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p>`;
+    c.appendChild(box);
+  });
+}
+function wo1Move(fromBank, si, wi) {
+  const st = wo1[si];
+  if (fromBank) st.ans.push(st.bank.splice(wi, 1)[0]);
+  else st.bank.push(st.ans.splice(wi, 1)[0]);
+  wo1Render();
+}
+function wo1Check(si) {
+  const st = wo1[si];
+  const fb = document.getElementById('wo1-fb-' + si);
+  const ok = st.ans.join(' ').toLowerCase() === WO1_DATA[si].s.toLowerCase();
+  fb.className = 'text-xs font-bold ' + (ok ? 'text-emerald-600' : 'text-red-500');
+  fb.textContent = ok ? '✅ Parfait ! Frase correta!' : '❌ Tente novamente! Resposta: ' + WO1_DATA[si].s;
+  fb.classList.remove('hidden');
+}
+function wo1Reset(si) {
+  wo1[si].bank = hwShuffle(WO1_DATA[si].orig);
+  wo1[si].ans = [];
+  wo1Render();
+}
 wo1Render();
 
-const MP1=[{l:'et quart 🕒',r:'quarter past (:15)'},{l:'et demie 🕧',r:'half past (:30)'},{l:'moins le quart 🕓',r:'quarter to (:45)'},{l:'midi ☀️',r:'noon'},{l:'minuit 🌙',r:'midnight'},];
-function mpShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const mp1R=mpShuffle(MP1.map((p,i)=>({label:p.r,pid:i})));
-let mp1SelL=null;const mp1Done=new Set();
-function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
-function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
-function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+const MP1 = [
+  {
+    "l": "Il est midi ☀️",
+    "r": "É meio-dia (12h00)"
+  },
+  {
+    "l": "Il est minuit 🌙",
+    "r": "É meia-noite (00h00)"
+  },
+  {
+    "l": "Et quart 🕒",
+    "r": "E quinze (:15)"
+  },
+  {
+    "l": "Et demie 🕤",
+    "r": "E meia (:30)"
+  },
+  {
+    "l": "Moins le quart 🕘",
+    "r": "Quinze para as... (:45)"
+  }
+];
+const mp1R = hwShuffle(MP1.map((p, i) => ({ label: p.r, pid: i })));
+let mp1SelL = null;
+const mp1Done = new Set();
+function mp1Render() {
+  document.getElementById('mp1-left').innerHTML = MP1.map((p, i) =>
+    `<button type="button" onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i) ? 'matched' : ''}" ${mp1Done.has(i) ? 'disabled' : ''}>${p.l}</button>`
+  ).join('');
+  document.getElementById('mp1-right').innerHTML = mp1R.map((p, i) =>
+    `<button type="button" onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid) ? 'matched' : ''}" ${mp1Done.has(p.pid) ? 'disabled' : ''}>${p.label}</button>`
+  ).join('');
+}
+function mp1ClickL(i) {
+  if (mp1Done.has(i)) return;
+  mp1SelL = i;
+  document.querySelectorAll('#mp1-left .mp-btn').forEach((b, j) => b.classList.toggle('selected', j === i && !mp1Done.has(j)));
+}
+function mp1ClickR(ri) {
+  if (mp1SelL === null) return;
+  const item = mp1R[ri];
+  if (item.pid === mp1SelL) {
+    mp1Done.add(mp1SelL);
+    mp1SelL = null;
+    mp1Render();
+    if (mp1Done.size === MP1.length) document.getElementById('mp1-done-msg').classList.remove('hidden');
+  } else {
+    [document.getElementById('mp1R-' + ri), document.getElementById('mp1L-' + mp1SelL)].forEach(b => {
+      if (b) { b.classList.add('wrong-flash'); setTimeout(() => b.classList.remove('wrong-flash'), 700); }
+    });
+    mp1SelL = null;
+    document.querySelectorAll('#mp1-left .mp-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
 mp1Render();
 
-const FILL1=[
-  {before:'Quelle',blank:'heure',after:'est-il? (hour)',ans:'heure'},
-  {before:'Il est trois heures et',blank:'demie',after:'(3:30 — half past)',ans:'demie'},
-  {before:'Il est midi et',blank:'quart',after:'(12:15 — quarter past)',ans:'quart'},
-  {before:'Je me lève à sept heures du',blank:'matin',after:'(in the morning)',ans:'matin'},
-  {before:'Désolé, je suis en',blank:'retard',after:'! (late)',ans:'retard'},
+const FILL1 = [
+  {
+    "before": "Il",
+    "after": "trois heures. (São — singular em francês!)",
+    "ans": "est"
+  },
+  {
+    "before": "Il est huit heures et",
+    "after": ". (8h30 — e meia)",
+    "ans": "demie"
+  },
+  {
+    "before": "Je déjeune à",
+    "after": ". (meio-dia)",
+    "ans": "midi"
+  },
+  {
+    "before": "Le matin, je",
+    "after": "lève à sept heures. (pronome de Je)",
+    "ans": "me"
+  },
+  {
+    "before": "À quelle",
+    "after": "part le train ? (hora)",
+    "ans": "heure"
+  }
 ];
-const fc=document.getElementById('fill1-container');
-FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`${f.before?`<span>${f.before}</span>`:''}  <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;fc.appendChild(d);});
-function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+const fc = document.getElementById('fill1-container');
+FILL1.forEach((f, i) => {
+  const d = document.createElement('p');
+  d.className = 'text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-xl';
+  d.innerHTML = `<span class="text-blue-600 font-black">${i + 1}.</span> ${f.before ? `<span>${f.before}</span>` : ''} <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="..."/> <span>${f.after}</span>`;
+  fc.appendChild(d);
+});
+function checkFill1() {
+  let okCount = 0;
+  FILL1.forEach((f, i) => {
+    const inp = document.getElementById('fill1-' + i);
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = f.ans.toLowerCase().replace(/’/g, "'");
+    const ok = val === ans;
+    if (ok) okCount++;
+    inp.classList.remove('ok', 'err');
+    inp.classList.add(ok ? 'ok' : 'err');
+  });
+  const fb = document.getElementById('fill1-fb');
+  fb.classList.remove('hidden');
+  fb.className = 'mt-2 text-xs font-black ' + (okCount === FILL1.length ? 'text-emerald-600' : 'text-blue-700');
+  fb.textContent = okCount === FILL1.length
+    ? '✅ Todas as lacunas corretas! Très bien !'
+    : `${okCount}/${FILL1.length} corretas. Respostas esperadas: ${FILL1.map((f, idx) => `(${idx + 1}) ${f.ans}`).join(' · ')}`;
+}
 
-function submitHomework(){
+function submitHomework() {
   markSection('homework');
-  if(typeof Store!=='undefined')Store.addXP(80);
-  spawnXP('+100 XP');
-  document.getElementById('hw-done').classList.remove('hidden');
-  const btn=document.querySelector('[onclick="submitHomework()"]');
-  btn.textContent='🎉 Homework Complete! +100 XP — Bravo!';
-  btn.disabled=true;
-  const a=document.createElement('a');
-  a.href='fr_aula_09.html';
-  a.className='block text-center mt-3 bg-white border-2 border-blue-300 text-blue-700 font-black py-3 rounded-2xl hover:bg-blue-50 transition-all text-sm';
-  a.textContent='Leçon 9 — La Météo →';
-  btn.insertAdjacentElement('afterend',a);
+  saveFrCompleted();
+  if (typeof Store !== 'undefined') Store.addXP(55);
+  spawnXP('+75 XP');
+  const btn = document.getElementById('btn-submit-hw');
+  if (btn) {
+    btn.textContent = '✓ Lição Concluída! (+75 XP) — Magnifique !';
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+  }
+  const doneBox = document.getElementById('hw-done-box');
+  if (doneBox) doneBox.classList.remove('hidden');
 }
 </script>
+<script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/fr_aula_08-folha.pdf"></script>
 </body>
 </html>

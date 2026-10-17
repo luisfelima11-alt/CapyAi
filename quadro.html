@@ -217,6 +217,7 @@ html,body{height:100%;overscroll-behavior:none}
           <option value="interview">💼 Entrevista</option>
           <option value="med">🩺 Medical English</option>
           <option value="fr">🥐 Français</option>
+          <option value="turkish">🧿 Türkçe</option>
           <option value="intermediate">🚀 Intermediate</option>
           <option value="base">💬 Inglês Base</option>
         </select>
@@ -1585,6 +1586,8 @@ const COURSE_RANGES = {
   med:          { nome: '🩺 Medical English', ini: 801, fim: 816 },
   fr:           { nome: '🥐 Français', ini: 201, fim: 212 },
   frances:      { nome: '🥐 Français', ini: 201, fim: 212 },
+  tr:           { nome: '🧿 Türkçe', ini: 301, fim: 336 },
+  turkish:      { nome: '🧿 Türkçe', ini: 301, fim: 336 },
   intermediate: { nome: '🚀 Intermediate', ini: 401, fim: 440 },
   base:         { nome: '💬 Inglês Base', ini: 1, fim: 112 },
   geral:        { nome: '💬 Inglês Base', ini: 1, fim: 112 },
@@ -1662,6 +1665,7 @@ async function abrirModalBiblioteca() {
     : (SALA === 'med') ? 'med'
     : (SALA === 'interview') ? 'interview'
     : (SALA === 'frances') ? 'fr'
+    : (SALA === 'turkish') ? 'turkish'
     : (SALA === 'intermediate') ? 'intermediate'
     : 'base';
 

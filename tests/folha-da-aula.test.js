@@ -9,8 +9,8 @@ const RAIZ = path.join(__dirname, '..');
 const PASTA = path.join(RAIZ, 'assets', 'pdf');
 const pdfs = fs.readdirSync(PASTA).filter(f => f.endsWith('-folha.pdf'));
 
-test('existe folha para os cursos em uso (GPS Tronic, Agro, Intermediate, Entrevista)', () => {
-    for (const fam of ['gpstronic_aula', 'agro_aula', 'intermediate_aula', 'interview_aula']) {
+test('existe folha para os cursos em uso (GPS Tronic, Agro, Intermediate, Entrevista, Francês)', () => {
+    for (const fam of ['gpstronic_aula', 'agro_aula', 'intermediate_aula', 'interview_aula', 'fr_aula']) {
         const aulas = fs.readdirSync(RAIZ).filter(f => new RegExp(`^${fam}_\\d+\\.html$`).test(f));
         for (const aula of aulas) {
             assert.ok(pdfs.includes(aula.replace('.html', '-folha.pdf')), `${aula} sem folha em PDF`);
@@ -37,7 +37,8 @@ test('cada PDF tem uma página só', () => {
 
 test('a página de cada curso lista as folhas logo abaixo de "Todas as aulas"', () => {
     const hubs = { gpstronic_aula: 'classes_gpstronic.html', agro_aula: 'classes_agro.html',
-        intermediate_aula: 'classes_intermediate.html', interview_aula: 'classes_interview.html' };
+        intermediate_aula: 'classes_intermediate.html', interview_aula: 'classes_interview.html',
+        fr_aula: 'classes_fr.html' };
     for (const [fam, hub] of Object.entries(hubs)) {
         const html = fs.readFileSync(path.join(RAIZ, hub), 'utf8');
         const nav = html.indexOf('</nav>', html.indexOf('<!-- SEO:indice-aulas -->'));

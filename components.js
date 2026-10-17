@@ -627,6 +627,7 @@ const Components = {
     // lesson (homework tab, and the writing tab of conversation lessons).
     // Free plan: 1 correction/day. Pro/Super: unlimited.
     autoInjectWritingCoach() {
+        if (window.SELF_STUDY || document.querySelector('script[src*="self-study.js"]')) return;
         const targets = [];
         const hw = document.querySelector('#tab-homework');
         if (hw) {
@@ -640,7 +641,7 @@ const Components = {
         const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         targets.forEach((ta, idx) => {
-            if (ta.dataset.yaraCoach) return; // guard double-injection
+            if (ta.dataset.yaraCoach || ta.dataset.selfStudyReady) return; // guard double-injection
             ta.dataset.yaraCoach = '1';
 
             const wrap = document.createElement('div');
@@ -686,13 +687,14 @@ const Components = {
                 try {
                     const lessonTitle = (window.YARA_WIDGET && window.YARA_WIDGET.lessonTitle) || document.title;
                     const course = (window.YARA_WIDGET && window.YARA_WIDGET.course) || 'english';
+                    const lang = (window.YARA_WIDGET && window.YARA_WIDGET.lang) || 'en';
                     const taskDesc = ta.getAttribute('placeholder') || 'free writing';
                     const userId = (typeof Store !== 'undefined' && Store.state && Store.state.userId) || undefined;
 
                     const r = await fetch('/api/correct-writing', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId, text, lessonTitle, course, task: taskDesc })
+                        body: JSON.stringify({ userId, text, lang, lessonTitle, course, task: taskDesc })
                     });
                     const d = await r.json();
                     if (!r.ok || d.error) throw new Error(d.error || 'Erro na correção');

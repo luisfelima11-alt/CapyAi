@@ -3,46 +3,48 @@
 <head>
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Le Passé Composé em francês — Lição 12 | Capy English</title>
-<meta name="description" content="Aprenda Le Passé Composé em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
+<title>Le Passé Composé (Falando do Passado com Avoir e Être) — Lição 12 de Francês | Capy English</title>
+<meta name="description" content="Aprenda Le Passé Composé (Falando do Passado com Avoir e Être) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
 <link rel="canonical" href="https://www.capyenglish.com.br/fr_aula_12.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
 <style>
 *{font-family:'Plus Jakarta Sans',sans-serif}
-@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
 @keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
-.float{animation:floatUp 3s ease-in-out infinite}
-.fade-in{animation:fadeIn .4s ease both}
 .xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
-.flip-card{perspective:800px;min-height:120px;cursor:pointer}
-.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card{perspective:800px;min-height:132px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
-.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;flex-direction:column;gap:4px}
-.flip-front{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.flip-back{background:linear-gradient(135deg,#1e40af,#3730a3);transform:rotateY(180deg)}
-.tab-btn{position:relative;font-weight:700;transition:color .2s}
-.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#4f46e5);border-radius:99px;transition:width .25s}
-.tab-btn.active{color:#1d4ed8}
-.tab-btn.active::after{width:80%}
-.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
-.prog-dot.done{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
-.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
-.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}
-.opt-btn.correct{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important}
-.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
-.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#1d4ed8;background:#eff6ff}
-.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#2563eb,#4f46e5);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#1d4ed8;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.4rem .8rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#2563eb;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #cbd5e1;border-radius:1rem}
 .wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
-.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}.mp-btn.selected{border-color:#1d4ed8;background:#dbeafe}.mp-btn.matched{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
-.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:130px;text-align:center}.fill-inp:focus{border-color:#1d4ed8}.fill-inp.ok{border-color:#1d4ed8;background:#dbeafe;color:#1e3a8a}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
-.btn-blue{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;font-weight:900;border-radius:1rem;transition:all .15s}
-.btn-blue:hover{transform:scale(1.05)}.btn-blue:active{transform:scale(.95)}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.6rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.mp-btn.selected{border-color:#2563eb;background:#dbeafe}
+.mp-btn.matched{border-color:#10b981!important;background:#ecfdf5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #cbd5e1;border-radius:.75rem;padding:.35rem .8rem;font-size:.9rem;font-weight:700;transition:border .2s;outline:none;min-width:130px;text-align:center}
+.fill-inp:focus{border-color:#2563eb}
+.fill-inp.ok{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.dlg-playing{ring:3px solid #3b82f6;transform:scale(1.01)}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -52,222 +54,351 @@
 <meta property="og:site_name" content="Capy Yara English"/>
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/fr_aula_12.html"/>
-<meta property="og:title" content="Le Passé Composé em francês — Lição 12 | Capy English"/>
-<meta property="og:description" content="Aprenda Le Passé Composé em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
+<meta property="og:title" content="Le Passé Composé (Falando do Passado com Avoir e Être) — Lição 12 de Francês | Capy English"/>
+<meta property="og:description" content="Aprenda Le Passé Composé (Falando do Passado com Avoir e Être) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Le Passé Composé em francês — Lição 12 | Capy English"/>
-<meta name="twitter:description" content="Aprenda Le Passé Composé em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
+<meta name="twitter:title" content="Le Passé Composé (Falando do Passado com Avoir e Être) — Lição 12 de Francês | Capy English"/>
+<meta name="twitter:description" content="Aprenda Le Passé Composé (Falando do Passado com Avoir e Être) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 12 da Capy English, com a Yara."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
 <main class="md:pl-24 pb-32 md:pb-10">
 
-  <!-- Hero -->
-  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
-    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
-      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">⏪</span>
-      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🇫🇷</span>
-      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">📖</span>
-      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">⏳</span>
-      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🐾</span>
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-blue-900 to-indigo-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:10%;left:3%;animation-delay:0s">⏪</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:60%;left:7%;animation-delay:.7s">🗼</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:20%;left:15%;animation-delay:1.3s">🎬</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:70%;left:22%;animation-delay:.4s">✈️</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:8%;right:22%;animation-delay:.9s">🥐</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:55%;right:15%;animation-delay:1.6s">📸</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:30%;right:5%;animation-delay:.2s">🏆</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:75%;right:28%;animation-delay:1s">🐾</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="fr_aula_11.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">← Leçon 11</a>
+      <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">🇫🇷 Curso de Francês</a>
+      <span class="inline-flex items-center gap-1 bg-amber-400/20 border border-amber-300/40 text-amber-200 text-sm font-bold px-3 py-1 rounded-full">🏆 Lição Final do Nível A1!</span>
     </div>
-    <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <div class="flex items-center gap-3 flex-wrap mb-5">
-        <a href="fr_aula_11.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Leçon 11</a>
-        <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Cours de Français</a>
-        <span class="inline-flex items-center gap-1 bg-white/10 border border-white/20 text-white/60 text-sm font-bold px-3 py-1.5 rounded-full">🏆 Dernière Leçon!</span>
-      </div>
-      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🇫🇷 Leçon 12 · Débutant</div>
-      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Le Passé Composé<br><span class="text-blue-300">Talking About the Past</span></h1>
-      <p class="text-white/70 mb-6 max-w-lg">Qu'est-ce que tu as fait hier? Learn to talk about the past in French — the passé composé with avoir and être.</p>
-      <div class="flex items-center gap-2 flex-wrap">
-        <div id="hero-dots" class="flex gap-2"></div>
-        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
-      </div>
+    <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1 text-sm font-black text-blue-200 mb-3">🇫🇷 Leçon 12 · Português → Francês</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">⏪ Le Passé Composé — <br><span class="text-blue-300">Falando do Passado com Avoir e Être</span></h1>
+    <p class="text-white/75 text-base mb-5 max-w-xl">Feche o curso com chave de ouro! Aprenda a contar histórias, viagens e o que você fez ontem ou nas férias usando o Passé Composé com "avoir" e "être".</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Passado (Passé Composé)</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Avoir vs. Être</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">A1 → A2</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/60 text-xs font-bold" id="section-label">0 / 8 etapas concluídas</span>
     </div>
   </div>
+</div>
 
-  <!-- Tabs -->
-  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
-    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
-      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbes</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
     </div>
   </div>
+</div>
 
-  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
-    <!-- VOCAB -->
-    <div id="tab-vocab" class="fade-in">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">⏪ Past Time &amp; Participles</h2><p class="text-slate-500 text-sm">Flip each card — front = English, back = French. Time markers first, then past forms!</p></div>
-      <h3 class="font-black text-navy mb-3 text-sm uppercase tracking-widest text-blue-600">⏳ Time Markers</h3>
-      <div id="vocab-time" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6"></div>
-      <h3 class="font-black text-navy mb-3 text-sm uppercase tracking-widest text-blue-600">📖 Past Forms (Passé Composé)</h3>
-      <div id="vocab-past" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6"></div>
-      <button onclick="markSection('vocab')" class="btn-blue px-8 py-3">✓ I know the past forms! +20 XP</button>
+<!-- VOCAB TAB -->
+<div id="tab-vocab" class="tab-content fade-in">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h2 class="text-2xl font-black text-navy">📚 Vocabulário Essencial</h2>
+      <p class="text-slate-500 text-sm mt-1">Clique no card para virar (ou abrir em tela cheia) e no botão 🔊 para ouvir a pronúncia francesa.</p>
     </div>
-
-    <!-- EXPRESSIONS -->
-    <div id="tab-expressions" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">How to ask and answer about the past in French. Click to expand.</p></div>
-      <div id="expr-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('expressions')" class="btn-blue px-8 py-3">✓ Got the expressions! +20 XP</button>
+    <div class="text-right">
+      <div class="text-2xl font-black text-blue-600" id="vocab-count">0</div>
+      <div class="text-xs text-slate-400 font-bold">de 18 vistos</div>
     </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="vocab-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6" id="vocab-grid"></div>
+  <button onclick="markSectionBtn(this,'vocab')" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Dominei o vocabulário! (+20 XP)
+  </button>
+</div>
 
-    <!-- GRAMMAR -->
-    <div id="tab-grammar" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">The passé composé = helper verb (avoir/être) + past participle.</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 mb-4 text-white">
-        <p class="text-xs font-black uppercase tracking-widest mb-3 text-blue-100">Passé Composé Formula</p>
-        <div class="text-lg font-black mb-2">[avoir / être au présent] + [participe passé]</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-bold mt-3">
-          <div class="bg-white/20 rounded-xl p-3">
-            <p class="font-black text-xs mb-1 text-blue-100">With AVOIR (most verbs)</p>
-            <p>j'ai mangé → I ate</p>
-            <p>tu as parlé → you spoke</p>
-            <p>il a fini → he finished</p>
-          </div>
-          <div class="bg-white/20 rounded-xl p-3">
-            <p class="font-black text-xs mb-1 text-blue-100">With ÊTRE (movement)</p>
-            <p>je suis allé(e) → I went</p>
-            <p>il est venu → he came</p>
-            <p>elle est partie → she left</p>
-          </div>
-        </div>
-      </div>
-      <div class="space-y-3 mb-6">
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>1️⃣ Passé composé with AVOIR + regular participles</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Most verbs use <strong>avoir</strong> (present) + the past participle:</p>
-            <p>✅ <strong>j'ai</strong> mangé, <strong>tu as</strong> parlé, <strong>il a</strong> fini</p>
-            <p>✅ Regular <strong>-er</strong> verbs → <strong>-é</strong>: parler → parlé, manger → mangé</p>
-            <p>✅ Regular <strong>-ir</strong> verbs → <strong>-i</strong>: finir → fini, choisir → choisi</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 Avoir present: j'ai, tu as, il/elle a, nous avons, vous avez, ils ont.</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⭐ Common IRREGULAR participles</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Some very common verbs have irregular past participles — memorise these!</p>
-            <p>✅ faire → <strong>fait</strong> (done/made) · voir → <strong>vu</strong> (seen)</p>
-            <p>✅ avoir → <strong>eu</strong> (had) · être → <strong>été</strong> (been)</p>
-            <p>✅ prendre → <strong>pris</strong> (taken) · boire → <strong>bu</strong> (drunk)</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 j'ai fait, j'ai vu, j'ai eu, j'ai été, j'ai pris, j'ai bu.</p>
+<!-- VERBS TAB -->
+<div id="tab-verbs" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔧 Verbos em Ação</h2>
+  <p class="text-slate-500 text-sm mb-6">Conjugação com guia de pronúncia para brasileiros e frases reais com áudio.</p>
+  <div class="space-y-8" id="verbs-grid"></div>
+  <div class="mt-8 bg-white border-2 border-blue-200 rounded-2xl p-6">
+    <h3 class="font-black text-navy text-lg mb-4">✏️ Mini-Quiz: Complete com a forma verbal correta</h3>
+    <div class="space-y-4" id="verbs-quiz"></div>
+    <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+      Verificar Respostas
+    </button>
+    <div id="verbs-quiz-result" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
+  </div>
+</div>
+
+<!-- EXPRESSIONS TAB -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">💬 Expressões Prontas para Conversar</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique em cada expressão para ver quando usar, exemplo real e ouvir a pronúncia.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+  <button onclick="markSectionBtn(this,'expressions')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Pratiquei as expressões! (+20 XP)
+  </button>
+</div>
+
+<!-- PATTERNS TAB (internal id="tab-grammar" for compatibility) -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🧩 Padrões do Francês</h2>
+  <p class="text-slate-500 text-sm mb-6">Os blocos lógicos da língua para você montar frases com segurança, sem decoreba.</p>
+  <div class="space-y-4">
+
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <div class="font-black text-navy">A Fórmula do Passé Composé: [Auxiliar no Presente] + [Particípio]</div>
+            <div class="text-blue-700 text-sm font-semibold">Parece que tem duas palavras ("J'ai mangé"), mas traduzimos como o nosso passado simples ("Eu comi")!</div>
           </div>
         </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>🚶 Passé composé with ÊTRE (movement verbs)</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">A few verbs of movement use <strong>être</strong> (not avoir):</p>
-            <p>✅ aller → <strong>je suis allé(e)</strong> (I went)</p>
-            <p>✅ venir → <strong>il est venu</strong> (he came)</p>
-            <p>✅ partir → <strong>elle est partie</strong> (she left)</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 With être, the participle AGREES: allé (m) / allée (f) / allés / allées. Mnemonic: a few movement verbs use être; most verbs use avoir.</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>⏳ Time markers signal the past</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">These words tell you the action is finished — use the passé composé:</p>
-            <p>✅ <strong>hier</strong> (yesterday), <strong>avant-hier</strong> (the day before yesterday)</p>
-            <p>✅ <strong>la semaine dernière</strong> (last week), <strong>le mois dernier</strong> (last month)</p>
-            <p>✅ <strong>déjà</strong> (already): "J'ai déjà mangé." (I already ate.)</p>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g1-arrow">expand_more</span>
+      </button>
+      <div id="g1" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Verbos terminados em -ER trocam -er por -É (mesmo som de -er [ê]!): parler → parlé, manger → mangé, visiter → visité.<br/>
+        ✅ Verbos regulares em -IR trocam -ir por -I: finir → fini, choisir → choisi.<br/>
+        ✅ Principais irregulares: faire → fait, voir → vu, prendre → pris, boire → bu, lire → lu.<br/>
+        ❌ "Je mangé hier" — nunca esqueça o verbo auxiliar no meio ("J'ai mangé")!
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Dica de pronúncia de ouro: "manger" (infinitivo) e "mangé" (particípio) têm EXATAMENTE o mesmo som [mãn-JÊ]! Quem diferencia é o "J'ai" antes!
           </div>
         </div>
       </div>
-      <button onclick="markSection('grammar')" class="btn-blue px-8 py-3">✓ Grammar understood! +20 XP</button>
     </div>
 
-    <!-- DIALOGUE -->
-    <div id="tab-dialogue" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">⏪ Yara tells Leo about her weekend. Read aloud!</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">⏪ It's Monday. Leo asks Yara what she did over the weekend — listen for the passé composé with avoir and être!</div>
-      <div class="space-y-3 mb-6">
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Salut Yara! <strong class="text-blue-700">Qu'est-ce que tu as fait</strong> le week-end?</p><p class="text-xs text-slate-400 mt-1 italic">Hi Yara! What did you do this weekend?</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Samedi, <strong class="text-blue-700">je suis allée</strong> au cinéma avec une amie. <strong class="text-blue-700">J'ai vu</strong> un super film!</p><p class="text-xs text-slate-400 mt-1 italic">Saturday, I went to the cinema with a friend. I saw a great film!</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Super! Et après le film, <strong class="text-blue-700">qu'est-ce que vous avez fait</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Great! And after the film, what did you do?</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm"><strong class="text-blue-700">J'ai mangé</strong> une crêpe au restaurant et <strong class="text-blue-700">j'ai bu</strong> un chocolat chaud. C'était délicieux!</p><p class="text-xs text-slate-400 mt-1 italic">I ate a crêpe at the restaurant and I drank a hot chocolate. It was delicious!</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍🦱 Leo</p><p class="text-slate-700 text-sm">Et dimanche? <strong class="text-blue-700">Tu es restée</strong> à la maison?</p><p class="text-xs text-slate-400 mt-1 italic">And Sunday? Did you stay home?</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Non! <strong class="text-blue-700">Je suis allée</strong> au parc et <strong class="text-blue-700">j'ai fait</strong> du sport. C'était super!</p><p class="text-xs text-slate-400 mt-1 italic">No! I went to the park and I did some sport. It was great!</p></div>
+    <div class="rounded-2xl border-2 border-indigo-200 bg-indigo-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <div class="font-black text-navy">Quando Usar AVOIR vs. Quando Usar ÊTRE (A Casa do Être)</div>
+            <div class="text-indigo-700 text-sm font-semibold">A maioria usa AVOIR; os verbos de deslocamento (ir, vir, chegar, partir, ficar) usam ÊTRE!</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g2-arrow">expand_more</span>
+      </button>
+      <div id="g2" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Com AVOIR (não muda no feminino/plural): Elle a mangé, nous avons visité, ils ont vu.<br/>
+        ✅ Com ÊTRE (concorda com quem faz a ação!): Il est allé / Elle est allée (+e) / Ils sont allés (+s).<br/>
+        ✅ Principais com ÊTRE: aller (allé), venir (venu), arriver (arrivé), partir (parti), entrer (entré), sortir (sorti), rester (resté), rentrer (rentré).<br/>
+        ❌ "J'ai allé au cinéma" — o verbo ALLER usa sempre ÊTRE: "Je suis allé(e) au cinéma"!
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Na fala, "allé", "allée", "allés" e "allées" pronunciam-se TODOS iguais [a-LÊ]! A diferença aparece na escrita.
+          </div>
+        </div>
       </div>
-      <button onclick="markSection('dialogue')" class="btn-blue px-8 py-3">✓ I read the dialogue! +20 XP</button>
     </div>
 
-    <!-- PRACTICE -->
-    <div id="tab-practice" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questions on the passé composé — avoir, être &amp; participles!</p></div>
-      <div id="quiz-container" class="space-y-5 mb-6"></div>
-      <div id="quiz-result" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-center mb-4">
-        <div class="text-4xl mb-2">🏆</div>
-        <p class="font-black text-blue-700 text-lg" id="quiz-score-text"></p>
-        <p class="text-blue-600 text-sm mt-1">+50 XP earned! Félicitations — you finished the course!</p>
-      </div>
-      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full btn-blue py-4 text-base">✓ Check Answers +50 XP</button>
-    </div>
-
-    <!-- SPEAK -->
-    <div id="tab-speak" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Read these past-tense sentences aloud — link "j'ai" smoothly into the participle!</p></div>
-      <div id="speak-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('speak')" class="btn-blue px-8 py-3">✓ All phrases practiced! +20 XP</button>
-    </div>
-
-    <!-- HOMEWORK -->
-    <div id="tab-homework" class="fade-in hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Leçon 12 — Le Passé Composé</p></div>
-          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <div class="font-black text-navy">A Negação no Passé Composé: "Ne... pas" Abraça o Auxiliar!</div>
+            <div class="text-blue-700 text-sm font-semibold">Je n'ai pas mangé / Je ne suis pas allé(e)</div>
+          </div>
         </div>
-      </div>
-      <div class="space-y-5">
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Arrange the words to form correct passé composé sentences.</p></div></div>
-          <div id="wo1-container" class="space-y-6"></div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g3-arrow">expand_more</span>
+      </button>
+      <div id="g3" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Com avoir: Je n'ai pas compris (Eu não entendi) · Il n'a pas travaillé hier.<br/>
+        ✅ Com être: Je ne suis pas sorti(e) hier soir (Eu não saí ontem à noite).<br/>
+        ❌ "Je n'ai mangé pas" — o "pas" vem ANTES do particípio passado!
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Fórmula da negativa: Sujeito + NE + (ai / suis) + PAS + particípio!
+          </div>
         </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match Infinitive → Participle</h3><p class="text-slate-500 text-sm mt-1">Match each French infinitive to its past participle.</p></div></div>
-          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
-          <p id="mp1-done-msg" class="hidden mt-3 text-blue-600 font-black text-sm">✅ All pairs matched! Parfait!</p>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Write the correct participle or helper verb (avoir/être).</p></div></div>
-          <div class="space-y-4" id="fill1-container"></div>
-          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️ — Final Challenge!</h3><p class="text-slate-500 text-sm mt-1">Write 4–6 sentences about yesterday or last weekend: what you ate, where you went, what you saw or did. Use the passé composé!</p></div></div>
-          <textarea rows="6" placeholder="Hier, j'ai mangé... Je suis allé(e) au... J'ai vu... La semaine dernière, j'ai fait..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
-        </div>
-      </div>
-      <button onclick="submitHomework()" class="mt-6 w-full btn-blue py-4 text-base">🏆 Submit Final Homework +100 XP</button>
-      <div id="hw-done" class="hidden mt-4 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center">
-        <div class="text-4xl mb-2">🎉</div>
-        <p class="font-black text-blue-700 text-lg">Félicitations! You completed the course!</p>
-        <p class="text-blue-600 text-sm mt-1">+100 XP — Vous êtes fantastique!</p>
       </div>
     </div>
   </div>
+  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Entendi o padrão! (+20 XP)
+  </button>
+</div>
+
+<!-- DIALOGUE TAB -->
+<div id="tab-dialogue" class="tab-content fade-in hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-2xl font-black text-navy mb-1">🎭 Contando Como Foi o Fim de Semana em Paris</h2>
+      <p class="text-slate-500 text-sm">🗼 Na segunda-feira de manhã, Yara conta para Camille tudo o que fez no fim de semana.</p>
+    </div>
+    <button id="btn-play-dialogue" onclick="playFullDialogue()" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm px-5 py-2.5 rounded-2xl shadow hover:scale-105 active:scale-95 transition-all">
+      🔊 Ouvir diálogo completo
+    </button>
+  </div>
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+  <button onclick="markSectionBtn(this,'dialogue')" class="mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li e ouvi o diálogo! (+20 XP)
+  </button>
+</div>
+
+<!-- PRACTICE TAB -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-black text-navy">✏️ Quiz Interativo</h2>
+      <p class="text-slate-500 text-sm mt-1" id="prac-subtitle">10 questões comentadas em português — Le Passé Composé</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-black text-blue-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">acertos</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-black text-amber-500" id="prac-streak">🔥 0</div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">sequência</div>
+      </div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="prac-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div id="practice-area"></div>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Très bien !</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Refazer</button>
+        <button onclick="document.querySelector('[data-tab=\'speak\']').click();document.getElementById('result-overlay').classList.add('hidden')" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Treinar Fala →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAK TAB -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🗣️ Pronúncia &amp; Repetição em Voz Alta</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique no botão ▶️ para ouvir a frase em francês, leia a dica fonética e marque como concluída após repetir em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+</div>
+
+<!-- HOMEWORK TAB -->
+<div id="tab-homework" class="tab-content fade-in hidden">
+  <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-3xl p-6 mb-6 text-white">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-4xl">📝</span>
+      <div>
+        <h2 class="text-2xl font-black">Devoir de Maison (Homework)</h2>
+        <p class="text-white/80 text-sm">Leçon 12 — Le Passé Composé (Falando do Passado com Avoir e Être)</p>
+      </div>
+    </div>
+    <p class="text-white/75 text-sm">Complete os 4 exercícios interativos abaixo para consolidar a lição e ganhar +75 XP!</p>
+  </div>
+
+  <!-- 1. Word Order -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">1</span>
+      <div>
+        <p class="font-black text-navy text-sm">Ordem das Palavras (Mettez dans l&#39;ordre)</p>
+        <p class="text-slate-500 text-xs">Toque nas palavras para montar as frases em francês na ordem correta.</p>
+      </div>
+    </div>
+    <div id="wo1-container" class="space-y-4"></div>
+  </div>
+
+  <!-- 2. Match Pairs -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">2</span>
+      <div>
+        <p class="font-black text-navy text-sm">Conecte os Pares (Francês ↔ Português)</p>
+        <p class="text-slate-500 text-xs">Clique em um item da esquerda e depois na tradução correspondente à direita.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div id="mp1-left" class="space-y-2"></div>
+      <div id="mp1-right" class="space-y-2"></div>
+    </div>
+    <p id="mp1-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados! Magnifique !</p>
+  </div>
+
+  <!-- 3. Fill in the Blank -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">3</span>
+      <div>
+        <p class="font-black text-navy text-sm">Complete as Lacunas</p>
+        <p class="text-slate-500 text-xs">Preencha cada espaço com a palavra francesa adequada.</p>
+      </div>
+    </div>
+    <div class="space-y-3" id="fill1-container"></div>
+    <button onclick="checkFill1()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl transition-all text-xs">
+      Verificar Lacunas ✓
+    </button>
+    <p id="fill1-fb" class="hidden mt-2 text-xs font-black"></p>
+  </div>
+
+  <!-- 4. Free Writing -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">4</span>
+      <div>
+        <p class="font-black text-navy text-sm">Produção Escrita em Francês ✍️</p>
+        <p class="text-slate-500 text-xs">Conte em francês (4 a 6 frases) como foi o seu último fim de semana ou uma viagem especial! Use pelo menos 3 verbos no Passé Composé ("J'ai mangé", "J'ai vu", "J'ai fait", "Je suis allé(e)") e diga o que achou ("C'était super / magnifique !").</p>
+      </div>
+    </div>
+    <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-blue-500 focus:outline-none resize-none" placeholder="Le week-end dernier, j&#39;ai passé deux jours magnifiques ! Samedi, je suis allé(e) au parc et j&#39;ai pris un café avec mes amis. Le soir, j&#39;ai mangé au restaurant et j&#39;ai vu un bon film. Dimanche, je suis resté(e) avec ma famille. C&#39;était super !"></textarea>
+    <button id="btn-submit-hw" onclick="submitHomework()" class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black px-6 py-3.5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all w-full shadow-md">
+      🚀 Concluir Lição 12 e Receber +75 XP
+    </button>
+    <div id="hw-done-box" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+      <p class="font-black text-emerald-700 text-base">🎉 Félicitations ! Lição 12 concluída com sucesso! (+75 XP)</p>
+      <div class="flex flex-wrap justify-center gap-3 mt-3">
+        <a href="classes_fr.html" class="bg-white border-2 border-slate-200 text-navy font-black text-xs px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all">← Voltar ao Curso de Francês</a>
+        <a href="learn_fr.html" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-5 py-2.5 rounded-xl hover:scale-105 transition-all">Ir para a Prática Diária de Francês →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 </main>
 <div id="mobile-nav-placeholder"></div>
+
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="components.js?v=skins1"></script>
-<script>window.YARA_WIDGET={lang:'fr',lessonTitle:'Le Passé Composé',lessonNum:12};</script>
+<script>window.YARA_WIDGET={lang:'fr',lessonTitle:"Le Passé Composé",lessonNum:12};</script>
 <script src="tts-fr.js?v=c52d7db"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
@@ -277,126 +408,1145 @@
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
-const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
-function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
-buildHeroDots();
-function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
-function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
-const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
-document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
 
-const TIME=[
-  ['yesterday','hier [ee-AIR]'],
-  ['the day before yesterday','avant-hier [ah-von-tee-AIR]'],
-  ['last week','la semaine dernière [lah suh-MEN dair-NYAIR]'],
-  ['last month','le mois dernier [luh MWAH dair-NYAY]'],
-  ['already','déjà [day-ZHAH]'],
-  ['finished / done','fini [fee-NEE]'],
-];
-const PAST=[
-  ['I ate','j\'ai mangé [zhay mon-ZHAY]'],
-  ['I did / made','j\'ai fait [zhay FAY]'],
-  ['I saw','j\'ai vu [zhay VU]'],
-  ['I spoke','j\'ai parlé [zhay par-LAY]'],
-  ['I went','je suis allé(e) [zhuh swee-zah-LAY]'],
-  ['I came','je suis venu(e) [zhuh swee vuh-NU]'],
-  ['I had','j\'ai eu [zhay U]'],
-  ['I was / have been','j\'ai été [zhay ay-TAY]'],
-];
-const tg=document.getElementById('vocab-time');
-TIME.forEach(([en,fr])=>{const frC=fr.replace(/\s*\[.*?\]/g,'').trim().replace(/'/g,"&#39;");const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-xs text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${fr}</p><button onclick="event.stopPropagation();speak('${frC}')" class="mt-2 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));tg.appendChild(d);});
-const pg=document.getElementById('vocab-past');
-PAST.forEach(([en,fr])=>{const frC=fr.replace(/\s*\[.*?\]/g,'').trim().replace(/'/g,"&#39;");const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-xs text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-xs text-center">${fr}</p><button onclick="event.stopPropagation();speak('${frC}')" class="mt-2 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));pg.appendChild(d);});
+const LESSON_NUM = 12;
+const TOTAL_SECTIONS = 8;
+let sectionsDone = 0;
+const doneSections = new Set();
 
-const EXPRS=[
-  {phrase:'Qu\'est-ce que tu as fait hier?',meaning:'What did you do yesterday?',example:'"Qu\'est-ce que tu as fait hier?" — "J\'ai travaillé."',use:'THE key question to ask about the past. Qu\'est-ce que = what. Tu as fait = you did (passé composé of faire). Swap hier for "le week-end", "la semaine dernière", etc.'},
-  {phrase:'J\'ai mangé au restaurant.',meaning:'I ate at the restaurant.',example:'"Hier soir, j\'ai mangé au restaurant avec des amis."',use:'J\'ai mangé = I ate (avoir + mangé). A perfect model sentence: helper verb j\'ai + past participle mangé. Most verbs follow exactly this pattern.'},
-  {phrase:'Je suis allé(e) au cinéma.',meaning:'I went to the cinema.',example:'"Samedi, je suis allé(e) au cinéma. J\'ai vu un bon film."',use:'Aller uses ÊTRE, not avoir! Je suis allé (man) / je suis allée (woman) — the participle agrees with the speaker. A few movement verbs work like this.'},
-  {phrase:'C\'était super!',meaning:'It was great!',example:'"On a fait une promenade. C\'était super!"',use:'A handy reaction phrase for the past. C\'était = it was. Pair it with super, génial, délicieux, magnifique. Great for finishing a story about what you did.'},
-];
-const exList=document.getElementById('expr-list');
-EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-blue-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-blue-50 rounded-xl p-3 italic">"${e.example}"</p><p>${e.use}</p></div>`;exList.appendChild(d);});
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  const lb = document.getElementById('section-label');
+  if (!c) return;
+  c.innerHTML = Array.from({ length: TOTAL_SECTIONS }, (_, i) =>
+    `<div class="prog-dot ${i < sectionsDone ? 'bg-gradient-to-r from-blue-400 to-indigo-300' : 'bg-white/20'}"></div>`
+  ).join('');
+  if (lb) lb.textContent = `${sectionsDone} / ${TOTAL_SECTIONS} etapas concluídas`;
+}
+buildSectionDots();
 
-function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
+function spawnXP(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = text;
+  el.style.cssText = `left:${40 + Math.random() * 20}%;top:${30 + Math.random() * 30}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
 
-const QUIZ=[
-  {q:'Which helper verb does "manger" use in the passé composé?',opts:['avoir (j\'ai mangé)','être (je suis mangé)','aller','faire'],ans:0},
-  {q:'What is the past participle of "faire"?',opts:['fait','faire','fais','fini'],ans:0},
-  {q:'What is the past participle of "voir"?',opts:['vu','voir','vois','vé'],ans:0},
-  {q:'Complete: "Hier, j\'___ parlé avec Marie."',opts:['ai','es','suis','as'],ans:0},
-  {q:'Which verb uses ÊTRE in the passé composé?',opts:['aller (je suis allé)','manger','parler','finir'],ans:0},
-  {q:'A woman says "I went". Which is correct?',opts:['Je suis allée','Je suis allé','J\'ai allé','Je vais'],ans:0},
-  {q:'What is the past participle of a regular -ir verb like "finir"?',opts:['fini','finé','finu','finir'],ans:0},
-  {q:'"J\'ai vu un bon film." means:',opts:['I saw a good film.','I see a good film.','I will see a film.','I make a film.'],ans:0},
-  {q:'Complete: "Elle ___ venue à la fête." (être verb)',opts:['est','a','as','ai'],ans:0},
-  {q:'What is the past participle of "boire"?',opts:['bu','boire','bois','bé'],ans:0},
-];
-let quizSubmitted=false;
-const qc=document.getElementById('quiz-container');
-QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-blue-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
-const selected={};
-function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#1d4ed8';btn.style.background='#eff6ff';selected[qi]=parseInt(btn.dataset.oi);}
-function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
+function saveFrCompleted() {
+  try {
+    const KEY = 'capyFrCompleted';
+    const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!arr.includes(LESSON_NUM)) {
+      arr.push(LESSON_NUM);
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+    if (typeof Store !== 'undefined' && typeof Store.completeLesson === 'function') {
+      Store.completeLesson(200 + LESSON_NUM, 'fr');
+    }
+  } catch (e) {}
+}
 
-const SPEAK=[
-  'Hier, j\'ai mangé une crêpe.',
-  'Je suis allé(e) au parc.',
-  'Qu\'est-ce que tu as fait?',
-  'J\'ai vu un bon film.',
-  'La semaine dernière, j\'ai fait du sport.',
-  'C\'était super! On a beaucoup ri.',
-];
-const sl=document.getElementById('speak-list');
-SPEAK.forEach((s,i)=>{const sC=s.replace(/'/g,"&#39;");const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><div class="flex items-center gap-3 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all hover:border-blue-200"><button onclick="event.stopPropagation();speak('${sC}')" class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-base transition-all" title="Ouvir">🔊</button><label for="sp${i}" class="cursor-pointer flex-1 flex items-center gap-3 min-w-0"><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl flex-shrink-0">☐</span></label></div>`;sl.appendChild(d);});
-function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+function markSection(name) {
+  if (!doneSections.has(name)) {
+    doneSections.add(name);
+    if (sectionsDone < TOTAL_SECTIONS) sectionsDone++;
+    buildSectionDots();
+    if (typeof Store !== 'undefined') Store.addXP(20);
+    spawnXP('+20 XP');
+  }
+  if (name === 'homework') saveFrCompleted();
+}
 
-const WO1_DATA=[
-  {s:'Hier j\'ai mangé au restaurant',w:['Hier','j\'ai','mangé','au','restaurant']},
-  {s:'Je suis allée au cinéma samedi',w:['Je','suis','allée','au','cinéma','samedi']},
-  {s:'La semaine dernière j\'ai vu un bon film',w:['La','semaine','dernière','j\'ai','vu','un','bon','film']},
+function markSectionBtn(btn, name) {
+  btn.disabled = true;
+  btn.textContent = '✓ Concluído! (+20 XP)';
+  btn.classList.add('opacity-75');
+  markSection(name);
+}
+
+const TABS = ['vocab', 'verbs', 'expressions', 'grammar', 'dialogue', 'practice', 'speak', 'homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── 1. VOCABULARY ────────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  {
+    "en": "Hier",
+    "pt": "Ontem",
+    "phon": "[i-ÉR]",
+    "ex": "Hier, j'ai dîné dans un bistrot.",
+    "emoji": "⏮️",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Avant-hier",
+    "pt": "Anteontem",
+    "phon": "[a-vãn-ti-ÉR]",
+    "ex": "Avant-hier, nous avons visité le Louvre.",
+    "emoji": "📅",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "La semaine dernière",
+    "pt": "Na semana passada",
+    "phon": "[la sã-MÉN dér-NIÉR]",
+    "ex": "La semaine dernière, j'ai beaucoup travaillé.",
+    "emoji": "🗓️",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Le mois dernier / L'année dernière",
+    "pt": "No mês passado / No ano passado",
+    "phon": "[lã MUÁ dér-NIÊ / la-NÊ dér-NIÉR]",
+    "ex": "L'année dernière, je suis allé(e) en France.",
+    "emoji": "✈️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "J'ai parlé / J'ai mangé",
+    "pt": "Eu falei / Eu comi (verbos em -ER → -É)",
+    "phon": "[jê par-LÊ / jê mãn-JÊ]",
+    "ex": "Hier, j'ai parlé français avec Léo.",
+    "emoji": "🗣️",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "J'ai visité / J'ai acheté",
+    "pt": "Eu visitei / Eu comprei",
+    "phon": "[jê vi-zi-TÊ / jê a-chã-TÊ]",
+    "ex": "J'ai visité la Tour Eiffel et j'ai acheté des souvenirs.",
+    "emoji": "🗼",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "J'ai fini / J'ai choisi",
+    "pt": "Eu terminei / Eu escolhi (verbos em -IR → -I)",
+    "phon": "[jê fi-NI / jê chua-ZI]",
+    "ex": "J'ai fini le cours de français !",
+    "emoji": "✅",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "J'ai fait",
+    "pt": "Eu fiz (particípio de faire)",
+    "phon": "[jê FÉ]",
+    "ex": "Qu'est-ce que tu as fait ce week-end ?",
+    "emoji": "🛠️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "J'ai vu",
+    "pt": "Eu vi / assisti (particípio de voir)",
+    "phon": "[jê VÜ]",
+    "ex": "J'ai vu un très bon film français.",
+    "emoji": "🎬",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "J'ai pris",
+    "pt": "Eu tomei / peguei (particípio de prendre)",
+    "phon": "[jê PRI]",
+    "ex": "J'ai pris un café et le métro.",
+    "emoji": "☕",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "J'ai bu / J'ai lu",
+    "pt": "Eu bebi (boire) / Eu li (lire)",
+    "phon": "[jê BÜ / jê LÜ]",
+    "ex": "J'ai bu du jus et j'ai lu un livre.",
+    "emoji": "📖",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "J'ai eu / J'ai été",
+    "pt": "Eu tive (avoir) / Eu fui ou estive (être)",
+    "phon": "[jê Ü / jê e-TÊ]",
+    "ex": "J'ai eu beaucoup de chance !",
+    "emoji": "🍀",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Je suis allé(e)",
+    "pt": "Eu fui (aller usa ÊTRE!)",
+    "phon": "[jã suí za-LÊ]",
+    "ex": "Samedi, je suis allé(e) au cinéma.",
+    "emoji": "🚶",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Je suis arrivé(e) / parti(e)",
+    "pt": "Eu cheguei / Eu parti (usam ÊTRE!)",
+    "phon": "[jã suí za-ri-VÊ / par-TI]",
+    "ex": "Je suis arrivé(e) à Paris vendredi.",
+    "emoji": "🛬",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Je suis venu(e) / rentré(e)",
+    "pt": "Eu vim / Eu voltei para casa (usam ÊTRE!)",
+    "phon": "[jã suí vã-NÜ / rãn-TRÊ]",
+    "ex": "Elle est rentrée tard hier soir.",
+    "emoji": "🏠",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Je suis resté(e)",
+    "pt": "Eu fiquei / permaneci (usa ÊTRE!)",
+    "phon": "[jã suí res-TÊ]",
+    "ex": "Dimanche, je suis resté(e) à la maison.",
+    "emoji": "🛋️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "C'était magnifique !",
+    "pt": "Foi magnífico / Estava incrível!",
+    "phon": "[se-TÉ ma-nhi-FÍK!]",
+    "ex": "J'ai adoré le voyage, c'était magnifique !",
+    "emoji": "🤩",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "D'abord / Ensuite / Enfin",
+    "pt": "Primeiro / Depois / Finalmente",
+    "phon": "[da-BÓR / ãn-SUÍT / ãn-FÃ]",
+    "ex": "D'abord j'ai déjeuné, ensuite j'ai visité le musée.",
+    "emoji": "🔗",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  }
 ];
-function hwShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle(d.w),orig:d.w}));
-function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
-function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
-function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-blue-600':'text-red-500');fb.textContent=ok?'✅ Correct! Parfait!':'❌ Try again! Answer: '+WO1_DATA[si].s;fb.classList.remove('hidden');}
-function wo1Reset(si){wo1[si].bank=hwShuffle(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+let vocabDone = new Set();
+function buildVocab() {
+  const grid = document.getElementById('vocab-grid');
+  VOCAB_DATA.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card h-32';
+    card.innerHTML = `
+      <div class="flip-card-inner h-full">
+        <div class="flip-front h-full border-2 ${v.bg} rounded-2xl flex flex-col items-center justify-center p-2.5 gap-1 relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center transition-all" title="Ouvir pronúncia">🔊</button>
+          <span class="text-2xl">${v.emoji}</span>
+          <span class="font-black text-navy text-sm text-center leading-tight">${v.en}</span>
+          <span class="w-2 h-2 rounded-full ${v.dot}"></span>
+        </div>
+        <div class="flip-back h-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-2.5 text-center relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].ex || VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs flex items-center justify-center transition-all" title="Ouvir exemplo">🔊</button>
+          <span class="font-black text-white text-xs leading-snug">${v.pt}<br><span class="text-blue-200 font-bold text-[10px]">${v.phon}</span>${v.ex ? `<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"${v.ex}"</em>` : ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) {
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent = vocabDone.size;
+        document.getElementById('vocab-bar').style.width = (vocabDone.size / VOCAB_DATA.length * 100) + '%';
+        if (vocabDone.size === VOCAB_DATA.length) markSection('vocab');
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+buildVocab();
+
+// ── 2. VERBS ─────────────────────────────────────────────────────────────────
+const VERBS_DATA = [
+  {
+    "verb": "PASSÉ COMPOSÉ COM AVOIR (90% dos verbos!)",
+    "emoji": "⚡",
+    "forms": [
+      {
+        "label": "J'ai",
+        "form": "j'ai mangé / j'ai fait [jê mãn-JÊ / jê FÉ]",
+        "example": "Hier, j'ai mangé une crêpe."
+      },
+      {
+        "label": "Tu as",
+        "form": "tu as parlé / tu as vu [tü a par-LÊ / VÜ]",
+        "example": "Qu'est-ce que tu as fait hier ?"
+      },
+      {
+        "label": "Il / Elle / On a",
+        "form": "il/elle/on a pris [a PRI]",
+        "example": "On a pris le train pour Lyon."
+      },
+      {
+        "label": "Nous avons",
+        "form": "nous avons visité [nu za-VÔN vi-zi-TÊ]",
+        "example": "Nous avons visité Notre-Dame."
+      },
+      {
+        "label": "Vous avez",
+        "form": "vous avez choisi [vu za-VÊ chua-ZI]",
+        "example": "Vous avez passé un bon week-end ?"
+      },
+      {
+        "label": "Ils / Elles ont",
+        "form": "ils/elles ont adoré [il zôn ta-dô-RÊ]",
+        "example": "Ils ont adoré le Brésil."
+      }
+    ]
+  },
+  {
+    "verb": "PASSÉ COMPOSÉ COM ÊTRE (Verbos de Movimento/Deslocamento)",
+    "emoji": "🚶",
+    "forms": [
+      {
+        "label": "Je suis",
+        "form": "je suis allé(e) [jã suí za-LÊ]",
+        "example": "Je suis allé(e) à Paris."
+      },
+      {
+        "label": "Tu es",
+        "form": "tu es arrivé(e) [tü é za-ri-VÊ]",
+        "example": "À quelle heure tu es arrivé(e) ?"
+      },
+      {
+        "label": "Il / Elle est",
+        "form": "il est parti / elle est partie",
+        "example": "Elle est partie ce matin."
+      },
+      {
+        "label": "Nous sommes",
+        "form": "nous sommes restés(es)",
+        "example": "Nous sommes restés trois jours."
+      },
+      {
+        "label": "Vous êtes",
+        "form": "vous êtes venu(e)(s)",
+        "example": "Vous êtes venus en avion ?"
+      },
+      {
+        "label": "Ils / Elles sont",
+        "form": "ils sont allés / elles sont allées",
+        "example": "Elles sont allées à la plage."
+      }
+    ]
+  },
+  {
+    "verb": "PARTICÍPIOS IRREGULARES ESSENCIAIS",
+    "emoji": "💎",
+    "forms": [
+      {
+        "label": "faire → fait",
+        "form": "j'ai fait [jê FÉ]",
+        "example": "J'ai fait du sport ce matin."
+      },
+      {
+        "label": "voir → vu",
+        "form": "j'ai vu [jê VÜ]",
+        "example": "J'ai vu la Tour Eiffel !"
+      },
+      {
+        "label": "prendre → pris",
+        "form": "j'ai pris [jê PRI]",
+        "example": "J'ai pris beaucoup de photos."
+      },
+      {
+        "label": "boire → bu / lire → lu",
+        "form": "j'ai bu / j'ai lu",
+        "example": "J'ai bu un café et j'ai lu le journal."
+      }
+    ]
+  }
+];
+const VERBS_QUIZ_DATA = [
+  {
+    "q": "Hier, j'___ mangé au restaurant. (auxiliar avoir — je)",
+    "ans": "ai"
+  },
+  {
+    "q": "Qu'est-ce que tu as ___ ce week-end ? (particípio de faire)",
+    "ans": "fait"
+  },
+  {
+    "q": "Samedi, je ___ allé(e) au cinéma. (auxiliar être — je)",
+    "ans": "suis"
+  },
+  {
+    "q": "J'ai ___ un très bon film hier soir. (particípio de voir)",
+    "ans": "vu"
+  },
+  {
+    "q": "Nous avons ___ le métro jusqu'au Louvre. (particípio de prendre)",
+    "ans": "pris"
+  }
+];
+
+function buildVerbs() {
+  const grid = document.getElementById('verbs-grid');
+  VERBS_DATA.forEach((v, vi) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-blue-200 rounded-2xl overflow-hidden';
+    div.innerHTML = `
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center gap-3">
+        <span class="text-3xl">${v.emoji}</span>
+        <span class="text-xl md:text-2xl font-black text-white">${v.verb}</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-blue-50">
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Pessoa</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma &amp; Pronúncia</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Exemplo em Francês</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${v.forms.map((f, fi) => `
+              <tr class="${fi % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+                <td class="px-4 py-2.5 font-black text-blue-600 text-xs whitespace-nowrap">${f.label}</td>
+                <td class="px-4 py-2.5 font-black text-navy text-xs whitespace-nowrap">${f.form}</td>
+                <td class="px-4 py-2.5 text-slate-600 text-xs flex items-center justify-between gap-2">
+                  <span>${f.example}</span>
+                  <button type="button" onclick="speak(VERBS_DATA[${vi}].forms[${fi}].example)" class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center" title="Ouvir exemplo">🔊</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    grid.appendChild(div);
+  });
+
+  const qWrap = document.getElementById('verbs-quiz');
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-sm font-semibold text-navy mb-2">${i + 1}. ${q.q}</p>
+        <input id="vq-fr-${i}" data-ans="${q.ans}" type="text" placeholder="Digite a resposta em francês..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
+        <p id="vq-fr-fb${i}" class="text-xs font-black mt-1 hidden"></p>
+      </div>`;
+    qWrap.appendChild(div);
+  });
+}
+buildVerbs();
+
+function checkVerbsQuiz() {
+  let correct = 0;
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const inp = document.getElementById('vq-fr-' + i);
+    const fb = document.getElementById('vq-fr-fb' + i);
+    if (!inp || !fb) return;
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = q.ans.toLowerCase().replace(/’/g, "'");
+    fb.classList.remove('hidden');
+    if (val === ans) {
+      correct++;
+      fb.textContent = '✅ Très bien ! Resposta correta!';
+      fb.className = 'text-xs font-black mt-1 text-emerald-600';
+    } else {
+      fb.textContent = `❌ Resposta correta: ${q.ans}`;
+      fb.className = 'text-xs font-black mt-1 text-red-500';
+    }
+  });
+  const res = document.getElementById('verbs-quiz-result');
+  res.classList.remove('hidden');
+  if (correct >= 4) {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+    res.textContent = `🎉 ${correct}/${VERBS_QUIZ_DATA.length} acertos! Excelente trabalho!`;
+    markSection('verbs');
+  } else {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200';
+    res.textContent = `${correct}/${VERBS_QUIZ_DATA.length} acertos. Confira as respostas acima e tente novamente!`;
+  }
+}
+
+// ── 3. EXPRESSIONS ───────────────────────────────────────────────────────────
+const EXPR_DATA = [
+  {
+    "expr": "Qu'est-ce que tu as fait hier / ce week-end ?",
+    "pt": "O que você fez ontem / neste fim de semana?",
+    "emoji": "💬",
+    "usage": "A pergunta mais comum de segunda-feira na França ou ao reencontrar amigos!",
+    "example": "— Qu'est-ce que tu as fait ce week-end ? — Je suis allé à la plage et j'ai vu mes amis."
+  },
+  {
+    "expr": "C'était super ! / C'était magnifique !",
+    "pt": "Foi ótimo! / Foi magnífico!",
+    "emoji": "🤩",
+    "usage": "Enquanto o Passé Composé conta o que aconteceu (\"J'ai visité\"), \"C'était...\" (imparfait) dá sua opinião sobre como foi!",
+    "example": "Nous avons dîné sur un bateau sur la Seine. C'était magnifique !"
+  },
+  {
+    "expr": "J'ai passé une excellente journée !",
+    "pt": "Eu passei um dia excelente!",
+    "emoji": "🌟",
+    "usage": "Ótima frase para resumir um passeio ou viagem.",
+    "example": "Merci pour tout, j'ai passé une excellente journée avec vous !"
+  },
+  {
+    "expr": "D'abord... ensuite... enfin...",
+    "pt": "Primeiro... depois... finalmente...",
+    "emoji": "🔗",
+    "usage": "Os três conectores mágicos para organizar sua narrativa no passado como um nativo.",
+    "example": "D'abord, j'ai pris un café. Ensuite, j'ai visité le musée. Enfin, je suis rentré à l'hôtel."
+  },
+  {
+    "expr": "On a beaucoup ri / On s'est bien amusés !",
+    "pt": "A gente riu muito / A gente se divertiu muito!",
+    "emoji": "😄",
+    "usage": "Perfeito para fechar uma história sobre uma festa ou encontro com amigos.",
+    "example": "Hier soir, j'ai dîné avec Camille et Léo, on a beaucoup ri !"
+  },
+  {
+    "expr": "Je n'ai pas eu le temps.",
+    "pt": "Eu não tive tempo.",
+    "emoji": "⏱️",
+    "usage": "Veja a posição da negação no Passé Composé: \"ne... pas\" abraça o verbo auxiliar (\"ai\"): Je n'ai pas eu / Je n'ai pas vu.",
+    "example": "Pardon, je n'ai pas eu le temps de répondre hier."
+  }
+];
+let exprDone = new Set();
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPR_DATA.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'border-2 border-blue-200 bg-white rounded-2xl overflow-hidden cursor-pointer';
+    div.innerHTML = `
+      <div class="p-4 flex items-center gap-4" onclick="toggleExpr(${i})">
+        <span class="text-3xl">${e.emoji}</span>
+        <div class="flex-1 min-w-0">
+          <div class="font-black text-navy">${e.expr}</div>
+          <div class="text-blue-600 text-sm font-semibold">${e.pt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].expr)" class="w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir expressão">🔊</button>
+        <span class="material-symbols-outlined text-blue-400 transition-transform" id="expr-arrow-${i}">expand_more</span>
+      </div>
+      <div id="expr-body-${i}" class="hidden px-4 pb-4">
+        <div class="bg-blue-50 rounded-xl p-3.5 text-sm space-y-2">
+          <p><strong class="text-navy">Quando usar:</strong> ${e.usage}</p>
+          <p class="flex items-center justify-between gap-2"><span class="italic text-slate-700"><strong class="text-navy not-italic">Exemplo:</strong> "${e.example}"</span><button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].example)" class="flex-shrink-0 text-xs font-black bg-white border border-blue-200 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100">🔊 Ouvir</button></p>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function toggleExpr(i) {
+  const body = document.getElementById('expr-body-' + i);
+  const arrow = document.getElementById('expr-arrow-' + i);
+  body.classList.toggle('hidden');
+  arrow.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  exprDone.add(i);
+  if (exprDone.size === EXPR_DATA.length) markSection('expressions');
+}
+buildExpressions();
+
+// ── 4. PATTERNS ACCORDION ────────────────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  if (!el) return;
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ── 5. DIALOGUE ──────────────────────────────────────────────────────────────
+const DIALOGUE_LINES = [
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Salut Yara ! Tu as passé un bon week-end à Paris ?",
+    "pt": "Oi Yara! Você passou um bom fim de semana em Paris?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Salut Camille ! Oui, c'était magnifique ! J'ai fait beaucoup de choses.",
+    "pt": "Oi Camille! Sim, foi magnífico! Eu fiz muitas coisas."
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Raconte-moi ! Qu'est-ce que tu as fait samedi ?",
+    "pt": "Me conta! O que você fez no sábado?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Samedi matin, je suis allée au musée du Louvre et j'ai vu la Joconde !",
+    "pt": "No sábado de manhã, eu fui ao Museu do Louvre e vi a Mona Lisa!"
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Oh, génial ! Et après, où est-ce que tu as déjeuné ?",
+    "pt": "Oh, demais! E depois, onde você almoçou?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Ensuite, j'ai mangé une crêpe au fromage dans un petit bistrot et j'ai pris un café.",
+    "pt": "Depois, comi um crepe de queijo em um pequeno bistrô e tomei um café."
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Et hier soir, tu es sortie ?",
+    "pt": "E ontem à noite, você saiu?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Oui ! Dimanche soir, je suis montée à la Tour Eiffel avec Léo. J'ai pris plein de photos, c'était inoubliable !",
+    "pt": "Sim! Domingo à noite, subi na Torre Eiffel com o Léo. Tirei um monte de fotos, foi inesquecível!"
+  }
+];
+let dlgPlaying = false;
+
+function buildDialogue() {
+  const c = document.getElementById('dialogue-lines');
+  DIALOGUE_LINES.forEach((l, i) => {
+    const isYara = l.who === 'yara';
+    const div = document.createElement('div');
+    div.className = `flex ${isYara ? 'justify-start' : 'justify-end'} fade-in`;
+    div.innerHTML = `
+      <div id="dlg-bubble-${i}" class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all ${isYara ? 'bg-blue-50 border-2 border-blue-200 text-navy' : 'bg-navy text-white'}">
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <span class="text-xs font-black ${isYara ? 'text-blue-600' : 'text-blue-300'}">${isYara ? '🐾 ' : '🗣️ '}${l.speaker}</span>
+          <button type="button" onclick="speak(DIALOGUE_LINES[${i}].text)" class="w-7 h-7 rounded-full ${isYara ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-white/15 hover:bg-white/25 text-white'} text-xs flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir fala">🔊</button>
+        </div>
+        <p class="font-bold">${l.text}</p>
+        <span class="block text-xs mt-1 ${isYara ? 'text-slate-500' : 'text-blue-200/80'}">🇧🇷 ${l.pt}</span>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+buildDialogue();
+
+function playFullDialogue() {
+  if (!window.speechSynthesis) return;
+  const btn = document.getElementById('btn-play-dialogue');
+  if (dlgPlaying) {
+    speechSynthesis.cancel();
+    dlgPlaying = false;
+    btn.textContent = '🔊 Ouvir diálogo completo';
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    return;
+  }
+  dlgPlaying = true;
+  btn.textContent = '⏹️ Parar áudio';
+  let idx = 0;
+  function nextLine() {
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    if (!dlgPlaying || idx >= DIALOGUE_LINES.length) {
+      dlgPlaying = false;
+      btn.textContent = '🔊 Ouvir diálogo completo';
+      return;
+    }
+    const bubble = document.getElementById('dlg-bubble-' + idx);
+    if (bubble) bubble.classList.add('ring-4', 'ring-blue-400');
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(DIALOGUE_LINES[idx].text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    u.pitch = DIALOGUE_LINES[idx].who === 'yara' ? 1.08 : 0.98;
+    u.onend = () => { idx++; setTimeout(nextLine, 350); };
+    u.onerror = () => { dlgPlaying = false; btn.textContent = '🔊 Ouvir diálogo completo'; };
+    speechSynthesis.speak(u);
+  }
+  nextLine();
+}
+
+// ── 6. PRACTICE QUIZ ─────────────────────────────────────────────────────────
+const QUIZ = [
+  {
+    "q": "Como se diz \"Ontem eu comi um croissant\" em francês?",
+    "opts": [
+      "Hier, j'ai mangé un croissant.",
+      "Hier, je mangé un croissant.",
+      "Hier, je suis mangé un croissant.",
+      "Hier, je mange un croissant."
+    ],
+    "a": "Hier, j'ai mangé un croissant.",
+    "rule": "O Passé Composé de \"manger\" forma-se com o auxiliar avoir no presente (\"j'ai\") + o particípio \"mangé\"."
+  },
+  {
+    "q": "Qual verbo abaixo usa o auxiliar ÊTRE (\"je suis...\") no Passé Composé?",
+    "opts": [
+      "aller → je suis allé(e)",
+      "manger → je suis mangé",
+      "parler → je suis parlé",
+      "finir → je suis fini"
+    ],
+    "a": "aller → je suis allé(e)",
+    "rule": "Verbos de deslocamento como \"aller\", \"venir\", \"arriver\", \"partir\" e \"rester\" usam o auxiliar ÊTRE!"
+  },
+  {
+    "q": "Quais são os particípios passados corretos dos verbos irregulares \"faire\", \"voir\" e \"prendre\"?",
+    "opts": [
+      "fait / vu / pris",
+      "fairé / voiré / prendu",
+      "fais / vois / prends",
+      "fini / venu / parlé"
+    ],
+    "a": "fait / vu / pris",
+    "rule": "Faire → fait (\"j'ai fait\"), voir → vu (\"j'ai vu\"), prendre → pris (\"j'ai pris\")."
+  },
+  {
+    "q": "Uma mulher quer dizer \"Eu fui ao cinema ontem\". Como ela escreve corretamente em francês?",
+    "opts": [
+      "Je suis allée au cinéma hier.",
+      "J'ai allée au cinéma hier.",
+      "Je suis allé au cinéma hier.",
+      "Je vais allée au cinéma hier."
+    ],
+    "a": "Je suis allée au cinéma hier.",
+    "rule": "Com o auxiliar ÊTRE, o particípio concorda com o sujeito: masculino = je suis allé; feminino = je suis allée (+e)!"
+  },
+  {
+    "q": "Como se forma o particípio passado de TODOS os verbos terminados em \"-er\" (como parler, visiter, acheter)?",
+    "opts": [
+      "Troca-se \"-er\" por \"-é\" (parlé, visité, acheté)",
+      "Troca-se \"-er\" por \"-i\"",
+      "Troca-se \"-er\" por \"-u\"",
+      "Não muda nada"
+    ],
+    "a": "Troca-se \"-er\" por \"-é\" (parlé, visité, acheté)",
+    "rule": "100% dos verbos terminados em \"-er\" formam o particípio passado com \"-é\" [ê]!"
+  },
+  {
+    "q": "Como fica a frase \"J'ai compris\" na forma NEGATIVA (\"Eu não entendi\")?",
+    "opts": [
+      "Je n'ai pas compris.",
+      "Je n'ai compris pas.",
+      "Je pas ai compris.",
+      "Je ne compris pas."
+    ],
+    "a": "Je n'ai pas compris.",
+    "rule": "No Passé Composé, \"ne... pas\" envolve o verbo auxiliar: Je n'ai pas compris!"
+  },
+  {
+    "q": "O que significa a pergunta: \"Qu'est-ce que tu as fait ce week-end ?\"?",
+    "opts": [
+      "O que você fez neste fim de semana?",
+      "O que você vai fazer na próxima semana?",
+      "Como está o tempo neste fim de semana?",
+      "Que horas você acorda no fim de semana?"
+    ],
+    "a": "O que você fez neste fim de semana?",
+    "rule": "\"Qu'est-ce que tu as fait... ?\" = O que você fez...?"
+  },
+  {
+    "q": "Qual é o significado de \"C'était magnifique !\"?",
+    "opts": [
+      "Foi magnífico / Estava magnífico!",
+      "Será magnífico amanhã!",
+      "Eu tenho um amigo magnífico!",
+      "Eu vou ao museu!"
+    ],
+    "a": "Foi magnífico / Estava magnífico!",
+    "rule": "\"C'était...\" é a forma ideal para dar sua opinião sobre como foi uma experiência no passado."
+  },
+  {
+    "q": "Quais palavras significam \"Primeiro... depois... finalmente...\" para contar uma história?",
+    "opts": [
+      "D'abord... ensuite... enfin...",
+      "Hier... demain... midi...",
+      "Mon... ton... son...",
+      "Du... de la... des..."
+    ],
+    "a": "D'abord... ensuite... enfin...",
+    "rule": "D'abord (primeiro), ensuite (em seguida/depois) e enfin (finalmente) conectam as ações em sequência."
+  },
+  {
+    "q": "Complete: \"La semaine dernière, nous ___ visité le musée d'Orsay.\"",
+    "opts": [
+      "avons",
+      "sommes",
+      "avez",
+      "ont"
+    ],
+    "a": "avons",
+    "rule": "O verbo \"visiter\" usa o auxiliar avoir: nous avons visité."
+  }
+];
+let pracIdx = 0, pracScore = 0, pracStreak = 0, pracAnswered = false;
+
+function buildPractice() {
+  if (pracIdx >= QUIZ.length) { showResult(); return; }
+  const q = QUIZ[pracIdx];
+  document.getElementById('prac-bar').style.width = (pracIdx / QUIZ.length * 100) + '%';
+  document.getElementById('practice-area').innerHTML = `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
+      <div class="text-xs font-black text-slate-400 mb-3 uppercase tracking-wider">Questão ${pracIdx + 1} de ${QUIZ.length}</div>
+      <p class="font-black text-navy text-base mb-5 leading-relaxed">${q.q}</p>
+      <div class="grid grid-cols-1 gap-3" id="opts"></div>
+      <div id="prac-feedback" class="hidden mt-4 p-3.5 rounded-xl text-sm font-bold"></div>
+    </div>`;
+  const opts = document.getElementById('opts');
+  [...q.opts].sort(() => Math.random() - 0.5).forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-blue-400 hover:bg-blue-50 transition-all';
+    btn.textContent = o;
+    btn.onclick = () => answerQ(o, btn, q);
+    opts.appendChild(btn);
+  });
+  pracAnswered = false;
+}
+
+function answerQ(ans, btn, q) {
+  if (pracAnswered) return;
+  pracAnswered = true;
+  const correct = ans === q.a;
+  document.querySelectorAll('#opts button').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.a) b.className = 'w-full text-left border-2 border-emerald-500 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-800';
+  });
+  if (!correct) btn.className = 'w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if (correct) { pracScore++; pracStreak++; } else { pracStreak = 0; }
+  document.getElementById('prac-score').innerHTML = `${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 ' + pracStreak;
+  const fb = document.getElementById('prac-feedback');
+  fb.classList.remove('hidden');
+  fb.className = `mt-4 p-3.5 rounded-xl text-sm font-bold ${correct ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'}`;
+  fb.innerHTML = `${correct ? '✅ Très bien !' : '❌ Quase lá:'} <span class="font-normal">${q.rule}</span>`;
+  pracIdx++;
+  setTimeout(buildPractice, 1800);
+}
+
+function showResult() {
+  document.getElementById('prac-bar').style.width = '100%';
+  const goodThresh = Math.ceil(QUIZ.length * 0.75), okThresh = Math.ceil(QUIZ.length * 0.5);
+  document.getElementById('result-msg').textContent = `Você acertou ${pracScore} de ${QUIZ.length} questões.${pracScore >= goodThresh ? ' Magnifique ! 🌟' : pracScore >= okThresh ? ' Muito bom progresso!' : ' Continue praticando!'}`;
+  document.getElementById('result-emoji').textContent = pracScore >= goodThresh ? '🏆' : pracScore >= okThresh ? '🎉' : '💪';
+  document.getElementById('result-title').textContent = pracScore >= goodThresh ? 'Magnifique !' : pracScore >= okThresh ? 'Très bien !' : 'Continue assim!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection('practice');
+  if (typeof Store !== 'undefined') Store.addXP(50);
+}
+
+function restartPractice() {
+  pracIdx = 0; pracScore = 0; pracStreak = 0;
+  document.getElementById('prac-score').innerHTML = `0<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 0';
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── 7. SPEAK ─────────────────────────────────────────────────────────────────
+const SPEAK_DATA = [
+  {
+    "text": "Qu'est-ce que tu as fait ce week-end ?",
+    "pt": "O que você fez neste fim de semana?",
+    "phon": "[kés kã tü a FÉ sã ui-KÉND?]"
+  },
+  {
+    "text": "Hier, j'ai mangé une crêpe et j'ai bu un café.",
+    "pt": "Ontem eu comi um crepe e bebi um café.",
+    "phon": "[i-ÉR, jê mãn-JÊ ün KRÉP ê jê BÜ ãn ka-FÊ]"
+  },
+  {
+    "text": "Samedi, je suis allé(e) au musée du Louvre.",
+    "pt": "No sábado, eu fui ao Museu do Louvre.",
+    "phon": "[sam-DI, jã suí za-LÊ ô mü-ZÊ dü LUVR]"
+  },
+  {
+    "text": "J'ai vu la Tour Eiffel et j'ai pris beaucoup de photos !",
+    "pt": "Eu vi a Torre Eiffel e tirei muitas fotos!",
+    "phon": "[jê VÜ la tur ê-FÉL ê jê PRI bô-KU dã fô-TÔ!]"
+  },
+  {
+    "text": "D'abord nous avons déjeuné, ensuite nous sommes sortis.",
+    "pt": "Primeiro nós almoçamos, depois nós saímos.",
+    "phon": "[da-BÓR nu za-VÔN de-jœ-NÊ, ãn-SUÍT nu SÓM sór-TI]"
+  },
+  {
+    "text": "L'année dernière, elle est allée en France.",
+    "pt": "No ano passado, ela foi para a França.",
+    "phon": "[la-NÊ dér-NIÉR, él é ta-LÊ ãn FRÃS]"
+  },
+  {
+    "text": "Dimanche, je suis resté(e) à la maison et j'ai lu un livre.",
+    "pt": "No domingo, fiquei em casa e li um livro.",
+    "phon": "[di-MÃCH, jã suí res-TÊ a la mê-ZÔN ê jê LÜ ãn LIVR]"
+  },
+  {
+    "text": "J'ai fini les douze leçons de français ! C'était super !",
+    "pt": "Eu terminei as doze lições de francês! Foi ótimo!",
+    "phon": "[jê fi-NI lê DUZ lã-SÔN dã frãn-SÉ! se-TÉ sü-PÉR!]"
+  }
+];
+let speakDone = new Set();
+
+function buildSpeak() {
+  const grid = document.getElementById('speak-grid');
+  SPEAK_DATA.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-blue-300 transition-colors';
+    div.innerHTML = `
+      <button type="button" onclick="speak(SPEAK_DATA[${i}].text)" class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <div class="flex-1 min-w-0">
+        <p class="text-navy font-black text-sm leading-relaxed">${s.text}</p>
+        <span class="block text-xs text-blue-600 font-bold mt-0.5">${s.phon}</span>
+        <span class="block text-xs text-slate-500 mt-0.5">🇧🇷 ${s.pt}</span>
+      </div>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-blue-600" onchange="markSpeak(${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Feito</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+
+function markSpeak(i, cb) {
+  if (cb.checked) speakDone.add(i); else speakDone.delete(i);
+  if (speakDone.size === SPEAK_DATA.length) markSection('speak');
+}
+
+// ── 8. HOMEWORK ──────────────────────────────────────────────────────────────
+const WO1_DATA = [
+  {
+    "s": "Hier j'ai mangé au restaurant avec mes amis",
+    "w": [
+      "Hier",
+      "j'ai",
+      "mangé",
+      "au",
+      "restaurant",
+      "avec",
+      "mes",
+      "amis"
+    ],
+    "pt": "Ontem eu comi no restaurante com meus amigos"
+  },
+  {
+    "s": "Samedi je suis allée au musée du Louvre",
+    "w": [
+      "Samedi",
+      "je",
+      "suis",
+      "allée",
+      "au",
+      "musée",
+      "du",
+      "Louvre"
+    ],
+    "pt": "Sábado eu fui ao Museu do Louvre"
+  },
+  {
+    "s": "La semaine dernière j'ai vu un bon film",
+    "w": [
+      "La",
+      "semaine",
+      "dernière",
+      "j'ai",
+      "vu",
+      "un",
+      "bon",
+      "film"
+    ],
+    "pt": "Na semana passada eu vi um bom filme"
+  }
+];
+function hwShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const wo1 = WO1_DATA.map(d => ({ ans: [], bank: hwShuffle(d.w), orig: d.w }));
+function wo1Render() {
+  const c = document.getElementById('wo1-container');
+  c.innerHTML = '';
+  WO1_DATA.forEach((d, si) => {
+    const st = wo1[si];
+    const box = document.createElement('div');
+    box.className = 'border border-slate-200 rounded-xl p-4 space-y-2 bg-slate-50/50';
+    box.innerHTML = `
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-black text-blue-600 uppercase tracking-wider">Frase ${si + 1}</p>
+        <p class="text-xs font-bold text-slate-500">🇧🇷 "${d.pt}"</p>
+      </div>
+      <div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="flex gap-2">
+        <button type="button" onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Verificar ✓</button>
+        <button type="button" onclick="wo1Reset(${si})" class="bg-slate-200 text-slate-700 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Recomeçar ↺</button>
+      </div>
+      <p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p>`;
+    c.appendChild(box);
+  });
+}
+function wo1Move(fromBank, si, wi) {
+  const st = wo1[si];
+  if (fromBank) st.ans.push(st.bank.splice(wi, 1)[0]);
+  else st.bank.push(st.ans.splice(wi, 1)[0]);
+  wo1Render();
+}
+function wo1Check(si) {
+  const st = wo1[si];
+  const fb = document.getElementById('wo1-fb-' + si);
+  const ok = st.ans.join(' ').toLowerCase() === WO1_DATA[si].s.toLowerCase();
+  fb.className = 'text-xs font-bold ' + (ok ? 'text-emerald-600' : 'text-red-500');
+  fb.textContent = ok ? '✅ Parfait ! Frase correta!' : '❌ Tente novamente! Resposta: ' + WO1_DATA[si].s;
+  fb.classList.remove('hidden');
+}
+function wo1Reset(si) {
+  wo1[si].bank = hwShuffle(WO1_DATA[si].orig);
+  wo1[si].ans = [];
+  wo1Render();
+}
 wo1Render();
 
-const MP1=[{l:'manger →',r:'mangé'},{l:'faire →',r:'fait'},{l:'voir →',r:'vu'},{l:'avoir →',r:'eu'},{l:'être →',r:'été'},];
-function mpShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const mp1R=mpShuffle(MP1.map((p,i)=>({label:p.r,pid:i})));
-let mp1SelL=null;const mp1Done=new Set();
-function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
-function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
-function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+const MP1 = [
+  {
+    "l": "Manger →",
+    "r": "J'ai mangé (Eu comi)"
+  },
+  {
+    "l": "Faire →",
+    "r": "J'ai fait (Eu fiz)"
+  },
+  {
+    "l": "Voir →",
+    "r": "J'ai vu (Eu vi)"
+  },
+  {
+    "l": "Prendre →",
+    "r": "J'ai pris (Eu peguei / tomei)"
+  },
+  {
+    "l": "Aller →",
+    "r": "Je suis allé(e) (Eu fui)"
+  }
+];
+const mp1R = hwShuffle(MP1.map((p, i) => ({ label: p.r, pid: i })));
+let mp1SelL = null;
+const mp1Done = new Set();
+function mp1Render() {
+  document.getElementById('mp1-left').innerHTML = MP1.map((p, i) =>
+    `<button type="button" onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i) ? 'matched' : ''}" ${mp1Done.has(i) ? 'disabled' : ''}>${p.l}</button>`
+  ).join('');
+  document.getElementById('mp1-right').innerHTML = mp1R.map((p, i) =>
+    `<button type="button" onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid) ? 'matched' : ''}" ${mp1Done.has(p.pid) ? 'disabled' : ''}>${p.label}</button>`
+  ).join('');
+}
+function mp1ClickL(i) {
+  if (mp1Done.has(i)) return;
+  mp1SelL = i;
+  document.querySelectorAll('#mp1-left .mp-btn').forEach((b, j) => b.classList.toggle('selected', j === i && !mp1Done.has(j)));
+}
+function mp1ClickR(ri) {
+  if (mp1SelL === null) return;
+  const item = mp1R[ri];
+  if (item.pid === mp1SelL) {
+    mp1Done.add(mp1SelL);
+    mp1SelL = null;
+    mp1Render();
+    if (mp1Done.size === MP1.length) document.getElementById('mp1-done-msg').classList.remove('hidden');
+  } else {
+    [document.getElementById('mp1R-' + ri), document.getElementById('mp1L-' + mp1SelL)].forEach(b => {
+      if (b) { b.classList.add('wrong-flash'); setTimeout(() => b.classList.remove('wrong-flash'), 700); }
+    });
+    mp1SelL = null;
+    document.querySelectorAll('#mp1-left .mp-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
 mp1Render();
 
-const FILL1=[
-  {before:'Hier, j\'ai',blank:'mangé',after:'une crêpe. (manger)',ans:'mangé'},
-  {before:'Je suis',blank:'allé',after:'au cinéma. (aller — say it as a man)',ans:'allé'},
-  {before:'J\'ai',blank:'fait',after:'du sport. (faire)',ans:'fait'},
-  {before:'Tu',blank:'as',after:'parlé avec Léo. (helper verb — avoir)',ans:'as'},
-  {before:'Elle',blank:'est',after:'venue à la fête. (helper verb — être)',ans:'est'},
+const FILL1 = [
+  {
+    "before": "Hier, j'ai",
+    "after": "une crêpe au chocolat. (comi — particípio de manger)",
+    "ans": "mangé"
+  },
+  {
+    "before": "Samedi, je",
+    "after": "allé(e) au cinéma. (fui — auxiliar être)",
+    "ans": "suis"
+  },
+  {
+    "before": "J'ai",
+    "after": "du sport ce matin. (fiz — particípio de faire)",
+    "ans": "fait"
+  },
+  {
+    "before": "Nous avons",
+    "after": "la Tour Eiffel ! (vimos — particípio de voir)",
+    "ans": "vu"
+  },
+  {
+    "before": "Elle",
+    "after": "arrivée à Paris hier soir. (chegou — auxiliar être para elle)",
+    "ans": "est"
+  }
 ];
-const fc=document.getElementById('fill1-container');
-FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`${f.before?`<span>${f.before}</span>`:''}  <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;fc.appendChild(d);});
-function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+const fc = document.getElementById('fill1-container');
+FILL1.forEach((f, i) => {
+  const d = document.createElement('p');
+  d.className = 'text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-xl';
+  d.innerHTML = `<span class="text-blue-600 font-black">${i + 1}.</span> ${f.before ? `<span>${f.before}</span>` : ''} <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="..."/> <span>${f.after}</span>`;
+  fc.appendChild(d);
+});
+function checkFill1() {
+  let okCount = 0;
+  FILL1.forEach((f, i) => {
+    const inp = document.getElementById('fill1-' + i);
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = f.ans.toLowerCase().replace(/’/g, "'");
+    const ok = val === ans;
+    if (ok) okCount++;
+    inp.classList.remove('ok', 'err');
+    inp.classList.add(ok ? 'ok' : 'err');
+  });
+  const fb = document.getElementById('fill1-fb');
+  fb.classList.remove('hidden');
+  fb.className = 'mt-2 text-xs font-black ' + (okCount === FILL1.length ? 'text-emerald-600' : 'text-blue-700');
+  fb.textContent = okCount === FILL1.length
+    ? '✅ Todas as lacunas corretas! Très bien !'
+    : `${okCount}/${FILL1.length} corretas. Respostas esperadas: ${FILL1.map((f, idx) => `(${idx + 1}) ${f.ans}`).join(' · ')}`;
+}
 
-function submitHomework(){
+function submitHomework() {
   markSection('homework');
-  if(typeof Store!=='undefined')Store.addXP(80);
-  spawnXP('+100 XP');
-  document.getElementById('hw-done').classList.remove('hidden');
-  const btn=document.querySelector('[onclick="submitHomework()"]');
-  btn.textContent='🎉 Course Complete! +100 XP — Félicitations!';
-  btn.disabled=true;
-  const a=document.createElement('a');
-  a.href='classes_fr.html';
-  a.className='block text-center mt-3 bg-white border-2 border-blue-300 text-blue-700 font-black py-3 rounded-2xl hover:bg-blue-50 transition-all text-sm';
-  a.textContent='← Retour au Cours de Français';
-  btn.insertAdjacentElement('afterend',a);
+  saveFrCompleted();
+  if (typeof Store !== 'undefined') Store.addXP(55);
+  spawnXP('+75 XP');
+  const btn = document.getElementById('btn-submit-hw');
+  if (btn) {
+    btn.textContent = '✓ Lição Concluída! (+75 XP) — Magnifique !';
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+  }
+  const doneBox = document.getElementById('hw-done-box');
+  if (doneBox) doneBox.classList.remove('hidden');
 }
 </script>
+<script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/fr_aula_12-folha.pdf"></script>
 </body>
 </html>

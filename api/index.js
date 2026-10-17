@@ -163,6 +163,7 @@ const RATE_LIMITS = {
 const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
     'boss_start', 'boss_win', 'newsline_search',
+    'push_card_visto', 'push_sim', 'push_negou', 'push_adiou', 'push_nunca', 'push_ignorou', 'ios_dica_vista',
 ]);
 
 async function getUserPlan(userId) {
@@ -3497,16 +3498,17 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {
-        const { topic, vocab, level, grammar } = await readBody(req);
+        const { topic, vocab, level, grammar, lang = 'en' } = await readBody(req);
+        const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
         // O prompt antigo dizia "for children" e travava o nivel em 'beginner'.
         // Os alunos sao ADULTOS (tecnicos de GPS agricola, candidato a vaga,
         // profissionais). E o exemplo de JSON usava opts ["A","B","C","D"]:
         // o modelo copiava literalmente e o aluno via "a resposta e A".
         const prompt = [
-            `Create 5 multiple-choice English quiz questions about "${topic}" at ${level || 'A2'} (CEFR) level.`,
-            'The students are Brazilian ADULTS learning English. Never write for children.',
+            `Create 5 multiple-choice ${targetLanguage} quiz questions about "${topic}" at ${level || 'A2'} (CEFR) level.`,
+            `The students are Brazilian ADULTS learning ${targetLanguage}. Never write for children.`,
             `Vocabulary to test: ${(vocab || []).join(', ')}.`,
-            grammar ? `Grammar point of this lesson: ${grammar}. At least 2 of the 5 questions must test it.` : '',
+            grammar ? `Pattern / structure of this lesson: ${grammar}. At least 2 of the 5 questions must test it.` : '',
             'Every option must be a real, plausible answer. NEVER use "A", "B", "C" or "D" as option text.',
             'The value of "a" must be the exact text of one of the options.',
             'Return ONLY a valid JSON array of 5 objects:',
