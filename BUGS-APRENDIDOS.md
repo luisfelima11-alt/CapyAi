@@ -1,5 +1,30 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
+
+**Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
+No computador e no tablet saía voz (a robótica do navegador, não a Nova).
+
+**Causa raiz (duas camadas):**
+1. O mesmo 403 `invalid_origin` de 28/09: a correção estava no PR do hotfix, mas
+   nunca chegou à produção. Toda voz Nova falhava para quem tinha cookie.
+2. A voz reserva (`speechSynthesis`) e o `CapyTTS` tocavam **depois** de esperar
+   a rede, fora do toque. O iOS Safari só deixa tocar som que começa dentro de um
+   toque, e silencia a voz do navegador com a chave de silencioso ligada. Por isso
+   o iPhone ficava mudo e os outros aparelhos não.
+
+**Correção:** além do portão do servidor, `CapyAudio` (`components.js`) libera um
+único elemento de áudio no primeiro toque da página (clipe mudo + fala vazia) e
+todas as vozes passam a usar esse elemento (`tts-en.js`, `CapyTTS`,
+`listening-lab.js`). Antes de tocar, `navigator.audioSession.type = 'playback'`
+faz a voz soar mesmo com a chave de silencioso.
+
+**Como pegar isso de novo:** testar no iPhone de verdade, logado, com a chave de
+silencioso ligada. Chromium/Playwright não reproduz a regra de toque do iOS.
+
+**Regra:** som que depende de rede toca num elemento já liberado por toque, nunca
+num `new Audio()` criado depois de um `await`.
+
 ## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
 
 **Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
