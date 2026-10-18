@@ -105,7 +105,7 @@
           <span class="text-4xl">🛤️</span>
           <div class="flex-1">
             <p class="font-black text-lg">Prática Diária</p>
-            <p class="text-emerald-100 text-sm">Treine todo dia o que viu nas aulas — mini-lições rápidas de 5 minutos</p>
+            <p class="text-emerald-100 text-sm">24 unidades (96 mini-lições de 5 min) — do atendimento e bancada até fornecedores e Agrishow</p>
           </div>
           <span class="bg-white/20 font-black px-5 py-2.5 rounded-full text-sm flex-shrink-0">Praticar →</span>
         </div>
@@ -169,15 +169,41 @@
     </ul>
   </details>
 </nav>
+
+<!-- FOLHAS:inicio (gerado por scripts/gera-folha-aula.mjs) -->
+<section aria-label="Folhas das aulas para imprimir" class="max-w-4xl mx-auto px-4 md:px-6 pb-12">
+  <div class="bg-white/60 border border-slate-200 rounded-2xl p-5 text-center">
+    <h2 class="font-black text-navy text-sm">📄 Folhas das aulas para imprimir (14)</h2>
+    <p class="text-slate-500 text-xs mt-1">Uma página por aula, com o vocabulário, os padrões e espaço para as suas frases e anotações. Baixe, imprima e acompanhe a aula.</p>
+    <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <li><a href="assets/pdf/gpstronic_aula_01-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 1 · GPS Signal &amp; Tractor Troubleshooting (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_02-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 2 · A Customer Calls (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_03-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 3 · Explaining the Repair (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_04-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 4 · Ordering Parts (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_05-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 5 · At the Farm (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_06-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 6 · Booking the Visit (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_07-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 7 · Price and Payment (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_08-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 8 · Small Talk with the Customer (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_09-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 9 · Walk Me Through It (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_10-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 10 · I'm Afraid There's a Delay (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_11-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 11 · What Seems to Be the Problem? (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_12-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 12 · It's Ready! (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_13-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 13 · Messaging a Supplier (PDF)</a></li>
+      <li><a href="assets/pdf/gpstronic_aula_14-folha.pdf" download class="text-slate-500 hover:text-navy underline decoration-dotted">Aula 14 · Nice to Meet You at Agrishow (PDF)</a></li>
+    </ul>
+  </div>
+</section>
+<!-- FOLHAS:fim -->
 </main>
 
 <div id="mobile-nav-placeholder"></div>
 <div id="footer-placeholder"></div>
 
-<script src="auth-secure.js?v=auth20260918"></script>
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=nav320"></script>
+<script src="components.js?v=skins1"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -215,7 +241,7 @@ const completed = getGpsCompleted();
 const total = LESSONS.length;
 const doneCount = completed.filter(n => LESSONS.some(l => l.n === n)).length;
 document.getElementById('progress-bar').style.width = `${Math.round(doneCount/total*100)}%`;
-document.getElementById('progress-label').textContent = `${doneCount} of ${total} lesson completed`;
+document.getElementById('progress-label').textContent = `${doneCount} de ${total} aulas concluídas`;
 
 const grid = document.getElementById('lessons-grid');
 
@@ -240,7 +266,7 @@ const grid = document.getElementById('lessons-grid');
         </div>
       </div>
       <button class="w-full bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 active:scale-95 font-black text-sm py-2.5 rounded-xl transition-all shadow-sm">
-        ${testDone ? 'Review →' : 'Começar →'}
+        ${testDone ? 'Revisar questionário →' : 'Começar →'}
       </button>
     </div>
     <div class="h-1 shine bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400"></div>
@@ -260,7 +286,7 @@ LESSONS.forEach((l, i) => {
     ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-slate-200 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded-full">🔜 Em breve</div>`
     : isDone
     ? `<div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-black shadow-sm shadow-green-300/50">✓</div>`
-    : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Start</div>`;
+    : `<div class="absolute top-3 right-3 flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-0.5 rounded-full">✨ Começar</div>`;
 
   card.innerHTML = `
     <div class="relative p-5">
@@ -274,12 +300,11 @@ LESSONS.forEach((l, i) => {
         </div>
       </div>
       <button class="w-full ${isAvailable ? 'bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:scale-105 active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'} font-black text-sm py-2.5 rounded-xl transition-all shadow-sm">
-        ${!isAvailable ? '🔜 Em breve' : isDone ? 'Review Lesson →' : 'Start Lesson →'}
+        ${!isAvailable ? '🔜 Em breve' : isDone ? 'Revisar aula →' : 'Começar aula →'}
       </button>
     </div>
     <div class="h-1 shine bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400"></div>
   `;
-
   grid.appendChild(card);
 });
 

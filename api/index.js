@@ -1,6 +1,7 @@
 const https = require('https');
 const crypto = require('crypto');
 const Security = require('./security');
+const CapySkins = require('../capy-skins');
 
 // Material das aulas para a ligacao guiada (scripts/gera-contexto-aulas.js).
 // So carrega quando alguem liga de dentro de uma aula: ~320 KB que as outras
@@ -162,6 +163,7 @@ const RATE_LIMITS = {
 const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
     'boss_start', 'boss_win', 'newsline_search',
+    'push_card_visto', 'push_sim', 'push_negou', 'push_adiou', 'push_nunca', 'push_ignorou', 'ios_dica_vista',
 ]);
 
 async function getUserPlan(userId) {
@@ -924,6 +926,12 @@ function cenarioParaLog(valor) {
 // handler de voz (ABERTURA), porque o texto dela diz "open the call" e
 // "speak" — num chat escrito isso sairia errado.
 function aberturaTexto(faixa, idioma) {
+    // 'zero' = nivel Total iniciante, escolhido pelo aluno no menu (28/set).
+    if (faixa === 'zero') return [
+        `IMPORTANT - this student is starting ${idioma} from ZERO.`,
+        `Write almost everything in Brazilian Portuguese. Teach ONE ${idioma} word or tiny phrase per message, between quotes, with its meaning in Portuguese right after it, and ask them to write it back.`,
+        'Answering in Portuguese is perfect. Celebrate every attempt, even a single word.',
+    ];
     if (faixa === 'iniciante') return [
         `IMPORTANT - this student is a TRUE BEGINNER in ${idioma}.`,
         `Write ONE short ${idioma} sentence at a time, immediately followed by its meaning in Brazilian Portuguese.`,
@@ -1012,7 +1020,7 @@ const TIPOS_DE_FATO = ['familia', 'trabalho', 'estudo', 'lugar', 'plano', 'gosto
 // So conversa livre gera fato. Cena, entrevista e aula sao interpretacao de
 // papel: "I have five years of experience as a manager", dito ao recrutador,
 // nao e a vida do aluno.
-const PERSONAS_COM_MEMORIA = ['conversa', 'maia', 'iniciante'];
+const PERSONAS_COM_MEMORIA = ['conversa', 'maia'];
 
 const MAX_FATOS_GUARDADOS = 40;
 const MAX_FATOS_POR_CONVERSA = 5;
@@ -1280,6 +1288,9 @@ const PERSONAS = {
     conversa: {
         rotulo: 'Yara', legenda: 'Conversa livre sobre o dia a dia',
         voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: null,
+        // So a Yara tem `ouvindo` (clipe antigo dela). O `fala` foi gerado em
+        // 12/out: o yara-chat.mp4 (16:9) nao fechava o loop nem batia com a foto.
+        clipes: { parada: 'yara-parada-v1.mp4', ouvindo: 'yara-ouvindo-v1.mp4', fala: 'yara-fala-v1.mp4' },
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
         ],
@@ -1319,6 +1330,11 @@ const PERSONAS = {
     maia: {
         rotulo: 'Maia, a zoeira', legenda: 'Aprende rindo: ela zoa seu inglês (com carinho)',
         voz: 'coral', arte: 'yara-maia-v1.jpg', destino: null, curso: null, lang: 'en',
+        clipes: { parada: 'persona-maia-parada-v1.mp4', fala: 'persona-maia-fala-v1.mp4' },
+        // Formato proprio (comedia, portugues primeiro, para iniciante): o menu
+        // de dificuldade e estilo nao se aplica a ela.
+        niveis: false, estilos: false,
+        motivo: 'A Maia tem o jeito dela: fala português e ensina zoando, uma palavra por vez.',
         // O aluno da Maia e iniciante e fala PORTUGUES com ela. Transcrever
         // forcando ingles embaralhava a fala dele no fio. null = detectar sozinho.
         transcricao: null,
@@ -1340,8 +1356,8 @@ const PERSONAS = {
             // Visto em producao: ela zoou "my parents are my cousins" e corrigiu para
             // "my parents are my parents". Zoar bem e ensinar errado e o pior caso.
             'The correction is what the student MEANT to say, in natural English — for "parentes" it is "relatives", for "pretender" it is "intend", for "puxar" it is "pull". Never a correction that just repeats the wrong word or makes no sense.',
-            'Every roast ends with a real correction. The joke is the hook; the English is the point.',
-            'Accent bits, now and then: say ONE English line in an exaggerated accent — posh British ("oh darling, how DREADFUL"), loud American, or the classic Brazilian-accented English ("rélou mai frendi") — and then comment on it IN PORTUGUESE. The accent is the joke; the comment is in Portuguese.',
+            'Every roast ends with a real correction. The joke is the hook — the English is the point.',
+            'Accent bits, now and then: say ONE English line in an exaggerated accent — posh British ("oh darling, how DREADFUL"), loud American, or the classic Brazilian-accented English ("rélou mai frendi") — and then comment on it IN PORTUGUESE. The accent is the joke — the comment is in Portuguese.',
             'HARD LIMITS: never joke about appearance, body, intelligence, money, religion, region, race or where they come from. No swearing and nothing sexual. If the student seems hurt, says they are bad at English or wants to give up, drop the roast at once, be warm and encouraging in Portuguese, and only bring the fun back gently.',
         ],
         voz_modo: c => [
@@ -1366,37 +1382,15 @@ const PERSONAS = {
         ],
     },
 
-    iniciante: {
-        rotulo: 'Capivara para iniciantes', legenda: 'Começa em português e vai soltando o inglês',
-        voz: 'marin', arte: 'yara-quadrado-v1.jpg', destino: null, curso: null,
-        // Mesmo motivo da Maia: o aluno comeca falando portugues com ela.
-        transcricao: null,
-        nucleo: c => [
-            `You are Yara, a capybara teacher whose ONLY job right now is to make an absolute beginner feel safe speaking ${c.idioma}.`,
-            'Assume they know almost nothing and that they are embarrassed about it. Never assume, never rush.',
-        ],
-        // Esta persona ignora a faixa medida e trata TODO mundo como iniciante:
-        // quem a escolhe esta dizendo que se sente iniciante, e isso vale mais
-        // que o `english_level` do perfil, que pode estar velho ou otimista.
-        voz_modo: c => [
-            'Open in Brazilian PORTUGUESE: greet them, say what is going to happen, and tell them it is fine to answer in Portuguese at first.',
-            `Then introduce ${c.idioma} slowly: ONE short sentence at a time, immediately followed by its meaning in Portuguese.`,
-            `Only move to mostly-${c.idioma} once they have answered you in ${c.idioma} twice. Never rush this.`,
-            ...planoDeConversa(c.perfil, c.idioma, 'voz'),
-            'Celebrate any attempt, even a single word. Keep every reply under two short sentences and end with a question.',
-            c.tema ? `Today's topic: "${c.tema}".` : '',
-        ],
-        texto_modo: c => [
-            'Write mostly in Brazilian Portuguese at first, introducing ONE short English sentence at a time with its meaning right after it.',
-            ...REGRAS_TEXTO,
-            ...planoDeConversa(c.perfil, c.idioma, 'texto'),
-            'Celebrate any attempt, even a single word.',
-        ],
-    },
+    // A 'Capivara para iniciantes' saiu em 28/set: o nivel Total iniciante
+    // (NIVEIS_CONVERSA) faz o papel dela para QUALQUER capivara. Links antigos
+    // (?persona=iniciante) viram Yara + Total iniciante pelo PERSONA_ANTIGA.
 
     travel: {
         rotulo: 'Capivara viajante', legenda: 'Aeroporto, hotel, pedir informação',
         voz: 'marin', arte: 'yara-travel-v1.jpg', destino: null, curso: 'travel',
+        clipes: { parada: 'persona-travel-parada-v1.mp4', fala: 'persona-travel-fala-v1.mp4' },
+        mundo: 'the world of travel, like airports, hotels, restaurants and asking for directions',
         nucleo: c => [
             `You are Yara, a capybara who has travelled a lot and is helping a Brazilian student survive a trip in ${c.idioma}.`,
             'Every exchange happens in a real travel situation: airport check-in, immigration, hotel reception, asking for directions, ordering food, a problem with luggage.',
@@ -1422,6 +1416,8 @@ const PERSONAS = {
     business: {
         rotulo: 'Capivara de negócios', legenda: 'Reunião, e-mail, apresentação',
         voz: 'marin', arte: 'yara-business-v1.jpg', destino: null, curso: 'business',
+        clipes: { parada: 'persona-business-parada-v1.mp4', fala: 'persona-business-fala-v1.mp4' },
+        mundo: 'the world of work, like meetings, calls with clients, e-mails and deadlines',
         nucleo: c => [
             `You are Yara, a capybara coaching a Brazilian professional to work in ${c.idioma}.`,
             'Every exchange happens in a real work situation: a meeting, a call with a client, a status update, asking for a deadline, disagreeing politely.',
@@ -1455,6 +1451,8 @@ const PERSONAS = {
     agro: {
         rotulo: 'Capivara do agro', legenda: 'Lavoura, maquinário, visita técnica',
         voz: 'marin', arte: 'yara-agro-v1.jpg', destino: null, curso: 'agro', lang: 'en',
+        clipes: { parada: 'persona-agro-parada-v1.mp4', fala: 'persona-agro-fala-v1.mp4' },
+        mundo: 'farm work, like crops, machines, suppliers and field visits',
         nucleo: c => [
             `You are Yara, a capybara who helps Brazilian agriculture professionals work in ${c.idioma}.`,
             'Every exchange happens in a real field situation: describing a crop problem to a technician, a supplier visit, a machine that stopped working, reading a number off a monitor in the cab.',
@@ -1479,6 +1477,11 @@ const PERSONAS = {
     med: {
         rotulo: 'Capivara da saúde', legenda: 'Consulta, sintomas, plantão',
         voz: 'marin', arte: 'yara-med-v1.jpg', destino: null, curso: 'med', lang: 'en',
+        clipes: { parada: 'persona-med-parada-v1.mp4', fala: 'persona-med-fala-v1.mp4' },
+        // O formato e a consulta. O nivel vale (ela fala mais simples ou mais
+        // rapido); o estilo nao.
+        estilos: false,
+        motivo: 'Aqui o formato é a consulta: você é o médico e ela é a paciente.',
         nucleo: c => [
             `You are helping a Brazilian health professional work in ${c.idioma}.`,
             // A tese do curso: o medico ja sabe o cognato tecnico. O que falta e
@@ -1505,6 +1508,10 @@ const PERSONAS = {
     francais: {
         rotulo: 'Capivara francesa', legenda: 'Conversa em francês, do zero',
         voz: 'marin', arte: 'yara-francais-v1.jpg', destino: null, curso: 'francais', lang: 'fr',
+        clipes: { parada: 'persona-francais-parada-v1.mp4', fala: 'persona-francais-fala-v1.mp4' },
+        // No nivel Automatico: o english_level do perfil fala do INGLES do aluno.
+        // Quem e avancado em ingles recebia 'advanced' em frances.
+        faixaAuto: 'desconhecido',
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
             'Most of them are starting French from zero, and many already speak some English — expect that mix.',
@@ -1528,6 +1535,8 @@ const PERSONAS = {
     turkish: {
         rotulo: 'Capivara turca', legenda: 'Conversa em turco, do zero',
         voz: 'marin', arte: 'yara-turkish-v1.jpg', destino: null, curso: 'turkish', lang: 'tr',
+        clipes: { parada: 'persona-turkish-parada-v1.mp4', fala: 'persona-turkish-fala-v1.mp4' },
+        faixaAuto: 'desconhecido',
         nucleo: c => [
             `You are Yara, a warm and patient capybara who teaches ${c.idioma} to Brazilian students.`,
             'Turkish is far from Portuguese: expect them to be lost with word order and endings, and never treat that as failure.',
@@ -1551,6 +1560,8 @@ const PERSONAS = {
     gpstronic: {
         rotulo: 'Capivara da oficina', legenda: 'Dia a dia do conserto de GPS agrícola',
         voz: 'marin', arte: 'yara-gpstronic-v1.jpg', destino: null, curso: 'gpstronic', lang: 'en',
+        clipes: { parada: 'persona-gpstronic-parada-v1.mp4', fala: 'persona-gpstronic-fala-v1.mp4' },
+        mundo: 'a GPS repair workshop and ordinary life',
         nucleo: c => [
             `You are Yara, a capybara talking with an adult who repairs agricultural GPS equipment and needs ${c.idioma} for work and for life.`,
             'Treat them as a FALSE beginner: they recognise a lot written down but freeze when they have to speak. The goal is speaking, not grammar.',
@@ -1630,11 +1641,305 @@ function personasPublicas() {
     return Object.entries(PERSONAS).map(([id, p]) => ({
         id, rotulo: p.rotulo, legenda: p.legenda,
         arte: p.arte || null, destino: p.destino || null, curso: p.curso || null,
+        // Clipes do palco (8/out): parada, fala e, so na Yara, ouvindo. Sem eles, a foto respira.
+        clipes: p.clipes || null,
         lang: p.lang || 'en',
         // Em que lingua transcrever o aluno (o microfone do chat usa isto).
         // null = detectar sozinho, para quem fala portugues com a capivara.
         escuta: Object.prototype.hasOwnProperty.call(p, 'transcricao') ? p.transcricao : (p.lang || 'en'),
+        // O menu de dificuldade e estilo (28/set) desliga o que nao se aplica.
+        niveis: p.niveis !== false && !p.destino,
+        estilos: p.estilos !== false && !p.destino,
+        motivo: p.motivo || null,
     }));
+}
+
+// ── Dificuldade e estilo da conversa (28/set) ────────────────────────────────
+// Pedido do Luis: a capivara vai para o topo da pagina, e no lugar dela, no
+// compositor, o aluno escolhe a DIFICULDADE e o ESTILO da conversa. Tres eixos:
+// quem fala (a persona), quao dificil (o nivel) e em que formato (o estilo). A
+// persona da o tema e o mundo, o estilo da o formato: "viajante + como se diz"
+// vira frases de viagem para traduzir.
+//
+// Listas FECHADAS, como as personas: o navegador manda so o id, e id invalido
+// cai em Automatico / Conversa livre. Os textos abaixo entram no prompt, entao
+// nada de `;`, chaves nem < > — o teste de sanitizacao varre o prompt inteiro.
+
+const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+
+// `faixa` e a faixa do aluno nas aberturas (ABERTURA na voz, aberturaTexto no
+// texto). 'zero' e nova. `portugues`: o aluno fala portugues com ela, entao a
+// transcricao nao pode forcar o idioma da conversa.
+const NIVEIS_CONVERSA = {
+    auto:      { emoji: '✨', rotulo: 'Automático', curto: 'Auto', legenda: 'Ela ajusta pelo seu perfil', faixa: null },
+    zero:      { emoji: '🌱', rotulo: 'Total iniciante', curto: 'Zero', legenda: 'Quase tudo em português, uma palavra por vez', faixa: 'zero', portugues: true },
+    iniciante: { emoji: '🌿', rotulo: 'Iniciante', curto: 'Iniciante', legenda: 'Frases curtas, português quando travar', faixa: 'iniciante', portugues: true },
+    medio:     { emoji: '🌳', rotulo: 'Mediano', curto: 'Mediano', legenda: 'Sem português, com calma', faixa: 'medio' },
+    intensivo: { emoji: '🔥', rotulo: 'Intensivo', curto: 'Intensivo', legenda: 'Rápido, corrige tudo, vocabulário rico', faixa: 'avancado', intensivo: true },
+};
+
+// Personas que sairam do menu, mas cujos links e preferencias salvas continuam
+// valendo. A "Capivara para iniciantes" virou o nivel Total iniciante.
+const PERSONA_ANTIGA = { iniciante: { persona: 'conversa', nivel: 'zero' } };
+
+const deOnde = m => (m ? `from ${m}` : 'from their own life, likes and goals');
+
+// Cada estilo: campos publicos (menu) e os construtores de prompt (privados).
+// `livre` e a conversa de hoje: usa o voz_modo/texto_modo da persona SEM mudar
+// nada. `memoria`: so conversa sobre a vida do aluno vira lembranca — cena e
+// exercicio nao sao a vida dele. `longo`: o chat precisa de mais tokens.
+const ESTILOS_CONVERSA = {
+    livre: {
+        emoji: '💬', rotulo: 'Conversa livre', curto: 'Livre', legenda: 'Papo solto: ela puxa assunto sobre você',
+        memoria: true, voz: null, texto: null,
+    },
+    guiada: {
+        emoji: '🧭', rotulo: 'Conversa guiada', curto: 'Guiada', legenda: 'Ela escolhe o tema, pergunta e no fim te ensina 3 expressões',
+        memoria: true, longo: true,
+        voz: (c, m) => [
+            'FORMAT - GUIDED CONVERSATION. You lead the call in three parts.',
+            `PART 1, in your first turn: greet them and name ONE concrete theme ${deOnde(m)} ("Today let's talk about your last trip."). Choose it yourself, never offer a list.`,
+            'PART 2: ask 3 or 4 questions about that theme, ONE per turn, each one built on their last answer. Let them do most of the talking. Correct only what blocks the meaning, but remember the other mistakes.',
+            `PART 3: say the talking part is over and teach 3 useful ${c.idioma} expressions they COULD have used in their answers, one per turn: say it slowly, what it means in Portuguese, and how it fits something they said. Then ask them to answer one of your questions again using one of the three.`,
+            'When they manage it, praise exactly what they did well, then offer a new theme and start again from PART 1.',
+        ],
+        texto: (c, m) => [
+            'FORMAT - GUIDED CONVERSATION, in three parts.',
+            `PART 1, in your first reply: name ONE concrete theme ${deOnde(m)} and ask your first question about it. Choose it yourself, never offer a list.`,
+            'PART 2: ask 3 or 4 questions about that theme, ONE per message, each built on their answer. Correct only what blocks the meaning and keep a note of the rest.',
+            `PART 3: after their 3rd or 4th answer, write "✨ 3 expressions you could use:" and then 3 useful ${c.idioma} expressions, one per line, each with its meaning in Portuguese and a short example tied to what they wrote. Ask them to rewrite one of their answers using one of them.`,
+            'Then praise what they did well and offer a new theme.',
+        ],
+    },
+    encenacao: {
+        emoji: '🎭', rotulo: 'Encenação', curto: 'Encenação', legenda: 'Restaurante, aeroporto, loja, médico: ela faz o outro papel',
+        memoria: false,
+        voz: (c, m) => [
+            'FORMAT - ROLE-PLAY. You and the student act out a real-life situation, and you play the other person.',
+            `Choose the situation ${m ? `from ${m}` : 'from real life abroad, like a restaurant, an airport, a shop, a hotel, a doctor or a phone call, preferring one connected to their goals or interests'}.`,
+            'Set it up in ONE short sentence: where you are, who you are, who they are, and a small goal for them ("You want a table by the window, and you have a coupon."). Then start in role right away.',
+            'Stay in role with short, realistic lines, ONE per turn, each ending with something they must answer. Halfway through, add one small complication (the dish is sold out, the flight is delayed).',
+            'If they freeze, step out for a moment, give them the exact words to say, then step back into the scene.',
+            'After 6 to 8 exchanges, close the scene and step out: one thing they did well and one phrase that would sound more natural, and have them say it. Then offer a new scene.',
+        ],
+        texto: (c, m) => [
+            'FORMAT - ROLE-PLAY in writing. You play the other person in a real-life situation.',
+            `Choose the situation ${m ? `from ${m}` : 'from real life abroad, like a restaurant, an airport, a shop, a hotel, a doctor or a phone call, preferring one connected to their goals or interests'}.`,
+            'Your first reply starts with 🎬 and one line describing the scene and their goal, then your first line in role on a new line.',
+            'Stay in role, ONE short line per message. If you need to correct or help, add it after your line, on a new line starting with 💡.',
+            'After 6 to 8 exchanges, close the scene with 🎬: one thing they did well and one more natural phrase. Then offer a new scene.',
+        ],
+    },
+    repete: {
+        emoji: '🔁', rotulo: 'Repete comigo', curto: 'Repete', legenda: 'Ela fala, você repete, ela corrige a pronúncia',
+        memoria: false,
+        voz: (c, m) => [
+            'FORMAT - REPEAT AFTER ME. This is pronunciation practice, not a conversation.',
+            `Each turn: say ONE ${c.idioma} sentence ${deOnde(m)}, slowly and clearly, ask them to repeat it, then STOP and wait.`,
+            'Listen closely to how they said it. If a word came out wrong, say ONLY that word slowly, in syllables if it helps, give ONE quick tip about the sound (the mouth, the stress, or the Portuguese sound it is NOT), and ask for the whole sentence again.',
+            'Be honest: never praise a word that did not sound right. When it is right, celebrate in a few words and give the next sentence.',
+            'Start at their level (single words for a true beginner, otherwise 3 to 5 words) and make each sentence a little longer and more natural after every success. After two misses in a row, go back to an easier one.',
+            c.idioma === 'English'
+                ? 'Prefer sounds that are hard for Brazilians: TH, the H at the start of words, final consonants, the R, short and long vowels, and past tense -ed.'
+                : `Prefer the ${c.idioma} sounds that are hardest for Brazilians.`,
+            'Do not explain grammar here. Every turn ends with a sentence for them to repeat.',
+        ],
+        texto: (c, m) => [
+            'FORMAT - REPEAT AFTER ME, for pronunciation. The student answers by recording audio on the 🎤 button, and you receive what the transcription understood.',
+            `Each message: write ONE ${c.idioma} sentence ${deOnde(m)} between quotes, add a simple hint for the hardest word written the way a Brazilian would read it, and ask them to record it on the 🎤.`,
+            'Compare their message with your sentence word by word. A word that came back different or missing probably did not sound right: point to it, give ONE quick tip about the sound, and ask them to record the sentence again.',
+            'When it matches, celebrate briefly and give a slightly longer sentence.',
+            'If they typed instead of recording, remind them kindly that this practice works best with the 🎤.',
+        ],
+    },
+    comosediz: {
+        emoji: '🇧🇷', rotulo: 'Como se diz?', curto: 'Como se diz', legenda: 'Ela fala em português e você traduz',
+        memoria: false,
+        voz: (c, m) => [
+            `FORMAT - HOW DO YOU SAY IT. You say a sentence in Brazilian Portuguese and the student says it in ${c.idioma}.`,
+            'In your first turn, explain the game in one short sentence in Portuguese and give the first sentence.',
+            `Each turn: say ONE natural Brazilian Portuguese sentence ${deOnde(m)}, then STOP and wait for their ${c.idioma} version.`,
+            `Accept any natural ${c.idioma} version, not only the textbook one. If it is right, say so in a few words and, if theirs sounded stiff, give the way a native would say it. If it is wrong, give the right version, point out the ONE key difference, and ask them to say it again.`,
+            'Start at their level (a single word or a 3 word phrase for a true beginner) and make each sentence a bit harder after two successes in a row: past and future, questions, negatives, longer sentences, then everyday expressions that do not translate word for word ("estou morrendo de fome", "tanto faz"). After two misses, go back a step.',
+            'Keep your turns short. This is a quick drill, not a chat.',
+        ],
+        texto: (c, m) => [
+            `FORMAT - HOW DO YOU SAY IT. You say a sentence in Brazilian Portuguese and the student says it in ${c.idioma}.`,
+            'Your first reply explains the game in one sentence in Portuguese and gives the first sentence on a new line starting with 🇧🇷.',
+            `Each message: react to their ${c.idioma} version with ✅ or ✏️ (the right version and the ONE key difference), then give the next Portuguese sentence ${deOnde(m)} on a new line starting with 🇧🇷.`,
+            `Accept any natural ${c.idioma} version, not only the textbook one.`,
+            'Start at their level (a single word or a 3 word phrase for a true beginner) and make each sentence a bit harder after two successes in a row: past and future, questions, negatives, longer sentences, then everyday expressions that do not translate word for word ("estou morrendo de fome", "tanto faz"). After two misses, go back a step.',
+        ],
+    },
+    revisao: {
+        emoji: '🧠', rotulo: 'Revisão das minhas palavras', curto: 'Revisão', legenda: 'Treina as palavras que você mais erra',
+        memoria: false,
+        voz: c => [
+            'FORMAT - REVIEW OF MY WORDS. This call is a quick, friendly review of what this student needs to practise. Say so in your first turn, in one sentence.',
+            ...linhasDeRevisao(c),
+            'At the end, or when they want to stop, tell them which words are now solid and which still need practice.',
+        ],
+        texto: c => [
+            'FORMAT - REVIEW OF MY WORDS. This chat is a quick, friendly review of what this student needs to practise.',
+            'Your first reply lists, in one line, the words you will review today (up to 5), then asks about the first one. Mark each word with ✅ once they use it right twice.',
+            ...linhasDeRevisao(c),
+            'At the end, or when they want to stop, tell them which words are now solid and which still need practice.',
+        ],
+    },
+    historia: {
+        emoji: '📖', rotulo: 'Me conta uma história', curto: 'História', legenda: 'Uma história curta em partes, com perguntas',
+        memoria: false, longo: true,
+        voz: (c, m) => [
+            'FORMAT - TELL ME A STORY. You tell a short original story in parts and check that they understood.',
+            `Invent a short story ${m ? `set in ${m}` : 'connected to something they like'}, with one main character, a problem and an ending. Use words right for their level.`,
+            'Tell it in 4 or 5 parts. Each part is 2 or 3 short sentences, told with expression. After each part, STOP and ask ONE question about it ("Why was Tom late?"), then wait.',
+            'If they answer right, confirm in a few words and tell the next part. If not, retell that part more simply and ask again. If they do not know a word, explain it quickly and go on.',
+            'At the end, ask what they would have done or what happens next, and talk about it for a moment. Then offer another story.',
+        ],
+        texto: (c, m) => [
+            'FORMAT - TELL ME A STORY in writing, in parts.',
+            `Invent a short story ${m ? `set in ${m}` : 'connected to something they like'}, with one main character, a problem and an ending. Use words right for their level.`,
+            'Each message is ONE part of the story, 2 to 4 short sentences starting with 📖, followed on a new line by ONE question about it starting with ❓. Wait for the answer before the next part.',
+            'If they answer right, confirm in a few words and tell the next part. If not, retell that part more simply and ask again. If they do not know a word, explain it quickly and go on.',
+            'At the end, ask what they would have done or what happens next, and talk about it for a moment. Then offer another story.',
+        ],
+    },
+};
+
+// O miolo da Revisao: as palavras que o aluno erra (mem_<id>) e, sem elas, as
+// mais uteis do nivel dele.
+function linhasDeRevisao(c) {
+    const fatos = c.perfil && Array.isArray(c.perfil.fatos) && c.perfil.fatos.length;
+    return [
+        c.fracas && c.fracas.length
+            ? `Words this student has been getting wrong lately: ${c.fracas.join(', ')}. Review them ONE at a time. For each word, ask a question about their own life that makes them use it, and correct them if they use it wrong. When they use it right twice, move to the next word.`
+            : `There is no list of weak words yet. Review the most useful everyday ${c.idioma} words and phrases for their level (have, want, need, go, like, and basic questions), ONE at a time. Early on, ask what they studied recently and review that too.`,
+        'Vary the practice: sometimes ask what a word means, sometimes ask them to use it in a sentence about their life, sometimes ask for the opposite or a similar word.',
+        fatos ? 'Use what they told you in past conversations as material for your questions, one thing at a time.' : '',
+    ];
+}
+
+// Vai SEMPRE por ultimo, e diz que prevalece: o voz_modo da conversa livre traz
+// "Speak simple, beginner-friendly", que brigaria com o Intensivo.
+function regraDeNivel(nivel, idioma, canal) {
+    if (nivel === 'zero') {
+        return canal === 'texto'
+            ? [`LEVEL RULE - this overrides anything above about language and pace. This student is starting ${idioma} from zero. Every explanation, question, instruction and reaction is in Brazilian Portuguese. ${idioma} appears only as the ONE word or short line you are teaching or acting out, between quotes, followed by its meaning in Portuguese.`]
+            : [`LEVEL RULE - this overrides anything above about language and pace. This student is starting ${idioma} from zero. Every explanation, question, instruction and reaction is in Brazilian Portuguese. ${idioma} appears only as the ONE word or short line you are teaching or acting out, said slowly and twice, followed by its meaning in Portuguese. Never say two ${idioma} sentences in a row.`];
+    }
+    if (nivel === 'intensivo') {
+        return canal === 'texto'
+            ? [
+                `LEVEL RULE - INTENSIVE mode, this overrides anything above about language and simplifying. Write ONLY in ${idioma}, with rich idiomatic vocabulary: phrasal verbs, collocations, natural expressions. If they write in Portuguese or do not understand, answer in simpler ${idioma} instead of translating.`,
+                'Correct EVERY mistake in their message at the start of your reply, in one short line starting with ✏️ (wrong → right), then continue. When their sentence is correct but basic, show one more natural way to say it.',
+                'Push them: ask for longer answers, reasons, examples and opinions, and do not accept one-word answers.',
+            ]
+            : [
+                `LEVEL RULE - INTENSIVE mode, this overrides anything above about language, pace and simplifying. Speak ONLY ${idioma}, at a natural native pace, with rich idiomatic vocabulary: phrasal verbs, collocations, natural expressions. Do not slow down or simplify unless they clearly get lost, and then rephrase in simpler ${idioma} instead of translating. Use Portuguese only if they explicitly ask for it.`,
+                'Correct EVERY mistake, briefly and right away: say the correct version in a few words, have them say it again, then go on. When a sentence is correct but basic, give them a more natural way to say it.',
+                'Push them: ask for longer answers, reasons, examples and opinions, and do not accept one-word answers.',
+            ];
+    }
+    return [];
+}
+
+// O que o cliente pediu -> {id, persona, nivel, estilo} valido. Unica porta de
+// entrada: so string, so id da lista, e o que a persona nao aceita cai no padrao.
+function pedidoDeConversa(personaId, nivelId, estiloId) {
+    const bruto = typeof personaId === 'string' ? personaId : '';
+    const antiga = own(PERSONA_ANTIGA, bruto) ? PERSONA_ANTIGA[bruto] : null;
+    const id = antiga ? antiga.persona : (own(PERSONAS, bruto) ? bruto : 'conversa');
+    const persona = PERSONAS[id];
+    const nivelOk = typeof nivelId === 'string' && own(NIVEIS_CONVERSA, nivelId) && nivelId !== 'auto';
+    const nivel = persona.niveis === false || persona.destino
+        ? 'auto'
+        : (nivelOk ? nivelId : (antiga ? antiga.nivel : 'auto'));
+    const estiloOk = typeof estiloId === 'string' && own(ESTILOS_CONVERSA, estiloId);
+    const estilo = persona.estilos === false || persona.destino || !estiloOk ? 'livre' : estiloId;
+    return { id, persona, nivel, estilo };
+}
+
+// A faixa desta conversa: a do nivel escolhido, senao a da persona (frances e
+// turco no Automatico), senao a do perfil.
+function faixaDoPedido(pedido, perfil) {
+    return NIVEIS_CONVERSA[pedido.nivel].faixa || pedido.persona.faixaAuto || (perfil && perfil.faixa) || 'desconhecido';
+}
+
+// O aluno vai falar portugues com ela? Entao a transcricao da voz nao pode
+// forcar o idioma da conversa (o mesmo motivo da Maia).
+function alunoFalaPortugues(pedido, faixa) {
+    return pedido.persona.niveis !== false && !pedido.persona.destino && (faixa === 'zero' || faixa === 'iniciante');
+}
+
+// O formato de um estilo que nao e o livre. O plano de conversa da persona sai
+// (o estilo E o plano), mas quem e o aluno fica.
+function modoDoEstilo(estiloId, persona, c, canal) {
+    const e = ESTILOS_CONVERSA[estiloId];
+    const fatos = c.perfil && Array.isArray(c.perfil.fatos) && c.perfil.fatos.length;
+    const fracas = estiloId !== 'revisao' && c.fracas && c.fracas.length
+        ? `Words this student has been getting wrong lately: ${c.fracas.join(', ')}. Use one or two of them when they fit. Never list them.`
+        : '';
+    const trocar = 'If they ask to switch to another activity or just to chat, do what they ask.';
+    const lembrar = fatos ? 'You may use what they told you in past conversations, one thing at a time. Never say you have notes.' : '';
+    if (canal === 'texto') {
+        return [
+            ...aberturaTexto(c.faixa, c.idioma),
+            ...REGRAS_TEXTO.map(l => l.replace('the English again', `the ${c.idioma} again`)),
+            ...linhasDoAluno(c.perfil, c.idioma),
+            ...e.texto(c, persona.mundo),
+            'In this format a reply may be a little longer when the format asks for it (a story part, a list of expressions), but never more than 6 short lines.',
+            'Plain text only: no markdown, no asterisks, no headings. Put each item of a list on its own line.',
+            'Follow this format from your next reply on, even if earlier messages in this chat followed a different one.',
+            trocar, lembrar, fracas,
+        ];
+    }
+    return [
+        ...(c.abertura || []),
+        ...linhasDoAluno(c.perfil, c.idioma),
+        ...e.voz(c, persona.mundo),
+        'This is a SPOKEN call. Do ONE thing per turn, keep it short, then stop and let the student speak.',
+        'If they are stuck, ask what something means, or speak Portuguese, help briefly in Brazilian Portuguese and go straight back to the activity.',
+        trocar,
+        'Be warm, patient and encouraging.',
+        lembrar,
+        c.tema ? `Today's topic: "${c.tema}".` : '',
+        c.vocab && c.vocab.length ? `Try to use these words naturally: ${c.vocab.join(', ')}.` : '',
+        fracas,
+    ];
+}
+
+// As instrucoes inteiras de uma conversa (fora da aula guiada): quem ela e,
+// o formato (o de hoje, no livre) e a regra de nivel por ultimo.
+function instrucoesDaPersona(pedido, c, canal) {
+    const p = pedido.persona;
+    const corpo = pedido.estilo === 'livre'
+        ? (canal === 'voz' ? p.voz_modo(c) : p.texto_modo(c))
+        : modoDoEstilo(pedido.estilo, p, c, canal);
+    return [...p.nucleo(c), ...corpo, ...regraDeNivel(pedido.nivel, c.idioma, canal)];
+}
+
+// Historia e conversa guiada escrevem mais por mensagem (uma parte da
+// historia, a lista de 3 expressoes).
+function tokensDoChat(pedido) {
+    return pedido && ESTILOS_CONVERSA[pedido.estilo].longo ? 260 : 150;
+}
+
+function estiloGuardaMemoria(id) {
+    const e = typeof id === 'string' && own(ESTILOS_CONVERSA, id) ? ESTILOS_CONVERSA[id] : ESTILOS_CONVERSA.livre;
+    return Boolean(e.memoria);
+}
+
+// O que o menu pode ver. NUNCA os prompts.
+function catalogoDeModos() {
+    return {
+        niveis: Object.entries(NIVEIS_CONVERSA).map(([id, n]) => ({
+            id, emoji: n.emoji, rotulo: n.rotulo, curto: n.curto, legenda: n.legenda, portugues: Boolean(n.portugues),
+        })),
+        estilos: Object.entries(ESTILOS_CONVERSA).map(([id, e]) => ({
+            id, emoji: e.emoji, rotulo: e.rotulo, curto: e.curto, legenda: e.legenda, memoria: Boolean(e.memoria),
+        })),
+        apelidos: Object.entries(PERSONA_ANTIGA).map(([id, a]) => ({ id, persona: a.persona, nivel: a.nivel })),
+    };
 }
 
 // ── Aula guiada (24/set) ─────────────────────────────────────────────────────
@@ -1761,7 +2066,7 @@ function instrucoesDaAula(c, aula, canal) {
     return [
         nucleo,
         `GUIDED LESSON: the student has the lesson "${aula.titulo}" open on the screen and called you to practise it out loud. You lead, they follow. Do not drift into small talk.`,
-        ...RITMO_DA_AULA[faixa](idioma),
+        ...(RITMO_DA_AULA[faixa] || RITMO_DA_AULA.desconhecido)(idioma),
         ...linhasDoAluno(perfil, idioma),
         'Follow these steps in order. One or two short sentences per turn, then STOP and let them speak. Skip a step whose material is missing below. Aim to finish in about 8 minutes.',
         `STEP 1 - OPEN (one turn): greet ${perfil.nome || 'them'}, say in one sentence that today you will practise "${aula.titulo}": some words, a role-play, then sentences about their own life.${faixa === 'iniciante' ? ' Say this in Portuguese.' : ''} Ask if they are ready.`,
@@ -2279,7 +2584,8 @@ module.exports = async (req, res) => {
     // cliente de ter a propria lista: acrescentar a IA de um curso novo e uma
     // entrada no PERSONAS, e ela aparece no menu de todo mundo sem tocar em HTML.
     if (req.method === 'GET' && url === '/api/personas') {
-        res.status(200).json({ personas: personasPublicas() });
+        // + o menu de dificuldade e estilo (28/set): so rotulos, nunca prompt.
+        res.status(200).json({ personas: personasPublicas(), ...catalogoDeModos() });
         return;
     }
 
@@ -2358,7 +2664,10 @@ module.exports = async (req, res) => {
         // Ligacao de dentro de uma aula: o cliente manda so o id, e a aula
         // decide a persona (e o idioma). O `cenario` do cliente e ignorado.
         const aula = body.aula ? aulaDe(body.aula, aulasContexto()) : null;
-        const persona = aula ? PERSONAS[aula.familia.persona] : personaDe(body.cenario);
+        // Fora da aula, a conversa e persona + nivel + estilo, todos de lista
+        // fechada (pedidoDeConversa). A aula guiada nao tem nivel nem estilo.
+        const pedido = aula ? null : pedidoDeConversa(body.cenario, body.nivel, body.estilo);
+        const persona = aula ? PERSONAS[aula.familia.persona] : pedido.persona;
         const requestedLang = String((aula && aula.lang) || persona.lang || body.lang || 'en').toLowerCase();
         const lang = ['en', 'fr', 'tr'].includes(requestedLang) ? requestedLang : 'en';
         const idioma = idiomaDe(lang);
@@ -2388,9 +2697,19 @@ module.exports = async (req, res) => {
             perfilDoAluno(alunoDaVez, req._securityIdentity && req._securityIdentity.appAccount),
             palavrasFracas(alunoDaVez, 8),
         ]);
-        const faixa = perfil.faixa;
+        // O nivel escolhido no menu manda na faixa; no Automatico, o perfil.
+        const faixa = pedido ? faixaDoPedido(pedido, perfil) : perfil.faixa;
+        // Total iniciante / iniciante fala portugues com ela: transcricao livre.
+        if (pedido && alunoFalaPortugues(pedido, faixa)) idiomaDoAluno = null;
 
         const ABERTURA = {
+            // Nivel Total iniciante, escolhido no menu (28/set).
+            zero: [
+                `IMPORTANT - this student is starting ${idioma} from ZERO and understands almost nothing yet.`,
+                'Open the call in Brazilian PORTUGUESE: greet them, say you will go one word at a time, and tell them answering in Portuguese is perfect.',
+                `Teach ONE ${idioma} word or tiny phrase per turn: say it slowly, twice, say what it means in Portuguese, and ask them to repeat it.`,
+                'Celebrate every attempt, even a single word. Never make them feel behind.',
+            ],
             iniciante: [
                 `IMPORTANT - this student is a TRUE BEGINNER in ${idioma}.`,
                 'Open the call in Brazilian PORTUGUESE: greet them, say what you are going to do, and tell them it is fine to answer in Portuguese at first.',
@@ -2436,7 +2755,7 @@ module.exports = async (req, res) => {
         };
         const instrucoes = (aula
             ? instrucoesDaAula(ctx, aula, 'voz')
-            : [...persona.nucleo(ctx), ...persona.voz_modo(ctx)]).filter(Boolean).join(' ');
+            : instrucoesDaPersona(pedido, ctx, 'voz')).filter(Boolean).join(' ');
         // Na aula, o iniciante fala PORTUGUES com ela (as instrucoes vem em
         // portugues): forcar o idioma da aula embaralhava a fala dele no fio,
         // o mesmo motivo da Maia.
@@ -2814,7 +3133,10 @@ module.exports = async (req, res) => {
             if (identity && identity.kind === 'user') appUserId = identity.appUserId || null;
         } catch (e) { /* sem sessao ou conta nao ligada: nao ha memoria para gravar */ }
         const body = (await readBody(req)) || {};
-        if (!appUserId || !PERSONAS_COM_MEMORIA.includes(String(body.persona || '')) || falasDoAluno(body.transcricao) < 3) {
+        // Estilo de exercicio ou encenacao (28/set) nao e a vida do aluno: nao vira
+        // lembranca. Sem `estilo` no corpo conta como conversa livre.
+        if (!appUserId || !PERSONAS_COM_MEMORIA.includes(String(body.persona || '')) || falasDoAluno(body.transcricao) < 3
+            || !estiloGuardaMemoria(body.estilo)) {
             res.status(204).end();
             return;
         }
@@ -2970,7 +3292,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST' && url === '/api/chat') {
-        const { history, message, persona: personaPedida, aula: aulaPedida } = await readBody(req);
+        const { history, message, persona: personaPedida, aula: aulaPedida, nivel: nivelPedido, estilo: estiloPedido } = await readBody(req);
         if (req.headers && req.headers.origin) assertOrigin(req);
         // A identidade NUNCA era resolvida aqui. `req._securityIdentity` so e
         // escrito dentro de resolveSecurityIdentity, e este handler nunca a
@@ -3000,15 +3322,17 @@ module.exports = async (req, res) => {
         // mandava um prompt inteiro em `systemOverride`, que este handler
         // (corretamente) ignora — e a Yara da aula nao sabia em que aula estava.
         const aula = aulaPedida ? aulaDe(aulaPedida, aulasContexto()) : null;
-        const persona = aula ? PERSONAS[aula.familia.persona] : personaDe(personaPedida);
+        const pedido = aula ? null : pedidoDeConversa(personaPedida, nivelPedido, estiloPedido);
+        const persona = aula ? PERSONAS[aula.familia.persona] : pedido.persona;
         const [perfilChat, fracasChat] = await Promise.all([
             perfilDoAluno(userId, req._securityIdentity && req._securityIdentity.appAccount),
             palavrasFracas(userId, 8),
         ]);
-        const ctxChat = { idioma: idiomaDe((aula && aula.lang) || persona.lang), faixa: perfilChat.faixa, perfil: perfilChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
+        const faixaChat = pedido ? faixaDoPedido(pedido, perfilChat) : perfilChat.faixa;
+        const ctxChat = { idioma: idiomaDe((aula && aula.lang) || persona.lang), faixa: faixaChat, perfil: perfilChat, fracas: fracasChat, tema: '', vocab: [], cargo: '', abertura: [] };
         const systemPrompt = (aula
             ? instrucoesDaAula(ctxChat, aula, 'texto')
-            : [...persona.nucleo(ctxChat), ...persona.texto_modo(ctxChat)])
+            : instrucoesDaPersona(pedido, ctxChat, 'texto'))
             .filter(Boolean).join(' ');
         const messages = [{ role: 'system', content: systemPrompt }];
         (Array.isArray(history) ? history.slice(-20) : []).forEach(m => {
@@ -3024,7 +3348,8 @@ module.exports = async (req, res) => {
             if (text) messages.push({ role: papel, content: text });
         });
         messages.push({ role: 'user', content: message.trim() });
-        callOpenAI(messages, 150, 0.85, res, req); return;
+        // Historia e conversa guiada escrevem mais por mensagem.
+        callOpenAI(messages, tokensDoChat(pedido), 0.85, res, req); return;
     }
 
     if (req.method === 'POST' && url === '/api/quiz') {
@@ -3227,16 +3552,17 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     if (req.method === 'POST' && url === '/api/lesson-quiz') {
-        const { topic, vocab, level, grammar } = await readBody(req);
+        const { topic, vocab, level, grammar, lang = 'en' } = await readBody(req);
+        const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
         // O prompt antigo dizia "for children" e travava o nivel em 'beginner'.
         // Os alunos sao ADULTOS (tecnicos de GPS agricola, candidato a vaga,
         // profissionais). E o exemplo de JSON usava opts ["A","B","C","D"]:
         // o modelo copiava literalmente e o aluno via "a resposta e A".
         const prompt = [
-            `Create 5 multiple-choice English quiz questions about "${topic}" at ${level || 'A2'} (CEFR) level.`,
-            'The students are Brazilian ADULTS learning English. Never write for children.',
+            `Create 5 multiple-choice ${targetLanguage} quiz questions about "${topic}" at ${level || 'A2'} (CEFR) level.`,
+            `The students are Brazilian ADULTS learning ${targetLanguage}. Never write for children.`,
             `Vocabulary to test: ${(vocab || []).join(', ')}.`,
-            grammar ? `Grammar point of this lesson: ${grammar}. At least 2 of the 5 questions must test it.` : '',
+            grammar ? `Pattern / structure of this lesson: ${grammar}. At least 2 of the 5 questions must test it.` : '',
             'Every option must be a real, plausible answer. NEVER use "A", "B", "C" or "D" as option text.',
             'The value of "a" must be the exact text of one of the options.',
             'Return ONLY a valid JSON array of 5 objects:',
@@ -3413,6 +3739,27 @@ Respond ONLY with valid JSON, no markdown:
     }
 
     // ── User Profile ──────────────────────────────────────────────────────────
+
+    // Only the authenticated account may change its own skin. Return the
+    // persisted row so a denied/empty update never appears successful.
+    if (req.method === 'POST' && url === '/api/account/avatar') {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const body = (await readBody(req)) || {};
+        if (!CapySkins.valid(body.avatar)) {
+            throw new HttpError(400, 'invalid_avatar', 'Escolha uma skin da coleção Capy.');
+        }
+        const rows = await sbUser(identity, `/accounts?id=eq.${encodeURIComponent(identity.appUserId)}&select=id,avatar`, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify({ avatar: body.avatar }),
+        });
+        if (!Array.isArray(rows) || rows.length !== 1 || rows[0].id !== identity.appUserId || rows[0].avatar !== body.avatar) {
+            throw new HttpError(502, 'avatar_not_saved', 'Não foi possível salvar sua skin. Tente novamente.');
+        }
+        res.status(200).json({ ok: true, avatar: rows[0].avatar });
+        return;
+    }
 
     // GET /api/profile?userId=xxx → returns user_profiles row
     if (req.method === 'GET' && url.startsWith('/api/profile')) {

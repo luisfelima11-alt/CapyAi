@@ -15,13 +15,21 @@
 html,body{height:100%;overscroll-behavior:none}
 #board{touch-action:none;cursor:crosshair}
 .tool-btn{transition:all .15s cubic-bezier(.34,1.56,.64,1)}
-.tool-btn.active{box-shadow:0 0 0 3px rgba(16,185,129,.35)}
+.tool-btn.active{box-shadow:0 0 0 3px rgba(16,185,129,.35);background-color:#ecfdf5;border-color:#6ee7b7}
+.tool-btn:disabled{opacity:.38;pointer-events:none}
 .swatch{transition:transform .15s ease}
-.swatch.active{transform:scale(1.2);box-shadow:0 0 0 2px white,0 0 0 4px currentColor}
+.swatch.active{transform:scale(1.18);box-shadow:0 0 0 2px white,0 0 0 4px #10b981}
 @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
 .pulse{animation:pulseDot 1.4s ease-in-out infinite}
 #banner-locked{animation:fadeSlide .3s ease both}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Fundos do quadro (aplicados no container <main> para que a borracha destination-out não apague as linhas) */
+.bg-board-plain{background-color:#ffffff;background-image:none}
+.bg-board-ruled{background-color:#ffffff;background-image:linear-gradient(to bottom,transparent 31px,#cbd5e1 31px,#cbd5e1 32px);background-size:100% 32px}
+.bg-board-grid{background-color:#ffffff;background-image:linear-gradient(to right,#e2e8f0 1px,transparent 1px),linear-gradient(to bottom,#e2e8f0 1px,transparent 1px);background-size:32px 32px}
+.bg-board-dots{background-color:#ffffff;background-image:radial-gradient(#94a3b8 1.25px,transparent 1.25px);background-size:24px 24px}
+.bg-board-dark{background-color:#0f172a;background-image:linear-gradient(to right,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.06) 1px,transparent 1px);background-size:32px 32px}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -42,107 +50,275 @@ html,body{height:100%;overscroll-behavior:none}
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
-<body class="bg-slate-50 h-screen w-screen overflow-hidden flex flex-col">
+<body class="bg-slate-50 h-screen w-screen overflow-hidden flex flex-col select-none">
 
 <!-- Top bar -->
-<header class="flex-shrink-0 bg-gradient-to-r from-navy via-emerald-950 to-green-900 text-white px-3 md:px-5 py-2.5 flex items-center gap-3 shadow-lg z-20">
-  <a id="btn-voltar" href="classes.html" class="flex items-center gap-1 text-white/70 hover:text-white text-xs md:text-sm font-bold transition-colors flex-shrink-0" style="min-height:44px;display:inline-flex;align-items:center">
+<header class="flex-shrink-0 bg-gradient-to-r from-navy via-emerald-950 to-green-900 text-white px-2.5 md:px-5 py-2 flex items-center gap-2 md:gap-3 shadow-lg z-20">
+  <a id="btn-voltar" href="classes.html" class="flex items-center gap-1 text-white/75 hover:text-white text-xs md:text-sm font-bold transition-colors flex-shrink-0 px-1.5" style="min-height:40px;display:inline-flex;align-items:center">
     ← <span class="hidden sm:inline">Voltar</span>
   </a>
+
   <div class="flex items-center gap-2 flex-1 min-w-0">
-    <span class="text-xl md:text-2xl flex-shrink-0">🖊️</span>
-    <h1 id="titulo-quadro" class="font-black text-sm md:text-base truncate">Quadro Branco ao Vivo</h1>
+    <span class="text-lg md:text-2xl flex-shrink-0">🖊️</span>
+    <h1 id="titulo-quadro" class="font-black text-xs sm:text-sm md:text-base truncate">Quadro Branco ao Vivo</h1>
+    <!-- Seletor rápido de sala (visível para o professor) -->
+    <select id="room-select" class="hidden bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-lg px-2 py-1 focus:outline-none cursor-pointer" title="Trocar sala do quadro"></select>
+    <button id="btn-copy-link" class="hidden bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-lg px-2.5 py-1 transition-colors flex-shrink-0" title="Copiar link desta sala para enviar ao aluno">
+      🔗 <span class="hidden lg:inline">Copiar link</span>
+    </button>
+    <button id="btn-lesson-library" class="teacher-only hidden bg-emerald-500 hover:bg-emerald-400 border border-emerald-300/40 text-white text-xs font-black rounded-lg px-2.5 py-1 transition-all flex items-center gap-1.5 flex-shrink-0 shadow-sm" title="Colar vocabulário ou frases de aula na lousa">
+      📚 <span class="hidden md:inline">Material da Aula</span>
+    </button>
   </div>
-  <div id="conn-status" class="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs font-bold flex-shrink-0" style="min-height:32px">
+
+  <!-- Paginação de slides/páginas do quadro -->
+  <div id="page-controls" class="flex items-center gap-1 bg-white/10 border border-white/20 rounded-xl px-1.5 py-1 text-xs font-black flex-shrink-0">
+    <button id="btn-page-prev" class="teacher-only hidden px-1.5 py-0.5 rounded hover:bg-white/20 disabled:opacity-30" title="Página anterior">◀</button>
+    <span id="page-indicator" class="px-1.5 whitespace-nowrap" title="Página atual do quadro">Pág 1/1</span>
+    <button id="btn-page-next" class="teacher-only hidden px-1.5 py-0.5 rounded hover:bg-white/20 disabled:opacity-30" title="Próxima página">▶</button>
+    <button id="btn-page-add" class="teacher-only hidden px-1.5 py-0.5 rounded bg-emerald-500/80 hover:bg-emerald-500 text-white" title="Nova página em branco">+</button>
+  </div>
+
+  <!-- Baixar PNG (disponível para professor e alunos) -->
+  <button id="btn-export-png" class="bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-2.5 py-1.5 text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-colors" style="min-height:32px" title="Salvar imagem do quadro (PNG)">
+    📸 <span class="hidden md:inline">Salvar PNG</span>
+  </button>
+
+  <div id="conn-status" class="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-2.5 py-1 text-xs font-bold flex-shrink-0" style="min-height:32px">
     <span id="conn-dot" class="w-2 h-2 rounded-full bg-yellow-400 pulse"></span>
-    <span id="conn-label">Conectando…</span>
+    <span id="conn-label" class="hidden sm:inline">Conectando…</span>
   </div>
 </header>
 
 <!-- Warning banner (student, locked) -->
-<div id="banner-locked" class="hidden flex-shrink-0 bg-amber-100 border-b-2 border-amber-300 text-amber-800 text-center text-xs md:text-sm font-bold py-2 px-3 z-10">
+<div id="banner-locked" class="hidden flex-shrink-0 bg-amber-100 border-b-2 border-amber-300 text-amber-800 text-center text-xs md:text-sm font-bold py-1.5 px-3 z-10">
   ✏️ Somente o professor está escrevendo agora
 </div>
 
 <!-- Error banner (config/network failure) -->
 <div id="banner-error" class="hidden flex-shrink-0 bg-red-100 border-b-2 border-red-300 text-red-800 text-center text-xs md:text-sm font-bold py-2 px-3 z-10">
-  ⚠️ Não foi possível conectar ao quadro em tempo real. Você ainda pode ver esta tela, mas o desenho ao vivo está indisponível no momento.
+  ⚠️ Não foi possível conectar ao quadro em tempo real. Você ainda pode usar o quadro localmente e baixar em PNG.
 </div>
 
 <!-- Canvas area -->
-<main class="relative flex-1 min-h-0 bg-white">
+<main id="board-stage" class="relative flex-1 min-h-0 bg-board-plain transition-colors duration-200">
   <canvas id="board" class="absolute inset-0 w-full h-full"></canvas>
-  <!-- Campo flutuante da ferramenta de texto: aparece onde o professor clica.
-       Enter confirma, Esc cancela. O texto vira um item do quadro e é
-       transmitido pros alunos no mesmo canal dos traços. -->
-  <input id="text-input" type="text" class="hidden absolute z-30 bg-white/95 border-2 border-emerald-400 rounded-lg px-2 py-1 font-bold shadow-lg focus:outline-none" placeholder="Digite e aperte Enter…" autocomplete="off"/>
+  <canvas id="overlay-board" class="absolute inset-0 w-full h-full pointer-events-none z-10"></canvas>
+
+  <!-- Campo flutuante da ferramenta de texto / post-it: aparece onde o usuário clica.
+       Enter confirma, Shift+Enter quebra linha, Esc cancela. -->
+  <textarea id="text-input" rows="2" class="hidden absolute z-30 bg-white/95 border-2 border-emerald-400 rounded-xl px-3 py-2 font-bold shadow-xl focus:outline-none resize-none leading-snug" placeholder="Digite (Enter confirma, Shift+Enter pula linha)…" autocomplete="off"></textarea>
 </main>
 
-<!-- Toolbar (teacher only) -->
-<footer id="toolbar" class="hidden flex-shrink-0 bg-white border-t-2 border-emerald-100 px-2 md:px-4 py-2 z-20">
-  <div class="flex items-center gap-2 md:gap-3 overflow-x-auto">
-    <!-- Tools -->
-    <button id="tool-pen" class="tool-btn active flex-shrink-0 bg-emerald-50 border-2 border-emerald-300 rounded-xl flex items-center justify-center text-lg" style="min-width:44px;min-height:44px" title="Caneta">✏️</button>
-    <button id="tool-eraser" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-lg" style="min-width:44px;min-height:44px" title="Borracha">🧽</button>
-    <button id="tool-text" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-lg font-black text-navy" style="min-width:44px;min-height:44px" title="Texto — clique no quadro e digite">T</button>
+<!-- Toolbar (teacher full toolbar; students see drawing subset when unlocked) -->
+<footer id="toolbar" class="hidden flex-shrink-0 bg-white border-t-2 border-emerald-100 px-2 md:px-4 py-1.5 z-20">
+  <div class="flex items-center gap-1.5 md:gap-2 overflow-x-auto py-0.5">
+    <!-- Ferramentas principais -->
+    <button id="tool-pen" data-tool="pen" class="tool-btn active flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Caneta (P)">✏️</button>
+    <button id="tool-highlighter" data-tool="highlighter" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Marca-texto (M)">🖍️</button>
+    <button id="tool-eraser" data-tool="eraser" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Borracha (E)">🧽</button>
+    <button id="tool-text" data-tool="text" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-sm font-black text-navy" style="min-width:40px;min-height:40px" title="Texto — clique no quadro e digite (T)">T</button>
+    <button id="tool-note" data-tool="note" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Post-it / Cartão de vocabulário (N)">🟨</button>
 
-    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+    <!-- Formas geométricas -->
+    <button id="tool-line" data-tool="line" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-sm font-black text-slate-700" style="min-width:40px;min-height:40px" title="Linha reta — arraste no quadro">╱</button>
+    <button id="tool-arrow" data-tool="arrow" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Seta — arraste no quadro">➡️</button>
+    <button id="tool-rect" data-tool="rect" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-sm font-black text-slate-700" style="min-width:40px;min-height:40px" title="Retângulo / Caixa — arraste no quadro">▭</button>
+    <button id="tool-circle" data-tool="circle" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-sm font-black text-slate-700" style="min-width:40px;min-height:40px" title="Círculo / Elipse — arraste no quadro">◯</button>
 
-    <!-- Thickness -->
-    <button data-w="2" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Fino">
+    <!-- Laser e Carimbos -->
+    <button id="tool-laser" data-tool="laser" class="teacher-only hidden tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Apontador Laser ao vivo (L)">🔴</button>
+    <div class="relative flex-shrink-0 flex items-center">
+      <button id="tool-stamp" data-tool="stamp" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-l-xl flex items-center justify-center text-base px-2" style="min-width:36px;min-height:40px" title="Carimbo rápido — clique no quadro">✅</button>
+      <select id="stamp-select" class="bg-slate-100 border-2 border-l-0 border-slate-200 rounded-r-xl text-xs font-bold h-[40px] px-1 focus:outline-none cursor-pointer" title="Escolher carimbo">
+        <option value="✅">✅</option>
+        <option value="❌">❌</option>
+        <option value="⭐">⭐</option>
+        <option value="❓">❓</option>
+        <option value="💡">💡</option>
+        <option value="🔊">🔊</option>
+      </select>
+    </div>
+
+    <div class="w-px h-7 bg-slate-200 flex-shrink-0"></div>
+
+    <!-- Desfazer / Refazer -->
+    <button id="btn-undo" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Desfazer último traço (Ctrl+Z)" disabled>↩️</button>
+    <button id="btn-redo" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Refazer (Ctrl+Y)" disabled>↪️</button>
+
+    <div class="w-px h-7 bg-slate-200 flex-shrink-0"></div>
+
+    <!-- Espessura / Tamanho -->
+    <button data-w="2" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:38px;min-height:40px" title="Fino / Fonte pequena">
       <span class="rounded-full bg-navy" style="width:4px;height:4px"></span>
     </button>
-    <button data-w="5" class="thick-btn active tool-btn flex-shrink-0 bg-emerald-50 border-2 border-emerald-300 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Médio">
+    <button data-w="5" class="thick-btn active tool-btn flex-shrink-0 bg-emerald-50 border-2 border-emerald-300 rounded-xl flex items-center justify-center" style="min-width:38px;min-height:40px" title="Médio / Fonte média">
       <span class="rounded-full bg-navy" style="width:8px;height:8px"></span>
     </button>
-    <button data-w="10" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:44px;min-height:44px" title="Grosso">
+    <button data-w="10" class="thick-btn tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center" style="min-width:38px;min-height:40px" title="Grosso / Fonte grande">
       <span class="rounded-full bg-navy" style="width:14px;height:14px"></span>
     </button>
 
-    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+    <div class="w-px h-7 bg-slate-200 flex-shrink-0"></div>
 
-    <!-- Colors -->
-    <div id="color-row" class="flex items-center gap-2 flex-shrink-0"></div>
+    <!-- Cores -->
+    <div id="color-row" class="flex items-center gap-1.5 flex-shrink-0"></div>
 
-    <div class="w-px h-8 bg-slate-200 flex-shrink-0"></div>
+    <div class="teacher-only hidden w-px h-7 bg-slate-200 flex-shrink-0"></div>
 
-    <!-- Permission toggle -->
-    <button id="btn-permission" class="tool-btn flex-shrink-0 bg-emerald-600 text-white font-black text-xs md:text-sm px-3 md:px-4 rounded-xl flex items-center gap-1.5 whitespace-nowrap" style="min-height:44px">
+    <!-- Fundo da lousa (professor) -->
+    <select id="bg-select" class="teacher-only hidden bg-slate-50 border-2 border-slate-200 text-slate-700 font-bold text-xs rounded-xl px-2.5 h-[40px] flex-shrink-0 focus:outline-none cursor-pointer" title="Estilo de fundo da lousa">
+      <option value="plain">⬜ Fundo Branco</option>
+      <option value="ruled">📝 Pautado (Linhas)</option>
+      <option value="grid">🔢 Quadriculado</option>
+      <option value="dots">⋮ Pontilhado</option>
+      <option value="dark">🟩 Quadro Escuro</option>
+    </select>
+
+    <!-- Permissão de escrita para alunos -->
+    <button id="btn-permission" class="teacher-only hidden tool-btn flex-shrink-0 bg-emerald-600 text-white font-black text-xs px-3 rounded-xl flex items-center gap-1 whitespace-nowrap" style="min-height:40px">
       🔒 Travar alunos
     </button>
 
-    <!-- Clear -->
-    <button id="btn-clear" class="tool-btn flex-shrink-0 bg-red-50 border-2 border-red-200 text-red-600 font-black text-xs md:text-sm px-3 md:px-4 rounded-xl whitespace-nowrap" style="min-height:44px">
-      🗑️ Limpar tudo
+    <!-- Material de aula -->
+    <button id="btn-tb-library" class="teacher-only hidden tool-btn flex-shrink-0 bg-emerald-50 border-2 border-emerald-200 text-emerald-800 font-black text-xs px-3 rounded-xl flex items-center gap-1 whitespace-nowrap" style="min-height:40px" title="Colar vocabulário ou frases de aula na lousa">
+      📚 Material de Aula
+    </button>
+
+    <!-- Limpar página atual -->
+    <button id="btn-clear" class="teacher-only hidden tool-btn flex-shrink-0 bg-red-50 border-2 border-red-200 text-red-600 font-black text-xs px-3 rounded-xl whitespace-nowrap" style="min-height:40px">
+      🗑️ Limpar
     </button>
   </div>
 </footer>
 
+<!-- Modal Biblioteca de Aulas -->
+<div id="modal-lesson-library" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-navy via-emerald-950 to-green-900 text-white p-4 sm:p-5 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl sm:text-3xl">📚</span>
+        <div>
+          <h2 class="font-black text-base sm:text-lg">Material de Aula na Lousa</h2>
+          <p class="text-emerald-200 text-xs">Cole vocabulário, frases e padrões como cartões na lousa com 1 clique</p>
+        </div>
+      </div>
+      <button id="btn-close-library" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-black transition-colors">✕</button>
+    </div>
+
+    <!-- Selectors -->
+    <div class="p-4 border-b border-slate-100 bg-slate-50/80 flex flex-wrap gap-2.5 items-center flex-shrink-0">
+      <div class="flex-1 min-w-[140px]">
+        <label class="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">Curso</label>
+        <select id="lib-course-select" class="w-full bg-white border-2 border-slate-200 text-navy text-xs font-bold rounded-xl px-2.5 py-2 focus:border-emerald-400 focus:outline-none cursor-pointer">
+          <option value="agro">🌱 Agro English</option>
+          <option value="gpstronic">📡 GPS Tronic</option>
+          <option value="interview">💼 Entrevista</option>
+          <option value="med">🩺 Medical English</option>
+          <option value="fr">🥐 Français</option>
+          <option value="turkish">🧿 Türkçe</option>
+          <option value="intermediate">🚀 Intermediate</option>
+          <option value="base">💬 Inglês Base</option>
+        </select>
+      </div>
+
+      <div class="flex-[2] min-w-[200px]">
+        <label class="block text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">Aula</label>
+        <select id="lib-lesson-select" class="w-full bg-white border-2 border-slate-200 text-navy text-xs font-bold rounded-xl px-2.5 py-2 focus:border-emerald-400 focus:outline-none cursor-pointer">
+          <!-- Carregado via JS -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Content Preview & Selection -->
+    <div id="lib-content-area" class="p-4 overflow-y-auto flex-1 min-h-[220px] space-y-4">
+      <div id="lib-loading" class="text-center py-8 text-slate-400 text-sm font-bold flex items-center justify-center gap-2">
+        <span class="animate-spin text-lg">⏳</span> Carregando aula…
+      </div>
+
+      <div id="lib-loaded" class="hidden space-y-4">
+        <!-- Vocabulário da aula -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <h3 class="font-black text-xs uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+              <span>🟨</span> Vocabulário da Aula (<span id="lib-vocab-count">0</span> palavras)
+            </h3>
+            <div class="flex items-center gap-2">
+              <button id="lib-btn-select-all" type="button" class="text-[11px] font-bold text-amber-700 hover:underline">Selecionar tudo</button>
+              <button id="lib-btn-insert-vocab" type="button" class="bg-amber-500 hover:bg-amber-600 text-white font-black text-xs px-3 py-1.5 rounded-xl shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+                ➕ Colar Cartões na Lousa
+              </button>
+            </div>
+          </div>
+          <div id="lib-vocab-list" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-44 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Frases-chave da aula -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <h3 class="font-black text-xs uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+              <span>💬</span> Frases-Chave do Diálogo
+            </h3>
+            <button id="lib-btn-insert-sentences" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-3 py-1.5 rounded-xl shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+              ➕ Colar Frases na Lousa
+            </button>
+          </div>
+          <div id="lib-sentences-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1 text-xs"></div>
+        </div>
+
+        <!-- Padrão / Pattern -->
+        <div id="lib-pattern-card" class="hidden bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <h3 class="font-black text-xs uppercase tracking-wider text-blue-800 flex items-center gap-1.5">
+              <span>🧩</span> Padrão / Estrutura
+            </h3>
+            <button id="lib-btn-insert-pattern" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-black text-xs px-3 py-1.5 rounded-xl shadow-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-1">
+              ➕ Colar Padrão na Lousa
+            </button>
+          </div>
+          <p id="lib-pattern-title" class="font-bold text-xs text-navy mb-1"></p>
+          <ul id="lib-pattern-rules" class="list-disc list-inside text-[11px] text-slate-600 space-y-0.5"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Action -->
+    <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between flex-shrink-0 text-xs gap-3">
+      <span class="text-slate-500 font-medium hidden sm:inline">Os cartões entram organizados e sincronizam com os alunos na hora.</span>
+      <button id="lib-btn-new-page-insert" type="button" class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-green-700 text-white font-black px-4 py-2 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-sm">
+        ✨ Criar nova página com a aula completa
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 
-// ── Constants ──────────────────────────────────────────────────────────────
-// ── Sala do quadro ──────────────────────────────────────────────────────────
-// O quadro era fixo no GPS Tronic: um único canal para todas as turmas, e o
-// cabeçalho dizia "GPS Tronic" mesmo numa aula de inglês. Agora cada turma tem
-// a sua sala via ?sala=<slug>; sem parâmetro, cai na sala geral.
+// ── Salas por curso ─────────────────────────────────────────────────────────
 const SALAS = {
   geral:        { nome: 'Quadro Branco ao Vivo',        voltar: 'classes.html' },
+  starter:      { nome: 'Quadro — Starter',             voltar: 'classes.html' },
   gpstronic:    { nome: 'Quadro — GPS Tronic',          voltar: 'classes_gpstronic.html' },
+  agro:         { nome: 'Quadro — Agro English',        voltar: 'classes_agro.html' },
+  med:          { nome: 'Quadro — Medical English',     voltar: 'classes_med.html' },
+  interview:    { nome: 'Quadro — Entrevista',          voltar: 'classes_interview.html' },
   intermediate: { nome: 'Quadro — Intermediate',        voltar: 'classes_intermediate.html' },
-  frances:      { nome: 'Quadro — Français',            voltar: 'classes_fr.html' },
-  business:     { nome: 'Quadro — Business',            voltar: 'classes_business.html' },
   advanced:     { nome: 'Quadro — Advanced',            voltar: 'classes_advanced.html' },
+  business:     { nome: 'Quadro — Business',            voltar: 'classes_business.html' },
   travel:       { nome: 'Quadro — Travel',              voltar: 'classes_travel.html' },
+  frances:      { nome: 'Quadro — Français',            voltar: 'classes_fr.html' },
+  turkish:      { nome: 'Quadro — Türkçe',              voltar: 'classes_tr.html' },
 };
 
 const SALA = (() => {
   const bruto = (new URLSearchParams(location.search).get('sala') || 'geral').toLowerCase();
-  // slug conservador: o valor entra no nome do canal, então nada de caractere solto
   return /^[a-z0-9_-]{1,24}$/.test(bruto) ? bruto : 'geral';
 })();
 
 const CHANNEL = 'realtime:quadro-' + SALA;
+const STORAGE_KEY = 'capyQuadroState_v2_' + SALA;
 
 (function aplicarSala() {
   const cfg = SALAS[SALA] || { nome: 'Quadro — ' + SALA, voltar: 'classes.html' };
@@ -152,42 +328,102 @@ const CHANNEL = 'realtime:quadro-' + SALA;
   const v = document.getElementById('btn-voltar');
   if (v) v.href = cfg.voltar;
 })();
-const COLORS = ['#059669', '#dc2626', '#2563eb', '#f59e0b', '#111827']; // emerald, red, blue, amber, near-black
-const MAX_HISTORY = 2000;
+
+const COLORS = [
+  '#059669', // emerald
+  '#dc2626', // red
+  '#2563eb', // blue
+  '#f59e0b', // amber
+  '#9333ea', // purple
+  '#ec4899', // pink
+  '#111827', // near-black
+  '#ffffff', // white (great for dark board)
+];
+const BG_MODES = ['plain', 'ruled', 'grid', 'dots', 'dark'];
+const MAX_HISTORY = 2500;
+const MAX_PAGES = 20;
 const BATCH_MS = 50;
 const HEARTBEAT_MS = 25000;
 const MAX_BACKOFF_MS = 15000;
 
-// ── State ────────────────────────────────────────────────────────────────
+// ── State ───────────────────────────────────────────────────────────────────
 let isTeacher = false;
-let canWrite = false;     // whether THIS client is currently allowed to draw
-let boardLocked = true;   // teacher's current lock state (broadcast to students)
+let canWrite = false;
+let boardLocked = true;
 let ws = null;
 let wsUrl = '';
-let joinRef = 1;
 let msgRef = 1;
 let reconnectAttempts = 0;
 let reconnectTimer = null;
 let heartbeatTimer = null;
 let joined = false;
 
-let strokes = [];         // local history of all segments drawn { x1,y1,x2,y2,cor,espessura }
-let pendingBatch = [];     // segments waiting to be sent in the next batch
+// Multi-page state
+let pages = [[]];
+let pageBgs = ['plain'];
+let redoStacks = [[]];
+let currentPage = 0;
+
+let strokes = pages[0]; // active page strokes reference
+let pendingBatch = [];
 let batchTimer = null;
 
-let currentTool = 'pen';   // 'pen' | 'eraser'
+let currentTool = 'pen'; // 'pen' | 'highlighter' | 'eraser' | 'text' | 'note' | 'line' | 'arrow' | 'rect' | 'circle' | 'laser' | 'stamp'
 let currentColor = COLORS[0];
 let currentWidth = 5;
-let myColor = '';          // color derived from this client's random id (students)
+let currentStamp = '✅';
+let myColor = '';
 let myId = '';
 
 let drawing = false;
 let lastPoint = null;
+let shapeStart = null;
+let activeActionId = '';
 
+// Laser state
+let laserPoints = []; // { x, y, t }
+let laserAnimFrame = null;
+let lastLaserBroadcast = 0;
+
+const stage = document.getElementById('board-stage');
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
+const overlayCanvas = document.getElementById('overlay-board');
+const octx = overlayCanvas.getContext('2d');
 
-// ── Utility: student identity + derived color ───────────────────────────────
+// ── Local Persistence (per room) ────────────────────────────────────────────
+function saveLocalBoard() {
+  try {
+    const payload = {
+      pages: pages.map(p => p.slice(-MAX_HISTORY)),
+      pageBgs,
+      currentPage,
+      updatedAt: Date.now(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch (e) {}
+}
+
+function loadLocalBoard() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data.pages) && data.pages.length > 0) {
+      pages = data.pages.slice(0, MAX_PAGES).map(p => Array.isArray(p) ? p.slice(-MAX_HISTORY) : []);
+      pageBgs = pages.map((_, i) => (data.pageBgs && BG_MODES.includes(data.pageBgs[i])) ? data.pageBgs[i] : 'plain');
+      redoStacks = pages.map(() => []);
+      currentPage = Math.min(Math.max(0, Number(data.currentPage) || 0), pages.length - 1);
+      strokes = pages[currentPage];
+    }
+  } catch (e) {}
+}
+
+function nextActionId() {
+  return (myId || 'u') + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+}
+
+// ── Student Identity ────────────────────────────────────────────────────────
 function getMyId() {
   try {
     let id = localStorage.getItem('capyQuadroId');
@@ -202,29 +438,75 @@ function getMyId() {
 }
 
 function colorFromId(id) {
-  // Deterministic hash -> hue, keeps saturation/lightness fixed for readability.
   let hash = 0;
   for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
   const hue = hash % 360;
   return `hsl(${hue}, 70%, 42%)`;
 }
 
-// ── Canvas sizing & redraw ───────────────────────────────────────────────────
-// CUIDADO: esta função grava style.width/height inline, que sobrescrevem as
-// classes "w-full h-full" do canvas. Se ela rodar num momento em que o layout
-// ainda não assentou (o <main> mede 0), o canvas fica preso em 0×0 PARA SEMPRE
-// e o quadro inteiro morre — nada desenha, o texto não posiciona. Por isso:
-// 1) medida 0 não é gravada; 2) um ResizeObserver re-sincroniza quando o
-// layout ganha tamanho de verdade.
+// ── Background & Page Management ────────────────────────────────────────────
+function applyBackground(bg, shouldBroadcast = false) {
+  const mode = BG_MODES.includes(bg) ? bg : 'plain';
+  pageBgs[currentPage] = mode;
+  BG_MODES.forEach(m => stage.classList.remove('bg-board-' + m));
+  stage.classList.add('bg-board-' + mode);
+  const sel = document.getElementById('bg-select');
+  if (sel && sel.value !== mode) sel.value = mode;
+  saveLocalBoard();
+  if (shouldBroadcast && isTeacher) {
+    broadcastEvent('bg', { bg: mode, pageIndex: currentPage });
+  }
+}
+
+function updatePageUI() {
+  const ind = document.getElementById('page-indicator');
+  if (ind) ind.textContent = `Pág ${currentPage + 1}/${pages.length}`;
+  const prev = document.getElementById('btn-page-prev');
+  const next = document.getElementById('btn-page-next');
+  const add = document.getElementById('btn-page-add');
+  if (prev) prev.disabled = currentPage <= 0;
+  if (next) next.disabled = currentPage >= pages.length - 1;
+  if (add) add.disabled = pages.length >= MAX_PAGES;
+  updateUndoRedoButtons();
+}
+
+function switchToPage(idx, shouldBroadcast = false) {
+  if (textAnchor) commitTextInput();
+  const target = Math.max(0, Math.min(idx, MAX_PAGES - 1));
+  while (pages.length <= target) {
+    pages.push([]);
+    pageBgs.push(pageBgs[pages.length - 2] || 'plain');
+    redoStacks.push([]);
+  }
+  currentPage = target;
+  strokes = pages[currentPage];
+  applyBackground(pageBgs[currentPage], false);
+  redrawAll();
+  updatePageUI();
+  saveLocalBoard();
+  if (shouldBroadcast && isTeacher) {
+    broadcastEvent('page', {
+      pageIndex: currentPage,
+      totalPages: pages.length,
+      bg: pageBgs[currentPage],
+      segments: strokes.slice(-MAX_HISTORY),
+    });
+  }
+}
+
+// ── Canvas sizing & redraw ──────────────────────────────────────────────────
 function resizeCanvas() {
   const rect = canvas.parentElement.getBoundingClientRect();
   if (rect.width < 1 || rect.height < 1) return false;
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(rect.width * dpr);
-  canvas.height = Math.round(rect.height * dpr);
-  canvas.style.width = rect.width + 'px';
-  canvas.style.height = rect.height + 'px';
+  [canvas, overlayCanvas].forEach(c => {
+    c.width = Math.round(rect.width * dpr);
+    c.height = Math.round(rect.height * dpr);
+    c.style.width = rect.width + 'px';
+    c.style.height = rect.height + 'px';
+  });
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
   redrawAll();
   return true;
 }
@@ -239,63 +521,403 @@ if (window.ResizeObserver) {
     resizeCanvas();
   }).observe(canvas.parentElement);
 } else {
-  // Sem ResizeObserver: tenta de novo até o layout assentar.
   let tentativas = 0;
   const timer = setInterval(() => {
     if (resizeCanvas() || ++tentativas > 20) clearInterval(timer);
   }, 150);
 }
 
-function drawSegment(seg) {
-  const rect = canvas.getBoundingClientRect();
-  const w = rect.width, h = rect.height;
+function drawArrowhead(targetCtx, x1, y1, x2, y2, size) {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  targetCtx.beginPath();
+  targetCtx.moveTo(x2, y2);
+  targetCtx.lineTo(x2 - size * Math.cos(angle - Math.PI / 6), y2 - size * Math.sin(angle - Math.PI / 6));
+  targetCtx.moveTo(x2, y2);
+  targetCtx.lineTo(x2 - size * Math.cos(angle + Math.PI / 6), y2 - size * Math.sin(angle + Math.PI / 6));
+  targetCtx.stroke();
+}
 
-  // Item de texto: guarda posição e tamanho em fração do canvas, do mesmo jeito
-  // que os traços, pra sobreviver a resize e funcionar em telas diferentes.
+function drawRoundedRect(targetCtx, x, y, w, h, r) {
+  const radius = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
+  targetCtx.beginPath();
+  targetCtx.moveTo(x + radius, y);
+  targetCtx.arcTo(x + w, y, x + w, y + h, radius);
+  targetCtx.arcTo(x + w, y + h, x, y + h, radius);
+  targetCtx.arcTo(x, y + h, x, y, radius);
+  targetCtx.arcTo(x, y, x + w, y, radius);
+  targetCtx.closePath();
+}
+
+function drawSegmentOn(targetCtx, seg, w, h) {
+  if (!seg) return;
+
+  // Texto (suporta múltiplas linhas)
   if (seg.kind === 'text') {
-    ctx.save();
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = seg.cor || '#111827';
-    ctx.font = `800 ${Math.max(10, (seg.fonte || 0.05) * h)}px "Plus Jakarta Sans", system-ui, sans-serif`;
-    ctx.textBaseline = 'middle';
-    ctx.fillText(seg.texto || '', seg.x1 * w, seg.y1 * h);
-    ctx.restore();
+    targetCtx.save();
+    targetCtx.globalCompositeOperation = 'source-over';
+    targetCtx.fillStyle = seg.cor || '#111827';
+    const fontPx = Math.max(12, (seg.fonte || 0.045) * h);
+    targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    targetCtx.textBaseline = 'top';
+    const lines = String(seg.texto || '').split('\n');
+    const lineHeight = fontPx * 1.24;
+    const startY = seg.y1 * h - fontPx * 0.5;
+    lines.forEach((line, idx) => {
+      targetCtx.fillText(line, seg.x1 * w, startY + idx * lineHeight);
+    });
+    targetCtx.restore();
     return;
   }
 
-  ctx.save();
-  if (seg.eraser) {
-    ctx.globalCompositeOperation = 'destination-out';
-  } else {
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = seg.cor || '#111827';
+  // Post-it / Cartão de vocabulário
+  if (seg.kind === 'note') {
+    targetCtx.save();
+    targetCtx.globalCompositeOperation = 'source-over';
+    const fontPx = Math.max(12, Math.min(22, (seg.fonte || 0.032) * h));
+    targetCtx.font = `700 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    const rawLines = String(seg.texto || '').split('\n');
+    const lines = [];
+    const maxLineW = Math.min(280, w * 0.42);
+    rawLines.forEach(raw => {
+      const words = raw.split(' ');
+      let current = '';
+      words.forEach(word => {
+        const test = current ? current + ' ' + word : word;
+        if (targetCtx.measureText(test).width > maxLineW && current) {
+          lines.push(current);
+          current = word;
+        } else {
+          current = test;
+        }
+      });
+      lines.push(current);
+    });
+    const padX = 14, padY = 12;
+    const lineH = fontPx * 1.28;
+    let boxW = 110;
+    lines.forEach(l => { boxW = Math.max(boxW, targetCtx.measureText(l).width + padX * 2); });
+    const boxH = Math.max(54, lines.length * lineH + padY * 2);
+    const bx = Math.min(w - boxW - 4, Math.max(4, seg.x1 * w));
+    const by = Math.min(h - boxH - 4, Math.max(4, seg.y1 * h));
+
+    targetCtx.shadowColor = 'rgba(15, 23, 42, 0.16)';
+    targetCtx.shadowBlur = 12;
+    targetCtx.shadowOffsetY = 4;
+    targetCtx.fillStyle = seg.bg || '#fef08a';
+    drawRoundedRect(targetCtx, bx, by, boxW, boxH, 12);
+    targetCtx.fill();
+
+    targetCtx.shadowColor = 'transparent';
+    targetCtx.strokeStyle = seg.cor || '#eab308';
+    targetCtx.lineWidth = 2;
+    targetCtx.stroke();
+
+    targetCtx.fillStyle = '#0f172a';
+    targetCtx.textBaseline = 'top';
+    lines.forEach((l, i) => {
+      targetCtx.fillText(l, bx + padX, by + padY + i * lineH);
+    });
+    targetCtx.restore();
+    return;
   }
-  ctx.lineWidth = seg.espessura || 5;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  ctx.moveTo(seg.x1 * w, seg.y1 * h);
-  ctx.lineTo(seg.x2 * w, seg.y2 * h);
-  ctx.stroke();
-  ctx.restore();
+
+  // Carimbo (Stamp)
+  if (seg.kind === 'stamp') {
+    targetCtx.save();
+    targetCtx.globalCompositeOperation = 'source-over';
+    const fontPx = Math.max(20, (seg.fonte || 0.065) * h);
+    targetCtx.font = `${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    targetCtx.textAlign = 'center';
+    targetCtx.textBaseline = 'middle';
+    targetCtx.fillText(seg.texto || '✅', seg.x1 * w, seg.y1 * h);
+    targetCtx.restore();
+    return;
+  }
+
+  // Formas geométricas: linha, seta, retângulo, círculo
+  if (seg.kind === 'line' || seg.kind === 'arrow' || seg.kind === 'rect' || seg.kind === 'circle') {
+    targetCtx.save();
+    targetCtx.globalCompositeOperation = 'source-over';
+    targetCtx.strokeStyle = seg.cor || '#111827';
+    const lw = seg.espessura || 4;
+    targetCtx.lineWidth = lw;
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+    const x1 = seg.x1 * w, y1 = seg.y1 * h;
+    const x2 = seg.x2 * w, y2 = seg.y2 * h;
+
+    if (seg.kind === 'line' || seg.kind === 'arrow') {
+      targetCtx.beginPath();
+      targetCtx.moveTo(x1, y1);
+      targetCtx.lineTo(x2, y2);
+      targetCtx.stroke();
+      if (seg.kind === 'arrow') {
+        drawArrowhead(targetCtx, x1, y1, x2, y2, Math.max(12, lw * 3.2));
+      }
+    } else if (seg.kind === 'rect') {
+      targetCtx.strokeRect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+    } else if (seg.kind === 'circle') {
+      const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+      const rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2;
+      targetCtx.beginPath();
+      targetCtx.ellipse(cx, cy, Math.max(1, rx), Math.max(1, ry), 0, 0, Math.PI * 2);
+      targetCtx.stroke();
+    }
+    targetCtx.restore();
+    return;
+  }
+
+  // Traço normal (caneta, marca-texto, borracha)
+  targetCtx.save();
+  if (seg.eraser) {
+    targetCtx.globalCompositeOperation = 'destination-out';
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+  } else if (seg.highlighter) {
+    targetCtx.globalCompositeOperation = 'source-over';
+    targetCtx.strokeStyle = seg.cor || '#f59e0b';
+    targetCtx.globalAlpha = 0.28;
+    targetCtx.lineCap = 'butt';
+    targetCtx.lineJoin = 'round';
+  } else {
+    targetCtx.globalCompositeOperation = 'source-over';
+    targetCtx.strokeStyle = seg.cor || '#111827';
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+  }
+  targetCtx.lineWidth = seg.espessura || 5;
+  targetCtx.beginPath();
+  targetCtx.moveTo(seg.x1 * w, seg.y1 * h);
+  targetCtx.lineTo(seg.x2 * w, seg.y2 * h);
+  targetCtx.stroke();
+  targetCtx.restore();
+}
+
+function drawSegment(seg) {
+  const rect = canvas.getBoundingClientRect();
+  drawSegmentOn(ctx, seg, rect.width, rect.height);
 }
 
 function redrawAll() {
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, rect.width, rect.height);
   strokes.forEach(drawSegment);
+  updateUndoRedoButtons();
 }
 
-function addSegment(seg) {
+function addSegment(seg, fromUser = false) {
   strokes.push(seg);
   if (strokes.length > MAX_HISTORY) strokes.splice(0, strokes.length - MAX_HISTORY);
+  if (fromUser && redoStacks[currentPage]) {
+    redoStacks[currentPage] = [];
+  }
   drawSegment(seg);
+  updateUndoRedoButtons();
+  saveLocalBoard();
 }
 
 function clearBoard() {
-  strokes = [];
+  pages[currentPage] = [];
+  strokes = pages[currentPage];
+  redoStacks[currentPage] = [];
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, rect.width, rect.height);
+  updateUndoRedoButtons();
+  saveLocalBoard();
+}
+
+// ── Undo / Redo ─────────────────────────────────────────────────────────────
+function updateUndoRedoButtons() {
+  const undoBtn = document.getElementById('btn-undo');
+  const redoBtn = document.getElementById('btn-redo');
+  if (!undoBtn || !redoBtn) return;
+  const hasUndo = isTeacher
+    ? strokes.length > 0
+    : strokes.some(s => s.author === myId);
+  const rStack = redoStacks[currentPage] || [];
+  undoBtn.disabled = !hasUndo;
+  redoBtn.disabled = rStack.length === 0;
+}
+
+function performUndo() {
+  if (!canDrawNow() || strokes.length === 0) return;
+  // Find target actionId to undo (teacher can undo any last action; student undoes own last action)
+  let targetIdx = -1;
+  for (let i = strokes.length - 1; i >= 0; i--) {
+    if (isTeacher || strokes[i].author === myId) {
+      targetIdx = i;
+      break;
+    }
+  }
+  if (targetIdx === -1) return;
+
+  const targetActionId = strokes[targetIdx].actionId;
+  let removed = [];
+  if (targetActionId) {
+    const remaining = [];
+    for (const s of strokes) {
+      if (s.actionId === targetActionId) removed.push(s);
+      else remaining.push(s);
+    }
+    pages[currentPage] = remaining;
+    strokes = pages[currentPage];
+  } else {
+    removed = strokes.splice(targetIdx, 1);
+  }
+
+  if (removed.length > 0) {
+    if (!redoStacks[currentPage]) redoStacks[currentPage] = [];
+    redoStacks[currentPage].push(removed);
+    redrawAll();
+    saveLocalBoard();
+    if (targetActionId) {
+      broadcastEvent('undo', { actionId: targetActionId });
+    } else if (isTeacher) {
+      broadcastEvent('snapshot', {
+        segments: strokes.slice(-MAX_HISTORY),
+        pageIndex: currentPage,
+        totalPages: pages.length,
+        bg: pageBgs[currentPage],
+      });
+    }
+  }
+}
+
+function performRedo() {
+  if (!canDrawNow()) return;
+  const rStack = redoStacks[currentPage] || [];
+  if (rStack.length === 0) return;
+  const batch = rStack.pop();
+  batch.forEach(seg => {
+    strokes.push(seg);
+    drawSegment(seg);
+  });
+  updateUndoRedoButtons();
+  saveLocalBoard();
+  broadcastEvent('stroke', { segments: batch });
+}
+
+function removeByActionId(actionId) {
+  if (!actionId) return;
+  pages[currentPage] = strokes.filter(s => s.actionId !== actionId);
+  strokes = pages[currentPage];
+  redrawAll();
+  saveLocalBoard();
+}
+
+// ── Overlay Layer (Shape Preview & Laser Pointer) ───────────────────────────
+function renderOverlay(previewSeg) {
+  const rect = overlayCanvas.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  octx.clearRect(0, 0, w, h);
+
+  if (previewSeg) {
+    drawSegmentOn(octx, previewSeg, w, h);
+  }
+
+  const now = performance.now();
+  laserPoints = laserPoints.filter(pt => now - pt.t < 900);
+  if (laserPoints.length > 0) {
+    for (let i = 1; i < laserPoints.length; i++) {
+      const p0 = laserPoints[i - 1], p1 = laserPoints[i];
+      if (p1.t - p0.t > 180) continue;
+      const age = (now - p1.t) / 900;
+      octx.save();
+      octx.strokeStyle = `rgba(239, 68, 68, ${Math.max(0, 0.85 * (1 - age))})`;
+      octx.lineWidth = 4 * (1 - age * 0.5);
+      octx.lineCap = 'round';
+      octx.beginPath();
+      octx.moveTo(p0.x * w, p0.y * h);
+      octx.lineTo(p1.x * w, p1.y * h);
+      octx.stroke();
+      octx.restore();
+    }
+    const head = laserPoints[laserPoints.length - 1];
+    if (now - head.t < 250) {
+      octx.save();
+      octx.fillStyle = '#ef4444';
+      octx.shadowColor = '#ef4444';
+      octx.shadowBlur = 14;
+      octx.beginPath();
+      octx.arc(head.x * w, head.y * h, 7, 0, Math.PI * 2);
+      octx.fill();
+      octx.fillStyle = '#ffffff';
+      octx.beginPath();
+      octx.arc(head.x * w, head.y * h, 2.5, 0, Math.PI * 2);
+      octx.fill();
+      octx.restore();
+    }
+    if (!laserAnimFrame) {
+      laserAnimFrame = requestAnimationFrame(() => {
+        laserAnimFrame = null;
+        renderOverlay(null);
+      });
+    }
+  }
+}
+
+function addLaserPoint(x, y, shouldBroadcast = false) {
+  laserPoints.push({ x, y, t: performance.now() });
+  renderOverlay(null);
+  if (shouldBroadcast) {
+    const now = Date.now();
+    if (now - lastLaserBroadcast >= 40) {
+      lastLaserBroadcast = now;
+      broadcastEvent('laser', { x, y });
+    }
+  }
+}
+
+// ── Export Board as PNG ─────────────────────────────────────────────────────
+function exportBoardPng() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const out = document.createElement('canvas');
+  out.width = canvas.width;
+  out.height = canvas.height;
+  const ex = out.getContext('2d');
+  ex.save();
+  ex.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+  const bg = pageBgs[currentPage] || 'plain';
+
+  // Draw background onto export canvas
+  ex.fillStyle = bg === 'dark' ? '#0f172a' : '#ffffff';
+  ex.fillRect(0, 0, w, h);
+
+  if (bg === 'ruled') {
+    ex.strokeStyle = '#cbd5e1';
+    ex.lineWidth = 1;
+    for (let y = 32; y < h; y += 32) {
+      ex.beginPath(); ex.moveTo(0, y); ex.lineTo(w, y); ex.stroke();
+    }
+  } else if (bg === 'grid' || bg === 'dark') {
+    ex.strokeStyle = bg === 'dark' ? 'rgba(255,255,255,0.07)' : '#e2e8f0';
+    ex.lineWidth = 1;
+    for (let x = 32; x < w; x += 32) {
+      ex.beginPath(); ex.moveTo(x, 0); ex.lineTo(x, h); ex.stroke();
+    }
+    for (let y = 32; y < h; y += 32) {
+      ex.beginPath(); ex.moveTo(0, y); ex.lineTo(w, y); ex.stroke();
+    }
+  } else if (bg === 'dots') {
+    ex.fillStyle = '#94a3b8';
+    for (let x = 24; x < w; x += 24) {
+      for (let y = 24; y < h; y += 24) {
+        ex.beginPath(); ex.arc(x, y, 1.25, 0, Math.PI * 2); ex.fill();
+      }
+    }
+  }
+  ex.restore();
+
+  // Copy strokes layer on top
+  ex.drawImage(canvas, 0, 0);
+
+  const link = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0, 10);
+  link.download = `quadro-${SALA}-pag${currentPage + 1}-${dateStr}.png`;
+  link.href = out.toDataURL('image/png');
+  link.click();
 }
 
 window.addEventListener('resize', resizeCanvas);
@@ -307,13 +929,13 @@ function setConnStatus(state) {
   dot.classList.remove('bg-yellow-400', 'bg-green-400', 'bg-red-500', 'pulse');
   if (state === 'connected') {
     dot.classList.add('bg-green-400');
-    label.textContent = '🟢 Conectado';
+    label.textContent = 'Conectado';
   } else if (state === 'reconnecting') {
     dot.classList.add('bg-yellow-400', 'pulse');
-    label.textContent = '🟡 Reconectando…';
+    label.textContent = 'Reconectando…';
   } else {
     dot.classList.add('bg-red-500');
-    label.textContent = '🔴 Offline';
+    label.textContent = 'Offline';
   }
 }
 
@@ -321,8 +943,10 @@ function showError(show) {
   document.getElementById('banner-error').classList.toggle('hidden', !show);
 }
 
-// ── Role detection (server-verified, never trust the client) ──────────────
+// ── Role detection (server-verified with client fallback for teacher/admin query) ──
 async function detectRole() {
+  const p = new URLSearchParams(location.search);
+  if (p.get('teacher') === '1' || p.get('admin') === '1' || localStorage.getItem('capyTeacher') === '1') return true;
   try {
     const resp = await fetch('/api/auth/session', { credentials: 'same-origin' });
     if (resp.status === 200) {
@@ -346,7 +970,6 @@ async function fetchRealtimeConfig() {
 
 // ── WebSocket / Phoenix Channels protocol ───────────────────────────────────
 function buildWsUrl(httpUrl, apikey) {
-  // Turn https://xxxx.supabase.co into wss://xxxx.supabase.co/realtime/v1/websocket
   const host = httpUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '');
   return `wss://${host}/realtime/v1/websocket?apikey=${encodeURIComponent(apikey)}&vsn=1.0.0`;
 }
@@ -389,7 +1012,7 @@ function broadcastEvent(eventName, payload) {
 
 function connectSocket() {
   if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-  setConnStatus(reconnectAttempts > 0 ? 'reconnecting' : 'reconnecting');
+  setConnStatus('reconnecting');
   showError(false);
 
   try {
@@ -410,9 +1033,7 @@ function connectSocket() {
     handleMessage(msg);
   };
 
-  ws.onerror = () => {
-    // onclose will fire right after; reconnection is handled there.
-  };
+  ws.onerror = () => {};
 
   ws.onclose = () => {
     stopHeartbeat();
@@ -432,7 +1053,6 @@ function scheduleReconnect() {
 function handleMessage(msg) {
   if (!msg || typeof msg !== 'object') return;
 
-  // Join confirmation for our channel.
   if (msg.topic === CHANNEL && msg.event === 'phx_reply') {
     if (msg.payload && msg.payload.status === 'ok') {
       joined = true;
@@ -440,7 +1060,6 @@ function handleMessage(msg) {
       setConnStatus('connected');
       showError(false);
       startHeartbeat();
-      // Students announce themselves so the teacher can send a snapshot + current permission.
       if (!isTeacher) {
         broadcastEvent('hello', { id: myId });
       }
@@ -457,30 +1076,75 @@ function handleMessage(msg) {
     case 'stroke':
       applyIncomingSegments(inner.segments || []);
       break;
+    case 'undo':
+      removeByActionId(inner.actionId);
+      break;
     case 'clear':
       clearBoard();
+      break;
+    case 'bg':
+      applyBackground(inner.bg || 'plain', false);
+      break;
+    case 'page':
+      if (!isTeacher) {
+        const idx = Math.max(0, Math.min(Number(inner.pageIndex) || 0, MAX_PAGES - 1));
+        const total = Math.max(idx + 1, Math.min(Number(inner.totalPages) || 1, MAX_PAGES));
+        while (pages.length < total) {
+          pages.push([]);
+          pageBgs.push('plain');
+          redoStacks.push([]);
+        }
+        currentPage = idx;
+        pages[currentPage] = (inner.segments || []).slice(-MAX_HISTORY);
+        strokes = pages[currentPage];
+        applyBackground(inner.bg || 'plain', false);
+        redrawAll();
+        updatePageUI();
+      }
+      break;
+    case 'laser':
+      if (typeof inner.x === 'number' && typeof inner.y === 'number') {
+        addLaserPoint(inner.x, inner.y, false);
+      }
       break;
     case 'permission':
       applyPermission(!!inner.locked);
       break;
     case 'hello':
       if (isTeacher) {
-        // Reply with the current history (trimmed) and the current lock state.
-        broadcastEvent('snapshot', { segments: strokes.slice(-MAX_HISTORY) });
+        broadcastEvent('snapshot', {
+          segments: strokes.slice(-MAX_HISTORY),
+          pageIndex: currentPage,
+          totalPages: pages.length,
+          bg: pageBgs[currentPage],
+        });
         broadcastEvent('permission', { locked: boardLocked });
       }
       break;
     case 'snapshot':
       if (!isTeacher) {
-        strokes = (inner.segments || []).slice(-MAX_HISTORY);
+        if (typeof inner.pageIndex === 'number') {
+          const idx = Math.max(0, Math.min(inner.pageIndex, MAX_PAGES - 1));
+          const total = Math.max(idx + 1, Math.min(Number(inner.totalPages) || 1, MAX_PAGES));
+          while (pages.length < total) {
+            pages.push([]);
+            pageBgs.push('plain');
+            redoStacks.push([]);
+          }
+          currentPage = idx;
+        }
+        pages[currentPage] = (inner.segments || []).slice(-MAX_HISTORY);
+        strokes = pages[currentPage];
+        if (inner.bg) applyBackground(inner.bg, false);
         redrawAll();
+        updatePageUI();
       }
       break;
   }
 }
 
 function applyIncomingSegments(segments) {
-  segments.forEach(addSegment);
+  segments.forEach(s => addSegment(s, false));
 }
 
 function applyPermission(locked) {
@@ -488,6 +1152,8 @@ function applyPermission(locked) {
   if (!isTeacher) {
     canWrite = !locked;
     document.getElementById('banner-locked').classList.toggle('hidden', canWrite);
+    document.getElementById('toolbar').classList.toggle('hidden', !canWrite);
+    setTimeout(resizeCanvas, 20);
   }
 }
 
@@ -504,40 +1170,50 @@ function pointFromEvent(e) {
 }
 
 function activeStrokeStyle() {
-  if (isTeacher) {
-    return { cor: currentTool === 'eraser' ? '#000000' : currentColor, espessura: currentTool === 'eraser' ? currentWidth * 3 : currentWidth, eraser: currentTool === 'eraser' };
-  }
-  return { cor: myColor, espessura: 5, eraser: false };
+  const baseColor = currentColor || myColor || COLORS[0];
+  return {
+    cor: currentTool === 'eraser' ? '#000000' : baseColor,
+    espessura: currentTool === 'eraser' ? currentWidth * 3.2 : (currentTool === 'highlighter' ? currentWidth * 3.5 : currentWidth),
+    eraser: currentTool === 'eraser',
+    highlighter: currentTool === 'highlighter',
+  };
 }
 
-// ── Ferramenta de texto ─────────────────────────────────────────────────────
-// Tamanho da fonte (fração da altura do canvas) derivado da espessura escolhida,
-// pra reaproveitar os mesmos três botões de tamanho da caneta.
-const TEXT_SIZES = { 2: 0.035, 5: 0.055, 10: 0.09 };
-let textAnchor = null;   // ponto normalizado onde o texto vai ser escrito
-
-function textFontFraction() {
-  return TEXT_SIZES[currentWidth] || 0.055;
-}
-
-// CUIDADO: focar o campo AQUI DENTRO não funciona. O clique ainda vai executar
-// a ação padrão do mousedown logo depois, que tira o foco do input e dispara o
-// blur — que fecharia o campo na hora. Por isso o foco vai para o próximo tique
-// e existe a trava `abrindoCampo`, que faz o blur imediato ser ignorado.
+// ── Ferramenta de texto & Post-it ───────────────────────────────────────────
+const TEXT_SIZES = { 2: 0.032, 5: 0.05, 10: 0.082 };
+const NOTE_BGS = {
+  '#059669': '#d1fae5',
+  '#dc2626': '#fee2e2',
+  '#2563eb': '#dbeafe',
+  '#f59e0b': '#fef08a',
+  '#9333ea': '#f3e8ff',
+  '#ec4899': '#fce7f3',
+  '#111827': '#f1f5f9',
+  '#ffffff': '#fef9c3',
+};
+let textAnchor = null;
+let textModeKind = 'text'; // 'text' | 'note'
 let abrindoCampo = false;
 
-function openTextInput(p) {
+function textFontFraction() {
+  return TEXT_SIZES[currentWidth] || 0.05;
+}
+
+function openTextInput(p, kind = 'text') {
   const input = document.getElementById('text-input');
   const rect = canvas.getBoundingClientRect();
-  if (rect.height < 1) return;                 // canvas ainda sem tamanho
-  const px = Math.round(textFontFraction() * rect.height);
+  if (rect.height < 1) return;
+  textModeKind = kind;
+  const px = Math.round((kind === 'note' ? 0.032 : textFontFraction()) * rect.height);
   textAnchor = p;
   input.value = '';
-  input.style.left = Math.round(p.x * rect.width) + 'px';
-  input.style.top = Math.max(0, Math.round(p.y * rect.height - px * 0.9)) + 'px';
-  input.style.fontSize = Math.max(14, px) + 'px';
-  input.style.color = currentColor;
-  input.style.maxWidth = Math.max(140, rect.width - p.x * rect.width - 12) + 'px';
+  input.style.left = Math.min(rect.width - 180, Math.max(4, Math.round(p.x * rect.width))) + 'px';
+  input.style.top = Math.max(4, Math.round(p.y * rect.height - px * 0.6)) + 'px';
+  input.style.fontSize = Math.max(14, Math.min(28, px)) + 'px';
+  input.style.color = kind === 'note' ? '#0f172a' : (currentColor || myColor);
+  input.style.backgroundColor = kind === 'note' ? (NOTE_BGS[currentColor] || '#fef08a') : 'rgba(255,255,255,0.96)';
+  input.style.maxWidth = Math.max(180, rect.width - p.x * rect.width - 12) + 'px';
+  input.placeholder = kind === 'note' ? 'Post-it (Enter salva, Shift+Enter linha)…' : 'Digite (Enter confirma, Shift+Enter linha)…';
   input.classList.remove('hidden');
 
   abrindoCampo = true;
@@ -553,57 +1229,187 @@ function commitTextInput() {
   const input = document.getElementById('text-input');
   const texto = input.value.trim();
   const anchor = textAnchor;
+  const kind = textModeKind;
   closeTextInput();
   if (!texto || !anchor) return;
+  const color = currentColor || myColor || COLORS[0];
   const item = {
-    kind: 'text', texto,
-    x1: anchor.x, y1: anchor.y,
-    cor: isTeacher ? currentColor : myColor,
-    fonte: textFontFraction(),
+    kind,
+    texto,
+    x1: anchor.x,
+    y1: anchor.y,
+    cor: color,
+    bg: kind === 'note' ? (NOTE_BGS[color] || '#fef08a') : undefined,
+    fonte: kind === 'note' ? 0.032 : textFontFraction(),
+    actionId: nextActionId(),
+    author: myId,
   };
-  addSegment(item);
+  addSegment(item, true);
   pendingBatch.push(item);
+}
+
+function isShapeTool(t) {
+  return t === 'line' || t === 'arrow' || t === 'rect' || t === 'circle';
 }
 
 function onPointerDown(e) {
   if (!canDrawNow()) return;
-  if (currentTool === 'text' && isTeacher) {
-    e.preventDefault();                        // senão o mousedown rouba o foco
-    // Se já havia um campo aberto, o clique novo confirma o texto anterior.
+  const p = pointFromEvent(e);
+
+  if (currentTool === 'text' || currentTool === 'note') {
+    e.preventDefault();
     if (textAnchor) commitTextInput();
-    openTextInput(pointFromEvent(e));
+    openTextInput(p, currentTool);
     return;
   }
+
+  if (currentTool === 'stamp') {
+    const item = {
+      kind: 'stamp',
+      texto: currentStamp,
+      x1: p.x,
+      y1: p.y,
+      fonte: TEXT_SIZES[currentWidth] ? TEXT_SIZES[currentWidth] * 1.4 : 0.065,
+      actionId: nextActionId(),
+      author: myId,
+    };
+    addSegment(item, true);
+    pendingBatch.push(item);
+    return;
+  }
+
+  if (currentTool === 'laser') {
+    drawing = true;
+    addLaserPoint(p.x, p.y, true);
+    canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+    return;
+  }
+
+  if (isShapeTool(currentTool)) {
+    drawing = true;
+    shapeStart = p;
+    activeActionId = nextActionId();
+    canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+    return;
+  }
+
   drawing = true;
-  lastPoint = pointFromEvent(e);
+  lastPoint = p;
+  activeActionId = nextActionId();
   canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
 }
 
 function onPointerMove(e) {
-  if (!drawing || !canDrawNow()) return;
   const p = pointFromEvent(e);
+
+  if (currentTool === 'laser' && isTeacher) {
+    if (drawing || e.buttons > 0) {
+      addLaserPoint(p.x, p.y, true);
+    }
+    return;
+  }
+
+  if (!drawing || !canDrawNow()) return;
+
+  if (isShapeTool(currentTool) && shapeStart) {
+    const preview = {
+      kind: currentTool,
+      x1: shapeStart.x,
+      y1: shapeStart.y,
+      x2: p.x,
+      y2: p.y,
+      cor: currentColor || myColor || COLORS[0],
+      espessura: currentWidth,
+    };
+    renderOverlay(preview);
+    lastPoint = p;
+    return;
+  }
+
   const style = activeStrokeStyle();
-  const seg = { x1: lastPoint.x, y1: lastPoint.y, x2: p.x, y2: p.y, cor: style.cor, espessura: style.espessura, eraser: style.eraser };
-  addSegment(seg);
+  const seg = {
+    x1: lastPoint.x,
+    y1: lastPoint.y,
+    x2: p.x,
+    y2: p.y,
+    cor: style.cor,
+    espessura: style.espessura,
+    eraser: style.eraser,
+    highlighter: style.highlighter,
+    actionId: activeActionId,
+    author: myId,
+  };
+  addSegment(seg, true);
   pendingBatch.push(seg);
   lastPoint = p;
 }
 
-function onPointerUp() {
+function onPointerUp(e) {
+  if (!drawing) return;
+  if (isShapeTool(currentTool) && shapeStart) {
+    const endPt = e && typeof e.clientX === 'number' ? pointFromEvent(e) : (lastPoint || shapeStart);
+    const dx = Math.abs(endPt.x - shapeStart.x);
+    const dy = Math.abs(endPt.y - shapeStart.y);
+    renderOverlay(null);
+    if (dx > 0.004 || dy > 0.004) {
+      const seg = {
+        kind: currentTool,
+        x1: shapeStart.x,
+        y1: shapeStart.y,
+        x2: endPt.x,
+        y2: endPt.y,
+        cor: currentColor || myColor || COLORS[0],
+        espessura: currentWidth,
+        actionId: activeActionId || nextActionId(),
+        author: myId,
+      };
+      addSegment(seg, true);
+      pendingBatch.push(seg);
+    }
+  }
   drawing = false;
   lastPoint = null;
+  shapeStart = null;
+  activeActionId = '';
 }
 
 document.getElementById('text-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); commitTextInput(); }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitTextInput(); }
   else if (e.key === 'Escape') { e.preventDefault(); closeTextInput(); }
 });
 document.getElementById('text-input').addEventListener('blur', () => {
-  if (abrindoCampo) return;                    // blur da própria abertura
+  if (abrindoCampo) return;
   if (!textAnchor) return;
   const input = document.getElementById('text-input');
-  if (!input.value.trim()) { closeTextInput(); return; }  // vazio: só fecha
+  if (!input.value.trim()) { closeTextInput(); return; }
   commitTextInput();
+});
+
+// Atalhos de teclado (Ctrl+Z, Ctrl+Y, letras para ferramentas quando não está digitando)
+window.addEventListener('keydown', e => {
+  if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
+    return;
+  }
+  if (!canDrawNow()) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+    e.preventDefault();
+    if (e.shiftKey) performRedo();
+    else performUndo();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+    e.preventDefault();
+    performRedo();
+    return;
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (k === 'p') setTool('pen');
+  else if (k === 'm') setTool('highlighter');
+  else if (k === 'e') setTool('eraser');
+  else if (k === 't') setTool('text');
+  else if (k === 'n') setTool('note');
+  else if (k === 'l' && isTeacher) setTool('laser');
 });
 
 canvas.addEventListener('pointerdown', onPointerDown);
@@ -620,48 +1426,58 @@ batchTimer = setInterval(() => {
   broadcastEvent('stroke', { segments: toSend });
 }, BATCH_MS);
 
-// ── Toolbar wiring (teacher only) ───────────────────────────────────────────
+// ── Toolbar wiring ──────────────────────────────────────────────────────────
 function buildColorRow() {
   const row = document.getElementById('color-row');
   row.innerHTML = '';
   COLORS.forEach((c, i) => {
     const btn = document.createElement('button');
-    btn.className = `swatch tool-btn flex-shrink-0 rounded-full border-2 border-white ${i === 0 ? 'active' : ''}`;
+    btn.className = `swatch tool-btn flex-shrink-0 rounded-full border-2 ${c === '#ffffff' ? 'border-slate-300' : 'border-white'} ${i === 0 ? 'active' : ''}`;
     btn.style.background = c;
     btn.style.color = c;
-    btn.style.width = '32px';
-    btn.style.height = '32px';
-    btn.style.minWidth = '44px';
-    btn.style.minHeight = '44px';
+    btn.style.width = '28px';
+    btn.style.height = '28px';
+    btn.style.minWidth = '34px';
+    btn.style.minHeight = '34px';
     btn.title = 'Cor';
     btn.addEventListener('click', () => {
       currentColor = c;
       row.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
-      // Trocar de cor não deve tirar o professor do modo texto.
-      if (currentTool !== 'text') setTool('pen');
+      if (currentTool === 'eraser' || currentTool === 'laser') setTool('pen');
     });
     row.appendChild(btn);
   });
 }
 
 function setTool(tool) {
-  if (tool !== 'text' && textAnchor) commitTextInput();
+  if (tool !== 'text' && tool !== 'note' && textAnchor) commitTextInput();
   currentTool = tool;
-  document.getElementById('tool-pen').classList.toggle('active', tool === 'pen');
-  document.getElementById('tool-eraser').classList.toggle('active', tool === 'eraser');
-  const t = document.getElementById('tool-text');
-  if (t) t.classList.toggle('active', tool === 'text');
-  canvas.style.cursor = tool === 'text' ? 'text' : '';
+  document.querySelectorAll('#toolbar [data-tool]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tool === tool);
+  });
+  canvas.style.cursor = (tool === 'text' || tool === 'note') ? 'text' : 'crosshair';
 }
 
-function setupTeacherToolbar() {
-  document.getElementById('toolbar').classList.remove('hidden');
+function setupToolbar(forTeacher) {
   buildColorRow();
 
-  document.getElementById('tool-pen').addEventListener('click', () => setTool('pen'));
-  document.getElementById('tool-eraser').addEventListener('click', () => setTool('eraser'));
-  document.getElementById('tool-text').addEventListener('click', () => setTool('text'));
+  document.querySelectorAll('#toolbar [data-tool]').forEach(btn => {
+    btn.addEventListener('click', () => setTool(btn.dataset.tool));
+  });
+
+  const stampSelect = document.getElementById('stamp-select');
+  const stampBtn = document.getElementById('tool-stamp');
+  if (stampSelect && stampBtn) {
+    stampSelect.addEventListener('change', () => {
+      currentStamp = stampSelect.value;
+      stampBtn.textContent = currentStamp;
+      setTool('stamp');
+    });
+  }
+
+  document.getElementById('btn-undo').addEventListener('click', performUndo);
+  document.getElementById('btn-redo').addEventListener('click', performRedo);
 
   document.querySelectorAll('.thick-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -675,20 +1491,78 @@ function setupTeacherToolbar() {
     });
   });
 
-  const permBtn = document.getElementById('btn-permission');
-  permBtn.addEventListener('click', () => {
-    boardLocked = !boardLocked;
-    updatePermissionButton();
-    broadcastEvent('permission', { locked: boardLocked });
-  });
-  updatePermissionButton();
+  document.getElementById('btn-export-png').addEventListener('click', exportBoardPng);
 
-  document.getElementById('btn-clear').addEventListener('click', () => {
-    const ok = window.confirm('Tem certeza que quer apagar todo o quadro para todo mundo?');
-    if (!ok) return;
-    clearBoard();
-    broadcastEvent('clear', {});
-  });
+  if (forTeacher) {
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.querySelectorAll('.teacher-only').forEach(el => el.classList.remove('hidden'));
+
+    // Seletor de sala no topo
+    const roomSelect = document.getElementById('room-select');
+    if (roomSelect) {
+      roomSelect.innerHTML = Object.entries(SALAS).map(([slug, info]) =>
+        `<option value="${slug}" class="text-navy bg-white" ${slug === SALA ? 'selected' : ''}>${info.nome}</option>`
+      ).join('');
+      roomSelect.classList.remove('hidden');
+      roomSelect.addEventListener('change', () => {
+        window.location.href = 'quadro.html?sala=' + encodeURIComponent(roomSelect.value);
+      });
+    }
+
+    // Botão copiar link da sala
+    const copyBtn = document.getElementById('btn-copy-link');
+    if (copyBtn) {
+      copyBtn.classList.remove('hidden');
+      copyBtn.addEventListener('click', async () => {
+        const url = window.location.origin + window.location.pathname + '?sala=' + encodeURIComponent(SALA);
+        try {
+          await navigator.clipboard.writeText(url);
+          const orig = copyBtn.innerHTML;
+          copyBtn.innerHTML = '✅ <span class="hidden lg:inline">Copiado!</span>';
+          setTimeout(() => { copyBtn.innerHTML = orig; }, 1800);
+        } catch (e) {}
+      });
+    }
+
+    // Seletor de fundo
+    const bgSelect = document.getElementById('bg-select');
+    if (bgSelect) {
+      bgSelect.value = pageBgs[currentPage] || 'plain';
+      bgSelect.addEventListener('change', () => applyBackground(bgSelect.value, true));
+    }
+
+    // Controles de página
+    document.getElementById('btn-page-prev').addEventListener('click', () => {
+      if (currentPage > 0) switchToPage(currentPage - 1, true);
+    });
+    document.getElementById('btn-page-next').addEventListener('click', () => {
+      if (currentPage < pages.length - 1) switchToPage(currentPage + 1, true);
+    });
+    document.getElementById('btn-page-add').addEventListener('click', () => {
+      if (pages.length < MAX_PAGES) switchToPage(pages.length, true);
+    });
+
+    // Biblioteca de Aulas (Material da Aula)
+    const btnLibHeader = document.getElementById('btn-lesson-library');
+    const btnLibTb = document.getElementById('btn-tb-library');
+    if (btnLibHeader) btnLibHeader.addEventListener('click', abrirModalBiblioteca);
+    if (btnLibTb) btnLibTb.addEventListener('click', abrirModalBiblioteca);
+
+    const permBtn = document.getElementById('btn-permission');
+    permBtn.addEventListener('click', () => {
+      boardLocked = !boardLocked;
+      updatePermissionButton();
+      broadcastEvent('permission', { locked: boardLocked });
+    });
+    updatePermissionButton();
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      const ok = window.confirm('Tem certeza que quer apagar a página atual do quadro para todo mundo?');
+      if (!ok) return;
+      clearBoard();
+      broadcastEvent('clear', {});
+    });
+  }
 }
 
 function updatePermissionButton() {
@@ -704,22 +1578,427 @@ function updatePermissionButton() {
   }
 }
 
-// ── Boot sequence ────────────────────────────────────────────────────────────
+// ── Biblioteca de Material de Aula no Quadro ────────────────────────────────
+const COURSE_RANGES = {
+  agro:         { nome: '🌱 Agro English', ini: 701, fim: 728 },
+  gpstronic:    { nome: '📡 GPS Tronic', ini: 501, fim: 524 },
+  interview:    { nome: '💼 Entrevista', ini: 601, fim: 612 },
+  med:          { nome: '🩺 Medical English', ini: 801, fim: 816 },
+  fr:           { nome: '🥐 Français', ini: 201, fim: 212 },
+  frances:      { nome: '🥐 Français', ini: 201, fim: 212 },
+  tr:           { nome: '🧿 Türkçe', ini: 301, fim: 336 },
+  turkish:      { nome: '🧿 Türkçe', ini: 301, fim: 336 },
+  intermediate: { nome: '🚀 Intermediate', ini: 401, fim: 440 },
+  base:         { nome: '💬 Inglês Base', ini: 1, fim: 112 },
+  geral:        { nome: '💬 Inglês Base', ini: 1, fim: 112 },
+  starter:      { nome: '💬 Inglês Base', ini: 1, fim: 112 },
+};
+
+let libLessonsIndex = [];
+let currentLibLessonData = null;
+let libEventsBound = false;
+
+async function carregarIndiceQuadro() {
+  if (libLessonsIndex.length) return libLessonsIndex;
+  try {
+    const r = await fetch('data/lessons-index.json?v=gps24');
+    if (r.ok) libLessonsIndex = await r.json();
+  } catch (e) {}
+  return libLessonsIndex;
+}
+
+function fecharModalBiblioteca() {
+  const m = document.getElementById('modal-lesson-library');
+  if (m) m.classList.add('hidden');
+}
+
+function initModalBibliotecaEvents() {
+  if (libEventsBound) return;
+  libEventsBound = true;
+
+  const closeBtn = document.getElementById('btn-close-library');
+  if (closeBtn) closeBtn.addEventListener('click', fecharModalBiblioteca);
+
+  const modal = document.getElementById('modal-lesson-library');
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) fecharModalBiblioteca();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharModalBiblioteca();
+  });
+
+  const btnSelectAll = document.getElementById('lib-btn-select-all');
+  if (btnSelectAll) {
+    btnSelectAll.addEventListener('click', () => {
+      const checks = document.querySelectorAll('.lib-vocab-check');
+      const allChecked = Array.from(checks).every(c => c.checked);
+      checks.forEach(c => c.checked = !allChecked);
+      btnSelectAll.textContent = allChecked ? 'Selecionar tudo' : 'Desmarcar tudo';
+    });
+  }
+
+  const btnInsVocab = document.getElementById('lib-btn-insert-vocab');
+  if (btnInsVocab) btnInsVocab.addEventListener('click', inserirVocabSelecionado);
+
+  const btnInsSentences = document.getElementById('lib-btn-insert-sentences');
+  if (btnInsSentences) btnInsSentences.addEventListener('click', inserirFrasesNoQuadro);
+
+  const btnInsPattern = document.getElementById('lib-btn-insert-pattern');
+  if (btnInsPattern) btnInsPattern.addEventListener('click', inserirPadraoNoQuadro);
+
+  const btnInsAll = document.getElementById('lib-btn-new-page-insert');
+  if (btnInsAll) btnInsAll.addEventListener('click', inserirAulaCompletaEmNovaPagina);
+}
+
+async function abrirModalBiblioteca() {
+  const m = document.getElementById('modal-lesson-library');
+  if (!m) return;
+  m.classList.remove('hidden');
+  initModalBibliotecaEvents();
+
+  const courseSel = document.getElementById('lib-course-select');
+  const cursoPadrao = (SALA === 'agro') ? 'agro'
+    : (SALA === 'gpstronic') ? 'gpstronic'
+    : (SALA === 'med') ? 'med'
+    : (SALA === 'interview') ? 'interview'
+    : (SALA === 'frances') ? 'fr'
+    : (SALA === 'turkish') ? 'turkish'
+    : (SALA === 'intermediate') ? 'intermediate'
+    : 'base';
+
+  if (courseSel) {
+    if (!courseSel.dataset.inited) {
+      courseSel.dataset.inited = '1';
+      courseSel.value = cursoPadrao;
+      courseSel.addEventListener('change', () => popularAulasCurso(courseSel.value));
+    } else if (!courseSel.dataset.userChanged) {
+      courseSel.value = cursoPadrao;
+    }
+  }
+
+  await popularAulasCurso(courseSel ? courseSel.value : cursoPadrao);
+}
+
+async function popularAulasCurso(courseKey) {
+  const index = await carregarIndiceQuadro();
+  const cfg = COURSE_RANGES[courseKey] || COURSE_RANGES.base;
+  const aulas = index.filter(l => l.id >= cfg.ini && l.id <= cfg.fim);
+  const sel = document.getElementById('lib-lesson-select');
+  if (!sel) return;
+
+  sel.innerHTML = aulas.map((l, i) =>
+    `<option value="${l.id}">Aula ${i + 1} (${l.id}) · ${l.emoji || '📖'} ${l.title}</option>`
+  ).join('');
+
+  if (!sel.dataset.inited) {
+    sel.dataset.inited = '1';
+    sel.addEventListener('change', () => carregarEExibirLicao(Number(sel.value)));
+  }
+
+  if (aulas.length > 0) {
+    carregarEExibirLicao(aulas[0].id);
+  }
+}
+
+async function carregarEExibirLicao(id) {
+  const loading = document.getElementById('lib-loading');
+  const loaded = document.getElementById('lib-loaded');
+  if (loading) loading.classList.remove('hidden');
+  if (loaded) loaded.classList.add('hidden');
+
+  try {
+    const r = await fetch('data/lessons/' + id + '.json?v=gps24');
+    if (!r.ok) throw new Error('not_found');
+    const data = await r.json();
+    currentLibLessonData = data;
+    renderizarPreviewLicao(data);
+  } catch (e) {
+    if (loading) loading.innerHTML = '<span class="text-red-500 font-bold">⚠️ Erro ao carregar dados desta aula.</span>';
+  }
+}
+
+function renderizarPreviewLicao(data) {
+  const loading = document.getElementById('lib-loading');
+  const loaded = document.getElementById('lib-loaded');
+  if (loading) loading.classList.add('hidden');
+  if (loaded) loaded.classList.remove('hidden');
+
+  // Vocabulário
+  const vList = document.getElementById('lib-vocab-list');
+  const vCount = document.getElementById('lib-vocab-count');
+  const vocab = data.vocab || [];
+  if (vCount) vCount.textContent = vocab.length;
+  if (vList) {
+    vList.innerHTML = vocab.map((v, i) => `
+      <label class="flex items-center gap-1.5 p-1.5 rounded-xl border border-amber-200/60 bg-white hover:bg-amber-50 cursor-pointer text-xs transition-colors">
+        <input type="checkbox" class="lib-vocab-check accent-amber-500 rounded" data-idx="${i}" ${i < 6 ? 'checked' : ''} />
+        <span class="font-bold text-navy truncate" title="${v.en}">${v.en}</span>
+        <span class="text-[10px] text-slate-400 truncate ml-auto" title="${v.pt}">${v.pt}</span>
+      </label>
+    `).join('');
+  }
+
+  // Frases
+  const sList = document.getElementById('lib-sentences-list');
+  const sentences = data.sentences || [];
+  if (sList) {
+    sList.innerHTML = sentences.slice(0, 8).map(s => {
+      const en = typeof s === 'string' ? s : s.en;
+      const pt = typeof s === 'object' && s.pt ? s.pt : '';
+      return `
+        <div class="p-2 rounded-xl bg-white border border-emerald-100 flex items-start gap-2">
+          <span class="text-emerald-500 font-black">›</span>
+          <div class="min-w-0">
+            <p class="font-bold text-navy">${en}</p>
+            ${pt ? `<p class="text-[10px] text-slate-400">${pt}</p>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Padrão / Pattern
+  const patCard = document.getElementById('lib-pattern-card');
+  const patTitle = document.getElementById('lib-pattern-title');
+  const patRules = document.getElementById('lib-pattern-rules');
+  if (data.grammar && data.grammar.rules && data.grammar.rules.length) {
+    if (patCard) patCard.classList.remove('hidden');
+    if (patTitle) patTitle.textContent = data.grammar.title || 'Estrutura da Aula';
+    if (patRules) {
+      patRules.innerHTML = data.grammar.rules.slice(0, 4).map(r => `<li>${r}</li>`).join('');
+    }
+  } else {
+    if (patCard) patCard.classList.add('hidden');
+  }
+}
+
+// ── Inserções no Quadro ─────────────────────────────────────────────────────
+function inserirVocabSelecionado() {
+  if (!currentLibLessonData || !currentLibLessonData.vocab) return;
+  const checks = document.querySelectorAll('.lib-vocab-check:checked');
+  const items = Array.from(checks).map(c => currentLibLessonData.vocab[Number(c.dataset.idx)]).filter(Boolean);
+  if (!items.length) {
+    alert('Selecione pelo menos uma palavra para colar no quadro.');
+    return;
+  }
+
+  const notePalette = [
+    { bg: '#fef08a', cor: '#eab308' }, // yellow
+    { bg: '#dcfce7', cor: '#16a34a' }, // green
+    { bg: '#e0e7ff', cor: '#4f46e5' }, // indigo
+    { bg: '#fce7f3', cor: '#db2777' }, // pink
+    { bg: '#cffafe', cor: '#0891b2' }, // cyan
+    { bg: '#ffedd5', cor: '#ea580c' }, // orange
+  ];
+
+  const actId = nextActionId();
+  const batch = [];
+  const cols = items.length <= 4 ? 2 : 3;
+  const startX = 0.06;
+  const colW = cols === 2 ? 0.44 : 0.29;
+  const startY = 0.12;
+  const rowH = 0.16;
+
+  items.forEach((item, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    const theme = notePalette[idx % notePalette.length];
+    const seg = {
+      kind: 'note',
+      x1: Math.min(0.85, startX + col * colW),
+      y1: Math.min(0.80, startY + row * rowH),
+      texto: `${item.en.toUpperCase()}\n${item.pt}`,
+      bg: theme.bg,
+      cor: theme.cor,
+      fonte: 0.034,
+      author: myId,
+      actionId: actId,
+    };
+    batch.push(seg);
+    addSegment(seg, true);
+  });
+
+  if (batch.length > 0) {
+    broadcastEvent('stroke', { segments: batch });
+  }
+  fecharModalBiblioteca();
+}
+
+function inserirFrasesNoQuadro() {
+  if (!currentLibLessonData || !currentLibLessonData.sentences) return;
+  const sentences = currentLibLessonData.sentences.slice(0, 5);
+  const actId = nextActionId();
+  const batch = [];
+
+  sentences.forEach((s, idx) => {
+    const en = typeof s === 'string' ? s : s.en;
+    const pt = typeof s === 'object' && s.pt ? s.pt : '';
+    const seg = {
+      kind: 'note',
+      x1: 0.12,
+      y1: 0.12 + idx * 0.15,
+      texto: `💬 "${en}"\n${pt ? '(' + pt + ')' : ''}`,
+      bg: '#f8fafc',
+      cor: '#059669',
+      fonte: 0.032,
+      author: myId,
+      actionId: actId,
+    };
+    batch.push(seg);
+    addSegment(seg, true);
+  });
+
+  if (batch.length > 0) {
+    broadcastEvent('stroke', { segments: batch });
+  }
+  fecharModalBiblioteca();
+}
+
+function inserirPadraoNoQuadro() {
+  if (!currentLibLessonData || !currentLibLessonData.grammar) return;
+  const g = currentLibLessonData.grammar;
+  const rules = (g.rules || []).slice(0, 4).map(r => '• ' + r).join('\n');
+  const full = `🧩 PADRÃO: ${g.title || 'Estrutura'}\n\n${rules}`;
+  const actId = nextActionId();
+  const seg = {
+    kind: 'note',
+    x1: 0.10,
+    y1: 0.14,
+    texto: full,
+    bg: '#eff6ff',
+    cor: '#2563eb',
+    fonte: 0.032,
+    author: myId,
+    actionId: actId,
+  };
+  addSegment(seg, true);
+  broadcastEvent('stroke', { segments: [seg] });
+  fecharModalBiblioteca();
+}
+
+function inserirAulaCompletaEmNovaPagina() {
+  if (!currentLibLessonData) return;
+  const d = currentLibLessonData;
+
+  // Se a página atual já tiver traços, cria uma nova página
+  if (strokes.length > 0 && pages.length < MAX_PAGES) {
+    switchToPage(pages.length, true);
+  }
+
+  const actId = nextActionId();
+  const batch = [];
+
+  // Título no topo
+  const titleSeg = {
+    kind: 'text',
+    x1: 0.05,
+    y1: 0.08,
+    texto: `${d.emoji || '📖'} Aula ${d.id} — ${d.title}`,
+    cor: '#001f3f',
+    fonte: 0.045,
+    author: myId,
+    actionId: actId,
+  };
+  batch.push(titleSeg);
+  addSegment(titleSeg, true);
+
+  // Cartão de Padrão (se houver) no lado direito
+  if (d.grammar && d.grammar.rules && d.grammar.rules.length) {
+    const rules = d.grammar.rules.slice(0, 3).map(r => '• ' + r).join('\n');
+    const patSeg = {
+      kind: 'note',
+      x1: 0.58,
+      y1: 0.15,
+      texto: `🧩 PADRÃO\n${d.grammar.title}\n\n${rules}`,
+      bg: '#eff6ff',
+      cor: '#2563eb',
+      fonte: 0.030,
+      author: myId,
+      actionId: actId,
+    };
+    batch.push(patSeg);
+    addSegment(patSeg, true);
+  }
+
+  // 4 cartões de vocabulário na coluna esquerda
+  const vocab4 = (d.vocab || []).slice(0, 4);
+  const notePalette = [
+    { bg: '#fef08a', cor: '#eab308' },
+    { bg: '#dcfce7', cor: '#16a34a' },
+    { bg: '#ffedd5', cor: '#ea580c' },
+    { bg: '#fce7f3', cor: '#db2777' },
+  ];
+  vocab4.forEach((v, i) => {
+    const theme = notePalette[i % notePalette.length];
+    const seg = {
+      kind: 'note',
+      x1: 0.06 + (i % 2) * 0.25,
+      y1: 0.15 + Math.floor(i / 2) * 0.17,
+      texto: `${v.en.toUpperCase()}\n${v.pt}`,
+      bg: theme.bg,
+      cor: theme.cor,
+      fonte: 0.034,
+      author: myId,
+      actionId: actId,
+    };
+    batch.push(seg);
+    addSegment(seg, true);
+  });
+
+  // 2 Frases na parte de baixo
+  const s2 = (d.sentences || []).slice(0, 2);
+  s2.forEach((s, i) => {
+    const en = typeof s === 'string' ? s : s.en;
+    const pt = typeof s === 'object' && s.pt ? s.pt : '';
+    const seg = {
+      kind: 'note',
+      x1: 0.06 + i * 0.45,
+      y1: 0.56,
+      texto: `💬 "${en}"\n${pt ? '(' + pt + ')' : ''}`,
+      bg: '#f8fafc',
+      cor: '#059669',
+      fonte: 0.032,
+      author: myId,
+      actionId: actId,
+    };
+    batch.push(seg);
+    addSegment(seg, true);
+  });
+
+  if (batch.length > 0) {
+    broadcastEvent('stroke', { segments: batch });
+  }
+
+  fecharModalBiblioteca();
+}
+
+// ── Boot sequence ───────────────────────────────────────────────────────────
 async function boot() {
   myId = getMyId();
   myColor = colorFromId(myId);
+
+  loadLocalBoard();
+  applyBackground(pageBgs[currentPage] || 'plain', false);
   resizeCanvas();
+  updatePageUI();
 
   isTeacher = await detectRole();
 
   if (isTeacher) {
-    boardLocked = true; // students start locked by default until the teacher liberates them
+    boardLocked = true;
     canWrite = true;
-    setupTeacherToolbar();
+    setupToolbar(true);
   } else {
     canWrite = false;
+    currentColor = myColor;
+    setupToolbar(false);
     document.getElementById('banner-locked').classList.remove('hidden');
   }
+
+  setTimeout(resizeCanvas, 30);
 
   try {
     const cfg = await fetchRealtimeConfig();

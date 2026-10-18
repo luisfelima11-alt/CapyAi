@@ -1,26 +1,22 @@
 /* ── avatar picker ──────────────────────────────── */
-const AVATARS = ['🐾','🦊','🐼','🐸','🦁','🐯','🐧','🦋','🐝','🌿'];
-let selectedAvatar = '🐾';
+const AVATARS = CapySkins.items;
+let selectedAvatar = CapySkins.defaultId;
 
 function renderAvatars() {
-  document.getElementById('avatar-row').innerHTML = AVATARS.map(a => `
-    <button data-capy-onclick="pickAvatar('${a}', this)"
-            data-avatar="${a}"
-            class="avatar-btn w-11 h-11 rounded-full bg-slate-100 hover:bg-pink-100 text-2xl
-                   transition-all border-2 border-transparent flex items-center justify-center
-                   ${a === selectedAvatar ? 'border-pink-brand bg-pink-50 scale-110' : ''}">
-      ${a}
+  const grid = document.getElementById('avatar-row');
+  grid.className = 'capy-signup-skins';
+  grid.innerHTML = AVATARS.map(a => `
+    <button type="button" data-capy-onclick="pickAvatar('${a.id}', this)"
+            data-avatar="${a.id}" class="capy-skin-option"
+            aria-label="${a.name}" aria-pressed="${a.id === selectedAvatar}">
+      ${CapySkins.image(a.id, 80)}<span>${a.name}</span>
     </button>`).join('');
 }
 
 function pickAvatar(emoji, btn) {
+  if (!CapySkins.valid(emoji)) return;
   selectedAvatar = emoji;
-  document.querySelectorAll('.avatar-btn').forEach(b => {
-    b.classList.remove('border-pink-brand', 'bg-pink-50', 'scale-110');
-    b.classList.add('border-transparent');
-  });
-  btn.classList.add('border-pink-brand', 'bg-pink-50', 'scale-110');
-  btn.classList.remove('border-transparent');
+  document.querySelectorAll('#avatar-row .capy-skin-option').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
 }
 renderAvatars();
 

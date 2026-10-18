@@ -149,7 +149,9 @@ const MIME_TYPES = {
     '.svg':  'image/svg+xml',
     '.json': 'application/json',
     '.md':   'text/markdown',
-    '.ico':  'image/x-icon'
+    '.ico':  'image/x-icon',
+    '.mp4':  'video/mp4',
+    '.pdf':  'application/pdf'
 };
 
 // ── OpenAI API helper ─────────────────────────────────────────────────────────
@@ -1300,4 +1302,11 @@ if (require.main === module) {
         console.log(`   GET  http://localhost:${PORT}/api/word-of-day`);
         console.log(`   GET  http://localhost:${PORT}/api/daily-challenge`);
     });
+    if (String(PORT) !== '3000') {
+        const mirrorServer = http.createServer(handler);
+        mirrorServer.on('error', () => { /* ignore if 3000 is busy */ });
+        mirrorServer.listen(3000, '127.0.0.1', () => {
+            console.log(`✅ Mirror listener active at http://localhost:3000/`);
+        });
+    }
 }
