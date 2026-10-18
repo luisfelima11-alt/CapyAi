@@ -132,7 +132,7 @@
           <div class="bg-rose-50/70 border-2 border-rose-200 rounded-2xl p-4">
             <div class="flex items-center justify-between mb-1.5">
               <span class="font-black text-navy text-sm">💬 Parte 1: Expressões &amp; Preposições</span>
-              <span class="text-xs font-black bg-rose-200 text-rose-800 px-2.5 py-0.5 rounded-full">15 questões</span>
+              <span class="text-xs font-black bg-rose-200 text-rose-800 px-2.5 py-0.5 rounded-full">11 questões</span>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
               Complete as frases com a expressão ou preposição natural: <em>on Monday, at night, in the morning, by accident, on purpose, look forward to, depend on, on time...</em>
@@ -142,10 +142,10 @@
           <div class="bg-orange-50/70 border-2 border-orange-200 rounded-2xl p-4">
             <div class="flex items-center justify-between mb-1.5">
               <span class="font-black text-navy text-sm">⚡ Parte 2: Passado, Presente &amp; Futuro</span>
-              <span class="text-xs font-black bg-orange-200 text-orange-800 px-2.5 py-0.5 rounded-full">13 questões</span>
+              <span class="text-xs font-black bg-orange-200 text-orange-800 px-2.5 py-0.5 rounded-full">17 questões</span>
             </div>
             <p class="text-xs text-slate-600 leading-relaxed">
-              Complete as frases com as ações e ideias das 20 aulas: <em>histórias no passado, experiências de vida, hábitos antigos (used to), desejos (wish), deduções e planos futuros</em>.
+              Complete as frases escolhendo a ação certa no passado, presente ou futuro: <em>histórias no passado, experiências de vida, ações em andamento, planos futuros e situações imaginárias</em>.
             </p>
           </div>
 
@@ -309,7 +309,7 @@ Components.mount('footer-placeholder', Components.renderFooter());
 // 40 QUESTÕES DA PROVA FINAL DO CURSO INTERMEDIATE (30 MINUTOS)
 // ══════════════════════════════════════════════════════════════════════════════
 const EXAM_QUESTIONS = [
-  // ── PARTE 1: EXPRESSÕES & PREPOSIÇÕES DO DIA A DIA (15 questões) ───────────
+  // ── PARTE 1: EXPRESSÕES & PREPOSIÇÕES DO DIA A DIA (11 questões) ───────────
   {
     id: 1,
     section: 'expressoes',
@@ -324,16 +324,6 @@ const EXAM_QUESTIONS = [
     id: 2,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
-    promptPt: 'Complete a frase com as expressões corretas de dia da semana e horário:',
-    sentence: 'I usually have English classes ___ and Thursdays ___ 7 p.m.',
-    opts: ['on Tuesdays / at', 'in Tuesdays / on', 'at Tuesdays / in', 'on the Tuesdays / at'],
-    ans: 'on Tuesdays / at',
-    rule: 'Usamos "ON" para dias da semana (on Tuesdays) e "AT" para horários específicos no relógio (at 7 p.m.).'
-  },
-  {
-    id: 3,
-    section: 'expressoes',
-    sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com as expressões corretas para partes do dia:',
     sentence: 'She loves studying ___ because it is quiet, but she hates working late ___.',
     opts: ['in the morning / at night', 'on the morning / in night', 'at the morning / on night', 'in morning / at the night'],
@@ -341,7 +331,7 @@ const EXAM_QUESTIONS = [
     rule: 'Partes do dia usam "in the": in the morning, in the afternoon, in the evening. Mas para a noite ao dormir/tarde da noite dizemos "at night"!'
   },
   {
-    id: 4,
+    id: 3,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a expressão que significa "sem querer / por acidente":',
@@ -351,7 +341,7 @@ const EXAM_QUESTIONS = [
     rule: 'Em inglês, a expressão natural para "sem querer" é "by accident", enquanto "de propósito" é "on purpose".'
   },
   {
-    id: 5,
+    id: 4,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a expressão que significa "de propósito":',
@@ -361,7 +351,7 @@ const EXAM_QUESTIONS = [
     rule: 'O par clássico da Aula 1 do Intermediário: "on purpose" (de propósito) vs. "by accident" (sem querer).'
   },
   {
-    id: 6,
+    id: 5,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a continuação correta após "look forward" (aguardar ansiosamente):',
@@ -371,7 +361,7 @@ const EXAM_QUESTIONS = [
     rule: 'Na expressão "look forward to", a ação seguinte vem sempre com -ING: "looking forward to seeing you".'
   },
   {
-    id: 7,
+    id: 6,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a palavra correta usada depois de "depend":',
@@ -381,7 +371,7 @@ const EXAM_QUESTIONS = [
     rule: 'Em português dizemos "depende DE", mas em inglês dizemos sempre "depend ON" (nunca "depend of").'
   },
   {
-    id: 8,
+    id: 7,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a forma correta para meses e anos:',
@@ -391,7 +381,7 @@ const EXAM_QUESTIONS = [
     rule: 'Para meses sozinhos (in July) e anos (in 2023), usamos sempre "IN". Só usamos "ON" se houver o dia específico (ex: on July 15th).'
   },
   {
-    id: 9,
+    id: 8,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase indicando pontualidade ("no horário certo"):',
@@ -401,17 +391,7 @@ const EXAM_QUESTIONS = [
     rule: '"On time" significa pontualmente, no horário marcado. ("In time" significa a tempo, antes que seja tarde).'
   },
   {
-    id: 10,
-    section: 'expressoes',
-    sectionLabel: '💬 Expressões & Preposições',
-    promptPt: 'Complete a frase com a expressão correta para "sozinho / por conta própria":',
-    sentence: 'When I first travelled to Portugal, I went completely ___ without any tour group.',
-    opts: ['on my own', 'in my own', 'by my own', 'at my own'],
-    ans: 'on my own',
-    rule: 'Para dizer "sozinho / por conta própria", dizemos "on my own" ou "by myself" (nunca "by my own").'
-  },
-  {
-    id: 11,
+    id: 9,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com as palavras corretas após "interested" e "good":',
@@ -421,7 +401,7 @@ const EXAM_QUESTIONS = [
     rule: 'Sempre dizemos: "interested IN something" (interessado em) e "good AT something" (bom em).'
   },
   {
-    id: 12,
+    id: 10,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase com a expressão de tempo correta ("quando chegamos..."):',
@@ -431,7 +411,7 @@ const EXAM_QUESTIONS = [
     rule: '"By the time" indica "quando / no momento em que chegamos, outra coisa já tinha acontecido".'
   },
   {
-    id: 13,
+    id: 11,
     section: 'expressoes',
     sectionLabel: '💬 Expressões & Preposições',
     promptPt: 'Complete a frase escolhendo entre "since" e "for":',
@@ -440,93 +420,113 @@ const EXAM_QUESTIONS = [
     ans: 'for / since',
     rule: 'Usamos "FOR" com o tempo de duração (for three years) e "SINCE" com o ponto de início no tempo (since we got married / since 2021).'
   },
-  {
-    id: 14,
-    section: 'expressoes',
-    sectionLabel: '💬 Expressões & Preposições',
-    promptPt: 'Complete a frase sobre transporte ("de metrô / a pé"):',
-    sentence: 'I usually go to work ___, but when the weather is nice I prefer to go ___.',
-    opts: ['by subway / on foot', 'on subway / by foot', 'in subway / on foot', 'by the subway / with foot'],
-    ans: 'by subway / on foot',
-    rule: 'Meios de transporte usam "BY" direto (by bus, by car, by subway), mas "a pé" é sempre "ON foot"!'
-  },
-  {
-    id: 15,
-    section: 'expressoes',
-    sectionLabel: '💬 Expressões & Preposições',
-    promptPt: 'Complete a frase com a expressão usada para o futuro ("daqui a cinco anos"):',
-    sentence: 'Where do you see yourself ___? Do you plan to run your own business?',
-    opts: ['in five years', 'after five years', 'on five years', 'at five years'],
-    ans: 'in five years',
-    rule: 'Para dizer "daqui a X tempo" no futuro, usamos "IN + período": "in five years", "in two weeks", "in ten minutes".'
-  },
 
-  // ── PARTE 2: PASSADO, PRESENTE & FUTURO EM CONTEXTO (13 questões) ──────────
+  // ── PARTE 2: PASSADO, PRESENTE & FUTURO EM CONTEXTO (17 questões) ──────────
   {
-    id: 16,
+    id: 12,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 1 & 2 (Ação em andamento interrompida no passado) — Complete a frase:',
+    promptPt: 'Rotina vs. O que está acontecendo hoje — Complete a frase:',
+    sentence: 'Normally I ___ from home on Fridays, but today I ___ at the main office.',
+    opts: ['work / am working', 'am working / work', 'worked / have worked', 'work / work'],
+    ans: 'work / am working',
+    rule: 'Para rotina ("Normally") usamos "work", e para algo temporário acontecendo hoje/agora ("today") usamos "am working".'
+  },
+  {
+    id: 13,
+    section: 'contexto',
+    sectionLabel: '⚡ Passado, Presente & Futuro',
+    promptPt: 'Pergunta no passado com data definida ("last summer") — Complete a frase:',
+    sentence: 'Where ___ you ___ on vacation last summer? We went to Italy!',
+    opts: ['did / go', 'have / gone', 'were / going', 'do / go'],
+    ans: 'did / go',
+    rule: 'Para perguntas no passado com tempo fechado ("last summer"), usamos "did + ação na forma base": "Where did you go?".'
+  },
+  {
+    id: 14,
+    section: 'contexto',
+    sectionLabel: '⚡ Passado, Presente & Futuro',
+    promptPt: 'Ação em andamento interrompida no passado — Complete a frase:',
     sentence: 'While I ___ dinner last night, the lights suddenly ___.',
     opts: ['was cooking / went out', 'cooked / were going out', 'was cooking / were going out', 'have cooked / went out'],
     ans: 'was cooking / went out',
     rule: 'O que estava acontecendo em andamento usa "was cooking" e o que interrompeu de repente usa "went out".'
   },
   {
-    id: 17,
+    id: 15,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 3 (Experiência de vida vs. data fechada) — Complete a frase:',
+    promptPt: 'Duas ações no passado com "when" — Complete a frase:',
+    sentence: 'They ___ for the bus when it suddenly ___ to rain heavily.',
+    opts: ['were waiting / started', 'waited / was starting', 'have waited / started', 'are waiting / starts'],
+    ans: 'were waiting / started',
+    rule: 'A ação longa que estava acontecendo usa "were waiting", e o que começou de repente no meio dela usa "started".'
+  },
+  {
+    id: 16,
+    section: 'contexto',
+    sectionLabel: '⚡ Passado, Presente & Futuro',
+    promptPt: 'Experiência de vida vs. data fechada — Complete a frase:',
     sentence: 'I ___ to London three times in my life, and my last trip ___ in 2022.',
     opts: ['have been / was', 'went / has been', 'was / was', 'have gone / has been'],
     ans: 'have been / was',
     rule: 'Experiência de vida sem data marcada usa "have been", mas quando dizemos quando aconteceu ("in 2022"), usamos "was".'
   },
   {
+    id: 17,
+    section: 'contexto',
+    sectionLabel: '⚡ Passado, Presente & Futuro',
+    promptPt: 'Ação pendente ("yet") vs. ação já concluída ("already") — Complete a frase:',
+    sentence: 'I ___ the report yet, but Maria ___ hers.',
+    opts: ['haven\'t finished / has already sent', 'didn\'t finish / already sent', 'don\'t finish / is sending', 'wasn\'t finishing / had sent'],
+    ans: 'haven\'t finished / has already sent',
+    rule: 'Com "yet" (ainda não) e "already" (já) conectados ao presente, usamos "haven\'t finished" e "has already sent".'
+  },
+  {
     id: 18,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 4 & 6 (Algo que já tinha acontecido antes) — Complete a frase:',
+    promptPt: 'Ação que começou às 8h e continua até agora — Complete a frase:',
+    sentence: 'My eyes are tired because I ___ at this computer screen since 8 a.m.',
+    opts: ['have been looking', 'am looking', 'looked', 'was looking'],
+    ans: 'have been looking',
+    rule: 'Quando uma ação começou lá atrás ("since 8 a.m.") e continua até agora causando efeito no presente, usamos "have been looking".'
+  },
+  {
+    id: 19,
+    section: 'contexto',
+    sectionLabel: '⚡ Passado, Presente & Futuro',
+    promptPt: 'Algo que já tinha acontecido antes no passado — Complete a frase:',
     sentence: 'When Sarah got to the station, she realised she ___ her passport at home.',
     opts: ['had left', 'has left', 'was leaving', 'leaves'],
     ans: 'had left',
     rule: '"Had left" mostra algo que aconteceu antes de outro momento no passado — ela esqueceu o passaporte antes de chegar à estação.'
   },
   {
-    id: 19,
-    section: 'contexto',
-    sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 7 & 8 (Quantidades: Much, Many, Some, Any) — Complete a frase:',
-    sentence: 'We don\'t have ___ time left before the flight, and I haven\'t packed ___ bags yet.',
-    opts: ['much / any', 'many / some', 'much / some', 'a few / any'],
-    ans: 'much / any',
-    rule: 'Com "time" na negativa usamos "much" (don\'t have much time), e para dizer "nenhuma mala" após "haven\'t" usamos "any".'
-  },
-  {
     id: 20,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 9 ("Foi construída") — Complete a frase:',
-    sentence: 'This historic bridge ___ over a hundred years ago by local engineers.',
-    opts: ['was built', 'built', 'has built', 'is building'],
-    ans: 'was built',
-    rule: 'Para dizer que a ponte "foi construída" no passado, usamos "was built".'
+    promptPt: 'Quanto tempo já estavam esperando antes de a comida chegar — Complete a frase:',
+    sentence: 'We ___ for over an hour before the waiter finally brought our food.',
+    opts: ['had been waiting', 'have been waiting', 'were waiting', 'are waiting'],
+    ans: 'had been waiting',
+    rule: 'Para mostrar por quanto tempo algo já vinha acontecendo antes de outra ação no passado ("before the waiter brought..."), usamos "had been waiting".'
   },
   {
     id: 21,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 11 (Uso de A, An, The) — Complete a frase:',
-    sentence: 'She works as ___ architect in São Paulo, and she thinks ___ creativity is essential.',
-    opts: ['an / — (sem palavra)', 'a / the', 'an / the', 'the / a'],
-    ans: 'an / — (sem palavra)',
-    rule: 'Profissões levam a/an ("an architect" porque começa com som de vogal). Já ideias gerais como "creativity" entram direto sem "the"!'
+    promptPt: 'Hábito no passado que não acontece mais ("Eu costumava ser...") — Complete a frase:',
+    sentence: 'I ___ be very shy when speaking English, but now I feel much more confident.',
+    opts: ['used to', 'use to', 'would to', 'am used to'],
+    ans: 'used to',
+    rule: 'Para contar como você costumava ser no passado (e não é mais), usamos "used to be".'
   },
   {
     id: 22,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 12 (Certeza sobre o que aconteceu) — Complete a frase:',
+    promptPt: 'Certeza sobre o que aconteceu no passado — Complete a frase:',
     sentence: 'Lucas isn\'t answering his phone and his car isn\'t outside. He ___ left already.',
     opts: ['must have', 'should', 'can have', 'must to'],
     ans: 'must have',
@@ -536,37 +536,37 @@ const EXAM_QUESTIONS = [
     id: 23,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 13 (Conectando ideias) — Complete a frase:',
-    sentence: 'That is the language school ___ Sofia opened five years ago.',
-    opts: ['that / which', 'who', 'where', 'whose'],
-    ans: 'that / which',
-    rule: 'Para nos referirmos à escola que a Sofia abriu, usamos "that" ou "which" ("who" é só para pessoas).'
+    promptPt: 'Decisão na hora ("will") vs. plano já combinado ("going to") — Complete a frase:',
+    sentence: '"The phone is ringing!" — "Don\'t worry, I ___ it! I know you ___ a client in five minutes."',
+    opts: ['will answer / are going to call', 'am going to answer / will call', 'answer / call', 'answered / were calling'],
+    ans: 'will answer / are going to call',
+    rule: 'Para decisões tomadas na hora em que falamos usamos "I will answer", e para planos já combinados usamos "are going to call".'
   },
   {
     id: 24,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 14 (Decide vs. Enjoy) — Complete a frase:',
-    sentence: 'After working as a translator for years, she finally decided ___ her own company and really enjoys ___ it.',
-    opts: ['to start / running', 'starting / to run', 'to start / to run', 'start / running'],
-    ans: 'to start / running',
-    rule: 'Depois de "decide" usamos "to + ação" ("decided to start"), e depois de "enjoy" usamos sempre "-ING" ("enjoys running").'
+    promptPt: 'O que estará em andamento num horário exato do futuro — Complete a frase:',
+    sentence: 'Don\'t call me at 8 p.m. tonight because I ___ to Buenos Aires at that exact time.',
+    opts: ['will be flying', 'will fly', 'flew', 'have flown'],
+    ans: 'will be flying',
+    rule: 'Para dizer o que estará acontecendo no meio do caminho num horário futuro ("at 8 p.m. tonight"), usamos "will be flying".'
   },
   {
     id: 25,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 16 ("Eu costumava ser...") — Complete a frase:',
-    sentence: 'I ___ be very shy when speaking English, but now I feel much more confident.',
-    opts: ['used to', 'use to', 'would to', 'am used to'],
-    ans: 'used to',
-    rule: 'Para contar como você costumava ser no passado (e não é mais), usamos "used to be".'
+    promptPt: 'Conectando duas ações no futuro com "As soon as" — Complete a frase:',
+    sentence: 'As soon as she ___ from the airport tonight, she ___ you a message.',
+    opts: ['gets back / will send', 'will get back / sends', 'got back / would send', 'is getting back / sent'],
+    ans: 'gets back / will send',
+    rule: 'Logo depois de "as soon as" ou "when" falando de futuro, usamos o presente ("gets back") e na outra parte usamos "will send".'
   },
   {
     id: 26,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 17 (Arrependimento sobre o passado) — Complete a frase:',
+    promptPt: 'Arrependimento sobre o passado ("gostaria de ter praticado") — Complete a frase:',
     sentence: 'I failed the interview because I didn\'t prepare. I really wish I ___ harder!',
     opts: ['had practised', 'practised', 'would practise', 'have practised'],
     ans: 'had practised',
@@ -576,17 +576,17 @@ const EXAM_QUESTIONS = [
     id: 27,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 18 (Confirmando no final da frase) — Complete a pergunta:',
-    sentence: 'You have already finished all 20 lessons of the Intermediate course, ___?',
-    opts: ['haven\'t you', 'didn\'t you', 'aren\'t you', 'don\'t you'],
-    ans: 'haven\'t you',
-    rule: 'Como a frase começa com "You have already finished...", confirmamos no final usando "haven\'t you?".'
+    promptPt: 'Imaginando um passado diferente ("Se eu soubesse... teria te convidado") — Complete a frase:',
+    sentence: 'If I ___ you were in town last weekend, I ___ you for coffee!',
+    opts: ['had known / would have invited', 'knew / would invite', 'know / will invite', 'have known / invited'],
+    ans: 'had known / would have invited',
+    rule: 'Para imaginar um passado diferente ("se eu soubesse no fim de semana passado, teria te convidado"), usamos "If I had known... I would have invited".'
   },
   {
     id: 28,
     section: 'contexto',
     sectionLabel: '⚡ Passado, Presente & Futuro',
-    promptPt: 'Aula 19 & 20 (Meta concluída no futuro & situação imaginária) — Complete a frase:',
+    promptPt: 'Meta concluída até o ano que vem & situação imaginária — Complete a frase:',
     sentence: 'By this time next year, I ___ my B2 certification, and if I knew I couldn\'t fail, I ___ abroad.',
     opts: ['will have completed / would move', 'will complete / will move', 'have completed / moved', 'am completing / would have moved'],
     ans: 'will have completed / would move',
