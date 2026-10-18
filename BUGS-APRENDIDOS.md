@@ -1,5 +1,115 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-09-30 — O chat da lição (`/api/lesson-chat`) respondia 500 no PR #1 (não chegou à produção)
+
+**Sintoma:** qualquer mensagem no chat de uma lição dava 500. Apareceu ao escrever o primeiro teste
+que chama a rota de verdade, antes de a branch ser publicada.
+
+**Causa raiz:** a rota montava o aluno com `nivelDoAluno()`. No merge com a produção (27/set), essa
+função saiu, porque a produção já lia o aluno com `perfilDoAluno()`. Só que a chamada ficou.
+`ReferenceError` dentro do handler, e daí o 500. O teste que existia só procurava o nome
+`nivelDoAluno(` no código-fonte, então passava.
+
+**Correção:** a rota usa `perfilDoAluno(appUserId, conta)`, igual ao `/api/chat`. Um teste chama a
+rota inteira num processo separado e espera o 503 de "sem chave de IA", não o 500.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="lesson chat runs end to end" tests/security.test.js
+# e, para qualquer nome que um merge deixou sem definição:
+npx eslint --no-config-lookup --rule '{"no-undef":"error"}' --global require,module,process,Buffer,__dirname,console,setTimeout,clearTimeout,setImmediate,URL,fetch,AbortController api/index.js api/security.js
+```
+
+**Por que aconteceu:** um teste que lê o código-fonte confere que o texto existe, não que ele roda.
+Rota nova ou refeita ganha pelo menos um teste que a executa. Depois de um merge grande, rode o
+`no-undef`.
+
+---
+
+## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
+
+**Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
+ouvir — CSRF validation failed." Com a página aberta tempo suficiente, **todo POST** falhava: o
+microfone, as rotas de IA e, em silêncio, o `POST /api/db` (XP e progresso, porque o `store.js`
+engole o erro). Recarregar a página resolvia até a próxima hora.
+
+**Causa raiz:** o access token dura cerca de 1 h. A primeira requisição depois disso (por exemplo,
+"Ouvir exemplo", `GET /api/tts`) renova a sessão em `getAuthenticatedSession`, e o
+`setSessionCookies` gerava ali um cookie `__Host-capy-csrf` **novo**. A aba tinha lido o token uma
+vez só, ao abrir (`Auth.ready()` → `/api/auth/session` → `sessionStorage.capyCsrf`), e o
+`auth-secure.js` continuou mandando o antigo. Cookie novo e cabeçalho velho: `assertCsrf` → 403.
+
+**Correção:** na renovação silenciosa, `setSessionCookies(res, sessao, { keepCsrf })` regrava o
+**mesmo** token que o navegador já tem. Login, cadastro, MFA e link de e-mail continuam gerando um
+token novo: eles devolvem o token à página ou recarregam a página.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="silent session refresh" tests/security.test.js
+```
+
+**Por que aconteceu:** a correção antiga "CSRF renovado acompanha os novos cookies" (entrada de
+setembro sobre a tela de entrada) só entregava o token novo ao `/api/auth/session`, que a página
+chama uma vez. Qualquer outra rota renovava a sessão e trocava o cookie sem a página saber. Quem
+mexer na renovação de sessão tem que testar uma página que **continua aberta** depois dela.
+
+---
+
+## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
+
+**Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante
+respondiam 403 `invalid_origin`. Nenhum PR podia ser testado logado antes de ir ao ar.
+
+**Causa raiz:** o Preview roda em modo produção (`VERCEL=1`), e o `isAllowedOrigin`
+(`api/security.js`) só aceitava o `APP_ORIGIN`, que é o domínio de produção. A página
+do Preview manda `Origin: https://<preview>.vercel.app`.
+
+**Correcao:** só quando `VERCEL_ENV=preview`, as URLs do próprio deploy (`VERCEL_URL`
+e `VERCEL_BRANCH_URL`) também contam como origem do site (`PREVIEW_ORIGINS`). A
+produção continua aceitando só o `APP_ORIGIN`. No Preview, entre com senha: o link
+mágico e os e-mails levam ao `APP_ORIGIN`.
+
+**Como pegar isso de novo:**
+```bash
+npm run test:security   # "a Vercel Preview accepts sign-in from its own URLs…"
+```
+
+---
+
+## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
+
+**Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
+mesmo defeito, sem ninguém notar: o Desafio Diário caía em erro, e a voz Nova
+(TTS) virava a voz robótica do navegador para quem estava logado ou era visitante.
+
+**Causa raiz:** o portão das rotas de IA (`AI_ROUTE_KEYS`, em `api/index.js`)
+chamava `assertCsrf` em TODA rota quando havia cookie de sessão, inclusive nas
+de GET (`/api/lyrics-search`, `/api/lyrics`, `/api/tts`, `/api/daily-challenge`,
+`/api/word-of-day`). O `assertCsrf` começa pelo `assertOrigin`, e em produção
+`isAllowedOrigin('')` é `false`. Só que o navegador **não manda `Origin` num GET
+da mesma origem**, e o `auth-secure.js` só põe o token CSRF em escrita. Resultado:
+403 `invalid_origin` para todo aluno com cookie. Sem cookie (anônimo) funcionava,
+e nos testes também: fora de produção o `Origin` vazio passa.
+
+**Correcao:** escrita continua exigindo CSRF. Leitura (GET/HEAD) com cookie passa
+pelo `Sec-Fetch-Site` que o navegador manda sempre: `same-origin` ou `none` passam,
+outro site leva 403. A página agora separa "o serviço não respondeu" de "nenhuma
+música encontrada", e os proxies de letra ganharam prazo (7 s) e resposta validada.
+
+**Como pegar isso de novo:** teste em modo produção, porque é lá que o `Origin`
+vazio é recusado:
+```bash
+npm run test:security   # "in production, reads from our own pages pass the AI gate…"
+# à mão: NODE_ENV=production node -e "…" chamando uma rota GET de IA com cookie e sem Origin
+```
+
+**Por que aconteceu:** a regra de CSRF foi escrita pensando em escrita, e ninguém
+testou uma rota GET com cookie em modo produção. E a página transformava qualquer
+falha em "Nenhuma música encontrada", o que escondeu o 403 por dias: **mensagem de
+"não existe" só quando a resposta veio vazia de verdade.**
+
+---
+
 ## 2026-09-20 — `\uXXXX` dentro de CSS vira `u00E7` na tela
 
 **Sintoma:** a legenda vazia do palco de voz mostrava
@@ -457,7 +567,7 @@ converte qualquer falha de escrita em `HttpError(502,'database_error')`, esconde
 mensagem real do PostgREST, então o erro não dizia qual coluna faltava.
 **Correção:** no bloco do `grant-plan` em `api/index.js`, gerar
 `userId = 'grant-' + crypto.randomBytes(8).toString('hex')` e mandar no insert.
-Confirmado em produção: `gavinhacarol@gmail.com → super (conta CRIADA agora)`.
+Confirmado em produção: `aluna@exemplo.com → super (conta CRIADA agora)`.
 **Como pegar isso de novo:**
 ```bash
 node scripts/cortesias.mjs                         # lista, nao escreve

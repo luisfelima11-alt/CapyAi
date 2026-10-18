@@ -13,7 +13,10 @@ const ROOT = path.join(__dirname, '..');
 
 function cspDeProducao() {
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-  const bloco = (v.headers || []).find(h => h.source === '/(.*)');
+  // A CSP das paginas comuns fica na regra que exclui as paginas endurecidas
+  // (/((?!...).*)); a /(.*) ficou com os outros cabecalhos de seguranca.
+  const temCsp = h => (h.headers || []).some(x => /content-security-policy/i.test(x.key));
+  const bloco = (v.headers || []).find(h => temCsp(h) && (h.source === '/(.*)' || h.source.startsWith('/((?!')));
   const csp = bloco && bloco.headers.find(h => /content-security-policy/i.test(h.key));
   assert.ok(csp, 'a CSP global sumiu do vercel.json');
   return csp.value;
