@@ -1435,7 +1435,7 @@ window.CapyAudio = (function () {
                 speechSynthesis.speak(u);
             }
         } catch (e) {}
-        try { if (window.CapySounds && CapySounds._ctx && CapySounds._ctx.state === 'suspended') CapySounds._ctx.resume(); } catch (e) {}
+        try { if (window.CapySound && CapySound._ctx && CapySound._ctx.state === 'suspended') CapySound._ctx.resume(); } catch (e) {}
     }
 
     ['touchend', 'pointerup', 'click', 'keydown'].forEach(type =>
