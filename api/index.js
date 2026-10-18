@@ -5721,22 +5721,29 @@ Rules:
 
     // ── Homework Submissions ──────────────────────────────────────────────────
 
-    // POST /api/homework → save a student homework submission to Supabase
+    // POST /api/homework → the homework the teacher sees in teacher_homework.html.
+    // components.js sends it from every lesson with a Homework tab
+    // (autoEnviarLicaoDeCasa). The limits repeat the table's
+    // (202610180001_licao_de_casa.sql), so a bad request gets a 400 here
+    // instead of a refusal from RLS.
     if (req.method === 'POST' && url === '/api/homework') {
         assertCsrf(req);
         const identity = await requireAppUser(req, res);
         const { lessonId, lessonTitle, answers, xp } = await readBody(req);
-        if (!lessonId) { res.status(400).json({ error: 'lessonId_required' }); return; }
+        const licao = String(lessonId || '').toLowerCase();
+        if (!/^[a-z0-9_-]{1,64}$/.test(licao)) { res.status(400).json({ error: 'lessonId_invalid' }); return; }
+        const respostas = answers && typeof answers === 'object' && !Array.isArray(answers) ? sanitizeStoredJson(answers) : {};
+        if (JSON.stringify(respostas).length > 20000) { res.status(413).json({ error: 'answers_too_large' }); return; }
         const result = await sbUser(identity, '/homework_submissions', {
             method: 'POST',
             headers: { 'Prefer': 'return=representation' },
             body: JSON.stringify({
                 user_id:       identity.appUserId,
-                student_name:  identity.appAccount.name || 'Student',
-                lesson_id:     String(lessonId).slice(0, 64),
+                student_name:  String(identity.appAccount.name || 'Student').slice(0, 80),
+                lesson_id:     licao,
                 lesson_title:  String(lessonTitle || '').slice(0, 160),
-                answers:       answers && typeof answers === 'object' ? sanitizeStoredJson(answers) : {},
-                xp_earned:     Math.max(0, Math.min(500, Number(xp) || 0)),
+                answers:       respostas,
+                xp_earned:     Math.max(0, Math.min(500, Math.round(Number(xp)) || 0)),
                 submitted_at:  new Date().toISOString(),
             }),
         });
@@ -5752,8 +5759,11 @@ Rules:
         let filter = '';
         if (lessonId) filter += `&lesson_id=eq.${encodeURIComponent(lessonId)}`;
         if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
-        const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc${filter}`);
-        res.status(200).json(rows || []); return;
+        const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc&limit=500${filter}`);
+        // On a GET, sb() returns Supabase's error object (a missing table, for
+        // one) instead of throwing: that is not a list of submissions.
+        if (!Array.isArray(rows)) { res.status(502).json({ error: 'database_error' }); return; }
+        res.status(200).json(rows); return;
     }
 
     // ── Admin stats ───────────────────────────────────────────────────────────
