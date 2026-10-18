@@ -51,14 +51,14 @@
         <span class="text-4xl">🛰️</span>
         <div>
           <h1 class="text-2xl font-black">Prática Diária GPS Tronic</h1>
-          <p class="text-emerald-200/80 text-sm font-bold">Treine todo dia o que você viu nas aulas</p>
+          <p class="text-emerald-200/80 text-sm font-bold">24 unidades · 96 mini-lições de 5 minutos com o inglês técnico e comercial do curso</p>
         </div>
       </div>
       <div class="flex items-center gap-3 mt-4">
         <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
           <div id="gps-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-green-300 rounded-full transition-all" style="width:0%"></div>
         </div>
-        <span id="gps-progress-label" class="text-xs font-black text-emerald-200">0 / 32</span>
+        <span id="gps-progress-label" class="text-xs font-black text-emerald-200">0 / 96</span>
       </div>
     </div>
 
@@ -90,19 +90,21 @@
 
 <div id="mobile-nav-placeholder"></div>
 
-<script src="auth-secure.js?v=auth20260918"></script>
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=nav320"></script>
+<script src="components.js?v=skins1"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha GPS Tronic: 8 lições × 4 minis = 32 nós ──────────────────────────
+// ── Trilha GPS Tronic: 24 lições × 4 minis = 96 nós ─────────────────────────
 const TRAIL_GPS = [
-  { id:501, emoji:'🛰️', title:'GPS Basics Review' },
+  // Bloco 1: Base Técnica, Atendimento e Fazenda (Aulas 1 a 5)
+  { id:501, emoji:'🛰️', title:'GPS Basics Review', block:'Bloco 1 · Base Técnica, Telefone e Fazenda (Aulas 1–5)' },
   { id:502, emoji:'🚜', title:'Tractor & Field Words' },
   { id:503, emoji:'📞', title:'Phone Greetings' },
   { id:504, emoji:'❓', title:'Customer Questions' },
@@ -110,6 +112,24 @@ const TRAIL_GPS = [
   { id:506, emoji:'📅', title:'Promising a Deadline' },
   { id:507, emoji:'🧩', title:'Ordering Parts' },
   { id:508, emoji:'🌾', title:'At the Farm' },
+  // Bloco 2: Agendamento, Orçamento, Suporte Remoto e Fornecedor (Aulas 6 a 13)
+  { id:509, emoji:'🗓️', title:'Booking the Visit', block:'Bloco 2 · Visitas, Preços, Suporte Remoto e Importação (Aulas 6–13)' },
+  { id:510, emoji:'💰', title:'Price, Quotes & Payment' },
+  { id:511, emoji:'☕', title:'Small Talk at the Farm' },
+  { id:512, emoji:'📲', title:'Walk Me Through It (Remote Support)' },
+  { id:513, emoji:'⏳', title:'Handling Delays & Bad News' },
+  { id:514, emoji:'🩺', title:'Front Desk Check-In' },
+  { id:515, emoji:'✅', title:"It's Ready! (Delivery & Care Tips)" },
+  { id:516, emoji:'📦', title:'Messaging a Supplier (Numbers & Dates)' },
+  // Bloco 3: Agrishow, Diagnóstico Avançado e Integração Campo-Oficina (Aula 14 + Especialidades)
+  { id:517, emoji:'🤝', title:'Networking at Agrishow', block:'Bloco 3 · Agrishow, Bancada Avançada, RTK e Implementos' },
+  { id:518, emoji:'⚙️', title:'Calibration, RTK & Base Station' },
+  { id:519, emoji:'🔌', title:'Wiring Harness, Pins & Voltage' },
+  { id:520, emoji:'💾', title:'Firmware Updates & Error Codes' },
+  { id:521, emoji:'🌱', title:'Planters, Sprayers & Section Control' },
+  { id:522, emoji:'🛡️', title:'Warranty Claims & Technical Reports' },
+  { id:523, emoji:'🛻', title:'Field Service & Pre-Harvest Checklist' },
+  { id:524, emoji:'🏆', title:'GPS Tronic Master Review' },
 ];
 const TOTAL_NODES = TRAIL_GPS.length * 4;
 const DAY_SUBS = ['Listen & Quiz','Game','Build & Speak','Chat with Yara'];
@@ -134,7 +154,15 @@ function render() {
   const next = nextMini();
   let done = 0, html = '';
 
-  TRAIL_GPS.forEach(l => {
+  TRAIL_GPS.forEach((l, idx) => {
+    if (l.block) {
+      html += `
+        <div class="pt-4 pb-1 px-2">
+          <span class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-emerald-200">
+            🛰️ ${l.block}
+          </span>
+        </div>`;
+    }
     let rows = '';
     for (let m = 1; m <= 4; m++) {
       const isDone = miniDone(l.id, m);
@@ -158,6 +186,7 @@ function render() {
       <div class="card-in bg-white/70 border border-emerald-100 rounded-3xl p-4">
         <div class="flex items-center gap-2 mb-3 px-1">
           <span class="text-2xl">${l.emoji}</span>
+          <span class="text-xs font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Unidade ${idx + 1}</span>
           <span class="font-black text-navy">${l.title}</span>
         </div>
         <div class="space-y-2">${rows}</div>
