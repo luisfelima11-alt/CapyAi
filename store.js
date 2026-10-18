@@ -40,7 +40,7 @@ const Store = {
         purchasedItems: [],
         planType: 'free',       // 'free' | 'plus' | 'pro'
         aiUsageToday: 0,        // resets daily
-        aiUsageLimit: 3,        // 3=free, 15=plus, 50=pro
+        aiUsageLimit: 10,       // free: daily ⚡ AI credits (server: IA_GRATIS_DIA)
         aiCreditsExtra: 0,      // top-up credits (one-time purchase)
         // ── User profile / personalization ────────────────────────
         englishLevel: null,           // 'beginner'|'elementary'|'intermediate'|'advanced'
@@ -182,8 +182,11 @@ const Store = {
             this.state.planType = data.plan || 'free';
             this.state.planExpiresAt = data.planExpiresAt || null;
             this.state.kiwifySubscriptionId = data.kiwifySubscriptionId || null;
-            // Update AI usage limit to match new plan
-            this.state.aiUsageLimit = data.plan === 'super' ? 500 : data.plan === 'pro' ? 200 : 3;
+            // Update AI usage limit to match new plan. Free: the server's daily
+            // ⚡ balance (/api/me → ia); the server is the one that enforces it.
+            this.state.aiUsageLimit = data.plan === 'super' ? 500 : data.plan === 'pro' ? 200
+                : (data.ia && data.ia.limite) || 10;
+            if (data.ia) this.state.aiUsageToday = Math.max(0, Number(data.ia.usado) || 0);
             localStorage.setItem('capyPlanSyncedAt', String(Date.now()));
             this.save();
             if (before !== this.state.planType) {
@@ -573,7 +576,7 @@ const Store = {
     // ── Plan & AI gating ──────────────────────────────────────
     consumeAI() {
         // Returns true if AI interaction is allowed; false if limit hit
-        const limit = this.state.aiUsageLimit || 3;
+        const limit = this.state.aiUsageLimit || 10;
         if ((this.state.aiUsageToday || 0) < limit) {
             this.state.aiUsageToday = (this.state.aiUsageToday || 0) + 1;
             this.save();
@@ -589,7 +592,7 @@ const Store = {
     },
 
     getRemainingAI() {
-        const base = (this.state.aiUsageLimit || 3) - (this.state.aiUsageToday || 0);
+        const base = (this.state.aiUsageLimit || 10) - (this.state.aiUsageToday || 0);
         return Math.max(0, base) + (this.state.aiCreditsExtra || 0);
     },
 
@@ -599,7 +602,7 @@ const Store = {
     },
 
     setPlan(type) {
-        const limits = { free: 3, plus: 15, pro: 50 };
+        const limits = { free: 10, plus: 15, pro: 50 };
         this.state.planType = type;
         this.state.aiUsageLimit = limits[type] || 3;
         this.save();

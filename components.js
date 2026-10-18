@@ -665,21 +665,6 @@ const Components = {
                     return;
                 }
 
-                // Plan gate: free = 1/day
-                const isFree = (typeof Store !== 'undefined') ? Store.isFree() : true;
-                const todayKey = 'capyWritingCoach_' + capyHojeBR();
-                const usedToday = parseInt(localStorage.getItem(todayKey) || '0', 10);
-                if (isFree && usedToday >= 1) {
-                    out.innerHTML = `
-                      <div class="bg-gradient-to-br from-navy to-purple-950 text-white rounded-2xl p-5 text-center">
-                        <div class="text-3xl mb-2">🐾✨</div>
-                        <p class="font-black mb-1">Você já usou sua correção grátis de hoje!</p>
-                        <p class="text-white/70 text-sm mb-4">No plano Pro a Yara corrige TODAS as suas redações, sem limite.</p>
-                        <a href="landing.html#pricing" class="inline-block bg-pink-500 hover:bg-pink-400 text-white font-black px-6 py-2.5 rounded-full transition-all">Quero correções ilimitadas →</a>
-                      </div>`;
-                    return;
-                }
-
                 btn.disabled = true;
                 btn.classList.add('opacity-70');
                 out.innerHTML = `<div class="bg-pink-50 border-2 border-pink-200 rounded-2xl p-4 flex items-center gap-3 text-sm font-bold text-pink-600"><span class="animate-bounce text-xl">🐾</span> Yara está lendo seu texto com carinho...</div>`;
@@ -697,9 +682,19 @@ const Components = {
                         body: JSON.stringify({ userId, text, lang, lessonTitle, course, task: taskDesc })
                     });
                     const d = await r.json();
+                    // The server holds the plan's limit: free students spend their
+                    // daily ⚡ AI credits (PESO_IA), no local counter.
+                    if (r.status === 429) {
+                        out.innerHTML = `
+                          <div class="bg-gradient-to-br from-navy to-purple-950 text-white rounded-2xl p-5 text-center">
+                            <div class="text-3xl mb-2">⚡</div>
+                            <p class="font-black mb-1">Seus créditos de IA de hoje acabaram</p>
+                            <p class="text-white/70 text-sm mb-4">${esc(d.message || 'Eles voltam amanhã.')}</p>
+                            <a href="landing.html#pricing" class="inline-block bg-pink-500 hover:bg-pink-400 text-white font-black px-6 py-2.5 rounded-full transition-all">Ver planos →</a>
+                          </div>`;
+                        return;
+                    }
                     if (!r.ok || d.error) throw new Error(d.error || 'Erro na correção');
-
-                    localStorage.setItem(todayKey, String(usedToday + 1));
 
                     const paws = '🐾'.repeat(d.score) + '<span class="opacity-25">' + '🐾'.repeat(5 - d.score) + '</span>';
                     const errHtml = (d.errors && d.errors.length)
