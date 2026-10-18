@@ -126,7 +126,7 @@
     <!-- ── GUIDED MODE HEADER (hidden in free mode) ── -->
     <div id="guided-header" class="hidden mb-6">
       <div class="flex items-center gap-3 mb-4">
-        <button onclick="window.location.href='learn.html'" class="flex items-center gap-1 text-slate-400 hover:text-navy text-sm font-bold transition-colors">
+        <button onclick="window.location.href=trilhaDoCurso()" class="flex items-center gap-1 text-slate-400 hover:text-navy text-sm font-bold transition-colors">
           <span class="material-symbols-outlined text-base">arrow_back</span> Learning Path
         </button>
         <span class="text-slate-300">·</span>
@@ -197,7 +197,7 @@
               class="bg-navy text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all mb-3 w-full max-w-xs">
         Next Lesson →
       </button>
-      <button onclick="window.location.href='learn.html'"
+      <button onclick="window.location.href=trilhaDoCurso()"
               class="bg-pink-500 text-white font-black px-8 py-4 rounded-2xl text-lg shadow-xl hover:scale-105 active:scale-95 transition-all w-full max-w-xs">
         🗺️ Back to Learning Path
       </button>
@@ -256,7 +256,7 @@
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="quiz"  onclick="switchTool('quiz')">❓ Quiz</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="build" onclick="switchTool('build')">🏗️ Build</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="expr"  onclick="switchTool('expr')">💬 Expressions</button>
-      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="gram"  onclick="switchTool('gram')">📐 Grammar</button>
+      <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="gram"  onclick="switchTool('gram')">🧩 Patterns</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="speak" onclick="switchTool('speak')">🎤 Speak</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="listen" onclick="switchTool('listen')">🔊 Listen</button>
       <button class="tool-tab px-4 py-2 rounded-2xl font-bold text-sm bg-white text-slate-500 border-2 border-slate-100" data-tool="typing" onclick="switchTool('typing')">⌨️ Typing</button>
@@ -284,7 +284,7 @@
 <script src="memory.js?v=mem1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=m1015"></script>
+<script src="components.js?v=m1018"></script>
 <script src="celebration.js?v=cel3"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script>
@@ -304,7 +304,7 @@ const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta se
 async function carregarIndice() {
   if (LESSON_INDEX.length) return LESSON_INDEX;
   try {
-    const r = await fetch('data/lessons-index.json?v=en112');
+    const r = await fetch('data/lessons-index.json?v=gps24');
     if (r.ok) LESSON_INDEX = await r.json();
   } catch (e) { /* offline: segue com o que der */ }
   return LESSON_INDEX;
@@ -315,7 +315,7 @@ async function garantirLicao(id) {
   const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
   if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
   try {
-    const r = await fetch('data/lessons/' + id + '.json?v=en112');
+    const r = await fetch('data/lessons/' + id + '.json?v=gps24');
     if (!r.ok) return null;
     const licao = await r.json();
     LICOES_CARREGADAS.set(id, licao);
@@ -346,6 +346,18 @@ function faixaDoCurso(id) {
   const ini = INICIOS_DE_CURSO.filter(s => id >= s).pop() || INICIOS_DE_CURSO[0];
   const prox = INICIOS_DE_CURSO.find(s => s > ini);
   return { ini, fim: prox ? prox - 1 : Infinity };
+}
+
+function trilhaDoCurso(id) {
+  const n = Number(id || (currentLesson && currentLesson.id) || (new URLSearchParams(location.search).get('lesson')) || 1);
+  if (n >= 801) return 'learn_med.html';
+  if (n >= 701) return 'learn_agro.html';
+  if (n >= 601) return 'learn_interview.html';
+  if (n >= 501) return 'learn_gpstronic.html';
+  if (n >= 401) return 'learn_intermediate.html';
+  if (n >= 301) return 'learn_tr.html';
+  if (n >= 201) return 'learn_fr.html';
+  return 'learn.html';
 }
 
 // {pos, total} da lição dentro do curso dela — ex.: a 508 vira {pos: 8, total: 8}.
@@ -898,6 +910,7 @@ let chatExchanges = 0;
 // O nivel vem da FAIXA DE ID, que e o curso. Sem isto todo quiz saia 'beginner'.
 function nivelDaLicao(lesson) {
   const id = Number(lesson.id);
+  if (id >= 701) return 'A1';   // Agro English (701-728) e Medical (801-816)
   if (id >= 601) return 'B1';   // entrevista de emprego
   if (id >= 501) return 'A2';   // GPS Tronic
   if (id >= 401) return 'B1';   // intermediate
@@ -924,6 +937,7 @@ async function loadAIQuiz(lesson) {
         vocab,
         level: nivelDaLicao(lesson),
         grammar: lesson.grammar && lesson.grammar.title,
+        lang: _lessonLanguage(),
       })
     });
     const data = await resp.json();
@@ -955,12 +969,16 @@ function renderAIChat() {
   document.getElementById('aichat-input').value = '';
   document.getElementById('aichat-input').placeholder = _lessonLanguage() === 'tr'
     ? 'Türkçe cevap yazın… (ou peça ajuda em português)'
-    : 'Type your answer in English…';
+    : _lessonLanguage() === 'fr'
+      ? 'Écrivez votre réponse en français… (ou peça ajuda em português)'
+      : 'Type your answer in English…';
   updateAIRemainingBadge();
   // Yara opens the conversation
   const opener = _lessonLanguage() === 'tr'
     ? `Harika! “${currentLesson.title}” dersini bitirdin. 🌟 Bugün öğrendiğin bir Türkçe kelime söyler misin?`
-    : `Great job finishing the lesson on "${currentLesson.title}"! 🌟 Can you tell me one word you learned today?`;
+    : _lessonLanguage() === 'fr'
+      ? `Bravo ! Tu as terminé la leçon « ${currentLesson.title} » ! 🌟 Peux-tu me dire un mot en français que tu as appris aujourd'hui ?`
+      : `Great job finishing the lesson on "${currentLesson.title}"! 🌟 Can you tell me one word you learned today?`;
   appendChatMsg('yara', opener);
   chatHistory.push({ role: 'model', text: opener });
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1243,7 +1261,8 @@ const GUIDED_VERSION = 'v2';
 function _lessonLanguage() { return (currentLesson && currentLesson.lang) || 'en'; }
 function _nextLessonInCurrentLanguage() {
   const language = _lessonLanguage();
-  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language);
+  const { ini, fim } = faixaDoCurso(currentLesson.id);
+  const languageLessons = LESSON_INDEX.filter(lesson => (lesson.lang || 'en') === language).filter(lesson => lesson.id >= ini && lesson.id <= fim);
   const currentIndex = languageLessons.findIndex(lesson => lesson.id === currentLesson.id);
   return currentIndex >= 0 ? (languageLessons[currentIndex + 1] || null) : null;
 }
@@ -1755,7 +1774,7 @@ function renderVocab() {
       <!-- action buttons -->
       <div class="flex gap-2 justify-center flex-wrap">
         <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-pink-200">
-          <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> EN
+          <span class="material-symbols-outlined text-pink-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> ${_lessonLanguage().toUpperCase()}
         </button>
         <button onclick="speakWord('${card.pt.replace(/'/g,"\\'")}','pt-BR')" class="flex items-center gap-1 px-3 py-2 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-600 text-xs shadow-sm hover:border-emerald-200">
           <span class="material-symbols-outlined text-emerald-500 text-sm" style="font-variation-settings:'FILL' 1;">volume_up</span> PT
@@ -2142,7 +2161,7 @@ function exprSelectRight(btn, val) {
 // ══════════════════════════════════════════════════════════════════════════════
 function renderGram() {
   const g = currentLesson.grammar;
-  if (!g) { document.getElementById('panel-gram').innerHTML = '<p class="text-center text-slate-400 py-10">Gramática em breve.</p>'; return; }
+  if (!g) { document.getElementById('panel-gram').innerHTML = '<p class="text-center text-slate-400 py-10">Padrões em breve.</p>'; return; }
   markToolDone(currentLesson.id, 'gram');
   document.getElementById('panel-gram').innerHTML = `
     <div class="space-y-5">
@@ -2368,7 +2387,7 @@ function renderProgressDashboard() {
   const pct   = Math.round((done / total) * 100);
   const toolLabels = {
     vocab:'🃏 Cards', quiz:'❓ Quiz', build:'🏗️ Build', expr:'💬 Expr',
-    gram:'📐 Grammar', speak:'🎤 Speak', listen:'🔊 Listen',
+    gram:'🧩 Patterns', speak:'🎤 Speak', listen:'🔊 Listen',
     typing:'⌨️ Typing', speed:'⏱️ Speed', scramble:'🧩 Scramble'
   };
   const nextTool = TOOL_KEYS.find(k => !p.tools[k]);
@@ -2423,6 +2442,8 @@ function renderListen() {
   const others = shuffle(vocab.filter((_,i) => i !== listenIdx)).slice(0,3);
   const opts   = shuffle([card, ...others]);
   const isEnToPt = listenMode === 'en-to-pt';
+  const langCode = _lessonLanguage().toUpperCase();
+  const langNamePt = _lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês';
   const streakHtml = listenStreak >= 2
     ? `<span class="text-xs font-black text-amber-500 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">🔥 ${listenStreak}x combo!</span>`
     : '';
@@ -2436,7 +2457,7 @@ function renderListen() {
         </div>
         <button onclick="listenMode = listenMode==='en-to-pt'?'pt-to-en':'en-to-pt'; renderListen()"
                 class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1 rounded-full transition-all">
-          Modo: ${isEnToPt ? 'EN → PT 🔄' : 'PT → EN 🔄'}
+          Modo: ${isEnToPt ? langCode + ' → PT 🔄' : 'PT → ' + langCode + ' 🔄'}
         </button>
       </div>
       <!-- Progress bar -->
@@ -2445,7 +2466,7 @@ function renderListen() {
       </div>
       <!-- Listen button — compact -->
       <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl border border-violet-100 p-4 text-center">
-        <p class="text-xs font-bold text-violet-500 uppercase tracking-wide mb-3">${isEnToPt ? 'Ouça e escolha a tradução' : 'Ouça e escolha em inglês'}</p>
+        <p class="text-xs font-bold text-violet-500 uppercase tracking-wide mb-3">${isEnToPt ? 'Ouça e escolha a tradução' : 'Ouça e escolha em ' + langNamePt}</p>
         <button onclick="speakWord('${isEnToPt ? card.en.replace(/'/g,"\\'") : card.pt.replace(/'/g,"\\'")}','${isEnToPt?CUR_TTS_LANG:'pt-BR'}')"
                 class="w-16 h-16 rounded-full bg-violet-500 hover:bg-violet-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-violet-500/30 transition-all active:scale-95">
           <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">volume_up</span>
@@ -2553,14 +2574,15 @@ function renderTyping() {
   const card = vocab[typeIdx];
   const isEnToPt = typeMode === 'en-to-pt';
   const prompt = isEnToPt ? card.en : card.pt;
-  const answerLang = isEnToPt ? 'PT' : 'EN';
+  const langCode = _lessonLanguage().toUpperCase();
+  const answerLang = isEnToPt ? 'PT' : langCode;
   document.getElementById('panel-typing').innerHTML = `
     <div class="space-y-4">
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-slate-400">${typeIdx+1} / ${vocab.length}</span>
         <button onclick="typeMode = typeMode==='pt-to-en'?'en-to-pt':'pt-to-en'; renderTyping()"
                 class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full">
-          Modo: ${isEnToPt ? 'EN → PT 🔄' : 'PT → EN 🔄'}
+          Modo: ${isEnToPt ? langCode + ' → PT 🔄' : 'PT → ' + langCode + ' 🔄'}
         </button>
       </div>
       <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -2826,7 +2848,7 @@ function renderScramble() {
       </div>
 
       <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border border-purple-100 p-6 text-center">
-        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em inglês</p>
+        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em ${_lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês'}</p>
         <p class="text-lg font-extrabold text-navy mb-1">${card.pt}</p>
         <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')"
                 class="text-xs text-purple-400 font-bold flex items-center gap-1 mx-auto hover:text-purple-600">
