@@ -1414,10 +1414,21 @@ window.CapyAudio = (function () {
     }
 
     // 'playback' keeps the voice audible with the iPhone's silent switch on.
-    // Set only when a voice plays, since it pauses the student's own music.
+    // Set only while a voice plays, since it pauses the student's own music;
+    // release() hands the session back so the music resumes and CapySound's
+    // beeps obey the silent switch again.
     function prepare() {
         try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
     }
+
+    function release() {
+        try { if (navigator.audioSession) navigator.audioSession.type = 'auto'; } catch (e) {}
+    }
+
+    // Each play() gets a turn. A clip replaced by a newer one still rejects its
+    // play() (AbortError) after the newer prepare(); only the current turn may
+    // release the session.
+    let turn = 0;
 
     function unlock() {
         if (unlocked) return;
@@ -1444,6 +1455,8 @@ window.CapyAudio = (function () {
     // Handlers are dropped before pausing: the element is shared, and a stale
     // onerror would fire the browser voice for a clip nobody asked for.
     function stop() {
+        turn++;
+        release();
         if (!el) return;
         el.onended = null;
         el.onerror = null;
@@ -1453,16 +1466,24 @@ window.CapyAudio = (function () {
     function play(src, opts = {}) {
         const a = element();
         stop();
+        const mine = turn;
+        const finish = handler => (...args) => {
+            if (mine === turn) release();
+            if (handler) handler(...args);
+        };
         prepare();
-        a.onended = opts.onended || null;
-        a.onerror = opts.onerror || null;
+        a.onended = finish(opts.onended);
+        a.onerror = finish(opts.onerror);
         a.defaultPlaybackRate = opts.rate || 1;
         a.src = src;
         a.playbackRate = opts.rate || 1;
-        return a.play();
+        return a.play().catch(err => {
+            if (mine === turn) release();
+            throw err;
+        });
     }
 
-    return { element, prepare, unlock, stop, play };
+    return { element, prepare, release, unlock, stop, play };
 })();
 
 // ── CapyTTS: shared OpenAI voice helper (Nova/gpt-4o-mini-tts) ─────────────
@@ -1528,6 +1549,13 @@ window.CapyTTS = {
         if (!clean) return;
         this._stop();
         const speakId = this._speakId = (this._speakId || 0) + 1;
+        // A failed clip fires onerror and also rejects play(): speak once.
+        let fellBack = false;
+        const cair = () => {
+            if (fellBack || this._speakId !== speakId) return;
+            fellBack = true;
+            this._fallbackSpeak(clean, bcp47);
+        };
 
         const { bcp47, apiLang } = this._mapLang(lang);
         const cacheKey = `/__capy-tts-cache/${apiLang}/${encodeURIComponent(clean.toLowerCase())}`;
@@ -1572,10 +1600,10 @@ window.CapyTTS = {
             this._currentUrl = objUrl;
             await CapyAudio.play(objUrl, {
                 onended: done,
-                onerror: () => { done(); this._fallbackSpeak(clean, bcp47); },
+                onerror: () => { done(); cair(); },
             });
         } catch (e) {
-            if (this._speakId === speakId) this._fallbackSpeak(clean, bcp47);
+            cair();
         }
     }
 };

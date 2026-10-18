@@ -143,7 +143,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
-**⚠️ Cache busting:** All pages reference `components.js?v=som1` (also `tts-en.js?v=som1`, `listening-lab.js?v=som1`). When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+**⚠️ Cache busting:** All pages reference `components.js?v=som2` (also `tts-en.js?v=som1`, `listening-lab.js?v=som1`). When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
 
 **⚠️ Sound on iPhone:** any audio that waits for the network must play through `CapyAudio.play(src, {onended, onerror, rate})` (components.js), never a `new Audio()` created after an `await`: iOS only plays an element first unlocked inside a tap. See BUGS-APRENDIDOS.md (2026-10-18).
 
