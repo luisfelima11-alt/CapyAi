@@ -198,7 +198,7 @@ test('the CI and npm run security:check run the audit gate; every exception has 
 test('homework: every lesson with a Homework tab reaches the teacher through the components.js hook', () => {
   // 18/out: only aula_32 sent its homework, to a table that did not exist. Now
   // components.js (autoEnviarLicaoDeCasa) sends it from every lesson, and only
-  // after the lesson accepts it: its submitHomework…() disables the button.
+  // after the lesson accepts it: its submit…() button disables itself.
   const paginas = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
   let comLicao = 0;
   for (const pagina of paginas) {
@@ -209,8 +209,8 @@ test('homework: every lesson with a Homework tab reaches the teacher through the
     comLicao++;
     assert.match(pagina.replace(/\.html$/, ''), /^[a-z0-9_-]{1,64}$/, `${pagina}: its name is the lesson_id the table accepts`);
     assert.match(source, /<script[^>]+src="components\.js/, `${pagina} does not load components.js`);
-    const botao = source.slice(inicio).match(/onclick="(submitHomework\w*)\(/);
-    assert.ok(botao, `${pagina} has no submitHomework button in the Homework tab`);
+    const botao = source.slice(inicio).match(/onclick="(submit\w*)\(/);
+    assert.ok(botao, `${pagina} has no submit…() button in the Homework tab`);
     const corpo = source.slice(source.search(new RegExp(`function\\s+${botao[1]}\\s*\\(`)));
     assert.match(corpo.slice(0, 3000), /disabled\s*=\s*true/, `${pagina}: ${botao[1]} never disables the button, so nothing is sent`);
   }

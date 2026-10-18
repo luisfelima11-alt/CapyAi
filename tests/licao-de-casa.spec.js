@@ -7,7 +7,7 @@ const ALUNA = { id: 'aluna-teste', name: 'Aluna Teste', email: 'aluna@example.te
 const TEXTO = 'I told my friend about my new job and she felt happy.';
 
 // Every API call is intercepted: these tests never reach a real database.
-async function abrirAula(page, { sessao = ALUNA, statusLicao = [200] } = {}) {
+async function abrirAula(page, { sessao = ALUNA, statusLicao = [200], pagina = '/aula_05.html', botao = 'submitHomework5()' } = {}) {
   const enviadas = [];
   const fila = [...statusLicao];
   await page.route('**/api/**', async route => {
@@ -25,12 +25,12 @@ async function abrirAula(page, { sessao = ALUNA, statusLicao = [200] } = {}) {
       await route.fulfill({ status: 401, json: { error: 'unexpected_mock_request' } });
     }
   });
-  await page.goto('/aula_05.html');
+  await page.goto(pagina);
   await page.evaluate(() => window.Auth && window.Auth.ready());
   await page.locator('[data-tab="homework"]').first().click();
   const aba = page.locator('#tab-homework');
-  await aba.locator('textarea').last().fill(TEXTO);
-  return { aba, enviadas, botao: aba.locator('button[onclick="submitHomework5()"]') };
+  await aba.locator('textarea, input[type="text"]').last().fill(TEXTO);
+  return { aba, enviadas, botao: aba.locator(`button[onclick="${botao}"]`) };
 }
 
 test('a signed-in student\'s homework reaches the teacher, with the lesson and the written answers', async ({ page }) => {
@@ -72,4 +72,15 @@ test('a failed send says so and "Tentar de novo" sends the same homework again',
   await expect(aba.getByText('Lição enviada para o seu professor.')).toBeVisible();
   expect(enviadas).toHaveLength(2);
   expect(enviadas[1]).toEqual(enviadas[0]);
+});
+
+test('a lesson whose submit button has another name (submitReviewDone) also reaches the teacher', async ({ page }) => {
+  // intermediate_revisao.html (18/out) ends its Homework tab in submitReviewDone(), not submitHomework…().
+  const { aba, enviadas, botao } = await abrirAula(page, { pagina: '/intermediate_revisao.html', botao: 'submitReviewDone()' });
+  await botao.click();
+  await expect(aba.getByText('Lição enviada para o seu professor.')).toBeVisible();
+  expect(enviadas).toHaveLength(1);
+  expect(enviadas[0]).toMatchObject({ lessonId: 'intermediate_revisao', xp: 75 });
+  expect(enviadas[0].lessonTitle).toContain('Master Review');
+  expect(Object.values(enviadas[0].answers)).toContain(TEXTO);
 });

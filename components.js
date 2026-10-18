@@ -624,13 +624,13 @@ const Components = {
 
     // ── Lição de casa: a entrega chega ao professor (18/out/2026) ──────────
     // Every lesson with a Homework tab ends in a button with
-    // onclick="submitHomework…()" that disables itself when the submission
-    // counts (a short text or a missing task leaves it enabled). This hook
-    // watches that click and, once the button is disabled, sends the written
-    // answers to POST /api/homework, which the teacher reads in
-    // teacher_homework.html. A new lesson needs nothing but that button inside
-    // #tab-homework. Until 18/out only aula_32 sent anything, to a table that
-    // did not exist.
+    // onclick="submit…()" (submitHomework5, submitReviewDone…) that disables
+    // itself when the submission counts (a short text or a missing task leaves
+    // it enabled). This hook watches that click and, once the button is
+    // disabled, sends the written answers to POST /api/homework, which the
+    // teacher reads in teacher_homework.html. A new lesson needs nothing but
+    // that button inside #tab-homework. Until 18/out only aula_32 sent
+    // anything, to a table that did not exist.
     autoEnviarLicaoDeCasa() {
         const aba = document.querySelector('#tab-homework');
         if (!aba || aba.dataset.licaoGancho) return;
@@ -716,7 +716,7 @@ const Components = {
         // the "+75 XP" label before the handler rewrites it.
         document.addEventListener('click', ev => {
             const btn = ev.target && ev.target.closest ? ev.target.closest('button') : null;
-            if (!btn || enviada || btn.disabled || !/submitHomework/.test(btn.getAttribute('onclick') || '')) return;
+            if (!btn || enviada || btn.disabled || !aba.contains(btn) || !/^\s*submit\w*\(/.test(btn.getAttribute('onclick') || '')) return;
             const xp = Number((String(btn.textContent).match(/\+\s*(\d{1,3})\s*XP/i) || [])[1]) || 75;
             setTimeout(() => {
                 if (enviada || !btn.disabled) return;   // the lesson refused it: nothing to send
