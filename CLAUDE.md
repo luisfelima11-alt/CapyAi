@@ -52,6 +52,19 @@ botão, SEO, PDF ou fala da Yara.
   vê, e o `self-study.js` e o `listening-lab.js` dependem deles.
 - Os prompts da Yara mandam ensinar com exemplos e nunca dizer "grammar" ou "gramática".
 
+## Lição de casa chega ao professor (18/out/2026)
+
+Toda aula com aba `#tab-homework` envia a entrega para `POST /api/homework` sozinha: o
+`components.js` (`autoEnviarLicaoDeCasa`) observa o clique no botão `onclick="submitHomework…()"`
+e, **se o botão ficou desabilitado**, manda as respostas escritas (inputs de texto e textareas).
+O professor vê tudo em `teacher_homework.html` (papel teacher/admin, com verificação em duas etapas).
+
+- Aula nova: basta o botão `submitHomework…()` dentro de `#tab-homework`, que se desabilita quando
+  a entrega vale. Não chame `fetch('/api/homework')` na página: o envio sairia duas vezes.
+- Visitante sem conta vê "Entre na sua conta para o professor ver"; erro de rede mostra "Tentar de novo".
+- Tabela `homework_submissions` (`202610180001_licao_de_casa.sql`): o aluno grava e lê só as dele,
+  o painel lê pelo servidor. Até 18/out ela não existia e a entrega se perdia em silêncio.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,

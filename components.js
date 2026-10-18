@@ -622,6 +622,110 @@ const Components = {
         };
     },
 
+    // ── Lição de casa: a entrega chega ao professor (18/out/2026) ──────────
+    // Every lesson with a Homework tab ends in a button with
+    // onclick="submitHomework…()" that disables itself when the submission
+    // counts (a short text or a missing task leaves it enabled). This hook
+    // watches that click and, once the button is disabled, sends the written
+    // answers to POST /api/homework, which the teacher reads in
+    // teacher_homework.html. A new lesson needs nothing but that button inside
+    // #tab-homework. Until 18/out only aula_32 sent anything, to a table that
+    // did not exist.
+    autoEnviarLicaoDeCasa() {
+        const aba = document.querySelector('#tab-homework');
+        if (!aba || aba.dataset.licaoGancho) return;
+        aba.dataset.licaoGancho = '1';
+        let enviada = false;
+
+        const W = window.YARA_WIDGET || {};
+        const pagina = location.pathname.split('/').pop() || '';
+        const licaoId = pagina.replace(/\.html$/i, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 64) || 'aula';
+        const titulo = String(W.lessonTitle
+            ? (W.lessonNum ? `Aula ${W.lessonNum} — ${W.lessonTitle}` : W.lessonTitle)
+            : (document.querySelector('h1')?.textContent || document.title)).trim().slice(0, 160);
+
+        // The written answers only: word-order tiles and matching pairs have no
+        // text to read. Each field is capped so the payload stays under the
+        // table's 20 000 characters.
+        const respostas = () => {
+            const out = {};
+            let total = 0;
+            aba.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach((el, i) => {
+                const valor = String(el.value || '').trim().slice(0, 1500);
+                if (!valor || total > 18000) return;
+                const chave = String(el.id || el.getAttribute('placeholder') || `campo_${i + 1}`).slice(0, 60);
+                out[chave] = valor;
+                total += chave.length + valor.length;
+            });
+            return out;
+        };
+
+        const aviso = (btn, estado, tentarDeNovo) => {
+            let p = btn._licaoStatus;
+            if (!p) {
+                p = document.createElement('p');
+                p.className = 'mt-3 text-sm font-bold text-center';
+                btn.insertAdjacentElement('afterend', p);
+                btn._licaoStatus = p;
+            }
+            p.textContent = {
+                enviando: '📤 Enviando sua lição para o professor…',
+                ok: '📤 Lição enviada para o seu professor.',
+                login: 'Sua lição ficou só neste aparelho. Entre na sua conta para o professor ver: ',
+                erro: '⚠️ Não deu para enviar sua lição para o professor. ',
+            }[estado];
+            p.classList.toggle('text-emerald-700', estado === 'ok');
+            p.classList.toggle('text-red-700', estado === 'erro');
+            p.classList.toggle('text-slate-500', estado === 'enviando' || estado === 'login');
+            if (estado === 'login') {
+                const a = document.createElement('a');
+                a.href = '4_Login_Capy_Yara_Welcomes_You.html?next=' + encodeURIComponent(pagina);
+                a.className = 'underline text-pink-600';
+                a.textContent = 'entrar';
+                p.append(a);
+            }
+            if (estado === 'erro' && tentarDeNovo) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'underline text-pink-600';
+                b.textContent = 'Tentar de novo';
+                b.addEventListener('click', tentarDeNovo, { once: true });
+                p.append(b);
+            }
+        };
+
+        const enviar = async (btn, entrega) => {
+            const sessao = window.Auth && typeof Auth.getSession === 'function' ? Auth.getSession() : null;
+            if (!sessao || sessao.role === 'guest') { aviso(btn, 'login'); return; }
+            aviso(btn, 'enviando');
+            try {
+                const r = await fetch('/api/homework', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(entrega),
+                });
+                if (r.ok) aviso(btn, 'ok');
+                else if (r.status === 401 || r.status === 403) aviso(btn, 'login');
+                else aviso(btn, 'erro', () => enviar(btn, entrega));
+            } catch (e) {
+                aviso(btn, 'erro', () => enviar(btn, entrega));
+            }
+        };
+
+        // Capture phase: runs before the button's inline onclick, so it can read
+        // the "+75 XP" label before the handler rewrites it.
+        document.addEventListener('click', ev => {
+            const btn = ev.target && ev.target.closest ? ev.target.closest('button') : null;
+            if (!btn || enviada || btn.disabled || !/submitHomework/.test(btn.getAttribute('onclick') || '')) return;
+            const xp = Number((String(btn.textContent).match(/\+\s*(\d{1,3})\s*XP/i) || [])[1]) || 75;
+            setTimeout(() => {
+                if (enviada || !btn.disabled) return;   // the lesson refused it: nothing to send
+                enviada = true;
+                enviar(btn, { lessonId: licaoId, lessonTitle: titulo, answers: respostas(), xp });
+            }, 0);
+        }, true);
+    },
+
     // ── Writing Coach: "Yara corrige sua redação" ──────────────────────────
     // Auto-injects a correction button under the free-writing textarea of every
     // lesson (homework tab, and the writing tab of conversation lessons).
@@ -1854,6 +1958,7 @@ window.CapyFala = (function () {
 document.addEventListener('DOMContentLoaded', () => {
     Components.autoInjectPersonalizedTab();
     Components.autoInjectWritingCoach();
+    Components.autoEnviarLicaoDeCasa();
     CapyPWA.init();
     CapyJuice.init();
     if (window.CapyTTS) CapyTTS._purgeOldFrenchAudioOnce();
