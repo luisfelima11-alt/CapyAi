@@ -326,7 +326,8 @@ test('routes that answer one JSON object use the API JSON mode', () => {
     const inicio = api.indexOf(`url === '/api/${rota}'`);
     assert.ok(inicio > 0, rota);
     const chamada = api.slice(inicio, api.indexOf('callOpenAI(', inicio) + 200);
-    assert.match(chamada, /\{ json: true \}\); return;/, rota);
+    // The shared cache (CACHE_PALAVRA_DO_DIA, CACHE_TRADUCAO...) rides along; JSON mode stays.
+    assert.match(chamada, /\{ json: true(, cache: CACHE_[A-Z_]+)? \}\); return;/, rota);
   }
 });
 
@@ -486,6 +487,21 @@ test('a Vercel Preview accepts sign-in from its own URLs; production still accep
   `;
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
+});
+
+test('every table a migration creates is server-only: RLS on and nothing granted to anon/authenticated', () => {
+  // A table the browser's keys can reach through PostgREST needs RLS; the tables
+  // created here (webhook claims, rate limits, the AI cache...) are read and
+  // written by the server alone, with the service key.
+  const dir = path.join(ROOT, 'supabase', 'migrations');
+  const sql = fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort()
+    .map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
+  const criadas = [...sql.matchAll(/create table (?:if not exists )?public\.([a-z_]+)/g)].map(m => m[1]);
+  assert.ok(criadas.includes('ai_cache'), 'the AI cache migration creates its table');
+  for (const tabela of criadas) {
+    assert.match(sql, new RegExp(`alter table (if exists )?public\\.${tabela} enable row level security;`), `${tabela}: RLS`);
+    assert.match(sql, new RegExp(`revoke all on public\\.${tabela} from anon, authenticated;`), `${tabela}: grants`);
+  }
 });
 
 test('a silent session refresh keeps the tab\'s CSRF token, so the next POST still passes', () => {
