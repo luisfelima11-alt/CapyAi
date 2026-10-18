@@ -1267,4 +1267,11 @@ if (require.main === module) {
         console.log(`   GET  http://localhost:${PORT}/api/word-of-day`);
         console.log(`   GET  http://localhost:${PORT}/api/daily-challenge`);
     });
+    if (String(PORT) !== '3000') {
+        const mirrorServer = http.createServer(handler);
+        mirrorServer.on('error', () => { /* ignore if 3000 is busy */ });
+        mirrorServer.listen(3000, '127.0.0.1', () => {
+            console.log(`✅ Mirror listener active at http://localhost:3000/`);
+        });
+    }
 }

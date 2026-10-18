@@ -3,46 +3,48 @@
 <head>
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Les Couleurs em francês — Lição 3 | Capy English</title>
-<meta name="description" content="Aprenda Les Couleurs em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
+<title>Les Couleurs (Cores, Gênero e Posição dos Adjetivos) — Lição 3 de Francês | Capy English</title>
+<meta name="description" content="Aprenda Les Couleurs (Cores, Gênero e Posição dos Adjetivos) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
 <link rel="canonical" href="https://www.capyenglish.com.br/fr_aula_03.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
 <style>
 *{font-family:'Plus Jakarta Sans',sans-serif}
-@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
 @keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
-.float{animation:floatUp 3s ease-in-out infinite}
-.fade-in{animation:fadeIn .4s ease both}
 .xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
-.flip-card{perspective:800px;min-height:120px;cursor:pointer}
-.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,2,.6,1);transform-style:preserve-3d}
+.flip-card{perspective:800px;min-height:132px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
 .flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
-.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:1rem;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;flex-direction:column;gap:4px}
-.flip-front{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.flip-back{background:linear-gradient(135deg,#1e40af,#3730a3);transform:rotateY(180deg)}
-.tab-btn{position:relative;font-weight:700;transition:color .2s}
-.tab-btn::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#4f46e5);border-radius:99px;transition:width .25s}
-.tab-btn.active{color:#1d4ed8}
-.tab-btn.active::after{width:80%}
-.prog-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:background .3s}
-.prog-dot.done{background:linear-gradient(135deg,#1d4ed8,#4f46e5)}
-.expr-detail{display:none}.expr-card.open .expr-detail{display:block}.expr-card.open .expr-chevron{transform:rotate(180deg)}.expr-chevron{transition:transform .25s}
-.acc-body{display:none}.acc-item.open .acc-body{display:block}.acc-item.open .acc-icon{transform:rotate(45deg)}.acc-icon{transition:transform .25s;font-style:normal}
-.opt-btn{transition:all .15s;border:2px solid #e2e8f0}.opt-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}
-.opt-btn.correct{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important}
-.opt-btn.wrong{border-color:#ef4444!important;background:#fee2e2!important;color:#991b1b!important}
-.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.35rem .75rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}.wo-tile:hover{border-color:#1d4ed8;background:#eff6ff}
-.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #e2e8f0;border-radius:1rem}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#2563eb,#4f46e5);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#1d4ed8;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.4rem .8rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#2563eb;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #cbd5e1;border-radius:1rem}
 .wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
-.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.55rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}.mp-btn:hover:not(:disabled){border-color:#1d4ed8;background:#eff6ff}.mp-btn.selected{border-color:#1d4ed8;background:#dbeafe}.mp-btn.matched{border-color:#1d4ed8!important;background:#dbeafe!important;color:#1e3a8a!important;cursor:default}.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
-.fill-inp{border:2px solid #e2e8f0;border-radius:.75rem;padding:.4rem .9rem;font-size:.9rem;font-weight:600;transition:border .2s;outline:none;width:120px;text-align:center}.fill-inp:focus{border-color:#1d4ed8}.fill-inp.ok{border-color:#1d4ed8;background:#dbeafe;color:#1e3a8a}.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
-.btn-blue{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;font-weight:900;border-radius:1rem;transition:all .15s}
-.btn-blue:hover{transform:scale(1.05)}.btn-blue:active{transform:scale(.95)}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.6rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.mp-btn.selected{border-color:#2563eb;background:#dbeafe}
+.mp-btn.matched{border-color:#10b981!important;background:#ecfdf5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #cbd5e1;border-radius:.75rem;padding:.35rem .8rem;font-size:.9rem;font-weight:700;transition:border .2s;outline:none;min-width:130px;text-align:center}
+.fill-inp:focus{border-color:#2563eb}
+.fill-inp.ok{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.dlg-playing{ring:3px solid #3b82f6;transform:scale(1.01)}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -52,207 +54,350 @@
 <meta property="og:site_name" content="Capy Yara English"/>
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/fr_aula_03.html"/>
-<meta property="og:title" content="Les Couleurs em francês — Lição 3 | Capy English"/>
-<meta property="og:description" content="Aprenda Les Couleurs em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
+<meta property="og:title" content="Les Couleurs (Cores, Gênero e Posição dos Adjetivos) — Lição 3 de Francês | Capy English"/>
+<meta property="og:description" content="Aprenda Les Couleurs (Cores, Gênero e Posição dos Adjetivos) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Les Couleurs em francês — Lição 3 | Capy English"/>
-<meta name="twitter:description" content="Aprenda Les Couleurs em francês com vocabulário, gramática, diálogo e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
+<meta name="twitter:title" content="Les Couleurs (Cores, Gênero e Posição dos Adjetivos) — Lição 3 de Francês | Capy English"/>
+<meta name="twitter:description" content="Aprenda Les Couleurs (Cores, Gênero e Posição dos Adjetivos) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição 3 da Capy English, com a Yara."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50/30 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
 <main class="md:pl-24 pb-32 md:pb-10">
 
-  <!-- Hero -->
-  <div class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white">
-    <div class="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
-      <span class="absolute text-7xl float" style="top:8%;left:5%;animation-delay:0s">🎨</span>
-      <span class="absolute text-5xl float" style="top:20%;left:18%;animation-delay:.5s">🇫🇷</span>
-      <span class="absolute text-6xl float" style="top:60%;left:7%;animation-delay:1s">👗</span>
-      <span class="absolute text-5xl float" style="top:12%;right:22%;animation-delay:.3s">🌈</span>
-      <span class="absolute text-7xl float" style="top:50%;right:6%;animation-delay:.8s">🐾</span>
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-blue-900 to-indigo-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:10%;left:3%;animation-delay:0s">🎨</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:60%;left:7%;animation-delay:.7s">🌈</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:20%;left:15%;animation-delay:1.3s">🔵</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:70%;left:22%;animation-delay:.4s">🔴</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:8%;right:22%;animation-delay:.9s">🟢</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:55%;right:15%;animation-delay:1.6s">🟡</span>
+    <span class="absolute text-5xl opacity-20 float-emoji" style="top:30%;right:5%;animation-delay:.2s">🐾</span>
+    <span class="absolute text-4xl opacity-15 float-emoji" style="top:75%;right:28%;animation-delay:1s">✨</span>
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      <a href="fr_aula_02.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">← Leçon 02</a>
+      <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">🇫🇷 Curso de Francês</a>
+      <a href="fr_aula_04.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1 rounded-full transition-colors">Leçon 04 →</a>
     </div>
-    <div class="relative max-w-5xl mx-auto px-6 py-12">
-      <div class="flex items-center gap-3 flex-wrap mb-5">
-        <a href="fr_aula_02.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Leçon 2</a>
-        <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">Cours de Français</a>
-        <a href="fr_aula_04.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next Lesson →</a>
-      </div>
-      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🇫🇷 Leçon 3 · Débutant</div>
-      <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Les Couleurs<br><span class="text-blue-300">Colors & Adjective Agreement</span></h1>
-      <p class="text-white/70 mb-6 max-w-lg">Paint the world in French! Learn 10 essential colors and how they change to match the gender of nouns.</p>
-      <div class="flex items-center gap-2 flex-wrap">
-        <div id="hero-dots" class="flex gap-2"></div>
-        <span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span>
-      </div>
+    <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1 text-sm font-black text-blue-200 mb-3">🇫🇷 Leçon 03 · Português → Francês</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎨 Les Couleurs — <br><span class="text-blue-300">Cores, Gênero e Posição dos Adjetivos</span></h1>
+    <p class="text-white/75 text-base mb-5 max-w-xl">Aprenda as cores em francês, descubra como concordar adjetivos no masculino, feminino e plural, e onde posicioná-los na frase.</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Cores &amp; Descrições</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Concordância</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">A1 · Débutant</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/60 text-xs font-bold" id="section-label">0 / 8 etapas concluídas</span>
     </div>
   </div>
+</div>
 
-  <!-- Tabs -->
-  <div class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 overflow-x-auto">
-    <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
-      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbes</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📋 Homework</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
     </div>
   </div>
+</div>
 
-  <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
-    <!-- VOCAB -->
-    <div id="tab-vocab" class="fade-in">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎨 Colors</h2><p class="text-slate-500 text-sm">Flip each card to see the French color. Front = English, back = French!</p></div>
-      <div id="vocab-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6"></div>
-      <button onclick="markSection('vocab')" class="btn-blue px-8 py-3">✓ I know these colors! +20 XP</button>
+<!-- VOCAB TAB -->
+<div id="tab-vocab" class="tab-content fade-in">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h2 class="text-2xl font-black text-navy">📚 Vocabulário Essencial</h2>
+      <p class="text-slate-500 text-sm mt-1">Clique no card para virar (ou abrir em tela cheia) e no botão 🔊 para ouvir a pronúncia francesa.</p>
     </div>
-
-    <!-- EXPRESSIONS -->
-    <div id="tab-expressions" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">💡 Expressions</h2><p class="text-slate-500 text-sm">Color-related French phrases. Click to expand.</p></div>
-      <div id="expr-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('expressions')" class="btn-blue px-8 py-3">✓ Got the expressions! +20 XP</button>
+    <div class="text-right">
+      <div class="text-2xl font-black text-blue-600" id="vocab-count">0</div>
+      <div class="text-xs text-slate-400 font-bold">de 18 vistos</div>
     </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="vocab-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6" id="vocab-grid"></div>
+  <button onclick="markSectionBtn(this,'vocab')" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Dominei o vocabulário! (+20 XP)
+  </button>
+</div>
 
-    <!-- GRAMMAR -->
-    <div id="tab-grammar" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Color adjectives must agree in gender and number with the noun.</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 mb-4 text-white">
-        <p class="text-xs font-black uppercase tracking-widest mb-3 text-blue-100">The Gender Agreement Rule</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm font-bold">
-          <div class="bg-white/20 rounded-xl p-3"><p class="font-black mb-1">Masculine ♂</p><p>un pull <strong>rouge</strong> — a red sweater</p><p>un chien <strong>noir</strong> — a black dog</p></div>
-          <div class="bg-white/20 rounded-xl p-3"><p class="font-black mb-1">Feminine ♀</p><p>une robe <strong>rouge</strong> — a red dress</p><p>une chatte <strong>noire</strong> — a black cat</p></div>
-        </div>
-      </div>
-      <div class="space-y-3 mb-6">
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>➕ Adding -e for Feminine</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Most colors add <strong>-e</strong> in feminine form (if they don't already end in -e):</p>
-            <p>✅ noir → <strong>noire</strong> (black)</p>
-            <p>✅ vert → <strong>verte</strong> (green)</p>
-            <p>✅ violet → <strong>violette</strong> (purple — doubles consonant!)</p>
-            <p>✅ rouge → rouge (red — already ends in -e, no change!)</p>
-            <p>✅ bleu → <strong>bleue</strong> (blue)</p>
+<!-- VERBS TAB -->
+<div id="tab-verbs" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔧 Verbos em Ação</h2>
+  <p class="text-slate-500 text-sm mb-6">Conjugação com guia de pronúncia para brasileiros e frases reais com áudio.</p>
+  <div class="space-y-8" id="verbs-grid"></div>
+  <div class="mt-8 bg-white border-2 border-blue-200 rounded-2xl p-6">
+    <h3 class="font-black text-navy text-lg mb-4">✏️ Mini-Quiz: Complete com a forma verbal correta</h3>
+    <div class="space-y-4" id="verbs-quiz"></div>
+    <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+      Verificar Respostas
+    </button>
+    <div id="verbs-quiz-result" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
+  </div>
+</div>
+
+<!-- EXPRESSIONS TAB -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">💬 Expressões Prontas para Conversar</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique em cada expressão para ver quando usar, exemplo real e ouvir a pronúncia.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+  <button onclick="markSectionBtn(this,'expressions')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Pratiquei as expressões! (+20 XP)
+  </button>
+</div>
+
+<!-- PATTERNS TAB (internal id="tab-grammar" for compatibility) -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🧩 Padrões do Francês</h2>
+  <p class="text-slate-500 text-sm mb-6">Os blocos lógicos da língua para você montar frases com segurança, sem decoreba.</p>
+  <div class="space-y-4">
+
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <div class="font-black text-navy">Feminino das Cores (Quando muda o som e quando não muda)</div>
+            <div class="text-blue-700 text-sm font-semibold">Vert → Verte, Blanc → Blanche, Rouge → Rouge</div>
           </div>
         </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📝 Invariable Colors — No Change!</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Some colors are <strong>invariable</strong> — they never change!</p>
-            <p>✅ <strong>orange</strong> stays orange for M and F</p>
-            <p>✅ <strong>marron</strong> (brown) stays marron</p>
-            <p class="bg-slate-100 rounded-xl p-3 text-xs font-bold text-slate-500">💡 These are usually colors that come from nouns (orange = the fruit, marron = the chestnut).</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>📍 Colors AFTER the noun in French!</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">Unlike English, color adjectives come <strong>AFTER</strong> the noun:</p>
-            <p>✅ <strong>une voiture rouge</strong> = a red car (lit. "a car red")</p>
-            <p>✅ <strong>un chat blanc</strong> = a white cat</p>
-            <p>❌ NOT: une rouge voiture</p>
-          </div>
-        </div>
-        <div class="acc-item bg-white rounded-2xl border-2 border-slate-100 overflow-hidden">
-          <button onclick="toggleAcc(this)" class="w-full flex items-center justify-between px-5 py-4 font-black text-navy text-left"><span>👥 Plural Forms</span><em class="acc-icon text-slate-400 not-italic">+</em></button>
-          <div class="acc-body px-5 pb-5 text-sm text-slate-600 space-y-2">
-            <p class="bg-blue-50 rounded-xl p-3">For plural nouns, add <strong>-s</strong> to the color adjective:</p>
-            <p>✅ des robes <strong>rouges</strong> (red dresses — plural F)</p>
-            <p>✅ des chiens <strong>noirs</strong> (black dogs — plural M)</p>
-            <p>✅ des chapeaux <strong>verts</strong> (green hats — plural M)</p>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g1-arrow">expand_more</span>
+      </button>
+      <div id="g1" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Ganham -E no feminino (e a consoante passa a soar!): vert [VÉR] → verte [VÉRT]; gris [GRI] → grise [GRIZ].<br/>
+        ✅ Já terminam em -E (não mudam): rouge, jaune, rose (un livre rouge / une fleur rouge).<br/>
+        ✅ Irregulares importantes: blanc → blanche [BLÃCH]; violet → violette [viô-LÉT].<br/>
+        ❌ "Une maison blanc" → O correto é "Une maison blanche".
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> No masculino "vert" [vér] o T é mudo; no feminino "verte" [vért] o E faz o T ganhar voz!
           </div>
         </div>
       </div>
-      <button onclick="markSection('grammar')" class="btn-blue px-8 py-3">✓ Grammar understood! +20 XP</button>
     </div>
 
-    <!-- DIALOGUE -->
-    <div id="tab-dialogue" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎭 Dialogue</h2><p class="text-slate-500 text-sm">🛍️ Shopping in a French boutique. Read aloud!</p></div>
-      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 mb-5 text-white text-sm font-bold">🛍️ Yara is shopping for clothes in a Parisian boutique. She needs to know the colors!</div>
-      <div class="space-y-3 mb-6">
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Bonjour! Je cherche une robe. Vous avez cette robe en <strong class="text-blue-700">bleu</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Hello! I'm looking for a dress. Do you have this dress in blue?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍💼 Vendeur</p><p class="text-slate-700 text-sm">Oui! Nous avons en <strong class="text-blue-700">bleu</strong>, <strong class="text-blue-700">rouge</strong> et <strong class="text-blue-700">noir</strong>.</p><p class="text-xs text-slate-400 mt-1 italic">Yes! We have it in blue, red, and black.</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Parfait! J'adore la robe <strong class="text-blue-700">bleue</strong>. Et ce pull, il est en quelle couleur?</p><p class="text-xs text-slate-400 mt-1 italic">Perfect! I love the blue dress. And this sweater, what color is it?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍💼 Vendeur</p><p class="text-slate-700 text-sm">C'est un pull <strong class="text-blue-700">vert</strong>. Très à la mode cette saison!</p><p class="text-xs text-slate-400 mt-1 italic">It's a green sweater. Very fashionable this season!</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Hmm, j'aime le <strong class="text-blue-700">vert</strong>, mais je préfère le <strong class="text-blue-700">blanc</strong>. Vous avez en <strong class="text-blue-700">blanc</strong>?</p><p class="text-xs text-slate-400 mt-1 italic">Hmm, I like green, but I prefer white. Do you have it in white?</p></div>
-        <div class="bg-slate-50 border-l-4 border-slate-300 rounded-r-2xl p-4"><p class="text-sm font-bold text-slate-600 mb-1">🧑‍💼 Vendeur</p><p class="text-slate-700 text-sm">Bien sûr! Un pull <strong class="text-blue-700">blanc</strong>, voilà! Vous aimez?</p><p class="text-xs text-slate-400 mt-1 italic">Of course! A white sweater, here you go! Do you like it?</p></div>
-        <div class="bg-blue-50 border-l-4 border-blue-400 rounded-r-2xl p-4"><p class="text-sm font-bold text-blue-700 mb-1">🐾 Yara</p><p class="text-slate-700 text-sm">Oui, magnifique! Une robe <strong class="text-blue-700">bleue</strong> et un pull <strong class="text-blue-700">blanc</strong> — les couleurs du drapeau français! 🇫🇷</p><p class="text-xs text-slate-400 mt-1 italic">Yes, magnificent! A blue dress and a white sweater — the colors of the French flag!</p></div>
+    <div class="rounded-2xl border-2 border-indigo-200 bg-indigo-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <div class="font-black text-navy">As Duas Cores Rebeldes: Orange e Marron (Invariáveis!)</div>
+            <div class="text-indigo-700 text-sm font-semibold">Nunca recebem -e nem -s no plural!</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g2-arrow">expand_more</span>
+      </button>
+      <div id="g2" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Une robe orange / Des robes orange (sem -s!).<br/>
+        ✅ Une chaussure marron / Des chaussures marron (sem -s!).<br/>
+        ❌ Des chaussures marrons / Des fleurs oranges.
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Por que são invariáveis? Porque vêm de frutas (a laranja e a castanha marron)! Em francês, cores que têm nome de fruta ou pedra nunca variam.
+          </div>
+        </div>
       </div>
-      <button onclick="markSection('dialogue');if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');" class="btn-blue px-8 py-3">✓ I read the dialogue! +20 XP</button>
     </div>
 
-    <!-- PRACTICE -->
-    <div id="tab-practice" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🎯 Practice Quiz</h2><p class="text-slate-500 text-sm">10 questions on French colors and adjective agreement!</p></div>
-      <div id="quiz-container" class="space-y-5 mb-6"></div>
-      <div id="quiz-result" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 text-center mb-4">
-        <div class="text-4xl mb-2">🏆</div>
-        <p class="font-black text-blue-700 text-lg" id="quiz-score-text"></p>
-        <p class="text-blue-600 text-sm mt-1">+50 XP earned! Magnifique!</p>
-      </div>
-      <button id="quiz-submit-btn" onclick="submitQuiz()" class="w-full btn-blue py-4 text-base">✓ Check Answers +50 XP</button>
-    </div>
-
-    <!-- SPEAK -->
-    <div id="tab-speak" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🗣️ Speak</h2><p class="text-slate-500 text-sm">Read aloud, paying attention to the color adjective placement!</p></div>
-      <div id="speak-list" class="space-y-3 mb-6"></div>
-      <button onclick="markSection('speak')" class="btn-blue px-8 py-3">✓ All phrases practiced! +20 XP</button>
-    </div>
-
-    <!-- HOMEWORK -->
-    <div id="tab-homework" class="fade-in hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 mb-6 text-white">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div><h2 class="text-2xl font-black mb-1">📋 Homework</h2><p class="text-white/80 text-sm">Leçon 3 — Les Couleurs</p></div>
-          <div class="bg-white/20 rounded-full px-4 py-2 text-sm font-black">⏱️ 10–15 min</div>
+    <div class="rounded-2xl border-2 border-blue-200 bg-blue-50 overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <div class="font-black text-navy">Posição dos Adjetivos: Cores DEPOIS, Tamanho/Beleza ANTES</div>
+            <div class="text-blue-700 text-sm font-semibold">Igual ao português para cores, atenção a petit/grand/beau/joli!</div>
+          </div>
         </div>
-      </div>
-      <div class="space-y-5">
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">1</div><div><h3 class="font-black text-navy text-base">Word Order</h3><p class="text-slate-500 text-sm mt-1">Arrange the words to form correct sentences.</p></div></div>
-          <div id="wo1-container" class="space-y-6"></div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="g3-arrow">expand_more</span>
+      </button>
+      <div id="g3" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ✅ Cores vão DEPOIS do substantivo: un chat noir, une voiture bleue.<br/>
+        ✅ Adjetivos curtos de tamanho e beleza (petit, grand, beau/belle, joli) vão ANTES: une petite maison blanche.<br/>
+        ❌ Une bleue voiture (A cor deve vir depois: une voiture bleue).
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> Você pode combinar os dois: "Une belle robe rouge" (Um lindo vestido vermelho — belle antes, rouge depois!).
+          </div>
         </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 font-black text-sm flex items-center justify-center flex-shrink-0">2</div><div><h3 class="font-black text-navy text-base">Match the Color</h3><p class="text-slate-500 text-sm mt-1">Match French color to English.</p></div></div>
-          <div class="grid grid-cols-2 gap-3"><div id="mp1-left" class="space-y-2"></div><div id="mp1-right" class="space-y-2"></div></div>
-          <p id="mp1-done-msg" class="hidden mt-3 text-blue-600 font-black text-sm">✅ All pairs matched! Parfait!</p>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-5"><div class="w-9 h-9 rounded-full bg-red-100 text-red-600 font-black text-sm flex items-center justify-center flex-shrink-0">3</div><div><h3 class="font-black text-navy text-base">Fill in the Blank</h3><p class="text-slate-500 text-sm mt-1">Choose the correct form of the color adjective.</p></div></div>
-          <div class="space-y-4" id="fill1-container"></div>
-          <button onclick="checkFill1()" class="mt-4 bg-blue-600 text-white font-black px-6 py-2.5 rounded-xl hover:scale-105 transition-all text-sm">Check Answers</button>
-        </div>
-        <div class="bg-white border-2 border-slate-200 rounded-2xl p-6">
-          <div class="flex items-start gap-4 mb-4"><div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-black text-sm flex items-center justify-center flex-shrink-0">4</div><div><h3 class="font-black text-navy text-base">Free Writing ✍️</h3><p class="text-slate-500 text-sm mt-1">Describe your outfit today in French! Write 3–5 sentences using colors. E.g.: "Je porte un t-shirt blanc et un pantalon bleu."</p></div></div>
-          <textarea rows="5" placeholder="Je porte..." class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 resize-none"></textarea>
-        </div>
-      </div>
-      <button onclick="submitHomework()" class="mt-6 w-full btn-blue py-4 text-base">✓ Submit Homework +75 XP</button>
-      <div id="hw-done" class="hidden mt-4 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center">
-        <div class="text-3xl mb-2">🎨</div>
-        <p class="font-black text-blue-700">Homework complete! +75 XP — Très bien!</p>
       </div>
     </div>
   </div>
+  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Entendi o padrão! (+20 XP)
+  </button>
+</div>
+
+<!-- DIALOGUE TAB -->
+<div id="tab-dialogue" class="tab-content fade-in hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-2xl font-black text-navy mb-1">🎭 Escolhendo Presentes em Montmartre</h2>
+      <p class="text-slate-500 text-sm">🎨 Yara e sua amiga Camille escolhem lenços e quadros coloridos em uma loja de Montmartre.</p>
+    </div>
+    <button id="btn-play-dialogue" onclick="playFullDialogue()" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm px-5 py-2.5 rounded-2xl shadow hover:scale-105 active:scale-95 transition-all">
+      🔊 Ouvir diálogo completo
+    </button>
+  </div>
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+  <button onclick="markSectionBtn(this,'dialogue')" class="mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li e ouvi o diálogo! (+20 XP)
+  </button>
+</div>
+
+<!-- PRACTICE TAB -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-black text-navy">✏️ Quiz Interativo</h2>
+      <p class="text-slate-500 text-sm mt-1" id="prac-subtitle">10 questões comentadas em português — Les Couleurs</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-black text-blue-600" id="prac-score">0<span class="text-sm text-slate-400">/10</span></div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">acertos</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-black text-amber-500" id="prac-streak">🔥 0</div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">sequência</div>
+      </div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="prac-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div id="practice-area"></div>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Très bien !</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Refazer</button>
+        <button onclick="document.querySelector('[data-tab=\'speak\']').click();document.getElementById('result-overlay').classList.add('hidden')" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Treinar Fala →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAK TAB -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🗣️ Pronúncia &amp; Repetição em Voz Alta</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique no botão ▶️ para ouvir a frase em francês, leia a dica fonética e marque como concluída após repetir em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+</div>
+
+<!-- HOMEWORK TAB -->
+<div id="tab-homework" class="tab-content fade-in hidden">
+  <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-3xl p-6 mb-6 text-white">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-4xl">📝</span>
+      <div>
+        <h2 class="text-2xl font-black">Devoir de Maison (Homework)</h2>
+        <p class="text-white/80 text-sm">Leçon 03 — Les Couleurs (Cores, Gênero e Posição dos Adjetivos)</p>
+      </div>
+    </div>
+    <p class="text-white/75 text-sm">Complete os 4 exercícios interativos abaixo para consolidar a lição e ganhar +75 XP!</p>
+  </div>
+
+  <!-- 1. Word Order -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">1</span>
+      <div>
+        <p class="font-black text-navy text-sm">Ordem das Palavras (Mettez dans l&#39;ordre)</p>
+        <p class="text-slate-500 text-xs">Toque nas palavras para montar as frases em francês na ordem correta.</p>
+      </div>
+    </div>
+    <div id="wo1-container" class="space-y-4"></div>
+  </div>
+
+  <!-- 2. Match Pairs -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">2</span>
+      <div>
+        <p class="font-black text-navy text-sm">Conecte os Pares (Francês ↔ Português)</p>
+        <p class="text-slate-500 text-xs">Clique em um item da esquerda e depois na tradução correspondente à direita.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div id="mp1-left" class="space-y-2"></div>
+      <div id="mp1-right" class="space-y-2"></div>
+    </div>
+    <p id="mp1-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados! Magnifique !</p>
+  </div>
+
+  <!-- 3. Fill in the Blank -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">3</span>
+      <div>
+        <p class="font-black text-navy text-sm">Complete as Lacunas</p>
+        <p class="text-slate-500 text-xs">Preencha cada espaço com a palavra francesa adequada.</p>
+      </div>
+    </div>
+    <div class="space-y-3" id="fill1-container"></div>
+    <button onclick="checkFill1()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl transition-all text-xs">
+      Verificar Lacunas ✓
+    </button>
+    <p id="fill1-fb" class="hidden mt-2 text-xs font-black"></p>
+  </div>
+
+  <!-- 4. Free Writing -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">4</span>
+      <div>
+        <p class="font-black text-navy text-sm">Produção Escrita em Francês ✍️</p>
+        <p class="text-slate-500 text-xs">Descreva em francês (3 a 4 frases) suas cores favoritas e a cor de 2 ou 3 objetos ou roupas que você tem (ex: celular, mochila, camisa, carro).</p>
+      </div>
+    </div>
+    <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-blue-500 focus:outline-none resize-none" placeholder="Ma couleur préférée est le bleu. J&#39;ai un sac noir et une chemise blanche. J&#39;aime aussi le vert clair !"></textarea>
+    <button id="btn-submit-hw" onclick="submitHomework()" class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black px-6 py-3.5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all w-full shadow-md">
+      🚀 Concluir Lição 03 e Receber +75 XP
+    </button>
+    <div id="hw-done-box" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+      <p class="font-black text-emerald-700 text-base">🎉 Félicitations ! Lição 03 concluída com sucesso! (+75 XP)</p>
+      <div class="flex flex-wrap justify-center gap-3 mt-3">
+        <a href="classes_fr.html" class="bg-white border-2 border-slate-200 text-navy font-black text-xs px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all">← Voltar ao Curso de Francês</a>
+        <a href="fr_aula_04.html" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-5 py-2.5 rounded-xl hover:scale-105 transition-all">Próxima: Leçon 04 — La Famille →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 </main>
 <div id="mobile-nav-placeholder"></div>
+
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=m1015"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=m1015"></script>
-<script>window.YARA_WIDGET={lang:'fr',lessonTitle:'Les Couleurs',lessonNum:3};</script>
+<script src="components.js?v=m1018"></script>
+<script>window.YARA_WIDGET={lang:'fr',lessonTitle:"Les Couleurs",lessonNum:3};</script>
 <script src="tts-fr.js?v=c52d7db"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
@@ -262,119 +407,1147 @@
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
-const TOTAL_SECTIONS=7;let sectionsDone=0;const doneSections=new Set();
-function buildHeroDots(){const c=document.getElementById('hero-dots');c.innerHTML='';for(let i=0;i<TOTAL_SECTIONS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<sectionsDone?' done':'');c.appendChild(d);}document.getElementById('hero-label').textContent=`${sectionsDone} / ${TOTAL_SECTIONS} sections done`;}
-buildHeroDots();
-function markSection(id){if(doneSections.has(id))return;doneSections.add(id);sectionsDone++;buildHeroDots();if(typeof Store!=='undefined')Store.addXP(20);spawnXP('+20 XP');}
-function spawnXP(text){const el=document.createElement('div');el.className='xp-pop';el.textContent=text;el.style.cssText=`left:${40+Math.random()*20}%;top:${30+Math.random()*30}%`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
-const TABS=['vocab','expressions','grammar','dialogue','practice','speak','homework'];
-document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{const tab=btn.dataset.tab;TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.classList.toggle('hidden',t!==tab);});document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));});});
 
-const VOCAB=[
-  ['Red','rouge [ROOJ]'],
-  ['Blue','bleu/bleue [BLUH]'],
-  ['Green','vert/verte [VAIR]'],
-  ['Yellow','jaune [ZHOHN]'],
-  ['White','blanc/blanche [BLON/BLONSH]'],
-  ['Black','noir/noire [NWAHR]'],
-  ['Orange','orange [oh-RONJ]'],
-  ['Pink','rose [ROHZ]'],
-  ['Purple','violet/violette [VYO-lay]'],
-  ['Gray','gris/grise [GREE]'],
+const LESSON_NUM = 3;
+const TOTAL_SECTIONS = 8;
+let sectionsDone = 0;
+const doneSections = new Set();
+
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  const lb = document.getElementById('section-label');
+  if (!c) return;
+  c.innerHTML = Array.from({ length: TOTAL_SECTIONS }, (_, i) =>
+    `<div class="prog-dot ${i < sectionsDone ? 'bg-gradient-to-r from-blue-400 to-indigo-300' : 'bg-white/20'}"></div>`
+  ).join('');
+  if (lb) lb.textContent = `${sectionsDone} / ${TOTAL_SECTIONS} etapas concluídas`;
+}
+buildSectionDots();
+
+function spawnXP(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = text;
+  el.style.cssText = `left:${40 + Math.random() * 20}%;top:${30 + Math.random() * 30}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+function saveFrCompleted() {
+  try {
+    const KEY = 'capyFrCompleted';
+    const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!arr.includes(LESSON_NUM)) {
+      arr.push(LESSON_NUM);
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+    if (typeof Store !== 'undefined' && typeof Store.completeLesson === 'function') {
+      Store.completeLesson(200 + LESSON_NUM, 'fr');
+    }
+  } catch (e) {}
+}
+
+function markSection(name) {
+  if (!doneSections.has(name)) {
+    doneSections.add(name);
+    if (sectionsDone < TOTAL_SECTIONS) sectionsDone++;
+    buildSectionDots();
+    if (typeof Store !== 'undefined') Store.addXP(20);
+    spawnXP('+20 XP');
+  }
+  if (name === 'homework') saveFrCompleted();
+}
+
+function markSectionBtn(btn, name) {
+  btn.disabled = true;
+  btn.textContent = '✓ Concluído! (+20 XP)';
+  btn.classList.add('opacity-75');
+  markSection(name);
+}
+
+const TABS = ['vocab', 'verbs', 'expressions', 'grammar', 'dialogue', 'practice', 'speak', 'homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── 1. VOCABULARY ────────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  {
+    "en": "Rouge",
+    "pt": "Vermelho(a)",
+    "phon": "[RUJ]",
+    "ex": "Une robe rouge magnifique.",
+    "emoji": "🔴",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Bleu / Bleue",
+    "pt": "Azul",
+    "phon": "[BLØ]",
+    "ex": "Le ciel est bleu aujourd'hui.",
+    "emoji": "🔵",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Vert / Verte",
+    "pt": "Verde [VÉR / VÉRT]",
+    "phon": "[VÉR / VÉRT]",
+    "ex": "J'aime la chemise verte.",
+    "emoji": "🟢",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Jaune",
+    "pt": "Amarelo(a)",
+    "phon": "[JÔN]",
+    "ex": "Un taxi jaune dans la rue.",
+    "emoji": "🟡",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Blanc / Blanche",
+    "pt": "Branco / Branca",
+    "phon": "[BLÃ / BLÃCH]",
+    "ex": "Une maison blanche.",
+    "emoji": "⚪",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Noir / Noire",
+    "pt": "Preto / Preta",
+    "phon": "[NUAR]",
+    "ex": "Un chat noir très mignon.",
+    "emoji": "⚫",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Gris / Grise",
+    "pt": "Cinza",
+    "phon": "[GRI / GRIZ]",
+    "ex": "Un manteau gris élégant.",
+    "emoji": "🩶",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Rose",
+    "pt": "Rosa",
+    "phon": "[RÔZ]",
+    "ex": "Des fleurs roses sur la table.",
+    "emoji": "🌸",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Orange",
+    "pt": "Laranja (invariável!)",
+    "phon": "[ô-RÃJ]",
+    "ex": "Deux sacs orange.",
+    "emoji": "🟠",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Violet / Violette",
+    "pt": "Roxo / Violeta",
+    "phon": "[viô-LÉ / viô-LÉT]",
+    "ex": "Une écharpe violette.",
+    "emoji": "🟣",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Marron",
+    "pt": "Marrom (invariável!)",
+    "phon": "[ma-RÔN]",
+    "ex": "Des chaussures marron.",
+    "emoji": "🟤",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Grand / Grande",
+    "pt": "Grande / Alto(a)",
+    "phon": "[GRÃ / GRÃD]",
+    "ex": "Paris est une grande ville.",
+    "emoji": "🏛️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Petit / Petite",
+    "pt": "Pequeno(a) / Baixo(a)",
+    "phon": "[pã-TI / pã-TÍT]",
+    "ex": "Un petit café, s'il vous plaît.",
+    "emoji": "☕",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Beau / Belle",
+    "pt": "Bonito / Bonita",
+    "phon": "[BÔ / BÉL]",
+    "ex": "Quelle belle journée !",
+    "emoji": "✨",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Joli / Jolie",
+    "pt": "Bonitinho(a) / Lindo(a)",
+    "phon": "[jô-LI]",
+    "ex": "Une jolie photo.",
+    "emoji": "📸",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "Clair",
+    "pt": "Claro (tom de cor)",
+    "phon": "[KLÉR]",
+    "ex": "Un pantalon bleu clair.",
+    "emoji": "🌤️",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  },
+  {
+    "en": "Foncé",
+    "pt": "Escuro (tom de cor)",
+    "phon": "[fôn-SÊ]",
+    "ex": "Une veste vert foncé.",
+    "emoji": "🌑",
+    "bg": "bg-blue-50 border-blue-200",
+    "dot": "bg-blue-400"
+  },
+  {
+    "en": "La couleur",
+    "pt": "A cor",
+    "phon": "[la ku-LŒR]",
+    "ex": "Quelle est ta couleur préférée ?",
+    "emoji": "🎨",
+    "bg": "bg-indigo-50 border-indigo-200",
+    "dot": "bg-indigo-400"
+  }
 ];
-const vg=document.getElementById('vocab-grid');
-VOCAB.forEach(([en,fr])=>{const frC=fr.replace(/\s*\[.*?\]/g,'').trim().replace(/'/g,"&#39;");const d=document.createElement('div');d.className='flip-card';d.innerHTML=`<div class="flip-card-inner"><div class="flip-front"><p class="text-white font-black text-sm text-center">${en}</p></div><div class="flip-back"><p class="text-white font-bold text-sm text-center">${fr}</p><button onclick="event.stopPropagation();speak('${frC}')" class="mt-2 bg-white/25 hover:bg-white/40 text-white text-xs font-black px-3 py-1 rounded-full transition-all">🔊</button></div></div>`;d.addEventListener('click',()=>d.classList.toggle('flipped'));vg.appendChild(d);});
+let vocabDone = new Set();
+function buildVocab() {
+  const grid = document.getElementById('vocab-grid');
+  VOCAB_DATA.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card h-32';
+    card.innerHTML = `
+      <div class="flip-card-inner h-full">
+        <div class="flip-front h-full border-2 ${v.bg} rounded-2xl flex flex-col items-center justify-center p-2.5 gap-1 relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center transition-all" title="Ouvir pronúncia">🔊</button>
+          <span class="text-2xl">${v.emoji}</span>
+          <span class="font-black text-navy text-sm text-center leading-tight">${v.en}</span>
+          <span class="w-2 h-2 rounded-full ${v.dot}"></span>
+        </div>
+        <div class="flip-back h-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-2.5 text-center relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[${i}].ex || VOCAB_DATA[${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs flex items-center justify-center transition-all" title="Ouvir exemplo">🔊</button>
+          <span class="font-black text-white text-xs leading-snug">${v.pt}<br><span class="text-blue-200 font-bold text-[10px]">${v.phon}</span>${v.ex ? `<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"${v.ex}"</em>` : ''}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) {
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent = vocabDone.size;
+        document.getElementById('vocab-bar').style.width = (vocabDone.size / VOCAB_DATA.length * 100) + '%';
+        if (vocabDone.size === VOCAB_DATA.length) markSection('vocab');
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+buildVocab();
 
-const EXPRS=[
-  {phrase:'C\'est de quelle couleur?',meaning:'What color is it?',example:'"Ce sac, c\'est de quelle couleur?" — "C\'est un sac rouge."',use:'Useful when shopping or describing objects. Short form: "C\'est quelle couleur?" Note: The color comes AFTER the noun — "un sac rouge" not "un rouge sac."'},
-  {phrase:'Je cherche quelque chose en...',meaning:'I\'m looking for something in...',example:'"Je cherche quelque chose en bleu ou en vert, s\'il vous plaît."',use:'Essential shopping phrase! Quelque chose = something. Use "en + color" to specify the color you want. Works for clothes, furniture, anything!'},
-  {phrase:'La couleur préférée',meaning:'Favorite color',example:'"Quelle est ta couleur préférée?" — "Ma couleur préférée est le violet."',use:'Great conversation starter! Quelle est = what is. Ma = my. Notice: "le violet" uses the article LE/LA before colors in this context.'},
-  {phrase:'Avoir le cafard',meaning:'To feel blue / depressed',example:'"Aujourd\'hui j\'ai le cafard — tout est gris pour moi."',use:'Idiom! Literally "to have the cockroach" — meaning to feel down or blue. Colors appear in French idioms too! Voir rouge = to see red (to be furious).'},
+// ── 2. VERBS ─────────────────────────────────────────────────────────────────
+const VERBS_DATA = [
+  {
+    "verb": "AIMER (Gostar de / Amar)",
+    "emoji": "❤️",
+    "forms": [
+      {
+        "label": "J'",
+        "form": "j'aime [JÉM]",
+        "example": "J'aime beaucoup le bleu."
+      },
+      {
+        "label": "Tu",
+        "form": "tu aimes [tü ÉM]",
+        "example": "Tu aimes cette couleur ?"
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle aime [ÉM]",
+        "example": "Elle aime les fleurs rouges."
+      },
+      {
+        "label": "Nous",
+        "form": "nous aimons [nu zê-MÔN]",
+        "example": "Nous aimons les couleurs vives."
+      },
+      {
+        "label": "Vous",
+        "form": "vous aimez [vu zê-MÊ]",
+        "example": "Vous aimez ce tableau ?"
+      },
+      {
+        "label": "Ils / Elles",
+        "form": "ils/elles aiment [il ZÉM]",
+        "example": "Ils aiment le noir et le blanc."
+      }
+    ]
+  },
+  {
+    "verb": "PRÉFÉRER (Preferir)",
+    "emoji": "⭐",
+    "forms": [
+      {
+        "label": "Je",
+        "form": "je préfère [jã pre-FÉR]",
+        "example": "Je préfère la veste bleue."
+      },
+      {
+        "label": "Tu",
+        "form": "tu préfères [tü pre-FÉR]",
+        "example": "Quelle couleur tu préfères ?"
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle préfère [pre-FÉR]",
+        "example": "Il préfère le vert."
+      },
+      {
+        "label": "Nous",
+        "form": "nous préférons [nu pre-fe-RÔN]",
+        "example": "Nous préférons les tons clairs."
+      },
+      {
+        "label": "Vous",
+        "form": "vous préférez [vu pre-fe-RÊ]",
+        "example": "Préférez-vous le noir ou le gris ?"
+      },
+      {
+        "label": "Ils / Elles",
+        "form": "ils/elles préfèrent [pre-FÉR]",
+        "example": "Elles préfèrent le rose."
+      }
+    ]
+  },
+  {
+    "verb": "VOIR (Ver)",
+    "emoji": "👀",
+    "forms": [
+      {
+        "label": "Je",
+        "form": "je vois [jã VUÁ]",
+        "example": "Je vois une voiture rouge."
+      },
+      {
+        "label": "Tu",
+        "form": "tu vois [tü VUÁ]",
+        "example": "Tu vois le sac marron ?"
+      },
+      {
+        "label": "Il / Elle",
+        "form": "il/elle voit [VUÁ]",
+        "example": "Elle voit la vie en rose."
+      },
+      {
+        "label": "Nous",
+        "form": "nous voyons [nu vua-IÔN]",
+        "example": "Nous voyons un beau jardin."
+      },
+      {
+        "label": "Vous",
+        "form": "vous voyez [vu vua-IÊ]",
+        "example": "Vous voyez la porte bleue ?"
+      },
+      {
+        "label": "Ils / Elles",
+        "form": "ils/elles voient [VUÁ]",
+        "example": "Ils voient les drapeaux."
+      }
+    ]
+  }
 ];
-const exList=document.getElementById('expr-list');
-EXPRS.forEach(e=>{const d=document.createElement('div');d.className='expr-card bg-white rounded-2xl border-2 border-slate-100 p-5 cursor-pointer';d.innerHTML=`<div class="flex items-center justify-between" onclick="this.parentElement.classList.toggle('open')"><div><p class="font-black text-navy text-base">${e.phrase}</p><p class="text-blue-600 font-bold text-sm mt-0.5">${e.meaning}</p></div><span class="expr-chevron text-slate-400 text-lg font-black">▾</span></div><div class="expr-detail mt-4 space-y-2 text-sm text-slate-600"><p class="bg-blue-50 rounded-xl p-3 italic">"${e.example}"</p><p>${e.use}</p></div>`;exList.appendChild(d);});
-
-function toggleAcc(btn){const item=btn.closest('.acc-item');item.classList.toggle('open');btn.querySelector('.acc-icon').textContent=item.classList.contains('open')?'−':'+';}
-
-const QUIZ=[
-  {q:'How do you say "red" in French?',opts:['rouge','vert','bleu','jaune'],ans:0},
-  {q:'A dress is feminine. Which is correct?',opts:['une robe bleue','une robe bleu','une bleu robe','une bleue robe'],ans:0},
-  {q:'Where does the color adjective go in French?',opts:['After the noun','Before the noun','Either position','At the end of the sentence'],ans:0},
-  {q:'What does "blanc" mean?',opts:['White','Black','Gray','Yellow'],ans:0},
-  {q:'Which color is INVARIABLE (never changes form)?',opts:['orange','noir','vert','bleu'],ans:0},
-  {q:'"Une voiture ___" — which is correct for "a gray car"?',opts:['grise','gris','grises','gray'],ans:0},
-  {q:'How do you say "green" (masculine) in French?',opts:['vert','verte','verts','vertes'],ans:0},
-  {q:'"Avoir le cafard" means:',opts:['To feel depressed','To have a cockroach problem','To see red','To be very happy'],ans:0},
-  {q:'What color is "jaune"?',opts:['Yellow','Orange','Gold','Brown'],ans:0},
-  {q:'Which sentence correctly says "white shoes" (shoes = chaussures, feminine plural)?',opts:['des chaussures blanches','des chaussures blanc','des blanches chaussures','des blanc chaussures'],ans:0},
+const VERBS_QUIZ_DATA = [
+  {
+    "q": "J'___ beaucoup la couleur bleue. (aimer)",
+    "ans": "aime"
+  },
+  {
+    "q": "Quelle couleur vous ___ ? (préférer — vous)",
+    "ans": "préférez"
+  },
+  {
+    "q": "Je ___ la robe verte. (préférer — je)",
+    "ans": "préfère"
+  },
+  {
+    "q": "Tu ___ le chat noir là-bas ? (voir — tu)",
+    "ans": "vois"
+  },
+  {
+    "q": "Nous ___ les couleurs claires. (aimer — nous)",
+    "ans": "aimons"
+  }
 ];
-let quizSubmitted=false;
-const qc=document.getElementById('quiz-container');
-QUIZ.forEach((q,qi)=>{const d=document.createElement('div');d.className='bg-white rounded-2xl border-2 border-slate-100 p-5';d.innerHTML=`<p class="font-black text-navy text-sm mb-3"><span class="text-blue-500">${qi+1}.</span> ${q.q}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${q.opts.map((o,oi)=>`<button data-qi="${qi}" data-oi="${oi}" onclick="selectOpt(this)" class="opt-btn text-left px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white">${o}</button>`).join('')}</div>`;qc.appendChild(d);});
-const selected={};
-function selectOpt(btn){if(quizSubmitted)return;const qi=btn.dataset.qi;document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.style.borderColor='';b.style.background='';});btn.style.borderColor='#1d4ed8';btn.style.background='#eff6ff';selected[qi]=parseInt(btn.dataset.oi);}
-function submitQuiz(){if(quizSubmitted)return;quizSubmitted=true;let correct=0;QUIZ.forEach((q,qi)=>{document.querySelectorAll(`[data-qi="${qi}"]`).forEach(b=>{b.disabled=true;const oi=parseInt(b.dataset.oi);if(oi===q.ans)b.classList.add('correct');else if(oi===selected[qi])b.classList.add('wrong');});if(selected[qi]===q.ans)correct++;});document.getElementById('quiz-result').classList.remove('hidden');document.getElementById('quiz-score-text').textContent=`${correct} / ${QUIZ.length} correct!`;document.getElementById('quiz-submit-btn').disabled=true;document.getElementById('quiz-submit-btn').classList.add('opacity-60');markSection('practice');if(typeof Store!=='undefined')Store.addXP(30);spawnXP('+50 XP');}
 
-const SPEAK=[
-  'Une robe rouge et un pull blanc.',
-  'J\'aime le bleu et le vert.',
-  'C\'est de quelle couleur? C\'est noir.',
-  'Je cherche quelque chose en rose, s\'il vous plaît.',
-  'Ma couleur préférée est le violet.',
-  'Un chat noir et une chatte blanche.',
-  'Le drapeau français est bleu, blanc et rouge!',
-  'J\'ai le cafard — tout est gris aujourd\'hui.',
-];
-const sl=document.getElementById('speak-list');
-SPEAK.forEach((s,i)=>{const sC=s.replace(/'/g,"&#39;");const d=document.createElement('div');d.innerHTML=`<input type="checkbox" id="sp${i}" class="speak-check hidden" onchange="checkAllSpeak()"/><div class="flex items-center gap-3 bg-white rounded-2xl border-2 border-slate-100 p-4 transition-all hover:border-blue-200"><button onclick="event.stopPropagation();speak('${sC}')" class="flex-shrink-0 w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center text-base transition-all" title="Ouvir">🔊</button><label for="sp${i}" class="cursor-pointer flex-1 flex items-center gap-3 min-w-0"><p class="text-slate-700 font-bold text-sm flex-1">${s}</p><span class="text-slate-300 text-xl flex-shrink-0">☐</span></label></div>`;sl.appendChild(d);});
-function checkAllSpeak(){if(document.querySelectorAll('.speak-check:checked').length===SPEAK.length)markSection('speak');}
+function buildVerbs() {
+  const grid = document.getElementById('verbs-grid');
+  VERBS_DATA.forEach((v, vi) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-blue-200 rounded-2xl overflow-hidden';
+    div.innerHTML = `
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center gap-3">
+        <span class="text-3xl">${v.emoji}</span>
+        <span class="text-xl md:text-2xl font-black text-white">${v.verb}</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-blue-50">
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Pessoa</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma &amp; Pronúncia</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Exemplo em Francês</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${v.forms.map((f, fi) => `
+              <tr class="${fi % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+                <td class="px-4 py-2.5 font-black text-blue-600 text-xs whitespace-nowrap">${f.label}</td>
+                <td class="px-4 py-2.5 font-black text-navy text-xs whitespace-nowrap">${f.form}</td>
+                <td class="px-4 py-2.5 text-slate-600 text-xs flex items-center justify-between gap-2">
+                  <span>${f.example}</span>
+                  <button type="button" onclick="speak(VERBS_DATA[${vi}].forms[${fi}].example)" class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center" title="Ouvir exemplo">🔊</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    grid.appendChild(div);
+  });
 
-const WO1_DATA=[
-  {s:'J\'aime la robe bleue',w:['J\'aime','la','robe','bleue']},
-  {s:'C\'est un pull vert très à la mode',w:['C\'est','un','pull','vert','très','à','la','mode']},
-  {s:'Nous avons des chaussures noires',w:['Nous','avons','des','chaussures','noires']},
+  const qWrap = document.getElementById('verbs-quiz');
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-sm font-semibold text-navy mb-2">${i + 1}. ${q.q}</p>
+        <input id="vq-fr-${i}" data-ans="${q.ans}" type="text" placeholder="Digite a resposta em francês..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
+        <p id="vq-fr-fb${i}" class="text-xs font-black mt-1 hidden"></p>
+      </div>`;
+    qWrap.appendChild(div);
+  });
+}
+buildVerbs();
+
+function checkVerbsQuiz() {
+  let correct = 0;
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const inp = document.getElementById('vq-fr-' + i);
+    const fb = document.getElementById('vq-fr-fb' + i);
+    if (!inp || !fb) return;
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = q.ans.toLowerCase().replace(/’/g, "'");
+    fb.classList.remove('hidden');
+    if (val === ans) {
+      correct++;
+      fb.textContent = '✅ Très bien ! Resposta correta!';
+      fb.className = 'text-xs font-black mt-1 text-emerald-600';
+    } else {
+      fb.textContent = `❌ Resposta correta: ${q.ans}`;
+      fb.className = 'text-xs font-black mt-1 text-red-500';
+    }
+  });
+  const res = document.getElementById('verbs-quiz-result');
+  res.classList.remove('hidden');
+  if (correct >= 4) {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+    res.textContent = `🎉 ${correct}/${VERBS_QUIZ_DATA.length} acertos! Excelente trabalho!`;
+    markSection('verbs');
+  } else {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200';
+    res.textContent = `${correct}/${VERBS_QUIZ_DATA.length} acertos. Confira as respostas acima e tente novamente!`;
+  }
+}
+
+// ── 3. EXPRESSIONS ───────────────────────────────────────────────────────────
+const EXPR_DATA = [
+  {
+    "expr": "Quelle est ta / votre couleur préférée ?",
+    "pt": "Qual é a sua cor favorita?",
+    "emoji": "🎨",
+    "usage": "Usa-se \"Quelle\" (com dois L e E) porque \"la couleur\" é uma palavra feminina em francês.",
+    "example": "— Quelle est ta couleur préférée ? — Ma couleur préférée est le vert !"
+  },
+  {
+    "expr": "De quelle couleur est... ?",
+    "pt": "De que cor é...?",
+    "emoji": "🔍",
+    "usage": "Excelente para perguntar a cor de um objeto específico.",
+    "example": "— De quelle couleur est ta voiture ? — Elle est gris foncé."
+  },
+  {
+    "expr": "Voir la vie en rose",
+    "pt": "Ver o lado bom da vida (expressão idiomática)",
+    "emoji": "🌸",
+    "usage": "Imortalizada por Édith Piaf, significa ser otimista e enxergar tudo com alegria.",
+    "example": "En vacances à Paris, je vois la vie en rose !"
+  },
+  {
+    "expr": "Bleu, blanc, rouge",
+    "pt": "Azul, branco e vermelho (a bandeira francesa)",
+    "emoji": "🇫🇷",
+    "usage": "É assim que os franceses se referem à bandeira nacional (le drapeau tricolore) e à seleção francesa.",
+    "example": "Le drapeau français est bleu, blanc, rouge."
+  },
+  {
+    "expr": "Bleu clair / Vert foncé",
+    "pt": "Azul-claro / Verde-escuro",
+    "emoji": "🖌️",
+    "usage": "Quando uma cor vem seguida de \"clair\" (claro) ou \"foncé\" (escuro), ambas ficam invariáveis!",
+    "example": "J'ai acheté une chemise bleu clair."
+  },
+  {
+    "expr": "C'est magnifique !",
+    "pt": "É magnífico / É lindo demais!",
+    "emoji": "🤩",
+    "usage": "Elogio super comum na França para obras de arte, roupas, paisagens ou comidas.",
+    "example": "Regarde ce jardin vert et jaune, c'est magnifique !"
+  }
 ];
-function hwShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const wo1=WO1_DATA.map(d=>({ans:[],bank:hwShuffle(d.w),orig:d.w}));
-function wo1Render(){const c=document.getElementById('wo1-container');c.innerHTML='';WO1_DATA.forEach((d,si)=>{const st=wo1[si];c.innerHTML+=`<div class="border border-slate-100 rounded-xl p-4 space-y-2"><p class="text-xs font-black text-slate-400 uppercase tracking-widest">Sentence ${si+1}</p><div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</div>`).join('')}</div><div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w,wi)=>`<div class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</div>`).join('')}</div><div class="flex gap-2"><button onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Check ✓</button><button onclick="wo1Reset(${si})" class="bg-slate-100 text-slate-600 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Reset ↺</button></div><p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p></div>`;});}
-function wo1Move(fromBank,si,wi){const st=wo1[si];if(fromBank)st.ans.push(st.bank.splice(wi,1)[0]);else st.bank.push(st.ans.splice(wi,1)[0]);wo1Render();}
-function wo1Check(si){const st=wo1[si];const fb=document.getElementById('wo1-fb-'+si);const ok=st.ans.join(' ').toLowerCase()===WO1_DATA[si].s.toLowerCase();fb.className='text-xs font-bold '+(ok?'text-blue-600':'text-red-500');fb.textContent=ok?'✅ Correct! Parfait!':'❌ Try again! Answer: '+WO1_DATA[si].s;fb.classList.remove('hidden');}
-function wo1Reset(si){wo1[si].bank=hwShuffle(WO1_DATA[si].orig);wo1[si].ans=[];document.getElementById('wo1-fb-'+si).classList.add('hidden');wo1Render();}
+let exprDone = new Set();
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPR_DATA.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'border-2 border-blue-200 bg-white rounded-2xl overflow-hidden cursor-pointer';
+    div.innerHTML = `
+      <div class="p-4 flex items-center gap-4" onclick="toggleExpr(${i})">
+        <span class="text-3xl">${e.emoji}</span>
+        <div class="flex-1 min-w-0">
+          <div class="font-black text-navy">${e.expr}</div>
+          <div class="text-blue-600 text-sm font-semibold">${e.pt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].expr)" class="w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir expressão">🔊</button>
+        <span class="material-symbols-outlined text-blue-400 transition-transform" id="expr-arrow-${i}">expand_more</span>
+      </div>
+      <div id="expr-body-${i}" class="hidden px-4 pb-4">
+        <div class="bg-blue-50 rounded-xl p-3.5 text-sm space-y-2">
+          <p><strong class="text-navy">Quando usar:</strong> ${e.usage}</p>
+          <p class="flex items-center justify-between gap-2"><span class="italic text-slate-700"><strong class="text-navy not-italic">Exemplo:</strong> "${e.example}"</span><button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[${i}].example)" class="flex-shrink-0 text-xs font-black bg-white border border-blue-200 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100">🔊 Ouvir</button></p>
+        </div>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function toggleExpr(i) {
+  const body = document.getElementById('expr-body-' + i);
+  const arrow = document.getElementById('expr-arrow-' + i);
+  body.classList.toggle('hidden');
+  arrow.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  exprDone.add(i);
+  if (exprDone.size === EXPR_DATA.length) markSection('expressions');
+}
+buildExpressions();
+
+// ── 4. PATTERNS ACCORDION ────────────────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  if (!el) return;
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ── 5. DIALOGUE ──────────────────────────────────────────────────────────────
+const DIALOGUE_LINES = [
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Regarde Camille, ces écharpes sont très jolies ! Quelle est ta couleur préférée ?",
+    "pt": "Olha Camille, estes lenços são muito lindos! Qual é a sua cor favorita?"
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "J'aime beaucoup le vert et le bleu clair. Et toi, Yara ?",
+    "pt": "Eu gosto muito de verde e azul-claro. E você, Yara?"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Moi, je préfère le rouge et le jaune. Regarde cette petite robe blanche !",
+    "pt": "Eu prefiro o vermelho e o amarelo. Olha este vestidinho branco!"
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Elle est magnifique ! Et j'adore aussi ces chaussures marron.",
+    "pt": "Ele é magnífico! E eu adoro também estes sapatos marrons."
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Je cherche un cadeau pour ma mère. De quelle couleur est son manteau ?",
+    "pt": "Estou procurando um presente para minha mãe. De que cor é o casaco dela?"
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Son manteau est noir. Une écharpe rose ou violette, c'est parfait avec le noir !",
+    "pt": "O casaco dela é preto. Um lenço rosa ou violeta fica perfeito com preto!"
+  },
+  {
+    "who": "yara",
+    "speaker": "Yara",
+    "text": "Bonne idée ! Je prends l'écharpe violette. Combien ça coûte ?",
+    "pt": "Boa ideia! Vou levar o lenço violeta. Quanto custa?"
+  },
+  {
+    "who": "other",
+    "speaker": "Camille",
+    "text": "Elle coûte quinze euros. C'est un très beau cadeau !",
+    "pt": "Custa quinze euros. É um presente muito bonito!"
+  }
+];
+let dlgPlaying = false;
+
+function buildDialogue() {
+  const c = document.getElementById('dialogue-lines');
+  DIALOGUE_LINES.forEach((l, i) => {
+    const isYara = l.who === 'yara';
+    const div = document.createElement('div');
+    div.className = `flex ${isYara ? 'justify-start' : 'justify-end'} fade-in`;
+    div.innerHTML = `
+      <div id="dlg-bubble-${i}" class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all ${isYara ? 'bg-blue-50 border-2 border-blue-200 text-navy' : 'bg-navy text-white'}">
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <span class="text-xs font-black ${isYara ? 'text-blue-600' : 'text-blue-300'}">${isYara ? '🐾 ' : '🗣️ '}${l.speaker}</span>
+          <button type="button" onclick="speak(DIALOGUE_LINES[${i}].text)" class="w-7 h-7 rounded-full ${isYara ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-white/15 hover:bg-white/25 text-white'} text-xs flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir fala">🔊</button>
+        </div>
+        <p class="font-bold">${l.text}</p>
+        <span class="block text-xs mt-1 ${isYara ? 'text-slate-500' : 'text-blue-200/80'}">🇧🇷 ${l.pt}</span>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+buildDialogue();
+
+function playFullDialogue() {
+  if (!window.speechSynthesis) return;
+  const btn = document.getElementById('btn-play-dialogue');
+  if (dlgPlaying) {
+    speechSynthesis.cancel();
+    dlgPlaying = false;
+    btn.textContent = '🔊 Ouvir diálogo completo';
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    return;
+  }
+  dlgPlaying = true;
+  btn.textContent = '⏹️ Parar áudio';
+  let idx = 0;
+  function nextLine() {
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    if (!dlgPlaying || idx >= DIALOGUE_LINES.length) {
+      dlgPlaying = false;
+      btn.textContent = '🔊 Ouvir diálogo completo';
+      return;
+    }
+    const bubble = document.getElementById('dlg-bubble-' + idx);
+    if (bubble) bubble.classList.add('ring-4', 'ring-blue-400');
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(DIALOGUE_LINES[idx].text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    u.pitch = DIALOGUE_LINES[idx].who === 'yara' ? 1.08 : 0.98;
+    u.onend = () => { idx++; setTimeout(nextLine, 350); };
+    u.onerror = () => { dlgPlaying = false; btn.textContent = '🔊 Ouvir diálogo completo'; };
+    speechSynthesis.speak(u);
+  }
+  nextLine();
+}
+
+// ── 6. PRACTICE QUIZ ─────────────────────────────────────────────────────────
+const QUIZ = [
+  {
+    "q": "Qual é a forma feminina correta da cor \"blanc\" (branco)?",
+    "opts": [
+      "blanche",
+      "blance",
+      "blanca",
+      "blanc"
+    ],
+    "a": "blanche",
+    "rule": "O feminino de \"blanc\" [BLÃ] é \"blanche\" [BLÃCH]: une maison blanche."
+  },
+  {
+    "q": "Quais são as duas cores que NUNCA mudam no feminino nem ganham \"-s\" no plural?",
+    "opts": [
+      "orange e marron",
+      "bleu e vert",
+      "noir e blanc",
+      "gris e violet"
+    ],
+    "a": "orange e marron",
+    "rule": "\"Orange\" e \"marron\" vêm de frutas/castanhas e são 100% invariáveis: des sacs orange, des chaussures marron."
+  },
+  {
+    "q": "Como se diz \"um gato preto\" em francês?",
+    "opts": [
+      "un chat noir",
+      "un noir chat",
+      "un chat noire",
+      "une chat noir"
+    ],
+    "a": "un chat noir",
+    "rule": "As cores ficam DEPOIS do substantivo, igual ao português: un chat noir."
+  },
+  {
+    "q": "Como fica \"uma camisa verde\" em francês (sabendo que \"chemise\" é feminino)?",
+    "opts": [
+      "une chemise verte",
+      "une chemise vert",
+      "une verte chemise",
+      "un chemise vert"
+    ],
+    "a": "une chemise verte",
+    "rule": "Como \"la chemise\" é feminina, \"vert\" recebe \"-e\": une chemise verte [VÉRT]."
+  },
+  {
+    "q": "Qual destas cores JÁ termina com \"-e\" no masculino e por isso não muda no feminino?",
+    "opts": [
+      "rouge",
+      "vert",
+      "gris",
+      "noir"
+    ],
+    "a": "rouge",
+    "rule": "Rouge, jaune e rose já terminam em -e e servem para masculino e feminino sem alteração."
+  },
+  {
+    "q": "Qual é a tradução de \"une petite maison blanche\"?",
+    "opts": [
+      "uma casinha branca (uma pequena casa branca)",
+      "uma casa grande e azul",
+      "um apartamento branco",
+      "uma porta amarela"
+    ],
+    "a": "uma casinha branca (uma pequena casa branca)",
+    "rule": "\"Petite\" (pequena) vem antes do substantivo e \"blanche\" (branca) vem depois."
+  },
+  {
+    "q": "Como dizemos \"azul-claro\" e \"verde-escuro\" em francês?",
+    "opts": [
+      "bleu clair / vert foncé",
+      "bleu foncé / vert clair",
+      "clair bleu / foncé vert",
+      "bleu blanc / vert noir"
+    ],
+    "a": "bleu clair / vert foncé",
+    "rule": "Clair = claro; foncé = escuro."
+  },
+  {
+    "q": "Quais são as três cores da bandeira da França?",
+    "opts": [
+      "Bleu, blanc, rouge",
+      "Vert, jaune, bleu",
+      "Noir, rouge, jaune",
+      "Vert, blanc, rouge"
+    ],
+    "a": "Bleu, blanc, rouge",
+    "rule": "A bandeira francesa (le drapeau tricolore) é azul, branca e vermelha: bleu, blanc, rouge."
+  },
+  {
+    "q": "O que significa a expressão francesa \"voir la vie en rose\"?",
+    "opts": [
+      "Ver a vida com otimismo / ver o lado bom da vida",
+      "Usar apenas roupas cor-de-rosa",
+      "Estar com sono",
+      "Pintar a casa de rosa"
+    ],
+    "a": "Ver a vida com otimismo / ver o lado bom da vida",
+    "rule": "\"Voir la vie en rose\" significa enxergar a vida de forma positiva e feliz."
+  },
+  {
+    "q": "Complete: \"J'ai acheté des chaussures ___.\" (marrons)",
+    "opts": [
+      "marron",
+      "marrons",
+      "marrones",
+      "marronnes"
+    ],
+    "a": "marron",
+    "rule": "\"Marron\" é invariável — nunca recebe \"-s\" no plural!"
+  }
+];
+let pracIdx = 0, pracScore = 0, pracStreak = 0, pracAnswered = false;
+
+function buildPractice() {
+  if (pracIdx >= QUIZ.length) { showResult(); return; }
+  const q = QUIZ[pracIdx];
+  document.getElementById('prac-bar').style.width = (pracIdx / QUIZ.length * 100) + '%';
+  document.getElementById('practice-area').innerHTML = `
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
+      <div class="text-xs font-black text-slate-400 mb-3 uppercase tracking-wider">Questão ${pracIdx + 1} de ${QUIZ.length}</div>
+      <p class="font-black text-navy text-base mb-5 leading-relaxed">${q.q}</p>
+      <div class="grid grid-cols-1 gap-3" id="opts"></div>
+      <div id="prac-feedback" class="hidden mt-4 p-3.5 rounded-xl text-sm font-bold"></div>
+    </div>`;
+  const opts = document.getElementById('opts');
+  [...q.opts].sort(() => Math.random() - 0.5).forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-blue-400 hover:bg-blue-50 transition-all';
+    btn.textContent = o;
+    btn.onclick = () => answerQ(o, btn, q);
+    opts.appendChild(btn);
+  });
+  pracAnswered = false;
+}
+
+function answerQ(ans, btn, q) {
+  if (pracAnswered) return;
+  pracAnswered = true;
+  const correct = ans === q.a;
+  document.querySelectorAll('#opts button').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.a) b.className = 'w-full text-left border-2 border-emerald-500 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-800';
+  });
+  if (!correct) btn.className = 'w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if (correct) { pracScore++; pracStreak++; } else { pracStreak = 0; }
+  document.getElementById('prac-score').innerHTML = `${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 ' + pracStreak;
+  const fb = document.getElementById('prac-feedback');
+  fb.classList.remove('hidden');
+  fb.className = `mt-4 p-3.5 rounded-xl text-sm font-bold ${correct ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'}`;
+  fb.innerHTML = `${correct ? '✅ Très bien !' : '❌ Quase lá:'} <span class="font-normal">${q.rule}</span>`;
+  pracIdx++;
+  setTimeout(buildPractice, 1800);
+}
+
+function showResult() {
+  document.getElementById('prac-bar').style.width = '100%';
+  const goodThresh = Math.ceil(QUIZ.length * 0.75), okThresh = Math.ceil(QUIZ.length * 0.5);
+  document.getElementById('result-msg').textContent = `Você acertou ${pracScore} de ${QUIZ.length} questões.${pracScore >= goodThresh ? ' Magnifique ! 🌟' : pracScore >= okThresh ? ' Muito bom progresso!' : ' Continue praticando!'}`;
+  document.getElementById('result-emoji').textContent = pracScore >= goodThresh ? '🏆' : pracScore >= okThresh ? '🎉' : '💪';
+  document.getElementById('result-title').textContent = pracScore >= goodThresh ? 'Magnifique !' : pracScore >= okThresh ? 'Très bien !' : 'Continue assim!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection('practice');
+  if (typeof Store !== 'undefined') Store.addXP(50);
+}
+
+function restartPractice() {
+  pracIdx = 0; pracScore = 0; pracStreak = 0;
+  document.getElementById('prac-score').innerHTML = `0<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
+  document.getElementById('prac-streak').textContent = '🔥 0';
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── 7. SPEAK ─────────────────────────────────────────────────────────────────
+const SPEAK_DATA = [
+  {
+    "text": "Quelle est votre couleur préférée ?",
+    "pt": "Qual é a sua cor favorita?",
+    "phon": "[kél é vótr ku-LŒR pre-fe-RÊ?]"
+  },
+  {
+    "text": "J'aime beaucoup le bleu clair et le vert.",
+    "pt": "Eu gosto muito do azul-claro e do verde.",
+    "phon": "[jém bô-KU lã blø KLÉR ê lã VÉR]"
+  },
+  {
+    "text": "Le drapeau français est bleu, blanc, rouge.",
+    "pt": "A bandeira francesa é azul, branca e vermelha.",
+    "phon": "[lã dra-PÔ frãn-SÉ é BLØ, BLÃ, RUJ]"
+  },
+  {
+    "text": "Elle porte une belle robe blanche.",
+    "pt": "Ela veste um lindo vestido branco.",
+    "phon": "[él PÓRT ün bél RÓB BLÃCH]"
+  },
+  {
+    "text": "J'ai un petit chat noir et gris.",
+    "pt": "Eu tenho um gatinho preto e cinza.",
+    "phon": "[jê ãn pã-TI CHÁ nuar ê GRI]"
+  },
+  {
+    "text": "De quelle couleur est ta voiture ? — Elle est rouge.",
+    "pt": "De que cor é o seu carro? — Ele é vermelho.",
+    "phon": "[dã kél ku-LŒR é ta vua-TÜR? — él é RUJ]"
+  },
+  {
+    "text": "J'adore ces chaussures marron et ce sac orange.",
+    "pt": "Eu adoro estes sapatos marrons e esta bolsa laranja.",
+    "phon": "[ja-DÓR sê chô-SÜR ma-RÔN ê sã SÁK ô-RÃJ]"
+  },
+  {
+    "text": "À Paris, je vois la vie en rose !",
+    "pt": "Em Paris, eu vejo a vida cor-de-rosa!",
+    "phon": "[a pa-RI, jã VUÁ la VI ãn RÔZ!]"
+  }
+];
+let speakDone = new Set();
+
+function buildSpeak() {
+  const grid = document.getElementById('speak-grid');
+  SPEAK_DATA.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-blue-300 transition-colors';
+    div.innerHTML = `
+      <button type="button" onclick="speak(SPEAK_DATA[${i}].text)" class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <div class="flex-1 min-w-0">
+        <p class="text-navy font-black text-sm leading-relaxed">${s.text}</p>
+        <span class="block text-xs text-blue-600 font-bold mt-0.5">${s.phon}</span>
+        <span class="block text-xs text-slate-500 mt-0.5">🇧🇷 ${s.pt}</span>
+      </div>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-blue-600" onchange="markSpeak(${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Feito</span>
+      </label>`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+
+function markSpeak(i, cb) {
+  if (cb.checked) speakDone.add(i); else speakDone.delete(i);
+  if (speakDone.size === SPEAK_DATA.length) markSection('speak');
+}
+
+// ── 8. HOMEWORK ──────────────────────────────────────────────────────────────
+const WO1_DATA = [
+  {
+    "s": "Elle a une petite voiture rouge",
+    "w": [
+      "Elle",
+      "a",
+      "une",
+      "petite",
+      "voiture",
+      "rouge"
+    ],
+    "pt": "Ela tem um carrinho vermelho"
+  },
+  {
+    "s": "Quelle est ta couleur préférée",
+    "w": [
+      "Quelle",
+      "est",
+      "ta",
+      "couleur",
+      "préférée"
+    ],
+    "pt": "Qual é a sua cor favorita?"
+  },
+  {
+    "s": "J'aime la grande maison blanche",
+    "w": [
+      "J'aime",
+      "la",
+      "grande",
+      "maison",
+      "blanche"
+    ],
+    "pt": "Eu gosto da casa grande branca"
+  }
+];
+function hwShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const wo1 = WO1_DATA.map(d => ({ ans: [], bank: hwShuffle(d.w), orig: d.w }));
+function wo1Render() {
+  const c = document.getElementById('wo1-container');
+  c.innerHTML = '';
+  WO1_DATA.forEach((d, si) => {
+    const st = wo1[si];
+    const box = document.createElement('div');
+    box.className = 'border border-slate-200 rounded-xl p-4 space-y-2 bg-slate-50/50';
+    box.innerHTML = `
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-black text-blue-600 uppercase tracking-wider">Frase ${si + 1}</p>
+        <p class="text-xs font-bold text-slate-500">🇧🇷 "${d.pt}"</p>
+      </div>
+      <div class="wo-ans" id="wo1-ans-${si}">${st.ans.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(false,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="wo-bank" id="wo1-bank-${si}">${st.bank.map((w, wi) => `<button type="button" class="wo-tile" onclick="wo1Move(true,${si},${wi})">${w}</button>`).join('')}</div>
+      <div class="flex gap-2">
+        <button type="button" onclick="wo1Check(${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Verificar ✓</button>
+        <button type="button" onclick="wo1Reset(${si})" class="bg-slate-200 text-slate-700 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Recomeçar ↺</button>
+      </div>
+      <p id="wo1-fb-${si}" class="text-xs font-bold hidden"></p>`;
+    c.appendChild(box);
+  });
+}
+function wo1Move(fromBank, si, wi) {
+  const st = wo1[si];
+  if (fromBank) st.ans.push(st.bank.splice(wi, 1)[0]);
+  else st.bank.push(st.ans.splice(wi, 1)[0]);
+  wo1Render();
+}
+function wo1Check(si) {
+  const st = wo1[si];
+  const fb = document.getElementById('wo1-fb-' + si);
+  const ok = st.ans.join(' ').toLowerCase() === WO1_DATA[si].s.toLowerCase();
+  fb.className = 'text-xs font-bold ' + (ok ? 'text-emerald-600' : 'text-red-500');
+  fb.textContent = ok ? '✅ Parfait ! Frase correta!' : '❌ Tente novamente! Resposta: ' + WO1_DATA[si].s;
+  fb.classList.remove('hidden');
+}
+function wo1Reset(si) {
+  wo1[si].bank = hwShuffle(WO1_DATA[si].orig);
+  wo1[si].ans = [];
+  wo1Render();
+}
 wo1Render();
 
-const MP1=[{l:'rouge 🔴',r:'Red'},{l:'bleu 🔵',r:'Blue'},{l:'vert 🟢',r:'Green'},{l:'jaune 🟡',r:'Yellow'},{l:'noir ⚫',r:'Black'},];
-function mpShuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-const mp1R=mpShuffle(MP1.map((p,i)=>({label:p.r,pid:i})));
-let mp1SelL=null;const mp1Done=new Set();
-function mp1Render(){document.getElementById('mp1-left').innerHTML=MP1.map((p,i)=>`<button onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i)?'matched':''}" ${mp1Done.has(i)?'disabled':''}>${p.l}</button>`).join('');document.getElementById('mp1-right').innerHTML=mp1R.map((p,i)=>`<button onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid)?'matched':''}" ${mp1Done.has(p.pid)?'disabled':''}>${p.label}</button>`).join('');}
-function mp1ClickL(i){if(mp1Done.has(i))return;mp1SelL=i;document.querySelectorAll('#mp1-left .mp-btn').forEach((b,j)=>b.classList.toggle('selected',j===i&&!mp1Done.has(j)));}
-function mp1ClickR(ri){if(mp1SelL===null)return;const item=mp1R[ri];if(item.pid===mp1SelL){mp1Done.add(mp1SelL);mp1SelL=null;mp1Render();if(mp1Done.size===MP1.length)document.getElementById('mp1-done-msg').classList.remove('hidden');}else{[document.getElementById('mp1R-'+ri),document.getElementById('mp1L-'+mp1SelL)].forEach(b=>{b.classList.add('wrong-flash');setTimeout(()=>b.classList.remove('wrong-flash'),700);});mp1SelL=null;document.querySelectorAll('#mp1-left .mp-btn').forEach(b=>b.classList.remove('selected'));}}
+const MP1 = [
+  {
+    "l": "Rouge 🔴",
+    "r": "Vermelho(a)"
+  },
+  {
+    "l": "Jaune 🟡",
+    "r": "Amarelo(a)"
+  },
+  {
+    "l": "Vert / Verte 🟢",
+    "r": "Verde"
+  },
+  {
+    "l": "Blanc / Blanche ⚪",
+    "r": "Branco / Branca"
+  },
+  {
+    "l": "Gris / Grise 🩶",
+    "r": "Cinza"
+  }
+];
+const mp1R = hwShuffle(MP1.map((p, i) => ({ label: p.r, pid: i })));
+let mp1SelL = null;
+const mp1Done = new Set();
+function mp1Render() {
+  document.getElementById('mp1-left').innerHTML = MP1.map((p, i) =>
+    `<button type="button" onclick="mp1ClickL(${i})" id="mp1L-${i}" class="mp-btn w-full ${mp1Done.has(i) ? 'matched' : ''}" ${mp1Done.has(i) ? 'disabled' : ''}>${p.l}</button>`
+  ).join('');
+  document.getElementById('mp1-right').innerHTML = mp1R.map((p, i) =>
+    `<button type="button" onclick="mp1ClickR(${i})" id="mp1R-${i}" class="mp-btn w-full ${mp1Done.has(p.pid) ? 'matched' : ''}" ${mp1Done.has(p.pid) ? 'disabled' : ''}>${p.label}</button>`
+  ).join('');
+}
+function mp1ClickL(i) {
+  if (mp1Done.has(i)) return;
+  mp1SelL = i;
+  document.querySelectorAll('#mp1-left .mp-btn').forEach((b, j) => b.classList.toggle('selected', j === i && !mp1Done.has(j)));
+}
+function mp1ClickR(ri) {
+  if (mp1SelL === null) return;
+  const item = mp1R[ri];
+  if (item.pid === mp1SelL) {
+    mp1Done.add(mp1SelL);
+    mp1SelL = null;
+    mp1Render();
+    if (mp1Done.size === MP1.length) document.getElementById('mp1-done-msg').classList.remove('hidden');
+  } else {
+    [document.getElementById('mp1R-' + ri), document.getElementById('mp1L-' + mp1SelL)].forEach(b => {
+      if (b) { b.classList.add('wrong-flash'); setTimeout(() => b.classList.remove('wrong-flash'), 700); }
+    });
+    mp1SelL = null;
+    document.querySelectorAll('#mp1-left .mp-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
 mp1Render();
 
-const FILL1=[
-  {before:'Une voiture',blank:'rouge',after:'(a red car — F)',ans:'rouge'},
-  {before:'Un chat',blank:'noir',after:'(a black cat — M)',ans:'noir'},
-  {before:'Des robes',blank:'bleues',after:'(blue dresses — F plural)',ans:'bleues'},
-  {before:'Une chemise',blank:'verte',after:'(a green shirt — F)',ans:'verte'},
-  {before:'Des pulls',blank:'blancs',after:'(white sweaters — M plural)',ans:'blancs'},
+const FILL1 = [
+  {
+    "before": "Une maison",
+    "after": ". (branca — feminino de blanc)",
+    "ans": "blanche"
+  },
+  {
+    "before": "Une chemise",
+    "after": ". (verde — feminino de vert)",
+    "ans": "verte"
+  },
+  {
+    "before": "Un chat",
+    "after": ". (preto — masculino)",
+    "ans": "noir"
+  },
+  {
+    "before": "Des chaussures",
+    "after": ". (marrons — invariável)",
+    "ans": "marron"
+  },
+  {
+    "before": "Le ciel est",
+    "after": ". (azul — masculino)",
+    "ans": "bleu"
+  }
 ];
-const fc=document.getElementById('fill1-container');
-FILL1.forEach((f,i)=>{const d=document.createElement('p');d.className='text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2';d.innerHTML=`${f.before?`<span>${f.before}</span>`:''}  <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="?"/> <span>${f.after}</span>`;fc.appendChild(d);});
-function checkFill1(){FILL1.forEach((f,i)=>{const inp=document.getElementById('fill1-'+i);const ok=inp.value.trim().toLowerCase()===f.ans;inp.classList.remove('ok','err');inp.classList.add(ok?'ok':'err');});}
+const fc = document.getElementById('fill1-container');
+FILL1.forEach((f, i) => {
+  const d = document.createElement('p');
+  d.className = 'text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-xl';
+  d.innerHTML = `<span class="text-blue-600 font-black">${i + 1}.</span> ${f.before ? `<span>${f.before}</span>` : ''} <input type="text" id="fill1-${i}" data-ans="${f.ans}" class="fill-inp" placeholder="..."/> <span>${f.after}</span>`;
+  fc.appendChild(d);
+});
+function checkFill1() {
+  let okCount = 0;
+  FILL1.forEach((f, i) => {
+    const inp = document.getElementById('fill1-' + i);
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = f.ans.toLowerCase().replace(/’/g, "'");
+    const ok = val === ans;
+    if (ok) okCount++;
+    inp.classList.remove('ok', 'err');
+    inp.classList.add(ok ? 'ok' : 'err');
+  });
+  const fb = document.getElementById('fill1-fb');
+  fb.classList.remove('hidden');
+  fb.className = 'mt-2 text-xs font-black ' + (okCount === FILL1.length ? 'text-emerald-600' : 'text-blue-700');
+  fb.textContent = okCount === FILL1.length
+    ? '✅ Todas as lacunas corretas! Très bien !'
+    : `${okCount}/${FILL1.length} corretas. Respostas esperadas: ${FILL1.map((f, idx) => `(${idx + 1}) ${f.ans}`).join(' · ')}`;
+}
 
-function submitHomework(){
+function submitHomework() {
   markSection('homework');
-  if(typeof Store!=='undefined')Store.addXP(55);
+  saveFrCompleted();
+  if (typeof Store !== 'undefined') Store.addXP(55);
   spawnXP('+75 XP');
-  const btn=document.querySelector('[onclick="submitHomework()"]');
-  btn.textContent='🎉 Homework submitted! +75 XP — Magnifique!';
-  btn.disabled=true;
-  const a=document.createElement('a');
-  a.href='fr_aula_04.html';
-  a.className='block text-center mt-3 bg-white border-2 border-blue-300 text-blue-700 font-black py-3 rounded-2xl hover:bg-blue-50 transition-all text-sm';
-  a.textContent='Continue to Leçon 04 — La Famille →';
-  btn.insertAdjacentElement('afterend',a);
+  const btn = document.getElementById('btn-submit-hw');
+  if (btn) {
+    btn.textContent = '✓ Lição Concluída! (+75 XP) — Magnifique !';
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+  }
+  const doneBox = document.getElementById('hw-done-box');
+  if (doneBox) doneBox.classList.remove('hidden');
 }
 </script>
+<script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/fr_aula_03-folha.pdf"></script>
 </body>
 </html>
