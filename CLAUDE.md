@@ -6,6 +6,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Capy Yara Adventures is a gamified English-learning platform for Brazilian students, centered on a capybara mascot named Yara 🐾. Built with vanilla HTML/CSS/JS (Tailwind CDN) + a Node.js dev server with OpenAI integration. No build step — all files are static except the API layer.
 
+## Sessão mestre: só ela revisa e publica (regra do Luis, 18/out/2026)
+
+Uma sessão do Claude é a **mestre** (a "capy na nuvem"). Toda funcionalidade feita por outra
+sessão passa pela revisão dela antes de ir ao ar, para não quebrar o site.
+
+**Toda outra sessão:**
+1. Cria o ramo a partir da `sync/estado-producao` (o que está no ar), nunca do `main`, que está parado em maio.
+2. Abre o PR para a `sync/estado-producao`, preenche o modelo `.github/pull_request_template.md` e para ali.
+3. **Nunca:** `vercel --prod`, `vercel promote`, push ou merge na `sync/estado-producao` ou no `main`, nem SQL
+   na produção. Isso é da mestre.
+4. Se a mestre pedir correção no PR, corrige no mesmo ramo.
+
+**A mestre:**
+- revisa o PR:
+  - CI, a suíte inteira com `PLAYWRIGHT_BROWSERS_PATH`, o e2e, o `scripts/audit.js` e o gitleaks;
+  - a mescla simulada com os outros PRs abertos;
+  - as regras deste arquivo e o SQL rodando antes do código;
+  - as etiquetas `?v=` e o Preview;
+- marca o PR com uma etiqueta:
+  - 🟢 **mestre: publicar** (correção de bug ou de segurança, verde e sem SQL): a mestre mescla sozinha;
+  - 🟡 **mestre: esperando** (o aluno vê a mudança, falta SQL, ou depende de outro PR): só vai ao ar depois
+    do ok do Luis no Preview ou da condição cumprida;
+  - 🔴 **mestre: corrigir**: volta para a sessão que fez, com o que corrigir no comentário;
+- **publica mesclando na `sync/estado-producao`**: a Production Branch do Vercel publica e promove sozinha,
+  e os crons vão junto;
+- confere o site no ar depois de publicar.
+
+Se der errado, a mestre volta pelo Vercel → Deployments → Instant Rollback, e depois abre um PR de revert.
+
 ## Antes de investigar um bug: leia BUGS-APRENDIDOS.md
 
 `BUGS-APRENDIDOS.md` guarda cada bug já consertado neste projeto, com a **causa raiz**
@@ -87,6 +116,8 @@ get no exception and an advisory only the dev tools reach (Tailwind, Playwright)
 
 Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**
 
+Só a sessão mestre publica, mesclando na `sync/estado-producao` (veja "Sessão mestre"). Os comandos abaixo
+ficam para emergência, com o Luis, se a publicação pelo merge falhar:
 ```bash
 npx vercel --prod --force                 # always use --force to bypass cache
 npx vercel promote <deployment-url>       # OBRIGATORIO: sem isto o deploy nao vira producao oficial
@@ -118,12 +149,14 @@ in `api/security.js`). Sign in there with a password: magic links and e-mails po
 https://github.com/luisfelima11-alt/CapyAi.git
 ```
 
-Typical push after changes:
+Fluxo de toda sessão (menos a mestre): ramo novo a partir da `sync/estado-producao`, commit, push do
+ramo e PR para a `sync/estado-producao`. Nada de push no `main` nem de `vercel --prod`.
 ```bash
-git add <files>
-git commit -m "description"
-git push origin main
-npx vercel --prod --force
+git fetch origin sync/estado-producao
+git checkout -b claude/<assunto> origin/sync/estado-producao
+git add <arquivos>
+git commit -m "descrição"
+git push -u origin claude/<assunto>     # depois, abrir o PR para sync/estado-producao
 ```
 
 ## Architecture
