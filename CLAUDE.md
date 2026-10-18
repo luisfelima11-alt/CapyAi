@@ -608,6 +608,23 @@ do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declarac
 (TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
 linha que pode se repetir.
 
+## Plano grátis: tudo liberado, IA por créditos (regra do Luis, 19/out/2026)
+
+O grátis usa o site inteiro: todos os cursos e aulas, sem cadeado. O limite é a IA, porque ela custa:
+
+- **⚡ Saldo único de IA:** `IA_GRATIS_DIA` (10) por dia para o aluno grátis logado. Cada uso gasta o
+  peso de `PESO_IA` (chat, tradução e transcrição 1; quiz e personalizar 2; plano, história, música,
+  YouTube, Newsline e Historyline 3). Quem decide é o `checkRateLimit`, no balde `ia-gratis`, pela
+  `consume_rate_limit_peso` (`202610190001_creditos_ia.sql`). Quando o uso não cabe, ele recusa **sem
+  gastar**. O `/api/me` devolve `ia: { limite, usado }`.
+- **Fora do saldo:** a voz Nova das aulas (`tts`), as letras de música, a ligação e a lição de casa, cada
+  um com o seu limite em `RATE_LIMITS`. Visitante sem conta continua com 3 usos (`guest-ai`).
+- **Pro e Super** seguem com os limites por função de `RATE_LIMITS`.
+- **Rota nova de IA:** entra em `AI_ROUTE_KEYS` e ganha um peso em `PESO_IA`. Sem peso, ela fica fora do
+  saldo do grátis e usa só o limite próprio.
+- **Página nova:** não tranca conteúdo por plano. Limite de IA é sempre do servidor, nunca um contador no
+  navegador.
+
 ## Design System
 
 Full spec in `1_Design_System.md`. Key constraints:

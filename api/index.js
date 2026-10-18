@@ -159,6 +159,19 @@ const RATE_LIMITS = {
     memoria:      { free:  10, pro:  30, super:  30 },
 };
 
+// ── Créditos de IA do plano grátis (19/out/2026, regra do Luis) ─────────────
+// O grátis tem um saldo único de IA por dia em vez de um limite por função:
+// cada uso gasta o peso da função, e o aluno vê um número só. Pro e Super
+// continuam com os limites de RATE_LIMITS. O que não é IA (voz Nova das
+// aulas, letra de música, ligação, lição de casa) fica fora do saldo.
+// O saldo vive na consume_rate_limit_peso (202610190001_creditos_ia.sql).
+const IA_GRATIS_DIA = 10;
+const PESO_IA = {
+    chat: 1, translate: 1, transcribe: 1,
+    quiz: 2, personalize: 2,
+    'study-plan': 3, story: 3, music: 3, youtube: 3, newsline: 3, historyline: 3,
+};
+
 // Whitelist of funnel-analytics events accepted by POST /api/track.
 const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
@@ -197,11 +210,14 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         : trusted?.kind === 'guest'
             ? `g:${trusted.guestId}|ip:${privacySafeIpKey(req)}`
             : `ip:${privacySafeIpKey(req)}`;
-    const effectiveKey = isGuest ? 'guest-ai' : key;
-    const bucket = `${identityKey}|${effectiveKey}|${today}`;
     const plan = isGuest ? 'free' : await getUserPlan(appUserId);
-    const limit = isGuest ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
-    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
+    // Signed-in free students spend one weighted daily balance (PESO_IA).
+    const peso = !isGuest && appUserId && plan === 'free' ? (PESO_IA[key] || 0) : 0;
+    const effectiveKey = isGuest ? 'guest-ai' : peso ? 'ia-gratis' : key;
+    const bucket = `${identityKey}|${effectiveKey}|${today}`;
+    const routeLimit = (RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10;
+    const limit = isGuest ? 3 : peso ? IA_GRATIS_DIA : routeLimit;
+    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(routeLimit / 10)));
 
     // Prefer the atomic Supabase RPC (consume_rate_limit) when it's available.
     // If the migration for that RPC hasn't been applied yet, fall back to a
@@ -209,7 +225,7 @@ async function checkRateLimit(req, key, _untrustedUserId) {
     // (mirrors the _metrics in-memory pattern already used above). Remove
     // this fallback once the RPC migration is confirmed live.
     try {
-        const minuteBucket = `${identityKey}|${effectiveKey}|minute:${Math.floor(Date.now() / 60000)}`;
+        const minuteBucket = `${identityKey}|${isGuest ? effectiveKey : key}|minute:${Math.floor(Date.now() / 60000)}`;
         const minuteAtomic = await sb('/rpc/consume_rate_limit', {
             method: 'POST',
             body: JSON.stringify({ p_bucket: minuteBucket, p_limit: minuteLimit, p_window_seconds: 60 }),
@@ -228,10 +244,15 @@ async function checkRateLimit(req, key, _untrustedUserId) {
             return info;
         }
 
-        const atomic = await sb('/rpc/consume_rate_limit', {
-            method: 'POST',
-            body: JSON.stringify({ p_bucket: bucket, p_limit: limit, p_window_seconds: 86400 }),
-        });
+        const atomic = peso
+            ? await sb('/rpc/consume_rate_limit_peso', {
+                method: 'POST',
+                body: JSON.stringify({ p_bucket: bucket, p_limit: limit, p_window_seconds: 86400, p_peso: peso }),
+            })
+            : await sb('/rpc/consume_rate_limit', {
+                method: 'POST',
+                body: JSON.stringify({ p_bucket: bucket, p_limit: limit, p_window_seconds: 86400 }),
+            });
         const result = Array.isArray(atomic) ? atomic[0] : atomic;
         if (!result || typeof result.allowed !== 'boolean') throw new Error('rpc_unavailable');
         const info = {
@@ -240,6 +261,7 @@ async function checkRateLimit(req, key, _untrustedUserId) {
             limit,
             used: Number(result.used) || 0,
             plan,
+            peso,
         };
         req._rateLimitResults[key] = info;
         return info;
@@ -249,15 +271,15 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         _rateLimitMemory[bucket] = _rateLimitMemory[bucket] || { count: 0, day: today };
         const entry = _rateLimitMemory[bucket];
         if (entry.day !== today) { entry.count = 0; entry.day = today; }
-        if (entry.count >= limit) {
+        if (entry.count + (peso || 1) > limit) {
             const now = new Date();
             const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan };
+            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan, peso };
             req._rateLimitResults[key] = info;
             return info;
         }
-        entry.count += 1;
-        const info = { ok: true, limit, used: entry.count, plan };
+        entry.count += peso || 1;
+        const info = { ok: true, limit, used: entry.count, plan, peso };
         req._rateLimitResults[key] = info;
         return info;
     }
@@ -270,10 +292,13 @@ function rateLimitedResponse(res, info) {
     res.setHeader('X-RateLimit-Plan',  info.plan);
     res.status(429).json({
         error: 'rate_limited',
-        message: info.plan === 'free'
-            ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
-            : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
+        message: info.peso
+            ? `Seus ⚡ ${info.limit} créditos de IA de hoje acabaram (este uso gasta ${info.peso}). Eles voltam amanhã — ou assine o Pro para usar muito mais.`
+            : info.plan === 'free'
+                ? 'Limite diário do plano grátis atingido. Assine Pro para ter mais usos.'
+                : 'Limite diário do seu plano atingido. Tente novamente amanhã.',
         limit: info.limit, used: info.used, plan: info.plan, retryAfter: info.retryAfter,
+        ...(info.peso ? { creditosIa: true, peso: info.peso } : {}),
     });
 }
 
@@ -2485,6 +2510,14 @@ module.exports = async (req, res) => {
         // Anonymous visitors retain the existing rate-limited access.
         const sessionCookies = parseCookies(req);
         if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        // Identify the student BEFORE counting. checkRateLimit caches the first
+        // result per key, so a count made here without identity was the one
+        // every route reused: all calls were plan "free" by IP — paying
+        // students hit the free cap, and a school behind one IP shared one
+        // quota. A broken cookie degrades to anonymous, as in /api/chat.
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.refresh] || sessionCookies[COOKIE_NAMES.guest]) {
+            try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { req._securityIdentity = null; }
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
@@ -4028,10 +4061,20 @@ Respond ONLY with valid JSON, no markdown:
         if (plan !== 'free' && row.plan_expires_at) {
             if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
         }
+        // Free: the ⚡ AI balance spent today (checkRateLimit's 'ia-gratis' bucket).
+        let ia = null;
+        if (effectivePlan === 'free' && identity.authUserId) {
+            const balde = `u:${identity.authUserId}|ia-gratis|${new Date().toISOString().slice(0, 10)}`;
+            const linhas = await sb(`/rate_limit_buckets?bucket=eq.${encodeURIComponent(balde)}&select=used,window_started_at`);
+            const linha = Array.isArray(linhas) ? linhas[0] : null;
+            const valendo = linha && (Date.now() - new Date(linha.window_started_at).getTime()) < 86400000;
+            ia = { limite: IA_GRATIS_DIA, usado: valendo ? Number(linha.used) || 0 : 0 };
+        }
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.status(200).json({
             plan: effectivePlan,
             planExpiresAt: row.plan_expires_at || null,
+            ...(ia ? { ia } : {}),
         });
         return;
     }
@@ -5793,3 +5836,6 @@ Rules:
     }
   }
 };
+
+// For tests: the free plan's ⚡ AI balance (tests/creditos-ia.test.js).
+module.exports._creditosIa = { checkRateLimit, PESO_IA, IA_GRATIS_DIA };
