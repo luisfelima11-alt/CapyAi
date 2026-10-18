@@ -312,8 +312,8 @@ test('no student personal data is tracked, and security.txt ships', () => {
 test('site prompts are written for teens and adults, not small children', () => {
   const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
   assert.doesNotMatch(api, /children aged|for a child|a child named|children's language app/i);
-  // quiz, word-of-day, daily-challenge, flashcard-deck, dialogue-scene; story words it its own way
-  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 5);
+  // quiz, word-of-day, daily-challenge and its grading, flashcard-deck, dialogue-scene; story words it its own way
+  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 6);
   assert.match(api, /for a Brazilian learner \(16\+\) named/);
   // Single gold examples with real values are what this model copies.
   assert.doesNotMatch(api, /"word":"Butterfly"|"title":"Use a Brave Word!"|"word":"Sun"|___ dog is fluffy|\["Apple","River","Bird","Tree"\]/);
