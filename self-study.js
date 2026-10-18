@@ -193,7 +193,7 @@
       // No ditado da aba Listening o aluno escreve o que OUVIU. Corrigir a
       // gramática dali diria "sua escrita está errada" para quem escutou certo.
       if (ta.classList.contains('ll-resposta')) return;
-      if (ta.dataset.selfStudyReady) return;
+      if (ta.dataset.selfStudyReady || ta.dataset.yaraCoach) return;
       ta.dataset.selfStudyReady = '1';
 
       const box = caixaResultado('ss-fb-' + i);

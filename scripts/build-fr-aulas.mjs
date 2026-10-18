@@ -1,0 +1,969 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { FR_LESSONS_1_6 } from './fr-lessons-part1.mjs';
+import { FR_LESSONS_7_12 } from './fr-lessons-part2.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const ALL_LESSONS = [...FR_LESSONS_1_6, ...FR_LESSONS_7_12];
+
+function escAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function buildLessonHtml(l) {
+  const numStr = String(l.num).padStart(2, '0');
+  const prevSlug = l.num > 1 ? `fr_aula_${String(l.num - 1).padStart(2, '0')}.html` : null;
+  const nextSlug = l.num < 12 ? `fr_aula_${String(l.num + 1).padStart(2, '0')}.html` : null;
+  const nextLesson = l.num < 12 ? ALL_LESSONS[l.num] : null;
+
+  const pageTitle = `${l.title} (${l.subtitle}) — Lição ${l.num} de Francês | Capy English`;
+  const metaDesc = `Aprenda ${l.title} (${l.subtitle}) em francês com vocabulário, pronúncia guiada, padrões da língua, diálogo com áudio e exercícios interativos. Lição ${l.num} da Capy English, com a Yara.`;
+
+  const heroPositions = [
+    'top:10%;left:3%;animation-delay:0s',
+    'top:60%;left:7%;animation-delay:.7s',
+    'top:20%;left:15%;animation-delay:1.3s',
+    'top:70%;left:22%;animation-delay:.4s',
+    'top:8%;right:22%;animation-delay:.9s',
+    'top:55%;right:15%;animation-delay:1.6s',
+    'top:30%;right:5%;animation-delay:.2s',
+    'top:75%;right:28%;animation-delay:1s',
+  ];
+
+  const heroFloating = l.heroEmojis.map((em, idx) => {
+    const size = idx % 2 === 0 ? 'text-5xl opacity-20' : 'text-4xl opacity-15';
+    return `    <span class="absolute ${size} float-emoji" style="${heroPositions[idx % heroPositions.length]}">${em}</span>`;
+  }).join('\n');
+
+  const patternCardsHtml = l.patterns.map((p, idx) => {
+    const gId = `g${idx + 1}`;
+    const borderCol = idx % 2 === 0 ? 'border-blue-200 bg-blue-50' : 'border-indigo-200 bg-indigo-50';
+    const badgeCol = idx % 2 === 0 ? 'bg-blue-600' : 'bg-indigo-600';
+    const subCol = idx % 2 === 0 ? 'text-blue-700' : 'text-indigo-700';
+    const linesHtml = [
+      ...p.certo.map(c => escHtml(c)),
+      ...p.errado.map(e => escHtml(e)),
+    ].join('<br/>\n        ');
+    return `
+    <div class="rounded-2xl border-2 ${borderCol} overflow-hidden">
+      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('${gId}')">
+        <div class="flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full ${badgeCol} text-white font-black text-sm flex items-center justify-center flex-shrink-0">${idx + 1}</span>
+          <div>
+            <div class="font-black text-navy">${escHtml(p.title)}</div>
+            <div class="${subCol} text-sm font-semibold">${escHtml(p.sub)}</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-blue-500 transition-transform" id="${gId}-arrow">expand_more</span>
+      </button>
+      <div id="${gId}" class="px-5 pb-5 hidden">
+        <div class="bg-white rounded-xl p-4 text-sm leading-relaxed text-slate-700 font-semibold">
+          ${linesHtml}
+          <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-200 text-xs font-bold text-blue-900">
+            💡 <strong>Dica da Yara:</strong> ${escHtml(p.tip)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('\n');
+
+  const vocabDataNormalized = l.vocab.map((v, i) => ({
+    en: v.en,
+    pt: v.pt,
+    phon: v.phon,
+    ex: v.ex,
+    emoji: v.emoji,
+    bg: i % 2 === 0 ? 'bg-blue-50 border-blue-200' : 'bg-indigo-50 border-indigo-200',
+    dot: i % 2 === 0 ? 'bg-blue-400' : 'bg-indigo-400',
+  }));
+
+  const dialogueDataNormalized = l.dialogueLines.map(d => ({
+    who: d.who,
+    speaker: d.speaker,
+    text: d.fr,
+    pt: d.pt,
+  }));
+
+  const speakDataNormalized = l.speak.map(s => ({
+    text: s.fr,
+    pt: s.pt,
+    phon: s.phon,
+  }));
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${escHtml(pageTitle)}</title>
+<meta name="description" content="${escAttr(metaDesc)}"/>
+<link rel="canonical" href="https://www.capyenglish.com.br/${l.slug}.html"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
+.float-emoji{animation:floatEmoji 3s ease-in-out infinite}
+@keyframes xpPop{0%{opacity:0;transform:translateY(0) scale(.6)}40%{opacity:1;transform:translateY(-30px) scale(1.2)}100%{opacity:0;transform:translateY(-70px) scale(.9)}}
+.xp-pop{position:fixed;font-weight:900;font-size:1.4rem;color:#2563eb;pointer-events:none;z-index:999;animation:xpPop 1.2s ease-out forwards}
+.flip-card{perspective:800px;min-height:132px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
+.tab-btn{position:relative;transition:color .2s}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#2563eb,#4f46e5);transform:scaleX(0);transition:transform .2s}
+.tab-btn.active{color:#1d4ed8;font-weight:800}
+.tab-btn.active::after{transform:scaleX(1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
+.wo-tile{cursor:pointer;user-select:none;transition:all .15s;padding:.4rem .8rem;border-radius:.75rem;font-weight:700;font-size:.85rem;border:2px solid #e2e8f0;background:#fff}
+.wo-tile:hover{border-color:#2563eb;background:#eff6ff}
+.wo-bank{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px dashed #cbd5e1;border-radius:1rem}
+.wo-ans{min-height:52px;display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem;border:2px solid #93c5fd;border-radius:1rem;background:#eff6ff}
+.mp-btn{transition:all .2s;font-size:.82rem;font-weight:700;padding:.6rem .9rem;border-radius:.85rem;border:2px solid #e2e8f0;background:#fff;text-align:left;cursor:pointer}
+.mp-btn:hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
+.mp-btn.selected{border-color:#2563eb;background:#dbeafe}
+.mp-btn.matched{border-color:#10b981!important;background:#ecfdf5!important;color:#065f46!important;cursor:default}
+.mp-btn.wrong-flash{border-color:#ef4444!important;background:#fee2e2!important}
+.fill-inp{border:2px solid #cbd5e1;border-radius:.75rem;padding:.35rem .8rem;font-size:.9rem;font-weight:700;transition:border .2s;outline:none;min-width:130px;text-align:center}
+.fill-inp:focus{border-color:#2563eb}
+.fill-inp.ok{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.fill-inp.err{border-color:#ef4444;background:#fee2e2;color:#991b1b}
+.dlg-playing{ring:3px solid #3b82f6;transform:scale(1.01)}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Capy Yara English"/>
+<meta property="og:locale" content="pt_BR"/>
+<meta property="og:url" content="https://www.capyenglish.com.br/${l.slug}.html"/>
+<meta property="og:title" content="${escAttr(pageTitle)}"/>
+<meta property="og:description" content="${escAttr(metaDesc)}"/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="${escAttr(pageTitle)}"/>
+<meta name="twitter:description" content="${escAttr(metaDesc)}"/>
+<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+<main class="md:pl-24 pb-32 md:pb-10">
+
+<!-- HERO -->
+<div class="relative overflow-hidden bg-gradient-to-br from-navy via-blue-900 to-indigo-900 text-white">
+  <div class="absolute inset-0 pointer-events-none select-none">
+${heroFloating}
+  </div>
+  <div class="relative max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center gap-3 flex-wrap mb-5">
+      ${prevSlug ? `<a href="${prevSlug}" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">← Leçon ${String(l.num - 1).padStart(2, '0')}</a>` : ''}
+      <a href="classes_fr.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors">🇫🇷 Curso de Francês</a>
+      ${nextSlug ? `<a href="${nextSlug}" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1 rounded-full transition-colors">Leçon ${String(l.num + 1).padStart(2, '0')} →</a>` : `<span class="inline-flex items-center gap-1 bg-amber-400/20 border border-amber-300/40 text-amber-200 text-sm font-bold px-3 py-1 rounded-full">🏆 Lição Final do Nível A1!</span>`}
+    </div>
+    <div class="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1 text-sm font-black text-blue-200 mb-3">🇫🇷 Leçon ${numStr} · Português → Francês</div>
+    <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">${l.emoji} ${escHtml(l.title)} — <br><span class="text-blue-300">${escHtml(l.subtitle)}</span></h1>
+    <p class="text-white/75 text-base mb-5 max-w-xl">${escHtml(l.desc)}</p>
+    <div class="flex flex-wrap gap-2 mb-6">
+      ${l.tags.map(t => `<span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">${escHtml(t)}</span>`).join('\n      ')}
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5" id="section-dots"></div>
+      <span class="text-white/60 text-xs font-bold" id="section-label">0 / 8 etapas concluídas</span>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY TABS -->
+<div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
+  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
+    <div class="flex gap-0 min-w-max">
+      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbes</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+
+<!-- VOCAB TAB -->
+<div id="tab-vocab" class="tab-content fade-in">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h2 class="text-2xl font-black text-navy">📚 Vocabulário Essencial</h2>
+      <p class="text-slate-500 text-sm mt-1">Clique no card para virar (ou abrir em tela cheia) e no botão 🔊 para ouvir a pronúncia francesa.</p>
+    </div>
+    <div class="text-right">
+      <div class="text-2xl font-black text-blue-600" id="vocab-count">0</div>
+      <div class="text-xs text-slate-400 font-bold">de ${l.vocab.length} vistos</div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="vocab-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6" id="vocab-grid"></div>
+  <button onclick="markSectionBtn(this,'vocab')" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Dominei o vocabulário! (+20 XP)
+  </button>
+</div>
+
+<!-- VERBS TAB -->
+<div id="tab-verbs" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔧 Verbos em Ação</h2>
+  <p class="text-slate-500 text-sm mb-6">Conjugação com guia de pronúncia para brasileiros e frases reais com áudio.</p>
+  <div class="space-y-8" id="verbs-grid"></div>
+  <div class="mt-8 bg-white border-2 border-blue-200 rounded-2xl p-6">
+    <h3 class="font-black text-navy text-lg mb-4">✏️ Mini-Quiz: Complete com a forma verbal correta</h3>
+    <div class="space-y-4" id="verbs-quiz"></div>
+    <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+      Verificar Respostas
+    </button>
+    <div id="verbs-quiz-result" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
+  </div>
+</div>
+
+<!-- EXPRESSIONS TAB -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">💬 Expressões Prontas para Conversar</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique em cada expressão para ver quando usar, exemplo real e ouvir a pronúncia.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+  <button onclick="markSectionBtn(this,'expressions')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Pratiquei as expressões! (+20 XP)
+  </button>
+</div>
+
+<!-- PATTERNS TAB (internal id="tab-grammar" for compatibility) -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🧩 Padrões do Francês</h2>
+  <p class="text-slate-500 text-sm mb-6">Os blocos lógicos da língua para você montar frases com segurança, sem decoreba.</p>
+  <div class="space-y-4">
+${patternCardsHtml}
+  </div>
+  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Entendi o padrão! (+20 XP)
+  </button>
+</div>
+
+<!-- DIALOGUE TAB -->
+<div id="tab-dialogue" class="tab-content fade-in hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-2xl font-black text-navy mb-1">${escHtml(l.dialogueTitle)}</h2>
+      <p class="text-slate-500 text-sm">${escHtml(l.dialogueSub)}</p>
+    </div>
+    <button id="btn-play-dialogue" onclick="playFullDialogue()" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm px-5 py-2.5 rounded-2xl shadow hover:scale-105 active:scale-95 transition-all">
+      🔊 Ouvir diálogo completo
+    </button>
+  </div>
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+  <button onclick="markSectionBtn(this,'dialogue')" class="mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li e ouvi o diálogo! (+20 XP)
+  </button>
+</div>
+
+<!-- PRACTICE TAB -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-black text-navy">✏️ Quiz Interativo</h2>
+      <p class="text-slate-500 text-sm mt-1" id="prac-subtitle">${l.quiz.length} questões comentadas em português — ${escHtml(l.title)}</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-black text-blue-600" id="prac-score">0<span class="text-sm text-slate-400">/${l.quiz.length}</span></div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">acertos</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-black text-amber-500" id="prac-streak">🔥 0</div>
+        <div class="text-[10px] text-slate-400 font-bold uppercase">sequência</div>
+      </div>
+    </div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+    <div id="prac-bar" class="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500" style="width:0%"></div>
+  </div>
+  <div id="practice-area"></div>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Très bien !</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Refazer</button>
+        <button onclick="document.querySelector('[data-tab=\\'speak\\']').click();document.getElementById('result-overlay').classList.add('hidden')" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Treinar Fala →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAK TAB -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🗣️ Pronúncia &amp; Repetição em Voz Alta</h2>
+  <p class="text-slate-500 text-sm mb-6">Clique no botão ▶️ para ouvir a frase em francês, leia a dica fonética e marque como concluída após repetir em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+</div>
+
+<!-- HOMEWORK TAB -->
+<div id="tab-homework" class="tab-content fade-in hidden">
+  <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-3xl p-6 mb-6 text-white">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="text-4xl">📝</span>
+      <div>
+        <h2 class="text-2xl font-black">Devoir de Maison (Homework)</h2>
+        <p class="text-white/80 text-sm">Leçon ${numStr} — ${escHtml(l.title)} (${escHtml(l.subtitle)})</p>
+      </div>
+    </div>
+    <p class="text-white/75 text-sm">Complete os 4 exercícios interativos abaixo para consolidar a lição e ganhar +75 XP!</p>
+  </div>
+
+  <!-- 1. Word Order -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">1</span>
+      <div>
+        <p class="font-black text-navy text-sm">Ordem das Palavras (Mettez dans l&#39;ordre)</p>
+        <p class="text-slate-500 text-xs">Toque nas palavras para montar as frases em francês na ordem correta.</p>
+      </div>
+    </div>
+    <div id="wo1-container" class="space-y-4"></div>
+  </div>
+
+  <!-- 2. Match Pairs -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">2</span>
+      <div>
+        <p class="font-black text-navy text-sm">Conecte os Pares (Francês ↔ Português)</p>
+        <p class="text-slate-500 text-xs">Clique em um item da esquerda e depois na tradução correspondente à direita.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div id="mp1-left" class="space-y-2"></div>
+      <div id="mp1-right" class="space-y-2"></div>
+    </div>
+    <p id="mp1-done-msg" class="hidden mt-3 text-emerald-600 font-black text-sm">✅ Todos os pares conectados! Magnifique !</p>
+  </div>
+
+  <!-- 3. Fill in the Blank -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-4">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">3</span>
+      <div>
+        <p class="font-black text-navy text-sm">Complete as Lacunas</p>
+        <p class="text-slate-500 text-xs">Preencha cada espaço com a palavra francesa adequada.</p>
+      </div>
+    </div>
+    <div class="space-y-3" id="fill1-container"></div>
+    <button onclick="checkFill1()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl transition-all text-xs">
+      Verificar Lacunas ✓
+    </button>
+    <p id="fill1-fb" class="hidden mt-2 text-xs font-black"></p>
+  </div>
+
+  <!-- 4. Free Writing -->
+  <div class="bg-white border-2 border-blue-200 rounded-2xl p-5 mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center">4</span>
+      <div>
+        <p class="font-black text-navy text-sm">Produção Escrita em Francês ✍️</p>
+        <p class="text-slate-500 text-xs">${escHtml(l.hwWritingPrompt)}</p>
+      </div>
+    </div>
+    <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-blue-500 focus:outline-none resize-none" placeholder="${escAttr(l.hwWritingPlaceholder)}"></textarea>
+    <button id="btn-submit-hw" onclick="submitHomework()" class="mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black px-6 py-3.5 rounded-2xl hover:scale-[1.02] active:scale-95 transition-all w-full shadow-md">
+      🚀 Concluir Lição ${numStr} e Receber +75 XP
+    </button>
+    <div id="hw-done-box" class="hidden mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center">
+      <p class="font-black text-emerald-700 text-base">🎉 Félicitations ! Lição ${numStr} concluída com sucesso! (+75 XP)</p>
+      <div class="flex flex-wrap justify-center gap-3 mt-3">
+        <a href="classes_fr.html" class="bg-white border-2 border-slate-200 text-navy font-black text-xs px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all">← Voltar ao Curso de Francês</a>
+        ${nextSlug ? `<a href="${nextSlug}" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-5 py-2.5 rounded-xl hover:scale-105 transition-all">Próxima: Leçon ${String(l.num + 1).padStart(2, '0')} — ${escHtml(nextLesson.title)} →</a>` : `<a href="learn_fr.html" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs px-5 py-2.5 rounded-xl hover:scale-105 transition-all">Ir para a Prática Diária de Francês →</a>`}
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</main>
+<div id="mobile-nav-placeholder"></div>
+
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=land1"></script>
+<script src="components.js?v=skins1"></script>
+<script>window.YARA_WIDGET={lang:'fr',lessonTitle:${JSON.stringify(l.title)},lessonNum:${l.num}};</script>
+<script src="tts-fr.js?v=c52d7db"></script>
+<script src="yara-widget.js?v=yw7"></script>
+<script src="vocab-focus.js?v=vf2"></script>
+<script src="listening-lab.js?v=lb1"></script>
+<script src="self-study.js?v=ss4"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+
+const LESSON_NUM = ${l.num};
+const TOTAL_SECTIONS = 8;
+let sectionsDone = 0;
+const doneSections = new Set();
+
+function buildSectionDots() {
+  const c = document.getElementById('section-dots');
+  const lb = document.getElementById('section-label');
+  if (!c) return;
+  c.innerHTML = Array.from({ length: TOTAL_SECTIONS }, (_, i) =>
+    \`<div class="prog-dot \${i < sectionsDone ? 'bg-gradient-to-r from-blue-400 to-indigo-300' : 'bg-white/20'}"></div>\`
+  ).join('');
+  if (lb) lb.textContent = \`\${sectionsDone} / \${TOTAL_SECTIONS} etapas concluídas\`;
+}
+buildSectionDots();
+
+function spawnXP(text) {
+  const el = document.createElement('div');
+  el.className = 'xp-pop';
+  el.textContent = text;
+  el.style.cssText = \`left:\${40 + Math.random() * 20}%;top:\${30 + Math.random() * 30}%\`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+function saveFrCompleted() {
+  try {
+    const KEY = 'capyFrCompleted';
+    const arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    if (!arr.includes(LESSON_NUM)) {
+      arr.push(LESSON_NUM);
+      localStorage.setItem(KEY, JSON.stringify(arr));
+    }
+    if (typeof Store !== 'undefined' && typeof Store.completeLesson === 'function') {
+      Store.completeLesson(200 + LESSON_NUM, 'fr');
+    }
+  } catch (e) {}
+}
+
+function markSection(name) {
+  if (!doneSections.has(name)) {
+    doneSections.add(name);
+    if (sectionsDone < TOTAL_SECTIONS) sectionsDone++;
+    buildSectionDots();
+    if (typeof Store !== 'undefined') Store.addXP(20);
+    spawnXP('+20 XP');
+  }
+  if (name === 'homework') saveFrCompleted();
+}
+
+function markSectionBtn(btn, name) {
+  btn.disabled = true;
+  btn.textContent = '✓ Concluído! (+20 XP)';
+  btn.classList.add('opacity-75');
+  markSection(name);
+}
+
+const TABS = ['vocab', 'verbs', 'expressions', 'grammar', 'dialogue', 'practice', 'speak', 'homework'];
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    TABS.forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.classList.toggle('hidden', t !== tab);
+    });
+  });
+});
+
+// ── 1. VOCABULARY ────────────────────────────────────────────────────────────
+const VOCAB_DATA = ${JSON.stringify(vocabDataNormalized, null, 2)};
+let vocabDone = new Set();
+function buildVocab() {
+  const grid = document.getElementById('vocab-grid');
+  VOCAB_DATA.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card h-32';
+    card.innerHTML = \`
+      <div class="flip-card-inner h-full">
+        <div class="flip-front h-full border-2 \${v.bg} rounded-2xl flex flex-col items-center justify-center p-2.5 gap-1 relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[\${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center transition-all" title="Ouvir pronúncia">🔊</button>
+          <span class="text-2xl">\${v.emoji}</span>
+          <span class="font-black text-navy text-sm text-center leading-tight">\${v.en}</span>
+          <span class="w-2 h-2 rounded-full \${v.dot}"></span>
+        </div>
+        <div class="flip-back h-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-2.5 text-center relative">
+          <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[\${i}].ex || VOCAB_DATA[\${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs flex items-center justify-center transition-all" title="Ouvir exemplo">🔊</button>
+          <span class="font-black text-white text-xs leading-snug">\${v.pt}<br><span class="text-blue-200 font-bold text-[10px]">\${v.phon}</span>\${v.ex ? \`<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"\${v.ex}"</em>\` : ''}</span>
+        </div>
+      </div>\`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if (card.classList.contains('flipped')) {
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent = vocabDone.size;
+        document.getElementById('vocab-bar').style.width = (vocabDone.size / VOCAB_DATA.length * 100) + '%';
+        if (vocabDone.size === VOCAB_DATA.length) markSection('vocab');
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+buildVocab();
+
+// ── 2. VERBS ─────────────────────────────────────────────────────────────────
+const VERBS_DATA = ${JSON.stringify(l.verbs, null, 2)};
+const VERBS_QUIZ_DATA = ${JSON.stringify(l.verbsQuiz, null, 2)};
+
+function buildVerbs() {
+  const grid = document.getElementById('verbs-grid');
+  VERBS_DATA.forEach((v, vi) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-blue-200 rounded-2xl overflow-hidden';
+    div.innerHTML = \`
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center gap-3">
+        <span class="text-3xl">\${v.emoji}</span>
+        <span class="text-xl md:text-2xl font-black text-white">\${v.verb}</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-blue-50">
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Pessoa</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma &amp; Pronúncia</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Exemplo em Francês</th>
+            </tr>
+          </thead>
+          <tbody>
+            \${v.forms.map((f, fi) => \`
+              <tr class="\${fi % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+                <td class="px-4 py-2.5 font-black text-blue-600 text-xs whitespace-nowrap">\${f.label}</td>
+                <td class="px-4 py-2.5 font-black text-navy text-xs whitespace-nowrap">\${f.form}</td>
+                <td class="px-4 py-2.5 text-slate-600 text-xs flex items-center justify-between gap-2">
+                  <span>\${f.example}</span>
+                  <button type="button" onclick="speak(VERBS_DATA[\${vi}].forms[\${fi}].example)" class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs flex items-center justify-center" title="Ouvir exemplo">🔊</button>
+                </td>
+              </tr>\`).join('')}
+          </tbody>
+        </table>
+      </div>\`;
+    grid.appendChild(div);
+  });
+
+  const qWrap = document.getElementById('verbs-quiz');
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = \`
+      <div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-sm font-semibold text-navy mb-2">\${i + 1}. \${q.q}</p>
+        <input id="vq-fr-\${i}" data-ans="\${q.ans}" type="text" placeholder="Digite a resposta em francês..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
+        <p id="vq-fr-fb\${i}" class="text-xs font-black mt-1 hidden"></p>
+      </div>\`;
+    qWrap.appendChild(div);
+  });
+}
+buildVerbs();
+
+function checkVerbsQuiz() {
+  let correct = 0;
+  VERBS_QUIZ_DATA.forEach((q, i) => {
+    const inp = document.getElementById('vq-fr-' + i);
+    const fb = document.getElementById('vq-fr-fb' + i);
+    if (!inp || !fb) return;
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = q.ans.toLowerCase().replace(/’/g, "'");
+    fb.classList.remove('hidden');
+    if (val === ans) {
+      correct++;
+      fb.textContent = '✅ Très bien ! Resposta correta!';
+      fb.className = 'text-xs font-black mt-1 text-emerald-600';
+    } else {
+      fb.textContent = \`❌ Resposta correta: \${q.ans}\`;
+      fb.className = 'text-xs font-black mt-1 text-red-500';
+    }
+  });
+  const res = document.getElementById('verbs-quiz-result');
+  res.classList.remove('hidden');
+  if (correct >= 4) {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200';
+    res.textContent = \`🎉 \${correct}/\${VERBS_QUIZ_DATA.length} acertos! Excelente trabalho!\`;
+    markSection('verbs');
+  } else {
+    res.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200';
+    res.textContent = \`\${correct}/\${VERBS_QUIZ_DATA.length} acertos. Confira as respostas acima e tente novamente!\`;
+  }
+}
+
+// ── 3. EXPRESSIONS ───────────────────────────────────────────────────────────
+const EXPR_DATA = ${JSON.stringify(l.expressions, null, 2)};
+let exprDone = new Set();
+function buildExpressions() {
+  const grid = document.getElementById('expr-grid');
+  EXPR_DATA.forEach((e, i) => {
+    const div = document.createElement('div');
+    div.className = 'border-2 border-blue-200 bg-white rounded-2xl overflow-hidden cursor-pointer';
+    div.innerHTML = \`
+      <div class="p-4 flex items-center gap-4" onclick="toggleExpr(\${i})">
+        <span class="text-3xl">\${e.emoji}</span>
+        <div class="flex-1 min-w-0">
+          <div class="font-black text-navy">\${e.expr}</div>
+          <div class="text-blue-600 text-sm font-semibold">\${e.pt}</div>
+        </div>
+        <button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[\${i}].expr)" class="w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir expressão">🔊</button>
+        <span class="material-symbols-outlined text-blue-400 transition-transform" id="expr-arrow-\${i}">expand_more</span>
+      </div>
+      <div id="expr-body-\${i}" class="hidden px-4 pb-4">
+        <div class="bg-blue-50 rounded-xl p-3.5 text-sm space-y-2">
+          <p><strong class="text-navy">Quando usar:</strong> \${e.usage}</p>
+          <p class="flex items-center justify-between gap-2"><span class="italic text-slate-700"><strong class="text-navy not-italic">Exemplo:</strong> "\${e.example}"</span><button type="button" onclick="event.stopPropagation();speak(EXPR_DATA[\${i}].example)" class="flex-shrink-0 text-xs font-black bg-white border border-blue-200 text-blue-700 px-2.5 py-1 rounded-lg hover:bg-blue-100">🔊 Ouvir</button></p>
+        </div>
+      </div>\`;
+    grid.appendChild(div);
+  });
+}
+function toggleExpr(i) {
+  const body = document.getElementById('expr-body-' + i);
+  const arrow = document.getElementById('expr-arrow-' + i);
+  body.classList.toggle('hidden');
+  arrow.style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  exprDone.add(i);
+  if (exprDone.size === EXPR_DATA.length) markSection('expressions');
+}
+buildExpressions();
+
+// ── 4. PATTERNS ACCORDION ────────────────────────────────────────────────────
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  if (!el) return;
+  el.classList.toggle('hidden');
+  if (arrow) arrow.style.transform = el.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+// ── 5. DIALOGUE ──────────────────────────────────────────────────────────────
+const DIALOGUE_LINES = ${JSON.stringify(dialogueDataNormalized, null, 2)};
+let dlgPlaying = false;
+
+function buildDialogue() {
+  const c = document.getElementById('dialogue-lines');
+  DIALOGUE_LINES.forEach((l, i) => {
+    const isYara = l.who === 'yara';
+    const div = document.createElement('div');
+    div.className = \`flex \${isYara ? 'justify-start' : 'justify-end'} fade-in\`;
+    div.innerHTML = \`
+      <div id="dlg-bubble-\${i}" class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed transition-all \${isYara ? 'bg-blue-50 border-2 border-blue-200 text-navy' : 'bg-navy text-white'}">
+        <div class="flex items-center justify-between gap-3 mb-1">
+          <span class="text-xs font-black \${isYara ? 'text-blue-600' : 'text-blue-300'}">\${isYara ? '🐾 ' : '🗣️ '}\${l.speaker}</span>
+          <button type="button" onclick="speak(DIALOGUE_LINES[\${i}].text)" class="w-7 h-7 rounded-full \${isYara ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-white/15 hover:bg-white/25 text-white'} text-xs flex items-center justify-center flex-shrink-0 transition-all" title="Ouvir fala">🔊</button>
+        </div>
+        <p class="font-bold">\${l.text}</p>
+        <span class="block text-xs mt-1 \${isYara ? 'text-slate-500' : 'text-blue-200/80'}">🇧🇷 \${l.pt}</span>
+      </div>\`;
+    c.appendChild(div);
+  });
+}
+buildDialogue();
+
+function playFullDialogue() {
+  if (!window.speechSynthesis) return;
+  const btn = document.getElementById('btn-play-dialogue');
+  if (dlgPlaying) {
+    speechSynthesis.cancel();
+    dlgPlaying = false;
+    btn.textContent = '🔊 Ouvir diálogo completo';
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    return;
+  }
+  dlgPlaying = true;
+  btn.textContent = '⏹️ Parar áudio';
+  let idx = 0;
+  function nextLine() {
+    document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    if (!dlgPlaying || idx >= DIALOGUE_LINES.length) {
+      dlgPlaying = false;
+      btn.textContent = '🔊 Ouvir diálogo completo';
+      return;
+    }
+    const bubble = document.getElementById('dlg-bubble-' + idx);
+    if (bubble) bubble.classList.add('ring-4', 'ring-blue-400');
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(DIALOGUE_LINES[idx].text);
+    u.lang = 'fr-FR';
+    u.rate = 0.85;
+    u.pitch = DIALOGUE_LINES[idx].who === 'yara' ? 1.08 : 0.98;
+    u.onend = () => { idx++; setTimeout(nextLine, 350); };
+    u.onerror = () => { dlgPlaying = false; btn.textContent = '🔊 Ouvir diálogo completo'; };
+    speechSynthesis.speak(u);
+  }
+  nextLine();
+}
+
+// ── 6. PRACTICE QUIZ ─────────────────────────────────────────────────────────
+const QUIZ = ${JSON.stringify(l.quiz, null, 2)};
+let pracIdx = 0, pracScore = 0, pracStreak = 0, pracAnswered = false;
+
+function buildPractice() {
+  if (pracIdx >= QUIZ.length) { showResult(); return; }
+  const q = QUIZ[pracIdx];
+  document.getElementById('prac-bar').style.width = (pracIdx / QUIZ.length * 100) + '%';
+  document.getElementById('practice-area').innerHTML = \`
+    <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
+      <div class="text-xs font-black text-slate-400 mb-3 uppercase tracking-wider">Questão \${pracIdx + 1} de \${QUIZ.length}</div>
+      <p class="font-black text-navy text-base mb-5 leading-relaxed">\${q.q}</p>
+      <div class="grid grid-cols-1 gap-3" id="opts"></div>
+      <div id="prac-feedback" class="hidden mt-4 p-3.5 rounded-xl text-sm font-bold"></div>
+    </div>\`;
+  const opts = document.getElementById('opts');
+  [...q.opts].sort(() => Math.random() - 0.5).forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-blue-400 hover:bg-blue-50 transition-all';
+    btn.textContent = o;
+    btn.onclick = () => answerQ(o, btn, q);
+    opts.appendChild(btn);
+  });
+  pracAnswered = false;
+}
+
+function answerQ(ans, btn, q) {
+  if (pracAnswered) return;
+  pracAnswered = true;
+  const correct = ans === q.a;
+  document.querySelectorAll('#opts button').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.a) b.className = 'w-full text-left border-2 border-emerald-500 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-800';
+  });
+  if (!correct) btn.className = 'w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if (correct) { pracScore++; pracStreak++; } else { pracStreak = 0; }
+  document.getElementById('prac-score').innerHTML = \`\${pracScore}<span class="text-sm text-slate-400">/\${QUIZ.length}</span>\`;
+  document.getElementById('prac-streak').textContent = '🔥 ' + pracStreak;
+  const fb = document.getElementById('prac-feedback');
+  fb.classList.remove('hidden');
+  fb.className = \`mt-4 p-3.5 rounded-xl text-sm font-bold \${correct ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'}\`;
+  fb.innerHTML = \`\${correct ? '✅ Très bien !' : '❌ Quase lá:'} <span class="font-normal">\${q.rule}</span>\`;
+  pracIdx++;
+  setTimeout(buildPractice, 1800);
+}
+
+function showResult() {
+  document.getElementById('prac-bar').style.width = '100%';
+  const goodThresh = Math.ceil(QUIZ.length * 0.75), okThresh = Math.ceil(QUIZ.length * 0.5);
+  document.getElementById('result-msg').textContent = \`Você acertou \${pracScore} de \${QUIZ.length} questões.\${pracScore >= goodThresh ? ' Magnifique ! 🌟' : pracScore >= okThresh ? ' Muito bom progresso!' : ' Continue praticando!'}\`;
+  document.getElementById('result-emoji').textContent = pracScore >= goodThresh ? '🏆' : pracScore >= okThresh ? '🎉' : '💪';
+  document.getElementById('result-title').textContent = pracScore >= goodThresh ? 'Magnifique !' : pracScore >= okThresh ? 'Très bien !' : 'Continue assim!';
+  document.getElementById('result-overlay').classList.remove('hidden');
+  markSection('practice');
+  if (typeof Store !== 'undefined') Store.addXP(50);
+}
+
+function restartPractice() {
+  pracIdx = 0; pracScore = 0; pracStreak = 0;
+  document.getElementById('prac-score').innerHTML = \`0<span class="text-sm text-slate-400">/\${QUIZ.length}</span>\`;
+  document.getElementById('prac-streak').textContent = '🔥 0';
+  document.getElementById('result-overlay').classList.add('hidden');
+  buildPractice();
+}
+buildPractice();
+
+// ── 7. SPEAK ─────────────────────────────────────────────────────────────────
+const SPEAK_DATA = ${JSON.stringify(speakDataNormalized, null, 2)};
+let speakDone = new Set();
+
+function buildSpeak() {
+  const grid = document.getElementById('speak-grid');
+  SPEAK_DATA.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 flex items-center gap-4 hover:border-blue-300 transition-colors';
+    div.innerHTML = \`
+      <button type="button" onclick="speak(SPEAK_DATA[\${i}].text)" class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 flex items-center justify-center transition-all hover:scale-105 active:scale-95" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span>
+      </button>
+      <div class="flex-1 min-w-0">
+        <p class="text-navy font-black text-sm leading-relaxed">\${s.text}</p>
+        <span class="block text-xs text-blue-600 font-bold mt-0.5">\${s.phon}</span>
+        <span class="block text-xs text-slate-500 mt-0.5">🇧🇷 \${s.pt}</span>
+      </div>
+      <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">
+        <input type="checkbox" class="w-5 h-5 accent-blue-600" onchange="markSpeak(\${i},this)"/>
+        <span class="text-[10px] text-slate-400 font-bold">Feito</span>
+      </label>\`;
+    grid.appendChild(div);
+  });
+}
+buildSpeak();
+
+function markSpeak(i, cb) {
+  if (cb.checked) speakDone.add(i); else speakDone.delete(i);
+  if (speakDone.size === SPEAK_DATA.length) markSection('speak');
+}
+
+// ── 8. HOMEWORK ──────────────────────────────────────────────────────────────
+const WO1_DATA = ${JSON.stringify(l.hwWordOrder, null, 2)};
+function hwShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const wo1 = WO1_DATA.map(d => ({ ans: [], bank: hwShuffle(d.w), orig: d.w }));
+function wo1Render() {
+  const c = document.getElementById('wo1-container');
+  c.innerHTML = '';
+  WO1_DATA.forEach((d, si) => {
+    const st = wo1[si];
+    const box = document.createElement('div');
+    box.className = 'border border-slate-200 rounded-xl p-4 space-y-2 bg-slate-50/50';
+    box.innerHTML = \`
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-black text-blue-600 uppercase tracking-wider">Frase \${si + 1}</p>
+        <p class="text-xs font-bold text-slate-500">🇧🇷 "\${d.pt}"</p>
+      </div>
+      <div class="wo-ans" id="wo1-ans-\${si}">\${st.ans.map((w, wi) => \`<button type="button" class="wo-tile" onclick="wo1Move(false,\${si},\${wi})">\${w}</button>\`).join('')}</div>
+      <div class="wo-bank" id="wo1-bank-\${si}">\${st.bank.map((w, wi) => \`<button type="button" class="wo-tile" onclick="wo1Move(true,\${si},\${wi})">\${w}</button>\`).join('')}</div>
+      <div class="flex gap-2">
+        <button type="button" onclick="wo1Check(\${si})" class="bg-blue-600 text-white font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Verificar ✓</button>
+        <button type="button" onclick="wo1Reset(\${si})" class="bg-slate-200 text-slate-700 font-black text-xs px-4 py-1.5 rounded-lg hover:scale-105 transition-all">Recomeçar ↺</button>
+      </div>
+      <p id="wo1-fb-\${si}" class="text-xs font-bold hidden"></p>\`;
+    c.appendChild(box);
+  });
+}
+function wo1Move(fromBank, si, wi) {
+  const st = wo1[si];
+  if (fromBank) st.ans.push(st.bank.splice(wi, 1)[0]);
+  else st.bank.push(st.ans.splice(wi, 1)[0]);
+  wo1Render();
+}
+function wo1Check(si) {
+  const st = wo1[si];
+  const fb = document.getElementById('wo1-fb-' + si);
+  const ok = st.ans.join(' ').toLowerCase() === WO1_DATA[si].s.toLowerCase();
+  fb.className = 'text-xs font-bold ' + (ok ? 'text-emerald-600' : 'text-red-500');
+  fb.textContent = ok ? '✅ Parfait ! Frase correta!' : '❌ Tente novamente! Resposta: ' + WO1_DATA[si].s;
+  fb.classList.remove('hidden');
+}
+function wo1Reset(si) {
+  wo1[si].bank = hwShuffle(WO1_DATA[si].orig);
+  wo1[si].ans = [];
+  wo1Render();
+}
+wo1Render();
+
+const MP1 = ${JSON.stringify(l.hwMatch, null, 2)};
+const mp1R = hwShuffle(MP1.map((p, i) => ({ label: p.r, pid: i })));
+let mp1SelL = null;
+const mp1Done = new Set();
+function mp1Render() {
+  document.getElementById('mp1-left').innerHTML = MP1.map((p, i) =>
+    \`<button type="button" onclick="mp1ClickL(\${i})" id="mp1L-\${i}" class="mp-btn w-full \${mp1Done.has(i) ? 'matched' : ''}" \${mp1Done.has(i) ? 'disabled' : ''}>\${p.l}</button>\`
+  ).join('');
+  document.getElementById('mp1-right').innerHTML = mp1R.map((p, i) =>
+    \`<button type="button" onclick="mp1ClickR(\${i})" id="mp1R-\${i}" class="mp-btn w-full \${mp1Done.has(p.pid) ? 'matched' : ''}" \${mp1Done.has(p.pid) ? 'disabled' : ''}>\${p.label}</button>\`
+  ).join('');
+}
+function mp1ClickL(i) {
+  if (mp1Done.has(i)) return;
+  mp1SelL = i;
+  document.querySelectorAll('#mp1-left .mp-btn').forEach((b, j) => b.classList.toggle('selected', j === i && !mp1Done.has(j)));
+}
+function mp1ClickR(ri) {
+  if (mp1SelL === null) return;
+  const item = mp1R[ri];
+  if (item.pid === mp1SelL) {
+    mp1Done.add(mp1SelL);
+    mp1SelL = null;
+    mp1Render();
+    if (mp1Done.size === MP1.length) document.getElementById('mp1-done-msg').classList.remove('hidden');
+  } else {
+    [document.getElementById('mp1R-' + ri), document.getElementById('mp1L-' + mp1SelL)].forEach(b => {
+      if (b) { b.classList.add('wrong-flash'); setTimeout(() => b.classList.remove('wrong-flash'), 700); }
+    });
+    mp1SelL = null;
+    document.querySelectorAll('#mp1-left .mp-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
+mp1Render();
+
+const FILL1 = ${JSON.stringify(l.hwFill, null, 2)};
+const fc = document.getElementById('fill1-container');
+FILL1.forEach((f, i) => {
+  const d = document.createElement('p');
+  d.className = 'text-sm font-bold text-slate-700 flex flex-wrap items-center gap-2 bg-slate-50 p-3 rounded-xl';
+  d.innerHTML = \`<span class="text-blue-600 font-black">\${i + 1}.</span> \${f.before ? \`<span>\${f.before}</span>\` : ''} <input type="text" id="fill1-\${i}" data-ans="\${f.ans}" class="fill-inp" placeholder="..."/> <span>\${f.after}</span>\`;
+  fc.appendChild(d);
+});
+function checkFill1() {
+  let okCount = 0;
+  FILL1.forEach((f, i) => {
+    const inp = document.getElementById('fill1-' + i);
+    const val = inp.value.trim().toLowerCase().replace(/’/g, "'");
+    const ans = f.ans.toLowerCase().replace(/’/g, "'");
+    const ok = val === ans;
+    if (ok) okCount++;
+    inp.classList.remove('ok', 'err');
+    inp.classList.add(ok ? 'ok' : 'err');
+  });
+  const fb = document.getElementById('fill1-fb');
+  fb.classList.remove('hidden');
+  fb.className = 'mt-2 text-xs font-black ' + (okCount === FILL1.length ? 'text-emerald-600' : 'text-blue-700');
+  fb.textContent = okCount === FILL1.length
+    ? '✅ Todas as lacunas corretas! Très bien !'
+    : \`\${okCount}/\${FILL1.length} corretas. Respostas esperadas: \${FILL1.map((f, idx) => \`(\${idx + 1}) \${f.ans}\`).join(' · ')}\`;
+}
+
+function submitHomework() {
+  markSection('homework');
+  saveFrCompleted();
+  if (typeof Store !== 'undefined') Store.addXP(55);
+  spawnXP('+75 XP');
+  const btn = document.getElementById('btn-submit-hw');
+  if (btn) {
+    btn.textContent = '✓ Lição Concluída! (+75 XP) — Magnifique !';
+    btn.disabled = true;
+    btn.classList.add('opacity-70');
+  }
+  const doneBox = document.getElementById('hw-done-box');
+  if (doneBox) doneBox.classList.remove('hidden');
+}
+</script>
+<script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/${l.slug}-folha.pdf"></script>
+</body>
+</html>
+`;
+}
+
+for (const lesson of ALL_LESSONS) {
+  const outPath = path.join(ROOT, `${lesson.slug}.html`);
+  fs.writeFileSync(outPath, buildLessonHtml(lesson), 'utf8');
+  console.log(`✓ Generated ${lesson.slug}.html — ${lesson.title} (${lesson.subtitle})`);
+}
