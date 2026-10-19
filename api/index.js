@@ -53,7 +53,7 @@ const AI_ROUTE_KEYS = new Map([
     ['/api/personalize', 'personalize'], ['/api/transcribe', 'transcribe'],
     ['/api/correct-writing', 'chat'], ['/api/study-plan', 'study-plan'], ['/api/music', 'music'],
     ['/api/lyrics-search', 'lyrics-search'], ['/api/lyrics', 'lyrics'], ['/api/tts', 'tts'],
-    ['/api/realtime-token', 'realtime'],
+    ['/api/realtime-token', 'realtime'], ['/api/quadro-ai', 'chat'],
 ]);
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
@@ -3533,6 +3533,47 @@ Respond ONLY with valid JSON, no markdown:
         });
         messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
         callOpenAI(messages, 120, 0.85, res, req); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/quadro-ai') {
+        const { history, message, sala = 'geral' } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'chat', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+
+        const salaLimpa = textoParaPrompt(sala, 30) || 'geral';
+        const targetLang = salaLimpa === 'frances' ? 'French' : salaLimpa === 'turkish' ? 'Turkish' : 'English';
+        const contextoSala = {
+            gpstronic: 'agricultural GPS, autopilot, wiring harnesses, sensors, CAN bus and workshop troubleshooting',
+            agro: 'farming, tractors, planting, spraying, harvesting and agribusiness',
+            med: 'medical consultations, patient symptoms and hospital routine',
+            interview: 'job interviews, career experience and professional answers',
+            business: 'business meetings, emails, negotiations and corporate routine',
+            travel: 'airports, hotels, restaurants and travel situations',
+            intermediate: 'natural B1-B2 everyday expressions, prepositions (on/in/at) and past/present/future actions',
+            advanced: 'advanced C1 fluency, idioms and nuanced communication',
+        }[salaLimpa] || 'practical everyday communication';
+
+        const system = [
+            `You are Yara, the AI teaching assistant inside the live interactive whiteboard (Quadro Branco) of Capy English.`,
+            `Current whiteboard room: "${salaLimpa}" (focus: ${contextoSala}, target language: ${targetLang}).`,
+            `When the teacher or student asks for sentences, phrases, examples, vocabulary, expressions, questions, dialogues, or explanations, you MUST generate clear, natural items ready to be placed as visual cards on the whiteboard.`,
+            `IMPORTANT: Never use the words "gramática", "grammar", "chunk" or "chunks" in your output. Use "expressões", "padrões" or "combinações naturais".`,
+            `Always respond ONLY with a valid JSON object (no markdown fences) in this exact format:`,
+            `{"reply":"Short, warm message in Portuguese explaining or presenting what you created","cards":[{"badge":"#1 · Expressão","en":"Main sentence or term in ${targetLang}","pt":"Portuguese translation or short tip"}]}`,
+            `Rules for "cards":`,
+            `- If the user asks for N sentences/examples/words (e.g. "5 frases em inglês"), return exactly N items in "cards" (up to 12 items).`,
+            `- Even if the user asks a general question or explanation, include 2 to 4 helpful example cards in "cards" so they can be added to the whiteboard.`,
+            `- Keep "badge" short (e.g., "Frase 1", "Exemplo 2", "Vocabulário", "Pergunta").`,
+            `- Keep "en" natural and accurate in ${targetLang}, and "pt" as the clear Brazilian Portuguese translation.`,
+        ].join('\n');
+
+        const messages = [{ role: 'system', content: system }];
+        (Array.isArray(history) ? history.slice(-10) : []).forEach(m => {
+            const texto = String(m?.content ?? m?.text ?? '').slice(0, 600);
+            if (texto) messages.push({ role: (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user', content: texto });
+        });
+        messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
+        callOpenAI(messages, 1000, 0.75, res, req); return;
     }
 
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
