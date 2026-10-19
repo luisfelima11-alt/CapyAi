@@ -94,8 +94,15 @@ function arraysDaPagina(html) {
             let valor;
             // So o literal, sem acesso a nada: variavel de execucao (shuffle,
             // tiles...) referencia outras coisas e simplesmente falha aqui.
-            try { valor = vm.runInNewContext('(' + s.slice(ini, fim + 1) + ')', Object.create(null), { timeout: 200 }); }
-            catch (e) { continue; }
+            // O timeout so protege de laco infinito. Estourar NAO e "nao e
+            // conteudo": com 200ms e a maquina carregada (suite inteira), arrays
+            // grandes estouravam, sumiam do catalogo e o teste de "JSON em dia"
+            // falhava as vezes. Folgado, e estouro vira erro, nunca saida menor.
+            try { valor = vm.runInNewContext('(' + s.slice(ini, fim + 1) + ')', Object.create(null), { timeout: 5000 }); }
+            catch (e) {
+                if (e && e.code === 'ERR_SCRIPT_EXECUTION_TIMEOUT') throw new Error('literal ' + m[1] + ' demorou mais de 5s para avaliar');
+                continue;
+            }
             if (Array.isArray(valor) && valor.length) saida.push({ nome: m[1], itens: valor });
         }
     }

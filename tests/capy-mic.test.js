@@ -129,11 +129,15 @@ test('self-study: pronúncia com 15s+ mostra o que foi ouvido, não "Não ouvi n
 });
 
 test('trilha (lessons.html): a trava de 15s leva a fala para a correção, no idioma da trilha', { timeout: 60_000 }, async () => {
-  await withPage('lessons.html', async ({ page, transcricoes }) => {
+  // A lição 201 é da trilha francesa. O init da lessons.html é async (busca o
+  // índice e a lição) e só no fim o loadLesson define CUR_TTS_LANG — depois do
+  // 'load' e do CapyMic. Antes o teste escrevia 'fr-FR' na mão e, com a suíte
+  // carregada, o loadLesson(1) chegava depois e trocava para 'en-US'.
+  await withPage('lessons.html?lesson=201', async ({ page, transcricoes }) => {
+    await page.waitForFunction(() => currentLesson && currentLesson.id === 201 && CUR_TTS_LANG === 'fr-FR');
     const feedback = await page.evaluate(() => {
       // Só o pedaço do Speak step que o toggleMic usa.
       document.body.insertAdjacentHTML('beforeend', '<button id="mic-btn"></button><span id="mic-hint"></span><div id="speak-feedback" class="hidden"></div>');
-      CUR_TTS_LANG = 'fr-FR';
       window.__feedback = [];
       showSpeakFeedback = (ok, falado) => window.__feedback.push(falado);
       toggleMic('Je t\'entends mais je ne te vois pas');
