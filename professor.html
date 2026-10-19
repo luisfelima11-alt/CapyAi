@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Painel do Professor — Capy English</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="assets/css/pages/professor.css?v=pf1">
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+</head>
+<body>
+
+<header class="topo">
+  <div class="largura topo-linha">
+    <div>
+      <h1>🎓 Painel do Professor</h1>
+      <p class="sub" id="nome-turma">Capy English</p>
+    </div>
+    <div class="topo-acoes">
+      <a class="botao fantasma" href="teacher_homework.html">📋 Todas as entregas</a>
+      <button class="botao fantasma" id="btn-sair" type="button">Sair</button>
+    </div>
+  </div>
+</header>
+
+<main class="largura">
+  <section id="estado" class="cartao centro" aria-live="polite">Carregando sua turma…</section>
+
+  <div id="painel" hidden>
+    <section class="cartao convite">
+      <div>
+        <h2>🔗 Link da sua turma</h2>
+        <p class="sub">Mande para os seus alunos. Cada um entra com a própria conta e aceita compartilhar o progresso com você.</p>
+      </div>
+      <div class="convite-linha">
+        <input id="link-turma" readonly aria-label="Link da turma"/>
+        <button class="botao rosa" id="btn-copiar" type="button">Copiar</button>
+        <button class="botao" id="btn-whats" type="button">WhatsApp</button>
+      </div>
+    </section>
+
+    <section class="numeros" aria-label="Resumo da turma">
+      <div class="numero"><span id="n-alunos">0</span><small>alunos</small></div>
+      <div class="numero"><span id="n-hoje">0</span><small>fizeram a trilha hoje</small></div>
+      <div class="numero"><span id="n-sumidos">0</span><small>sumidos há 3+ dias</small></div>
+      <div class="numero"><span id="n-licoes">0</span><small>lições de casa (14 dias)</small></div>
+    </section>
+
+    <section id="alertas" class="cartao" hidden>
+      <h2>⚠️ Para cobrar hoje</h2>
+      <ul id="lista-alertas" class="alertas"></ul>
+    </section>
+
+    <section class="cartao">
+      <div class="linha-titulo">
+        <h2>👥 Alunos</h2>
+        <input id="busca" type="search" placeholder="Buscar aluno" aria-label="Buscar aluno"/>
+      </div>
+      <p id="vazio" class="sub" hidden>Nenhum aluno ainda. Mande o link acima: assim que um aluno entrar, ele aparece aqui.</p>
+      <div class="tabela-rolagem">
+        <table id="tabela" hidden>
+          <thead><tr>
+            <th>Aluno</th><th>Trilha hoje</th><th>Sequência</th><th>Último dia</th><th>Mini-lições</th><th>Lições de casa</th><th></th>
+          </tr></thead>
+          <tbody id="corpo"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+
+<dialog id="detalhe" class="detalhe">
+  <div class="detalhe-topo">
+    <h2 id="det-nome"></h2>
+    <button class="botao fantasma escuro" id="det-fechar" type="button" aria-label="Fechar">✕</button>
+  </div>
+  <div id="det-corpo"></div>
+</dialog>
+
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
+<script src="assets/js/pages/professor.js?v=pf1"></script>
+</body>
+</html>
