@@ -43,7 +43,7 @@ test('sem consentimento nada do Google carrega; Aceitar carrega o gtag e lembra 
 
   // Próxima página: carrega direto, sem perguntar de novo.
   google.length = 0;
-  await page.goto(SITE + '/classes.html');
+  await page.goto(SITE + '/termos.html');
   await expect(page.locator('#capy-cookies')).toHaveCount(0);
   await expect.poll(() => google.length).toBeGreaterThan(0);
 });
@@ -52,7 +52,7 @@ test('Recusar não carrega nada, não volta a perguntar, e a política reabre o 
   const google = await montar(page);
   await page.goto(SITE + '/privacidade.html');
   await page.locator('#capy-cookies').getByRole('button', { name: 'Recusar' }).click();
-  await page.goto(SITE + '/classes.html');
+  await page.goto(SITE + '/termos.html');
   await expect(page.locator('#capy-cookies')).toHaveCount(0);
   await page.goto(SITE + '/privacidade.html');
   await page.getByRole('button', { name: 'Mudar minha escolha de cookies' }).click();
