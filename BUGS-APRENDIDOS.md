@@ -1,5 +1,43 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-19 — Teste da trilha francesa no CapyMic falhava às vezes com `['en']`
+
+**Sintoma:** o teste `trilha (lessons.html): a trava de 15s leva a fala para a
+correção, no idioma da trilha` (`tests/capy-mic.test.js`) falhava de vez em
+quando na suíte inteira com `expected ['fr'], actual ['en']`. Sozinho, passava
+sempre.
+
+**Causa raiz:** o teste abria `lessons.html` (lição 1, inglês), esperava só o
+`window.CapyMic` existir e então escrevia `CUR_TTS_LANG = 'fr-FR'` na mão. Mas a
+página ainda estava iniciando: o `DOMContentLoaded` da `lessons.html` é
+`async`, espera `carregarIndice()` e `garantirLicao(1)` (dois `fetch`) e só
+então chama `loadLesson(1)`, que **sobrescreve** `CUR_TTS_LANG = 'en-US'`. O
+evento `load` não espera esses `fetch`. Com a máquina folgada, o init acabava
+antes do teste escrever `fr-FR`; com a suíte inteira rodando, o init terminava
+**depois**, entre o `fr-FR` do teste e a trava de 15s, e o `toggleMic` lia `en`.
+Não era vazamento de estado: cada teste tem navegador e contexto próprios.
+
+**Correção:** o teste abre a trilha francesa de verdade
+(`lessons.html?lesson=201`) e espera a condição real,
+`currentLesson.id === 201 && CUR_TTS_LANG === 'fr-FR'`, antes de tocar no
+microfone. Sem `sleep`, e o teste agora cobre também o caminho
+lição → idioma do `loadLesson`, que antes era pulado.
+
+**Como pegar isso de novo:**
+```bash
+# Teste de página que mexe em global sem esperar o init async acabar:
+grep -nE "^\s+[A-Z_]{4,} = " tests/*.test.js
+# Prova determinística: segure o init até depois do ajuste manual, ex. esperar
+# currentLesson antes de page.clock.runFor(15_000) — o teste antigo falha 100%.
+```
+
+**Por que aconteceu:** `waitUntil: 'load'` + "a lib carregou" não quer dizer
+"a página terminou de iniciar". Se a página tem init `async` que escreve no
+mesmo estado que o teste, espere o **resultado** do init (a lição carregada),
+não um sinal vizinho.
+
+---
+
 ## 2026-09-20 — `\uXXXX` dentro de CSS vira `u00E7` na tela
 
 **Sintoma:** a legenda vazia do palco de voz mostrava
