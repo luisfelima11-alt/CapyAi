@@ -315,7 +315,7 @@ async function garantirLicao(id) {
   const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
   if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
   try {
-    const r = await fetch('data/lessons/' + id + '.json?v=gps24');
+    const r = await fetch('data/lessons/' + id + '.json?v=fr1');
     if (!r.ok) return null;
     const licao = await r.json();
     LICOES_CARREGADAS.set(id, licao);

@@ -3,9 +3,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FR_LESSONS_1_6 } from './fr-lessons-part1.mjs';
 import { FR_LESSONS_7_12 } from './fr-lessons-part2.mjs';
+import { semPronuncia, confere } from './fr-sem-pronuncia.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ALL_LESSONS = [...FR_LESSONS_1_6, ...FR_LESSONS_7_12];
+const ALL_LESSONS = semPronuncia([...FR_LESSONS_1_6, ...FR_LESSONS_7_12]);
+const ERROS_PRONUNCIA = confere(ALL_LESSONS);
+if (ERROS_PRONUNCIA.length) { console.error(ERROS_PRONUNCIA.join('\n')); process.exit(1); }
 
 function escAttr(s) {
   return String(s)
@@ -83,7 +86,6 @@ function buildLessonHtml(l) {
   const vocabDataNormalized = l.vocab.map((v, i) => ({
     en: v.en,
     pt: v.pt,
-    phon: v.phon,
     ex: v.ex,
     emoji: v.emoji,
     bg: i % 2 === 0 ? 'bg-blue-50 border-blue-200' : 'bg-indigo-50 border-indigo-200',
@@ -100,7 +102,6 @@ function buildLessonHtml(l) {
   const speakDataNormalized = l.speak.map(s => ({
     text: s.fr,
     pt: s.pt,
-    phon: s.phon,
   }));
 
   return `<!DOCTYPE html>
@@ -423,12 +424,12 @@ ${patternCardsHtml}
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=som2"></script>
 <script>window.YARA_WIDGET={lang:'fr',lessonTitle:${JSON.stringify(l.title)},lessonNum:${l.num}};</script>
-<script src="tts-fr.js?v=c52d7db"></script>
+<script src="tts-fr.js?v=fr1"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script src="vocab-focus.js?v=vf2"></script>
-<script src="listening-lab.js?v=lb1"></script>
+<script src="listening-lab.js?v=som1"></script>
 <script src="self-study.js?v=ss4"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -523,7 +524,7 @@ function buildVocab() {
         </div>
         <div class="flip-back h-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-2.5 text-center relative">
           <button type="button" onclick="event.stopPropagation();speak(VOCAB_DATA[\${i}].ex || VOCAB_DATA[\${i}].en)" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs flex items-center justify-center transition-all" title="Ouvir exemplo">🔊</button>
-          <span class="font-black text-white text-xs leading-snug">\${v.pt}<br><span class="text-blue-200 font-bold text-[10px]">\${v.phon}</span>\${v.ex ? \`<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"\${v.ex}"</em>\` : ''}</span>
+          <span class="font-black text-white text-xs leading-snug">\${v.pt}\${v.ex ? \`<br><em class="text-[10px] italic font-medium opacity-90 leading-tight">"\${v.ex}"</em>\` : ''}</span>
         </div>
       </div>\`;
     card.addEventListener('click', () => {
@@ -559,7 +560,7 @@ function buildVerbs() {
           <thead>
             <tr class="bg-blue-50">
               <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Pessoa</th>
-              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma &amp; Pronúncia</th>
+              <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Forma</th>
               <th class="text-left px-4 py-2.5 font-black text-navy text-xs">Exemplo em Francês</th>
             </tr>
           </thead>
@@ -694,10 +695,9 @@ function buildDialogue() {
 buildDialogue();
 
 function playFullDialogue() {
-  if (!window.speechSynthesis) return;
   const btn = document.getElementById('btn-play-dialogue');
   if (dlgPlaying) {
-    speechSynthesis.cancel();
+    if (window.speakFrStop) speakFrStop(); else speechSynthesis.cancel();
     dlgPlaying = false;
     btn.textContent = '🔊 Ouvir diálogo completo';
     document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
@@ -715,14 +715,14 @@ function playFullDialogue() {
     }
     const bubble = document.getElementById('dlg-bubble-' + idx);
     if (bubble) bubble.classList.add('ring-4', 'ring-blue-400');
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(DIALOGUE_LINES[idx].text);
-    u.lang = 'fr-FR';
-    u.rate = 0.85;
-    u.pitch = DIALOGUE_LINES[idx].who === 'yara' ? 1.08 : 0.98;
-    u.onend = () => { idx++; setTimeout(nextLine, 350); };
-    u.onerror = () => { dlgPlaying = false; btn.textContent = '🔊 Ouvir diálogo completo'; };
-    speechSynthesis.speak(u);
+    // Voz da OpenAI (tts-fr.js). Termina a fala, espera um instante e vai para a próxima.
+    speakFrEnd(DIALOGUE_LINES[idx].text).then(ok => {
+      if (!dlgPlaying) return;
+      if (ok) { idx++; setTimeout(nextLine, 350); return; }
+      dlgPlaying = false;
+      btn.textContent = '🔊 Ouvir diálogo completo';
+      document.querySelectorAll('[id^="dlg-bubble-"]').forEach(b => b.classList.remove('ring-4', 'ring-blue-400'));
+    });
   }
   nextLine();
 }
@@ -808,7 +808,6 @@ function buildSpeak() {
       </button>
       <div class="flex-1 min-w-0">
         <p class="text-navy font-black text-sm leading-relaxed">\${s.text}</p>
-        <span class="block text-xs text-blue-600 font-bold mt-0.5">\${s.phon}</span>
         <span class="block text-xs text-slate-500 mt-0.5">🇧🇷 \${s.pt}</span>
       </div>
       <label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer">

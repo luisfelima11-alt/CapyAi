@@ -1,5 +1,34 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-19 — Curso de francês: pronúncia escrita em todo canto e voz do navegador
+
+**Sintoma:** as aulas de francês mostravam a pronúncia entre colchetes ("Bonjour [bon-JUR]") e a voz
+variava de aparelho para aparelho (e ficava muda no iPhone com a chave de silencioso).
+
+**Causa raiz:** a pronúncia estava em **cinco lugares** ao mesmo tempo: o campo `phon` (vocabulário e Speak),
+colchetes dentro de textos (verbos, expressões, quizzes, padrões), uma coluna inteira da tabela de horas da
+trilha, o texto fixo dos padrões e as folhas em PDF. A voz vinha do `tts-fr.js`, que usava a voz do navegador.
+Quizzes de "como se pronuncia?" tinham a pronúncia escrita como alternativa.
+
+**Correção:** `scripts/fr-sem-pronuncia.mjs` roda nos dois geradores e a geração falha se sobrar colchete.
+O `tts-fr.js` usa a voz da OpenAI (`lang=fr`) e pula o que está entre parênteses.
+
+**Armadilhas que me pegaram ao limpar (ficam aqui para a próxima vez):**
+- Tirar colchete de texto **sem olhar a estrutura**: `WO1_DATA[si]` virou `WO1_DATA` e quebrou o JavaScript.
+  O limpador só mexe em dados e em texto fixo, nunca em código.
+- Limpar a resposta certa (`a`) e **esquecer as alternativas** (`opts`, uma lista de textos): o quiz ficava sem
+  resposta certa. `confere()` valida resposta dentro das alternativas e alternativa vazia.
+- Arrumar a pontuação junto: em francês o espaço antes de `?` e `!` é o correto, e não pode sumir.
+- A trilha lê `data/lessons/<id>.json`, e não o `lessons_fr_data.js`: sem rodar `build-lesson-data.js` nada muda.
+
+**Como pegar isso de novo:**
+```bash
+node --test tests/frances-sem-pronuncia.test.js
+grep -rEc '\[[^]]*[A-ZÉ]{2,}[^]]*\]' data/lessons/20[1-9].json data/lessons/21[0-2].json   # só serve de olho; o teste é o juiz
+```
+
+---
+
 ## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
 
 **Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
