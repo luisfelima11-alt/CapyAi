@@ -46,19 +46,30 @@
 
     <!-- Header -->
     <a href="classes_intermediate.html" class="inline-flex items-center gap-1 text-slate-400 hover:text-rose-600 text-sm font-bold transition-colors mb-4">← Voltar ao curso</a>
-    <div class="bg-gradient-to-br from-navy via-rose-900 to-orange-900 text-white rounded-3xl p-6 mb-6 card-in">
+    <div class="bg-gradient-to-br from-navy via-rose-900 to-orange-900 text-white rounded-3xl p-6 mb-5 card-in">
       <div class="flex items-center gap-3 mb-2">
         <span class="text-4xl">🎯</span>
         <div>
           <h1 class="text-2xl font-black">Prática Diária Intermediate</h1>
-          <p class="text-rose-200/80 text-sm font-bold">Treine todo dia o que você viu nas aulas</p>
+          <p class="text-rose-200/80 text-sm font-bold">49 unidades (196 mini-lições) + Trilha Especial de Revisão e Mini-Provas a cada 10 lições</p>
         </div>
       </div>
       <div class="flex items-center gap-3 mt-4">
         <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
           <div id="int-progress-bar" class="h-full bg-gradient-to-r from-rose-400 to-orange-300 rounded-full transition-all" style="width:0%"></div>
         </div>
-        <span id="int-progress-label" class="text-xs font-black text-rose-200">0 / 80</span>
+        <span id="int-progress-label" class="text-xs font-black text-rose-200">0 / 196</span>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <a href="#trilha-revisao" class="inline-flex items-center gap-1.5 bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-black px-3.5 py-2 rounded-xl transition-all">
+          🔥 Ir para a Trilha de Revisão (10 Unidades · 40 Mini-Lições) ↓
+        </a>
+        <a href="intermediate_revisao.html" class="inline-flex items-center gap-1.5 bg-amber-400/20 hover:bg-amber-400/30 border border-amber-300/40 text-amber-200 text-xs font-black px-3.5 py-2 rounded-xl transition-all">
+          📚 Abrir Aula de Revisão →
+        </a>
+        <a href="intermediate_prova.html" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-navy text-xs font-black px-3.5 py-2 rounded-xl transition-all">
+          🏆 Prova Final (30 min) →
+        </a>
       </div>
     </div>
 
@@ -82,7 +93,8 @@
     <div id="int-done" class="hidden card-in bg-gradient-to-br from-rose-600 to-orange-600 text-white rounded-3xl p-8 text-center mt-6">
       <div class="text-5xl mb-3">🏆</div>
       <p class="font-black text-xl mb-1">Prática completa!</p>
-      <p class="text-rose-100 text-sm">Você treinou todo o conteúdo das aulas. Continue revisitando pra manter o inglês afiado!</p>
+      <p class="text-rose-100 text-sm mb-4">Você treinou todas as 49 unidades (196 mini-lições), incluindo toda a Trilha Diária de Revisão!</p>
+      <a href="intermediate_prova.html" class="inline-block bg-white text-rose-700 font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all">🚀 Fazer Prova Final →</a>
     </div>
 
   </div>
@@ -101,49 +113,69 @@ Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha Intermediate: 20 lições × 4 minis = 80 nós ───────────────────────
+// ── Trilha Intermediate: 49 unidades × 4 minis = 196 nós ────────────────────
+// (39 unidades das aulas + 10 unidades da Trilha Diária da Revisão Pré-Prova)
 const TRAIL_INT = [
-  { id:401, emoji:'📝', title:'Past Simple: Regular Verbs' },
-  { id:402, emoji:'⚡', title:'Past Simple: Irregular Verbs' },
+  // Bloco 1: Passado e Histórias (Lições 1 a 10 da trilha)
+  { id:401, emoji:'📝', title:'Past Simple: Regular Actions', block:'Bloco 1 · Passado, Experiências & Histórias (Unidades 1–10)' },
+  { id:402, emoji:'⚡', title:'Past Simple: Irregular Actions' },
   { id:403, emoji:'🔄', title:'Past Continuous Basics' },
   { id:404, emoji:'🔗', title:'While & When' },
   { id:405, emoji:'✅', title:'Present Perfect Basics' },
-  { id:406, emoji:'⏳', title:'Ever, Never, Already' },
+  { id:406, emoji:'⏳', title:'Ever, Never, Already & Yet' },
   { id:407, emoji:'⏪', title:'Past Perfect Basics' },
-  { id:408, emoji:'⏱️', title:'Before & After' },
+  { id:408, emoji:'⏱️', title:'Before, After & By the Time' },
   { id:409, emoji:'🎭', title:'Telling Your Story' },
-  { id:410, emoji:'🌟', title:'Life Events' },
-  { id:411, emoji:'🔀', title:'Mixing Past Tenses' },
+  { id:410, emoji:'🌟', title:'Life Events & Milestones', miniExamAfter: { bloco: 1, title: 'Mini-Prova 1 · Aulas 1 a 10 (Passado & Experiências)' } },
+
+  // Bloco 2: Condicionais, Conversa Indireta e Carreira (Lições 11 a 20 da trilha)
+  { id:411, emoji:'🔀', title:'Mixing Past Tenses', block:'Bloco 2 · Condicionais, Conversa & Carreira (Unidades 11–20)' },
   { id:412, emoji:'📖', title:'Story Time Practice' },
-  { id:413, emoji:'🌦️', title:'First Conditional' },
-  { id:414, emoji:'💭', title:'Second Conditional' },
-  { id:415, emoji:'🗣️', title:'Reported Speech Basics' },
-  { id:416, emoji:'💬', title:'Say, Tell, Ask' },
-  { id:417, emoji:'🏗️', title:'Passive Voice Basics' },
-  { id:418, emoji:'📜', title:'Passive in the Past' },
+  { id:413, emoji:'🌦️', title:'Real Possibilities (If + Will)' },
+  { id:414, emoji:'💭', title:'Imagining Situations (If + Would)' },
+  { id:415, emoji:'🗣️', title:'Telling What Someone Said' },
+  { id:416, emoji:'💬', title:'Say, Tell & Ask' },
+  { id:417, emoji:'🏗️', title:'Was Built / Were Made ( Focus on the Action )' },
+  { id:418, emoji:'📜', title:'Historical Facts & Reports' },
   { id:419, emoji:'💼', title:'Work & Career Words' },
-  { id:420, emoji:'🎯', title:'My Career Story' },
-  { id:421, emoji:'🔤', title:'Articles: A or An?' },
-  { id:422, emoji:'🎯', title:'The or No Article?' },
-  { id:423, emoji:'📋', title:'Modal Verbs: Obligation & Advice' },
-  { id:424, emoji:'🔍', title:'Modal Verbs: Possibility & Deduction' },
-  { id:425, emoji:'🔗', title:'Relative Clauses: Who, Which, That' },
-  { id:426, emoji:'📍', title:'Relative Clauses: Where, When, Whose' },
-  { id:427, emoji:'🎬', title:'Gerunds: Verb + -ing' },
-  { id:428, emoji:'➡️', title:'Infinitives & Verbs That Change Meaning' },
+  { id:420, emoji:'🎯', title:'My Career Story', miniExamAfter: { bloco: 2, title: 'Mini-Prova 2 · Aulas 11 a 20 (Condicionais, Carreira & Futuro)' } },
+
+  // Bloco 3: Artigos, Deduções, Conexões e Ações (Lições 21 a 30 da trilha)
+  { id:421, emoji:'🔤', title:'Using A or An Naturally', block:'Bloco 3 · Deduções, Conexões & Combinações (Unidades 21–30)' },
+  { id:422, emoji:'🎯', title:'When to Use The' },
+  { id:423, emoji:'📋', title:'Obligation & Advice (Must, Should, Have To)' },
+  { id:424, emoji:'🔍', title:'Deductions in the Past (Must Have / Might Have)' },
+  { id:425, emoji:'🔗', title:'Connecting Ideas: Who, Which & That' },
+  { id:426, emoji:'📍', title:'Connecting Places & Time: Where, When & Whose' },
+  { id:427, emoji:'🎬', title:'Actions with -ING (Enjoy, Finish, Look Forward To)' },
+  { id:428, emoji:'➡️', title:'Actions with TO (Decide, Want, Promise)' },
   { id:429, emoji:'🌟', title:'Talking About Your Dreams & Goals' },
-  { id:430, emoji:'🏆', title:'Describing Your Ideal Life' },
-  { id:431, emoji:'🔙', title:'Used to: Talking About Past Habits' },
+  { id:430, emoji:'🏆', title:'Describing Your Ideal Life', miniExamAfter: { bloco: 1, title: 'Mini-Prova de Reforço · Bloco 1 a 10' } },
+
+  // Bloco 4: Hábitos Passados, Desejos, Confirmações e Futuro (Lições 31 a 39 da trilha)
+  { id:431, emoji:'🔙', title:'Used to: Talking About Past Habits', block:'Bloco 4 · Used To, Wish, Confirmações & Futuro (Unidades 31–39)' },
   { id:432, emoji:'🔄', title:'Would, Be Used To & Get Used To' },
   { id:433, emoji:'🌠', title:'I Wish... (Present Wishes)' },
-  { id:434, emoji:'😔', title:'Wishes, Regrets & Complaints' },
-  { id:435, emoji:'🪞', title:'Question Tags: The Mirror Rule' },
-  { id:436, emoji:'🎭', title:'Question Tags: Tricky Cases & Tone' },
-  { id:437, emoji:'🔮', title:'Will vs Going To' },
-  { id:438, emoji:'📅', title:'Future Plans, Perfect & Continuous' },
-  { id:439, emoji:'🚀', title:'Reflecting on the Past, Looking to the Future' },
-  { id:440, emoji:'🎓', title:'Intermediate Course Review: Grand Finale' }
+  { id:434, emoji:'😔', title:'Wishes & Past Regrets (I Wish I Had...)' },
+  { id:435, emoji:'🪞', title:'Confirming at the End: Haven\'t You? / Aren\'t You?' },
+  { id:436, emoji:'🎭', title:'Natural Intonation & Confirmations' },
+  { id:437, emoji:'🔮', title:'Will vs. Going To in Real Life' },
+  { id:438, emoji:'📅', title:'Future Plans: Will Be Doing & Will Have Done' },
+  { id:439, emoji:'🚀', title:'Reflecting on the Past, Looking to the Future', miniExamAfter: { bloco: 2, title: 'Mini-Prova de Reforço · Bloco 11 a 20' } },
+
+  // 🔥 BLOCO ESPECIAL: TRILHA DIÁRIA DA REVISÃO PRÉ-PROVA (10 UNIDADES = 40 MINI-LIÇÕES)
+  { id:440, emoji:'📅', title:'Revisão 1 · Expressões de Tempo: ON, IN & AT', isReview: true, reviewBlockHeader: true },
+  { id:441, emoji:'😬', title:'Revisão 2 · Dia a Dia: By Accident, On Purpose & On Time', isReview: true },
+  { id:442, emoji:'🤩', title:'Revisão 3 · Combinações: Look Forward To, Depend On & Good At', isReview: true },
+  { id:443, emoji:'⏪', title:'Revisão 4 · Passado na Prática: Simple Past vs. Past Continuous', isReview: true },
+  { id:444, emoji:'⏳', title:'Revisão 5 · Experiências e Duração: Have Been, For & Since', isReview: true },
+  { id:445, emoji:'🕰️', title:'Revisão 6 · Antes do Passado & Ações Contínuas: Had Done & Have Been Doing', isReview: true },
+  { id:446, emoji:'🔄', title:'Revisão 7 · Hábitos Antigos & Costume: Used To vs. Be Used To', isReview: true },
+  { id:447, emoji:'🔮', title:'Revisão 8 · Planos e Futuro: Will, Going To & Will Be Doing', isReview: true },
+  { id:448, emoji:'💭', title:'Revisão 9 · Situações Imaginárias & Desejos: If & I Wish', isReview: true },
+  { id:449, emoji:'🏆', title:'Revisão 10 · Grande Simulado Geral B1 → B2 (Aquecimento Final)', isReview: true }
 ];
+const TOTAL_NODES = TRAIL_INT.length * 4;
 const DAY_SUBS = ['Listen & Quiz','Game','Build & Speak','Chat with Yara'];
 
 function miniDone(lessonId, miniNum) {
@@ -166,7 +198,28 @@ function render() {
   const next = nextMini();
   let done = 0, html = '';
 
-  TRAIL_INT.forEach(l => {
+  TRAIL_INT.forEach((l, idx) => {
+    if (l.block) {
+      html += `
+        <div class="pt-4 pb-1 px-2">
+          <span class="inline-flex items-center gap-2 bg-rose-100 text-rose-800 text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-rose-200">
+            🎯 ${l.block}
+          </span>
+        </div>`;
+    }
+    if (l.reviewBlockHeader) {
+      html += `
+        <div id="trilha-revisao" class="pt-6 pb-2">
+          <div class="bg-gradient-to-br from-rose-600 via-rose-700 to-orange-600 text-white rounded-3xl p-5 shadow-lg">
+            <span class="inline-block bg-white/20 text-[11px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full mb-2">🔥 Trilha Diária da Revisão Expandida · 10 Unidades · 40 Mini-Lições</span>
+            <h2 class="text-xl font-black mb-1">Maratona Diária de Revisão Pré-Prova</h2>
+            <p class="text-rose-100 text-xs md:text-sm leading-relaxed">
+              Treine todos os dias as expressões, preposições e situações de passado, presente e futuro antes de fazer a Prova Final de 30 minutos!
+            </p>
+          </div>
+        </div>`;
+    }
+
     let rows = '';
     for (let m = 1; m <= 4; m++) {
       const isDone = miniDone(l.id, m);
@@ -186,19 +239,43 @@ function render() {
           ${isCurrent ? '<span class="text-[10px] font-black bg-rose-600 text-white px-2.5 py-1 rounded-full flex-shrink-0">COMEÇAR</span>' : ''}
         </button>`;
     }
+
+    const cardBorder = l.isReview ? 'border-2 border-rose-300 bg-rose-50/40' : 'border border-rose-100 bg-white/70';
+    const badgeTag = l.isReview
+      ? `<span class="text-[10px] font-black text-white bg-rose-600 px-2.5 py-0.5 rounded-full">Revisão ${l.id - 439}/10</span>`
+      : `<span class="text-xs font-black text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">Unidade ${idx + 1}</span>`;
+
     html += `
-      <div class="card-in bg-white/70 border border-rose-100 rounded-3xl p-4">
-        <div class="flex items-center gap-2 mb-3 px-1">
+      <div class="card-in ${cardBorder} rounded-3xl p-4">
+        <div class="flex items-center gap-2 mb-3 px-1 flex-wrap">
           <span class="text-2xl">${l.emoji}</span>
+          ${badgeTag}
           <span class="font-black text-navy">${l.title}</span>
         </div>
         <div class="space-y-2">${rows}</div>
       </div>`;
+
+    if (l.miniExamAfter) {
+      html += `
+        <a href="mini_prova.html?curso=intermediate&bloco=${l.miniExamAfter.bloco}" class="block card-in bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-3xl p-5 shadow-md hover:scale-[1.01] transition-all">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">⚡</span>
+              <div>
+                <span class="inline-block bg-white/20 text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full mb-1">Checkpoint a cada 10 Lições · 15 Minutos</span>
+                <p class="font-black text-base">${l.miniExamAfter.title}</p>
+                <p class="text-amber-100 text-xs">15 questões práticas com frases para completar, áudio e pronúncia</p>
+              </div>
+            </div>
+            <span class="bg-white text-orange-700 font-black text-xs px-4 py-2.5 rounded-xl flex-shrink-0">Fazer Mini-Prova →</span>
+          </div>
+        </a>`;
+    }
   });
 
   cont.innerHTML = html;
-  document.getElementById('int-progress-bar').style.width = Math.round(done / 80 * 100) + '%';
-  document.getElementById('int-progress-label').textContent = done + ' / 80';
+  document.getElementById('int-progress-bar').style.width = Math.round(done / TOTAL_NODES * 100) + '%';
+  document.getElementById('int-progress-label').textContent = done + ' / ' + TOTAL_NODES;
 
   if (next) {
     const c = document.getElementById('int-continue');

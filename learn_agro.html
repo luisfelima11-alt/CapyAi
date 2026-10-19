@@ -187,7 +187,40 @@ function render() {
         </div>
         <div class="space-y-2">${rows}</div>
       </div>`;
+
+    if ((idx + 1) % 10 === 0) {
+      const bloco = ((idx + 1) / 10) <= 1 ? 1 : 2;
+      html += `
+        <div class="card-in bg-gradient-to-r from-green-600 to-emerald-700 text-white rounded-3xl p-5 shadow-lg my-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <span class="text-3xl">⚡</span>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full">Checkpoint · Unidades ${idx - 8} a ${idx + 1}</span>
+              <p class="font-black text-base mt-0.5">Mini-Prova ${bloco} — Agro English (15 min)</p>
+              <p class="text-xs text-green-100">Teste prático a cada 10 unidades com expressões da fazenda, máquinas, Listening e Speaking.</p>
+            </div>
+          </div>
+          <a href="mini_prova.html?curso=agro&bloco=${bloco}" class="w-full sm:w-auto text-center bg-white text-green-900 font-black text-xs px-4 py-2.5 rounded-xl shadow hover:bg-green-50 transition shrink-0">
+            ⚡ Fazer Mini-Prova →
+          </a>
+        </div>`;
+    }
   });
+
+  html += `
+    <div class="card-in bg-gradient-to-br from-green-950 via-emerald-900 to-lime-950 text-white rounded-3xl p-6 shadow-xl mt-4 border-2 border-green-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <span class="text-4xl">🏆</span>
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest bg-green-400/20 text-green-200 px-2.5 py-0.5 rounded-full border border-green-400/30">Avaliação Final · 30 Minutos · 40 Questões</span>
+          <p class="font-black text-lg mt-0.5">Prova Final — Agro English</p>
+          <p class="text-xs text-green-100">Expressões de fazenda, máquinas agrícolas, plantio, colheita, Listening e Speaking no campo.</p>
+        </div>
+      </div>
+      <a href="agro_prova.html" class="w-full sm:w-auto text-center bg-gradient-to-r from-green-400 to-emerald-400 text-navy font-black text-xs sm:text-sm px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition shrink-0">
+        🚀 Fazer Prova Final →
+      </a>
+    </div>`;
 
   cont.innerHTML = html;
   document.getElementById('agro-progress-bar').style.width = Math.round(done / TOTAL_NODES * 100) + '%';

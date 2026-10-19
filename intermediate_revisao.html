@@ -282,11 +282,11 @@
 <div id="tab-practice" class="tab-content fade-in hidden">
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-2xl font-black text-navy">✏️ Mini-Simulado de Aquecimento (12 Questões)</h2>
-      <p class="text-slate-500 text-sm mt-1">Treine o mesmo estilo de completar frases que o aluno vai encontrar na Prova Final!</p>
+      <h2 class="text-2xl font-black text-navy">✏️ Mini-Simulado de Aquecimento (20 Questões)</h2>
+      <p class="text-slate-500 text-sm mt-1">Treine o mesmo estilo de completar frases (expressões, preposições, passado, presente e futuro) que o aluno vai encontrar na Prova Final!</p>
     </div>
     <div class="flex items-center gap-3">
-      <div class="text-center"><div class="text-2xl font-black text-rose-600" id="prac-score">0<span class="text-sm text-slate-400">/12</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+      <div class="text-center"><div class="text-2xl font-black text-rose-600" id="prac-score">0<span class="text-sm text-slate-400">/20</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
       <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
     </div>
   </div>
@@ -352,6 +352,21 @@
     <button onclick="submitReviewDone()" class="mt-4 bg-gradient-to-r from-rose-500 to-orange-600 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       ✅ Concluir Aula de Revisão (+75 XP)
     </button>
+  </div>
+
+  <!-- TRILHA DIÁRIA DA REVISÃO EXPANDIDA (10 UNIDADES / 40 MINI-LIÇÕES) -->
+  <div class="bg-white border-2 border-rose-200 rounded-3xl p-6 mb-6 shadow-sm">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+      <div>
+        <span class="inline-block bg-rose-100 text-rose-700 text-[11px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full mb-1">🛤️ Trilha Diária da Revisão Expandida · 10 Unidades · 40 Mini-Lições</span>
+        <h3 class="text-xl font-black text-navy">Treino Diário Completo da Revisão</h3>
+        <p class="text-slate-500 text-xs md:text-sm">Quer continuar praticando cada parte da revisão passo a passo? Acesse as 10 unidades especiais de revisão (40 mini-lições com áudio, jogo, montagem de frases e conversa com a Yara):</p>
+      </div>
+      <a href="learn_intermediate.html#trilha-revisao" class="bg-rose-600 hover:bg-rose-700 text-white font-black text-xs px-4 py-2.5 rounded-xl transition-all flex-shrink-0">
+        Ver Trilha Completa →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="review-trail-grid"></div>
   </div>
 
   <!-- CTA DIRETO PARA A PROVA FINAL -->
@@ -472,8 +487,8 @@ const INTENSIVE_GROUPS = [
       { en: 'By the time I arrived on Monday morning, everyone was already there.', pt: 'Quando cheguei na segunda de manhã, todos já estavam lá.' }
     ],
     drills: [
-      { q: 'I have a dentist appointment ___ at 10 o\'clock.', opts: ['on Wednesday', 'in Wednesday', 'at Wednesday', 'on the Wednesday'], ans: 'on Wednesday' },
-      { q: 'What are you doing ___ night?', opts: ['on Friday', 'in Friday', 'at Friday', 'on the Friday'], ans: 'on Friday' }
+      { q: 'I have a dentist appointment ___ at 10 o\'clock.', opts: ['in Wednesday', 'on Wednesday', 'at Wednesday', 'on the Wednesday'], ans: 'on Wednesday' },
+      { q: 'What are you doing ___ night?', opts: ['in Friday', 'at Friday', 'on the Friday', 'on Friday'], ans: 'on Friday' }
     ]
   },
   {
@@ -489,8 +504,8 @@ const INTENSIVE_GROUPS = [
       { en: 'The streets in this neighbourhood are very quiet at midnight.', pt: 'As ruas deste bairro são muito silenciosas à meia-noite.' }
     ],
     drills: [
-      { q: 'He works better ___, but he hates driving ___.', opts: ['in the morning / at night', 'on the morning / in night', 'at morning / on the night', 'in morning / at the night'], ans: 'in the morning / at night' },
-      { q: 'Our online class starts ___ 8 p.m. ___ Thursdays.', opts: ['at / on', 'on / at', 'in / on', 'at / in'], ans: 'at / on' }
+      { q: 'He works better ___, but he hates driving ___.', opts: ['on the morning / in night', 'at morning / on the night', 'in the morning / at night', 'in morning / at the night'], ans: 'in the morning / at night' },
+      { q: 'Our online class starts ___ 8 p.m. ___ Thursdays.', opts: ['on / at', 'at / on', 'in / on', 'at / in'], ans: 'at / on' }
     ]
   },
   {
@@ -506,8 +521,8 @@ const INTENSIVE_GROUPS = [
       { en: 'I am going to take my vacation in two weeks.', pt: 'Eu vou tirar minhas férias daqui a duas semanas.' }
     ],
     drills: [
-      { q: 'She started her company ___ March, back ___ 2021.', opts: ['in / in', 'on / on', 'at / in', 'on / in'], ans: 'in / in' },
-      { q: 'Wait for me! I\'ll be there ___ fifteen minutes.', opts: ['in', 'on', 'at', 'after'], ans: 'in' }
+      { q: 'She started her company ___ March, back ___ 2021.', opts: ['on / on', 'at / in', 'on / in', 'in / in'], ans: 'in / in' },
+      { q: 'Wait for me! I\'ll be there ___ fifteen minutes.', opts: ['on', 'at', 'in', 'after'], ans: 'in' }
     ]
   },
   {
@@ -523,8 +538,8 @@ const INTENSIVE_GROUPS = [
       { en: 'By the time the police got there, the thief had escaped.', pt: 'Quando a polícia chegou lá, o ladrão já tinha escapado.' }
     ],
     drills: [
-      { q: 'The meeting starts at 9:00 sharp, so please arrive ___.', opts: ['on time', 'in the time', 'at time', 'by time'], ans: 'on time' },
-      { q: '___ we got to the restaurant, the kitchen had already closed.', opts: ['By the time', 'On the time', 'In time that', 'At the time'], ans: 'By the time' }
+      { q: 'The meeting starts at 9:00 sharp, so please arrive ___.', opts: ['in the time', 'on time', 'at time', 'by time'], ans: 'on time' },
+      { q: '___ we got to the restaurant, the kitchen had already closed.', opts: ['On the time', 'In time that', 'At the time', 'By the time'], ans: 'By the time' }
     ]
   },
   {
@@ -540,8 +555,8 @@ const INTENSIVE_GROUPS = [
       { en: 'I promise I would never hurt your feelings on purpose.', pt: 'Eu prometo que nunca magoaria seus sentimentos de propósito.' }
     ],
     drills: [
-      { q: 'I swear I didn\'t break your cup ___ — it slipped from my hand ___!', opts: ['on purpose / by accident', 'by purpose / on accident', 'in purpose / by accident', 'on purpose / in accident'], ans: 'on purpose / by accident' },
-      { q: 'I sent the wrong attachment ___ because I was in a hurry.', opts: ['by accident', 'on accident', 'in accident', 'with accident'], ans: 'by accident' }
+      { q: 'I swear I didn\'t break your cup ___ — it slipped from my hand ___!', opts: ['by purpose / on accident', 'in purpose / by accident', 'on purpose / by accident', 'on purpose / in accident'], ans: 'on purpose / by accident' },
+      { q: 'I sent the wrong attachment ___ because I was in a hurry.', opts: ['on accident', 'by accident', 'in accident', 'with accident'], ans: 'by accident' }
     ]
   },
   {
@@ -557,8 +572,8 @@ const INTENSIVE_GROUPS = [
       { en: 'He goes to school by bus in the morning and comes back on foot.', pt: 'Ele vai para a escola de ônibus de manhã e volta a pé.' }
     ],
     drills: [
-      { q: 'When I moved abroad, I lived ___ for two years.', opts: ['on my own', 'by my own', 'in my own', 'at my own'], ans: 'on my own' },
-      { q: 'It\'s faster to go ___ than by car at rush hour, or we can just walk ___.', opts: ['by subway / on foot', 'on subway / by foot', 'in the subway / on foot', 'by the subway / with foot'], ans: 'by subway / on foot' }
+      { q: 'When I moved abroad, I lived ___ for two years.', opts: ['by my own', 'in my own', 'at my own', 'on my own'], ans: 'on my own' },
+      { q: 'It\'s faster to go ___ than by car at rush hour, or we can just walk ___.', opts: ['on subway / by foot', 'in the subway / on foot', 'by subway / on foot', 'by the subway / with foot'], ans: 'by subway / on foot' }
     ]
   },
   {
@@ -574,8 +589,8 @@ const INTENSIVE_GROUPS = [
       { en: 'I am looking forward to practising my English every single day.', pt: 'Estou ansioso para praticar meu inglês todos os dias.' }
     ],
     drills: [
-      { q: 'I\'m really looking forward ___ your family this weekend!', opts: ['to meeting', 'to meet', 'for meeting', 'at meeting'], ans: 'to meeting' },
-      { q: 'She is looking forward ___ a break after the final exam.', opts: ['to taking', 'to take', 'for take', 'in taking'], ans: 'to taking' }
+      { q: 'I\'m really looking forward ___ your family this weekend!', opts: ['to meet', 'to meeting', 'for meeting', 'at meeting'], ans: 'to meeting' },
+      { q: 'She is looking forward ___ a break after the final exam.', opts: ['to take', 'for take', 'in taking', 'to taking'], ans: 'to taking' }
     ]
   },
   {
@@ -591,7 +606,7 @@ const INTENSIVE_GROUPS = [
       { en: 'I used to be bad at speaking in public, but now I\'m quite good at it!', pt: 'Eu costumava ser ruim em falar em público, mas agora sou muito bom nisso!' }
     ],
     drills: [
-      { q: 'I don\'t know what time I\'ll arrive — it depends ___ the traffic.', opts: ['on', 'of', 'in', 'from'], ans: 'on' },
+      { q: 'I don\'t know what time I\'ll arrive — it depends ___ the traffic.', opts: ['of', 'in', 'on', 'from'], ans: 'on' },
       { q: 'He is very interested ___ music and really good ___ playing the guitar.', opts: ['in / at', 'on / in', 'at / on', 'about / at'], ans: 'in / at' }
     ]
   },
@@ -608,8 +623,8 @@ const INTENSIVE_GROUPS = [
       { en: 'I have been studying English for two years, since I got my new job.', pt: 'Venho estudando inglês há dois anos, desde que consegui meu emprego novo.' }
     ],
     drills: [
-      { q: 'She has worked here ___ ten years, ___ she graduated from university.', opts: ['for / since', 'since / for', 'during / since', 'from / for'], ans: 'for / since' },
-      { q: 'We were stuck in traffic ___ two hours ___ Monday morning!', opts: ['for / on', 'since / in', 'for / in', 'during / at'], ans: 'for / on' }
+      { q: 'She has worked here ___ ten years, ___ she graduated from university.', opts: ['since / for', 'during / since', 'for / since', 'from / for'], ans: 'for / since' },
+      { q: 'We were stuck in traffic ___ two hours ___ Monday morning!', opts: ['since / in', 'for / in', 'during / at', 'for / on'], ans: 'for / on' }
     ]
   },
   {
@@ -625,8 +640,8 @@ const INTENSIVE_GROUPS = [
       { en: 'I wish I hadn\'t spent so much money last month.', pt: 'Eu gostaria de não ter gastado tanto dinheiro no mês passado.' }
     ],
     drills: [
-      { q: 'I ___ be terrified of speaking English on the phone, but now it\'s easy.', opts: ['used to', 'use to', 'am used to', 'would to'], ans: 'used to' },
-      { q: 'I missed the flight! I really wish I ___ up thirty minutes earlier.', opts: ['had woken', 'woke', 'would wake', 'have woken'], ans: 'had woken' }
+      { q: 'I ___ be terrified of speaking English on the phone, but now it\'s easy.', opts: ['use to', 'used to', 'am used to', 'would to'], ans: 'used to' },
+      { q: 'I missed the flight! I really wish I ___ up thirty minutes earlier.', opts: ['woke', 'would wake', 'had woken', 'have woken'], ans: 'had woken' }
     ]
   },
   {
@@ -642,8 +657,8 @@ const INTENSIVE_GROUPS = [
       { en: 'Our presentation was moved from Tuesday morning to Friday afternoon.', pt: 'Nossa apresentação foi transferida de terça de manhã para sexta à tarde.' }
     ],
     drills: [
-      { q: 'After five years, he decided ___ his old job, and now he enjoys ___ his own boss.', opts: ['to quit / being', 'quitting / to be', 'to quit / to be', 'quit / being'], ans: 'to quit / being' },
-      { q: 'This novel ___ in 1998 by a famous Brazilian author.', opts: ['was written', 'wrote', 'has wrote', 'is writing'], ans: 'was written' }
+      { q: 'After five years, he decided ___ his old job, and now he enjoys ___ his own boss.', opts: ['quitting / to be', 'to quit / to be', 'quit / being', 'to quit / being'], ans: 'to quit / being' },
+      { q: 'This novel ___ in 1998 by a famous Brazilian author.', opts: ['wrote', 'was written', 'has wrote', 'is writing'], ans: 'was written' }
     ]
   },
   {
@@ -659,8 +674,8 @@ const INTENSIVE_GROUPS = [
       { en: 'If I knew I couldn\'t fail, I would start my own international business.', pt: 'Se eu soubesse que não poderia falhar, abriria meu próprio negócio internacional.' }
     ],
     drills: [
-      { q: 'You are ready for the final exam, ___?', opts: ['aren\'t you', 'don\'t you', 'haven\'t you', 'isn\'t it'], ans: 'aren\'t you' },
-      { q: 'By 2030, she ___ to ten countries, and if she had more time now, she ___ another language.', opts: ['will have travelled / would learn', 'will travel / learned', 'travelled / would have learned', 'has travelled / will learn'], ans: 'will have travelled / would learn' }
+      { q: 'You are ready for the final exam, ___?', opts: ['don\'t you', 'haven\'t you', 'aren\'t you', 'isn\'t it'], ans: 'aren\'t you' },
+      { q: 'By 2030, she ___ to ten countries, and if she had more time now, she ___ another language.', opts: ['will travel / learned', 'travelled / would have learned', 'has travelled / will learn', 'will have travelled / would learn'], ans: 'will have travelled / would learn' }
     ]
   }
 ];
@@ -671,9 +686,28 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// Embaralhamento Fisher-Yates real + garantia de que a resposta correta nunca fique viciada na mesma letra
+let _lastDrillCorrectIdx = -1;
+function shuffleBalanced(opts, correctAns) {
+  const a = [...opts];
+  for (let attempt = 0; attempt < 8; attempt++) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    const idx = a.indexOf(correctAns);
+    if (idx !== _lastDrillCorrectIdx) {
+      _lastDrillCorrectIdx = idx;
+      return a;
+    }
+  }
+  return a;
+}
+
 function buildIntensiveExamples() {
   const container = document.getElementById('intensive-examples-list');
   if (!container) return;
+  const letters = ['A', 'B', 'C', 'D'];
 
   container.innerHTML = INTENSIVE_GROUPS.map((g, gi) => {
     const exRows = g.examples.map((ex, ei) => `
@@ -688,21 +722,24 @@ function buildIntensiveExamples() {
       </div>
     `).join('');
 
-    const drillsHtml = g.drills.map((d, di) => `
+    const drillsHtml = g.drills.map((d, di) => {
+      d._shuffled = shuffleBalanced(d.opts, d.ans);
+      return `
       <div class="bg-white border border-rose-200 rounded-xl p-3.5">
         <p class="text-xs font-black text-rose-600 uppercase tracking-wider mb-1">Teste Rápido ${di + 1}</p>
         <p class="text-sm font-black text-navy mb-2.5">${escapeHtml(d.q)}</p>
-        <div class="flex flex-wrap gap-2" id="drill-opts-${gi}-${di}">
-          ${d.opts.map(opt => `
-            <button type="button" onclick="checkDrill(${gi}, ${di}, this, '${opt.replace(/'/g, "\\'")}')"
-                    class="px-3 py-1.5 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-rose-400 hover:bg-rose-50 text-xs font-bold text-navy transition-all">
-              ${escapeHtml(opt)}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="drill-opts-${gi}-${di}">
+          ${d._shuffled.map((opt, oi) => `
+            <button type="button" data-val="${escapeHtml(opt)}" onclick="checkDrill(${gi}, ${di}, this, '${opt.replace(/'/g, "\\'")}')"
+                    class="flex items-center gap-2 text-left px-3 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-rose-400 hover:bg-rose-50 text-xs font-bold text-navy transition-all">
+              <span class="w-5 h-5 rounded-md bg-white border border-slate-200 text-[10px] font-black flex items-center justify-center flex-shrink-0 text-rose-600">${letters[oi]}</span>
+              <span>${escapeHtml(opt)}</span>
             </button>
           `).join('')}
         </div>
         <p id="drill-fb-${gi}-${di}" class="hidden text-xs font-black mt-2"></p>
       </div>
-    `).join('');
+    `}).join('');
 
     return `
       <div class="bg-white border-2 border-rose-200 rounded-3xl overflow-hidden shadow-sm">
@@ -751,12 +788,12 @@ function checkDrill(gi, di, btn, chosen) {
   const isOk = chosen === drill.ans;
   wrap.querySelectorAll('button').forEach(b => {
     b.disabled = true;
-    if (b.textContent.trim() === drill.ans) {
-      b.className = 'px-3 py-1.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-xs font-black text-emerald-800';
+    if (b.getAttribute('data-val') === drill.ans) {
+      b.className = 'flex items-center gap-2 text-left px-3 py-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-xs font-black text-emerald-800';
     }
   });
   if (!isOk) {
-    btn.className = 'px-3 py-1.5 rounded-xl border-2 border-red-400 bg-red-50 text-xs font-black text-red-700';
+    btn.className = 'flex items-center gap-2 text-left px-3 py-2 rounded-xl border-2 border-red-400 bg-red-50 text-xs font-black text-red-700';
   }
   fb.classList.remove('hidden');
   fb.className = `text-xs font-black mt-2 ${isOk ? 'text-emerald-700' : 'text-red-600'}`;
@@ -986,25 +1023,34 @@ function toggleAccordion(id) {
   markSection('resumo');
 }
 
-// ── 5. MINI-SIMULADO (12 QUESTÕES DE AQUECIMENTO) ───────────────────────────
+// ── 5. MINI-SIMULADO (20 QUESTÕES DE AQUECIMENTO) ───────────────────────────
 const QUIZ = [
-  {q:'1. "Let\'s schedule our review session ___ at 6 p.m."',opts:['on Wednesday','in Wednesday','at Wednesday','on the Wednesday'],a:'on Wednesday',rule:'Dias da semana sempre usam ON: on Monday, on Wednesday, on Friday.'},
-  {q:'2. "I prefer studying ___ because I\'m too tired ___."',opts:['in the morning / at night','on the morning / in night','at the morning / on night','in morning / at the night'],a:'in the morning / at night',rule:'Usamos "in the morning / afternoon / evening", mas a noite (tarde) é "at night".'},
-  {q:'3. "Oops! I sent that email to the whole company ___!"',opts:['by accident','on accident','in accident','for purpose'],a:'by accident',rule:'"Sem querer / por acidente" = by accident. ("De propósito" = on purpose).'},
+  {q:'1. "Let\'s schedule our review session ___ at 6 p.m."',opts:['in Wednesday','on Wednesday','at Wednesday','on the Wednesday'],a:'on Wednesday',rule:'Dias da semana sempre usam ON: on Monday, on Wednesday, on Friday.'},
+  {q:'2. "I prefer studying ___ because I\'m too tired ___."',opts:['on the morning / in night','at the morning / on night','in the morning / at night','in morning / at the night'],a:'in the morning / at night',rule:'Usamos "in the morning / afternoon / evening", mas a noite (tarde) é "at night".'},
+  {q:'3. "Oops! I sent that email to the whole company ___!"',opts:['on accident','in accident','for purpose','by accident'],a:'by accident',rule:'"Sem querer / por acidente" = by accident. ("De propósito" = on purpose).'},
   {q:'4. "We are really looking forward ___ our trip to London!"',opts:['to planning','to plan','for planning','in planning'],a:'to planning',rule:'Depois de "look forward to", usamos sempre a ação com -ING (to planning).'},
-  {q:'5. "___ we arrived at the theatre, the play had already begun."',opts:['By the time','On the time','In the time','At time'],a:'By the time',rule:'"By the time" mostra que quando chegamos lá, outra coisa já tinha acontecido.'},
-  {q:'6. "She has worked at this hospital ___ five years, ___ 2021."',opts:['for / since','since / for','during / since','for / from'],a:'for / since',rule:'FOR indica o tempo de duração (for five years); SINCE indica quando começou (since 2021).'},
-  {q:'7. "I ___ be afraid of speaking in public, but not anymore."',opts:['used to','use to','was used','would to'],a:'used to',rule:'"Used to be" expressa como você costumava ser no passado e que não é mais.'},
+  {q:'5. "___ we arrived at the theatre, the play had already begun."',opts:['On the time','By the time','In the time','At time'],a:'By the time',rule:'"By the time" mostra que quando chegamos lá, outra coisa já tinha acontecido.'},
+  {q:'6. "She has worked at this hospital ___ five years, ___ 2021."',opts:['since / for','during / since','for / since','for / from'],a:'for / since',rule:'FOR indica o tempo de duração (for five years); SINCE indica quando começou (since 2021).'},
+  {q:'7. "I ___ be afraid of speaking in public, but not anymore."',opts:['use to','was used','would to','used to'],a:'used to',rule:'"Used to be" expressa como você costumava ser no passado e que não é mais.'},
   {q:'8. "I didn\'t study enough for the test. I really wish I ___ harder!"',opts:['had studied','studied','would study','have studied'],a:'had studied',rule:'Arrependimento sobre o passado usa WISH + HAD (wish I had studied).'},
-  {q:'9. "You have already reviewed all the lessons, ___?"',opts:["haven't you","didn't you","aren't you","don't you"],a:"haven't you",rule:'A frase começa com "You have...", então confirmamos com "haven\'t you?".'},
-  {q:'10. "If I ___ more free time, I ___ learn a third language."',opts:['had / would','have / would','had / will','would have / learned'],a:'had / would',rule:'Para imaginar uma situação hoje: "If I had more time, I would learn...".'},
-  {q:'11. "I usually go to work ___ subway, or I walk ___."',opts:['by / on foot','on / by foot','in / on foot','by the / with foot'],a:'by / on foot',rule:'Meios de transporte usam BY (by subway, by bus), mas "a pé" é sempre ON foot!'},
-  {q:'12. "Whether we travel this weekend depends ___ the weather."',opts:['on','of','in','from'],a:'on',rule:'Em inglês sempre dizemos "depend ON" (jamais "depend of").'},
+  {q:'9. "You have already reviewed all the lessons, ___?"',opts:["didn't you","haven't you","aren't you","don't you"],a:"haven't you",rule:'A frase começa com "You have...", então confirmamos com "haven\'t you?".'},
+  {q:'10. "If I ___ more free time, I ___ learn a third language."',opts:['have / would','had / will','had / would','would have / learned'],a:'had / would',rule:'Para imaginar uma situação hoje: "If I had more time, I would learn...".'},
+  {q:'11. "I usually go to work ___ subway, or I walk ___."',opts:['on / by foot','in / on foot','by the / with foot','by / on foot'],a:'by / on foot',rule:'Meios de transporte usam BY (by subway, by bus), mas "a pé" é sempre ON foot!'},
+  {q:'12. "Whether we travel this weekend depends ___ the weather."',opts:['of','on','in','from'],a:'on',rule:'Em inglês sempre dizemos "depend ON" (jamais "depend of").'},
+  {q:'13. "Normally I ___ from home on Fridays, but today I ___ at the office."',opts:['am working / work','worked / have worked','work / am working','work / work'],a:'work / am working',rule:'Para rotina ("Normally") usamos "work", e para hoje/agora ("today") usamos "am working".'},
+  {q:'14. "Where ___ you ___ on vacation last summer?"',opts:['have / gone','were / going','do / go','did / go'],a:'did / go',rule:'Perguntas no passado com data fechada ("last summer") usam "did + ação na forma base".'},
+  {q:'15. "While I ___ dinner last night, the lights suddenly ___."',opts:['was cooking / went out','cooked / were going out','have cooked / went out','was cooking / were going out'],a:'was cooking / went out',rule:'O que estava em andamento usa "was cooking", e o que interrompeu usa "went out".'},
+  {q:'16. "I ___ the report yet, but Maria ___ hers."',opts:['didn\'t finish / already sent','haven\'t finished / has already sent','don\'t finish / is sending','wasn\'t finishing / had sent'],a:'haven\'t finished / has already sent',rule:'Com "yet" e "already" ligados ao presente, usamos "haven\'t finished" e "has already sent".'},
+  {q:'17. "My eyes are tired because I ___ at this screen since 8 a.m."',opts:['am looking','looked','have been looking','was looking'],a:'have been looking',rule:'Ação que começou lá atrás ("since 8 a.m.") e continua até agora usa "have been looking".'},
+  {q:'18. "We ___ for over an hour before the waiter finally brought our food."',opts:['have been waiting','were waiting','are waiting','had been waiting'],a:'had been waiting',rule:'Para mostrar por quanto tempo algo já acontecia antes de outro evento no passado, usamos "had been waiting".'},
+  {q:'19. "Don\'t call me at 8 p.m. tonight because I ___ to Buenos Aires at that exact time."',opts:['will be flying','will fly','flew','have flown'],a:'will be flying',rule:'Para uma ação que estará em andamento num horário exato do futuro, usamos "will be flying".'},
+  {q:'20. "If I ___ you were in town last weekend, I ___ you for coffee!"',opts:['knew / would invite','had known / would have invited','know / will invite','have known / invited'],a:'had known / would have invited',rule:'Para imaginar um passado diferente ("se eu soubesse... teria convidado"), usamos "If I had known... would have invited".'},
 ];
 let pracIdx=0, pracScore=0, pracStreak=0, pracAnswered=false;
 function buildPractice() {
   if(pracIdx>=QUIZ.length){showResult();return;}
   const q=QUIZ[pracIdx];
+  const letters=['A','B','C','D'];
   document.getElementById('prac-bar').style.width=(pracIdx/QUIZ.length*100)+'%';
   document.getElementById('practice-area').innerHTML=`
     <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in">
@@ -1014,10 +1060,12 @@ function buildPractice() {
       <div id="prac-feedback" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
     </div>`;
   const opts=document.getElementById('opts');
-  [...q.opts].sort(()=>Math.random()-.5).forEach(o=>{
+  const shuffledOpts = shuffleBalanced(q.opts, q.a);
+  shuffledOpts.forEach((o, oi)=>{
     const btn=document.createElement('button');
-    btn.className='w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-rose-400 hover:bg-rose-50 transition-all';
-    btn.textContent=o;
+    btn.setAttribute('data-val', o);
+    btn.className='w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-rose-400 hover:bg-rose-50 transition-all flex items-center gap-3';
+    btn.innerHTML=`<span class="w-7 h-7 rounded-lg bg-slate-100 text-rose-600 text-xs font-black flex items-center justify-center flex-shrink-0">${letters[oi]}</span><span class="flex-1">${escapeHtml(o)}</span>`;
     btn.onclick=()=>answerQ(o,btn,q);
     opts.appendChild(btn);
   });
@@ -1028,23 +1076,23 @@ function answerQ(ans,btn,q){
   const correct=ans===q.a;
   document.querySelectorAll('#opts button').forEach(b=>{
     b.disabled=true;
-    if(b.textContent===q.a) b.className='w-full text-left border-2 border-rose-400 bg-rose-50 rounded-2xl px-4 py-3 text-sm font-black text-rose-700';
+    if(b.getAttribute('data-val')===q.a) b.className='w-full text-left border-2 border-emerald-500 bg-emerald-50 rounded-2xl px-4 py-3 text-sm font-black text-emerald-800 flex items-center gap-3';
   });
-  if(!correct) btn.className='w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';
+  if(!correct) btn.className='w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700 flex items-center gap-3';
   if(correct){pracScore++;pracStreak++;}else{pracStreak=0;}
   document.getElementById('prac-score').innerHTML=`${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;
   document.getElementById('prac-streak').textContent='🔥 '+pracStreak;
   const fb=document.getElementById('prac-feedback');
   fb.classList.remove('hidden');
-  fb.className=`mt-4 p-3 rounded-xl text-sm font-bold ${correct?'bg-rose-50 text-rose-700 border border-rose-200':'bg-red-50 text-red-700 border border-red-200'}`;
+  fb.className=`mt-4 p-3 rounded-xl text-sm font-bold ${correct?'bg-emerald-50 text-emerald-800 border border-emerald-200':'bg-red-50 text-red-700 border border-red-200'}`;
   fb.innerHTML=`${correct?'✅ Correto!':'❌ Atenção:'} <span class="font-normal">${q.rule}</span>`;
   pracIdx++;
   setTimeout(buildPractice,1600);
 }
 function showResult(){
-  document.getElementById('result-msg').textContent=`Você acertou ${pracScore} de ${QUIZ.length} no aquecimento.${pracScore>=9?' Pronto(a) para a Prova Final! 🏆':' Revise os comentários e parta para a prova!'}`;
-  document.getElementById('result-emoji').textContent=pracScore>=9?'🏆':pracScore>=7?'🎉':'💪';
-  document.getElementById('result-title').textContent=pracScore>=9?'Excelente!':'Bom aquecimento!';
+  document.getElementById('result-msg').textContent=`Você acertou ${pracScore} de ${QUIZ.length} no aquecimento.${pracScore>=14?' Pronto(a) para a Prova Final! 🏆':' Revise os comentários e parta para a prova!'}`;
+  document.getElementById('result-emoji').textContent=pracScore>=14?'🏆':pracScore>=11?'🎉':'💪';
+  document.getElementById('result-title').textContent=pracScore>=14?'Excelente!':'Bom aquecimento!';
   document.getElementById('result-overlay').classList.remove('hidden');
   markSection('practice');
   if(typeof Store!=='undefined') Store.addXP(50);
@@ -1057,6 +1105,34 @@ function restartPractice(){
   buildPractice();
 }
 buildPractice();
+
+const REVIEW_TRAIL_UNITS = [
+  { id: 440, emoji: '📅', title: 'Revisão 1 · Expressões de Tempo: ON, IN & AT' },
+  { id: 441, emoji: '😬', title: 'Revisão 2 · Dia a Dia: By Accident, On Purpose & On Time' },
+  { id: 442, emoji: '🤩', title: 'Revisão 3 · Combinações: Look Forward To, Depend On & Good At' },
+  { id: 443, emoji: '⏪', title: 'Revisão 4 · Passado na Prática: Simple Past vs. Past Continuous' },
+  { id: 444, emoji: '⏳', title: 'Revisão 5 · Experiências e Duração: Have Been, For & Since' },
+  { id: 445, emoji: '🕰️', title: 'Revisão 6 · Antes do Passado & Ações Contínuas: Had Done & Have Been Doing' },
+  { id: 446, emoji: '🔄', title: 'Revisão 7 · Hábitos Antigos & Costume: Used To vs. Be Used To' },
+  { id: 447, emoji: '🔮', title: 'Revisão 8 · Planos e Futuro: Will, Going To & Will Be Doing' },
+  { id: 448, emoji: '💭', title: 'Revisão 9 · Situações Imaginárias & Desejos: If & I Wish' },
+  { id: 449, emoji: '🏆', title: 'Revisão 10 · Grande Simulado Geral B1 → B2' },
+];
+function buildReviewTrailGrid() {
+  const el = document.getElementById('review-trail-grid');
+  if (!el) return;
+  el.innerHTML = REVIEW_TRAIL_UNITS.map((u, idx) => `
+    <a href="lessons.html?lesson=${u.id}&mini=1&guided=1" class="flex items-center gap-3 p-3.5 rounded-2xl border-2 border-rose-100 hover:border-rose-400 bg-rose-50/40 hover:bg-rose-50 transition-all group">
+      <span class="w-10 h-10 rounded-xl bg-white border border-rose-200 flex items-center justify-center text-xl flex-shrink-0">${u.emoji}</span>
+      <div class="flex-1 min-w-0">
+        <span class="block text-[10px] font-black uppercase tracking-wider text-rose-600">Unidade de Revisão ${idx + 1} · 4 Mini-Lições</span>
+        <span class="block font-black text-navy text-xs md:text-sm truncate">${escapeHtml(u.title)}</span>
+      </div>
+      <span class="text-xs font-black text-rose-600 group-hover:translate-x-0.5 transition-transform">Treinar →</span>
+    </a>
+  `).join('');
+}
+buildReviewTrailGrid();
 
 // ── 6. SPEAK & PRACTISE (10 FRASES) ─────────────────────────────────────────
 const SPEAK_DATA = [

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mini-Prova de 10 Lições | Capy English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.opt-btn{transition:all .18s ease}
+.opt-btn:hover:not(:disabled){transform:translateY(-2px);border-color:#f97316;background:#fff7ed}
+.opt-btn.correct{border-color:#10b981!important;background:#ecfdf5!important;color:#065f46!important}
+.opt-btn.wrong{border-color:#ef4444!important;background:#fef2f2!important;color:#991b1b!important}
+.blank-slot{display:inline-block;min-width:90px;border-bottom:3px dashed #f97316;color:#ea580c;font-weight:900;padding:0 6px;text-align:center}
+.blank-slot.filled-ok{border-bottom:3px solid #10b981;color:#059669;background:#ecfdf5;border-radius:6px}
+.blank-slot.filled-err{border-bottom:3px solid #ef4444;color:#dc2626;background:#fef2f2;border-radius:6px}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-amber-50/40 min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-12">
+
+  <!-- HERO HEADER -->
+  <div id="hero-header" class="relative overflow-hidden bg-gradient-to-br from-navy via-amber-900 to-orange-800 text-white">
+    <div class="relative max-w-5xl mx-auto px-6 py-10">
+      <a id="back-course-link" href="classes_intermediate.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors mb-4">← Voltar ao Curso</a>
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/40 text-amber-200 rounded-full px-3.5 py-1 text-xs font-black uppercase tracking-wider">
+          ⚡ Mini-Prova · Checkpoint de 10 Lições
+        </span>
+        <span class="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3.5 py-1 text-xs font-bold">
+          ⏱️ 15 Minutos · 15 Questões
+        </span>
+      </div>
+      <h1 id="mini-exam-title" class="text-3xl md:text-4xl font-black leading-tight mb-2">
+        ⚡ Mini-Prova — Lições 1 a 10
+      </h1>
+      <p id="mini-exam-subtitle" class="text-white/80 text-sm md:text-base max-w-2xl">
+        Avalie o que você aprendeu nestas 10 lições: completar frases com expressões e preposições, situações práticas, listening e speaking!
+      </p>
+
+      <!-- Switcher between Mini-Provas -->
+      <div class="flex flex-wrap gap-2 mt-5" id="mini-exam-switcher"></div>
+    </div>
+  </div>
+
+  <!-- STICKY TIMER BAR -->
+  <div id="exam-sticky-bar" class="hidden sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-amber-100 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-2.5">
+        <span id="section-pill" class="text-xs font-black px-3 py-1 rounded-full bg-amber-100 text-amber-800">💬 Expressões</span>
+        <span id="q-counter-top" class="text-xs font-black text-slate-500">Questão 1 / 15</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="timer-box" class="flex items-center gap-1.5 bg-navy text-white px-3.5 py-1.5 rounded-full text-sm font-black shadow-sm">
+          <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1">timer</span>
+          <span id="timer-display">15:00</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1 rounded-full text-xs font-black">
+          ⭐ <span id="live-score">0</span> acertos
+        </div>
+        <button onclick="confirmFinishEarly()" class="text-xs font-black text-slate-400 hover:text-orange-600 underline px-2 py-1">
+          Finalizar
+        </button>
+      </div>
+    </div>
+    <div class="h-1.5 bg-slate-100 w-full overflow-hidden">
+      <div id="exam-progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto px-4 md:px-6 py-8">
+
+    <!-- SCREEN 1: INTRO -->
+    <div id="screen-intro" class="fade-in">
+      <div class="bg-white border-2 border-amber-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex flex-col md:flex-row items-center gap-6 mb-6">
+          <img src="yara.png?v=3" alt="Yara" class="w-24 h-24 rounded-full object-cover border-4 border-amber-300 shadow-md flex-shrink-0"/>
+          <div>
+            <h2 id="intro-heading" class="text-2xl font-black text-navy mb-1">Pronto(a) para a Mini-Prova de 10 Lições?</h2>
+            <p id="intro-text" class="text-slate-600 text-sm leading-relaxed">
+              São <strong>15 questões rápidas (15 minutos)</strong> focadas exatamente nas 10 lições deste bloco: frases para completar com a alternativa correta, compreensão de áudio (Listening) e pronúncia no microfone (Speaking).
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-around gap-4 text-center">
+          <div><div class="text-xs font-bold text-slate-400 uppercase">Duração</div><div class="text-lg font-black text-navy">⏱️ 15 min</div></div>
+          <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div><div class="text-xs font-bold text-slate-400 uppercase">Questões</div><div class="text-lg font-black text-navy">📋 15 questões</div></div>
+          <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div><div class="text-xs font-bold text-slate-400 uppercase">Meta</div><div class="text-lg font-black text-orange-600">🎯 70% (11/15)</div></div>
+          <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+          <div><div class="text-xs font-bold text-slate-400 uppercase">Recompensa</div><div class="text-lg font-black text-amber-600">⭐ +120 XP</div></div>
+        </div>
+
+        <button onclick="startExam()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-lg py-4 rounded-2xl shadow-lg hover:scale-[1.01] active:scale-95 transition-all">
+          ⚡ Começar Mini-Prova Agora (15:00)
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: ACTIVE QUESTION -->
+    <div id="screen-exam" class="hidden">
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 mb-5 overflow-x-auto">
+        <div class="flex items-center gap-1.5 min-w-max" id="q-nav-pills"></div>
+      </div>
+      <div id="question-card" class="bg-white border-2 border-amber-200 rounded-3xl p-6 md:p-8 shadow-sm fade-in"></div>
+    </div>
+
+    <!-- SCREEN 3: RESULTS -->
+    <div id="screen-result" class="hidden fade-in">
+      <div class="bg-white border-2 border-amber-200 rounded-3xl p-6 md:p-10 shadow-sm text-center mb-6">
+        <div id="res-emoji" class="text-6xl mb-3">🏆</div>
+        <h2 id="res-title" class="text-3xl font-black text-navy mb-2"></h2>
+        <p id="res-desc" class="text-slate-600 text-sm max-w-xl mx-auto mb-6"></p>
+        <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto mb-6">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4"><div class="text-xs font-bold text-slate-400 uppercase">Nota</div><div id="res-score-pct" class="text-2xl font-black text-navy mt-1">0%</div></div>
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4"><div class="text-xs font-bold text-slate-400 uppercase">Acertos</div><div id="res-score-raw" class="text-2xl font-black text-orange-600 mt-1">0 / 15</div></div>
+          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4"><div class="text-xs font-bold text-amber-600 uppercase">XP</div><div id="res-xp-earned" class="text-2xl font-black text-amber-600 mt-1">+120 XP</div></div>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button onclick="restartExam()" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black px-7 py-3.5 rounded-2xl hover:scale-105 transition-all">🔄 Refazer Mini-Prova</button>
+          <a id="res-back-btn" href="classes_intermediate.html" class="bg-slate-100 hover:bg-slate-200 text-navy font-black px-7 py-3.5 rounded-2xl transition-all">📚 Voltar ao Curso</a>
+        </div>
+      </div>
+
+      <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+        <h3 class="text-xl font-black text-navy mb-4">🔍 Gabarito Comentado das 15 Questões</h3>
+        <div id="res-review-list" class="space-y-3"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=skins1"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="streak-overlay.js?v=land1"></script>
+<script src="components.js?v=skins1"></script>
+<script src="tts-en.js?v=c52d7db"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
+Components.mount('footer-placeholder', Components.renderFooter());
+
+const MINI_EXAMS = {
+  'intermediate_1': {
+    course: 'intermediate',
+    bloco: 1,
+    backHref: 'classes_intermediate.html',
+    title: '⚡ Mini-Prova 1 — Intermediate (Lições 1 a 10)',
+    subtitle: 'Expressões (on Monday, by accident, on purpose, by the time, for/since), Passado, Experiências e Situações.',
+    questions: [
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com a expressão correta para dias da semana:', sentence:'Our team review is scheduled ___ at 10 a.m.', opts:['in Monday','on Monday','at Monday','on the Monday'], ans:'on Monday', rule:'Dias da semana usam sempre ON: on Monday, on Tuesday, on Friday.' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com "sem querer" e "de propósito":', sentence:'I deleted your message ___ — I swear I didn\'t do it ___!', opts:['on accident / by purpose','in accident / on purpose','by accident / on purpose','by accident / for purpose'], ans:'by accident / on purpose', rule:'"Sem querer" = by accident · "De propósito" = on purpose.' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com as expressões para partes do dia:', sentence:'He loves running ___, but he never exercises late ___.', opts:['on the morning / in night','at morning / on night','in morning / at the night','in the morning / at night'], ans:'in the morning / at night', rule:'Dizemos "in the morning / afternoon / evening", mas "at night".' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete escolhendo entre "for" e "since":', sentence:'We have worked together ___ four years, ___ 2022.', opts:['for / since','since / for','during / since','from / for'], ans:'for / since', rule:'FOR indica duração (for four years); SINCE indica quando começou (since 2022).' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com a expressão que significa "quando chegamos":', sentence:'___ we got to the station, the train had already left.', opts:['On the time','By the time','In the time','At time'], ans:'By the time', rule:'"By the time" mostra que quando chegamos lá, outra ação já tinha acontecido.' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Pergunta no passado com data fechada — Complete a frase:', sentence:'Where ___ you ___ last weekend? We went to the beach!', opts:['have / gone','were / going','did / go','do / go'], ans:'did / go', rule:'Com data fechada ("last weekend"), usamos "did + ação na forma base": Where did you go?' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Ação em andamento interrompida no passado — Complete a frase:', sentence:'While she ___ to work, it suddenly ___ to rain.', opts:['drove / was starting','was driving / started','has driven / started','was driving / was starting'], ans:'was driving / started', rule:'A ação longa em andamento usa "was driving" e a que aconteceu de repente usa "started".' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Experiência de vida vs. data fechada — Complete a frase:', sentence:'I ___ to Buenos Aires twice, and my first visit ___ in 2021.', opts:['went / has been','was / was','have gone / has been','have been / was'], ans:'have been / was', rule:'Experiência sem data usa "have been"; com data fechada ("in 2021") usa "was".' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Algo que aconteceu antes de outro momento no passado — Complete:', sentence:'When I arrived at the airport, I realised I ___ my ID at home.', opts:['had forgotten','have forgotten','was forgetting','forget'], ans:'had forgotten', rule:'"Had forgotten" mostra que você esqueceu o documento antes de chegar ao aeroporto.' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'While I was cooking dinner on Tuesday night, the lights suddenly went out.', promptPt:'Ouça o áudio e complete a frase:', sentence:'The lights went out while the speaker ___ dinner ___.', opts:['cooked / in Tuesday night','was cooking / on Tuesday night','has cooked / at Tuesday night','was cooking / in the Tuesday'], ans:'was cooking / on Tuesday night', rule:'O áudio diz: "While I was cooking dinner on Tuesday night, the lights suddenly went out."' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'I haven\'t finished the report yet, but Maria has already sent hers to the manager.', promptPt:'Ouça o áudio e escolha a alternativa correta:', sentence:'According to the speaker, Maria ___ her report.', opts:['hasn\'t started writing','lost the file by accident','has already sent','will write tomorrow'], ans:'has already sent', rule:'O áudio afirma: "Maria has already sent hers to the manager."' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'By the time we arrived at the cinema, the movie had already started.', promptPt:'Ouça o áudio e complete a frase:', sentence:'___ they arrived at the cinema, the movie ___.', opts:['On the time / started','In time / has started','At the time / was starting','By the time / had already started'], ans:'By the time / had already started', rule:'Ouvimos: "By the time we arrived at the cinema, the movie had already started."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Fale a frase inteira no microfone!', sentence:'Our team meeting is scheduled ___ at nine in the morning.', fullTarget:'Our team meeting is scheduled on Monday at nine in the morning.', opts:['on Monday','in Monday','at Monday','on the Monday'], ans:'on Monday', rule:'Dias da semana usam ON: on Monday.' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Leia em voz alta no microfone!', sentence:'I have lived in this city ___ three years.', fullTarget:'I have lived in this city for three years.', opts:['since','for','during','from'], ans:'for', rule:'Com duração de tempo ("three years"), usamos FOR.' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'I deleted your file ___, not on purpose.', fullTarget:'I deleted your file by accident, not on purpose.', opts:['on accident','in accident','by accident','for accident'], ans:'by accident', rule:'"Sem querer" em inglês é sempre "by accident".' }
+    ]
+  },
+  'intermediate_2': {
+    course: 'intermediate',
+    bloco: 2,
+    backHref: 'classes_intermediate.html',
+    title: '⚡ Mini-Prova 2 — Intermediate (Lições 11 a 20)',
+    subtitle: 'Look forward to, depend on, interested in / good at, used to, wish, confirmações e planos para o futuro.',
+    questions: [
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com a continuação correta após "looking forward":', sentence:'We are really looking forward ___ you at the event on Saturday!', opts:['to see','for seeing','to seeing','at seeing'], ans:'to seeing', rule:'Depois de "look forward to", usamos a ação com -ING: to seeing.' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com a palavra correta após "depends":', sentence:'Whether we travel tomorrow depends ___ the weather.', opts:['of','on','in','from'], ans:'on', rule:'Em inglês sempre dizemos "depend ON" (nunca "depend of").' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete com as preposições após "interested" e "good":', sentence:'She is very interested ___ photography and really good ___ editing.', opts:['on / in','about / at','in / on','in / at'], ans:'in / at', rule:'Dizemos sempre "interested IN" e "good AT".' },
+      { section:'expressoes', sectionLabel:'💬 Expressões & Preposições', promptPt:'Complete indicando pontualidade ("no horário certo"):', sentence:'The flight boards at 7:00 sharp, so please arrive ___.', opts:['on time','in the time','at time','by the time'], ans:'on time', rule:'"On time" significa pontualmente, no horário marcado.' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Hábito antigo no passado ("costumava ser") — Complete a frase:', sentence:'Five years ago, I ___ be very shy when speaking English.', opts:['use to','used to','am used to','would to'], ans:'used to', rule:'Para algo que acontecia no passado e mudou, usamos "used to".' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Arrependimento sobre o passado — Complete a frase:', sentence:'I didn\'t pass the test. I really wish I ___ harder last week!', opts:['studied','would study','had studied','have studied'], ans:'had studied', rule:'Para arrependimentos sobre o passado, usamos "wish + had + 3ª forma": wish I had studied.' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Decisão na hora ("will") vs. plano já combinado ("going to"):', sentence:'"The phone is ringing!" — "Don\'t worry, I ___ it! I know you ___ a client now."', opts:['am going to answer / will call','answer / call','answered / were calling','will answer / are going to call'], ans:'will answer / are going to call', rule:'Decisão na hora usa "will answer"; plano já combinado usa "are going to call".' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'O que estará em andamento num horário exato do futuro:', sentence:'Don\'t call me at 9 p.m. tonight because I ___ to Lisbon at that time.', opts:['will be flying','will fly','flew','have flown'], ans:'will be flying', rule:'Para uma ação que estará em andamento num horário exato do futuro, usamos "will be flying".' },
+      { section:'contexto', sectionLabel:'⚡ Passado, Presente & Futuro', promptPt:'Imaginando um passado diferente — Complete a frase:', sentence:'If I ___ you were in town last Sunday, I ___ you for lunch!', opts:['knew / would invite','had known / would have invited','know / will invite','have known / invited'], ans:'had known / would have invited', rule:'Para imaginar o passado diferente: "If I had known..., I would have invited".' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'I used to drink four cups of coffee a day, but since last month I have switched to green tea in the morning.', promptPt:'Ouça o áudio e complete a frase:', sentence:'The speaker ___ drink a lot of coffee, but now drinks green tea ___.', opts:['is used to / at morning','would to / on the morning','used to / in the morning','uses to / in morning'], ans:'used to / in the morning', rule:'O áudio diz: "I used to drink four cups of coffee a day... green tea in the morning."' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'You\'re coming to the farewell dinner on Saturday night, aren\'t you? Everyone is looking forward to seeing you!', promptPt:'Ouça o áudio e complete:', sentence:'The dinner is ___, and the speaker confirmed with "___?"', opts:['in Saturday night / don\'t you','at Saturday night / isn\'t it','on the Saturday / won\'t you','on Saturday night / aren\'t you'], ans:'on Saturday night / aren\'t you', rule:'Dia da semana usa ON ("on Saturday night") e a confirmação de "You\'re coming" é "aren\'t you?".' },
+      { section:'listening', sectionLabel:'🎧 Listening', audioText:'By this time next year, I will have completed my certification, and I\'m going to apply for an international role.', promptPt:'Ouça o áudio e escolha a alternativa correta:', sentence:'By this time next year, the speaker ___ their certification.', opts:['will have completed','has forgotten','cancelled','used to complete'], ans:'will have completed', rule:'Ouvimos: "By this time next year, I will have completed my certification."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Fale a frase inteira no microfone!', sentence:'Five years ago, I ___ feel nervous when speaking in public.', fullTarget:'Five years ago, I used to feel nervous when speaking in public.', opts:['use to','used to','was used','would to'], ans:'used to', rule:'"Used to feel" indica como você se sentia antes.' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Leia em voz alta no microfone!', sentence:'If I knew I couldn\'t fail, I ___ my own business.', fullTarget:'If I knew I couldn\'t fail, I would start my own business.', opts:['will start','started','would start','would have started'], ans:'would start', rule:'"If I knew..., I would start".' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'I am really looking forward ___ my English every single day.', fullTarget:'I am really looking forward to practising my English every single day.', opts:['to practise','for practising','at practise','to practising'], ans:'to practising', rule:'"Looking forward to practising" (com -ING!).' }
+    ]
+  },
+  'gpstronic_1': {
+    course: 'gpstronic',
+    bloco: 1,
+    backHref: 'classes_gpstronic.html',
+    title: '⚡ Mini-Prova 1 — GPS Tronic (Lições 1 a 10)',
+    subtitle: 'Sinal de GPS, atendimento ao telefone, explicação de reparo, pedido de peças, visita na fazenda, orçamento, suporte remoto e atrasos.',
+    questions: [
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Complete a frase ao atender o cliente no telefone (Aula 2):', sentence:'Good morning, GPS Tronic! This is Lucas speaking. How ___ I help you today?', opts:['do','can','are','have'], ans:'can', rule:'Ao atender o telefone profissionalmente, dizemos: "How can I help you today?".' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Complete a frase sobre peça em estoque vs. fora de estoque (Aula 4):', sentence:'We have the antenna cable ___, but the main board is currently ___.', opts:['on stock / off stock','at stock / without stock','in stock / out of stock','for stock / out stock'], ans:'in stock / out of stock', rule:'Em inglês técnico comercial dizemos sempre "in stock" (em estoque) e "out of stock" (sem estoque).' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Complete agendando a visita técnica na fazenda (Aula 6):', sentence:'Can we schedule the field visit ___ at 8 a.m.?', opts:['in Tuesday','at Tuesday','on the Tuesday','on Tuesday'], ans:'on Tuesday', rule:'Dias da semana usam sempre ON: on Monday, on Tuesday, on Friday.' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Complete pedindo para o cliente explicar passo a passo no suporte remoto (Aula 9):', sentence:'Could you ___ me through what appears on the monitor right now?', opts:['walk','run','step','look'], ans:'walk', rule:'"Walk me through it" significa "me explique passo a passo o que está acontecendo".' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões & Preposições', promptPt:'Complete avisando sobre um atraso com educação (Aula 10):', sentence:'I\'m ___ there is a short delay with the shipment, but I\'ll keep you posted.', opts:['scared','afraid','sorry to','worried'], ans:'afraid', rule:'"I\'m afraid there\'s a delay" é a expressão educada padrão para dar uma notícia de atraso ao cliente.' },
+      { section:'contexto', sectionLabel:'🔧 Diagnóstico, Passado & Futuro', promptPt:'Explicando o problema que o técnico encontrou ontem (Aula 3):', sentence:'Yesterday we ___ the receiver on the bench and ___ a damaged connector.', opts:['test / find','tested / found','have tested / find','were testing / finding'], ans:'tested / found', rule:'Para contar o que foi testado e encontrado ontem na bancada, usamos o passado: "tested" e "found".' },
+      { section:'contexto', sectionLabel:'🔧 Diagnóstico, Passado & Futuro', promptPt:'Falando sobre o que estava acontecendo quando o sinal caiu (Aula 1 & 5):', sentence:'While the operator ___ soybean, the GPS signal suddenly ___ out.', opts:['planted / was dropping','has planted / dropped','was planting / dropped','is planting / drops'], ans:'was planting / dropped', rule:'A ação em andamento no campo usa "was planting" e a queda repentina do sinal usa "dropped".' },
+      { section:'contexto', sectionLabel:'🔧 Diagnóstico, Passado & Futuro', promptPt:'Informando garantia e prazo de entrega (Aula 7 & 10):', sentence:'This monitor is still ___ warranty, and the replacement part ___ arrive by Friday.', opts:['under / will','in / is','on / has','with / did'], ans:'under / will', rule:'Para garantia dizemos sempre "under warranty", e para a previsão de chegada usamos "will arrive".' },
+      { section:'contexto', sectionLabel:'🔧 Diagnóstico, Passado & Futuro', promptPt:'Confirmando o pagamento e orçamento (Aula 7):', sentence:'Once you ___ the quote, we ___ start the repair right away.', opts:['will approve / start','approved / would start','are approving / started','approve / will'], ans:'approve / will', rule:'Depois de "Once" (assim que você aprovar o orçamento), usamos o presente ("approve") e "will start" na sequência.' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'Hello! I\'m calling about my tractor monitor. The GPS signal is very weak and the autopilot isn\'t working.', promptPt:'Ouça o cliente ao telefone e complete:', sentence:'The customer is calling because the GPS signal is ___ and the autopilot ___.', opts:['strong / is calibrated','weak / isn\'t working','ready / was updated','expensive / is in stock'], ans:'weak / isn\'t working', rule:'O cliente diz: "The GPS signal is very weak and the autopilot isn\'t working."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'We replaced the antenna cable and tested the unit on the bench. It will be ready on Thursday afternoon.', promptPt:'Ouça o áudio da oficina e complete:', sentence:'The technician ___ the antenna cable, and the unit will be ready ___.', opts:['ordered / in Thursday','cleaned / at Thursday','replaced / on Thursday afternoon','calibrated / on the Thursday'], ans:'replaced / on Thursday afternoon', rule:'O áudio informa: "We replaced the antenna cable... It will be ready on Thursday afternoon."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'I\'m afraid the part is stuck in customs, so there\'s a two-day delay. I\'ll keep you posted.', promptPt:'Ouça o áudio e identifique o motivo do atraso:', sentence:'There is a two-day delay because the part is ___.', opts:['stuck in customs','out of warranty','already installed on the tractor','working fine on the bench'], ans:'stuck in customs', rule:'O técnico explica: "I\'m afraid the part is stuck in customs, so there\'s a two-day delay."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale a frase completa no microfone!', sentence:'We tested the receiver ___ the bench and replaced the connector.', fullTarget:'We tested the receiver on the bench and replaced the connector.', opts:['on','in','at','by'], ans:'on', rule:'Dizemos sempre "on the bench" (na bancada).' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'I can visit your farm ___ morning at eight o\'clock.', fullTarget:'I can visit your farm on Monday morning at eight o\'clock.', opts:['in Monday','on Monday','at Monday','on the Monday'], ans:'on Monday', rule:'Dias da semana usam ON: "on Monday morning".' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking', promptPt:'1º Complete a frase. 2º Fale em voz alta no microfone!', sentence:'I\'m afraid there is a short delay, but I will ___ you posted.', fullTarget:'I\'m afraid there is a short delay, but I will keep you posted.', opts:['make','let','keep','give'], ans:'keep', rule:'"I will keep you posted" = vou te manter informado!' }
+    ]
+  },
+  'gpstronic_2': {
+    course: 'gpstronic',
+    bloco: 2,
+    backHref: 'classes_gpstronic.html',
+    title: '⚡ Mini-Prova 2 — GPS Tronic (Lições 11 a 14 + Especialidades)',
+    subtitle: 'Recepção de equipamento, entrega, código de peça e números com fornecedor, networking na Agrishow, RTK e chicote elétrico.',
+    questions: [
+      { section:'expressoes', sectionLabel:'🛰️ Recepção, Entrega & Agrishow', promptPt:'Perguntando o defeito na recepção da oficina (Aula 11):', sentence:'Welcome to GPS Tronic! What ___ to be the problem with your display?', opts:['looks','seems','makes','goes'], ans:'seems', rule:'A pergunta clássica de recepção técnica é: "What seems to be the problem?".' },
+      { section:'expressoes', sectionLabel:'🛰️ Recepção, Entrega & Agrishow', promptPt:'Avisando que o equipamento está pronto para retirada (Aula 12):', sentence:'Good news! Your GPS receiver is ___ for pickup and working perfectly.', opts:['good','done','ready','set'], ans:'ready', rule:'Dizemos "Your receiver is ready for pickup!" (pronto para retirada).' },
+      { section:'expressoes', sectionLabel:'🛰️ Recepção, Entrega & Agrishow', promptPt:'Como falar o código de peça "AG-402" ao telefone para o fornecedor (Aula 13):', sentence:'The part number is AG-402 — spoken on the phone as "___".', opts:['A, G, four hundred and two','A, G, forty, two','Ag, four, zero, two','A, G, four, oh, two'], ans:'A, G, four, oh, two', rule:'Códigos de peça são ditos letra por letra e dígito por dígito, e o zero no meio vira "oh": A, G, four, oh, two.' },
+      { section:'expressoes', sectionLabel:'🛰️ Recepção, Entrega & Agrishow', promptPt:'Despedindo-se de um parceiro comercial na Agrishow (Aula 14):', sentence:'It was great meeting you at Agrishow! I look forward ___ with you soon.', opts:['to work','for working','to working','in working'], ans:'to working', rule:'Depois de "look forward to", usamos sempre a ação com -ING: "look forward to working with you".' },
+      { section:'contexto', sectionLabel:'🔧 Bancada, Fornecedor & Campo', promptPt:'Dando instruções de cuidado ao entregar o monitor (Aula 12):', sentence:'Make sure you keep the connector dry and ___ moisture inside the cab.', opts:['avoid','to avoid','avoiding','avoided'], ans:'avoid', rule:'Para dar dicas de cuidado ("Make sure you keep... and avoid moisture"), usamos a ação na forma base.' },
+      { section:'contexto', sectionLabel:'🔧 Bancada, Fornecedor & Campo', promptPt:'Perguntando prazo de envio ao fornecedor internacional (Aula 13):', sentence:'If we ___ the order today, when ___ you ship the sensors?', opts:['placed / will','place / will','will place / do','place / would'], ans:'place / will', rule:'Na condição real futura: "If we place the order today, when will you ship...?".' },
+      { section:'contexto', sectionLabel:'🔧 Bancada, Fornecedor & Campo', promptPt:'Explicando o que já foi feito no equipamento antes da entrega (Aula 12):', sentence:'We ___ already updated the firmware and calibrated the touch screen.', opts:['did','are','have','were'], ans:'have', rule:'Para ações já concluídas com resultado agora ("já atualizamos"), usamos "We have already updated".' },
+      { section:'contexto', sectionLabel:'🔧 Bancada, Fornecedor & Campo', promptPt:'Falando da experiência da empresa na Agrishow (Aula 14):', sentence:'We ___ worked with precision agriculture ___ over ten years.', opts:['have / for','are / since','worked / for','have / since'], ans:'have / for', rule:'"We have worked... for over ten years" (experiência que continua até hoje + duração com FOR).' },
+      { section:'contexto', sectionLabel:'🔧 Bancada, Fornecedor & Campo', promptPt:'Diagnosticando chicote e tensão na bancada:', sentence:'By the time the display arrived at our shop, someone ___ already opened the case.', opts:['has','was','had','did'], ans:'had', rule:'"By the time... arrived, someone had already opened" (aconteceu antes de chegar à oficina).' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'What seems to be the problem? The screen freezes after ten minutes and shows error code E-15.', promptPt:'Ouça o áudio e complete:', sentence:'The customer says the screen ___ after ten minutes and shows ___.', opts:['turns off / no signal','freezes / error code E-15','breaks / battery low','reboots / code A-40'], ans:'freezes / error code E-15', rule:'O áudio diz: "The screen freezes after ten minutes and shows error code E-15."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'Your monitor is ready! We updated the firmware and replaced the power cable. Please keep it away from moisture.', promptPt:'Ouça a recomendação final do técnico:', sentence:'The technician updated the firmware and advised the customer to keep it away from ___.', opts:['sunlight','dust','moisture','heat'], ans:'moisture', rule:'O técnico orienta: "Please keep it away from moisture."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'Nice to meet you at Agrishow! Here is my business card. Let\'s keep in touch on WhatsApp.', promptPt:'Ouça o áudio e escolha a alternativa correta:', sentence:'At Agrishow, the speaker hands over their ___ and suggests keeping in touch ___.', opts:['invoice / by email','business card / on WhatsApp','catalog / on Monday','receiver / by phone'], ans:'business card / on WhatsApp', rule:'Ouvimos: "Here is my business card. Let\'s keep in touch on WhatsApp."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale a frase completa no microfone!', sentence:'What ___ to be the problem with your monitor?', fullTarget:'What seems to be the problem with your monitor?', opts:['seems','looks','is','makes'], ans:'seems', rule:'"What seems to be the problem with your monitor?"' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'Your equipment is ___ for pickup and working great.', fullTarget:'Your equipment is ready for pickup and working great.', opts:['done','ready','good','fixed'], ans:'ready', rule:'"Your equipment is ready for pickup".' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale em voz alta no microfone!', sentence:'Nice to meet you ___ Agrishow! Here is my business card.', fullTarget:'Nice to meet you at Agrishow! Here is my business card.', opts:['in','on','at','by'], ans:'at', rule:'Para eventos e feiras como a Agrishow, usamos AT: "at Agrishow"!' }
+    ]
+  },
+  'agro_1': {
+    course: 'agro',
+    bloco: 1,
+    backHref: 'classes_agro.html',
+    title: '⚡ Mini-Prova 1 — Agro English (Lições 1 a 10)',
+    subtitle: 'Apresentação, máquinas e ferramentas (This/That, A/An), números e hectares (There is/are), posse (Have/Has), lugares na fazenda, rotina, horas, gostos, Can/Can\'t e clima!',
+    questions: [
+      { section:'expressoes', sectionLabel:'🌱 Expressões do Campo (Aulas 1–5)', promptPt:'Aula 1 (Apresentação no campo) — Complete a frase:', sentence:'Hello! I ___ Luan, and this ___ my partner Marcos. We are agronomists.', opts:['is / am','are / is','am / is','am / are'], ans:'am / is', rule:'Com "I" usamos "am" (I am Luan), e com "this / he / she" usamos "is" (this is Marcos).' },
+      { section:'expressoes', sectionLabel:'🌱 Expressões do Campo (Aulas 1–5)', promptPt:'Aula 2 (Apontando máquinas: A vs. An) — Complete a frase:', sentence:'This is ___ tractor, and that over there is ___ old sprayer.', opts:['an / a','a / a','the / an','a / an'], ans:'a / an', rule:'Usamos "a" antes de som de consoante (a tractor) e "an" antes de som de vogal (an old sprayer).' },
+      { section:'expressoes', sectionLabel:'🌱 Expressões do Campo (Aulas 1–5)', promptPt:'Aula 3 (Quantidades na fazenda: There is / There are) — Complete:', sentence:'___ one pickup truck in the shed, and ___ five hundred hectares of soybean.', opts:['There is / there are','There are / there is','Is there / are there','Have / has'], ans:'There is / there are', rule:'Para existir/haver no singular usamos "There is" (one pickup truck) e no plural usamos "There are" (five hundred hectares).' },
+      { section:'expressoes', sectionLabel:'🌱 Expressões do Campo (Aulas 1–5)', promptPt:'Aula 5 (Onde estão as coisas na fazenda) — Complete:', sentence:'The tractor is ___ the field, and the tools are ___ the workbench.', opts:['on / at','in / on','at / in','by / under'], ans:'in / on', rule:'Dizemos "in the field" (dentro da lavoura/talhão) e "on the workbench" (em cima da bancada).' },
+      { section:'expressoes', sectionLabel:'🌱 Expressões do Campo (Aulas 6–10)', promptPt:'Aula 7 (Horários e partes do dia na fazenda) — Complete:', sentence:'I wake up ___ six o\'clock ___ the morning every day.', opts:['on / in','in / at','at / in','at / on'], ans:'at / in', rule:'Horários no relógio usam AT (at six o\'clock) e manhã usa IN THE (in the morning).' },
+      { section:'contexto', sectionLabel:'🚜 Rotina, Máquinas & Clima (Aulas 4–10)', promptPt:'Aula 4 (Have vs. Has) — Complete a frase:', sentence:'I ___ a pickup truck, and my father ___ two big John Deere tractors.', opts:['has / have','have / has','have / have','am / is'], ans:'have / has', rule:'Com I/you/we/they usamos "have"; com he/she/it (my father) usamos "has".' },
+      { section:'contexto', sectionLabel:'🚜 Rotina, Máquinas & Clima (Aulas 4–10)', promptPt:'Aula 6 & 7 (Rotina na agronomia) — Complete a frase:', sentence:'We ___ soybean and corn, and the harvest ___ in March.', opts:['plant / starts','plants / start','planting / is start','plant / start'], ans:'plant / starts', rule:'Com "We" usamos "plant"; com "the harvest" (ele/ela = it) a ação ganha -S: "starts" (e mês usa "in March").' },
+      { section:'contexto', sectionLabel:'🚜 Rotina, Máquinas & Clima (Aulas 4–10)', promptPt:'Aula 8 (Perguntando gostos com Do / Does) — Complete:', sentence:'___ you like country music, and ___ your brother like soccer?', opts:['Does / do','Are / is','Do / does','Do / do'], ans:'Do / does', rule:'Perguntas com you/we/they usam "Do", e com he/she (your brother) usam "Does".' },
+      { section:'contexto', sectionLabel:'🚜 Rotina, Máquinas & Clima (Aulas 4–10)', promptPt:'Aula 9 & 10 (Habilidade Can/Can\'t e Clima) — Complete:', sentence:'I ___ drive a tractor very well, but we ___ spray today because it is raining and windy.', opts:['can / can\'t','can to / don\'t','am / aren\'t','can / not'], ans:'can / can\'t', rule:'"Can drive" = sei/posso dirigir; "can\'t spray" = não podemos pulverizar hoje por causa da chuva e vento.' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'Good morning! I\'m Luan. I work on a soybean farm and I wake up at six o\'clock every day.', promptPt:'Ouça o áudio e complete a frase:', sentence:'Luan works on a ___ farm and wakes up ___ every day.', opts:['corn / at five o\'clock','coffee / in the afternoon','soybean / at six o\'clock','cattle / at seven o\'clock'], ans:'soybean / at six o\'clock', rule:'O áudio diz: "I work on a soybean farm and I wake up at six o\'clock every day."' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'How many hectares are there on your farm? There are four hundred hectares of corn and two trucks in the shed.', promptPt:'Ouça o áudio e escolha a alternativa correta:', sentence:'On the farm, there are ___ hectares of corn and ___ in the shed.', opts:['four hundred / two trucks','fourteen / one tractor','five hundred / three sprayers','two hundred / four bags'], ans:'four hundred / two trucks', rule:'O áudio informa: "There are four hundred hectares of corn and two trucks in the shed."' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'Can you drive a combine harvester? Yes, I can, but today it\'s raining heavily in the field.', promptPt:'Ouça o áudio e complete:', sentence:'The speaker ___ drive a harvester, but today ___ in the field.', opts:['can\'t / it is sunny','can / it is raining heavily','likes to / it is very hot','wants to / there is frost'], ans:'can / it is raining heavily', rule:'Ouvimos: "Yes, I can, but today it\'s raining heavily in the field."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Fale a frase inteira no microfone!', sentence:'Hello! I ___ an agronomist and I work on a farm.', fullTarget:'Hello! I am an agronomist and I work on a farm.', opts:['is','are','am','be'], ans:'am', rule:'"I am an agronomist and I work on a farm."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Leia a frase em voz alta no microfone!', sentence:'I wake up ___ six o\'clock in the morning.', fullTarget:'I wake up at six o\'clock in the morning.', opts:['in','on','at','by'], ans:'at', rule:'Horas exatas usam AT: "at six o\'clock in the morning".' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'Yes, I ___ drive a tractor and a pickup truck.', fullTarget:'Yes, I can drive a tractor and a pickup truck.', opts:['can','do','am','have'], ans:'can', rule:'"Yes, I can drive a tractor and a pickup truck."' }
+    ]
+  },
+  'agro_2': {
+    course: 'agro',
+    bloco: 2,
+    backHref: 'classes_agro.html',
+    title: '⚡ Mini-Prova 2 — Agro English (Unidades 11 a 20)',
+    subtitle: 'Ações acontecendo agora na lavoura, sementes e solo, pulverização, preço de peças, passado na fazenda (was/were, went), comparativos de máquinas e próxima safra!',
+    questions: [
+      { section:'expressoes', sectionLabel:'🌾 Lavoura, Peças & Safra', promptPt:'Perguntando o preço de uma peça na loja agrícola (Unidade 13/24):', sentence:'Excuse me, ___ is this hydraulic filter for the planter?', opts:['how many','how much','what price','how long'], ans:'how much', rule:'Para perguntar o preço de algo, dizemos sempre "How much is this...?".' },
+      { section:'expressoes', sectionLabel:'🌾 Lavoura, Peças & Safra', promptPt:'Falando sobre o monitor dentro da cabine do trator (Unidade 19):', sentence:'The GPS screen ___ the cab is showing a green signal.', opts:['on','at','in','by'], ans:'in', rule:'Dentro da cabine do trator ou caminhão dizemos "in the cab".' },
+      { section:'expressoes', sectionLabel:'🌾 Lavoura, Peças & Safra', promptPt:'Falando da próxima safra e estação do ano:', sentence:'We are going to start planting ___ October, right after the first rain.', opts:['on','at','by','in'], ans:'in', rule:'Meses do ano usam sempre IN: in October, in March.' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'O que está acontecendo agora mesmo na lavoura (Unidade 21):', sentence:'Look! Marcos ___ the sprayer right now, and the team ___ the seeds.', opts:['drives / checks','is driving / is checking','drove / checked','drive / check'], ans:'is driving / is checking', rule:'Para o que está acontecendo agora mesmo ("Look! / right now"), usamos am/is/are + -ING.' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'Como estava o tempo ontem na fazenda (Unidade 25 — Was / Were):', sentence:'Yesterday the weather ___ sunny, and the trucks ___ ready at the gate.', opts:['was / was','were / was','was / were','is / are'], ans:'was / were', rule:'No passado, singular usa WAS (the weather was) e plural usa WERE (the trucks were).' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'Contando o que você fez ontem no campo (Unidade 26):', sentence:'Yesterday morning I ___ to the field early and ___ the soil moisture.', opts:['go / check','went / checked','was / checking','gone / checked'], ans:'went / checked', rule:'No passado ("Yesterday morning"), "go" vira "went" e "check" vira "checked".' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'Comparando duas máquinas agrícolas (Unidade 27):', sentence:'The new combine harvester is ___ and ___ than the old one.', opts:['fast / big','more fast / more big','faster / bigger','fastest / biggest'], ans:'faster / bigger', rule:'Para comparar duas máquinas com palavras curtas, adicionamos -ER: faster (mais rápida) e bigger (maior).' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'Comparando eficiência com palavras longas (Unidade 27):', sentence:'GPS autopilot is much ___ than manual steering at night.', opts:['more accurate','accurater','most accurate','as accurate'], ans:'more accurate', rule:'Com palavras longas como "accurate" (preciso), comparamos usando "more accurate than".' },
+      { section:'contexto', sectionLabel:'🚜 Agora, Passado & Futuro na Fazenda', promptPt:'Planos para a próxima safra (Unidade 28 — Going to):', sentence:'Next harvest, we ___ plant two hundred more hectares of corn.', opts:['going to','are going to','will to','went to'], ans:'are going to', rule:'Para planos futuros na fazenda ("Next harvest"), usamos "We are going to plant...".' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'I\'m in the cab right now checking the GPS monitor before we start spraying.', promptPt:'Ouça o áudio e complete:', sentence:'The speaker is ___ right now checking the ___ before spraying.', opts:['at the store / tires','in the cab / GPS monitor','in the shed / engine','on the road / truck'], ans:'in the cab / GPS monitor', rule:'Ouvimos: "I\'m in the cab right now checking the GPS monitor before we start spraying."' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'Yesterday I went to the farm store and bought three new nozzles for the sprayer.', promptPt:'Ouça o áudio e responda:', sentence:'Yesterday the speaker ___ to the farm store and bought ___.', opts:['goes / fertilizer','will go / seeds','went / three new nozzles','was going / a tractor'], ans:'went / three new nozzles', rule:'O áudio conta: "Yesterday I went to the farm store and bought three new nozzles for the sprayer."' },
+      { section:'listening', sectionLabel:'🎧 Listening no Campo', audioText:'This new tractor is bigger and faster than our old one, and next season we are going to buy another planter.', promptPt:'Ouça o áudio e complete:', sentence:'The new tractor is ___, and next season they ___ another planter.', opts:['smaller / bought','bigger and faster / are going to buy','older / will sell','slower / are fixing'], ans:'bigger and faster / are going to buy', rule:'O áudio diz: "bigger and faster than our old one, and next season we are going to buy another planter."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Fale a frase inteira no microfone!', sentence:'I ___ working in the soybean field right now.', fullTarget:'I am working in the soybean field right now.', opts:['am','is','are','do'], ans:'am', rule:'"I am working in the soybean field right now."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Leia em voz alta no microfone!', sentence:'Yesterday I ___ to the farm and checked the machines.', fullTarget:'Yesterday I went to the farm and checked the machines.', opts:['go','went','going','goes'], ans:'went', rule:'Passado de go = went: "Yesterday I went to the farm and checked the machines."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking no Campo', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'The new tractor is ___ and faster than the old one.', fullTarget:'The new tractor is bigger and faster than the old one.', opts:['big','more big','bigger','biggest'], ans:'bigger', rule:'"The new tractor is bigger and faster than the old one."' }
+    ]
+  }
+};
+
+const params = new URLSearchParams(location.search);
+const curCourse = (params.get('curso') || 'intermediate').toLowerCase();
+const curBloco = Number(params.get('bloco') || 1);
+const examKey = `${curCourse}_${curBloco}`;
+const ACTIVE_EXAM = MINI_EXAMS[examKey] || MINI_EXAMS['intermediate_1'];
+const EXAM_QUESTIONS = ACTIVE_EXAM.questions;
+const EXAM_DURATION_SEC = 15 * 60;
+const STORAGE_KEY = `capyMiniExam_${examKey}`;
+
+// Populate header & switcher
+document.getElementById('mini-exam-title').textContent = ACTIVE_EXAM.title;
+document.getElementById('mini-exam-subtitle').textContent = ACTIVE_EXAM.subtitle;
+document.getElementById('back-course-link').href = ACTIVE_EXAM.backHref;
+document.getElementById('res-back-btn').href = ACTIVE_EXAM.backHref;
+
+const switcherEl = document.getElementById('mini-exam-switcher');
+Object.entries(MINI_EXAMS).forEach(([k, ex]) => {
+  const active = k === examKey;
+  const a = document.createElement('a');
+  a.href = `mini_prova.html?curso=${ex.course}&bloco=${ex.bloco}`;
+  a.className = `text-xs font-black px-3.5 py-1.5 rounded-full border transition-all ${active ? 'bg-white text-navy border-white shadow' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`;
+  const labelMap = {
+    intermediate_1: '🎯 Intermediate · Lições 1–10',
+    intermediate_2: '🎯 Intermediate · Lições 11–20',
+    gpstronic_1: '🛰️ GPS Tronic · Lições 1–10',
+    gpstronic_2: '🛰️ GPS Tronic · Lições 11–14+',
+    agro_1: '🌱 Agro English · Lições 1–10',
+    agro_2: '🌱 Agro English · Lições 11–20'
+  };
+  a.textContent = labelMap[k] || ex.title;
+  switcherEl.appendChild(a);
+});
+
+let currentIdx = 0;
+let remainingSec = EXAM_DURATION_SEC;
+let timerInterval = null;
+let examStartTime = 0;
+let userResponses = {};
+let activeMicIndex = null;
+
+function formatTime(sec) {
+  const s = Math.max(0, Math.floor(sec));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function prepareShuffledOptions() {
+  let lastCorrectPos = -1;
+  EXAM_QUESTIONS.forEach(q => {
+    const arr = [...q.opts];
+    for (let attempt = 0; attempt < 10; attempt++) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      const pos = arr.indexOf(q.ans);
+      if (pos !== lastCorrectPos) {
+        lastCorrectPos = pos;
+        break;
+      }
+    }
+    q._shuffledOpts = arr;
+  });
+}
+
+function startExam() {
+  currentIdx = 0;
+  remainingSec = EXAM_DURATION_SEC;
+  examStartTime = Date.now();
+  userResponses = {};
+  prepareShuffledOptions();
+  if (activeMicIndex !== null && window.CapyMic) {
+    CapyMic.cancel();
+    activeMicIndex = null;
+  }
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-result').classList.add('hidden');
+  document.getElementById('screen-exam').classList.remove('hidden');
+  document.getElementById('exam-sticky-bar').classList.remove('hidden');
+  startTimer();
+  renderNavPills();
+  renderCurrentQuestion();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  document.getElementById('timer-display').textContent = formatTime(remainingSec);
+  timerInterval = setInterval(() => {
+    remainingSec--;
+    document.getElementById('timer-display').textContent = formatTime(remainingSec);
+    if (remainingSec <= 0) {
+      clearInterval(timerInterval);
+      finishExam();
+    }
+  }, 1000);
+}
+
+function getCompletedCount() {
+  return Object.values(userResponses).filter(r => r && r.completed).length;
+}
+function getScoreCount() {
+  return Object.values(userResponses).filter(r => r && r.finalOk).length;
+}
+
+function renderNavPills() {
+  const nav = document.getElementById('q-nav-pills');
+  nav.innerHTML = EXAM_QUESTIONS.map((q, idx) => {
+    const r = userResponses[idx];
+    const isCurrent = idx === currentIdx;
+    let cls = 'bg-slate-100 text-slate-500 border-slate-200';
+    if (r && r.completed) {
+      cls = r.finalOk ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
+    }
+    if (isCurrent) cls += ' ring-2 ring-orange-500 font-black scale-105';
+    return `<button type="button" onclick="goToQuestion(${idx})" class="w-8 h-8 rounded-xl border text-xs font-bold flex items-center justify-center transition-all flex-shrink-0 ${cls}">${idx + 1}</button>`;
+  }).join('');
+  document.getElementById('live-score').textContent = getScoreCount();
+  document.getElementById('exam-progress-bar').style.width = `${Math.round((getCompletedCount() / EXAM_QUESTIONS.length) * 100)}%`;
+}
+
+function goToQuestion(idx) {
+  if (activeMicIndex !== null && window.CapyMic) { CapyMic.cancel(); activeMicIndex = null; }
+  currentIdx = idx;
+  renderNavPills();
+  renderCurrentQuestion();
+}
+
+function renderSentenceWithBlank(sentence, state) {
+  const safe = escapeHtml(sentence);
+  if (!state || !state.chosen) return safe.replace('___', `<span class="blank-slot">___</span>`);
+  const slotCls = state.choiceOk ? 'blank-slot filled-ok' : 'blank-slot filled-err';
+  return safe.replace('___', `<span class="${slotCls}">${escapeHtml(state.chosen)}</span>`);
+}
+
+function renderCurrentQuestion() {
+  const q = EXAM_QUESTIONS[currentIdx];
+  const st = userResponses[currentIdx] || null;
+  const card = document.getElementById('question-card');
+  document.getElementById('q-counter-top').textContent = `Questão ${currentIdx + 1} / ${EXAM_QUESTIONS.length}`;
+  document.getElementById('section-pill').textContent = q.sectionLabel;
+
+  let listeningHtml = '';
+  if (q.section === 'listening') {
+    listeningHtml = `
+      <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-5 mb-5">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-3">
+            <button type="button" onclick="playExamAudio(${currentIdx}, 0.92)" class="w-12 h-12 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shadow transition-all">
+              <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">volume_up</span>
+            </button>
+            <div>
+              <p class="font-black text-navy text-sm">Ouça a frase em inglês</p>
+              <p class="text-xs text-slate-500">Escute quantas vezes precisar antes de responder.</p>
+            </div>
+          </div>
+          <button type="button" onclick="playExamAudio(${currentIdx}, 0.68)" class="bg-white border-2 border-indigo-200 text-indigo-700 text-xs font-black px-3 py-2 rounded-xl">🐢 Ouvir devagar</button>
+        </div>
+        ${st && st.completed ? `<div class="mt-3 pt-3 border-t border-indigo-200/70 text-xs text-indigo-950"><strong>📄 O que foi dito:</strong> "${escapeHtml(q.audioText)}"</div>` : ''}
+      </div>`;
+  }
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const optionsHtml = q._shuffledOpts.map((opt, oi) => {
+    const isChosen = st && st.chosen === opt;
+    const isCorrectOpt = opt === q.ans;
+    let btnCls = 'border-slate-200 bg-white text-navy';
+    let badgeCls = 'bg-slate-100 text-slate-600';
+    if (st && st.chosen) {
+      if (isCorrectOpt) { btnCls = 'opt-btn correct'; badgeCls = 'bg-emerald-600 text-white'; }
+      else if (isChosen && !st.choiceOk) { btnCls = 'opt-btn wrong'; badgeCls = 'bg-red-600 text-white'; }
+      else { btnCls = 'border-slate-200 bg-slate-50 text-slate-400 opacity-70'; }
+    }
+    return `
+      <button type="button" ${(st && st.chosen) ? 'disabled' : ''} onclick="selectExamOption(${currentIdx}, ${oi})"
+              class="opt-btn w-full text-left border-2 rounded-2xl p-4 flex items-center gap-3.5 font-bold text-sm md:text-base ${btnCls}">
+        <span class="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center flex-shrink-0 ${badgeCls}">${letters[oi]}</span>
+        <span class="flex-1">${escapeHtml(opt)}</span>
+      </button>`;
+  }).join('');
+
+  let speakingHtml = '';
+  if (q.section === 'speaking') {
+    const chosenDone = !!(st && st.chosen);
+    const spokenDone = !!(st && st.spokenCompleted);
+    speakingHtml = `
+      <div class="mt-6 bg-emerald-50/90 border-2 border-emerald-200 rounded-2xl p-5">
+        <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+          <div>
+            <p class="font-black text-emerald-900 text-sm">🎤 Etapa de Voz — Leia a frase completa:</p>
+            <p class="text-xs text-emerald-800 mt-0.5">${chosenDone ? `Frase: <strong>"${escapeHtml(q.fullTarget)}"</strong>` : 'Escolha primeiro uma alternativa acima para liberar o microfone.'}</p>
+          </div>
+          ${chosenDone ? `<button type="button" onclick="playTargetSentence(${currentIdx})" class="bg-white border border-emerald-300 text-emerald-700 text-xs font-black px-3 py-1.5 rounded-xl">🔊 Ouvir pronúncia</button>` : ''}
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button type="button" id="exam-mic-btn-${currentIdx}" ${!chosenDone ? 'disabled' : ''} onclick="toggleExamMic(${currentIdx})"
+                  class="inline-flex items-center gap-2 ${!chosenDone ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} font-black text-sm px-5 py-3 rounded-2xl transition-all">
+            <span>🎤 ${spokenDone ? 'Gravar novamente' : 'Gravar minha voz'}</span>
+          </button>
+          ${chosenDone && !spokenDone ? `<button type="button" onclick="skipMicStep(${currentIdx})" class="text-xs font-bold text-slate-500 hover:text-navy underline">Estou sem microfone agora</button>` : ''}
+        </div>
+        <div id="exam-mic-feedback-${currentIdx}" class="${st && st.spokenFeedback ? '' : 'hidden'} mt-3 p-3 rounded-xl text-xs font-bold ${st && st.spokenOk ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+          ${st && st.spokenFeedback ? st.spokenFeedback : ''}
+        </div>
+      </div>`;
+  }
+
+  let feedbackHtml = '';
+  if (st && st.chosen) {
+    feedbackHtml = `
+      <div class="mt-5 rounded-2xl p-4 border-2 ${st.choiceOk ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-rose-50/70 border-rose-200 text-rose-900'}">
+        <p class="font-black text-sm mb-1">${st.choiceOk ? '✅ Resposta certa!' : `❌ A expressão correta é: "${escapeHtml(q.ans)}"`}</p>
+        <p class="text-xs leading-relaxed">💡 ${escapeHtml(q.rule)}</p>
+      </div>`;
+  }
+
+  const isLast = currentIdx === EXAM_QUESTIONS.length - 1;
+  card.innerHTML = `
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <span class="text-xs font-black uppercase tracking-wider text-amber-600">${q.sectionLabel}</span>
+      <span class="text-xs font-bold text-slate-400">Questão ${currentIdx + 1} de ${EXAM_QUESTIONS.length}</span>
+    </div>
+    <p class="text-xs md:text-sm font-bold text-slate-500 mb-3">${escapeHtml(q.promptPt)}</p>
+    ${listeningHtml}
+    <div class="bg-slate-50 border-2 border-slate-200/80 rounded-2xl p-5 mb-6">
+      <p class="text-lg md:text-xl font-black text-navy leading-relaxed">${renderSentenceWithBlank(q.sentence, st)}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${optionsHtml}</div>
+    ${speakingHtml}
+    ${feedbackHtml}
+    <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+      <button type="button" onclick="goToQuestion(${Math.max(0, currentIdx - 1)})" ${currentIdx === 0 ? 'disabled' : ''}
+              class="px-5 py-3 rounded-2xl font-black text-sm border-2 ${currentIdx === 0 ? 'border-slate-100 text-slate-300 cursor-not-allowed' : 'border-slate-200 text-navy hover:bg-slate-50'}">← Anterior</button>
+      ${!isLast
+        ? `<button type="button" onclick="goToQuestion(${currentIdx + 1})" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-sm px-7 py-3.5 rounded-2xl shadow-md">Próxima →</button>`
+        : `<button type="button" onclick="finishExam()" class="bg-gradient-to-r from-emerald-500 to-green-600 text-white font-black text-sm px-7 py-3.5 rounded-2xl shadow-md">🏆 Ver Resultado</button>`}
+    </div>`;
+}
+
+function selectExamOption(qIndex, optIndex) {
+  const q = EXAM_QUESTIONS[qIndex];
+  const chosen = q._shuffledOpts[optIndex];
+  const choiceOk = chosen === q.ans;
+  if (window.CapySound) { if (choiceOk) CapySound.correct(); else CapySound.wrong(); }
+  const isSpeaking = q.section === 'speaking';
+  userResponses[qIndex] = {
+    chosen,
+    choiceOk,
+    spokenCompleted: !isSpeaking,
+    spokenOk: !isSpeaking,
+    finalOk: !isSpeaking ? choiceOk : false,
+    completed: !isSpeaking
+  };
+  renderNavPills();
+  renderCurrentQuestion();
+}
+
+function playExamAudio(qIndex, rate) {
+  const q = EXAM_QUESTIONS[qIndex];
+  if (!q || !q.audioText) return;
+  if (rate && rate < 0.8 && window.speechSynthesis) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(q.audioText);
+    u.lang = 'en-US'; u.rate = rate;
+    speechSynthesis.speak(u);
+    return;
+  }
+  if (window.CapyTTS) CapyTTS.speak(q.audioText, 'en-US');
+}
+
+function playTargetSentence(qIndex) {
+  const q = EXAM_QUESTIONS[qIndex];
+  if (q && window.CapyTTS) CapyTTS.speak(q.fullTarget, 'en-US');
+}
+
+async function toggleExamMic(qIndex) {
+  const btn = document.getElementById(`exam-mic-btn-${qIndex}`);
+  const q = EXAM_QUESTIONS[qIndex];
+  if (!btn || !q || !window.CapyMic) { skipMicStep(qIndex); return; }
+  if (activeMicIndex === qIndex) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ Avaliando...</span>';
+    const { text, empty, error } = await CapyMic.stopAndTranscribe({ lang: 'en' });
+    activeMicIndex = null;
+    btn.disabled = false;
+    if (error || empty || !text.trim()) {
+      btn.innerHTML = '<span>🎤 Tentar novamente</span>';
+      return;
+    }
+    const res = window.CapyFala ? CapyFala.acerto(q.fullTarget, text, 'en') : { pct: 85 };
+    const passedSpeak = res.pct >= 65;
+    const st = userResponses[qIndex] || {};
+    st.spokenCompleted = true;
+    st.spokenOk = passedSpeak;
+    st.completed = true;
+    st.finalOk = !!(st.choiceOk && passedSpeak);
+    st.spokenFeedback = passedSpeak
+      ? `✅ Boa pronúncia (${res.pct}%)! Você disse: "${escapeHtml(text)}"`
+      : `🎤 Você disse: "${escapeHtml(text)}" (${res.pct}%). Tente repetir mais uma vez!`;
+    userResponses[qIndex] = st;
+    renderNavPills();
+    renderCurrentQuestion();
+    return;
+  }
+  const started = await CapyMic.start({
+    onError: () => skipMicStep(qIndex),
+    onAutoStop: () => { if (activeMicIndex === qIndex) toggleExamMic(qIndex); }
+  });
+  if (started) {
+    activeMicIndex = qIndex;
+    btn.innerHTML = '<span>⏹ Parar e avaliar</span>';
+  }
+}
+
+function skipMicStep(qIndex) {
+  const st = userResponses[qIndex];
+  if (!st || !st.chosen) return;
+  st.spokenCompleted = true; st.spokenOk = true; st.completed = true; st.finalOk = st.choiceOk;
+  st.spokenFeedback = 'ℹ️ Etapa de voz validada no modo silencioso.';
+  userResponses[qIndex] = st;
+  renderNavPills();
+  renderCurrentQuestion();
+}
+
+function confirmFinishEarly() {
+  finishExam();
+}
+
+function finishExam() {
+  clearInterval(timerInterval);
+  document.getElementById('exam-sticky-bar').classList.add('hidden');
+  document.getElementById('screen-exam').classList.add('hidden');
+  document.getElementById('screen-result').classList.remove('hidden');
+
+  const total = EXAM_QUESTIONS.length;
+  const score = getScoreCount();
+  const pct = Math.round((score / total) * 100);
+  const passed = pct >= 70;
+  const xp = passed ? 120 : 60;
+  if (typeof Store !== 'undefined' && Store.addXP) Store.addXP(xp);
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ score, total, pct, passed, date: new Date().toISOString() }));
+  } catch (e) {}
+
+  document.getElementById('res-emoji').textContent = passed ? '🏆' : '💪';
+  document.getElementById('res-title').textContent = passed ? 'Excelente! Checkpoint de 10 Lições Concluído!' : 'Bom treino! Revise o gabarito abaixo';
+  document.getElementById('res-desc').textContent = passed
+    ? 'Você mandou muito bem nas 10 lições deste bloco e já pode avançar com segurança!'
+    : 'Veja a explicação de cada frase abaixo e refaça a Mini-Prova quando quiser.';
+  document.getElementById('res-score-pct').textContent = `${pct}%`;
+  document.getElementById('res-score-raw').textContent = `${score} / ${total}`;
+  document.getElementById('res-xp-earned').textContent = `+${xp} XP`;
+
+  document.getElementById('res-review-list').innerHTML = EXAM_QUESTIONS.map((q, i) => {
+    const r = userResponses[i];
+    const ok = !!(r && r.finalOk);
+    return `
+      <div class="rounded-2xl border-2 p-4 ${ok ? 'border-emerald-200 bg-emerald-50/40' : 'border-rose-200 bg-rose-50/40'}">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-black text-navy">Questão ${i + 1} · ${q.sectionLabel}</span>
+          <span class="text-xs font-black ${ok ? 'text-emerald-700' : 'text-rose-700'}">${ok ? '✅ Acertou' : '❌ Revisar'}</span>
+        </div>
+        <p class="text-sm font-black text-navy mb-1">${escapeHtml(q.sentence.replace('___', `[ ${q.ans} ]`))}</p>
+        <p class="text-xs text-slate-600">💡 ${escapeHtml(q.rule)}</p>
+      </div>`;
+  }).join('');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restartExam() {
+  startExam();
+}
+</script>
+</body>
+</html>
