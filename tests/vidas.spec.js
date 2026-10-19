@@ -33,53 +33,67 @@ async function abrirPratica(page) {
   };
 }
 
-test('a free student\'s wrong answer spends a life; a right one does not', async ({ page }) => {
-  const { erros } = await abrir(page, { vidas: 5, depois: [4] });
+// The trail's answers need a lesson on screen; these tests call them directly,
+// the way their buttons do. What matters is the wrong sound inside them.
+const responder = (page, js) => page.evaluate(js).catch(() => {});
+
+test('on the daily trail a wrong answer spends a life; a right one does not', async ({ page }) => {
+  const { erros } = await abrir(page, { vidas: 5, depois: [4], pagina: '/lessons.html' });
   await expect(page.locator('#capy-vidas')).toHaveText('❤️ 5');
-  const { errada } = await abrirPratica(page);
-  await errada.click();
+  await responder(page, () => { try { answerListen(document.createElement('button'), true); } catch (e) {} });
+  await page.waitForTimeout(300);
+  expect(erros).toHaveLength(0);
+  await responder(page, () => { try { answerListen(document.createElement('button'), false); } catch (e) {} });
   await expect(page.locator('#capy-vidas')).toHaveText('❤️ 4');
-  expect(erros).toHaveLength(1);
-  // The answered question is locked: clicking again spends nothing.
-  await errada.click({ force: true });
-  await page.waitForTimeout(200);
   expect(erros).toHaveLength(1);
 });
 
-test('a right answer spends nothing', async ({ page }) => {
-  const { erros } = await abrir(page, { vidas: 5 });
-  const { certa } = await abrirPratica(page);
-  await certa.click();
+test('a pronunciation miss on the trail spends nothing', async ({ page }) => {
+  const { erros } = await abrir(page, { vidas: 5, pagina: '/lessons.html' });
+  await expect(page.locator('#capy-vidas')).toHaveText('❤️ 5');
+  await page.evaluate(() => CapySound.wrong());
   await page.waitForTimeout(300);
   expect(erros).toHaveLength(0);
-  await expect(page.locator('#capy-vidas')).toHaveText('❤️ 5');
 });
 
 test('the last life lost opens the warning, with the invite and the plans', async ({ page }) => {
-  await abrir(page, { vidas: 1, depois: [0] });
-  const { errada } = await abrirPratica(page);
-  await errada.click();
+  await abrir(page, { vidas: 1, depois: [0], pagina: '/lessons.html' });
+  await expect(page.locator('#capy-vidas')).toHaveText('❤️ 1');
+  await responder(page, () => { try { answerSpeed(document.createElement('button'), false, 'cow', 'vaca'); } catch (e) {} });
   const aviso = page.locator('#capy-vidas-aviso');
   await expect(aviso.getByText('Suas vidas acabaram')).toBeVisible({ timeout: 4000 });
   await expect(aviso.getByRole('button', { name: /Convidar um amigo/ })).toBeVisible();
   await expect(aviso.getByRole('link', { name: /Pro/ })).toHaveAttribute('href', 'landing.html#pricing');
 });
 
-test('with no lives the answer does not run: the warning opens instead', async ({ page }) => {
-  const { erros } = await abrir(page, { vidas: 0 });
-  const { certa } = await abrirPratica(page);
-  await certa.click();
+test('with no lives the trail answer does not run: the warning opens instead', async ({ page }) => {
+  const { erros } = await abrir(page, { vidas: 0, pagina: '/lessons.html' });
+  await expect(page.locator('#capy-vidas')).toHaveText('❤️ 0');
+  const rodou = await page.evaluate(() => {
+    let tocou = false; const antes = CapySound.correct;
+    CapySound.correct = () => { tocou = true; };
+    try { answerListen(document.createElement('button'), true); } catch (e) {}
+    CapySound.correct = antes;
+    return tocou;
+  });
+  expect(rodou).toBe(false);
   await expect(page.locator('#capy-vidas-aviso').getByText('Suas vidas acabaram')).toBeVisible();
-  expect(await page.evaluate(() => pracScore)).toBe(0);
-  await expect(certa).toBeEnabled();
   expect(erros).toHaveLength(0);
 });
 
-test('Pro and Super see no lives and spend nothing', async ({ page }) => {
-  const { erros } = await abrir(page, { ilimitado: true });
+test('courses spend no lives: no counter, wrong answers are free', async ({ page }) => {
+  const { erros } = await abrir(page, { vidas: 5 });
   const { errada } = await abrirPratica(page);
   await errada.click();
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(400);
+  await expect(page.locator('#capy-vidas')).toHaveCount(0);
+  expect(erros).toHaveLength(0);
+});
+
+test('Pro and Super see no lives on the trail either', async ({ page }) => {
+  const { erros } = await abrir(page, { ilimitado: true, pagina: '/lessons.html' });
+  await responder(page, () => { try { answerListen(document.createElement('button'), false); } catch (e) {} });
+  await page.waitForTimeout(400);
   await expect(page.locator('#capy-vidas')).toHaveCount(0);
   expect(erros).toHaveLength(0);
 });

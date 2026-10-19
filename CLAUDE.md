@@ -624,13 +624,15 @@ O grátis usa o site inteiro: todos os cursos e aulas, sem cadeado. O limite é 
   saldo do grátis e usa só o limite próprio.
 - **Página nova:** não tranca conteúdo por plano. Limite de IA é sempre do servidor, nunca um contador no
   navegador.
-- **❤️ Vidas (o que não é IA):** 5 para o grátis logado; cada erro numa pergunta gasta 1; volta 1 a cada
-  4 h (`VIDAS_MAX`, `VIDAS_RECARGA_SEG`). O servidor conta (`GET /api/vidas`, `POST /api/vidas/errou`,
-  função `vidas_estado` em `202610190002_vidas_convites.sql`). O `vidas.js`, que o `components.js` carrega
-  em toda página, embrulha `answerQ`, `answerPrac` e `answerQuiz` (lista `ESPIAS`) e lê o erro em qualquer
-  ordem de argumentos. Sem vidas, a resposta não roda e abre o aviso. Pro e Super não veem nada.
-- **Pergunta nova:** use um desses três nomes, como `function` global; outro nome entra em `ESPIAS`. Página
-  sem `components.js` carrega `vidas.js?v=vd1` antes de `</body>` (o teste confere).
+- **❤️ Vidas, só na trilha diária** (`lessons.html`; regra do Luis, 19/out): 5 para o grátis logado; cada
+  erro numa pergunta gasta 1; volta 1 a cada 4 h (`VIDAS_MAX`, `VIDAS_RECARGA_SEG`). Cursos, jogos e
+  prática solta não gastam vida: o limite deles é só a IA. O servidor conta (`GET /api/vidas`,
+  `POST /api/vidas/errou`, função `vidas_estado` em `202610190002_vidas_convites.sql`). O `vidas.js`, que o
+  `components.js` carrega em toda página, conta um erro quando o `CapySound.wrong()` toca dentro de uma das
+  respostas da trilha (`RESPOSTAS_DA_TRILHA`: `answerQuiz`, `answerReview`, `answerListen`, `answerSpeed`).
+  A pronúncia não gasta vida. Sem vidas, a resposta não roda e abre o aviso. Pro e Super não veem nada.
+- **Pergunta nova na trilha:** toque `CapySound.wrong()` no erro e ponha o nome da função em
+  `RESPOSTAS_DA_TRILHA` (o teste confere as quatro).
 - **Convidar e ganhar:** `GET /api/convite` dá o link `landing.html?convite=<código>`; o `vidas.js` guarda o
   código e, quando a conta nova existe, chama `POST /api/convite/aceitar`. Só vale para conta com e-mail
   confirmado e criada há menos de 7 dias: os dois ganham +5 vidas e +5 créditos de IA guardados

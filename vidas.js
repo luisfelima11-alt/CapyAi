@@ -1,16 +1,17 @@
-/* ❤️ Vidas do plano grátis (regra do Luis, 19/out/2026).
+/* ❤️ Vidas do plano grátis (regras do Luis, 19/out/2026).
  *
- * O aluno grátis usa o site inteiro; o que acaba são as vidas: 5, cada erro
- * numa pergunta gasta 1, e volta 1 a cada 4 horas. Quem conta é o servidor
- * (GET /api/vidas, POST /api/vidas/errou); aqui só se mostra o contador e se
- * avisa o erro. Pro e Super não veem nada.
+ * Só na TRILHA DIÁRIA (lessons.html): 5 vidas, cada erro numa pergunta gasta 1,
+ * e volta 1 a cada 4 horas. Cursos, jogos e prática solta não gastam vida (o
+ * limite deles é só a IA). Quem conta é o servidor (GET /api/vidas, POST
+ * /api/vidas/errou); aqui só se mostra o contador e se avisa o erro. Pro e
+ * Super não veem nada.
  *
- * Os erros vêm das funções de resposta que as páginas já têm, embrulhadas
- * aqui como o game-celebra.js faz com os jogos (ESPIAS). Página nova com
- * pergunta: use um desses nomes, ou acrescente o dela em ESPIAS.
+ * Um erro é o som de erro (CapySound.wrong) tocado DENTRO de uma das respostas
+ * de pergunta da trilha (RESPOSTAS_DA_TRILHA). A pronúncia também toca esse som
+ * quando o reconhecimento de voz não entende, e não gasta vida.
  *
- * Também guarda o código de convite de um link ?convite=... e, quando o aluno
- * entra na conta, manda para POST /api/convite/aceitar.
+ * Em toda página, também guarda o código de convite de um link ?convite=... e,
+ * quando o aluno entra na conta, manda para POST /api/convite/aceitar.
  */
 (function () {
     if (window.__capyVidas) return;
@@ -24,23 +25,11 @@
         if (cod && /^[a-z0-9]{10}$/i.test(cod)) localStorage.setItem('capyConvite', cod.toLowerCase());
     } catch (e) {}
 
-    // ── Quem errou: cada função de resposta, com o jeito dela de dizer ─────────
-    // Devolve true (errou), false (acertou) ou null (não dá para saber).
-    // A ordem dos argumentos varia de página para página — answerQ(ans, btn, q),
-    // answerQ(btn, qi, chosen, correct), answerQ(btn, chosen, correct, explicação),
-    // answerPrac(chosen, correct, btn), answerQuiz(btn, chosen, correct) e
-    // answerQuiz(chosen, correct, btn) no alfabeto —, mas sempre há um objeto
-    // pergunta com .a, ou os dois primeiros textos são a escolha e a certa.
-    function errou(a) {
-        const q = a.find(x => x && typeof x === 'object' && x.nodeType !== 1 && 'a' in x);
-        const textos = a.filter(x => typeof x === 'string');
-        if (q && textos.length) return textos[0].trim() !== String(q.a).trim();
-        if (textos.length >= 2) return textos[0].trim() !== textos[1].trim();
-        return null;
-    }
-    const ESPIAS = ['answerQ', 'answerPrac', 'answerQuiz'];
-    const botaoDe = a => a.find(x => x && x.nodeType === 1) || null;
-    const contados = new WeakSet();   // um botão só gasta uma vez
+    // ── Onde a vida conta: só nas perguntas da trilha diária ─────────────────
+    const NA_TRILHA = /(^|\/)lessons\.html$/.test(location.pathname);
+    const RESPOSTAS_DA_TRILHA = ['answerQuiz', 'answerReview', 'answerListen', 'answerSpeed'];
+    let respondendo = 0;     // > 0 while one of those answers runs
+    let errouAgora = false;
 
     // ── Contador ─────────────────────────────────────────────────────────────
     let selo = null;
@@ -130,20 +119,31 @@
         }
     }
 
-    // ── Embrulha as funções de resposta ──────────────────────────────────────
+    // ── Embrulha as respostas da trilha e o som de erro ───────────────────────
     function embrulhar() {
-        for (const nome of ESPIAS) {
+        const som = window.CapySound;
+        if (som && typeof som.wrong === 'function' && !som.wrong.__capyVidas) {
+            const tocar = som.wrong;
+            som.wrong = function (...args) {
+                if (respondendo > 0) errouAgora = true;
+                return tocar.apply(this, args);
+            };
+            som.wrong.__capyVidas = true;
+        }
+        for (const nome of RESPOSTAS_DA_TRILHA) {
             const original = window[nome];
             if (typeof original !== 'function' || original.__capyVidas) continue;
             const embrulhada = function (...args) {
                 if (Vidas.ativo && Vidas.vidas <= 0) { abrirAviso(true); return; }
-                const btn = botaoDe(args);
-                if (btn && (btn.disabled || contados.has(btn))) return original.apply(this, args);
-                const errado = errou(args);
-                const volta = original.apply(this, args);
-                if (btn) contados.add(btn);
-                if (Vidas.ativo && errado === true) perder();
-                return volta;
+                respondendo++;
+                errouAgora = false;
+                try {
+                    return original.apply(this, args);
+                } finally {
+                    respondendo--;
+                    if (Vidas.ativo && errouAgora) perder();
+                    errouAgora = false;
+                }
             };
             embrulhada.__capyVidas = true;
             window[nome] = embrulhada;
@@ -189,6 +189,7 @@
         try { user = await Auth.ready(); } catch (e) {}
         if (!user || user.role === 'guest') return;
         await aceitarConvite();
+        if (!NA_TRILHA) return;              // lives only on the daily trail
         try {
             const r = await fetch('/api/vidas', { credentials: 'same-origin' });
             if (!r.ok) return;
