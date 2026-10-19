@@ -7,6 +7,10 @@ const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
 const SITE = 'https://www.capyenglish.com.br';
+// components.js registra o sw.js: com ele ativo, as páginas seguintes passam pelo
+// service worker e o page.route deixa de ver os pedidos (e o mock do site some).
+test.use({ serviceWorkers: 'block' });
+
 const TIPOS = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 async function montar(page, { idDeTeste = true } = {}) {
