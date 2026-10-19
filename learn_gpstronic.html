@@ -94,7 +94,7 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=som2"></script>
 <script src="yara-widget.js?v=yw7"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
@@ -191,7 +191,40 @@ function render() {
         </div>
         <div class="space-y-2">${rows}</div>
       </div>`;
+
+    if ((idx + 1) % 10 === 0) {
+      const bloco = ((idx + 1) / 10) <= 1 ? 1 : 2;
+      html += `
+        <div class="card-in bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-3xl p-5 shadow-lg my-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <span class="text-3xl">⚡</span>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full">Checkpoint · Unidades ${idx - 8} a ${idx + 1}</span>
+              <p class="font-black text-base mt-0.5">Mini-Prova ${bloco} — GPS Tronic (15 min)</p>
+              <p class="text-xs text-emerald-100">Teste prático a cada 10 unidades com frases de bancada, Listening e Speaking.</p>
+            </div>
+          </div>
+          <a href="mini_prova.html?curso=gpstronic&bloco=${bloco}" class="w-full sm:w-auto text-center bg-white text-emerald-900 font-black text-xs px-4 py-2.5 rounded-xl shadow hover:bg-emerald-50 transition shrink-0">
+            ⚡ Fazer Mini-Prova →
+          </a>
+        </div>`;
+    }
   });
+
+  html += `
+    <div class="card-in bg-gradient-to-br from-emerald-950 via-teal-900 to-emerald-900 text-white rounded-3xl p-6 shadow-xl mt-4 border-2 border-emerald-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <span class="text-4xl">🏆</span>
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest bg-emerald-400/20 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30">Avaliação Final · 30 Minutos · 40 Questões</span>
+          <p class="font-black text-lg mt-0.5">Prova Final — GPS Tronic</p>
+          <p class="text-xs text-emerald-100">Expressões de oficina, rede CAN/ISOBUS, diagnóstico, Listening e Speaking técnico.</p>
+        </div>
+      </div>
+      <a href="gpstronic_prova.html" class="w-full sm:w-auto text-center bg-gradient-to-r from-emerald-400 to-teal-400 text-navy font-black text-xs sm:text-sm px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition shrink-0">
+        🚀 Fazer Prova Final →
+      </a>
+    </div>`;
 
   cont.innerHTML = html;
   document.getElementById('gps-progress-bar').style.width = Math.round(done / TOTAL_NODES * 100) + '%';

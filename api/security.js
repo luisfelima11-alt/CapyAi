@@ -7,6 +7,14 @@ const SUPABASE_PUBLIC_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_KEY || '';
 const APP_ORIGIN = (process.env.APP_ORIGIN || 'https://www.capyenglish.com.br').replace(/\/$/, '');
 const IS_PRODUCTION = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+// A Vercel Preview runs in production mode but is served from its own URLs, so
+// with APP_ORIGIN alone nobody could sign in there to test a PR (28/set). Only
+// in Preview, the deployment's URLs count as our own origin too.
+const PREVIEW_ORIGINS = process.env.VERCEL_ENV === 'preview'
+  ? [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+      .filter(Boolean)
+      .map(host => `https://${String(host).replace(/^https?:\/\//, '').replace(/\/$/, '')}`)
+  : [];
 
 const COOKIE_NAMES = IS_PRODUCTION
   ? {
@@ -115,7 +123,8 @@ function safeEqual(a, b) {
 
 function isAllowedOrigin(origin) {
   if (!origin) return !IS_PRODUCTION;
-  if (origin.replace(/\/$/, '') === APP_ORIGIN) return true;
+  const normalized = origin.replace(/\/$/, '');
+  if (normalized === APP_ORIGIN || PREVIEW_ORIGINS.includes(normalized)) return true;
   if (!IS_PRODUCTION && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return true;
   return false;
 }

@@ -139,6 +139,10 @@ fica so como reforco, se o `curl` no www nao mostrar o conteudo novo.
 
 Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
 
+A Preview runs in production mode from its own `*.vercel.app` URLs. Writes accept `APP_ORIGIN` and,
+only when `VERCEL_ENV=preview`, the deployment's `VERCEL_URL` / `VERCEL_BRANCH_URL` (`PREVIEW_ORIGINS`
+in `api/security.js`). Sign in there with a password: magic links and e-mails point to `APP_ORIGIN`.
+
 ## GitHub
 
 ```
@@ -172,7 +176,9 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
-**⚠️ Cache busting:** All pages reference `components.js?v=3`. When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+**⚠️ Cache busting:** All pages reference `components.js?v=som2` (also `tts-en.js?v=som1`, `listening-lab.js?v=som1`). When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+
+**⚠️ Sound on iPhone:** any audio that waits for the network must play through `CapyAudio.play(src, {onended, onerror, rate})` (components.js), never a `new Audio()` created after an `await`: iOS only plays an element first unlocked inside a tap. See BUGS-APRENDIDOS.md (2026-10-18).
 
 **⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
@@ -225,6 +231,12 @@ async function sb(path, opts = {}) {
 
 `/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
 Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
+
+**AI routes: reads vs writes (28/set/2026).** Writes need an allowed `Origin` and, with session cookies,
+the CSRF token. A same-origin GET sends neither, so a GET AI route with cookies (lyrics search, lyrics,
+TTS, daily challenge, word of the day) is checked by `Sec-Fetch-Site` instead (`assertLeituraDoProprioSite`).
+Test such rules with `NODE_ENV=production`: outside production a missing `Origin` passes and hides the bug.
+The lyrics proxies (`ROTAS_SEM_IA`) have their own limit and never spend a guest's AI uses.
 
 ### Lesson Architecture
 
