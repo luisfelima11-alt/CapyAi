@@ -193,3 +193,20 @@ test('gramatica-slides.js parses, drives the deck and builds the fullscreen view
   assert.doesNotMatch(codigo, /innerHTML\s*=\s*(?=\S)(?![`'"])/, 'no HTML built from page text');
   assert.doesNotMatch(codigo, /innerHTML\s*=\s*`[^`]*\$\{/, 'no interpolation in the overlay markup');
 });
+
+test('every asset type a page loads is published by vercel.json (the slide images were not)', () => {
+  // 19/out: the slide images (.webp) never reached the Preview: vercel.json
+  // only publishes the asset types listed in "builds", and .webp was missing.
+  // The PDFs had the same bug before. Any assets/... file a page references
+  // must match an "assets/**/*.<ext>" build.
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const raiz = path.resolve(__dirname, '..');
+  const builds = JSON.parse(fs.readFileSync(path.join(raiz, 'vercel.json'), 'utf8')).builds.map(b => b.src);
+  const tipos = new Set();
+  for (const f of fs.readdirSync(raiz).filter(n => n.endsWith('.html'))) {
+    for (const m of fs.readFileSync(path.join(raiz, f), 'utf8').matchAll(/["'(]assets\/[^"'()?\s]+\.([a-z0-9]+)(?:[?"')\s])/gi)) tipos.add(m[1].toLowerCase());
+  }
+  assert.ok(tipos.has('webp'), 'the slide images are referenced');
+  for (const ext of tipos) assert.ok(builds.includes(`assets/**/*.${ext}`), `vercel.json does not publish assets/**/*.${ext}`);
+});
