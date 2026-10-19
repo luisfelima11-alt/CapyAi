@@ -620,6 +620,17 @@ do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declarac
 (TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
 linha que pode se repetir.
 
+## Google Analytics e aviso de cookies (19/out/2026)
+
+- `analytics.js` entra em toda página pública (`<script src="analytics.js?v=…" defer>` no `<head>`), nunca nas
+  páginas endurecidas (login, conta, admin, professor). Página nova pública: copie a tag; um teste falha sem ela.
+- Nada do Google carrega antes do "Aceitar" do aviso (LGPD). A escolha fica em `localStorage.capyCookies`, e a
+  política (`privacidade.html#cookies`) tem o botão que reabre o aviso.
+- O ID fica em `GA_ID` dentro do `analytics.js`. Com o ID provisório, ou fora de `capyenglish.com.br` (Preview,
+  localhost), o arquivo não faz nada.
+- Os eventos do `capyTrack` vão também para o GA, com o mesmo nome; cliques na Kiwify viram `begin_checkout`, e no
+  WhatsApp, `generate_lead`. Nunca mande dado pessoal ao GA: só nome do evento e id da lição.
+
 ## Design System
 
 Full spec in `1_Design_System.md`. Key constraints:

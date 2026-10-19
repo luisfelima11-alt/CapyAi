@@ -271,3 +271,29 @@ test('a Vercel Preview accepts sign-in from its own URLs; production still accep
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
 });
+
+test('Google Analytics: only the compatibility CSP allows Google, and only public pages load analytics.js', () => {
+  // The hardened pages (login, account, admin, teacher) never load Google; every other page
+  // loads analytics.js, which asks for consent before anything from Google is fetched.
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  const strict = config.headers.find(group => String(group.source).includes('4_Login_Capy_Yara_Welcomes_You'));
+  const strictCsp = strict.headers.find(header => header.key === 'Content-Security-Policy').value;
+  const compat = config.headers.find(group => group.source === '/(.*)').headers.find(header => header.key === 'Content-Security-Policy').value;
+  const landing = config.routes.find(route => route.src === '^/$').headers['Content-Security-Policy'];
+  assert.doesNotMatch(strictCsp, /google-analytics|googletagmanager/);
+  for (const csp of [compat, landing]) {
+    assert.match(csp, /script-src [^;]*https:\/\/www\.googletagmanager\.com/);
+    assert.match(csp, /connect-src [^;]*https:\/\/\*\.google-analytics\.com/);
+  }
+  const hardened = String(strict.source).match(/\(([^)]*)\)/)[1].split('|');
+  const pages = fs.readdirSync(ROOT).filter(file => file.endsWith('.html'));
+  for (const page of hardened) {
+    assert.doesNotMatch(fs.readFileSync(path.join(ROOT, page), 'utf8'), /analytics\.js/, `${page} is hardened and must not load analytics.js`);
+  }
+  const sem = pages.filter(page => !hardened.includes(page) && !['offline.html', 'voice-test.html', 'pixel_preview.html'].includes(page))
+    .filter(page => !/<script src="analytics\.js\?v=[^"]+" defer><\/script>/.test(fs.readFileSync(path.join(ROOT, page), 'utf8')));
+  assert.deepEqual(sem, [], 'public pages without analytics.js');
+  const source = fs.readFileSync(path.join(ROOT, 'analytics.js'), 'utf8');
+  assert.doesNotThrow(() => new Function(source));
+  assert.match(source, /DOMINIOS\.includes\(location\.hostname\)/, 'analytics.js must stay off on Previews and localhost');
+});
