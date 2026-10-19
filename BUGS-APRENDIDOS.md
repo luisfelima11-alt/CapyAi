@@ -1,5 +1,35 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-18 — "Traduzir palavras para" sempre voltava para Spanish
+
+**Sintoma:** em Configurações, o Luis escolhia o idioma da tradução dos flashcards,
+saía da página e, ao voltar, estava 🇪🇸 Spanish de novo. Em todos os usuários.
+
+**Causa raiz:** o `<select id="lang-select">` da `settings.html` não tinha `onchange`.
+O idioma só era gravado dentro de `saveAll()`, que é o botão "Salvar" **da skin**, e
+esse botão ainda saía mais cedo se o `Auth.saveAvatar()` falhasse. O padrão era
+`'Spanish'` (na `settings.html` e no `translateWord()` do flashcard), então todo
+aparelho novo começava em espanhol. O mesmo valia para "Efeitos sonoros", "Leitura
+em voz alta", "Recursos de IA" e a dificuldade: só o modo escuro gravava na hora.
+
+**Correção:** `salvarConfig()` grava o `capySettings` no momento da troca (idioma,
+interruptores e dificuldade) e mostra "✅ Ajustes salvos!". O padrão virou
+`'Portuguese'`, que é a primeira opção da lista. O `saveAll()` grava as configurações
+antes da skin.
+
+**Como pegar isso de novo:**
+```bash
+grep -n 'onchange="setLang' settings.html          # o seletor grava na troca
+grep -n "translateLang || 'Spanish'" *.html         # tem que voltar vazio
+```
+
+**Regra:** toda configuração grava na hora em que muda. Um botão "Salvar" de outra
+seção não pode ser o único caminho para gravar nada.
+
+**Fica para depois:** as configurações vivem só no `localStorage`. O
+`GET /api/db?type=settings` devolve `null` em produção, então elas não acompanham a
+conta entre aparelhos.
+
 ## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
 
 **Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
