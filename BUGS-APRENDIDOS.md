@@ -1,5 +1,32 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-19 — `aulas-contexto.json` "desatualizado" só com a máquina carregada
+
+**Sintoma:** com a CPU cheia, o teste `o api/aulas-contexto.json esta em dia com
+as paginas das aulas` (`tests/aula-contexto.test.js`) falhou uma vez com
+"rode `npm run aulas:contexto`", sem ninguém ter mexido em aula nenhuma.
+
+**Causa raiz:** `scripts/gera-contexto-aulas.js` avalia cada array das páginas
+com `vm.runInNewContext(..., { timeout: 200 })` e um `catch { continue; }` que
+engolia **qualquer** erro. Estourar o tempo era tratado igual a "o array
+referencia outra coisa, não é conteúdo": o array sumia em silêncio e o
+catálogo gerado saía menor que o commitado. Com 200ms e a máquina ocupada, os
+arrays grandes estouravam.
+
+**Correção:** timeout de 5s (só protege de laço infinito) e estouro vira
+**erro**, nunca saída menor.
+
+**Como pegar isso de novo:**
+```bash
+# Com timeout de 1ms a saída muda — prova que tempo influencia o resultado:
+sed 's/timeout: 5000 }/timeout: 1 }/' scripts/gera-contexto-aulas.js > scripts/_t.js && node -e "const g=require('./scripts/_t.js');try{g.gerar();console.log('nao estourou')}catch(e){console.log('erro alto, ok:',e.message)}"; rm scripts/_t.js
+```
+
+**Por que aconteceu:** `catch` genérico em gerador determinístico. Timeout é
+falha de ambiente, não dado; não pode virar "pula este item".
+
+---
+
 ## 2026-10-19 — Teste da trilha francesa no CapyMic falhava às vezes com `['en']`
 
 **Sintoma:** o teste `trilha (lessons.html): a trava de 15s leva a fala para a
