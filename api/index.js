@@ -157,6 +157,9 @@ const RATE_LIMITS = {
     // Memoria da Yara: uma extracao curta por conversa livre. Balde proprio para
     // nao gastar a cota de chat do aluno com uma coisa que ele nem ve acontecer.
     memoria:      { free:  10, pro:  30, super:  30 },
+    // ❤️ Vidas: o aviso de erro e o convite. Não é IA: só freia abuso.
+    vidas:        { free: 400, pro: 400, super: 400 },
+    convite:      { free:  10, pro:  10, super:  10 },
 };
 
 // ── Créditos de IA do plano grátis (19/out/2026, regra do Luis) ─────────────
@@ -166,6 +169,16 @@ const RATE_LIMITS = {
 // aulas, letra de música, ligação, lição de casa) fica fora do saldo.
 // O saldo vive na consume_rate_limit_peso (202610190001_creditos_ia.sql).
 const IA_GRATIS_DIA = 10;
+
+// ❤️ Vidas do plano grátis (fora da IA): 5, cada erro numa pergunta gasta 1,
+// volta 1 a cada 4 h. Convite aceito: +5 vidas e +5 créditos de IA guardados
+// para os dois, até 10 convites em 30 dias. Tabelas e funções em
+// 202610190002_vidas_convites.sql.
+const VIDAS_MAX = 5;
+const VIDAS_RECARGA_SEG = 4 * 3600;
+const CONVITE_VIDAS = 5;
+const CONVITE_IA = 5;
+const CONVITE_LIMITE_MES = 10;
 const PESO_IA = {
     chat: 1, translate: 1, transcribe: 1,
     quiz: 2, personalize: 2,
@@ -263,6 +276,14 @@ async function checkRateLimit(req, key, _untrustedUserId) {
             plan,
             peso,
         };
+        // Day's balance over: credits saved from an invite (vidas.ia_bonus) pay for it.
+        if (!info.ok && peso) {
+            const pago = await sb('/rpc/gastar_bonus_ia', {
+                method: 'POST',
+                body: JSON.stringify({ p_user: appUserId, p_peso: peso }),
+            }).catch(() => false);
+            if (pago === true) { info.ok = true; info.bonus = true; }
+        }
         req._rateLimitResults[key] = info;
         return info;
     } catch (e) {
@@ -4050,6 +4071,80 @@ Respond ONLY with valid JSON, no markdown:
     // GET /api/me?userId=xxx → returns subscription/plan info
     // Used by frontend to gate Pro/Super features in real time.
     // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
+    // ── ❤️ Vidas e convites (plano grátis, 19/out/2026) ──────────────────────
+    // GET  /api/vidas          → { ilimitado } | { vidas, max, proximaEm, iaBonus }
+    // POST /api/vidas/errou    → gasta 1 vida (o vidas.js chama a cada erro)
+    // GET  /api/convite        → { link, convidados } (o código nasce na 1ª vez)
+    // POST /api/convite/aceitar { codigo } → { status } ('ok' dá o prêmio aos dois)
+    // Só o aluno logado conta vidas; Pro e Super não têm limite.
+    if ((req.method === 'GET' && url === '/api/vidas') || (req.method === 'POST' && url === '/api/vidas/errou')) {
+        const gastar = req.method === 'POST' ? 1 : 0;
+        if (gastar) assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const _rl = await checkRateLimit(req, 'vidas', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        if (_rl.plan !== 'free') { res.status(200).json({ ilimitado: true }); return; }
+        const r = await sb('/rpc/vidas_estado', {
+            method: 'POST',
+            body: JSON.stringify({ p_user: identity.appUserId, p_max: VIDAS_MAX, p_recarga_seg: VIDAS_RECARGA_SEG, p_gastar: gastar }),
+        }).catch(() => null);
+        const linha = Array.isArray(r) ? r[0] : r;
+        // No table yet (SQL not run): degrade to unlimited instead of blocking lessons.
+        if (!linha || typeof linha.vidas !== 'number') { res.status(200).json({ ilimitado: true, indisponivel: true }); return; }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ vidas: linha.vidas, max: VIDAS_MAX, proximaEm: linha.proxima_em || null, iaBonus: linha.ia_bonus || 0 });
+        return;
+    }
+
+    if (req.method === 'GET' && url === '/api/convite') {
+        const identity = await requireAppUser(req, res);
+        let linhas = await sb(`/convite_codigos?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=codigo`);
+        let codigo = Array.isArray(linhas) && linhas[0] ? linhas[0].codigo : null;
+        for (let tentativa = 0; !codigo && tentativa < 3; tentativa++) {
+            const novo = [...crypto.randomBytes(10)].map(b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
+            await sb('/convite_codigos?on_conflict=user_id', {
+                method: 'POST',
+                headers: { Prefer: 'resolution=ignore-duplicates' },
+                body: JSON.stringify({ user_id: identity.appUserId, codigo: novo }),
+            }).catch(() => null);
+            linhas = await sb(`/convite_codigos?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=codigo`);
+            codigo = Array.isArray(linhas) && linhas[0] ? linhas[0].codigo : null;
+        }
+        if (!codigo) { res.status(503).json({ error: 'convite_indisponivel' }); return; }
+        const desde = new Date(Date.now() - 30 * 86400000).toISOString();
+        const feitos = await sb(`/convites?convidante_id=eq.${encodeURIComponent(identity.appUserId)}&criado_em=gt.${encodeURIComponent(desde)}&select=convidado_id`);
+        const origem = String(process.env.APP_ORIGIN || 'https://www.capyenglish.com.br').replace(/\/$/, '');
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({
+            link: `${origem}/landing.html?convite=${codigo}`,
+            convidados: Array.isArray(feitos) ? feitos.length : 0,
+            limite: CONVITE_LIMITE_MES,
+            premio: { vidas: CONVITE_VIDAS, ia: CONVITE_IA },
+        });
+        return;
+    }
+
+    if (req.method === 'POST' && url === '/api/convite/aceitar') {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const _rl = await checkRateLimit(req, 'convite', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const { codigo } = await readBody(req);
+        const cod = String(codigo || '').toLowerCase();
+        if (!/^[a-z0-9]{10}$/.test(cod)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
+        // Only a new account with a confirmed e-mail earns the prize: sharing the
+        // link alone, or making throwaway accounts, earns nothing.
+        const u = identity.session && identity.session.user || {};
+        const novo = u.created_at && (Date.now() - new Date(u.created_at).getTime()) < 7 * 86400000;
+        if (!u.email_confirmed_at || !novo) { res.status(200).json({ status: 'nao_elegivel' }); return; }
+        const status = await sb('/rpc/premiar_convite', {
+            method: 'POST',
+            body: JSON.stringify({ p_convidado: identity.appUserId, p_codigo: cod, p_vidas: CONVITE_VIDAS, p_ia: CONVITE_IA, p_limite_mes: CONVITE_LIMITE_MES }),
+        }).catch(() => null);
+        res.status(200).json({ status: typeof status === 'string' ? status : 'indisponivel', premio: { vidas: CONVITE_VIDAS, ia: CONVITE_IA } });
+        return;
+    }
+
     if (req.method === 'GET' && url.startsWith('/api/me')) {
         const identity = await requireAppUser(req, res);
         const rows = await sbUser(identity, `/user_profiles?id=eq.${encodeURIComponent(identity.appUserId)}&select=plan,plan_expires_at`);
@@ -4068,7 +4163,12 @@ Respond ONLY with valid JSON, no markdown:
             const linhas = await sb(`/rate_limit_buckets?bucket=eq.${encodeURIComponent(balde)}&select=used,window_started_at`);
             const linha = Array.isArray(linhas) ? linhas[0] : null;
             const valendo = linha && (Date.now() - new Date(linha.window_started_at).getTime()) < 86400000;
-            ia = { limite: IA_GRATIS_DIA, usado: valendo ? Number(linha.used) || 0 : 0 };
+            const v = await sb(`/vidas?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=ia_bonus`);
+            ia = {
+                limite: IA_GRATIS_DIA,
+                usado: valendo ? Number(linha.used) || 0 : 0,
+                bonus: Array.isArray(v) && v[0] ? Number(v[0].ia_bonus) || 0 : 0,
+            };
         }
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.status(200).json({
@@ -5838,4 +5938,4 @@ Rules:
 };
 
 // For tests: the free plan's ⚡ AI balance (tests/creditos-ia.test.js).
-module.exports._creditosIa = { checkRateLimit, PESO_IA, IA_GRATIS_DIA };
+module.exports._creditosIa = { checkRateLimit, PESO_IA, IA_GRATIS_DIA, VIDAS_MAX, VIDAS_RECARGA_SEG };

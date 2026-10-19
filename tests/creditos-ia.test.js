@@ -67,3 +67,21 @@ test('every course is open on the free plan, and the site says so', () => {
     const coach = fs.readFileSync(path.join(ROOT, 'components.js'), 'utf8');
     assert.doesNotMatch(coach, /capyWritingCoach_/, 'the writing coach has no local daily counter: the server decides');
 });
+
+test('lives: only the daily trail spends them, and the tables stay on the server', () => {
+    const sql = fs.readFileSync(path.join(ROOT, 'supabase', 'migrations', '202610190002_vidas_convites.sql'), 'utf8');
+    for (const t of ['vidas', 'convite_codigos', 'convites']) assert.match(sql, new RegExp(`alter table public\\.${t} enable row level security;`));
+    assert.match(sql, /revoke all on public\.vidas, public\.convite_codigos, public\.convites from anon, authenticated;/);
+    assert.doesNotMatch(sql, /grant [^;]* to (anon|authenticated)/);
+    assert.match(fs.readFileSync(path.join(ROOT, 'components.js'), 'utf8'), /s\.src = 'vidas\.js\?v=vd1';/);
+    const vidas = fs.readFileSync(path.join(ROOT, 'vidas.js'), 'utf8');
+    assert.doesNotMatch(vidas, /innerHTML|outerHTML|insertAdjacentHTML/);
+    // Luis, 19/out: lives on the daily trail only; courses, games and practice pages are free.
+    assert.match(vidas, /const NA_TRILHA = \/\(\^\|\\\/\)lessons\\\.html\$\/\.test\(location\.pathname\);/);
+    assert.match(vidas, /if \(!NA_TRILHA\) return;/);
+    const trilha = fs.readFileSync(path.join(ROOT, 'lessons.html'), 'utf8');
+    for (const nome of ['answerQuiz', 'answerReview', 'answerListen', 'answerSpeed']) {
+        const corpo = trilha.slice(trilha.search(new RegExp(`function ${nome}\\s*\\(`)));
+        assert.match(corpo.slice(0, 600), /CapySound\.wrong\(\)/, `${nome} no longer plays the wrong sound, so its errors would not spend a life`);
+    }
+});

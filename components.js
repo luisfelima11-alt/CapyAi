@@ -1849,6 +1849,13 @@ window.CapyFala = (function () {
 document.addEventListener('DOMContentLoaded', () => {
     Components.autoInjectPersonalizedTab();
     Components.autoInjectWritingCoach();
+    // ❤️ Vidas do plano grátis: one shared script on every page (vidas.js).
+    if (!window.__capyVidas && !document.querySelector('script[src^="vidas.js"]')) {
+        const s = document.createElement('script');
+        s.src = 'vidas.js?v=vd1';
+        s.defer = true;
+        document.head.appendChild(s);
+    }
     CapyPWA.init();
     CapyJuice.init();
     if (window.CapyTTS) CapyTTS._purgeOldFrenchAudioOnce();
