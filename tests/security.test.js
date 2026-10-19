@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
+const { execFileSync } = require('node:child_process');
 const { EventEmitter } = require('node:events');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -159,6 +160,58 @@ test('local server blocks traversal and private files', async t => {
   }
 });
 
+// IS_PRODUCTION, the cookie names and the Preview origins are read when the API
+// loads, so a test that needs another environment runs the handler in a child
+// process. `corpo` calls chamar(method, url, headers, body) and prints one JSON line.
+function rodarApiEm(env, corpo) {
+  const script = `
+    const { EventEmitter } = require('events');
+    const api = require('./api/index');
+    function res() {
+      const r = new EventEmitter(); r.statusCode = 200; r.headers = {}; r.body = ''; r.headersSent = false;
+      r.setHeader = (k, v) => { r.headers[String(k).toLowerCase()] = v; }; r.getHeader = k => r.headers[String(k).toLowerCase()];
+      r.status = c => { r.statusCode = c; return r; };
+      r.json = v => { r.setHeader('Content-Type', 'application/json'); return r.end(JSON.stringify(v)); };
+      r.end = v => { if (v) r.body += String(v); r.headersSent = true; r.emit('finish'); return r; };
+      return r;
+    }
+    async function chamar(method, url, headers, body) {
+      const req = new EventEmitter(); req.method = method; req.url = url; req.headers = headers;
+      req.socket = { remoteAddress: '127.0.0.1' }; req.destroy = () => {};
+      const r = res(); const p = api(req, r);
+      process.nextTick(() => { if (body) req.emit('data', Buffer.from(body)); req.emit('end'); });
+      await p; let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
+      return { status: r.statusCode, erro };
+    }
+    ${corpo}
+  `;
+  const saida = execFileSync(process.execPath, ['-e', script], { cwd: ROOT, env, encoding: 'utf8' });
+  return JSON.parse(saida.trim().split('\n').pop());
+}
+const SEM_CHAVES = { OPENAI_API_KEY: '', OPENROUTER_API_KEY: '', SUPABASE_URL: '', SUPABASE_SECRET_KEY: '', SUPABASE_KEY: '' };
+
+test('in production, reads from our own pages pass the AI gate with cookies; other sites and unsigned writes do not', () => {
+  // Production refuses a missing Origin, and a same-origin fetch GET sends none.
+  // The gate used assertCsrf for every AI route, so every signed-in student and
+  // guest got 403 on the Music Lab search, lyrics, TTS and daily challenge (28/set).
+  const saida = rodarApiEm({ ...process.env, NODE_ENV: 'production', ...SEM_CHAVES }, `
+    (async () => {
+      const guest = '__Host-capy-guest=qualquer';
+      console.log(JSON.stringify({
+        mesmoSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'same-origin' }),
+        outroSite: await chamar('GET', '/api/daily-challenge', { cookie: guest, 'sec-fetch-site': 'cross-site' }),
+        escritaSemCsrf: await chamar('POST', '/api/chat', { cookie: guest, origin: 'https://www.capyenglish.com.br', 'content-type': 'application/json' }, '{"message":"hi"}'),
+      }));
+    })();
+  `);
+  assert.notEqual(saida.mesmoSite.status, 403, JSON.stringify(saida.mesmoSite));
+  assert.equal(saida.mesmoSite.status, 503);          // got past the gate: only the missing AI key stops it
+  assert.equal(saida.outroSite.status, 403);
+  assert.equal(saida.outroSite.erro, 'invalid_origin');
+  assert.equal(saida.escritaSemCsrf.status, 403);
+  assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
+});
+
 test('npm audit gate: production gets no exception; a dev-only one holds only until its date', () => {
   // 04/out: a high advisory for braces (no fixed release) reached us only through
   // tailwindcss 3, a dev tool, and failed every CI run. scripts/audit.js keeps
@@ -193,4 +246,28 @@ test('the CI and npm run security:check run the audit gate; every exception has 
     assert.ok(ex.pacote && ex.motivo.length > 40, ex.id);
     assert.match(ex.ate, /^\d{4}-\d{2}-\d{2}$/, ex.id);
   }
+});
+
+test('a Vercel Preview accepts sign-in from its own URLs; production still accepts only APP_ORIGIN', () => {
+  // A Preview runs in production mode from *.vercel.app. With APP_ORIGIN alone,
+  // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
+  // could be tested signed in before going live (28/set).
+  const env = {
+    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'x'.repeat(40),
+    VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
+  };
+  delete env.APP_ORIGIN;
+  const corpo = `
+    (async () => {
+      const visitante = async origin => (await chamar('POST', '/api/auth/guest', { origin, 'content-type': 'application/json' }, '{}')).status;
+      console.log(JSON.stringify({
+        deploy: await visitante('https://capy-abc123-time.vercel.app'),
+        branch: await visitante('https://capy-git-minha-branch-time.vercel.app/'),
+        outroPreview: await visitante('https://capy-git-outra-branch-time.vercel.app'),
+        site: await visitante('https://www.capyenglish.com.br'),
+      }));
+    })();
+  `;
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
 });

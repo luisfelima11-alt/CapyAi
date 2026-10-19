@@ -1,5 +1,87 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
+
+**Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
+No computador e no tablet saía voz (a robótica do navegador, não a Nova).
+
+**Causa raiz (duas camadas):**
+1. O mesmo 403 `invalid_origin` de 28/09: a correção estava no PR do hotfix, mas
+   nunca chegou à produção. Toda voz Nova falhava para quem tinha cookie.
+2. A voz reserva (`speechSynthesis`) e o `CapyTTS` tocavam **depois** de esperar
+   a rede, fora do toque. O iOS Safari só deixa tocar som que começa dentro de um
+   toque, e silencia a voz do navegador com a chave de silencioso ligada. Por isso
+   o iPhone ficava mudo e os outros aparelhos não.
+
+**Correção:** além do portão do servidor, `CapyAudio` (`components.js`) libera um
+único elemento de áudio no primeiro toque da página (clipe mudo + fala vazia) e
+todas as vozes passam a usar esse elemento (`tts-en.js`, `CapyTTS`,
+`listening-lab.js`). Antes de tocar, `navigator.audioSession.type = 'playback'`
+faz a voz soar mesmo com a chave de silencioso.
+
+**Como pegar isso de novo:** testar no iPhone de verdade, logado, com a chave de
+silencioso ligada. Chromium/Playwright não reproduz a regra de toque do iOS.
+
+**Regra:** som que depende de rede toca num elemento já liberado por toque, nunca
+num `new Audio()` criado depois de um `await`.
+
+---
+
+## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
+
+**Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante
+respondiam 403 `invalid_origin`. Nenhum PR podia ser testado logado antes de ir ao ar.
+
+**Causa raiz:** o Preview roda em modo produção (`VERCEL=1`), e o `isAllowedOrigin`
+(`api/security.js`) só aceitava o `APP_ORIGIN`, que é o domínio de produção. A página
+do Preview manda `Origin: https://<preview>.vercel.app`.
+
+**Correcao:** só quando `VERCEL_ENV=preview`, as URLs do próprio deploy (`VERCEL_URL`
+e `VERCEL_BRANCH_URL`) também contam como origem do site (`PREVIEW_ORIGINS`). A
+produção continua aceitando só o `APP_ORIGIN`. No Preview, entre com senha: o link
+mágico e os e-mails levam ao `APP_ORIGIN`.
+
+**Como pegar isso de novo:**
+```bash
+npm run test:security   # "a Vercel Preview accepts sign-in from its own URLs…"
+```
+
+---
+
+## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
+
+**Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
+mesmo defeito, sem ninguém notar: o Desafio Diário caía em erro, e a voz Nova
+(TTS) virava a voz robótica do navegador para quem estava logado ou era visitante.
+
+**Causa raiz:** o portão das rotas de IA (`AI_ROUTE_KEYS`, em `api/index.js`)
+chamava `assertCsrf` em TODA rota quando havia cookie de sessão, inclusive nas
+de GET (`/api/lyrics-search`, `/api/lyrics`, `/api/tts`, `/api/daily-challenge`,
+`/api/word-of-day`). O `assertCsrf` começa pelo `assertOrigin`, e em produção
+`isAllowedOrigin('')` é `false`. Só que o navegador **não manda `Origin` num GET
+da mesma origem**, e o `auth-secure.js` só põe o token CSRF em escrita. Resultado:
+403 `invalid_origin` para todo aluno com cookie. Sem cookie (anônimo) funcionava,
+e nos testes também: fora de produção o `Origin` vazio passa.
+
+**Correcao:** escrita continua exigindo CSRF. Leitura (GET/HEAD) com cookie passa
+pelo `Sec-Fetch-Site` que o navegador manda sempre: `same-origin` ou `none` passam,
+outro site leva 403. A página agora separa "o serviço não respondeu" de "nenhuma
+música encontrada", e os proxies de letra ganharam prazo (7 s) e resposta validada.
+
+**Como pegar isso de novo:** teste em modo produção, porque é lá que o `Origin`
+vazio é recusado:
+```bash
+npm run test:security   # "in production, reads from our own pages pass the AI gate…"
+# à mão: NODE_ENV=production node -e "…" chamando uma rota GET de IA com cookie e sem Origin
+```
+
+**Por que aconteceu:** a regra de CSRF foi escrita pensando em escrita, e ninguém
+testou uma rota GET com cookie em modo produção. E a página transformava qualquer
+falha em "Nenhuma música encontrada", o que escondeu o 403 por dias: **mensagem de
+"não existe" só quando a resposta veio vazia de verdade.**
+
+---
+
 ## 2026-09-20 — `\uXXXX` dentro de CSS vira `u00E7` na tela
 
 **Sintoma:** a legenda vazia do palco de voz mostrava
