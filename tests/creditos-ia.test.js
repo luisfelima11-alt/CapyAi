@@ -67,3 +67,32 @@ test('every course is open on the free plan, and the site says so', () => {
     const coach = fs.readFileSync(path.join(ROOT, 'components.js'), 'utf8');
     assert.doesNotMatch(coach, /capyWritingCoach_/, 'the writing coach has no local daily counter: the server decides');
 });
+
+test('lives: a wrong answer is read the same way whatever the order of the arguments', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'vidas.js'), 'utf8');
+    const errou = new Function(src.match(/function errou\(a\) \{[\s\S]*?\n {4}\}/)[0] + '; return errou;')();
+    const btn = { nodeType: 1 };
+    const casos = [
+        [['x', btn, { a: 'y' }], true], [['y', btn, { a: 'y' }], false],      // answerQ(ans, btn, q)
+        [[btn, 2, 'a', 'b'], true], [[btn, 2, 'a', 'a'], false],              // answerQ(btn, qi, chosen, correct)
+        [[btn, 'a', 'b', 'explicação'], true], [[btn, 'a', 'a', 'exp'], false], // grammar_lab, reading_room
+        [['a', 'b', btn], true], [['a', 'a', btn], false],                    // answerPrac, answerQuiz do alfabeto
+        [[btn, 'c ', 'c'], false],                                             // answerQuiz(btn, chosen, correct)
+    ];
+    for (const [args, esperado] of casos) assert.equal(errou(args), esperado, JSON.stringify(args.map(x => x === btn ? 'btn' : x)));
+});
+
+test('lives: server-only tables, every quiz page loads vidas.js, and the script builds no HTML from strings', () => {
+    const sql = fs.readFileSync(path.join(ROOT, 'supabase', 'migrations', '202610190002_vidas_convites.sql'), 'utf8');
+    for (const t of ['vidas', 'convite_codigos', 'convites']) assert.match(sql, new RegExp(`alter table public\\.${t} enable row level security;`));
+    assert.match(sql, /revoke all on public\.vidas, public\.convite_codigos, public\.convites from anon, authenticated;/);
+    assert.doesNotMatch(sql, /grant [^;]* to (anon|authenticated)/);
+    assert.match(fs.readFileSync(path.join(ROOT, 'components.js'), 'utf8'), /s\.src = 'vidas\.js\?v=vd1';/);
+    const vidas = fs.readFileSync(path.join(ROOT, 'vidas.js'), 'utf8');
+    assert.doesNotMatch(vidas, /innerHTML|outerHTML|insertAdjacentHTML/);
+    for (const pagina of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
+        const src = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
+        if (!/function\s+(answerQ|answerPrac|answerQuiz)\s*\(/.test(src)) continue;
+        assert.match(src, /src="(components|vidas)\.js/, `${pagina} has quiz answers but loads neither components.js nor vidas.js`);
+    }
+});
