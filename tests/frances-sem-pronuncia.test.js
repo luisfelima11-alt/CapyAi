@@ -120,3 +120,9 @@ test('as 12 aulas carregam o tts-fr.js novo e o diálogo completo usa a voz da O
     assert.ok(!/new SpeechSynthesisUtterance\(DIALOGUE_LINES/.test(html), `${f}: diálogo ainda usa a voz do navegador`);
   }
 });
+
+test('toda página que carrega o tts-fr.js usa a etiqueta nova (o /tts-fr.js?v= fica em cache imutável)', () => {
+  const paginas = fs.readdirSync(ROOT).filter(f => f.endsWith('.html') && fs.readFileSync(path.join(ROOT, f), 'utf8').includes('tts-fr.js'));
+  assert.ok(paginas.includes('classes_fr.html') && paginas.length >= 13, 'as 12 aulas e o hub carregam o tts-fr.js');
+  for (const f of paginas) assert.match(fs.readFileSync(path.join(ROOT, f), 'utf8'), /tts-fr\.js\?v=fr1"/, f);
+});
