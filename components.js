@@ -159,11 +159,11 @@ const Components = {
                         <button onclick="window.location.href='6_Home_Forest_Expedition.html'" title="Home" class="${activeTab === 'home' ? 'bg-pink-500 text-white rounded-full p-3 scale-110 shadow-lg shadow-pink-500/40' : 'text-slate-400 p-2'} active:scale-90 hover:rotate-6 transition-all duration-300">
                             <span class="material-symbols-outlined text-2xl" ${activeTab === 'home' ? 'style="font-variation-settings:\'FILL\' 1;"' : ''}>home</span>
                         </button>
-                        <button onclick="window.location.href='classes.html'" title="Cursos" class="${activeTab === 'classes' ? 'bg-violet-500 text-white rounded-full p-3 scale-110 shadow-lg shadow-violet-500/40' : 'text-slate-400 p-2'} hover:text-violet-500 active:scale-90 hover:rotate-6 transition-all duration-300">
-                            <span class="material-symbols-outlined text-2xl">menu_book</span>
-                        </button>
                         <button onclick="window.location.href='learn.html'" title="Trilha Diária" class="${activeTab === 'lessons' ? 'bg-amber-500 text-white rounded-full p-3 scale-110 shadow-lg shadow-amber-500/40' : 'text-slate-400 p-2'} hover:text-amber-500 active:scale-90 hover:rotate-6 transition-all duration-300">
                             <span class="material-symbols-outlined text-2xl">route</span>
+                        </button>
+                        <button onclick="window.location.href='classes.html'" title="Cursos" class="${activeTab === 'classes' ? 'bg-violet-500 text-white rounded-full p-3 scale-110 shadow-lg shadow-violet-500/40' : 'text-slate-400 p-2'} hover:text-violet-500 active:scale-90 hover:rotate-6 transition-all duration-300">
+                            <span class="material-symbols-outlined text-2xl">menu_book</span>
                         </button>
                         <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" title="Games" class="${activeTab === 'games' ? 'bg-emerald-500 text-white rounded-full p-3 scale-110 shadow-lg shadow-emerald-500/40' : 'text-slate-400 p-2'} hover:text-emerald-500 active:scale-90 hover:rotate-6 transition-all duration-300">
                             <span class="material-symbols-outlined text-2xl">sports_esports</span>
@@ -241,26 +241,26 @@ const Components = {
         const ico = 'display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0;';
         const cheio = on => on ? "font-variation-settings:'FILL' 1;" : '';
         return `
-            <!-- Bottom Nav (5 tabs) -->
+            <!-- Bottom Nav (5 tabs): Início · Trilha · Cursos · Jogos · Mais (home nova, 29/out/2026).
+                 A Yara tem o cartão de ligação na home, o widget em toda página e o Mais. -->
             <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2 py-3 flex justify-around items-center z-50 border-t border-slate-100 dark:border-slate-800">
                 <button onclick="window.location.href='6_Home_Forest_Expedition.html'" class="${activeTab === 'home' ? 'text-pink-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'home' ? 'bg-pink-50' : ''}">
                     <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'home')}">home</span>
                     <span class="text-[10px] font-black">Início</span>
                 </button>
-                <button onclick="window.location.href='classes.html'" class="${activeTab === 'classes' ? 'text-violet-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'classes' ? 'bg-violet-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'classes')}">menu_book</span>
-                    <span class="text-[10px] font-black">Cursos</span>
-                </button>
                 <button onclick="window.location.href='learn.html'" class="${activeTab === 'lessons' ? 'text-amber-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'lessons' ? 'bg-amber-50' : ''}">
                     <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'lessons')}">route</span>
                     <span class="text-[10px] font-black">Trilha</span>
                 </button>
-                <button onclick="window.location.href='ai_chat.html'" class="${activeTab === 'ai' ? 'text-pink-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl relative ${activeTab === 'ai' ? 'bg-pink-50' : ''}">
-                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(true)}">auto_awesome</span>
-                    <span class="text-[10px] font-black">Yara AI</span>
-                    <span class="absolute top-0.5 right-2 w-2 h-2 bg-pink-500 rounded-full animate-pulse"></span>
+                <button onclick="window.location.href='classes.html'" class="${activeTab === 'classes' ? 'text-violet-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'classes' ? 'bg-violet-50' : ''}">
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'classes')}">menu_book</span>
+                    <span class="text-[10px] font-black">Cursos</span>
                 </button>
-                <button onclick="openMoreSheet()" class="${['games','youtube','music','studyplan','flashcards','quadro','leaderboard','progress','settings'].includes(activeTab) ? 'text-slate-700' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl">
+                <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="${activeTab === 'games' ? 'text-emerald-500' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl ${activeTab === 'games' ? 'bg-emerald-50' : ''}">
+                    <span class="material-symbols-outlined text-2xl" style="${ico}${cheio(activeTab === 'games')}">sports_esports</span>
+                    <span class="text-[10px] font-black">Jogos</span>
+                </button>
+                <button onclick="openMoreSheet()" class="${['ai','youtube','music','studyplan','flashcards','quadro','leaderboard','progress','settings'].includes(activeTab) ? 'text-slate-700' : 'text-slate-400'} flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl">
                     <span class="material-symbols-outlined text-2xl" style="${ico}">grid_view</span>
                     <span class="text-[10px] font-black">Mais</span>
                 </button>
@@ -278,9 +278,9 @@ const Components = {
 
                 <!-- Feature grid -->
                 <div class="grid grid-cols-4 gap-3 mb-5">
-                    <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="flex flex-col items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'games' ? 'ring-2 ring-emerald-400' : ''}">
-                        <span class="material-symbols-outlined text-emerald-500 text-2xl" style="${ico}${cheio(true)}">sports_esports</span>
-                        <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Jogos</span>
+                    <button onclick="window.location.href='ai_chat.html'" class="flex flex-col items-center gap-2 bg-pink-50 dark:bg-pink-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'ai' ? 'ring-2 ring-pink-400' : ''}">
+                        <span class="material-symbols-outlined text-pink-500 text-2xl" style="${ico}${cheio(true)}">auto_awesome</span>
+                        <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Yara AI</span>
                     </button>
                     <button onclick="window.location.href='youtube_lab.html'" class="flex flex-col items-center gap-2 bg-red-50 dark:bg-red-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'youtube' ? 'ring-2 ring-red-400' : ''}">
                         <span class="material-symbols-outlined text-red-500 text-2xl" style="${ico}${cheio(true)}">smart_display</span>
@@ -301,6 +301,14 @@ const Components = {
                     <button onclick="window.location.href='quadro.html'" class="flex flex-col items-center gap-2 bg-lime-50 dark:bg-lime-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all ${activeTab === 'quadro' ? 'ring-2 ring-lime-400' : ''}">
                         <span class="material-symbols-outlined text-lime-500 text-2xl" style="${ico}${cheio(true)}">stylus</span>
                         <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">🖊️ Quadro</span>
+                    </button>
+                    <button onclick="window.location.href='entrevista.html'" class="flex flex-col items-center gap-2 bg-violet-50 dark:bg-violet-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-violet-500 text-2xl" style="${ico}${cheio(true)}">work</span>
+                        <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Entrevista</span>
+                    </button>
+                    <button onclick="window.location.href='pronun_practice.html'" class="flex flex-col items-center gap-2 bg-teal-50 dark:bg-teal-500/10 rounded-2xl py-3 px-1 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-teal-500 text-2xl" style="${ico}${cheio(true)}">mic</span>
+                        <span class="text-[10px] font-black text-slate-600 dark:text-slate-300">Pronúncia</span>
                     </button>
                 </div>
 

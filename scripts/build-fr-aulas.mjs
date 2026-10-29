@@ -423,10 +423,10 @@ ${patternCardsHtml}
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=nav1"></script>
 <script>window.YARA_WIDGET={lang:'fr',lessonTitle:${JSON.stringify(l.title)},lessonNum:${l.num}};</script>
 <script src="tts-fr.js?v=c52d7db"></script>
-<script src="yara-widget.js?v=yw7"></script>
+<script src="yara-widget.js?v=yw8"></script>
 <script src="vocab-focus.js?v=vf2"></script>
 <script src="listening-lab.js?v=lb1"></script>
 <script src="self-study.js?v=ss4"></script>

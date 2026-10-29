@@ -584,6 +584,40 @@ deixar a IA gerar so as outras 2-3.
 a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
 defeito vale para eles.
 
+## Home nova (29/out/2026)
+
+- `6_Home_Forest_Expedition.html` + `assets/js/pages/home.js` (`window.CapyHome`): saudação, 🔥 sequência e ⭐ nível,
+  semana (seg-dom), cartão da ligação, plano de hoje e "Continuar o curso". O resto do site foi para "Mais para praticar".
+- A semana marca os dias da **sequência atual** (`streakDays` terminando em `lastPracticeDate`); o app não guarda o
+  histórico de dias. O ⚡ de créditos da maquete ficou de fora: o `aiUsageLimit` do Store (3) não bate com o servidor (20/dia).
+- Cartão da ligação: `teste` (vozTeste disponível, "1ª ligação: 3 min grátis"), `super`, `convite` (teste usado → Super)
+  e `normal`. Os dados vêm do evento `capyPlanoHoje` do `plano-hoje-cartao.js` (sem 2º `/api/me`).
+  O botão abre `ai_chat.html#ligar`: o telefone pulsa e espera o toque (o navegador exige o gesto para microfone e som).
+  Nunca prometer "sem limite" no Super: ele tem `VOZ_MINUTOS_MES`.
+- "Continuar o curso" = última aula aberta no `classes.html` (`localStorage.capyUltimaAula`); as aulas não marcam conclusão.
+  Aula > 5 para quem é grátis volta para o `classes.html` (paywall).
+- Menu de baixo: Início · Trilha · Cursos · Jogos · Mais (Yara AI foi para o Mais). Eventos `home_*` no `/api/track`.
+
+## Plano de hoje e "Pôr na agenda" (29/out/2026)
+
+- `plano-hoje.js` (`window.CapyPlano`) monta 3 tarefas de 5 min **sem IA**: próxima mini-lição da trilha
+  (`capyLastMini_en` ou a 1ª incompleta), conversa com a Yara (ligação no Super ou teste grátis; senão chat) e
+  revisão (`/api/memory`, `lessons.html?review=1`). O "Meu Plano" semanal com IA continua no `study_plan.html`.
+- "Feito" vem de marcas com data gravadas onde a coisa acontece: `capyLastMini_en.at` + mini concluída,
+  `capyConversaDia` (`ai_chat.html`) e `capyRevisaoDia` (modo revisão). Nunca de uma foto tirada na home.
+- Horário em `Store.state.horarioEstudo` (padrão 19:00). Google: link `calendar.google.com/...&recur=RRULE:FREQ=DAILY`.
+  iPhone/Outlook: `GET /api/agenda.ics?hora=HH:MM` (evento diário de 15 min com alarme; só aceita HH:MM).
+- O cartão (`assets/js/plano-hoje-cartao.js`) monta tudo por `textContent`.
+
+## Ligação de teste: 3 minutos grátis, uma vez só (28/out/2026)
+
+- Quem não é Super (free e pro) liga **uma vez**, por 3 minutos (`VOZ_TESTE_MIN`), e só com e-mail
+  confirmado (`liberarTesteDeVoz` em `api/index.js`). O teto global de US$ é checado antes, para nunca gastar o teste.
+- A marca `__vozteste_<aluno>` no `user_state` nasce no 1º token. Dentro desses 3 minutos o aluno religa com o
+  que sobrou (até 3 tokens); depois, `403 plano_sem_voz` com `teste: 'usado'` (ou `'confirmar_email'`).
+- O token responde `teste: true`, e o `conversa-core.js` desliga quando acabam os minutos liberados (motivo
+  `teste` ou `cota`), não só aos 15 min. `/api/me` devolve `vozTeste: 'disponivel' | 'usado'` para a home.
+
 ## Custo da ligacao por voz: calculado e guardado (14/set/2026)
 
 **O que existia:** o `conversa-core.js` ja contava os tokens reais de cada

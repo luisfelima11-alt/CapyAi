@@ -10,7 +10,7 @@
 //   - <script src="store.js">
 //   - <script src="tts-en.js"> (placed before yara-widget.js)
 //   - <div id="top-nav-placeholder"></div> + <div id="side-nav-placeholder">
-//   - <script src="components.js?v=7"> + Components.mount(...) calls
+//   - <script src="components.js?v=nav1"> + Components.mount(...) calls
 //
 // Safe to re-run — each patch is idempotent (checks if pattern already present).
 // ════════════════════════════════════════════════════════════════════════════
@@ -78,7 +78,7 @@ for (const f of files) {
     // Inject mount script just before yara-widget script.
     if (/<script\s+[^>]*src=["']?yara-widget\.js[^>]*>\s*<\/script>/i.test(content)) {
       const mountBlock =
-        '<script src="components.js?v=7"></script>\n' +
+        '<script src="components.js?v=nav1"></script>\n' +
         '<script>\n' +
         "if (typeof Components !== 'undefined') {\n" +
         '  try {\n' +
