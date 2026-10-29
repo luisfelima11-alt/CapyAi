@@ -47,14 +47,14 @@ test('class codes are 8 characters from an unambiguous alphabet', () => {
 
 test('teacher routes require a teacher/admin session and are scoped to the teacher', () => {
   const rota = nome => api.slice(api.indexOf(nome), api.indexOf('\n    }\n', api.indexOf(nome)));
-  for (const nome of ["url === '/api/professor/turma'", "url === '/api/professor/remover'", "url.startsWith('/api/professor/licao?')"]) {
+  for (const nome of ["url === '/api/professor/turma'", "url === '/api/professor/remover'", "url === '/api/professor/licao'"]) {
     assert.match(rota(nome), /await requireProfessor\(req, res\)/, `${nome} must call requireProfessor`);
   }
   // Every query on the class filters by the teacher id from the session, never from the request.
   assert.match(rota("url === '/api/professor/turma'"), /turma_alunos\?professor_id=eq\.\$\{encodeURIComponent\(profId\)\}/);
   assert.match(rota("url === '/api/professor/remover'"), /professor_id=eq\.\$\{encodeURIComponent\(identity\.appUserId\)\}/);
   // A homework text opens only when its student is in this teacher's class.
-  assert.match(rota("url.startsWith('/api/professor/licao?')"), /turma_alunos\?professor_id=eq\.\$\{encodeURIComponent\(identity\.appUserId\)\}&aluno_id=eq\.\$\{encodeURIComponent\(row\.user_id\)\}/);
+  assert.match(rota("url === '/api/professor/licao'"), /turma_alunos\?professor_id=eq\.\$\{encodeURIComponent\(identity\.appUserId\)\}&aluno_id=eq\.\$\{encodeURIComponent\(row\.user_id\)\}/);
   // Joining needs a signed-in student and the CSRF token.
   const entrar = rota("url === '/api/turma/entrar'");
   assert.match(entrar, /assertCsrf\(req\)/);
@@ -79,4 +79,11 @@ test('the migration keeps the class tables server-only', () => {
   }
   assert.match(sql, /revoke all on public\.turmas, public\.turma_alunos, public\.atividade_diaria from anon, authenticated/);
   assert.match(sql, /grant execute on function public\.somar_atividade\([^)]*\) to service_role/);
+});
+
+test('no API route compares the path with a query string (url has none: req.url.split("?")[0])', () => {
+  // GET /api/turma?c= and /api/professor/licao?id= were written as
+  // url.startsWith('/api/...?') and never matched: both answered 404.
+  assert.match(api, /const url = req\.url\.split\('\?'\)\[0\];/);
+  assert.doesNotMatch(api, /url\.startsWith\('\/api\/[^']*\?'\)|url === '\/api\/[^']*\?/);
 });

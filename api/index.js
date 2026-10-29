@@ -5918,7 +5918,7 @@ Rules:
 
     // ── Turma: o aluno entra pelo link do professor e pode sair quando quiser ──
     // GET /api/turma?c=<código> → { professor, nome, jaEsta }   (aluno logado)
-    if (req.method === 'GET' && url.startsWith('/api/turma?')) {
+    if (req.method === 'GET' && url === '/api/turma') {
         const identity = await requireAppUser(req, res);
         const codigo = String(new URL(req.url, 'http://x').searchParams.get('c') || '').toLowerCase();
         if (!/^[a-z0-9]{8}$/.test(codigo)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
@@ -6008,7 +6008,7 @@ Rules:
     }
 
     // GET /api/professor/licao?id=<uuid> — o texto de uma lição de casa de um aluno DA TURMA.
-    if (req.method === 'GET' && url.startsWith('/api/professor/licao?')) {
+    if (req.method === 'GET' && url === '/api/professor/licao') {
         const identity = await requireProfessor(req, res);
         const id = String(new URL(req.url, 'http://x').searchParams.get('id') || '');
         if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(400).json({ error: 'id_invalido' }); return; }
