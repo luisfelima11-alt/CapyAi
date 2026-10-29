@@ -507,6 +507,8 @@ function updateWeakWordSRS(lessonId, en, isCorrect) {
 }
 
 function initReviewMode() {
+  // O plano de hoje (plano-hoje.js) marca a revisao como feita quando ela abre.
+  try { localStorage.setItem('capyRevisaoDia', new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })); } catch (e) {}
   const sidebar = document.getElementById('lesson-sidebar');
   if (sidebar) sidebar.style.display = 'none';
   document.querySelectorAll('.md\\:hidden').forEach(el => {

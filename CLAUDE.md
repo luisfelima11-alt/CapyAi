@@ -584,6 +584,17 @@ deixar a IA gerar so as outras 2-3.
 a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
 defeito vale para eles.
 
+## Plano de hoje e "Pôr na agenda" (29/out/2026)
+
+- `plano-hoje.js` (`window.CapyPlano`) monta 3 tarefas de 5 min **sem IA**: próxima mini-lição da trilha
+  (`capyLastMini_en` ou a 1ª incompleta), conversa com a Yara (ligação no Super ou teste grátis; senão chat) e
+  revisão (`/api/memory`, `lessons.html?review=1`). O "Meu Plano" semanal com IA continua no `study_plan.html`.
+- "Feito" vem de marcas com data gravadas onde a coisa acontece: `capyLastMini_en.at` + mini concluída,
+  `capyConversaDia` (`ai_chat.html`) e `capyRevisaoDia` (modo revisão). Nunca de uma foto tirada na home.
+- Horário em `Store.state.horarioEstudo` (padrão 19:00). Google: link `calendar.google.com/...&recur=RRULE:FREQ=DAILY`.
+  iPhone/Outlook: `GET /api/agenda.ics?hora=HH:MM` (evento diário de 15 min com alarme; só aceita HH:MM).
+- O cartão (`assets/js/plano-hoje-cartao.js`) monta tudo por `textContent`.
+
 ## Custo da ligacao por voz: calculado e guardado (14/set/2026)
 
 **O que existia:** o `conversa-core.js` ja contava os tokens reais de cada

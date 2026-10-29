@@ -1248,6 +1248,7 @@ const chamada = CapyChamada({
   aoErro(msg) { avisar(msg, true); controles(); },
   aoDesligar(motivo, dados) {
     registrarUso(dados.uso, dados.duracaoMs);
+    if (dados && dados.duracaoMs > 30000) { try { localStorage.setItem('capyConversaDia', new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })); } catch (e) {} }
     anotarMemoria('voz');
     controles();
     $('cron').textContent = '';
@@ -1481,6 +1482,8 @@ async function enviar(canal) {
     // tempo de leitura da resposta. E o uso mais comum da pagina.
     if (window.CapyPresence) CapyPresence.falarTexto(resposta);
     historia.push({ role: 'assistant', content: resposta });
+    // Plano de hoje (plano-hoje.js): a conversa do dia conta como feita.
+    try { localStorage.setItem('capyConversaDia', new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })); } catch (e) {}
   } catch (_) {
     pensando(false);
     dizer('ia', 'texto', 'Não consegui responder agora. Tenta de novo?');
