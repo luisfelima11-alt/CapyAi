@@ -216,6 +216,8 @@ const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
     'boss_start', 'boss_win', 'newsline_search',
     'push_card_visto', 'push_sim', 'push_negou', 'push_adiou', 'push_nunca', 'push_ignorou', 'ios_dica_vista',
+    // Home nova: o que o aluno toca nela (contagem por dia, sem dado do aluno).
+    'home_ligar', 'home_super', 'home_chat', 'home_curso', 'home_plano',
 ]);
 
 async function getUserPlan(userId) {

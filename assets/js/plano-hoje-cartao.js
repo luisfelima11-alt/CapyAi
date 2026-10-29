@@ -1,5 +1,7 @@
-/* Cartão "Seu plano de hoje" (study_plan.html; a home nova reusa no PR 3).
- * Tudo por textContent: título e detalhe vêm de dados do aluno (nome de lição). */
+/* Cartão "Seu plano de hoje" (study_plan.html e a home).
+ * Tudo por textContent: título e detalhe vêm de dados do aluno (nome de lição).
+ * Avisa com o evento `capyPlanoHoje` (detail = o plano), que a home usa para o
+ * cartão da ligação sem buscar o /api/me de novo. */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -21,6 +23,7 @@
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = it.href;
+      a.dataset.item = it.id;
       a.className = 'flex items-center gap-3 py-3';
       const ck = document.createElement('span');
       ck.className = 'w-6 h-6 rounded-full grid place-items-center text-xs font-black flex-none ' + (it.feito ? 'bg-emerald-500 text-white' : 'bg-white');
@@ -42,6 +45,7 @@
       li.appendChild(a);
       ul.appendChild(li);
     }
+    document.dispatchEvent(new CustomEvent('capyPlanoHoje', { detail: p }));
   }
 
   $('ph-hora').addEventListener('change', e => { if (CapyPlano.salvarHorario(e.target.value)) atualizarAgenda(); });

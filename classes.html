@@ -422,7 +422,7 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=som2"></script>
+<script src="components.js?v=nav1"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -567,7 +567,13 @@ LESSONS.forEach((l, i) => {
   card.style.animationDelay = `${i * 0.04}s`;
 
   if (locked) { card.onclick = () => showPaywall(l); }
-  else if (l.available) { card.onclick = () => window.location.href = l.href; }
+  else if (l.available) {
+    card.onclick = () => {
+      // "Continuar o curso" da home: a última aula aberta aqui.
+      try { localStorage.setItem('capyUltimaAula', JSON.stringify({ n: l.n, title: l.title, href: l.href, at: Date.now() })); } catch (e) {}
+      window.location.href = l.href;
+    };
+  }
 
   const badge = locked
     ? `<div class="absolute top-3 right-3 flex items-center gap-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">🔒 Pro</div>`

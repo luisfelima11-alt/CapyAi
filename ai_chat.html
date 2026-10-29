@@ -248,6 +248,10 @@
   #ligar,#silenciar{background:rgba(255,255,255,.07);border:1px solid var(--borda);color:var(--rosa-claro)}
   #silenciar{color:var(--tinta)}
   #ligar.desligar,#silenciar.desligar{background:var(--vermelho);border-color:transparent;color:#fff}
+  /* Veio do "Ligar para a Yara" da home (#ligar): o telefone fica verde e pulsa. */
+  #ligar.chamar{background:#10b981;border-color:transparent;color:#fff;animation:chamaLigar 1.6s ease-in-out infinite}
+  @keyframes chamaLigar{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}50%{box-shadow:0 0 0 10px rgba(16,185,129,0)}}
+  @media (prefers-reduced-motion:reduce){#ligar.chamar{animation:none}}
   /* A ponta direita troca de papel como no WhatsApp: microfone com a caixa
      vazia, seta de enviar quando ha texto. */
   #gravar,#btn-enviar{background:var(--rosa);color:#fff}
@@ -1285,6 +1289,7 @@ function registrarUso(uso, duracaoMs) {
 }
 
 // ── Controles ────────────────────────────────────────────────────────────────
+let chamarLigacao = false;   // veio da home com #ligar: o telefone pulsa ate o 1o toque
 function controles() {
   const ligado = chamada.ligado(), pendente = chamada.pendente();
   const emChamada = ligado || pendente;
@@ -1292,7 +1297,7 @@ function controles() {
   const temTexto = !!$('entrada').value.trim();
 
   const b = $('ligar');
-  b.className = 'acao' + (emChamada ? ' desligar' : '');
+  b.className = 'acao' + (emChamada ? ' desligar' : chamarLigacao ? ' chamar' : '');
   b.setAttribute('aria-label', emChamada ? 'Encerrar a chamada' : 'Ligar para a Yara');
   b.title = emChamada ? 'Encerrar' : 'Ligar';
   b.querySelector('.ic-ligar').hidden = emChamada;
@@ -1529,6 +1534,17 @@ async function enviar(canal) {
     primeira = sessionStorage.getItem('capyPrimeiraMensagem') || '';
     sessionStorage.removeItem('capyPrimeiraMensagem');
   } catch (_) { primeira = ''; }
+
+  // Veio do "Ligar para a Yara" da home: o navegador so libera o microfone e o
+  // som com um toque do aluno nesta pagina, entao o telefone pulsa e espera.
+  if (location.hash === '#ligar') {
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {}
+    chamarLigacao = true;
+    controles();
+    $('ligar').addEventListener('click', () => { chamarLigacao = false; controles(); }, { once: true, capture: true });
+    $('ligar').focus({ preventScroll: true });
+    avisar('Toque no telefone verde para começar a ligação com a Yara.');
+  }
 
   // Quem ainda nao descobriu o menu (o botao do topo esta pulsando) ganha a dica.
   const dicaCapivara = $('btn-capivara').classList.contains('chamar')

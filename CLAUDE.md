@@ -584,6 +584,20 @@ deixar a IA gerar so as outras 2-3.
 a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
 defeito vale para eles.
 
+## Home nova (29/out/2026)
+
+- `6_Home_Forest_Expedition.html` + `assets/js/pages/home.js` (`window.CapyHome`): saudação, 🔥 sequência e ⭐ nível,
+  semana (seg-dom), cartão da ligação, plano de hoje e "Continuar o curso". O resto do site foi para "Mais para praticar".
+- A semana marca os dias da **sequência atual** (`streakDays` terminando em `lastPracticeDate`); o app não guarda o
+  histórico de dias. O ⚡ de créditos da maquete ficou de fora: o `aiUsageLimit` do Store (3) não bate com o servidor (20/dia).
+- Cartão da ligação: `teste` (vozTeste disponível, "1ª ligação: 3 min grátis"), `super`, `convite` (teste usado → Super)
+  e `normal`. Os dados vêm do evento `capyPlanoHoje` do `plano-hoje-cartao.js` (sem 2º `/api/me`).
+  O botão abre `ai_chat.html#ligar`: o telefone pulsa e espera o toque (o navegador exige o gesto para microfone e som).
+  Nunca prometer "sem limite" no Super: ele tem `VOZ_MINUTOS_MES`.
+- "Continuar o curso" = última aula aberta no `classes.html` (`localStorage.capyUltimaAula`); as aulas não marcam conclusão.
+  Aula > 5 para quem é grátis volta para o `classes.html` (paywall).
+- Menu de baixo: Início · Trilha · Cursos · Jogos · Mais (Yara AI foi para o Mais). Eventos `home_*` no `/api/track`.
+
 ## Plano de hoje e "Pôr na agenda" (29/out/2026)
 
 - `plano-hoje.js` (`window.CapyPlano`) monta 3 tarefas de 5 min **sem IA**: próxima mini-lição da trilha
