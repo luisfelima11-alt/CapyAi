@@ -595,6 +595,15 @@ defeito vale para eles.
   iPhone/Outlook: `GET /api/agenda.ics?hora=HH:MM` (evento diário de 15 min com alarme; só aceita HH:MM).
 - O cartão (`assets/js/plano-hoje-cartao.js`) monta tudo por `textContent`.
 
+## Ligação de teste: 3 minutos grátis, uma vez só (28/out/2026)
+
+- Quem não é Super (free e pro) liga **uma vez**, por 3 minutos (`VOZ_TESTE_MIN`), e só com e-mail
+  confirmado (`liberarTesteDeVoz` em `api/index.js`). O teto global de US$ é checado antes, para nunca gastar o teste.
+- A marca `__vozteste_<aluno>` no `user_state` nasce no 1º token. Dentro desses 3 minutos o aluno religa com o
+  que sobrou (até 3 tokens); depois, `403 plano_sem_voz` com `teste: 'usado'` (ou `'confirmar_email'`).
+- O token responde `teste: true`, e o `conversa-core.js` desliga quando acabam os minutos liberados (motivo
+  `teste` ou `cota`), não só aos 15 min. `/api/me` devolve `vozTeste: 'disponivel' | 'usado'` para a home.
+
 ## Custo da ligacao por voz: calculado e guardado (14/set/2026)
 
 **O que existia:** o `conversa-core.js` ja contava os tokens reais de cada
