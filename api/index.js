@@ -526,6 +526,33 @@ async function isAdminReq(req, res) {
     return false;
 }
 
+// "Pôr na agenda" do plano de hoje (29/out/2026): um evento diário de 15 min no
+// horário do aluno, com alarme na hora. Sem dado do aluno: só o horário, de uma
+// lista fechada (HH:MM). iPhone e Outlook abrem o .ics; o Google usa o link.
+function icsDaAgenda(hora, agora = new Date()) {
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hora || ''))) return null;
+    const [hh, mm] = hora.split(':');
+    const dia = agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).replace(/-/g, '');
+    const carimbo = agora.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    return [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Capy English//Plano de hoje//PT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+        'BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo',
+        'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD',
+        'END:VTIMEZONE',
+        'BEGIN:VEVENT',
+        `UID:capy-ingles-${hh}${mm}@capyenglish.com.br`,
+        `DTSTAMP:${carimbo}`,
+        `DTSTART;TZID=America/Sao_Paulo:${dia}T${hh}${mm}00`,
+        'DURATION:PT15M',
+        'RRULE:FREQ=DAILY',
+        'SUMMARY:Inglês com a Yara 🐾',
+        'DESCRIPTION:Seu plano de hoje: trilha\\, conversa com a Yara e revisão (15 min).\\nhttps://www.capyenglish.com.br/',
+        'URL:https://www.capyenglish.com.br/',
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Hora do inglês com a Yara!', 'TRIGGER:PT0M', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR', '',
+    ].join('\r\n');
+}
+
 const API_KEY = process.env.OPENAI_API_KEY;
 const MODEL   = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 // Voz em tempo real. O "mini" custa ~1/3 do completo e, medido, sai quase igual
@@ -4109,6 +4136,21 @@ Respond ONLY with valid JSON, no markdown:
         res.status(410).json({ error: 'legacy_auth_retired' }); return;
     }
 
+    // GET /api/agenda.ics?hora=HH:MM — evento diario do plano de hoje (publico, sem dado do aluno).
+    if (req.method === 'GET' && url === '/api/agenda.ics') {
+        const _rl = await checkRateLimit(req, 'track', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const hora = new URL(req.url, 'http://x').searchParams.get('hora') || '19:00';
+        const ics = icsDaAgenda(hora);
+        if (!ics) { res.status(400).json({ error: 'hora_invalida' }); return; }
+        res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+        res.setHeader('Content-Disposition', 'inline; filename="ingles-com-a-yara.ics"');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.statusCode = 200;
+        res.end(ics);
+        return;
+    }
+
     // GET /api/me?userId=xxx → returns subscription/plan info
     // Used by frontend to gate Pro/Super features in real time.
     // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
@@ -5896,4 +5938,4 @@ Rules:
 };
 
 // Pure helpers, exposed for tests only.
-module.exports._internos = { buscarJsonExterno, checkRateLimit };
+module.exports._internos = { buscarJsonExterno, checkRateLimit, icsDaAgenda };
