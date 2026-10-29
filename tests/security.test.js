@@ -139,6 +139,7 @@ test('sensitive pages use local scripts and contain no executable inline handler
   const pages = [
     '4_Login_Capy_Yara_Welcomes_You.html', 'set-password.html', 'account.html',
     'admin.html', 'admin-antigo.html', 'admin-metrics.html', 'teacher_homework.html',
+    'professor.html', 'turma.html',
   ];
   for (const page of pages) {
     const source = fs.readFileSync(path.join(ROOT, page), 'utf8');

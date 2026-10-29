@@ -620,6 +620,16 @@ do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declarac
 (TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
 linha que pode se repetir.
 
+## Painel do professor e turma (19/out/2026)
+
+- O professor (papel `teacher` ou `admin` no `app_metadata`) abre `professor.html` e manda o link
+  `turma.html?c=<código>` aos alunos. O aluno só entra aceitando compartilhar o progresso (LGPD) e sai quando quiser.
+- O servidor só devolve alunos de `turma_alunos` do professor da sessão (`requireProfessor`); nunca aceite id de
+  professor vindo do navegador. Lição de casa abre só se o aluno é da turma.
+- `atividade_diaria` (mini-lições e XP por dia) sai da diferença entre o estado salvo e o anterior no `POST /api/db`
+  (`deltaAtividade`), sem nada novo no navegador. SQL: `202610190003_turmas.sql`, antes do código.
+- `professor.html` e `turma.html` são páginas endurecidas (CSP estrita): JS em `assets/js/pages/`, só `textContent`.
+
 ## Design System
 
 Full spec in `1_Design_System.md`. Key constraints:
