@@ -210,3 +210,29 @@ test('every asset type a page loads is published by vercel.json (the slide image
   assert.ok(tipos.has('webp'), 'the slide images are referenced');
   for (const ext of tipos) assert.ok(builds.includes(`assets/**/*.${ext}`), `vercel.json does not publish assets/**/*.${ext}`);
 });
+
+test('nothing the student sees says "Grammar": the title loses the prefix and the carousel is "padrões"', async () => {
+  const { blocoGramaticaSlides } = await modulo();
+  const html = blocoGramaticaSlides(aula(), { slug: 'agro09' });
+  const visivel = html.replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
+  assert.doesNotMatch(visivel, /gram[aá]tic|grammar/i);
+  assert.match(html, /<h2 class="text-2xl font-black text-navy mb-1">O verbo TO BE<\/h2>/);
+  assert.match(html, /aria-label="Slides dos padrões"/);
+});
+
+test('hand-made lessons without proximoPasso() get the deck without the "Continuar" button', async () => {
+  const { blocoGramaticaSlides } = await modulo();
+  assert.match(blocoGramaticaSlides(aula(), { slug: 'gps05' }), /onclick="proximoPasso\(\)"/);
+  const semContinuar = blocoGramaticaSlides(aula(), { slug: 'gps05', continuar: false });
+  assert.doesNotMatch(semContinuar, /proximoPasso/);
+  assert.match(semContinuar, /<script src="gramatica-slides\.js\?v=/);
+});
+
+test('the lesson PDF reads the patterns from the slides, and aplicar-slides only swaps the Patterns tab', () => {
+  const folha = fs.readFileSync(path.join(ROOT, 'scripts/gera-folha-aula.mjs'), 'utf8');
+  assert.match(folha, /querySelectorAll\('\.gs-slide'\)/);
+  const aplicar = fs.readFileSync(path.join(ROOT, 'scripts/aplicar-slides.mjs'), 'utf8');
+  assert.match(aplicar, /checarSlides\(c, ok, \{ teto: c\.tetoPalavras \|\| 14, slug, raiz: RAIZ \}\)/);
+  assert.match(aplicar, /continuar = \/function\\s\+proximoPasso/);
+  assert.match(aplicar, /🧩 Patterns/);
+});
