@@ -265,6 +265,8 @@ function tokenHarness(options = {}) {
     // palavras que ele erra. Sem estes stubs o sandbox morre em ReferenceError
     // e 13 testes que nao tem nada a ver com isso caem junto.
     isAdminReq: async () => options.admin !== false,
+    // A ligacao de teste (28/out): por padrao ja usada, para os testes antigos de plano sem voz.
+    liberarTesteDeVoz: async () => options.teste || { ok: false, motivo: 'usado' },
     getUserPlan: async () => options.plano || 'super',
     VOZ_MINUTOS_MES: { free: 0, pro: 0, super: 60 },
     VOZ_TETO_USD_MES: 50,
@@ -1456,4 +1458,95 @@ test('frances e turco no Automatico nao herdam o nivel de INGLES do perfil', asy
 test('o log de uso guarda persona, estilo e nivel', () => {
   const { cenarioParaLog } = catalogoReal();
   assert.equal(cenarioParaLog('travel:encenacao:intensivo'), 'travel:encenacao:intensivo');
+});
+
+
+// ── Ligacao de teste: 3 minutos gratis, uma vez so (28/out) ─────────────────
+
+test('sem voz no plano, a ligacao de teste libera 3 minutos e avisa o cliente', async () => {
+  const nomes = require('../api/security').COOKIE_NAMES;
+  const logado = { cookie: nomes.access + '=mock-session; ' + nomes.csrf + '=mock-csrf', 'x-csrf-token': 'mock-csrf' };
+  const h = tokenHarness({ admin: false, aluno: 'aluno-1', plano: 'free', headers: logado, teste: { ok: true, minutos: 3 } });
+  await h.run();
+  assert.equal(h.res.statusCode, 200);
+  assert.equal(h.res.body.minutosRestantes, 3);
+  assert.equal(h.res.body.teste, true);
+  assert.equal(h.requests.length, 1);
+});
+
+test('teste ja usado ou sem e-mail confirmado: 403 com o motivo, sem falar com a OpenAI', async () => {
+  const nomes = require('../api/security').COOKIE_NAMES;
+  const logado = { cookie: nomes.access + '=mock-session; ' + nomes.csrf + '=mock-csrf', 'x-csrf-token': 'mock-csrf' };
+  for (const motivo of ['usado', 'confirmar_email']) {
+    const h = tokenHarness({ admin: false, aluno: 'aluno-1', plano: 'free', headers: logado, teste: { ok: false, motivo } });
+    await h.run();
+    assert.equal(h.res.statusCode, 403);
+    assert.equal(h.res.body.error, 'plano_sem_voz');
+    assert.equal(h.res.body.teste, motivo);
+    assert.equal(h.requests.length, 0);
+  }
+});
+
+test('o teto global de gasto barra o teste antes de gasta-lo', async () => {
+  const nomes = require('../api/security').COOKIE_NAMES;
+  const logado = { cookie: nomes.access + '=mock-session; ' + nomes.csrf + '=mock-csrf', 'x-csrf-token': 'mock-csrf' };
+  let pediuTeste = false;
+  const h = tokenHarness({ admin: false, aluno: 'aluno-1', plano: 'free', headers: logado,
+    consumoGeral: { segundos: 0, minutos: 0, usd: 50.01 },
+    get teste() { pediuTeste = true; return { ok: true, minutos: 3 }; } });
+  await h.run();
+  assert.equal(h.res.statusCode, 503);
+  assert.equal(pediuTeste, false, 'the trial must not be consumed when the site is over budget');
+  assert.equal(h.requests.length, 0);
+});
+
+test('liberarTesteDeVoz: uma vez so, religa dentro dos 3 minutos com o que sobrou, e exige e-mail confirmado', () => {
+  const saida = require('node:child_process').execFileSync(process.execPath, ['-e', `
+    const tabela = new Map();
+    global.fetch = async (url, opts = {}) => {
+      const u = new URL(url), metodo = (opts.method || 'GET').toUpperCase();
+      const r = (status, obj) => ({ ok: status < 400, status, text: async () => obj === undefined ? '' : JSON.stringify(obj) });
+      if (!u.pathname.endsWith('/user_state')) return r(404, {});
+      const id = (u.searchParams.get('user_id') || '').replace(/^eq\\./, '');
+      if (metodo === 'POST') {
+        const linha = JSON.parse(opts.body);
+        if (tabela.has(linha.user_id)) return r(201, []);
+        tabela.set(linha.user_id, linha); return r(201, [linha]);
+      }
+      if (metodo === 'PATCH') { const l = tabela.get(id); Object.assign(l, JSON.parse(opts.body)); return { ok: true, status: 204, text: async () => '' }; }
+      return r(200, tabela.has(id) ? [{ data: tabela.get(id).data }] : []);
+    };
+    const { liberarTesteDeVoz, estadoTesteDeVoz } = require('./api/index.js')._vozTeste;
+    const quem = { appUserId: 'a1', session: { user: { email_confirmed_at: '2026-10-01T00:00:00Z' } } };
+    const t0 = Date.parse('2026-10-28T12:00:00Z');
+    (async () => {
+      const out = {};
+      out.antes = await estadoTesteDeVoz('a1');
+      out.semEmail = await liberarTesteDeVoz({ appUserId: 'a1', session: { user: {} } }, t0);
+      out.primeira = await liberarTesteDeVoz(quem, t0);
+      out.depois = await estadoTesteDeVoz('a1');
+      out.religa = await liberarTesteDeVoz(quem, t0 + 60000);
+      out.terceira = await liberarTesteDeVoz(quem, t0 + 90000);
+      out.quarta = await liberarTesteDeVoz(quem, t0 + 100000);
+      const outro = { appUserId: 'b2', session: { user: { email_confirmed_at: 'x' } } };
+      await liberarTesteDeVoz(outro, t0);
+      out.tarde = await liberarTesteDeVoz(outro, t0 + 170000);
+      console.log(JSON.stringify(out));
+    })();
+  `], { cwd: ROOT, encoding: 'utf8', env: { ...process.env, SUPABASE_URL: 'https://sb.invalid', SUPABASE_SECRET_KEY: 'k', OPENAI_API_KEY: '' } });
+  const r = JSON.parse(saida.trim().split('\n').pop());
+  assert.equal(r.antes, 'disponivel');
+  assert.deepEqual(r.semEmail, { ok: false, motivo: 'confirmar_email' });
+  assert.deepEqual(r.primeira, { ok: true, minutos: 3, primeira: true });
+  assert.equal(r.depois, 'usado');
+  assert.deepEqual(r.religa, { ok: true, minutos: 2, primeira: false }, 'a dropped call redials with what is left');
+  assert.equal(r.terceira.ok, true);
+  assert.deepEqual(r.quarta, { ok: false, motivo: 'usado' }, 'at most 3 tokens');
+  assert.deepEqual(r.tarde, { ok: false, motivo: 'usado' }, 'less than 30 s left counts as used');
+});
+
+test('conversa-core desliga quando acabam os minutos liberados, com o motivo do teste', () => {
+  const core = fs.readFileSync(path.join(ROOT, 'conversa-core.js'), 'utf8');
+  assert.match(core, /s\.limite = minutos == null \? 900000 : Math\.min\(900000, Math\.max\(0, minutos \* 60000\)\)/);
+  assert.match(core, /now-s\.started>=\(s\.limite\|\|900000\)\) end\(s,s\.limite&&s\.limite<900000\?\(s\.ehTeste\?'teste':'cota'\):'tempo'\)/);
 });

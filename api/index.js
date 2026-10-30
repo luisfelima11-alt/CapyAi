@@ -128,6 +128,58 @@ const VOZ_MINUTOS_MES = { free: 0, pro: 0, super: 60 };
 // nao so contra aluno. Estourou, ninguem liga ate o dono liberar.
 const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 
+// Ligacao de teste (28/out/2026, decisao do Luis): quem nao e Super liga UMA vez,
+// com 3 minutos gratis. E o que vende o Super, entao so conta conta com e-mail
+// confirmado (senao cada e-mail inventado vira 3 minutos de graca).
+//
+// A marca e uma linha `__vozteste_<aluno>` no user_state, gravada no PRIMEIRO
+// token: o teste vale 3 minutos de relogio a partir dali. Se a ligacao cair ou
+// nao conectar, o aluno religa dentro desses 3 minutos e recebe o que sobrou
+// (no maximo 3 tokens). Depois disso, nunca mais. Na duvida (banco fora), nega:
+// minuto gratis por falha nossa e dinheiro que ninguem pagou.
+const VOZ_TESTE_MIN = 3;
+const VOZ_TESTE_TOKENS = 3;
+
+async function liberarTesteDeVoz(identity, agora = Date.now()) {
+    const alunoId = identity && identity.appUserId;
+    if (!alunoId) return { ok: false, motivo: 'login' };
+    if (!identity.session?.user?.email_confirmed_at) return { ok: false, motivo: 'confirmar_email' };
+    const chave = `__vozteste_${alunoId}`;
+    const iso = new Date(agora).toISOString();
+    let linha = null;
+    try {
+        const criada = await sb('/user_state', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=ignore-duplicates,return=representation' },
+            body: JSON.stringify({ user_id: chave, data: { em: iso, ligacoes: 1 }, updated_at: iso }),
+        });
+        if (Array.isArray(criada) && criada.length) return { ok: true, minutos: VOZ_TESTE_MIN, primeira: true };
+        const lida = await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}&select=data`);
+        linha = Array.isArray(lida) ? lida[0] : null;
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    const inicio = Date.parse(linha?.data?.em || '');
+    const ligacoes = Number(linha?.data?.ligacoes) || 1;
+    const sobra = VOZ_TESTE_MIN - (agora - inicio) / 60000;
+    if (!Number.isFinite(inicio) || sobra < 0.5 || ligacoes >= VOZ_TESTE_TOKENS) return { ok: false, motivo: 'usado' };
+    try {
+        await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}`, {
+            method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ data: { em: linha.data.em, ligacoes: ligacoes + 1 }, updated_at: iso }),
+        });
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    return { ok: true, minutos: Math.round(sobra * 10) / 10, primeira: false };
+}
+
+// Para a home: 'disponivel' (nunca ligou) ou 'usado'. So le; nunca marca.
+async function estadoTesteDeVoz(alunoId) {
+    if (!alunoId) return null;
+    try {
+        const r = await sb(`/user_state?user_id=eq.${encodeURIComponent(`__vozteste_${alunoId}`)}&select=data`);
+        if (!Array.isArray(r)) return null;
+        return r.length ? 'usado' : 'disponivel';
+    } catch (e) { return null; }
+}
+
 const RATE_LIMITS = {
     chat:         { free:  20, pro: 200, super: 500 },  // per day
     music:        { free:   3, pro:  50, super: 150 },
@@ -2618,17 +2670,8 @@ module.exports = async (req, res) => {
             }
             const plano = await getUserPlan(alunoId);
             const cota = VOZ_MINUTOS_MES[plano] || 0;
-            if (cota <= 0) {
-                res.status(403).json({
-                    error: 'plano_sem_voz',
-                    message: 'A conversa por voz faz parte do plano Super.',
-                    plano,
-                    acao: '/account.html',
-                });
-                return;
-            }
-            // Freio global antes da cota individual: se o site estourou o teto,
-            // nao adianta o aluno ter minutos sobrando.
+            // Freio global antes de tudo: se o site estourou o teto, nao adianta
+            // o aluno ter minutos sobrando, e o teste gratis nao pode ser gasto.
             const geral = await consumoVozDoMes(null);
             if (geral && geral.usd >= VOZ_TETO_USD_MES) {
                 console.error('[voz] teto mensal de USD atingido', geral.usd.toFixed(2), 'de', VOZ_TETO_USD_MES);
@@ -2638,7 +2681,25 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            const meu = await consumoVozDoMes(alunoId);
+            if (cota <= 0) {
+                // Sem voz no plano: a ligacao de teste, uma vez so.
+                const teste = await liberarTesteDeVoz(req._securityIdentity);
+                if (!teste.ok) {
+                    res.status(403).json({
+                        error: 'plano_sem_voz',
+                        message: teste.motivo === 'confirmar_email'
+                            ? 'Confirme seu e-mail para usar a ligação de teste grátis.'
+                            : 'A conversa por voz faz parte do plano Super.',
+                        plano,
+                        teste: teste.motivo,
+                        acao: '/account.html',
+                    });
+                    return;
+                }
+                req._vozRestante = teste.minutos;
+                req._vozTeste = true;
+            }
+            const meu = req._vozTeste ? null : await consumoVozDoMes(alunoId);
             // consumoVozDoMes devolve null quando nao conseguiu ler o banco. Nesse
             // caso libera: derrubar aluno pagante por falha nossa de leitura e pior
             // do que deixar passar uma ligacao. O freio global acima ja segura o pior.
@@ -2652,7 +2713,7 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
+            if (!req._vozTeste) req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
         }
 
 
@@ -2840,6 +2901,7 @@ module.exports = async (req, res) => {
         const expiresAt = dados.expires_at || (dados.client_secret && dados.client_secret.expires_at);
 
         res.status(200).json({ minutosRestantes: req._vozRestante == null ? null : Number(req._vozRestante.toFixed(1)),
+            teste: req._vozTeste === true,
             value: valor,
             expiresAt: Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null,
             model: REALTIME_MODEL,
@@ -4123,10 +4185,13 @@ Respond ONLY with valid JSON, no markdown:
         if (plan !== 'free' && row.plan_expires_at) {
             if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
         }
+        // A home mostra "1ª ligação: 3 min grátis" ou o convite ao Super.
+        const vozTeste = effectivePlan === 'super' ? null : await estadoTesteDeVoz(identity.appUserId);
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.status(200).json({
             plan: effectivePlan,
             planExpiresAt: row.plan_expires_at || null,
+            vozTeste,
         });
         return;
     }
@@ -5897,3 +5962,5 @@ Rules:
 
 // Pure helpers, exposed for tests only.
 module.exports._internos = { buscarJsonExterno, checkRateLimit };
+// For tests: the free voice-call trial (tests/realtime-voice.test.js).
+module.exports._vozTeste = { liberarTesteDeVoz, estadoTesteDeVoz, VOZ_TESTE_MIN };
