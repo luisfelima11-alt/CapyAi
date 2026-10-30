@@ -130,8 +130,9 @@ function slide(i, total, imagem, rotulo, titulo, corpo) {
  * A aba #tab-grammar inteira, do <div> de abertura até antes do <!-- CONVERSATION.
  * slug: o nome da aula nas imagens (gps14, agro01, med05, interview03).
  * raiz: a raiz do repositório, para versionar o endereço de cada imagem.
+ * continuar: false nas aulas antigas feitas à mão, que não têm proximoPasso() (aplicar-slides.mjs).
  */
-export function blocoGramaticaSlides(c, { slug, raiz } = {}) {
+export function blocoGramaticaSlides(c, { slug, raiz, continuar = true } = {}) {
     if (!slug) throw new Error('blocoGramaticaSlides: falta o slug da aula (ex.: agro01), que dá o nome das imagens');
     const g = c.gramatica;
     const padroes = g.slides;
@@ -176,8 +177,8 @@ export function blocoGramaticaSlides(c, { slug, raiz } = {}) {
   <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
     Veja os ${total} slides para ganhar +20 XP
   </button>
-  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
-<script src="gramatica-slides.js?v=${VERSAO_JS}"></script>
+${continuar ? `  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+` : ''}<script src="gramatica-slides.js?v=${VERSAO_JS}"></script>
 </div>
 
 `;
