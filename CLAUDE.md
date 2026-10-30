@@ -80,6 +80,8 @@ botão, SEO, PDF ou fala da Yara.
 - Os ids internos (`tab-grammar`, `'grammar'` na `ROTA`) continuam como estão: o aluno não os
   vê, e o `self-study.js` e o `listening-lab.js` dependem deles.
 - Os prompts da Yara mandam ensinar com exemplos e nunca dizer "grammar" ou "gramática".
+- O `grammar_lab.html` se chama **Laboratório de Padrões** (30/out/2026); a categoria de jogos do pavilhão
+  é "Padrões". O nome do arquivo e os ids (`grammarDone`, `grammar_star`, `data-filter="grammar"`) ficam.
 
 ## SEO e página 404 (30/out/2026)
 

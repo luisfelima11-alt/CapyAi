@@ -318,3 +318,13 @@ test('unknown addresses get the branded 404 page, which is not indexed', () => {
   // Servida em qualquer caminho (/a/b/c): links e imagens só com caminho absoluto.
   for (const [, url] of pagina.matchAll(/(?:href|src)="([^"]*)"/g)) assert.match(url, /^(\/|https:\/\/)/, url);
 });
+
+test('the old "Grammar Lab" name is gone: the page is the Laboratório de Padrões', () => {
+  for (const f of fs.readdirSync(ROOT).filter(n => n.endsWith('.html') || n.endsWith('.js'))) {
+    assert.ok(!fs.readFileSync(path.join(ROOT, f), 'utf8').includes('Grammar Lab'), `${f} still says "Grammar Lab"`);
+  }
+  const lab = fs.readFileSync(path.join(ROOT, 'grammar_lab.html'), 'utf8');
+  assert.match(lab, /<title>Laboratório de Padrões — /);
+  // Os ids internos (grammarDone, grammar_star, data-filter="grammar") continuam; o aluno não os vê.
+  assert.doesNotMatch(lab, /gramátic|Grammar/);
+});
