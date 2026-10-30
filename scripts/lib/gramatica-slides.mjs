@@ -161,9 +161,9 @@ export function blocoGramaticaSlides(c, { slug, raiz } = {}) {
         `<button type="button" class="gs-dot w-2.5 h-2.5 rounded-full ${i ? 'bg-slate-200' : 'bg-emerald-500'}" aria-label="Ir para o slide ${i + 1}" aria-current="${i ? 'false' : 'true'}"></button>`).join('');
 
     return `<div id="tab-grammar" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-1">${esc(g.titulo)}</h2>
+  <h2 class="text-2xl font-black text-navy mb-1">${esc(semPrefixo(g.titulo))}</h2>
   <p class="text-slate-500 text-sm mb-5">${total} slides com ${nFrases} exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
-  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides da gramática">
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
     <div class="flex items-center justify-between gap-3 mb-3">
       <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de ${total}</span>
       <div class="flex flex-wrap gap-1.5">${bolinhas}</div>

@@ -272,7 +272,7 @@ function validar({ t, d, c, n, nn }) {
     ok(c.quiz.every(q => new Set(q.opts).size === q.opts.length), 'sem opção repetida no quiz');
     ok(d.linhas.filter(x => !x.extra).length === 12, '12 falas na versão curta');
     ok(d.linhas.filter(x => x.extra).length === 8, '8 falas extras');
-    const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"/g, '');
+    const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
     ok(!/gram[aá]tic|grammar/i.test(visivel), 'sem a palavra proibida gramática/grammar (regra de 12/out)');
     ok(t.includes('id="dialogue-lines"') && t.includes('id="speak-grid"'), 'contrato de DOM do listening-lab');
 

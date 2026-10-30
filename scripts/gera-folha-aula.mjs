@@ -77,6 +77,16 @@ function LER_PADROES() {
     c.querySelectorAll('s').forEach(s => s.replaceWith('~~' + s.textContent + '~~'));
     return c.textContent.replace(/\s+/g, ' ').trim();
   };
+  // Slides de exemplos (gramatica-slides.mjs, desde 05/out/2026): um padrão por slide, sem
+  // a abertura (lista dos padrões) e sem a revisão (frases misturadas).
+  const slides = [...document.querySelectorAll('.gs-slide')];
+  if (slides.length > 2) {
+    return slides.slice(1, -1).map(s => ({
+      titulo: limpa(s.querySelector('.gs-titulo') || s),
+      certo: [...s.querySelectorAll('.gs-lista .gs-en')].map(limpa),
+      errado: [],
+    })).filter(p => p.titulo);
+  }
   return [...document.querySelectorAll('[onclick^="toggleAccordion"]')].map(btn => {
     const id = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
     const titulo = (btn.querySelector('.font-black.text-navy') || btn).textContent.trim();

@@ -11,6 +11,9 @@
 //       as imagens da aula, com o prompt completo de cada uma e se já existe
 //   node scripts/gramatica-imagens.mjs --salvar agro01 3 <arquivo-ou-https-url>
 //       reduz para 1024×768 e grava em WebP (até 200 KB), no caminho certo
+//   node scripts/gramatica-imagens.mjs --checar agro01
+//       confere o texto do deck (as regras do checarSlides e a palavra proibida)
+//       antes de gastar com as imagens, que ainda não precisam existir
 //
 // slug: gps14 (scripts/aula14-conteudo.json), agro01, med05, interview03.
 // A conversão usa o Chromium do Playwright (dependência de dev), porque o
@@ -20,7 +23,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cenasDoDeck, promptDaImagem, imagemDoSlide, MAX_KB_IMAGEM } from './lib/gramatica-slides.mjs';
+import { cenasDoDeck, promptDaImagem, imagemDoSlide, MAX_KB_IMAGEM, checarSlides } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const LARGURA = 1024, ALTURA = 768;
@@ -103,14 +106,31 @@ async function salvar(slug, k, entrada) {
     }
 }
 
+function checar(slug) {
+    const c = conteudoDe(slug);
+    let falhas = 0;
+    const ok = (cond, msg) => { console.log(`  ${cond ? '✓' : '✗'} ${msg}`); if (!cond) falhas++; };
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14 });
+    // Regra de 12/out: nada que o aluno vê diz gramática/grammar (o "Grammar:" do começo do título sai na página).
+    const g = c.gramatica || {};
+    const visto = [String(g.titulo || '').replace(/^\s*grammar\s*:\s*/i, ''),
+        ...(g.slides || []).flatMap(p => [p.padrao, ...(p.frases || []).flatMap(f => [f.en, f.pt])]),
+        ...(g.revisao || []).flatMap(f => [f.en, f.pt])].join('\n');
+    ok(!/gram[aá]tic|grammar/i.test(visto), 'sem a palavra proibida gramática/grammar no texto do deck');
+    console.log(falhas ? `\n${falhas} verificação(ões) falharam` : '\ntudo passou');
+    process.exitCode = falhas ? 1 : 0;
+}
+
 const [modo, slug, k, entrada] = process.argv.slice(2);
 try {
     if (modo === '--lista' && slug) {
         console.log(JSON.stringify(lista(slug), null, 2));
+    } else if (modo === '--checar' && slug) {
+        checar(slug);
     } else if (modo === '--salvar' && slug && /^\d+$/.test(k || '') && entrada) {
         await salvar(slug, Number(k), entrada);
     } else {
-        console.log('uso: node scripts/gramatica-imagens.mjs --lista <slug>\n     node scripts/gramatica-imagens.mjs --salvar <slug> <k> <arquivo-ou-https-url>');
+        console.log('uso: node scripts/gramatica-imagens.mjs --lista <slug>\n     node scripts/gramatica-imagens.mjs --checar <slug>\n     node scripts/gramatica-imagens.mjs --salvar <slug> <k> <arquivo-ou-https-url>');
         process.exitCode = 1;
     }
 } catch (e) {
