@@ -271,3 +271,15 @@ test('a Vercel Preview accepts sign-in from its own URLs; production still accep
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
 });
+
+test('the Super voice minutes on the sales pages match the server quota', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const minutos = Number(api.match(/const VOZ_MINUTOS_MES = \{[^}]*super:\s*(\d+)/)[1]);
+  assert.ok(minutos > 0);
+  for (const f of ['landing.html', 'assets/js/pages/account-1.js']) {
+    const texto = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const citados = [...texto.matchAll(/(\d+) min(?:utos)?(?:\/| por )mês/g)].map(m => Number(m[1]));
+    assert.ok(citados.length > 0, `${f} mentions the voice minutes`);
+    assert.deepEqual([...new Set(citados)], [minutos], `${f} must say ${minutos} min/mês`);
+  }
+});
