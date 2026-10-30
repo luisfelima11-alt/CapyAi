@@ -283,3 +283,38 @@ test('the Super voice minutes on the sales pages match the server quota', () => 
     assert.deepEqual([...new Set(citados)], [minutos], `${f} must say ${minutos} min/mês`);
   }
 });
+
+test('every page in the sitemap has its own search description, without the forbidden words', () => {
+  const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  const paginas = [...sitemap.matchAll(/<loc>https:\/\/www\.capyenglish\.com\.br\/([^<]*)<\/loc>/g)].map(m => m[1] || 'landing.html');
+  assert.ok(paginas.length > 100);
+  const vistas = new Map();
+  for (const p of paginas) {
+    const cabeca = fs.readFileSync(path.join(ROOT, p), 'utf8').split('</head>')[0];
+    const tag = (cabeca.match(/<meta\s[^>]*name="description"[^>]*>/) || [''])[0];
+    assert.ok(tag, `${p}: no meta description`);
+    // Só atributos bem formados: uma aspa solta dentro do texto cortava a descrição.
+    assert.match(tag.replace(/\s[\w:-]+="[^"]*"/g, ''), /^<meta\s*\/?>$/, `${p}: broken meta description`);
+    const d = tag.match(/content="([^"]*)"/)[1];
+    assert.ok(d.length >= 50, `${p}: description too short`);
+    assert.doesNotMatch(d, /gram[aá]tic|grammar/i, `${p}: "gramática" in the description (CLAUDE.md)`);
+    assert.ok(!vistas.has(d), `${p}: same description as ${vistas.get(d)}`);
+    vistas.set(d, p);
+  }
+});
+
+test('no page escapes & twice in its meta tags', () => {
+  for (const f of fs.readdirSync(ROOT).filter(n => n.endsWith('.html'))) {
+    const cabeca = fs.readFileSync(path.join(ROOT, f), 'utf8').split('</head>')[0];
+    for (const tag of cabeca.match(/<meta\s[^>]*>/g) || []) assert.ok(!tag.includes('&amp;amp;'), `${f}: ${tag.slice(0, 80)}`);
+  }
+});
+
+test('unknown addresses get the branded 404 page, which is not indexed', () => {
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  assert.deepEqual(config.routes.slice(-2), [{ handle: 'filesystem' }, { src: '/(.*)', status: 404, dest: '/404.html' }]);
+  const pagina = fs.readFileSync(path.join(ROOT, '404.html'), 'utf8');
+  assert.match(pagina, /<meta name="robots" content="noindex"\/>/);
+  // Servida em qualquer caminho (/a/b/c): links e imagens só com caminho absoluto.
+  for (const [, url] of pagina.matchAll(/(?:href|src)="([^"]*)"/g)) assert.match(url, /^(\/|https:\/\/)/, url);
+});

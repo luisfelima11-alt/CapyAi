@@ -81,6 +81,16 @@ botão, SEO, PDF ou fala da Yara.
   vê, e o `self-study.js` e o `listening-lab.js` dependem deles.
 - Os prompts da Yara mandam ensinar com exemplos e nunca dizer "grammar" ou "gramática".
 
+## SEO e página 404 (30/out/2026)
+
+- Toda página do `sitemap.xml` tem `<meta name="description">` própria (50+ caracteres, sem repetir e sem
+  "gramática"/"grammar"); `og:description` e `twitter:description` repetem o mesmo texto. Página nova no
+  sitemap sem descrição faz o `npm run test:security` falhar.
+- Nas metas, `&` vira `&amp;` **uma vez** (`&amp;amp;` aparecia literal no WhatsApp) e aspas dentro do texto
+  são curvas (“ ”): uma aspa reta fecha o `content` no meio.
+- Endereço que não existe mostra o `404.html` (últimas rotas do `vercel.json`: `handle: filesystem` e depois o
+  404; o dev-server faz o mesmo). Ele usa só caminhos absolutos, porque aparece em qualquer pasta.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
