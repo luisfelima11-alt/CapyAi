@@ -614,7 +614,7 @@ const LESSONS_GPS = [
       'Good morning! How is everything?','How is the crop this year?',
       'It is better than last year because we had more rain.','Do you work on Saturdays too?',
       'Sometimes, during the harvest season.','I prefer to rest with my family on Sunday.',
-      'Do you like football? Me too!','Thank you for the coffee. Have a good weekend!',
+      'I love football. I watch every Sunday.','Thank you for the coffee. Have a good weekend!',
     ],
     grammar: {
       title: 'Quebrando o gelo: Do you…? / How often…? / And you?',
