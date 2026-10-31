@@ -212,30 +212,6 @@ test('in production, reads from our own pages pass the AI gate with cookies; oth
   assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
 });
 
-test('a Vercel Preview accepts sign-in from its own URLs; production still accepts only APP_ORIGIN', () => {
-  // A Preview runs in production mode from *.vercel.app. With APP_ORIGIN alone,
-  // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
-  // could be tested signed in before going live (28/set).
-  const env = {
-    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'x'.repeat(40),
-    VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
-  };
-  delete env.APP_ORIGIN;
-  const corpo = `
-    (async () => {
-      const visitante = async origin => (await chamar('POST', '/api/auth/guest', { origin, 'content-type': 'application/json' }, '{}')).status;
-      console.log(JSON.stringify({
-        deploy: await visitante('https://capy-abc123-time.vercel.app'),
-        branch: await visitante('https://capy-git-minha-branch-time.vercel.app/'),
-        outroPreview: await visitante('https://capy-git-outra-branch-time.vercel.app'),
-        site: await visitante('https://www.capyenglish.com.br'),
-      }));
-    })();
-  `;
-  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
-  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
-});
-
 test('a silent session refresh keeps the tab\'s CSRF token, so the next POST still passes', () => {
   // Access tokens last about an hour; the next request renews them in
   // getAuthenticatedSession. setSessionCookies issued a NEW CSRF cookie there,
@@ -313,5 +289,41 @@ test('the CI and npm run security:check run the audit gate; every exception has 
     assert.match(ex.id, /^GHSA(-[0-9a-z]{4}){3}$/);
     assert.ok(ex.pacote && ex.motivo.length > 40, ex.id);
     assert.match(ex.ate, /^\d{4}-\d{2}-\d{2}$/, ex.id);
+  }
+});
+
+test('a Vercel Preview accepts sign-in from its own URLs; production still accepts only APP_ORIGIN', () => {
+  // A Preview runs in production mode from *.vercel.app. With APP_ORIGIN alone,
+  // login and "Entrar como visitante" got 403 invalid_origin there, so no PR
+  // could be tested signed in before going live (28/set).
+  const env = {
+    ...process.env, ...SEM_CHAVES, VERCEL: '1', SESSION_COOKIE_SECRET: 'x'.repeat(40),
+    VERCEL_URL: 'capy-abc123-time.vercel.app', VERCEL_BRANCH_URL: 'capy-git-minha-branch-time.vercel.app',
+  };
+  delete env.APP_ORIGIN;
+  const corpo = `
+    (async () => {
+      const visitante = async origin => (await chamar('POST', '/api/auth/guest', { origin, 'content-type': 'application/json' }, '{}')).status;
+      console.log(JSON.stringify({
+        deploy: await visitante('https://capy-abc123-time.vercel.app'),
+        branch: await visitante('https://capy-git-minha-branch-time.vercel.app/'),
+        outroPreview: await visitante('https://capy-git-outra-branch-time.vercel.app'),
+        site: await visitante('https://www.capyenglish.com.br'),
+      }));
+    })();
+  `;
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
+  assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
+});
+
+test('the Super voice minutes on the sales pages match the server quota', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const minutos = Number(api.match(/const VOZ_MINUTOS_MES = \{[^}]*super:\s*(\d+)/)[1]);
+  assert.ok(minutos > 0);
+  for (const f of ['landing.html', 'assets/js/pages/account-1.js']) {
+    const texto = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const citados = [...texto.matchAll(/(\d+) min(?:utos)?(?:\/| por )mês/g)].map(m => Number(m[1]));
+    assert.ok(citados.length > 0, `${f} mentions the voice minutes`);
+    assert.deepEqual([...new Set(citados)], [minutos], `${f} must say ${minutos} min/mês`);
   }
 });

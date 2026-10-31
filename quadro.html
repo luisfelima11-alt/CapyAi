@@ -108,12 +108,76 @@ html,body{height:100%;overscroll-behavior:none}
   <!-- Campo flutuante da ferramenta de texto / post-it: aparece onde o usuário clica.
        Enter confirma, Shift+Enter quebra linha, Esc cancela. -->
   <textarea id="text-input" rows="2" class="hidden absolute z-30 bg-white/95 border-2 border-emerald-400 rounded-xl px-3 py-2 font-bold shadow-xl focus:outline-none resize-none leading-snug" placeholder="Digite (Enter confirma, Shift+Enter pula linha)…" autocomplete="off"></textarea>
+
+  <!-- Barra Flutuante de Personalização de Cartão / Texto Selecionado na Lousa -->
+  <div id="card-customizer" class="hidden absolute z-30 bg-white/95 backdrop-blur-md border-2 border-indigo-200 rounded-2xl shadow-2xl p-2 flex flex-wrap items-center gap-1.5 max-w-[94vw] transition-all">
+    <button id="cc-btn-edit" type="button" class="px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1 shadow-sm transition" title="Editar texto deste cartão (ou dê duplo-clique no cartão)">
+      ✏️ <span>Editar</span>
+    </button>
+    <button id="cc-btn-speak" type="button" class="px-2 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-black flex items-center gap-1 transition" title="Ouvir pronúncia em voz alta">
+      🔊
+    </button>
+
+    <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+
+    <!-- Estilos de cartão -->
+    <select id="cc-style-select" class="bg-slate-50 border border-slate-200 text-navy text-[11px] font-extrabold rounded-xl px-2 py-1.5 focus:outline-none cursor-pointer" title="Estilo visual do texto na lousa">
+      <option value="modern">✨ Cartão Moderno</option>
+      <option value="sticky">🟨 Post-it Colorido</option>
+      <option value="minimal">🪟 Borda Minimal</option>
+      <option value="plain">🔤 Só Texto</option>
+    </select>
+
+    <!-- Tamanho da fonte -->
+    <div class="flex items-center bg-slate-100 rounded-xl p-0.5 border border-slate-200">
+      <button id="cc-font-dec" type="button" class="px-2 py-1 rounded-lg hover:bg-white text-navy text-xs font-black transition" title="Diminuir letra">A-</button>
+      <button id="cc-font-inc" type="button" class="px-2 py-1 rounded-lg hover:bg-white text-navy text-xs font-black transition" title="Aumentar letra">A+</button>
+    </div>
+
+    <!-- Cores do cartão -->
+    <div id="cc-color-swatches" class="flex items-center gap-1 px-1"></div>
+
+    <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+
+    <!-- Organizar cartões em grade -->
+    <button id="cc-layout-1col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 1 coluna">1 Col</button>
+    <button id="cc-layout-2col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 2 colunas">2 Col</button>
+
+    <button id="cc-btn-dup" type="button" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" title="Duplicar cartão">📑</button>
+    <button id="cc-btn-del" type="button" class="px-2 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition" title="Apagar este cartão">🗑️</button>
+    <button id="cc-btn-close" type="button" class="px-1.5 py-1 text-slate-400 hover:text-slate-600 text-xs font-black" title="Fechar barra">✕</button>
+  </div>
+
+  <!-- Modal / Popover de Edição Rica do Cartão -->
+  <div id="card-editor-popover" class="hidden absolute z-40 bg-white border-2 border-indigo-400 rounded-3xl shadow-2xl p-4 w-[340px] max-w-[92vw] space-y-3">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-black uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">✏️ Editar Texto na Lousa</span>
+      <button id="ce-close" type="button" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-black">✕</button>
+    </div>
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Etiqueta / Título (Opcional)</label>
+      <input id="ce-badge" type="text" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs font-bold text-navy focus:outline-none" placeholder="Ex: Frase 1 · Present Perfect" />
+    </div>
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Frase Principal / Texto em Inglês</label>
+      <textarea id="ce-main" rows="2" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm font-black text-navy focus:outline-none resize-y" placeholder="Digite a frase principal…"></textarea>
+    </div>
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Tradução / Explicação Abaixo (Opcional)</label>
+      <input id="ce-sub" type="text" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-600 focus:outline-none" placeholder="Ex: Tradução ou dica de uso…" />
+    </div>
+    <div class="flex items-center justify-end gap-2 pt-1">
+      <button id="ce-cancel" type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold">Cancelar</button>
+      <button id="ce-save" type="button" class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black shadow-md">💾 Salvar Alterações</button>
+    </div>
+  </div>
 </main>
 
 <!-- Toolbar (teacher full toolbar; students see drawing subset when unlocked) -->
 <footer id="toolbar" class="hidden flex-shrink-0 bg-white border-t-2 border-emerald-100 px-2 md:px-4 py-1.5 z-20">
   <div class="flex items-center gap-1.5 md:gap-2 overflow-x-auto py-0.5">
     <!-- Ferramentas principais -->
+    <button id="tool-select" data-tool="select" class="tool-btn flex-shrink-0 bg-indigo-50 border-2 border-indigo-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Mover, Editar e Personalizar Textos/Cartões (V)">✋</button>
     <button id="tool-pen" data-tool="pen" class="tool-btn active flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Caneta (P)">✏️</button>
     <button id="tool-highlighter" data-tool="highlighter" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Marca-texto (M)">🖍️</button>
     <button id="tool-eraser" data-tool="eraser" class="tool-btn flex-shrink-0 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-center text-base" style="min-width:40px;min-height:40px" title="Borracha (E)">🧽</button>
@@ -292,6 +356,79 @@ html,body{height:100%;overscroll-behavior:none}
     </div>
   </div>
 </div>
+
+<!-- Chat de IA no Canto Inferior Direito (Yara IA na Lousa) -->
+<div id="yw-fab-wrap" class="fixed right-4 bottom-20 z-40 flex items-center gap-2">
+  <button id="yw-fab" type="button" class="group relative flex items-center gap-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-navy text-white pl-2 pr-4 py-2 rounded-full shadow-2xl border-2 border-white/90 hover:scale-105 active:scale-95 transition-all" aria-label="Abrir Chat IA da Yara na Lousa" title="Pedir frases ou textos para a Yara IA colar na lousa">
+    <div class="relative w-11 h-11 rounded-full overflow-hidden border-2 border-emerald-300 bg-emerald-900 flex-shrink-0 shadow-md">
+      <img src="yara-avatar.png?v=3" alt="Yara IA" class="w-full h-full object-cover" onerror="this.style.display='none'" />
+      <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white"></span>
+    </div>
+    <div class="text-left leading-tight">
+      <div class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-200 flex items-center gap-1">✨ Chat IA na Lousa</div>
+      <div class="text-xs sm:text-sm font-black text-white">Pedir frases p/ Lousa</div>
+    </div>
+  </button>
+</div>
+
+<section id="yw-panel" class="hidden fixed right-4 bottom-[140px] z-40 w-[395px] max-w-[calc(100vw-24px)] h-[545px] max-h-[calc(100vh-165px)] bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 flex flex-col overflow-hidden" role="dialog" aria-label="Chat com a Yara IA na Lousa">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-navy via-emerald-900 to-teal-800 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <img src="yara-avatar.png?v=3" alt="Yara" class="w-10 h-10 rounded-full border-2 border-emerald-300 object-cover bg-emerald-950 flex-shrink-0" onerror="this.style.display='none'" />
+      <div class="min-w-0">
+        <div class="font-black text-sm truncate flex items-center gap-1.5">Yara IA · Gerador de Lousa <span class="text-[10px] bg-emerald-500/30 border border-emerald-300/40 px-1.5 py-0.5 rounded-full font-extrabold">Ao Vivo</span></div>
+        <div class="text-[11px] text-emerald-200 truncate">Peça frases, vocabulário ou exercícios p/ colar no quadro</div>
+      </div>
+    </div>
+    <button id="yw-close" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-black transition-colors flex-shrink-0" title="Fechar chat">✕</button>
+  </div>
+
+  <!-- Barra de Configuração de Colagem na Lousa -->
+  <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px] flex-shrink-0">
+    <label class="flex items-center gap-1.5 font-extrabold text-navy cursor-pointer select-none" title="Quando ativado, as frases pedidas já entram direto na lousa">
+      <input id="yw-auto-paste" type="checkbox" checked class="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer" />
+      <span>📌 Colar na lousa automaticamente</span>
+    </label>
+    <div class="flex items-center gap-1">
+      <select id="yw-card-style" class="bg-white border border-slate-200 text-navy font-bold rounded-lg px-1.5 py-1 text-[10px] focus:outline-none cursor-pointer" title="Estilo visual dos cartões criados">
+        <option value="modern">✨ Moderno</option>
+        <option value="sticky">🟨 Post-it</option>
+        <option value="minimal">🪟 Minimal</option>
+        <option value="plain">🔤 Só Texto</option>
+      </select>
+      <select id="yw-card-layout" class="bg-white border border-slate-200 text-navy font-bold rounded-lg px-1.5 py-1 text-[10px] focus:outline-none cursor-pointer" title="Disposição das frases na lousa">
+        <option value="1col">1 Coluna</option>
+        <option value="2col">2 Colunas</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Sugestões Rápidas -->
+  <div id="yw-chips" class="px-3 py-2 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-1.5 overflow-x-auto flex-shrink-0">
+    <button type="button" data-prompt="Me dê 5 frases práticas em inglês com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">✨ 5 Frases em Inglês</button>
+    <button type="button" data-prompt="Me dê 6 palavras essenciais deste curso com exemplo e tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">🟨 6 Palavras do Curso</button>
+    <button type="button" data-prompt="Crie 4 falas de um diálogo curto em inglês com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">🗣️ Diálogo Curto</button>
+    <button type="button" data-prompt="Crie 4 frases em inglês com lacuna (___) para o aluno completar na lousa" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">❓ 4 Frases p/ Completar</button>
+  </div>
+
+  <!-- Mensagens -->
+  <div id="yw-messages" class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-gradient-to-b from-slate-50/60 to-white text-xs">
+    <div class="bg-white border border-emerald-200 rounded-2xl rounded-tl-sm p-3 shadow-sm text-slate-700 leading-relaxed">
+      <div class="font-black text-emerald-800 text-[11px] uppercase tracking-wider mb-1">🦫 Yara IA · Assistente da Lousa</div>
+      Oi! Peça qualquer lista de frases, exemplos, vocabulário ou exercícios — por exemplo: <strong class="text-navy">"Me dê 5 frases em inglês sobre rotina"</strong>.<br><br>
+      Eu coloco tudo na lousa em <strong>cartões bonitos, personalizáveis e editáveis</strong> (basta clicar no cartão na lousa para arrastar, trocar cores, fonte ou dar duplo-clique para editar!).
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="p-2.5 bg-white border-t border-slate-200 flex items-end gap-2 flex-shrink-0">
+    <textarea id="yw-input" rows="1" class="flex-1 bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl px-3.5 py-2 text-xs font-bold text-navy focus:outline-none resize-none max-h-24 leading-snug" placeholder="Peça ex: 5 frases em inglês sobre viagem…"></textarea>
+    <button id="yw-send" type="button" class="px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition flex items-center gap-1 flex-shrink-0" style="min-height:38px">
+      <span>Enviar</span> 🚀
+    </button>
+  </div>
+</section>
 
 <script>
 'use strict';
@@ -548,76 +685,237 @@ function drawRoundedRect(targetCtx, x, y, w, h, r) {
   targetCtx.closePath();
 }
 
+function wrapCanvasText(targetCtx, text, maxWidth) {
+  const rawLines = String(text || '').split('\n');
+  const lines = [];
+  rawLines.forEach(raw => {
+    const words = raw.split(' ');
+    let current = '';
+    words.forEach(word => {
+      const test = current ? current + ' ' + word : word;
+      if (targetCtx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    });
+    if (current || raw === '') lines.push(current);
+  });
+  return lines.length ? lines : [''];
+}
+
+let selectedSegId = null;
+
+function drawSelectionHighlight(targetCtx, b) {
+  if (!b) return;
+  targetCtx.save();
+  targetCtx.shadowColor = 'transparent';
+  targetCtx.strokeStyle = '#4f46e5';
+  targetCtx.lineWidth = 2;
+  targetCtx.setLineDash([6, 4]);
+  drawRoundedRect(targetCtx, b.x - 4, b.y - 4, b.w + 8, b.h + 8, 14);
+  targetCtx.stroke();
+  targetCtx.setLineDash([]);
+  const corners = [
+    [b.x - 4, b.y - 4],
+    [b.x + b.w + 4, b.y - 4],
+    [b.x - 4, b.y + b.h + 4],
+    [b.x + b.w + 4, b.y + b.h + 4],
+  ];
+  targetCtx.fillStyle = '#ffffff';
+  targetCtx.strokeStyle = '#4f46e5';
+  targetCtx.lineWidth = 2;
+  corners.forEach(([cx, cy]) => {
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+    targetCtx.fill();
+    targetCtx.stroke();
+  });
+  targetCtx.restore();
+}
+
 function drawSegmentOn(targetCtx, seg, w, h) {
   if (!seg) return;
 
-  // Texto (suporta múltiplas linhas)
-  if (seg.kind === 'text') {
-    targetCtx.save();
-    targetCtx.globalCompositeOperation = 'source-over';
-    targetCtx.fillStyle = seg.cor || '#111827';
-    const fontPx = Math.max(12, (seg.fonte || 0.045) * h);
-    targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-    targetCtx.textBaseline = 'top';
-    const lines = String(seg.texto || '').split('\n');
-    const lineHeight = fontPx * 1.24;
-    const startY = seg.y1 * h - fontPx * 0.5;
-    lines.forEach((line, idx) => {
-      targetCtx.fillText(line, seg.x1 * w, startY + idx * lineHeight);
-    });
-    targetCtx.restore();
-    return;
-  }
+  // Texto ou Cartão Personalizável (kind === 'text' || kind === 'note')
+  if (seg.kind === 'text' || seg.kind === 'note') {
+    if (!seg.id) {
+      seg.id = (seg.actionId || 'seg') + '_' + Math.round((seg.x1 || 0) * 1000) + '_' + Math.round((seg.y1 || 0) * 1000);
+    }
+    const style = seg.cardStyle || (seg.kind === 'text' ? 'plain' : ((seg.badge || seg.subtexto) ? 'modern' : 'sticky'));
+    const badgeText = String(seg.badge || '').trim();
+    const mainText = String(seg.texto || '').trim();
+    const subText = String(seg.subtexto || '').trim();
+    const accent = seg.cor || (seg.kind === 'text' ? '#0f172a' : '#059669');
+    const bgFill = seg.bg || (style === 'sticky' ? '#fef08a' : '#ffffff');
 
-  // Post-it / Cartão de vocabulário
-  if (seg.kind === 'note') {
     targetCtx.save();
     targetCtx.globalCompositeOperation = 'source-over';
-    const fontPx = Math.max(12, Math.min(22, (seg.fonte || 0.032) * h));
-    targetCtx.font = `700 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-    const rawLines = String(seg.texto || '').split('\n');
-    const lines = [];
-    const maxLineW = Math.min(280, w * 0.42);
-    rawLines.forEach(raw => {
-      const words = raw.split(' ');
-      let current = '';
-      words.forEach(word => {
-        const test = current ? current + ' ' + word : word;
-        if (targetCtx.measureText(test).width > maxLineW && current) {
-          lines.push(current);
-          current = word;
-        } else {
-          current = test;
-        }
+    targetCtx.textBaseline = 'top';
+
+    const baseFrac = seg.fonte || (seg.kind === 'text' ? 0.040 : 0.028);
+    const fontPx = Math.max(12, Math.min(42, baseFrac * h));
+    const subFontPx = Math.max(11, Math.round(fontPx * 0.78));
+    const badgeFontPx = Math.max(10, Math.round(fontPx * 0.62));
+
+    if (style === 'plain') {
+      const maxW = Math.min(w * 0.86, 680);
+      targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      const mainLines = wrapCanvasText(targetCtx, mainText, maxW);
+      targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      const subLines = subText ? wrapCanvasText(targetCtx, subText, maxW) : [];
+
+      const lineH = fontPx * 1.24;
+      const subLineH = subFontPx * 1.24;
+      const badgeH = badgeText ? (badgeFontPx + 8) : 0;
+
+      let maxMeasuredW = 80;
+      targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      mainLines.forEach(l => { maxMeasuredW = Math.max(maxMeasuredW, targetCtx.measureText(l).width); });
+      if (subLines.length) {
+        targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+        subLines.forEach(l => { maxMeasuredW = Math.max(maxMeasuredW, targetCtx.measureText(l).width); });
+      }
+      if (badgeText) {
+        targetCtx.font = `800 ${badgeFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+        maxMeasuredW = Math.max(maxMeasuredW, targetCtx.measureText(badgeText.toUpperCase()).width + 12);
+      }
+
+      const totalH = badgeH + mainLines.length * lineH + (subLines.length ? (4 + subLines.length * subLineH) : 0);
+      const bx = Math.min(w - maxMeasuredW - 6, Math.max(6, seg.x1 * w));
+      const by = Math.min(h - totalH - 6, Math.max(6, seg.y1 * h));
+
+      let curY = by;
+      if (badgeText) {
+        targetCtx.font = `800 ${badgeFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+        targetCtx.fillStyle = accent;
+        targetCtx.fillText(badgeText.toUpperCase(), bx, curY);
+        curY += badgeH;
+      }
+
+      targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      targetCtx.fillStyle = accent;
+      mainLines.forEach((line, idx) => {
+        targetCtx.fillText(line, bx, curY + idx * lineH);
       });
-      lines.push(current);
-    });
-    const padX = 14, padY = 12;
-    const lineH = fontPx * 1.28;
-    let boxW = 110;
-    lines.forEach(l => { boxW = Math.max(boxW, targetCtx.measureText(l).width + padX * 2); });
-    const boxH = Math.max(54, lines.length * lineH + padY * 2);
+      curY += mainLines.length * lineH;
+
+      if (subLines.length) {
+        curY += 4;
+        targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+        targetCtx.fillStyle = '#475569';
+        subLines.forEach((line, idx) => {
+          targetCtx.fillText(line, bx, curY + idx * subLineH);
+        });
+      }
+
+      seg._bounds = { x: bx - 4, y: by - 4, w: maxMeasuredW + 8, h: totalH + 8 };
+      targetCtx.restore();
+      if (selectedSegId && seg.id === selectedSegId && targetCtx === ctx) {
+        drawSelectionHighlight(targetCtx, seg._bounds);
+      }
+      return;
+    }
+
+    // Estilos em caixa: 'modern' | 'sticky' | 'minimal'
+    const maxLineW = Math.min(390, Math.max(190, w * 0.42));
+    targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    const mainLines = wrapCanvasText(targetCtx, mainText, maxLineW);
+
+    targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    const subLines = subText ? wrapCanvasText(targetCtx, subText, maxLineW) : [];
+
+    const padX = style === 'modern' ? 18 : 14;
+    const padY = 12;
+    const lineH = fontPx * 1.26;
+    const subLineH = subFontPx * 1.25;
+    const badgeBlockH = badgeText ? (badgeFontPx + 12) : 0;
+
+    let contentW = 130;
+    targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+    mainLines.forEach(l => { contentW = Math.max(contentW, targetCtx.measureText(l).width); });
+    if (subLines.length) {
+      targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      subLines.forEach(l => { contentW = Math.max(contentW, targetCtx.measureText(l).width); });
+    }
+    if (badgeText) {
+      targetCtx.font = `800 ${badgeFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      contentW = Math.max(contentW, targetCtx.measureText(badgeText.toUpperCase()).width + 20);
+    }
+
+    const boxW = contentW + padX * 2 + (style === 'modern' ? 6 : 0);
+    const boxH = Math.max(50, padY * 2 + badgeBlockH + mainLines.length * lineH + (subLines.length ? (6 + subLines.length * subLineH) : 0));
     const bx = Math.min(w - boxW - 4, Math.max(4, seg.x1 * w));
     const by = Math.min(h - boxH - 4, Math.max(4, seg.y1 * h));
 
-    targetCtx.shadowColor = 'rgba(15, 23, 42, 0.16)';
-    targetCtx.shadowBlur = 12;
+    // Sombra e fundo do cartão
+    targetCtx.shadowColor = style === 'minimal' ? 'rgba(15, 23, 42, 0.07)' : 'rgba(15, 23, 42, 0.15)';
+    targetCtx.shadowBlur = style === 'minimal' ? 6 : 14;
     targetCtx.shadowOffsetY = 4;
-    targetCtx.fillStyle = seg.bg || '#fef08a';
-    drawRoundedRect(targetCtx, bx, by, boxW, boxH, 12);
+
+    targetCtx.fillStyle = style === 'minimal' ? 'rgba(255, 255, 255, 0.96)' : bgFill;
+    drawRoundedRect(targetCtx, bx, by, boxW, boxH, 14);
     targetCtx.fill();
 
     targetCtx.shadowColor = 'transparent';
-    targetCtx.strokeStyle = seg.cor || '#eab308';
-    targetCtx.lineWidth = 2;
+    targetCtx.strokeStyle = accent;
+    targetCtx.lineWidth = style === 'minimal' ? 2.2 : 1.8;
     targetCtx.stroke();
 
+    // Barra lateral de destaque no estilo Moderno
+    if (style === 'modern') {
+      targetCtx.save();
+      drawRoundedRect(targetCtx, bx, by, boxW, boxH, 14);
+      targetCtx.clip();
+      targetCtx.fillStyle = accent;
+      targetCtx.fillRect(bx, by, 7, boxH);
+      targetCtx.restore();
+    }
+
+    const textLeft = bx + padX + (style === 'modern' ? 5 : 0);
+    let curY = by + padY;
+
+    // Etiqueta (Badge) no topo do cartão
+    if (badgeText) {
+      targetCtx.font = `800 ${badgeFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      const bLabel = badgeText.toUpperCase();
+      const bW = targetCtx.measureText(bLabel).width + 14;
+      const bH = badgeFontPx + 6;
+      targetCtx.fillStyle = accent;
+      targetCtx.globalAlpha = 0.14;
+      drawRoundedRect(targetCtx, textLeft, curY - 1, bW, bH, 6);
+      targetCtx.fill();
+      targetCtx.globalAlpha = 1;
+      targetCtx.fillStyle = accent;
+      targetCtx.fillText(bLabel, textLeft + 7, curY + 2);
+      curY += badgeBlockH;
+    }
+
+    // Texto principal (Inglês)
+    targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
     targetCtx.fillStyle = '#0f172a';
-    targetCtx.textBaseline = 'top';
-    lines.forEach((l, i) => {
-      targetCtx.fillText(l, bx + padX, by + padY + i * lineH);
+    mainLines.forEach((l, i) => {
+      targetCtx.fillText(l, textLeft, curY + i * lineH);
     });
+    curY += mainLines.length * lineH;
+
+    // Subtexto / Tradução (Português)
+    if (subLines.length) {
+      curY += 5;
+      targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
+      targetCtx.fillStyle = '#475569';
+      subLines.forEach((l, i) => {
+        targetCtx.fillText(l, textLeft, curY + i * subLineH);
+      });
+    }
+
+    seg._bounds = { x: bx, y: by, w: boxW, h: boxH };
     targetCtx.restore();
+
+    if (selectedSegId && seg.id === selectedSegId && targetCtx === ctx) {
+      drawSelectionHighlight(targetCtx, seg._bounds);
+    }
     return;
   }
 
@@ -1121,6 +1419,25 @@ function handleMessage(msg) {
         broadcastEvent('permission', { locked: boardLocked });
       }
       break;
+    case 'update_seg':
+      if (inner.seg && inner.seg.id) {
+        const target = strokes.find(s => s && s.id === inner.seg.id);
+        if (target) {
+          Object.assign(target, inner.seg);
+          redrawAll();
+          saveLocalBoard();
+        }
+      }
+      break;
+    case 'delete_seg':
+      if (inner.id) {
+        pages[currentPage] = strokes.filter(s => !s || s.id !== inner.id);
+        strokes = pages[currentPage];
+        if (selectedSegId === inner.id) selectCardSeg(null);
+        redrawAll();
+        saveLocalBoard();
+      }
+      break;
     case 'snapshot':
       if (!isTeacher) {
         if (typeof inner.pageIndex === 'number') {
@@ -1156,6 +1473,266 @@ function applyPermission(locked) {
     setTimeout(resizeCanvas, 20);
   }
 }
+
+// ── Seleção, Arraste, Edição e Personalização de Cartões/Textos na Lousa ────
+const CARD_THEMES = [
+  { name: 'Esmeralda', cor: '#059669', bg: '#ecfdf5', stickyBg: '#d1fae5' },
+  { name: 'Índigo',    cor: '#4f46e5', bg: '#eef2ff', stickyBg: '#e0e7ff' },
+  { name: 'Âmbar',     cor: '#d97706', bg: '#fffbeb', stickyBg: '#fef08a' },
+  { name: 'Rosa',      cor: '#e11d48', bg: '#fff1f2', stickyBg: '#ffe4e6' },
+  { name: 'Azul Céu',  cor: '#0284c7', bg: '#f0f9ff', stickyBg: '#bae6fd' },
+  { name: 'Roxo',      cor: '#9333ea', bg: '#faf5ff', stickyBg: '#f3e8ff' },
+  { name: 'Marinho',   cor: '#0f172a', bg: '#f8fafc', stickyBg: '#e2e8f0' },
+];
+
+let draggingSeg = null;
+let dragOffset = { dx: 0, dy: 0 };
+let dragMoved = false;
+
+function getSelectedSeg() {
+  if (!selectedSegId) return null;
+  return strokes.find(s => s && s.id === selectedSegId) || null;
+}
+
+function hitTestCard(px, py) {
+  for (let i = strokes.length - 1; i >= 0; i--) {
+    const s = strokes[i];
+    if (!s || (s.kind !== 'note' && s.kind !== 'text') || !s._bounds) continue;
+    const b = s._bounds;
+    if (px >= b.x - 4 && px <= b.x + b.w + 4 && py >= b.y - 4 && py <= b.y + b.h + 4) {
+      return s;
+    }
+  }
+  return null;
+}
+
+function broadcastSegUpdate(seg) {
+  if (!seg || !seg.id) return;
+  const copy = Object.assign({}, seg);
+  delete copy._bounds;
+  broadcastEvent('update_seg', { seg: copy });
+}
+
+function positionCardCustomizer(seg) {
+  const bar = document.getElementById('card-customizer');
+  if (!bar) return;
+  if (!seg || !seg._bounds) {
+    bar.classList.add('hidden');
+    return;
+  }
+  bar.classList.remove('hidden');
+  const rect = canvas.getBoundingClientRect();
+  const b = seg._bounds;
+  const styleSel = document.getElementById('cc-style-select');
+  if (styleSel) {
+    styleSel.value = seg.cardStyle || (seg.kind === 'text' ? 'plain' : ((seg.badge || seg.subtexto) ? 'modern' : 'sticky'));
+  }
+  const barW = Math.min(rect.width - 16, bar.offsetWidth || 440);
+  const left = Math.max(8, Math.min(rect.width - barW - 8, b.x));
+  let top = b.y - (bar.offsetHeight || 48) - 10;
+  if (top < 8) {
+    top = Math.min(rect.height - 56, b.y + b.h + 10);
+  }
+  bar.style.left = Math.round(left) + 'px';
+  bar.style.top = Math.round(top) + 'px';
+}
+
+function selectCardSeg(seg) {
+  selectedSegId = seg ? seg.id : null;
+  if (!seg) {
+    const bar = document.getElementById('card-customizer');
+    if (bar) bar.classList.add('hidden');
+    closeCardEditor();
+  }
+  redrawAll();
+  if (seg) positionCardCustomizer(seg);
+}
+
+function openCardEditor(seg) {
+  if (!seg) return;
+  const pop = document.getElementById('card-editor-popover');
+  if (!pop) return;
+  document.getElementById('ce-badge').value = seg.badge || '';
+  document.getElementById('ce-main').value = seg.texto || '';
+  document.getElementById('ce-sub').value = seg.subtexto || '';
+  pop.classList.remove('hidden');
+
+  const rect = canvas.getBoundingClientRect();
+  const b = seg._bounds || { x: rect.width * 0.2, y: rect.height * 0.2, w: 220, h: 80 };
+  const popW = Math.min(340, rect.width - 16);
+  const left = Math.max(8, Math.min(rect.width - popW - 8, b.x));
+  const top = Math.max(12, Math.min(rect.height - 290, b.y));
+  pop.style.left = Math.round(left) + 'px';
+  pop.style.top = Math.round(top) + 'px';
+  setTimeout(() => {
+    const mainInput = document.getElementById('ce-main');
+    if (mainInput) { mainInput.focus(); mainInput.select(); }
+  }, 10);
+}
+
+function closeCardEditor() {
+  const pop = document.getElementById('card-editor-popover');
+  if (pop) pop.classList.add('hidden');
+}
+
+function saveCardEditor() {
+  const seg = getSelectedSeg();
+  if (!seg) { closeCardEditor(); return; }
+  const badge = document.getElementById('ce-badge').value.trim();
+  const main = document.getElementById('ce-main').value.trim();
+  const sub = document.getElementById('ce-sub').value.trim();
+  if (main) seg.texto = main;
+  seg.badge = badge;
+  seg.subtexto = sub;
+  closeCardEditor();
+  redrawAll();
+  positionCardCustomizer(seg);
+  saveLocalBoard();
+  broadcastSegUpdate(seg);
+}
+
+function speakCardText(seg) {
+  if (!seg || !seg.texto || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const clean = String(seg.texto).replace(/[💬🧩✨🟨🔊]/g, '').trim();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = SALA === 'frances' ? 'fr-FR' : (SALA === 'turkish' ? 'tr-TR' : 'en-US');
+    u.rate = 0.94;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function organizeBoardCards(cols = 1) {
+  const cards = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text'));
+  if (!cards.length) return;
+  const startX = 0.05;
+  const startY = 0.08;
+  const colW = cols === 2 ? 0.46 : 0.88;
+  const rowH = cols === 2 ? 0.19 : 0.155;
+  cards.forEach((c, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    c.x1 = Math.min(0.88, startX + col * colW);
+    c.y1 = Math.min(0.86, startY + row * rowH);
+  });
+  redrawAll();
+  const sel = getSelectedSeg();
+  if (sel) positionCardCustomizer(sel);
+  saveLocalBoard();
+  broadcastEvent('snapshot', {
+    segments: strokes.slice(-MAX_HISTORY),
+    pageIndex: currentPage,
+    totalPages: pages.length,
+    bg: pageBgs[currentPage],
+  });
+}
+
+function initCardCustomizerEvents() {
+  const swatchWrap = document.getElementById('cc-color-swatches');
+  if (swatchWrap && !swatchWrap.dataset.inited) {
+    swatchWrap.dataset.inited = '1';
+    CARD_THEMES.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'w-5 h-5 rounded-full border-2 border-white shadow-sm hover:scale-125 transition-transform';
+      btn.style.background = t.cor;
+      btn.title = 'Cor: ' + t.name;
+      btn.addEventListener('click', () => {
+        const seg = getSelectedSeg();
+        if (!seg) return;
+        seg.cor = t.cor;
+        const st = seg.cardStyle || (seg.kind === 'text' ? 'plain' : 'modern');
+        seg.bg = st === 'sticky' ? t.stickyBg : t.bg;
+        redrawAll();
+        positionCardCustomizer(seg);
+        saveLocalBoard();
+        broadcastSegUpdate(seg);
+      });
+      swatchWrap.appendChild(btn);
+    });
+  }
+
+  const bind = (id, fn) => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.bound) {
+      el.dataset.bound = '1';
+      el.addEventListener('click', fn);
+    }
+  };
+
+  bind('cc-btn-edit', () => openCardEditor(getSelectedSeg()));
+  bind('cc-btn-speak', () => speakCardText(getSelectedSeg()));
+  bind('cc-font-dec', () => {
+    const seg = getSelectedSeg();
+    if (!seg) return;
+    seg.fonte = Math.max(0.018, (seg.fonte || 0.030) - 0.004);
+    redrawAll();
+    positionCardCustomizer(seg);
+    saveLocalBoard();
+    broadcastSegUpdate(seg);
+  });
+  bind('cc-font-inc', () => {
+    const seg = getSelectedSeg();
+    if (!seg) return;
+    seg.fonte = Math.min(0.075, (seg.fonte || 0.030) + 0.004);
+    redrawAll();
+    positionCardCustomizer(seg);
+    saveLocalBoard();
+    broadcastSegUpdate(seg);
+  });
+  bind('cc-layout-1col', () => organizeBoardCards(1));
+  bind('cc-layout-2col', () => organizeBoardCards(2));
+  bind('cc-btn-dup', () => {
+    const seg = getSelectedSeg();
+    if (!seg) return;
+    const copy = Object.assign({}, seg, {
+      id: 'card_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6),
+      actionId: nextActionId(),
+      x1: Math.min(0.84, (seg.x1 || 0.1) + 0.03),
+      y1: Math.min(0.84, (seg.y1 || 0.1) + 0.04),
+    });
+    delete copy._bounds;
+    addSegment(copy, true);
+    broadcastEvent('stroke', { segments: [copy] });
+    selectCardSeg(copy);
+  });
+  bind('cc-btn-del', () => {
+    const seg = getSelectedSeg();
+    if (!seg) return;
+    const delId = seg.id;
+    pages[currentPage] = strokes.filter(s => !s || s.id !== delId);
+    strokes = pages[currentPage];
+    selectCardSeg(null);
+    redrawAll();
+    saveLocalBoard();
+    broadcastEvent('delete_seg', { id: delId });
+  });
+  bind('cc-btn-close', () => selectCardSeg(null));
+
+  const styleSel = document.getElementById('cc-style-select');
+  if (styleSel && !styleSel.dataset.bound) {
+    styleSel.dataset.bound = '1';
+    styleSel.addEventListener('change', () => {
+      const seg = getSelectedSeg();
+      if (!seg) return;
+      const val = styleSel.value;
+      seg.cardStyle = val;
+      seg.kind = val === 'plain' ? 'text' : 'note';
+      const theme = CARD_THEMES.find(t => t.cor === seg.cor) || CARD_THEMES[0];
+      seg.bg = val === 'sticky' ? theme.stickyBg : theme.bg;
+      redrawAll();
+      positionCardCustomizer(seg);
+      saveLocalBoard();
+      broadcastSegUpdate(seg);
+    });
+  }
+
+  bind('ce-close', closeCardEditor);
+  bind('ce-cancel', closeCardEditor);
+  bind('ce-save', saveCardEditor);
+}
+initCardCustomizerEvents();
 
 // ── Drawing input (Pointer Events: mouse + touch + pen) ─────────────────────
 function canDrawNow() {
@@ -1233,15 +1810,18 @@ function commitTextInput() {
   closeTextInput();
   if (!texto || !anchor) return;
   const color = currentColor || myColor || COLORS[0];
+  const actId = nextActionId();
   const item = {
+    id: 'card_' + actId,
     kind,
+    cardStyle: kind === 'note' ? 'sticky' : 'plain',
     texto,
     x1: anchor.x,
     y1: anchor.y,
     cor: color,
     bg: kind === 'note' ? (NOTE_BGS[color] || '#fef08a') : undefined,
     fonte: kind === 'note' ? 0.032 : textFontFraction(),
-    actionId: nextActionId(),
+    actionId: actId,
     author: myId,
   };
   addSegment(item, true);
@@ -1253,8 +1833,32 @@ function isShapeTool(t) {
 }
 
 function onPointerDown(e) {
-  if (!canDrawNow()) return;
   const p = pointFromEvent(e);
+  const rect = canvas.getBoundingClientRect();
+  const px = p.x * rect.width;
+  const py = p.y * rect.height;
+
+  // Clicar num cartão/texto existente permite selecioná-lo, arrastá-lo e personalizá-lo
+  if (currentTool !== 'eraser' && currentTool !== 'laser' && !isShapeTool(currentTool)) {
+    const hit = hitTestCard(px, py);
+    if (hit) {
+      e.preventDefault();
+      if (textAnchor) commitTextInput();
+      selectCardSeg(hit);
+      draggingSeg = hit;
+      dragOffset = { dx: p.x - (hit.x1 || 0), dy: p.y - (hit.y1 || 0) };
+      dragMoved = false;
+      canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+      return;
+    }
+  }
+
+  if (selectedSegId) {
+    selectCardSeg(null);
+  }
+
+  if (currentTool === 'select') return;
+  if (!canDrawNow()) return;
 
   if (currentTool === 'text' || currentTool === 'note') {
     e.preventDefault();
@@ -1302,6 +1906,25 @@ function onPointerDown(e) {
 function onPointerMove(e) {
   const p = pointFromEvent(e);
 
+  if (draggingSeg) {
+    draggingSeg.x1 = Math.min(0.92, Math.max(0.01, p.x - dragOffset.dx));
+    draggingSeg.y1 = Math.min(0.92, Math.max(0.01, p.y - dragOffset.dy));
+    dragMoved = true;
+    redrawAll();
+    positionCardCustomizer(draggingSeg);
+    return;
+  }
+
+  if (!drawing && currentTool !== 'eraser' && currentTool !== 'laser') {
+    const rect = canvas.getBoundingClientRect();
+    const overCard = hitTestCard(p.x * rect.width, p.y * rect.height);
+    if (overCard) {
+      canvas.style.cursor = 'grab';
+    } else {
+      canvas.style.cursor = currentTool === 'select' ? 'default' : ((currentTool === 'text' || currentTool === 'note') ? 'text' : 'crosshair');
+    }
+  }
+
   if (currentTool === 'laser' && isTeacher) {
     if (drawing || e.buttons > 0) {
       addLaserPoint(p.x, p.y, true);
@@ -1345,6 +1968,15 @@ function onPointerMove(e) {
 }
 
 function onPointerUp(e) {
+  if (draggingSeg) {
+    const movedSeg = draggingSeg;
+    draggingSeg = null;
+    if (dragMoved) {
+      saveLocalBoard();
+      broadcastSegUpdate(movedSeg);
+    }
+    return;
+  }
   if (!drawing) return;
   if (isShapeTool(currentTool) && shapeStart) {
     const endPt = e && typeof e.clientX === 'number' ? pointFromEvent(e) : (lastPoint || shapeStart);
@@ -1373,6 +2005,17 @@ function onPointerUp(e) {
   activeActionId = '';
 }
 
+canvas.addEventListener('dblclick', e => {
+  const p = pointFromEvent(e);
+  const rect = canvas.getBoundingClientRect();
+  const hit = hitTestCard(p.x * rect.width, p.y * rect.height);
+  if (hit) {
+    e.preventDefault();
+    selectCardSeg(hit);
+    openCardEditor(hit);
+  }
+});
+
 document.getElementById('text-input').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitTextInput(); }
   else if (e.key === 'Escape') { e.preventDefault(); closeTextInput(); }
@@ -1390,6 +2033,16 @@ window.addEventListener('keydown', e => {
   if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
     return;
   }
+  if (e.key === 'Escape' && selectedSegId) {
+    selectCardSeg(null);
+    return;
+  }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedSegId) {
+    e.preventDefault();
+    const delBtn = document.getElementById('cc-btn-del');
+    if (delBtn) delBtn.click();
+    return;
+  }
   if (!canDrawNow()) return;
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
     e.preventDefault();
@@ -1404,7 +2057,8 @@ window.addEventListener('keydown', e => {
   }
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   const k = e.key.toLowerCase();
-  if (k === 'p') setTool('pen');
+  if (k === 'v') setTool('select');
+  else if (k === 'p') setTool('pen');
   else if (k === 'm') setTool('highlighter');
   else if (k === 'e') setTool('eraser');
   else if (k === 't') setTool('text');
@@ -1456,7 +2110,7 @@ function setTool(tool) {
   document.querySelectorAll('#toolbar [data-tool]').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tool === tool);
   });
-  canvas.style.cursor = (tool === 'text' || tool === 'note') ? 'text' : 'crosshair';
+  canvas.style.cursor = tool === 'select' ? 'default' : ((tool === 'text' || tool === 'note') ? 'text' : 'crosshair');
 }
 
 function setupToolbar(forTeacher) {
@@ -1975,6 +2629,345 @@ function inserirAulaCompletaEmNovaPagina() {
   fecharModalBiblioteca();
 }
 
+// ── Chat de IA na Lousa (Yara IA · Canto Inferior Direito) ──────────────────
+const quadroChatHistory = [];
+
+function parseRequestedCount(promptText) {
+  const m = String(promptText || '').match(/\b([1-9]|1[0-2])\b/);
+  if (m) return Math.min(10, Math.max(1, parseInt(m[1], 10)));
+  const wordNums = { uma: 1, um: 1, duas: 2, dois: 2, tres: 3, três: 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10 };
+  const lower = String(promptText || '').toLowerCase();
+  for (const [w, n] of Object.entries(wordNums)) {
+    if (new RegExp(`\\b${w}\\b`, 'i').test(lower)) return n;
+  }
+  return 5;
+}
+
+function generateLocalFallbackCards(userText) {
+  const lower = String(userText || '').toLowerCase();
+  const count = parseRequestedCount(userText);
+
+  const pools = {
+    lacuna: [
+      { badge: 'Complete 1', en: 'I usually ___ coffee before starting work.', pt: 'Complete com o verbo de rotina (ex: drink / have)' },
+      { badge: 'Complete 2', en: 'She ___ already finished the main report.', pt: 'Complete com o auxiliar correto (ex: has)' },
+      { badge: 'Complete 3', en: 'If I have time tomorrow, I ___ call you.', pt: 'Complete com o futuro (ex: will)' },
+      { badge: 'Complete 4', en: 'Were you ___ for the meeting yesterday?', pt: 'Complete com a forma em -ing (ex: waiting)' },
+      { badge: 'Complete 5', en: 'Could you please ___ me that file?', pt: 'Complete com a ação (ex: send / show)' },
+      { badge: 'Complete 6', en: 'We have been working here ___ 2022.', pt: 'Complete com since ou for' },
+    ],
+    dialogo: [
+      { badge: 'Diálogo · A', en: 'Hi! Do you have a quick minute to talk?', pt: 'Oi! Você tem um minutinho rápido para conversar?' },
+      { badge: 'Diálogo · B', en: 'Sure! What do you need help with?', pt: 'Claro! Com o que você precisa de ajuda?' },
+      { badge: 'Diálogo · A', en: 'I am trying to organize the schedule for Friday.', pt: 'Estou tentando organizar o cronograma de sexta-feira.' },
+      { badge: 'Diálogo · B', en: 'Let’s review the priorities together right now.', pt: 'Vamos revisar as prioridades juntos agora mesmo.' },
+      { badge: 'Diálogo · A', en: 'That sounds great, thank you so much!', pt: 'Parece ótimo, muito obrigado!' },
+    ],
+    viagem: [
+      { badge: 'Viagem 1', en: 'Could you tell me where the boarding gate is?', pt: 'Você poderia me dizer onde fica o portão de embarque?' },
+      { badge: 'Viagem 2', en: 'I have a reservation under my last name.', pt: 'Eu tenho uma reserva no meu sobrenome.' },
+      { badge: 'Viagem 3', en: 'What time is breakfast served at the hotel?', pt: 'A que horas o café da manhã é servido no hotel?' },
+      { badge: 'Viagem 4', en: 'How can I get to the city center from here?', pt: 'Como posso chegar ao centro da cidade saindo daqui?' },
+      { badge: 'Viagem 5', en: 'Could we have the bill, please?', pt: 'Você poderia nos trazer a conta, por favor?' },
+      { badge: 'Viagem 6', en: 'Is there a pharmacy near this station?', pt: 'Tem uma farmácia perto desta estação?' },
+    ],
+    agro: [
+      { badge: 'Agro 1', en: 'Soil moisture is ideal for planting soybeans this week.', pt: 'A umidade do solo está ideal para plantar soja nesta semana.' },
+      { badge: 'Agro 2', en: 'We need to check the sprayer nozzles before going to the field.', pt: 'Precisamos verificar os bicos do pulverizador antes de ir para o talhão.' },
+      { badge: 'Agro 3', en: 'The harvest yield exceeded our expectations this season.', pt: 'A produtividade da colheita superou nossas expectativas nesta safra.' },
+      { badge: 'Agro 4', en: 'Make sure the grain moisture sensor is calibrated.', pt: 'Certifique-se de que o sensor de umidade de grãos está calibrado.' },
+      { badge: 'Agro 5', en: 'Weather forecasts indicate heavy rain in the southern plot.', pt: 'As previsões do tempo indicam chuva forte no talhão sul.' },
+      { badge: 'Agro 6', en: 'Livestock nutrition directly impacts milk production.', pt: 'A nutrição do rebanho impacta diretamente a produção de leite.' },
+    ],
+    gpstronic: [
+      { badge: 'GPS Tronic 1', en: 'The RTK correction signal is locked with high accuracy.', pt: 'O sinal de correção RTK está travado com alta precisão.' },
+      { badge: 'GPS Tronic 2', en: 'Check the CAN bus harness for any loose connectors.', pt: 'Verifique o chicote da rede CAN para ver se há conectores frouxos.' },
+      { badge: 'GPS Tronic 3', en: 'Let’s calibrate the autopilot steering angle sensor.', pt: 'Vamos calibrar o sensor de ângulo de direção do piloto automático.' },
+      { badge: 'GPS Tronic 4', en: 'Variable rate application saves fertilizer and seeds.', pt: 'A aplicação em taxa variável economiza fertilizante e sementes.' },
+      { badge: 'GPS Tronic 5', en: 'Please update the terminal firmware via USB drive.', pt: 'Por favor, atualize o firmware do terminal via pen drive.' },
+      { badge: 'GPS Tronic 6', en: 'Section control prevents overlap at the headland.', pt: 'O corte de seção evita sobreposição na cabeceira.' },
+    ],
+    trabalho: [
+      { badge: 'Trabalho 1', en: 'Let me share my screen so we can check the numbers.', pt: 'Deixe-me compartilhar minha tela para conferirmos os números.' },
+      { badge: 'Trabalho 2', en: 'I will send you a summary right after the meeting.', pt: 'Vou te enviar um resumo logo após a reunião.' },
+      { badge: 'Trabalho 3', en: 'Could we reschedule our call for tomorrow morning?', pt: 'Poderíamos reagendar nossa chamada para amanhã de manhã?' },
+      { badge: 'Trabalho 4', en: 'We are on track to deliver the project on Friday.', pt: 'Estamos dentro do prazo para entregar o projeto na sexta-feira.' },
+      { badge: 'Trabalho 5', en: 'Thank you for bringing this detail to my attention.', pt: 'Obrigado por trazer esse detalhe para a minha atenção.' },
+      { badge: 'Trabalho 6', en: 'What are the next steps for our team this week?', pt: 'Quais são os próximos passos para nossa equipe nesta semana?' },
+    ],
+    geral: [
+      { badge: 'Frase 1', en: 'I have been practicing English every single day.', pt: 'Eu tenho praticado inglês todos os dias.' },
+      { badge: 'Frase 2', en: 'Could you repeat that a little more slowly, please?', pt: 'Você poderia repetir isso um pouco mais devagar, por favor?' },
+      { badge: 'Frase 3', en: 'It takes time and consistency to build confidence.', pt: 'Leva tempo e consistência para construir confiança.' },
+      { badge: 'Frase 4', en: 'What do you usually like to do on weekends?', pt: 'O que você costuma gostar de fazer nos fins de semana?' },
+      { badge: 'Frase 5', en: 'I was just about to call you when you texted me.', pt: 'Eu estava prestes a te ligar quando você me mandou mensagem.' },
+      { badge: 'Frase 6', en: 'Let’s make the most of our class today!', pt: 'Vamos aproveitar ao máximo a nossa aula de hoje!' },
+      { badge: 'Frase 7', en: 'Would you mind helping me with this expression?', pt: 'Você se importaria de me ajudar com esta expressão?' },
+      { badge: 'Frase 8', en: 'The more you speak out loud, the more natural it feels.', pt: 'Quanto mais você fala em voz alta, mais natural fica.' },
+    ],
+  };
+
+  let chosen = pools.geral;
+  if (lower.includes('lacuna') || lower.includes('completar') || lower.includes('exerc')) chosen = pools.lacuna;
+  else if (lower.includes('diálogo') || lower.includes('dialogo') || lower.includes('conversa')) chosen = pools.dialogo;
+  else if (lower.includes('viagem') || lower.includes('aeroporto') || lower.includes('hotel') || SALA === 'travel') chosen = pools.viagem;
+  else if (lower.includes('agro') || lower.includes('safra') || lower.includes('fazenda') || SALA === 'agro') chosen = pools.agro;
+  else if (lower.includes('gps') || lower.includes('piloto') || lower.includes('sensor') || SALA === 'gpstronic') chosen = pools.gpstronic;
+  else if (lower.includes('trabalho') || lower.includes('reuni') || lower.includes('entrevista') || SALA === 'business' || SALA === 'interview') chosen = pools.trabalho;
+
+  const cards = [];
+  for (let i = 0; i < count; i++) {
+    const item = chosen[i % chosen.length];
+    cards.push({
+      badge: item.badge || `Frase ${i + 1}`,
+      en: item.en,
+      pt: item.pt,
+    });
+  }
+  return {
+    reply: `Preparei ${cards.length} itens prontinhos para a sua lousa! Clique em qualquer cartão no quadro para arrastar, mudar as cores, ajustar a letra ou dar duplo-clique para editar.`,
+    cards,
+  };
+}
+
+function insertAICardsOnBoard(cards, opts = {}) {
+  if (!Array.isArray(cards) || !cards.length) return [];
+
+  // Garante que a barra de ferramentas esteja ativa localmente para quem inseriu
+  if (!canWrite && !isTeacher) {
+    canWrite = true;
+    const tb = document.getElementById('toolbar');
+    if (tb) tb.classList.remove('hidden');
+    const bl = document.getElementById('banner-locked');
+    if (bl) bl.classList.add('hidden');
+  }
+
+  const styleSel = document.getElementById('yw-card-style');
+  const layoutSel = document.getElementById('yw-card-layout');
+  const cardStyle = opts.cardStyle || (styleSel ? styleSel.value : 'modern');
+  const layoutMode = opts.layout || (layoutSel ? layoutSel.value : (cards.length >= 6 ? '2col' : '1col'));
+  const cols = layoutMode === '2col' ? 2 : 1;
+
+  // Verifica quantos cartões já existem na página atual para posicionar sem sobrepor
+  const existingCards = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text')).length;
+  const startX = 0.05;
+  const colW = cols === 2 ? 0.45 : 0.85;
+  const rowH = cols === 2 ? 0.175 : 0.15;
+  const baseRowOffset = existingCards > 0 && existingCards < 4 ? existingCards : 0;
+  const startY = 0.08 + (baseRowOffset * 0.14);
+
+  const actId = nextActionId();
+  const batch = [];
+
+  cards.forEach((item, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    const theme = CARD_THEMES[(existingCards + idx) % CARD_THEMES.length];
+    const x1 = Math.min(0.86, startX + col * colW);
+    const y1 = Math.min(0.84, (startY + row * rowH) % 0.82 + (startY + row * rowH >= 0.82 ? 0.08 : 0));
+
+    const seg = {
+      id: 'ai_' + Date.now().toString(36) + '_' + idx + '_' + Math.random().toString(36).slice(2, 5),
+      kind: cardStyle === 'plain' ? 'text' : 'note',
+      cardStyle,
+      badge: String(item.badge || `Frase ${idx + 1}`).trim(),
+      texto: String(item.en || item.texto || '').trim(),
+      subtexto: String(item.pt || item.subtexto || '').trim(),
+      x1,
+      y1,
+      cor: theme.cor,
+      bg: cardStyle === 'sticky' ? theme.stickyBg : theme.bg,
+      fonte: cards.length >= 6 ? 0.025 : 0.028,
+      actionId: actId,
+      author: myId,
+    };
+    batch.push(seg);
+    addSegment(seg, true);
+  });
+
+  if (batch.length > 0) {
+    broadcastEvent('stroke', { segments: batch });
+    selectCardSeg(batch[0]);
+  }
+  return batch;
+}
+
+function initQuadroAIChat() {
+  const fab = document.getElementById('yw-fab');
+  const panel = document.getElementById('yw-panel');
+  const closeBtn = document.getElementById('yw-close');
+  const input = document.getElementById('yw-input');
+  const sendBtn = document.getElementById('yw-send');
+  const messagesEl = document.getElementById('yw-messages');
+  const autoPasteEl = document.getElementById('yw-auto-paste');
+
+  if (!fab || !panel) return;
+
+  const togglePanel = (forceOpen) => {
+    const isHidden = panel.classList.contains('hidden');
+    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : isHidden;
+    panel.classList.toggle('hidden', !shouldOpen);
+    if (shouldOpen && input) {
+      setTimeout(() => input.focus(), 40);
+    }
+  };
+
+  fab.addEventListener('click', () => togglePanel());
+  if (closeBtn) closeBtn.addEventListener('click', () => togglePanel(false));
+
+  document.querySelectorAll('.yw-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.getAttribute('data-prompt') || chip.textContent;
+      if (input) input.value = prompt;
+      sendChatPrompt(prompt);
+    });
+  });
+
+  if (input) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatPrompt(input.value);
+      }
+    });
+  }
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      if (input) sendChatPrompt(input.value);
+    });
+  }
+
+  function appendUserBubble(text) {
+    const div = document.createElement('div');
+    div.className = 'bg-emerald-600 text-white font-bold rounded-2xl rounded-tr-sm px-3.5 py-2.5 ml-8 shadow-sm break-words';
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function appendLoadingBubble() {
+    const div = document.createElement('div');
+    div.className = 'bg-white border border-emerald-200 rounded-2xl rounded-tl-sm p-3 mr-6 shadow-sm text-slate-500 font-bold flex items-center gap-2';
+    div.innerHTML = '<span class="animate-spin text-base">⏳</span> <span>Yara está preparando os cartões para a lousa…</span>';
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  function appendYaraResponse(replyText, cards, autoPasted) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bg-white border border-emerald-200 rounded-2xl rounded-tl-sm p-3 mr-2 shadow-sm space-y-2.5 text-slate-700';
+
+    const header = document.createElement('div');
+    header.className = 'flex items-center justify-between gap-2';
+    header.innerHTML = `<span class="font-black text-emerald-800 text-[11px] uppercase tracking-wider">🦫 Yara IA</span>
+      ${autoPasted && cards.length ? '<span class="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">✅ Colado na lousa!</span>' : ''}`;
+    wrap.appendChild(header);
+
+    if (replyText) {
+      const p = document.createElement('p');
+      p.className = 'leading-relaxed font-medium text-xs text-slate-700';
+      p.textContent = replyText;
+      wrap.appendChild(p);
+    }
+
+    if (Array.isArray(cards) && cards.length > 0) {
+      const list = document.createElement('div');
+      list.className = 'space-y-1.5 pt-1';
+      cards.forEach((c, idx) => {
+        const itemRow = document.createElement('div');
+        itemRow.className = 'p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-2 hover:border-emerald-300 transition';
+        const info = document.createElement('div');
+        info.className = 'min-w-0 flex-1';
+        info.innerHTML = `
+          ${c.badge ? `<div class="text-[9px] font-black uppercase tracking-wider text-emerald-700">${c.badge}</div>` : ''}
+          <div class="font-extrabold text-navy text-xs leading-snug">${c.en}</div>
+          ${c.pt ? `<div class="text-[11px] text-slate-500">${c.pt}</div>` : ''}
+        `;
+        const addOneBtn = document.createElement('button');
+        addOneBtn.type = 'button';
+        addOneBtn.className = 'px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-800 border border-emerald-200 text-[10px] font-black flex-shrink-0 transition';
+        addOneBtn.title = 'Colar apenas este cartão na lousa';
+        addOneBtn.textContent = '➕ Lousa';
+        addOneBtn.addEventListener('click', () => {
+          insertAICardsOnBoard([c]);
+          addOneBtn.textContent = '✅ Colado';
+          setTimeout(() => { addOneBtn.textContent = '➕ Lousa'; }, 1400);
+        });
+        itemRow.appendChild(info);
+        itemRow.appendChild(addOneBtn);
+        list.appendChild(itemRow);
+      });
+      wrap.appendChild(list);
+
+      const actionsBar = document.createElement('div');
+      actionsBar.className = 'pt-1 flex flex-wrap items-center gap-1.5';
+
+      const pasteAllBtn = document.createElement('button');
+      pasteAllBtn.type = 'button';
+      pasteAllBtn.className = 'flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs shadow-sm transition flex items-center justify-center gap-1.5';
+      pasteAllBtn.innerHTML = `📌 ${autoPasted ? 'Colar novamente na lousa' : 'Colar todos na lousa'} (${cards.length})`;
+      pasteAllBtn.addEventListener('click', () => {
+        insertAICardsOnBoard(cards);
+      });
+      actionsBar.appendChild(pasteAllBtn);
+      wrap.appendChild(actionsBar);
+    }
+
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function sendChatPrompt(rawText) {
+    const text = String(rawText || '').trim();
+    if (!text) return;
+    if (input) input.value = '';
+
+    appendUserBubble(text);
+    const loadingEl = appendLoadingBubble();
+
+    let result = null;
+    try {
+      const resp = await fetch('/api/quadro-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sala: SALA,
+          message: text,
+          history: quadroChatHistory.slice(-8),
+        }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data && (Array.isArray(data.cards) || data.reply)) {
+          result = {
+            reply: data.reply || 'Prontinho! Aqui estão os cartões para a lousa:',
+            cards: Array.isArray(data.cards) ? data.cards : [],
+          };
+        }
+      }
+    } catch (e) {}
+
+    if (!result || (!result.cards.length && !result.reply)) {
+      result = generateLocalFallbackCards(text);
+    }
+
+    loadingEl.remove();
+
+    quadroChatHistory.push({ role: 'user', content: text });
+    quadroChatHistory.push({ role: 'assistant', content: result.reply || '' });
+
+    const shouldAutoPaste = autoPasteEl ? autoPasteEl.checked : true;
+    let pasted = false;
+    if (shouldAutoPaste && Array.isArray(result.cards) && result.cards.length > 0) {
+      insertAICardsOnBoard(result.cards);
+      pasted = true;
+    }
+
+    appendYaraResponse(result.reply, result.cards || [], pasted);
+  }
+}
+
 // ── Boot sequence ───────────────────────────────────────────────────────────
 async function boot() {
   myId = getMyId();
@@ -1984,6 +2977,7 @@ async function boot() {
   applyBackground(pageBgs[currentPage] || 'plain', false);
   resizeCanvas();
   updatePageUI();
+  initQuadroAIChat();
 
   isTeacher = await detectRole();
 
@@ -2007,6 +3001,10 @@ async function boot() {
   } catch (e) {
     setConnStatus('offline');
     showError(true);
+    // No modo local/offline, libera a barra de ferramentas para uso completo
+    canWrite = true;
+    document.getElementById('toolbar').classList.remove('hidden');
+    document.getElementById('banner-locked').classList.add('hidden');
   }
 }
 
