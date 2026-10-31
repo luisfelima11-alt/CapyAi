@@ -94,7 +94,7 @@
       <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbs</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="conversation">🗨️ Conversation</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
@@ -140,58 +140,333 @@
 
 <!-- GRAMMAR TAB -->
 <div id="tab-grammar" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">Grammar: Questions & Polite Requests</h2>
-  <p class="text-slate-500 text-sm mb-6">Um único ponto: como PERGUNTAR e como PEDIR. É o que destrava a conversa com fornecedor e com cliente.</p>
-  <div class="space-y-4">
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">Do you have…? / Do you sell…?</div><div class="text-emerald-700 text-sm font-semibold">"Do you have this part in stock?"</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g1-arrow">expand_more</span>
-      </button>
-      <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Do you have</strong> this antenna in stock?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Do you sell</strong> cables for Trimble?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>Does it work</strong> with an Ag Leader monitor?"</span></div>
-        <div class="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
-          <strong class="text-emerald-800">💡 Regra:</strong> Perguntas com <strong>Do / Does</strong> + verbo na forma base. Nunca "Do you have<em>s</em>".
-        </div>
-      </div></div>
+  <h2 class="text-2xl font-black text-navy mb-1">Perguntar e pedir ao fornecedor</h2>
+  <p class="text-slate-500 text-sm mb-5">6 slides com 28 exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de 6</span>
+      <div class="flex flex-wrap gap-1.5"><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-emerald-500" aria-label="Ir para o slide 1" aria-current="true"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 2" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 3" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 4" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 5" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 6" aria-current="false"></button></div>
     </div>
-
-    <div class="rounded-2xl border-2 border-green-200 bg-green-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-green-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">Can you…? / Could you…? (pedidos)</div><div class="text-green-600 text-sm font-semibold">"Can you send it this week?"</div></div></div>
-        <span class="material-symbols-outlined text-green-400 transition-transform" id="g2-arrow">expand_more</span>
-      </button>
-      <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>Can you send</strong> it this week?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>Could you check</strong> the price for me?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>I need</strong> two cables, please."</span></div>
-        <div class="mt-3 p-3 bg-green-50 rounded-xl border border-green-200 text-xs">
-          <strong class="text-green-800">⚡ Dica:</strong> "Could you" é só uma versão mais educada de "Can you". Sempre + verbo base, sem "to".
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="0" aria-label="Slide 1 de 6">
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Nesta aula</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Perguntar e pedir ao fornecedor</h3>
         </div>
-      </div></div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 1 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-0.webp?v=565f105314" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ol class="gs-lista space-y-2">
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">Do you have</strong> …? · <strong class="text-emerald-600">Do you sell</strong> …?</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">Does it work</strong> with …? · How long <strong class="text-emerald-600">does it take</strong>?</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">3</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">Can you send</strong> …? · <strong class="text-emerald-600">Could you check</strong> …?</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">I need</strong> two cables, please · <strong class="text-emerald-600">We need</strong> it this week</span></li>
+          </ol>
+          <p class="gs-nota mt-4 text-slate-500 text-sm">28 exemplos. Ouça cada frase e repare na parte em destaque.</p>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="1" aria-label="Slide 2 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 1 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">Do you have</strong> …? · <strong class="text-emerald-300">Do you sell</strong> …?</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 2 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-1.webp?v=f3256f48ed" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you have this part in stock?" aria-label="Ouvir: Do you have this part in stock?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you have</strong> this part in stock?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês têm essa peça em estoque?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you sell antenna cables?" aria-label="Ouvir: Do you sell antenna cables?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you sell</strong> antenna cables?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês vendem cabos de antena?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you have a cheaper model?" aria-label="Ouvir: Do you have a cheaper model?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you have</strong> a cheaper model?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês têm um modelo mais barato?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you sell parts for old receivers?" aria-label="Ouvir: Do you sell parts for old receivers?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you sell</strong> parts for old receivers?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês vendem peças para receptores antigos?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you have two antennas available?" aria-label="Ouvir: Do you have two antennas available?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you have</strong> two antennas available?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês têm duas antenas disponíveis?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you sell to companies in Brazil?" aria-label="Ouvir: Do you sell to companies in Brazil?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you sell</strong> to companies in Brazil?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês vendem para empresas no Brasil?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="2" aria-label="Slide 3 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 2 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">Does it work</strong> with …? · How long <strong class="text-emerald-300">does it take</strong>?</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 3 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-2.webp?v=fe4246dae9" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does it work with this monitor?" aria-label="Ouvir: Does it work with this monitor?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does it work</strong> with this monitor?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Funciona com este monitor?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="How long does it take to arrive?" aria-label="Ouvir: How long does it take to arrive?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">How long <strong class="text-emerald-600">does it take</strong> to arrive?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Quanto tempo demora para chegar?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does the price include shipping?" aria-label="Ouvir: Does the price include shipping?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> the price <strong class="text-emerald-600">include</strong> shipping?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O preço inclui o frete?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="How much does the shipping cost?" aria-label="Ouvir: How much does the shipping cost?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">How much <strong class="text-emerald-600">does</strong> the shipping <strong class="text-emerald-600">cost</strong>?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Quanto custa o frete?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does the new antenna need a different cable?" aria-label="Ouvir: Does the new antenna need a different cable?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> the new antenna <strong class="text-emerald-600">need</strong> a different cable?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A antena nova precisa de outro cabo?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does the supplier have it in stock?" aria-label="Ouvir: Does the supplier have it in stock?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> the supplier <strong class="text-emerald-600">have</strong> it in stock?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O fornecedor tem em estoque?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="3" aria-label="Slide 4 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 3 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">Can you send</strong> …? · <strong class="text-emerald-300">Could you check</strong> …?</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 4 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-3.webp?v=f9d0cddd4e" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Can you send it this week?" aria-label="Ouvir: Can you send it this week?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Can you send</strong> it this week?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você consegue enviar essa semana?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Could you check the price for me?" aria-label="Ouvir: Could you check the price for me?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Could you check</strong> the price for me?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você poderia verificar o preço para mim?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Can you tell me the delivery date?" aria-label="Ouvir: Can you tell me the delivery date?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Can you tell</strong> me the delivery date?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você pode me dizer a data de entrega?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Could you send me the invoice by email?" aria-label="Ouvir: Could you send me the invoice by email?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Could you send</strong> me the invoice by email?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você poderia me mandar a nota fiscal por e-mail?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Can you check my order number, please?" aria-label="Ouvir: Can you check my order number, please?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Can you check</strong> my order number, please?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você pode conferir o número do meu pedido, por favor?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Could you call me when the part arrives?" aria-label="Ouvir: Could you call me when the part arrives?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Could you call</strong> me when the part arrives?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você poderia me ligar quando a peça chegar?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="4" aria-label="Slide 5 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 4 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">I need</strong> two cables, please · <strong class="text-emerald-300">We need</strong> it this week</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 5 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-4.webp?v=2ae580afe5" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need two antenna cables, please." aria-label="Ouvir: I need two antenna cables, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">I need</strong> two antenna cables, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Preciso de dois cabos de antena, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need the price with shipping, please." aria-label="Ouvir: I need the price with shipping, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">I need</strong> the price with shipping, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Preciso do preço com o frete, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We need the part this week. The customer is waiting." aria-label="Ouvir: We need the part this week. The customer is waiting."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">We need</strong> the part this week. The customer is waiting.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Precisamos da peça essa semana. O cliente está esperando.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We need ten connectors, please." aria-label="Ouvir: We need ten connectors, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">We need</strong> ten connectors, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Precisamos de dez conectores, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need an answer today, please." aria-label="Ouvir: I need an answer today, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">I need</strong> an answer today, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Preciso de uma resposta hoje, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We need a cheaper option for this customer." aria-label="Ouvir: We need a cheaper option for this customer."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">We need</strong> a cheaper option for this customer.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Precisamos de uma opção mais barata para este cliente.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="5" aria-label="Slide 6 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Revisão</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Uma frase nova de cada padrão</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 6 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps04-5.webp?v=57e7a881ab" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Do you sell spare parts for displays?" aria-label="Ouvir: Do you sell spare parts for displays?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 1</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Do you sell</strong> spare parts for displays?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vocês vendem peças de reposição para monitores?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does it take more than ten days?" aria-label="Ouvir: Does it take more than ten days?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 2</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does it take</strong> more than ten days?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Demora mais de dez dias?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Could you send me a photo of the part?" aria-label="Ouvir: Could you send me a photo of the part?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 3</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Could you send</strong> me a photo of the part?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você poderia me mandar uma foto da peça?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need one more cable, please." aria-label="Ouvir: I need one more cable, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 4</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">I need</strong> one more cable, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Preciso de mais um cabo, por favor.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" id="gs-ant" class="flex-shrink-0 inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-navy font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Anterior</button>
+      <button type="button" id="gs-prox" class="flex-1 inline-flex items-center justify-center gap-1 bg-navy hover:opacity-90 text-white font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">Próximo →</button>
     </div>
-
   </div>
-  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Estudei a gramática! (+20 XP)
+  <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+    Veja os 6 slides para ganhar +20 XP
   </button>
+<script src="gramatica-slides.js?v=gs1"></script>
 </div>
 
 <!-- DIALOGUE TAB -->
 <div id="tab-dialogue" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">🎭 Explaining the Repair</h2>
-  <p class="text-slate-500 text-sm mb-5">🔧 O cliente volta pra buscar o GPS e Yara explica o que estava quebrado, o que foi trocado e o prazo.</p>
+  <h2 class="text-2xl font-black text-navy mb-2">🎭 Ordering Parts</h2>
+  <p class="text-slate-500 text-sm mb-5">📦 Yara liga para o fornecedor e pede dois cabos de antena: estoque, preço, frete e prazo de entrega.</p>
   <div class="space-y-3 mb-6" id="dialogue-lines"></div>
   <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4">
     <p class="font-black text-emerald-800 text-sm mb-2">🎯 Encontre no diálogo:</p>
     <div class="grid grid-cols-2 gap-2 text-xs">
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>It was broken.</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>I replaced / tested</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>going to be ready</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>warranty / invoice</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>Do you have…?</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>How much is…?</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>How long does it take?</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>Can you send…?</strong></div>
     </div>
   </div>
   <button onclick="markSectionBtn(this,'dialogue')" class="mt-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
@@ -285,7 +560,7 @@
       <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
       <div><p class="font-black text-navy text-sm">Write a short message (4–6 lines) to a supplier asking for a part.</p><p class="text-slate-500 text-xs">Use "Do you have…?", "Can you…?", "How much…?" and vocabulary from this lesson.</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="The antenna cable was broken.&#10;I replaced the cable and I tested the signal.&#10;This is covered by warranty.&#10;It's going to be ready on Friday."></textarea>
+    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Hello! Do you have GPS antennas in stock?&#10;I need two for a customer.&#10;How much is the shipping to Brazil?&#10;Can you send them this week?"></textarea>
     <button onclick="submitHomeworkGps4()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
