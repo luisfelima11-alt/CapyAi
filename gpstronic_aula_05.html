@@ -94,7 +94,7 @@
       <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbs</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="conversation">🗨️ Conversation</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
@@ -140,44 +140,319 @@
 
 <!-- GRAMMAR TAB -->
 <div id="tab-grammar" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">Grammar: There is / There are + Places</h2>
-  <p class="text-slate-500 text-sm mb-6">Um único ponto: descrever o que EXISTE e ONDE está. É o que você mais usa numa visita à fazenda.</p>
-  <div class="space-y-4">
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">There is / There are</div><div class="text-emerald-700 text-sm font-semibold">"There is a problem with the antenna."</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g1-arrow">expand_more</span>
-      </button>
-      <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>There is</strong> a problem with the antenna." (1 coisa)</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>There are</strong> two tractors in the field." (2+ coisas)</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-emerald-700'>There isn't</strong> a signal here."</span></div>
-        <div class="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
-          <strong class="text-emerald-800">💡 Regra:</strong> <strong>There is</strong> pra singular, <strong>There are</strong> pra plural. Pergunta: "Is there…? / Are there…?"
-        </div>
-      </div></div>
+  <h2 class="text-2xl font-black text-navy mb-1">O que tem e onde está o equipamento</h2>
+  <p class="text-slate-500 text-sm mb-5">6 slides com 28 exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de 6</span>
+      <div class="flex flex-wrap gap-1.5"><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-emerald-500" aria-label="Ir para o slide 1" aria-current="true"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 2" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 3" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 4" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 5" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 6" aria-current="false"></button></div>
     </div>
-
-    <div class="rounded-2xl border-2 border-green-200 bg-green-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-green-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">in / on / under / next to</div><div class="text-green-600 text-sm font-semibold">"The monitor is in the cab."</div></div></div>
-        <span class="material-symbols-outlined text-green-400 transition-transform" id="g2-arrow">expand_more</span>
-      </button>
-      <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"The monitor is <strong class='text-green-700'>in</strong> the cab."</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"The antenna is <strong class='text-green-700'>on</strong> the roof."</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"The cable is <strong class='text-green-700'>under</strong> the seat."</span></div>
-        <div class="mt-3 p-3 bg-green-50 rounded-xl border border-green-200 text-xs">
-          <strong class="text-green-800">⚡ Dica:</strong> <strong>in</strong> = dentro, <strong>on</strong> = em cima, <strong>under</strong> = embaixo, <strong>next to</strong> = ao lado.
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="0" aria-label="Slide 1 de 6">
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Nesta aula</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">O que tem e onde está o equipamento</h3>
         </div>
-      </div></div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 1 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-0.webp?v=fd3f444ca3" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ol class="gs-lista space-y-2">
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">There is</strong> a … · <strong class="text-emerald-600">There are</strong> two …</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">Is there</strong> …? · <strong class="text-emerald-600">Are there</strong> …? · <strong class="text-emerald-600">There isn't</strong> …</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">3</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">in</strong> the cab · <strong class="text-emerald-600">on</strong> the roof</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">under</strong> the seat · <strong class="text-emerald-600">next to</strong> the shed</span></li>
+          </ol>
+          <p class="gs-nota mt-4 text-slate-500 text-sm">28 exemplos. Ouça cada frase e repare na parte em destaque.</p>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="1" aria-label="Slide 2 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 1 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">There is</strong> a … · <strong class="text-emerald-300">There are</strong> two …</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 2 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-1.webp?v=2c774aac5d" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There is a problem with the antenna." aria-label="Ouvir: There is a problem with the antenna."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There is</strong> a problem with the antenna.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem um problema com a antena.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There are two tractors in the field." aria-label="Ouvir: There are two tractors in the field."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There are</strong> two tractors in the field.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem dois tratores no campo.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There is a lot of dust on the screen." aria-label="Ouvir: There is a lot of dust on the screen."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There is</strong> a lot of dust on the screen.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem muita poeira na tela.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There are some old cables in the cab." aria-label="Ouvir: There are some old cables in the cab."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There are</strong> some old cables in the cab.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem uns cabos velhos na cabine.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="During the harvest, there are ten people working here." aria-label="Ouvir: During the harvest, there are ten people working here."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">During the harvest, <strong class="text-emerald-600">there are</strong> ten people working here.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Na colheita, tem dez pessoas trabalhando aqui.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There is only one road to the farm." aria-label="Ouvir: There is only one road to the farm."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There is</strong> only one road to the farm.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Só tem uma estrada até a fazenda.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="2" aria-label="Slide 3 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 2 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">Is there</strong> …? · <strong class="text-emerald-300">Are there</strong> …? · <strong class="text-emerald-300">There isn't</strong> …</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 3 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-2.webp?v=dafe17ed01" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There isn't a signal here." aria-label="Ouvir: There isn't a signal here."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There isn't</strong> a signal here.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Não tem sinal aqui.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Is there a problem with the screen?" aria-label="Ouvir: Is there a problem with the screen?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Is there</strong> a problem with the screen?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem algum problema com a tela?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Are there other tractors on the farm?" aria-label="Ouvir: Are there other tractors on the farm?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Are there</strong> other tractors on the farm?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem outros tratores na fazenda?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Is there a big problem? No, there isn't." aria-label="Ouvir: Is there a big problem? No, there isn't."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Is there</strong> a big problem? No, <strong class="text-emerald-600">there isn't</strong>.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem algum problema grande? Não, não tem.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Are there many farms near here?" aria-label="Ouvir: Are there many farms near here?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Are there</strong> many farms near here?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem muitas fazendas aqui perto?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There isn't a GPS monitor in the old tractor." aria-label="Ouvir: There isn't a GPS monitor in the old tractor."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There isn't</strong> a GPS monitor in the old tractor.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Não tem monitor de GPS no trator velho.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="3" aria-label="Slide 4 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 3 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">in</strong> the cab · <strong class="text-emerald-300">on</strong> the roof</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 4 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-3.webp?v=a8223f5437" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The monitor is in the cab." aria-label="Ouvir: The monitor is in the cab."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The monitor is <strong class="text-emerald-600">in</strong> the cab.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O monitor fica na cabine.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The antenna is on the roof." aria-label="Ouvir: The antenna is on the roof."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The antenna is <strong class="text-emerald-600">on</strong> the roof.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A antena fica no teto.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The screen in the cab is not turning on." aria-label="Ouvir: The screen in the cab is not turning on."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The screen <strong class="text-emerald-600">in</strong> the cab is not turning on.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A tela da cabine não está ligando.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The farmer is waiting for us in the field." aria-label="Ouvir: The farmer is waiting for us in the field."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The farmer is waiting for us <strong class="text-emerald-600">in</strong> the field.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O produtor está esperando a gente na lavoura.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Put the toolbox on the seat, please." aria-label="Ouvir: Put the toolbox on the seat, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Put the toolbox <strong class="text-emerald-600">on</strong> the seat, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Coloca a caixa de ferramentas no banco, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The field map is on the screen now." aria-label="Ouvir: The field map is on the screen now."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The field map is <strong class="text-emerald-600">on</strong> the screen now.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O mapa da lavoura está na tela agora.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="4" aria-label="Slide 5 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 4 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">under</strong> the seat · <strong class="text-emerald-300">next to</strong> the shed</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 5 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-4.webp?v=ca4723e634" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The cable is under the seat." aria-label="Ouvir: The cable is under the seat."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The cable is <strong class="text-emerald-600">under</strong> the seat.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O cabo fica embaixo do banco.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The tractor is next to the shed." aria-label="Ouvir: The tractor is next to the shed."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The tractor is <strong class="text-emerald-600">next to</strong> the shed.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O trator está ao lado do galpão.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I found the old cable under the floor mat." aria-label="Ouvir: I found the old cable under the floor mat."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I found the old cable <strong class="text-emerald-600">under</strong> the floor mat.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Achei o cabo velho embaixo do tapete.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Park your truck next to the house." aria-label="Ouvir: Park your truck next to the house."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Park your truck <strong class="text-emerald-600">next to</strong> the house.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Estaciona a caminhonete ao lado da casa.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The fuse box is under the dashboard." aria-label="Ouvir: The fuse box is under the dashboard."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The fuse box is <strong class="text-emerald-600">under</strong> the dashboard.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A caixa de fusíveis fica embaixo do painel.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Sit next to me, and I'll show you the screen." aria-label="Ouvir: Sit next to me, and I'll show you the screen."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Sit <strong class="text-emerald-600">next to</strong> me, and I'll show you the screen.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Senta do meu lado que eu te mostro a tela.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="5" aria-label="Slide 6 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Revisão</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Uma frase nova de cada padrão</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 6 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps05-5.webp?v=f73dff3a9e" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="There is a new screen in the cab." aria-label="Ouvir: There is a new screen in the cab."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 1</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">There is</strong> a new screen in the cab.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem uma tela nova na cabine.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Is there a signal in the field?" aria-label="Ouvir: Is there a signal in the field?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 2</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Is there</strong> a signal in the field?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Tem sinal na lavoura?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The owner is in the shed with the tractor." aria-label="Ouvir: The owner is in the shed with the tractor."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 3</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The owner is <strong class="text-emerald-600">in</strong> the shed with the tractor.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O dono está no galpão com o trator.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The toolbox is next to the tractor." aria-label="Ouvir: The toolbox is next to the tractor."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 4</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The toolbox is <strong class="text-emerald-600">next to</strong> the tractor.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A caixa de ferramentas está ao lado do trator.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" id="gs-ant" class="flex-shrink-0 inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-navy font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Anterior</button>
+      <button type="button" id="gs-prox" class="flex-1 inline-flex items-center justify-center gap-1 bg-navy hover:opacity-90 text-white font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">Próximo →</button>
     </div>
-
   </div>
-  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Estudei a gramática! (+20 XP)
+  <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+    Veja os 6 slides para ganhar +20 XP
   </button>
+<script src="gramatica-slides.js?v=gs1"></script>
 </div>
 
 <!-- DIALOGUE TAB -->

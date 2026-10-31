@@ -145,7 +145,7 @@ test('the image prompt joins the shared style, the scene and the full character 
 test('every converted lesson passes the validator, has its images and ships the deck it describes', async () => {
   const { checarSlides, VERSAO_JS, MAX_KB_IMAGEM } = await modulo();
   const fontes = fs.readdirSync(path.join(ROOT, 'scripts'))
-    .filter(f => /^(aula|agro|med|interview)\d+-conteudo\.json$/.test(f))
+    .filter(f => /^(aula|agro|med|interview)\d+-(conteudo|gramatica)\.json$/.test(f))
     .map(f => ({ f, c: JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', f), 'utf8')) }))
     .filter(({ c }) => c.gramatica && c.gramatica.slides);
   assert.ok(fontes.length >= 2, 'the pilot lessons are converted');
@@ -163,7 +163,9 @@ test('every converted lesson passes the validator, has its images and ships the 
     assert.deepEqual(erros, [], f);
     if (!arquivo) continue;
     const html = fs.readFileSync(path.join(ROOT, arquivo), 'utf8');
-    const aba = html.slice(html.indexOf('<div id="tab-grammar"'), html.indexOf('<!-- CONVERSATION'));
+    // As aulas feitas à mão (aulaNN-gramatica.json) nem sempre têm o <!-- CONVERSATION: a aba vai até a próxima.
+    const ini = html.indexOf('<div id="tab-grammar"');
+    const aba = html.slice(ini, html.indexOf('<div id="tab-', ini + 10));
     const total = c.gramatica.slides.length + 2;
     assert.equal((aba.match(/class="gs-slide/g) || []).length, total, arquivo);
     assert.equal((aba.match(/<img class="gs-img/g) || []).length, total, arquivo + ': one image per slide');
