@@ -218,6 +218,8 @@ test('nothing the student sees says "Grammar": the title loses the prefix and th
   assert.doesNotMatch(visivel, /gram[aá]tic|grammar/i);
   assert.match(html, /<h2 class="text-2xl font-black text-navy mb-1">O verbo TO BE<\/h2>/);
   assert.match(html, /aria-label="Slides dos padrões"/);
+  const comPatterns = blocoGramaticaSlides(aula(g => ({ ...g, titulo: 'Patterns: falar do tempo' })), { slug: 'agro10' });
+  assert.match(comPatterns, /<h2 class="text-2xl font-black text-navy mb-1">Falar do tempo<\/h2>/, 'the tab is already called Patterns');
 });
 
 test('hand-made lessons without proximoPasso() get the deck without the "Continuar" button', async () => {

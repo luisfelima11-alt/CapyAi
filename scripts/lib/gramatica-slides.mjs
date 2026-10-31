@@ -86,7 +86,8 @@ const destaque = (s, classe) => esc(s).replace(/\*\*(.+?)\*\*/g, `<strong class=
 const puro = s => String(s).replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
 const palavras = s => puro(s).split(/\s+/).filter(Boolean).length;
 const semPrefixo = t => {
-    const s = String(t).replace(/^\s*grammar\s*:\s*/i, '');
+    // "Grammar:" (as primeiras aulas) e "Patterns:" (o nome da aba, que já aparece acima) saem do título.
+    const s = String(t).replace(/^\s*(grammar|patterns)\s*:\s*/i, '');
     return s.charAt(0).toUpperCase() + s.slice(1);
 };
 

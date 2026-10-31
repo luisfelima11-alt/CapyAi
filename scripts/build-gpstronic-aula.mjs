@@ -145,6 +145,9 @@ function construir(n) {
     const d = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/aula${nn}-dialogo.json`), 'utf8'));
     const c = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/aula${nn}-conteudo.json`), 'utf8'));
     let t = fs.readFileSync(MOLDE, 'utf8');
+    // O molde (GPS 09) já traz o cartão da folha apontando para o PDF dele. Sai aqui; o
+    // gera-folha-aula.mjs põe o cartão certo desta aula (igual ao build-agro-aula.mjs).
+    t = t.replace(/<script src="folha-da-aula\.js[^>]*><\/script>\n?/, '');
     const sufixo = c.sufixo;                          // gps10
     const pastaAudio = `gps${nn}`;
 
