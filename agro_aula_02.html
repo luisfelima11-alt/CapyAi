@@ -188,55 +188,320 @@
 
 <!-- GRAMMAR -->
 <div id="tab-grammar" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">Grammar: this, that e o plural</h2>
-  <p class="text-slate-500 text-sm mb-6">O português tem <em>este, esse, aquele</em>. O inglês simplificou: só existe <strong>perto</strong> e <strong>longe</strong> — e cada um tem uma forma no plural. São quatro palavras no total.</p>
-  <div class="space-y-4">
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">this = perto · that = longe</div><div class="text-emerald-700 text-sm font-semibold">"This is a wrench. That is a harvester."</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g1-arrow">expand_more</span>
-      </button>
-      <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">Se está na sua mão ou do seu lado, é <strong>this</strong>. Se está lá longe, é <strong>that</strong>.<br><br>✅ <strong>This</strong> is a wrench. <em>(aqui na minha mão)</em><br>✅ <strong>That</strong> is a harvester. <em>(lá no pátio)</em><br><br>Não existe uma palavra para <em>esse</em> no meio do caminho. Perto → this. Longe → that. Só isso.</div></div>
+  <h2 class="text-2xl font-black text-navy mb-1">Apontar e dizer o que é</h2>
+  <p class="text-slate-500 text-sm mb-5">6 slides com 28 exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de 6</span>
+      <div class="flex flex-wrap gap-1.5"><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-emerald-500" aria-label="Ir para o slide 1" aria-current="true"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 2" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 3" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 4" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 5" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 6" aria-current="false"></button></div>
     </div>
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">these e those — o plural dos dois</div><div class="text-emerald-700 text-sm font-semibold">"These are cables. Those machines are big."</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g2-arrow">expand_more</span>
-      </button>
-      <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">Mais de uma coisa muda a palavra <u>e</u> muda o verbo:<br><br>this → <strong>these</strong> · that → <strong>those</strong><br>is → <strong>are</strong><br><br>✅ This <strong>is</strong> a cable. → <strong>These are</strong> cables.<br>✅ That <strong>is</strong> a machine. → <strong>Those are</strong> machines.<br><br>❌ <s>These is cables.</s> — plural pede are, sempre.</div></div>
-    </div>
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g3')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">3</span><div><div class="font-black text-navy">a e an — nenhuma coisa anda sozinha</div><div class="text-emerald-700 text-sm font-semibold">"a wrench" · "an antenna"</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g3-arrow">expand_more</span>
-      </button>
-      <div id="g3" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">Em português a gente diz <em>"isto é chave inglesa"</em>. Em inglês falta alguma coisa aí: toda coisa contável no singular precisa de <strong>a</strong> na frente.<br><br>✅ This is <strong>a</strong> wrench.<br>❌ <s>This is wrench.</s><br><br>Quando a palavra <u>começa com som de vogal</u> (a, e, i, o, u), o <em>a</em> vira <strong>an</strong> — só para a boca não travar:<br>✅ <strong>an</strong> antenna · <strong>an</strong> old cable · <strong>an</strong> engine<br><br>No plural, não se usa nem um nem outro: ✅ These are <s>a</s> cables.</div></div>
-    </div>
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g4')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span><div><div class="font-black text-navy">O plural: -s, e -es depois de s, x, ch, sh</div><div class="text-emerald-700 text-sm font-semibold">"cable → cables" · "wrench → wrenches"</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g4-arrow">expand_more</span>
-      </button>
-      <div id="g4" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">Quase sempre é só grudar um <strong>-s</strong>:<br>cable → cable<strong>s</strong> · truck → truck<strong>s</strong> · machine → machine<strong>s</strong> · field → field<strong>s</strong><br><br>Mas se a palavra já termina em <strong>s, x, ch, sh</strong>, o -s não caberia na boca — então entra <strong>-es</strong>:<br>wren<strong>ch</strong> → wrench<strong>es</strong> · bo<strong>x</strong> → box<strong>es</strong> · bu<strong>s</strong> → bus<strong>es</strong><br><br>⚠️ Adjetivo <u>nunca</u> vai para o plural em inglês:<br>✅ Those cables are <strong>old</strong>. &nbsp; ❌ <s>olds</s></div></div>
-    </div>
-
-    <div class="rounded-2xl border-2 border-slate-200 bg-white overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-slate-50"><tr><th class="text-left font-black text-navy px-4 py-3 whitespace-nowrap"></th><th class="text-left font-black text-navy px-4 py-3 whitespace-nowrap">Perto</th><th class="text-left font-black text-navy px-4 py-3 whitespace-nowrap">Longe</th><th class="text-left font-black text-navy px-4 py-3 whitespace-nowrap">Exemplo</th></tr></thead>
-          <tbody><tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-black text-navy">1 coisa</td><td class="px-4 py-2.5 text-slate-600 font-semibold">this</td><td class="px-4 py-2.5 text-slate-600 font-semibold">that</td><td class="px-4 py-2.5 text-slate-600 font-semibold">This is a wrench.</td></tr><tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-black text-navy">2+ coisas</td><td class="px-4 py-2.5 text-slate-600 font-semibold">these</td><td class="px-4 py-2.5 text-slate-600 font-semibold">those</td><td class="px-4 py-2.5 text-slate-600 font-semibold">These are cables.</td></tr><tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-black text-navy">o verbo</td><td class="px-4 py-2.5 text-slate-600 font-semibold">is</td><td class="px-4 py-2.5 text-slate-600 font-semibold">is</td><td class="px-4 py-2.5 text-slate-600 font-semibold">That antenna is new.</td></tr><tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-black text-navy">no plural</td><td class="px-4 py-2.5 text-slate-600 font-semibold">are</td><td class="px-4 py-2.5 text-slate-600 font-semibold">are</td><td class="px-4 py-2.5 text-slate-600 font-semibold">Those machines are big.</td></tr><tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-black text-navy">o artigo</td><td class="px-4 py-2.5 text-slate-600 font-semibold">a / an</td><td class="px-4 py-2.5 text-slate-600 font-semibold">a / an</td><td class="px-4 py-2.5 text-slate-600 font-semibold">an antenna, a truck</td></tr></tbody>
-        </table>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="0" aria-label="Slide 1 de 6">
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Nesta aula</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Apontar e dizer o que é</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 1 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
       </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-0.webp?v=e6498c975b" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ol class="gs-lista space-y-2">
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">This</strong> is … · <strong class="text-emerald-600">That</strong> is …</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">These are</strong> … · <strong class="text-emerald-600">Those are</strong> …</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">3</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">a</strong> wrench · <strong class="text-emerald-600">an</strong> antenna</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span><span class="gs-en font-black text-navy">cable<strong class="text-emerald-600">s</strong> · truck<strong class="text-emerald-600">s</strong> · wrench<strong class="text-emerald-600">es</strong> · box<strong class="text-emerald-600">es</strong></span></li>
+          </ol>
+          <p class="gs-nota mt-4 text-slate-500 text-sm">28 exemplos. Ouça cada frase e repare na parte em destaque.</p>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="1" aria-label="Slide 2 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 1 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">This</strong> is … · <strong class="text-emerald-300">That</strong> is …</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 2 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-1.webp?v=3863e086b9" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="This is a wrench." aria-label="Ouvir: This is a wrench."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">This</strong> is a wrench.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Isto é uma chave inglesa.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="That is a harvester." aria-label="Ouvir: That is a harvester."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">That</strong> is a harvester.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquilo é uma colheitadeira.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Jack, this is a GPS screen." aria-label="Ouvir: Jack, this is a GPS screen."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Jack, <strong class="text-emerald-600">this</strong> is a GPS screen.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Jack, isto é uma tela de GPS.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="That truck is old." aria-label="Ouvir: That truck is old."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">That</strong> truck is old.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquele caminhão é velho.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="This screwdriver is new." aria-label="Ouvir: This screwdriver is new."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">This</strong> screwdriver is new.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Esta chave de fenda é nova.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="What is that?" aria-label="Ouvir: What is that?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">What is <strong class="text-emerald-600">that</strong>?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O que é aquilo?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="2" aria-label="Slide 3 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 2 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">These are</strong> … · <strong class="text-emerald-300">Those are</strong> …</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 3 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-2.webp?v=178776c614" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="These are cables." aria-label="Ouvir: These are cables."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">These are</strong> cables.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Estes são cabos.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Those machines are big." aria-label="Ouvir: Those machines are big."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Those</strong> machines <strong class="text-emerald-600">are</strong> big.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquelas máquinas são grandes.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="What are these?" aria-label="Ouvir: What are these?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">What <strong class="text-emerald-600">are these</strong>?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O que são estes?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Those fields are soybean." aria-label="Ouvir: Those fields are soybean."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Those</strong> fields <strong class="text-emerald-600">are</strong> soybean.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquelas lavouras são de soja.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="These screwdrivers are new." aria-label="Ouvir: These screwdrivers are new."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">These</strong> screwdrivers <strong class="text-emerald-600">are</strong> new.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Estas chaves de fenda são novas.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Those are work trucks." aria-label="Ouvir: Those are work trucks."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Those are</strong> work trucks.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aqueles são caminhões de trabalho.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="3" aria-label="Slide 4 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 3 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">a</strong> wrench · <strong class="text-emerald-300">an</strong> antenna</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 4 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-3.webp?v=df3f0e15d5" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="It's a wrench." aria-label="Ouvir: It's a wrench."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">It's <strong class="text-emerald-600">a</strong> wrench.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">É uma chave inglesa.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="That is an antenna." aria-label="Ouvir: That is an antenna."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">That is <strong class="text-emerald-600">an</strong> antenna.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquilo é uma antena.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need a screwdriver, please." aria-label="Ouvir: I need a screwdriver, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I need <strong class="text-emerald-600">a</strong> screwdriver, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu preciso de uma chave de fenda, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="It's an old cable." aria-label="Ouvir: It's an old cable."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">It's <strong class="text-emerald-600">an</strong> old cable.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">É um cabo velho.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="This is a work truck." aria-label="Ouvir: This is a work truck."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">This is <strong class="text-emerald-600">a</strong> work truck.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Este é um caminhão de trabalho.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Jack is an agronomist." aria-label="Ouvir: Jack is an agronomist."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Jack is <strong class="text-emerald-600">an</strong> agronomist.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O Jack é agrônomo.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="4" aria-label="Slide 5 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 4 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">cable<strong class="text-emerald-300">s</strong> · truck<strong class="text-emerald-300">s</strong> · wrench<strong class="text-emerald-300">es</strong> · box<strong class="text-emerald-300">es</strong></h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 5 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-4.webp?v=cef64ed490" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need two new cables." aria-label="Ouvir: I need two new cables."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I need two new cable<strong class="text-emerald-600">s</strong>.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu preciso de dois cabos novos.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The trucks are old." aria-label="Ouvir: The trucks are old."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The truck<strong class="text-emerald-600">s</strong> are old.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Os caminhões são velhos.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The antennas are new." aria-label="Ouvir: The antennas are new."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The antenna<strong class="text-emerald-600">s</strong> are new.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">As antenas são novas.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I need two wrenches, please." aria-label="Ouvir: I need two wrenches, please."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I need two wrench<strong class="text-emerald-600">es</strong>, please.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu preciso de duas chaves inglesas, por favor.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The screwdrivers are in the boxes." aria-label="Ouvir: The screwdrivers are in the boxes."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The screwdriver<strong class="text-emerald-600">s</strong> are in the box<strong class="text-emerald-600">es</strong>.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">As chaves de fenda estão nas caixas.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The harvesters are big." aria-label="Ouvir: The harvesters are big."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The harvester<strong class="text-emerald-600">s</strong> are big.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">As colheitadeiras são grandes.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="5" aria-label="Slide 6 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Revisão</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Uma frase nova de cada padrão</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 6 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/agro02-5.webp?v=46ca477481" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="That harvester is new." aria-label="Ouvir: That harvester is new."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 1</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">That</strong> harvester is new.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aquela colheitadeira é nova.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Those are old cables." aria-label="Ouvir: Those are old cables."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 2</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Those are</strong> old cables.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Aqueles são cabos velhos.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Is this an antenna?" aria-label="Ouvir: Is this an antenna?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 3</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Is this <strong class="text-emerald-600">an</strong> antenna?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Isto é uma antena?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The wrenches are here." aria-label="Ouvir: The wrenches are here."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 4</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The wrench<strong class="text-emerald-600">es</strong> are here.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">As chaves inglesas estão aqui.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" id="gs-ant" class="flex-shrink-0 inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-navy font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Anterior</button>
+      <button type="button" id="gs-prox" class="flex-1 inline-flex items-center justify-center gap-1 bg-navy hover:opacity-90 text-white font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">Próximo →</button>
     </div>
   </div>
-  <button onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Entendi a gramática! (+20 XP)
+  <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+    Veja os 6 slides para ganhar +20 XP
   </button>
   <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+<script src="gramatica-slides.js?v=gs1"></script>
 </div>
 
 <!-- CONVERSATION -->
@@ -369,7 +634,7 @@ const ROTA=[
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
-  {id:'grammar',     rotulo:'📐 Grammar'},
+  {id:'grammar',     rotulo:'🧩 Patterns'},
   {id:'conversation',rotulo:'🗨️ Conversation'},
   {id:'practice',    rotulo:'✏️ Practice'},
   {id:'speak',       rotulo:'🗣️ Speak'},
