@@ -27,6 +27,72 @@ node --test tests/frances-sem-pronuncia.test.js
 grep -rEc '\[[^]]*[A-ZÉ]{2,}[^]]*\]' data/lessons/20[1-9].json data/lessons/21[0-2].json   # só serve de olho; o teste é o juiz
 ```
 
+
+---
+
+## 2026-10-19 — `aulas-contexto.json` "desatualizado" só com a máquina carregada
+
+**Sintoma:** com a CPU cheia, o teste `o api/aulas-contexto.json esta em dia com
+as paginas das aulas` (`tests/aula-contexto.test.js`) falhou uma vez com
+"rode `npm run aulas:contexto`", sem ninguém ter mexido em aula nenhuma.
+
+**Causa raiz:** `scripts/gera-contexto-aulas.js` avalia cada array das páginas
+com `vm.runInNewContext(..., { timeout: 200 })` e um `catch { continue; }` que
+engolia **qualquer** erro. Estourar o tempo era tratado igual a "o array
+referencia outra coisa, não é conteúdo": o array sumia em silêncio e o
+catálogo gerado saía menor que o commitado. Com 200ms e a máquina ocupada, os
+arrays grandes estouravam.
+
+**Correção:** timeout de 5s (só protege de laço infinito) e estouro vira
+**erro**, nunca saída menor.
+
+**Como pegar isso de novo:**
+```bash
+# Com timeout de 1ms a saída muda — prova que tempo influencia o resultado:
+sed 's/timeout: 5000 }/timeout: 1 }/' scripts/gera-contexto-aulas.js > scripts/_t.js && node -e "const g=require('./scripts/_t.js');try{g.gerar();console.log('nao estourou')}catch(e){console.log('erro alto, ok:',e.message)}"; rm scripts/_t.js
+```
+
+**Por que aconteceu:** `catch` genérico em gerador determinístico. Timeout é
+falha de ambiente, não dado; não pode virar "pula este item".
+
+---
+
+## 2026-10-19 — Teste da trilha francesa no CapyMic falhava às vezes com `['en']`
+
+**Sintoma:** o teste `trilha (lessons.html): a trava de 15s leva a fala para a
+correção, no idioma da trilha` (`tests/capy-mic.test.js`) falhava de vez em
+quando na suíte inteira com `expected ['fr'], actual ['en']`. Sozinho, passava
+sempre.
+
+**Causa raiz:** o teste abria `lessons.html` (lição 1, inglês), esperava só o
+`window.CapyMic` existir e então escrevia `CUR_TTS_LANG = 'fr-FR'` na mão. Mas a
+página ainda estava iniciando: o `DOMContentLoaded` da `lessons.html` é
+`async`, espera `carregarIndice()` e `garantirLicao(1)` (dois `fetch`) e só
+então chama `loadLesson(1)`, que **sobrescreve** `CUR_TTS_LANG = 'en-US'`. O
+evento `load` não espera esses `fetch`. Com a máquina folgada, o init acabava
+antes do teste escrever `fr-FR`; com a suíte inteira rodando, o init terminava
+**depois**, entre o `fr-FR` do teste e a trava de 15s, e o `toggleMic` lia `en`.
+Não era vazamento de estado: cada teste tem navegador e contexto próprios.
+
+**Correção:** o teste abre a trilha francesa de verdade
+(`lessons.html?lesson=201`) e espera a condição real,
+`currentLesson.id === 201 && CUR_TTS_LANG === 'fr-FR'`, antes de tocar no
+microfone. Sem `sleep`, e o teste agora cobre também o caminho
+lição → idioma do `loadLesson`, que antes era pulado.
+
+**Como pegar isso de novo:**
+```bash
+# Teste de página que mexe em global sem esperar o init async acabar:
+grep -nE "^\s+[A-Z_]{4,} = " tests/*.test.js
+# Prova determinística: segure o init até depois do ajuste manual, ex. esperar
+# currentLesson antes de page.clock.runFor(15_000) — o teste antigo falha 100%.
+```
+
+**Por que aconteceu:** `waitUntil: 'load'` + "a lib carregou" não quer dizer
+"a página terminou de iniciar". Se a página tem init `async` que escreve no
+mesmo estado que o teste, espere o **resultado** do init (a lição carregada),
+não um sinal vizinho.
+
 ---
 
 ## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
@@ -53,6 +119,35 @@ silencioso ligada. Chromium/Playwright não reproduz a regra de toque do iOS.
 
 **Regra:** som que depende de rede toca num elemento já liberado por toque, nunca
 num `new Audio()` criado depois de um `await`.
+
+---
+
+## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
+
+**Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
+ouvir — CSRF validation failed." Com a página aberta tempo suficiente, **todo POST** falhava: o
+microfone, as rotas de IA e, em silêncio, o `POST /api/db` (XP e progresso, porque o `store.js`
+engole o erro). Recarregar a página resolvia até a próxima hora.
+
+**Causa raiz:** o access token dura cerca de 1 h. A primeira requisição depois disso (por exemplo,
+"Ouvir exemplo", `GET /api/tts`) renova a sessão em `getAuthenticatedSession`, e o
+`setSessionCookies` gerava ali um cookie `__Host-capy-csrf` **novo**. A aba tinha lido o token uma
+vez só, ao abrir (`Auth.ready()` → `/api/auth/session` → `sessionStorage.capyCsrf`), e o
+`auth-secure.js` continuou mandando o antigo. Cookie novo e cabeçalho velho: `assertCsrf` → 403.
+
+**Correção:** na renovação silenciosa, `setSessionCookies(res, sessao, { keepCsrf })` regrava o
+**mesmo** token que o navegador já tem. Login, cadastro, MFA e link de e-mail continuam gerando um
+token novo: eles devolvem o token à página ou recarregam a página.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="silent session refresh" tests/security.test.js
+```
+
+**Por que aconteceu:** a correção antiga "CSRF renovado acompanha os novos cookies" (entrada de
+setembro sobre a tela de entrada) só entregava o token novo ao `/api/auth/session`, que a página
+chama uma vez. Qualquer outra rota renovava a sessão e trocava o cookie sem a página saber. Quem
+mexer na renovação de sessão tem que testar uma página que **continua aberta** depois dela.
 
 ---
 
