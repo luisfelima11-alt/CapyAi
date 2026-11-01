@@ -67,6 +67,21 @@ acompanhar a aula. A aula só está pronta quando a folha existe.
 - `assets/**/*.pdf` tem que estar nos builds do `vercel.json`. Fora da lista, o PDF dá 404 sem
   nenhum erro.
 
+## Botão "Tela cheia" para dar aula (pedido do Luis, 01/nov/2026)
+
+Só nas aulas do **GPS Tronic** e do **Agro English**:
+`<script src="tela-cheia.js?v=tc1"></script>`, logo antes do script da folha.
+
+- O botão coloca a página inteira em tela cheia, para projetar a aula. Ele não aumenta o texto.
+- Para sair, o mesmo botão ou o Esc.
+- Ele é flutuante, no canto inferior esquerdo.
+- Não aparece onde não há API de tela cheia (iPhone).
+- Os geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`) usam `gpstronic_aula_09.html`
+  como molde, e o molde já tem a tag. Por isso aula nova desses cursos nasce com o botão.
+- `tests/tela-cheia.test.js` garante:
+  - a tag uma vez em cada aula desses dois cursos;
+  - nenhuma outra página com o botão.
+
 ## Proibido: "gramática" e "grammar" (regra do Luis, 12/out/2026)
 
 O foco do site não é gramática, é **aprender com exemplos**. Por isso, as palavras
