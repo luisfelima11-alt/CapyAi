@@ -9,7 +9,6 @@
     const $ = id => document.getElementById(id);
     const TZ = 'America/Sao_Paulo';
     const TOTAL_AULAS = 44;
-    const AULAS_GRATIS = 5;   // o mesmo FREE_LESSON_LIMIT do classes.html
     const estado = () => (window.Store && Store.state) || {};
     const hojeBR = () => (window.capyHojeBR ? capyHojeBR() : new Date().toLocaleDateString('en-CA', { timeZone: TZ }));
     const ler = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -67,8 +66,8 @@
         },
     };
 
-    // A última aula aberta no classes.html (capyUltimaAula). Aula paga para quem
-    // é grátis volta para o classes.html, que mostra o paywall.
+    // A última aula aberta no classes.html (capyUltimaAula). Todas as aulas são
+    // grátis desde 01/nov/2026: o card leva direto à aula em qualquer plano.
     function cursoAtual(registro, plano) {
         const r = registro || {};
         const n = Number(r.n);
@@ -77,12 +76,11 @@
         if (!ok) {
             return { sub: 'Comece o curso de inglês', titulo: 'Aula 1 — To Have, Want, Need & Like', pct: 0, href: 'classes.html' };
         }
-        const pago = plano === 'pro' || plano === 'super';
         return {
             sub: `Continuar o curso de inglês · Aula ${n} de ${TOTAL_AULAS}`,
             titulo: `Aula ${n} — ${r.title.slice(0, 80)}`,
             pct: Math.round((n / TOTAL_AULAS) * 100),
-            href: n > AULAS_GRATIS && !pago ? 'classes.html' : r.href,
+            href: r.href,
         };
     }
 

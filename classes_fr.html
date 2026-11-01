@@ -237,12 +237,11 @@ document.getElementById('progress-label').textContent = `${doneCount} de ${total
 
 const grid = document.getElementById('lessons-grid');
 
-// Plan gating: ALL French lessons require Pro or Super (it's a Pro-tier perk).
-function isPro() { return typeof Store !== 'undefined' && (Store.state?.planType === 'pro' || Store.state?.planType === 'super'); }
+// Todas as aulas de todos os cursos sao gratis (decisao do Luis, 01/nov/2026).
 
 LESSONS.forEach((l, i) => {
   const isDone = completed.includes(l.n) || (typeof Store !== 'undefined' && Store.isLessonDone && Store.isLessonDone(200 + l.n, 'fr'));
-  const locked = !isPro();
+  const locked = false;
   const card = document.createElement('div');
   card.className = `card-in lesson-card rounded-2xl border-2 overflow-hidden cursor-pointer ${locked ? 'border-amber-200 bg-amber-50/40' : isDone ? 'border-emerald-300 bg-emerald-50/30' : 'available-card border-blue-200'}`;
   card.style.animationDelay = `${i * 0.05}s`;
