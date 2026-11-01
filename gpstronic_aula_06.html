@@ -94,7 +94,7 @@
       <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📚 Vocab</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="verbs">🔧 Verbs</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💬 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="conversation">🗨️ Conversation</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">✏️ Practice</button>
@@ -140,58 +140,333 @@
 
 <!-- GRAMMAR TAB -->
 <div id="tab-grammar" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">Grammar: at / on / in com tempo</h2>
-  <p class="text-slate-500 text-sm mb-6">Um único ponto: a preposição certa pra hora, dia e mês. É o erro nº 1 quando se marca horário em inglês.</p>
-  <div class="space-y-4">
-
-    <div class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g1')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><div><div class="font-black text-navy">at (hora) · on (dia) · in (mês)</div><div class="text-emerald-700 text-sm font-semibold">"at 9 a.m., on Monday, in March"</div></div></div>
-        <span class="material-symbols-outlined text-emerald-400 transition-transform" id="g1-arrow">expand_more</span>
-      </button>
-      <div id="g1" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"I can be there <strong class='text-emerald-700'>at</strong> nine o'clock." (hora exata)</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"The visit is <strong class='text-emerald-700'>on</strong> Monday." (dia da semana / data)</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 mt-1.5"></span><span>"We are busy <strong class='text-emerald-700'>in</strong> March." (mês, ano, estação)</span></div>
-        <div class="mt-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs">
-          <strong class="text-emerald-800">💡 Regra:</strong> <strong>at</strong> hora · <strong>on</strong> dia · <strong>in</strong> mês. Truque: do menor (at) pro maior (in).
-        </div>
-      </div></div>
+  <h2 class="text-2xl font-black text-navy mb-1">Marcar a visita com at, on e in</h2>
+  <p class="text-slate-500 text-sm mb-5">6 slides com 28 exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de 6</span>
+      <div class="flex flex-wrap gap-1.5"><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-emerald-500" aria-label="Ir para o slide 1" aria-current="true"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 2" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 3" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 4" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 5" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 6" aria-current="false"></button></div>
     </div>
-
-    <div class="rounded-2xl border-2 border-green-200 bg-green-50 overflow-hidden">
-      <button class="w-full flex items-center justify-between p-5 text-left" onclick="toggleAccordion('g2')">
-        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-green-500 text-white font-black text-sm flex items-center justify-center">2</span><div><div class="font-black text-navy">Marcar e confirmar</div><div class="text-green-600 text-sm font-semibold">"Can we meet on Tuesday morning?"</div></div></div>
-        <span class="material-symbols-outlined text-green-400 transition-transform" id="g2-arrow">expand_more</span>
-      </button>
-      <div id="g2" class="px-5 pb-5 hidden"><div class="bg-white rounded-xl p-4 space-y-2 text-sm">
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>Can we meet</strong> on Tuesday morning?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>Does</strong> Thursday <strong class='text-green-700'>work</strong> for you?"</span></div>
-        <div class="flex gap-2"><span class="w-2 h-2 rounded-full bg-green-400 flex-shrink-0 mt-1.5"></span><span>"<strong class='text-green-700'>I'll be there</strong> at two in the afternoon."</span></div>
-        <div class="mt-3 p-3 bg-green-50 rounded-xl border border-green-200 text-xs">
-          <strong class="text-green-800">⚡ Dica:</strong> Pergunte com "Can we…?" ou "Does … work for you?" e confirme repetindo o dia e a hora.
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="0" aria-label="Slide 1 de 6">
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Nesta aula</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Marcar a visita com at, on e in</h3>
         </div>
-      </div></div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 1 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-0.webp?v=df0f9c5e9e" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ol class="gs-lista space-y-2">
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">1</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">at</strong> nine · <strong class="text-emerald-600">at</strong> half past ten</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">2</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">on</strong> Monday · <strong class="text-emerald-600">on</strong> Tuesday morning</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">3</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">in</strong> March · <strong class="text-emerald-600">in</strong> the morning</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span><span class="gs-en font-black text-navy"><strong class="text-emerald-600">Can we meet</strong> …? · <strong class="text-emerald-600">Does</strong> Tuesday <strong class="text-emerald-600">work</strong> for you?</span></li>
+          </ol>
+          <p class="gs-nota mt-4 text-slate-500 text-sm">28 exemplos. Ouça cada frase e repare na parte em destaque.</p>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="1" aria-label="Slide 2 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 1 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">at</strong> nine · <strong class="text-emerald-300">at</strong> half past ten</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 2 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-1.webp?v=67a9c09bb4" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I can be there at nine o'clock." aria-label="Ouvir: I can be there at nine o'clock."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I can be there <strong class="text-emerald-600">at</strong> nine o'clock.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Posso estar aí às nove em ponto.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The appointment is at half past ten." aria-label="Ouvir: The appointment is at half past ten."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The appointment is <strong class="text-emerald-600">at</strong> half past ten.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O horário marcado é às dez e meia.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I'll be there at two in the afternoon." aria-label="Ouvir: I'll be there at two in the afternoon."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I'll be there <strong class="text-emerald-600">at</strong> two in the afternoon.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vou estar aí às duas da tarde.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We're busy until three, but we're free at four." aria-label="Ouvir: We're busy until three, but we're free at four."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">We're busy until three, but we're free <strong class="text-emerald-600">at</strong> four.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Estamos ocupados até as três, mas livres às quatro.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The farm is far, so I'll leave at seven." aria-label="Ouvir: The farm is far, so I'll leave at seven."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The farm is far, so I'll leave <strong class="text-emerald-600">at</strong> seven.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A fazenda é longe, então vou sair às sete.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Let's meet at half past two, then." aria-label="Ouvir: Let's meet at half past two, then."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Let's meet <strong class="text-emerald-600">at</strong> half past two, then.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Então vamos nos encontrar às duas e meia.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="2" aria-label="Slide 3 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 2 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">on</strong> Monday · <strong class="text-emerald-300">on</strong> Tuesday morning</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 3 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-2.webp?v=93cf8f99d2" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Are you free on Monday?" aria-label="Ouvir: Are you free on Monday?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Are you free <strong class="text-emerald-600">on</strong> Monday?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você está livre na segunda?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The customer is busy all day on Monday." aria-label="Ouvir: The customer is busy all day on Monday."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The customer is busy all day <strong class="text-emerald-600">on</strong> Monday.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O cliente está ocupado o dia todo na segunda.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Can we meet on Tuesday morning?" aria-label="Ouvir: Can we meet on Tuesday morning?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Can we meet <strong class="text-emerald-600">on</strong> Tuesday morning?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Podemos nos encontrar na terça de manhã?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="My schedule is full on Wednesday." aria-label="Ouvir: My schedule is full on Wednesday."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">My schedule is full <strong class="text-emerald-600">on</strong> Wednesday.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Minha agenda está cheia na quarta.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="See you on Thursday afternoon!" aria-label="Ouvir: See you on Thursday afternoon!"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">See you <strong class="text-emerald-600">on</strong> Thursday afternoon!</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Até quinta à tarde!</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The next visit is on June tenth." aria-label="Ouvir: The next visit is on June tenth."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The next visit is <strong class="text-emerald-600">on</strong> June tenth.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A próxima visita é no dia 10 de junho.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="3" aria-label="Slide 4 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 3 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">in</strong> March · <strong class="text-emerald-300">in</strong> the morning</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 4 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-3.webp?v=43bbd24700" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We are very busy in March." aria-label="Ouvir: We are very busy in March."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">We are very busy <strong class="text-emerald-600">in</strong> March.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Estamos muito ocupados em março.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I can come in the morning." aria-label="Ouvir: I can come in the morning."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I can come <strong class="text-emerald-600">in</strong> the morning.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Posso ir aí de manhã.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Is the visit in the morning or in the afternoon?" aria-label="Ouvir: Is the visit in the morning or in the afternoon?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Is the visit <strong class="text-emerald-600">in</strong> the morning or <strong class="text-emerald-600">in</strong> the afternoon?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A visita é de manhã ou à tarde?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="We have a lot of visits in October." aria-label="Ouvir: We have a lot of visits in October."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">We have a lot of visits <strong class="text-emerald-600">in</strong> October.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A gente tem muitas visitas em outubro.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="I'll confirm by message in the evening." aria-label="Ouvir: I'll confirm by message in the evening."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I'll confirm by message <strong class="text-emerald-600">in</strong> the evening.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Vou confirmar por mensagem à noite.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="In the rainy season, the farm roads are bad." aria-label="Ouvir: In the rainy season, the farm roads are bad."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">In</strong> the rainy season, the farm roads are bad.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Na época das chuvas, as estradas das fazendas ficam ruins.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="4" aria-label="Slide 5 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Padrão 4 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug"><strong class="text-emerald-300">Can we meet</strong> …? · <strong class="text-emerald-300">Does</strong> Tuesday <strong class="text-emerald-300">work</strong> for you?</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 5 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-4.webp?v=93e0049971" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does Thursday work for you?" aria-label="Ouvir: Does Thursday work for you?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> Thursday <strong class="text-emerald-600">work</strong> for you?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Quinta funciona pra você?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Monday is difficult. Can we meet on Wednesday?" aria-label="Ouvir: Monday is difficult. Can we meet on Wednesday?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Monday is difficult. <strong class="text-emerald-600">Can we meet</strong> on Wednesday?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Segunda é difícil. Podemos nos encontrar na quarta?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does nine o'clock work for you?" aria-label="Ouvir: Does nine o'clock work for you?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> nine o'clock <strong class="text-emerald-600">work</strong> for you?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Às nove funciona pra você?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Can we meet after lunch?" aria-label="Ouvir: Can we meet after lunch?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Can we meet</strong> after lunch?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Podemos nos encontrar depois do almoço?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does the afternoon work better for you?" aria-label="Ouvir: Does the afternoon work better for you?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> the afternoon <strong class="text-emerald-600">work</strong> better for you?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A tarde funciona melhor pra você?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Eight is too early. Can we meet at half past nine?" aria-label="Ouvir: Eight is too early. Can we meet at half past nine?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">Eight is too early. <strong class="text-emerald-600">Can we meet</strong> at half past nine?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Oito é muito cedo. Podemos nos encontrar às nove e meia?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-emerald-100 overflow-hidden cursor-zoom-in" data-i="5" aria-label="Slide 6 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-emerald-300">Revisão</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Uma frase nova de cada padrão</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 6 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-emerald-50 sm:col-span-2" src="assets/img/gramatica/gps06-5.webp?v=7d99dc7763" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="My last appointment today is at five." aria-label="Ouvir: My last appointment today is at five."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 1</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">My last appointment today is <strong class="text-emerald-600">at</strong> five.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Meu último compromisso hoje é às cinco.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The customer cancelled, so the visit is on Friday now." aria-label="Ouvir: The customer cancelled, so the visit is on Friday now."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 2</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The customer cancelled, so the visit is <strong class="text-emerald-600">on</strong> Friday now.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O cliente cancelou, então agora a visita é na sexta.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="The new monitors arrive in May." aria-label="Ouvir: The new monitors arrive in May."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 3</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">The new monitors arrive <strong class="text-emerald-600">in</strong> May.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Os monitores novos chegam em maio.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700 flex items-center justify-center transition-all active:scale-95" data-say="Does half past ten work for you?" aria-label="Ouvir: Does half past ten work for you?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100 rounded-full px-2 py-0.5">Padrão 4</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-emerald-600">Does</strong> half past ten <strong class="text-emerald-600">work</strong> for you?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Dez e meia funciona pra você?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" id="gs-ant" class="flex-shrink-0 inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-navy font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Anterior</button>
+      <button type="button" id="gs-prox" class="flex-1 inline-flex items-center justify-center gap-1 bg-navy hover:opacity-90 text-white font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">Próximo →</button>
     </div>
-
   </div>
-  <button onclick="markSectionBtn(this,'grammar')" class="mt-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Estudei a gramática! (+20 XP)
+  <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+    Veja os 6 slides para ganhar +20 XP
   </button>
+<script src="gramatica-slides.js?v=gs1"></script>
 </div>
 
 <!-- DIALOGUE TAB -->
 <div id="tab-dialogue" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">🎭 Explaining the Repair</h2>
-  <p class="text-slate-500 text-sm mb-5">🔧 O cliente volta pra buscar o GPS e Yara explica o que estava quebrado, o que foi trocado e o prazo.</p>
+  <h2 class="text-2xl font-black text-navy mb-2">🎭 Booking the Visit</h2>
+  <p class="text-slate-500 text-sm mb-5">📅 O cliente precisa de uma visita técnica, e Yara combina com ele o dia e a hora.</p>
   <div class="space-y-3 mb-6" id="dialogue-lines"></div>
   <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4">
     <p class="font-black text-emerald-800 text-sm mb-2">🎯 Encontre no diálogo:</p>
     <div class="grid grid-cols-2 gap-2 text-xs">
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>It was broken.</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>I replaced / tested</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>going to be ready</strong></div>
-      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>warranty / invoice</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>Are you free…?</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>Does Tuesday work?</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>at half past ten</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-emerald-200">✅ <strong>on Tuesday</strong></div>
     </div>
   </div>
   <button onclick="markSectionBtn(this,'dialogue')" class="mt-4 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
@@ -285,7 +560,7 @@
       <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
       <div><p class="font-black text-navy text-sm">Write a short message (4–6 lines) booking a visit with a customer.</p><p class="text-slate-500 text-xs">Use at / on / in, "Are you free…?" and "I can be there at…".</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="The antenna cable was broken.&#10;I replaced the cable and I tested the signal.&#10;This is covered by warranty.&#10;It's going to be ready on Friday."></textarea>
+    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Hi! This is Yara from GPS Tronic.&#10;Are you free on Thursday?&#10;I can be there at ten in the morning.&#10;I will confirm by message."></textarea>
     <button onclick="submitHomeworkGps6()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
