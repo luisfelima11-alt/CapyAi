@@ -186,10 +186,10 @@ tailwind.config = {
           <p class="font-label font-bold text-slate-800 dark:text-white text-sm">Traduzir palavras para</p>
           <p class="font-body text-slate-500 dark:text-slate-400 text-xs mt-0.5">Idioma que aparece no botão de tradução dos flashcards</p>
         </div>
-        <select id="lang-select"
+        <select id="lang-select" onchange="setLang(this.value)"
                 class="bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-label font-bold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 flex-shrink-0">
-          <option value="Spanish">🇪🇸 Spanish</option>
           <option value="Portuguese">🇧🇷 Portuguese</option>
+          <option value="Spanish">🇪🇸 Spanish</option>
           <option value="French">🇫🇷 French</option>
           <option value="Italian">🇮🇹 Italian</option>
           <option value="German">🇩🇪 German</option>
@@ -358,11 +358,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   applyToggle(document.getElementById('dark-toggle'), settings.darkMode === true);
 
   // Difficulty
-  setDiff(settings.difficulty || 'medium');
+  setDiff(settings.difficulty || 'medium', false);
 
   // Language
   const langSel = document.getElementById('lang-select');
-  langSel.value = settings.translateLang || 'Spanish';
+  langSel.value = settings.translateLang || 'Portuguese';
 
   // Account
   loadAccountInfo();
@@ -400,15 +400,31 @@ function renderSkinPreview() {
   document.getElementById('skin-name').textContent = CapySkins.get(selectedAvatar).name;
 }
 
+// ── Persistence ───────────────────────────────────────────────────────────────
+// Every setting is written the moment it changes. Before, only dark mode was:
+// the language and the sound toggles waited for the skin's "Salvar" button, so
+// whoever changed them and left found them back at the default (18/out).
+function salvarConfig(avisar = true) {
+  try { localStorage.setItem('capySettings', JSON.stringify(settings)); } catch (e) { return; }
+  if (!avisar) return;
+  const toast = document.getElementById('save-toast');
+  if (!toast) return;
+  toast.style.opacity = '1';
+  clearTimeout(salvarConfig._t);
+  salvarConfig._t = setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+}
+
+function setLang(value) {
+  settings.translateLang = value;
+  salvarConfig();
+}
+
 // ── Toggles ───────────────────────────────────────────────────────────────────
 function toggle(el, key) {
   const isOn = el.classList.toggle('on');
   settings[key] = isOn;
-  // Apply dark mode immediately when toggled
-  if (key === 'darkMode') {
-    localStorage.setItem('capySettings', JSON.stringify(settings));
-    Components.applyDarkMode();
-  }
+  salvarConfig();
+  if (key === 'darkMode') Components.applyDarkMode();
 }
 
 function applyToggle(el, state) {
@@ -417,8 +433,9 @@ function applyToggle(el, state) {
 }
 
 // ── Difficulty ────────────────────────────────────────────────────────────────
-function setDiff(level) {
+function setDiff(level, salvar = true) {
   settings.difficulty = level;
+  if (salvar) salvarConfig();
   document.querySelectorAll('.diff-btn').forEach(btn => {
     const isActive = btn.dataset.diff === level;
     btn.className = `diff-btn py-3 rounded-xl font-label font-bold text-sm border-2 transition-all active:scale-95 ${
@@ -437,6 +454,9 @@ async function saveAll() {
   button.disabled = true;
   button.textContent = 'Salvando…';
   status.dataset.error = 'false';
+  // The other settings are saved first: a failed skin save must not drop them.
+  settings.translateLang = document.getElementById('lang-select').value;
+  salvarConfig(false);
   try {
     await Auth.saveAvatar(selectedAvatar);
   } catch (error) {
