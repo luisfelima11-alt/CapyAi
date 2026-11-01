@@ -1,3 +1,6 @@
+-- Substituída por 202611010002_ranking_primeiro_nome.sql (o ranking público mostra só o primeiro nome).
+-- Esta versão nunca rodou na produção; não rode esta sozinha depois daquela.
+
 begin;
 
 create or replace function public.public_leaderboard(p_limit integer default 20)
