@@ -1,16 +1,22 @@
--- Lição de casa que chega ao professor (18/out/2026).
+-- Lição de casa que chega ao professor (01/nov/2026).
 --
--- A tabela homework_submissions nunca foi criada em produção: as migrações
--- anteriores só ajustavam permissões nela (a 202607190005 falha inteira por
--- isso). O POST /api/homework devolvia 502 e o painel teacher_homework.html
--- abria com erro. Esta migração cria a tabela com o mesmo desenho das outras:
+-- A tabela homework_submissions nunca foi criada em produção. Com isso:
+--   - o POST /api/homework (aula 32, via lesson-engine.js) responde 502;
+--   - o teacher_homework.html abre com erro;
+--   - a coluna de lição de casa do painel do professor (professor.html) fica vazia.
 --
--- - o aluno grava e lê só as entregas dele (RLS por current_account_id());
--- - o servidor lê tudo com a chave secreta, para o painel do professor;
+-- Mesmo desenho do PR #9 (202610180001_licao_de_casa.sql, nunca aplicado), com uma
+-- diferença: as regras usam private.current_account_id(). Desde a 202611010001 a
+-- public.current_account_id() não pode mais ser executada por usuário logado, então
+-- a versão do #9 faria todo envio falhar com erro de permissão. Por isso este arquivo
+-- vem DEPOIS da 202611010001 e substitui a 202610180001 do #9.
+--
+-- - o aluno grava e lê só as entregas dele (RLS, com o token dele via sbUser);
+-- - o servidor lê tudo com a chave secreta (painéis do professor);
 -- - visitante sem login não tem acesso nenhum;
--- - tamanho e XP limitados no próprio banco, além da API.
+-- - tamanho, formato do id da aula e XP limitados no próprio banco, além da API.
 --
--- Roda no SQL Editor ANTES do código que a usa. Pode rodar de novo sem efeito.
+-- Pode rodar de novo sem efeito.
 
 begin;
 
@@ -42,11 +48,11 @@ drop policy if exists homework_select_own on public.homework_submissions;
 drop policy if exists homework_insert_own on public.homework_submissions;
 
 create policy homework_select_own on public.homework_submissions for select to authenticated
-  using (user_id = public.current_account_id());
+  using (user_id = private.current_account_id());
 
 create policy homework_insert_own on public.homework_submissions for insert to authenticated
   with check (
-    user_id = public.current_account_id()
+    user_id = private.current_account_id()
     and xp_earned between 0 and 500
     and lesson_id ~ '^[a-z0-9_-]{1,64}$'
     and length(lesson_title) <= 160

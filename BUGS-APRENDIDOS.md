@@ -1,5 +1,243 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-19 — Curso de francês: pronúncia escrita em todo canto e voz do navegador
+
+**Sintoma:** as aulas de francês mostravam a pronúncia entre colchetes ("Bonjour [bon-JUR]") e a voz
+variava de aparelho para aparelho (e ficava muda no iPhone com a chave de silencioso).
+
+**Causa raiz:** a pronúncia estava em **cinco lugares** ao mesmo tempo: o campo `phon` (vocabulário e Speak),
+colchetes dentro de textos (verbos, expressões, quizzes, padrões), uma coluna inteira da tabela de horas da
+trilha, o texto fixo dos padrões e as folhas em PDF. A voz vinha do `tts-fr.js`, que usava a voz do navegador.
+Quizzes de "como se pronuncia?" tinham a pronúncia escrita como alternativa.
+
+**Correção:** `scripts/fr-sem-pronuncia.mjs` roda nos dois geradores e a geração falha se sobrar colchete.
+O `tts-fr.js` usa a voz da OpenAI (`lang=fr`) e pula o que está entre parênteses.
+
+**Armadilhas que me pegaram ao limpar (ficam aqui para a próxima vez):**
+- Tirar colchete de texto **sem olhar a estrutura**: `WO1_DATA[si]` virou `WO1_DATA` e quebrou o JavaScript.
+  O limpador só mexe em dados e em texto fixo, nunca em código.
+- Limpar a resposta certa (`a`) e **esquecer as alternativas** (`opts`, uma lista de textos): o quiz ficava sem
+  resposta certa. `confere()` valida resposta dentro das alternativas e alternativa vazia.
+- Arrumar a pontuação junto: em francês o espaço antes de `?` e `!` é o correto, e não pode sumir.
+- A trilha lê `data/lessons/<id>.json`, e não o `lessons_fr_data.js`: sem rodar `build-lesson-data.js` nada muda.
+
+**Como pegar isso de novo:**
+```bash
+node --test tests/frances-sem-pronuncia.test.js
+grep -rEc '\[[^]]*[A-ZÉ]{2,}[^]]*\]' data/lessons/20[1-9].json data/lessons/21[0-2].json   # só serve de olho; o teste é o juiz
+```
+
+
+---
+
+## 2026-10-19 — `aulas-contexto.json` "desatualizado" só com a máquina carregada
+
+**Sintoma:** com a CPU cheia, o teste `o api/aulas-contexto.json esta em dia com
+as paginas das aulas` (`tests/aula-contexto.test.js`) falhou uma vez com
+"rode `npm run aulas:contexto`", sem ninguém ter mexido em aula nenhuma.
+
+**Causa raiz:** `scripts/gera-contexto-aulas.js` avalia cada array das páginas
+com `vm.runInNewContext(..., { timeout: 200 })` e um `catch { continue; }` que
+engolia **qualquer** erro. Estourar o tempo era tratado igual a "o array
+referencia outra coisa, não é conteúdo": o array sumia em silêncio e o
+catálogo gerado saía menor que o commitado. Com 200ms e a máquina ocupada, os
+arrays grandes estouravam.
+
+**Correção:** timeout de 5s (só protege de laço infinito) e estouro vira
+**erro**, nunca saída menor.
+
+**Como pegar isso de novo:**
+```bash
+# Com timeout de 1ms a saída muda — prova que tempo influencia o resultado:
+sed 's/timeout: 5000 }/timeout: 1 }/' scripts/gera-contexto-aulas.js > scripts/_t.js && node -e "const g=require('./scripts/_t.js');try{g.gerar();console.log('nao estourou')}catch(e){console.log('erro alto, ok:',e.message)}"; rm scripts/_t.js
+```
+
+**Por que aconteceu:** `catch` genérico em gerador determinístico. Timeout é
+falha de ambiente, não dado; não pode virar "pula este item".
+
+---
+
+## 2026-10-19 — Teste da trilha francesa no CapyMic falhava às vezes com `['en']`
+
+**Sintoma:** o teste `trilha (lessons.html): a trava de 15s leva a fala para a
+correção, no idioma da trilha` (`tests/capy-mic.test.js`) falhava de vez em
+quando na suíte inteira com `expected ['fr'], actual ['en']`. Sozinho, passava
+sempre.
+
+**Causa raiz:** o teste abria `lessons.html` (lição 1, inglês), esperava só o
+`window.CapyMic` existir e então escrevia `CUR_TTS_LANG = 'fr-FR'` na mão. Mas a
+página ainda estava iniciando: o `DOMContentLoaded` da `lessons.html` é
+`async`, espera `carregarIndice()` e `garantirLicao(1)` (dois `fetch`) e só
+então chama `loadLesson(1)`, que **sobrescreve** `CUR_TTS_LANG = 'en-US'`. O
+evento `load` não espera esses `fetch`. Com a máquina folgada, o init acabava
+antes do teste escrever `fr-FR`; com a suíte inteira rodando, o init terminava
+**depois**, entre o `fr-FR` do teste e a trava de 15s, e o `toggleMic` lia `en`.
+Não era vazamento de estado: cada teste tem navegador e contexto próprios.
+
+**Correção:** o teste abre a trilha francesa de verdade
+(`lessons.html?lesson=201`) e espera a condição real,
+`currentLesson.id === 201 && CUR_TTS_LANG === 'fr-FR'`, antes de tocar no
+microfone. Sem `sleep`, e o teste agora cobre também o caminho
+lição → idioma do `loadLesson`, que antes era pulado.
+
+**Como pegar isso de novo:**
+```bash
+# Teste de página que mexe em global sem esperar o init async acabar:
+grep -nE "^\s+[A-Z_]{4,} = " tests/*.test.js
+# Prova determinística: segure o init até depois do ajuste manual, ex. esperar
+# currentLesson antes de page.clock.runFor(15_000) — o teste antigo falha 100%.
+```
+
+**Por que aconteceu:** `waitUntil: 'load'` + "a lib carregou" não quer dizer
+"a página terminou de iniciar". Se a página tem init `async` que escreve no
+mesmo estado que o teste, espere o **resultado** do init (a lição carregada),
+não um sinal vizinho.
+
+---
+
+## 2026-10-18 — "Traduzir palavras para" sempre voltava para Spanish
+
+**Sintoma:** em Configurações, o Luis escolhia o idioma da tradução dos flashcards,
+saía da página e, ao voltar, estava 🇪🇸 Spanish de novo. Em todos os usuários.
+
+**Causa raiz:** o `<select id="lang-select">` da `settings.html` não tinha `onchange`.
+O idioma só era gravado dentro de `saveAll()`, que é o botão "Salvar" **da skin**, e
+esse botão ainda saía mais cedo se o `Auth.saveAvatar()` falhasse. O padrão era
+`'Spanish'` (na `settings.html` e no `translateWord()` do flashcard), então todo
+aparelho novo começava em espanhol. O mesmo valia para "Efeitos sonoros", "Leitura
+em voz alta", "Recursos de IA" e a dificuldade: só o modo escuro gravava na hora.
+
+**Correção:** `salvarConfig()` grava o `capySettings` no momento da troca (idioma,
+interruptores e dificuldade) e mostra "✅ Ajustes salvos!". O padrão virou
+`'Portuguese'`, que é a primeira opção da lista. O `saveAll()` grava as configurações
+antes da skin.
+
+**Como pegar isso de novo:**
+```bash
+grep -n 'onchange="setLang' settings.html          # o seletor grava na troca
+grep -n "translateLang || 'Spanish'" *.html         # tem que voltar vazio
+```
+
+**Regra:** toda configuração grava na hora em que muda. Um botão "Salvar" de outra
+seção não pode ser o único caminho para gravar nada.
+
+**Fica para depois:** as configurações vivem só no `localStorage`. O
+`GET /api/db?type=settings` devolve `null` em produção, então elas não acompanham a
+conta entre aparelhos.
+
+---
+
+## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
+
+**Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
+No computador e no tablet saía voz (a robótica do navegador, não a Nova).
+
+**Causa raiz (duas camadas):**
+1. O mesmo 403 `invalid_origin` de 28/09: a correção estava no PR do hotfix, mas
+   nunca chegou à produção. Toda voz Nova falhava para quem tinha cookie.
+2. A voz reserva (`speechSynthesis`) e o `CapyTTS` tocavam **depois** de esperar
+   a rede, fora do toque. O iOS Safari só deixa tocar som que começa dentro de um
+   toque, e silencia a voz do navegador com a chave de silencioso ligada. Por isso
+   o iPhone ficava mudo e os outros aparelhos não.
+
+**Correção:** além do portão do servidor, `CapyAudio` (`components.js`) libera um
+único elemento de áudio no primeiro toque da página (clipe mudo + fala vazia) e
+todas as vozes passam a usar esse elemento (`tts-en.js`, `CapyTTS`,
+`listening-lab.js`). Antes de tocar, `navigator.audioSession.type = 'playback'`
+faz a voz soar mesmo com a chave de silencioso.
+
+**Como pegar isso de novo:** testar no iPhone de verdade, logado, com a chave de
+silencioso ligada. Chromium/Playwright não reproduz a regra de toque do iOS.
+
+**Regra:** som que depende de rede toca num elemento já liberado por toque, nunca
+num `new Audio()` criado depois de um `await`.
+
+---
+
+## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
+
+**Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
+ouvir — CSRF validation failed." Com a página aberta tempo suficiente, **todo POST** falhava: o
+microfone, as rotas de IA e, em silêncio, o `POST /api/db` (XP e progresso, porque o `store.js`
+engole o erro). Recarregar a página resolvia até a próxima hora.
+
+**Causa raiz:** o access token dura cerca de 1 h. A primeira requisição depois disso (por exemplo,
+"Ouvir exemplo", `GET /api/tts`) renova a sessão em `getAuthenticatedSession`, e o
+`setSessionCookies` gerava ali um cookie `__Host-capy-csrf` **novo**. A aba tinha lido o token uma
+vez só, ao abrir (`Auth.ready()` → `/api/auth/session` → `sessionStorage.capyCsrf`), e o
+`auth-secure.js` continuou mandando o antigo. Cookie novo e cabeçalho velho: `assertCsrf` → 403.
+
+**Correção:** na renovação silenciosa, `setSessionCookies(res, sessao, { keepCsrf })` regrava o
+**mesmo** token que o navegador já tem. Login, cadastro, MFA e link de e-mail continuam gerando um
+token novo: eles devolvem o token à página ou recarregam a página.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="silent session refresh" tests/security.test.js
+```
+
+**Por que aconteceu:** a correção antiga "CSRF renovado acompanha os novos cookies" (entrada de
+setembro sobre a tela de entrada) só entregava o token novo ao `/api/auth/session`, que a página
+chama uma vez. Qualquer outra rota renovava a sessão e trocava o cookie sem a página saber. Quem
+mexer na renovação de sessão tem que testar uma página que **continua aberta** depois dela.
+
+---
+
+## 2026-09-28 — No Preview da Vercel, login e "Entrar como visitante" davam 403
+
+**Sintoma:** no Preview de um PR (`*.vercel.app`), o login e o botão de visitante
+respondiam 403 `invalid_origin`. Nenhum PR podia ser testado logado antes de ir ao ar.
+
+**Causa raiz:** o Preview roda em modo produção (`VERCEL=1`), e o `isAllowedOrigin`
+(`api/security.js`) só aceitava o `APP_ORIGIN`, que é o domínio de produção. A página
+do Preview manda `Origin: https://<preview>.vercel.app`.
+
+**Correcao:** só quando `VERCEL_ENV=preview`, as URLs do próprio deploy (`VERCEL_URL`
+e `VERCEL_BRANCH_URL`) também contam como origem do site (`PREVIEW_ORIGINS`). A
+produção continua aceitando só o `APP_ORIGIN`. No Preview, entre com senha: o link
+mágico e os e-mails levam ao `APP_ORIGIN`.
+
+**Como pegar isso de novo:**
+```bash
+npm run test:security   # "a Vercel Preview accepts sign-in from its own URLs…"
+```
+
+---
+
+## 2026-09-28 — Logado, o Music Lab dizia "Nenhuma música encontrada" para tudo
+
+**Sintoma:** o Luis entrou com a conta dele e nenhuma busca achava música. O
+mesmo defeito, sem ninguém notar: o Desafio Diário caía em erro, e a voz Nova
+(TTS) virava a voz robótica do navegador para quem estava logado ou era visitante.
+
+**Causa raiz:** o portão das rotas de IA (`AI_ROUTE_KEYS`, em `api/index.js`)
+chamava `assertCsrf` em TODA rota quando havia cookie de sessão, inclusive nas
+de GET (`/api/lyrics-search`, `/api/lyrics`, `/api/tts`, `/api/daily-challenge`,
+`/api/word-of-day`). O `assertCsrf` começa pelo `assertOrigin`, e em produção
+`isAllowedOrigin('')` é `false`. Só que o navegador **não manda `Origin` num GET
+da mesma origem**, e o `auth-secure.js` só põe o token CSRF em escrita. Resultado:
+403 `invalid_origin` para todo aluno com cookie. Sem cookie (anônimo) funcionava,
+e nos testes também: fora de produção o `Origin` vazio passa.
+
+**Correcao:** escrita continua exigindo CSRF. Leitura (GET/HEAD) com cookie passa
+pelo `Sec-Fetch-Site` que o navegador manda sempre: `same-origin` ou `none` passam,
+outro site leva 403. A página agora separa "o serviço não respondeu" de "nenhuma
+música encontrada", e os proxies de letra ganharam prazo (7 s) e resposta validada.
+
+**Como pegar isso de novo:** teste em modo produção, porque é lá que o `Origin`
+vazio é recusado:
+```bash
+npm run test:security   # "in production, reads from our own pages pass the AI gate…"
+# à mão: NODE_ENV=production node -e "…" chamando uma rota GET de IA com cookie e sem Origin
+```
+
+**Por que aconteceu:** a regra de CSRF foi escrita pensando em escrita, e ninguém
+testou uma rota GET com cookie em modo produção. E a página transformava qualquer
+falha em "Nenhuma música encontrada", o que escondeu o 403 por dias: **mensagem de
+"não existe" só quando a resposta veio vazia de verdade.**
+
+---
+
 ## 2026-09-20 — `\uXXXX` dentro de CSS vira `u00E7` na tela
 
 **Sintoma:** a legenda vazia do palco de voz mostrava

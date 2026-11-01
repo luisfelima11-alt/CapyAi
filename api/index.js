@@ -53,7 +53,7 @@ const AI_ROUTE_KEYS = new Map([
     ['/api/personalize', 'personalize'], ['/api/transcribe', 'transcribe'],
     ['/api/correct-writing', 'chat'], ['/api/study-plan', 'study-plan'], ['/api/music', 'music'],
     ['/api/lyrics-search', 'lyrics-search'], ['/api/lyrics', 'lyrics'], ['/api/tts', 'tts'],
-    ['/api/realtime-token', 'realtime'],
+    ['/api/realtime-token', 'realtime'], ['/api/quadro-ai', 'chat'],
 ]);
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
@@ -128,6 +128,58 @@ const VOZ_MINUTOS_MES = { free: 0, pro: 0, super: 60 };
 // nao so contra aluno. Estourou, ninguem liga ate o dono liberar.
 const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 
+// Ligacao de teste (28/out/2026, decisao do Luis): quem nao e Super liga UMA vez,
+// com 3 minutos gratis. E o que vende o Super, entao so conta conta com e-mail
+// confirmado (senao cada e-mail inventado vira 3 minutos de graca).
+//
+// A marca e uma linha `__vozteste_<aluno>` no user_state, gravada no PRIMEIRO
+// token: o teste vale 3 minutos de relogio a partir dali. Se a ligacao cair ou
+// nao conectar, o aluno religa dentro desses 3 minutos e recebe o que sobrou
+// (no maximo 3 tokens). Depois disso, nunca mais. Na duvida (banco fora), nega:
+// minuto gratis por falha nossa e dinheiro que ninguem pagou.
+const VOZ_TESTE_MIN = 3;
+const VOZ_TESTE_TOKENS = 3;
+
+async function liberarTesteDeVoz(identity, agora = Date.now()) {
+    const alunoId = identity && identity.appUserId;
+    if (!alunoId) return { ok: false, motivo: 'login' };
+    if (!identity.session?.user?.email_confirmed_at) return { ok: false, motivo: 'confirmar_email' };
+    const chave = `__vozteste_${alunoId}`;
+    const iso = new Date(agora).toISOString();
+    let linha = null;
+    try {
+        const criada = await sb('/user_state', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=ignore-duplicates,return=representation' },
+            body: JSON.stringify({ user_id: chave, data: { em: iso, ligacoes: 1 }, updated_at: iso }),
+        });
+        if (Array.isArray(criada) && criada.length) return { ok: true, minutos: VOZ_TESTE_MIN, primeira: true };
+        const lida = await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}&select=data`);
+        linha = Array.isArray(lida) ? lida[0] : null;
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    const inicio = Date.parse(linha?.data?.em || '');
+    const ligacoes = Number(linha?.data?.ligacoes) || 1;
+    const sobra = VOZ_TESTE_MIN - (agora - inicio) / 60000;
+    if (!Number.isFinite(inicio) || sobra < 0.5 || ligacoes >= VOZ_TESTE_TOKENS) return { ok: false, motivo: 'usado' };
+    try {
+        await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}`, {
+            method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ data: { em: linha.data.em, ligacoes: ligacoes + 1 }, updated_at: iso }),
+        });
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    return { ok: true, minutos: Math.round(sobra * 10) / 10, primeira: false };
+}
+
+// Para a home: 'disponivel' (nunca ligou) ou 'usado'. So le; nunca marca.
+async function estadoTesteDeVoz(alunoId) {
+    if (!alunoId) return null;
+    try {
+        const r = await sb(`/user_state?user_id=eq.${encodeURIComponent(`__vozteste_${alunoId}`)}&select=data`);
+        if (!Array.isArray(r)) return null;
+        return r.length ? 'usado' : 'disponivel';
+    } catch (e) { return null; }
+}
+
 const RATE_LIMITS = {
     chat:         { free:  20, pro: 200, super: 500 },  // per day
     music:        { free:   3, pro:  50, super: 150 },
@@ -139,6 +191,8 @@ const RATE_LIMITS = {
     // fazia cada música custar 2 créditos e o aluno ficar sem no 5º uso.
     'lyrics-search': { free: 60, pro: 300, super: 600 },
     tts:          { free: 200, pro:1000, super:2000 },
+    // Entrar/sair de turma: não é IA, só um teto contra abuso de códigos.
+    turma:        { free:  20, pro:  20, super:  20 },
     // Conversa por voz: cada chamada aberta consome contínuo enquanto durar,
     // então este balde conta SESSÕES por dia. O teto de minutos vive no cliente
     // (desliga sozinho) — é o número que o piloto existe para medir.
@@ -164,6 +218,8 @@ const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
     'boss_start', 'boss_win', 'newsline_search',
     'push_card_visto', 'push_sim', 'push_negou', 'push_adiou', 'push_nunca', 'push_ignorou', 'ios_dica_vista',
+    // Home nova: o que o aluno toca nela (contagem por dia, sem dado do aluno).
+    'home_ligar', 'home_super', 'home_chat', 'home_curso', 'home_plano',
 ]);
 
 async function getUserPlan(userId) {
@@ -185,6 +241,25 @@ function privacySafeIpKey(req) {
     return crypto.createHmac('sha256', salt).update(requestIp(req)).digest('hex').slice(0, 32);
 }
 
+// Routes in AI_ROUTE_KEYS that call no AI: the proxies to the lyrics catalogue.
+// A visitor's 3 daily AI uses are for AI. Searching a song and fetching its
+// lyrics have their own limit (the free plan's), so the Music Lab analysis is
+// still reachable after the search (decision of 28/set).
+const ROTAS_SEM_IA = new Set(['lyrics-search', 'lyrics']);
+
+// A read (GET/HEAD) carrying our cookies. Browsers send Sec-Fetch-Site on every
+// request (Chrome 76+, Firefox 90+, Safari 16.4+): only our own pages
+// ("same-origin") or the student typing the URL ("none") may use the cookies,
+// so another site can't spend a student's quota. Without the header (old
+// browser, script) the read goes through: anyone may already call these routes
+// without cookies, under the per-IP limit.
+function assertLeituraDoProprioSite(req) {
+    const site = String(req.headers['sec-fetch-site'] || '').toLowerCase();
+    if (site && site !== 'same-origin' && site !== 'none') {
+        throw new HttpError(403, 'invalid_origin', 'Request origin is not allowed.');
+    }
+}
+
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
@@ -197,11 +272,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         : trusted?.kind === 'guest'
             ? `g:${trusted.guestId}|ip:${privacySafeIpKey(req)}`
             : `ip:${privacySafeIpKey(req)}`;
-    const effectiveKey = isGuest ? 'guest-ai' : key;
+    const guestAi = isGuest && !ROTAS_SEM_IA.has(key);
+    const effectiveKey = guestAi ? 'guest-ai' : key;
     const bucket = `${identityKey}|${effectiveKey}|${today}`;
     const plan = isGuest ? 'free' : await getUserPlan(appUserId);
-    const limit = isGuest ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
-    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
+    const limit = guestAi ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
+    const minuteLimit = guestAi ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
 
     // Prefer the atomic Supabase RPC (consume_rate_limit) when it's available.
     // If the migration for that RPC hasn't been applied yet, fall back to a
@@ -504,6 +580,92 @@ async function isAdminReq(req, res) {
         if (identity?.kind === 'user' && identity.session.user?.app_metadata?.role === 'admin') return true;
     } catch (e) { /* no valid session — fall through to false */ }
     return false;
+}
+
+// ── Painel do professor (19/out/2026) ─────────────────────────────────────────
+// Papel 'teacher' ou 'admin' no app_metadata (só o admin do Supabase muda). MFA só
+// com ADMIN_REQUIRE_MFA=true, como no isAdminReq. O professor vê apenas os alunos
+// que entraram na turma dele pelo link (turma_alunos): o servidor filtra sempre.
+async function requireProfessor(req, res) {
+    const identity = await requireAppUser(req, res);
+    const role = identity.session?.user?.app_metadata?.role || 'student';
+    if (!['teacher', 'admin'].includes(role)) throw new HttpError(403, 'forbidden', 'Insufficient permissions.');
+    const producao = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+    if (process.env.ADMIN_REQUIRE_MFA === 'true' && producao && identity.session?.jwt?.aal !== 'aal2') {
+        throw new HttpError(403, 'mfa_required', 'Multi-factor authentication is required.');
+    }
+    return identity;
+}
+
+const diaBrasil = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+
+// Quanto o aluno avançou entre dois estados salvos: mini-lições novas e XP ganho.
+// Um aparelho atrasado que salva menos não gera número negativo.
+function deltaAtividade(antes, depois) {
+    const a = new Set(Array.isArray(antes?.completedMinis) ? antes.completedMinis.map(String) : []);
+    const novos = Array.isArray(depois?.completedMinis) ? depois.completedMinis.filter(k => !a.has(String(k))).length : 0;
+    const xp = Math.max(0, (Number(depois?.xp) || 0) - (Number(antes?.xp) || 0));
+    return { minis: Math.min(novos, 50), xp: Math.min(xp, 5000) };
+}
+
+// Resumo de um aluno para o painel: só números e datas, nada do que ele escreveu
+// fora da lição de casa.
+function resumoAluno({ state, atualizadoEm, atividade = [], licoes = [], hoje = diaBrasil() }) {
+    const s = state && typeof state === 'object' ? state : {};
+    const ultimoDia = [s.lastPracticeDate, atividade.length ? atividade.map(a => a.dia).sort().pop() : '', atualizadoEm ? diaBrasil(new Date(atualizadoEm)) : '']
+        .filter(d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''))).sort().pop() || null;
+    const diasSem = ultimoDia ? Math.max(0, Math.round((Date.parse(hoje + 'T12:00:00Z') - Date.parse(ultimoDia + 'T12:00:00Z')) / 86400000)) : null;
+    const minis = Array.isArray(s.completedMinis) ? s.completedMinis : [];
+    const porIdioma = {};
+    for (const k of minis) { const lang = String(k).includes(':') ? String(k).split(':')[0] : 'en'; porIdioma[lang] = (porIdioma[lang] || 0) + 1; }
+    const hojeAtiv = atividade.find(a => a.dia === hoje);
+    const ultimaLicao = licoes.length ? licoes.map(l => l.submitted_at).sort().pop() : null;
+    const diasSemLicao = ultimaLicao ? Math.round((Date.now() - Date.parse(ultimaLicao)) / 86400000) : null;
+    const alertas = [];
+    if (diasSem === null) alertas.push('nunca_praticou');
+    else if (diasSem >= 3) alertas.push('sumido');
+    if (licoes.length && diasSemLicao >= 7) alertas.push('licao_atrasada');
+    return {
+        ultimoDia, diasSem,
+        sequencia: Math.max(0, Number(s.streakDays) || 0),
+        xp: Math.max(0, Number(s.xp) || 0),
+        trilhaHoje: !!(hojeAtiv && hojeAtiv.minis > 0),
+        minisHoje: hojeAtiv ? hojeAtiv.minis : 0,
+        minisPorIdioma: porIdioma,
+        licoesConcluidas: Array.isArray(s.completedLessons) ? s.completedLessons.length : 0,
+        dias14: atividade.filter(a => a.minis > 0 || a.xp > 0).map(a => ({ dia: a.dia, minis: a.minis, xp: a.xp })),
+        licoes: licoes.slice(0, 30).map(l => ({ id: l.id, lessonId: l.lesson_id, titulo: l.lesson_title, em: l.submitted_at, xp: l.xp_earned })),
+        alertas,
+    };
+}
+
+const novoCodigoTurma = () => Array.from(crypto.randomBytes(8), b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');
+
+// "Pôr na agenda" do plano de hoje (29/out/2026): um evento diário de 15 min no
+// horário do aluno, com alarme na hora. Sem dado do aluno: só o horário, de uma
+// lista fechada (HH:MM). iPhone e Outlook abrem o .ics; o Google usa o link.
+function icsDaAgenda(hora, agora = new Date()) {
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hora || ''))) return null;
+    const [hh, mm] = hora.split(':');
+    const dia = agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).replace(/-/g, '');
+    const carimbo = agora.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    return [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Capy English//Plano de hoje//PT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+        'BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo',
+        'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD',
+        'END:VTIMEZONE',
+        'BEGIN:VEVENT',
+        `UID:capy-ingles-${hh}${mm}@capyenglish.com.br`,
+        `DTSTAMP:${carimbo}`,
+        `DTSTART;TZID=America/Sao_Paulo:${dia}T${hh}${mm}00`,
+        'DURATION:PT15M',
+        'RRULE:FREQ=DAILY',
+        'SUMMARY:Inglês com a Yara 🐾',
+        'DESCRIPTION:Seu plano de hoje: trilha\\, conversa com a Yara e revisão (15 min).\\nhttps://www.capyenglish.com.br/',
+        'URL:https://www.capyenglish.com.br/',
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Hora do inglês com a Yara!', 'TRIGGER:PT0M', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR', '',
+    ].join('\r\n');
 }
 
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -2089,6 +2251,31 @@ function sanitizeAiOutput(value, depth = 0) {
     return value;
 }
 
+// ── GET to an outside JSON API, with a deadline ─────────────────────────────
+// Resolves { status, json } (json is null when the body is not JSON, e.g. an
+// HTML error page) and rejects only on a network error or when the deadline
+// passes, so a route can tell "not found" from "provider down".
+function buscarJsonExterno(alvo, { timeoutMs = 7000 } = {}) {
+    return new Promise((resolve, reject) => {
+        let pronto = false;
+        let prazo = null;
+        const fim = (erro, valor) => { if (pronto) return; pronto = true; clearTimeout(prazo); if (erro) reject(erro); else resolve(valor); };
+        const pedido = https.get(alvo, { headers: { 'User-Agent': 'CapyEnglish/1.0 (+https://capyenglish.com.br)', Accept: 'application/json' } }, r => {
+            let corpo = '';
+            r.setEncoding('utf8');
+            r.on('data', c => { corpo += c; if (corpo.length > 2000000) pedido.destroy(new Error('resposta_grande_demais')); });
+            r.on('end', () => {
+                let json = null;
+                try { json = JSON.parse(corpo); } catch (e) { json = null; }
+                fim(null, { status: r.statusCode, json });
+            });
+            r.on('error', erro => fim(erro));
+        });
+        prazo = setTimeout(() => { pedido.destroy(new Error('timeout')); fim(new Error('timeout')); }, timeoutMs);
+        pedido.on('error', erro => fim(erro));
+    });
+}
+
 // ── GET with redirect following (Google News RSS 302s on some hl/gl combos) ─
 function httpsGetFollow(urlStr, maxRedirects = 3) {
     return new Promise((resolve, reject) => {
@@ -2483,8 +2670,17 @@ module.exports = async (req, res) => {
     if (aiKey && url !== '/api/realtime-token') {
         // Requests carrying session cookies must prove same-session intent.
         // Anonymous visitors retain the existing rate-limited access.
+        // Writes prove it with the CSRF token. Reads (lyrics search, lyrics,
+        // TTS, daily challenge, word of the day) come from a same-origin fetch,
+        // which sends neither Origin nor the token: assertCsrf refused every one
+        // of them in production (403 invalid_origin), so a signed-in student saw
+        // "Nenhuma música encontrada" in the Music Lab and lost the Nova voice.
+        // For reads the browser's Sec-Fetch-Site tells who is asking.
         const sessionCookies = parseCookies(req);
-        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) {
+            if (req.method === 'GET' || req.method === 'HEAD') assertLeituraDoProprioSite(req);
+            else assertCsrf(req);
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
@@ -2564,17 +2760,8 @@ module.exports = async (req, res) => {
             }
             const plano = await getUserPlan(alunoId);
             const cota = VOZ_MINUTOS_MES[plano] || 0;
-            if (cota <= 0) {
-                res.status(403).json({
-                    error: 'plano_sem_voz',
-                    message: 'A conversa por voz faz parte do plano Super.',
-                    plano,
-                    acao: '/account.html',
-                });
-                return;
-            }
-            // Freio global antes da cota individual: se o site estourou o teto,
-            // nao adianta o aluno ter minutos sobrando.
+            // Freio global antes de tudo: se o site estourou o teto, nao adianta
+            // o aluno ter minutos sobrando, e o teste gratis nao pode ser gasto.
             const geral = await consumoVozDoMes(null);
             if (geral && geral.usd >= VOZ_TETO_USD_MES) {
                 console.error('[voz] teto mensal de USD atingido', geral.usd.toFixed(2), 'de', VOZ_TETO_USD_MES);
@@ -2584,7 +2771,25 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            const meu = await consumoVozDoMes(alunoId);
+            if (cota <= 0) {
+                // Sem voz no plano: a ligacao de teste, uma vez so.
+                const teste = await liberarTesteDeVoz(req._securityIdentity);
+                if (!teste.ok) {
+                    res.status(403).json({
+                        error: 'plano_sem_voz',
+                        message: teste.motivo === 'confirmar_email'
+                            ? 'Confirme seu e-mail para usar a ligação de teste grátis.'
+                            : 'A conversa por voz faz parte do plano Super.',
+                        plano,
+                        teste: teste.motivo,
+                        acao: '/account.html',
+                    });
+                    return;
+                }
+                req._vozRestante = teste.minutos;
+                req._vozTeste = true;
+            }
+            const meu = req._vozTeste ? null : await consumoVozDoMes(alunoId);
             // consumoVozDoMes devolve null quando nao conseguiu ler o banco. Nesse
             // caso libera: derrubar aluno pagante por falha nossa de leitura e pior
             // do que deixar passar uma ligacao. O freio global acima ja segura o pior.
@@ -2598,7 +2803,7 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
+            if (!req._vozTeste) req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
         }
 
 
@@ -2786,6 +2991,7 @@ module.exports = async (req, res) => {
         const expiresAt = dados.expires_at || (dados.client_secret && dados.client_secret.expires_at);
 
         res.status(200).json({ minutosRestantes: req._vozRestante == null ? null : Number(req._vozRestante.toFixed(1)),
+            teste: req._vozTeste === true,
             value: valor,
             expiresAt: Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null,
             model: REALTIME_MODEL,
@@ -3535,6 +3741,47 @@ Respond ONLY with valid JSON, no markdown:
         callOpenAI(messages, 120, 0.85, res, req); return;
     }
 
+    if (req.method === 'POST' && url === '/api/quadro-ai') {
+        const { history, message, sala = 'geral' } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'chat', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+
+        const salaLimpa = textoParaPrompt(sala, 30) || 'geral';
+        const targetLang = salaLimpa === 'frances' ? 'French' : salaLimpa === 'turkish' ? 'Turkish' : 'English';
+        const contextoSala = {
+            gpstronic: 'agricultural GPS, autopilot, wiring harnesses, sensors, CAN bus and workshop troubleshooting',
+            agro: 'farming, tractors, planting, spraying, harvesting and agribusiness',
+            med: 'medical consultations, patient symptoms and hospital routine',
+            interview: 'job interviews, career experience and professional answers',
+            business: 'business meetings, emails, negotiations and corporate routine',
+            travel: 'airports, hotels, restaurants and travel situations',
+            intermediate: 'natural B1-B2 everyday expressions, prepositions (on/in/at) and past/present/future actions',
+            advanced: 'advanced C1 fluency, idioms and nuanced communication',
+        }[salaLimpa] || 'practical everyday communication';
+
+        const system = [
+            `You are Yara, the AI teaching assistant inside the live interactive whiteboard (Quadro Branco) of Capy English.`,
+            `Current whiteboard room: "${salaLimpa}" (focus: ${contextoSala}, target language: ${targetLang}).`,
+            `When the teacher or student asks for sentences, phrases, examples, vocabulary, expressions, questions, dialogues, or explanations, you MUST generate clear, natural items ready to be placed as visual cards on the whiteboard.`,
+            `IMPORTANT: Never use the words "gramática", "grammar", "chunk" or "chunks" in your output. Use "expressões", "padrões" or "combinações naturais".`,
+            `Always respond ONLY with a valid JSON object (no markdown fences) in this exact format:`,
+            `{"reply":"Short, warm message in Portuguese explaining or presenting what you created","cards":[{"badge":"#1 · Expressão","en":"Main sentence or term in ${targetLang}","pt":"Portuguese translation or short tip"}]}`,
+            `Rules for "cards":`,
+            `- If the user asks for N sentences/examples/words (e.g. "5 frases em inglês"), return exactly N items in "cards" (up to 12 items).`,
+            `- Even if the user asks a general question or explanation, include 2 to 4 helpful example cards in "cards" so they can be added to the whiteboard.`,
+            `- Keep "badge" short (e.g., "Frase 1", "Exemplo 2", "Vocabulário", "Pergunta").`,
+            `- Keep "en" natural and accurate in ${targetLang}, and "pt" as the clear Brazilian Portuguese translation.`,
+        ].join('\n');
+
+        const messages = [{ role: 'system', content: system }];
+        (Array.isArray(history) ? history.slice(-10) : []).forEach(m => {
+            const texto = String(m?.content ?? m?.text ?? '').slice(0, 600);
+            if (texto) messages.push({ role: (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user', content: texto });
+        });
+        messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
+        callOpenAI(messages, 1000, 0.75, res, req); return;
+    }
+
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
 
     // Leaderboard: top 20 by XP
@@ -3580,6 +3827,10 @@ Respond ONLY with valid JSON, no markdown:
             delete safePayload.planType;
             delete safePayload.subscription;
             if ('xp' in safePayload) safePayload.xp = Math.max(0, Math.min(10000000, Number(safePayload.xp) || 0));
+            // O estado anterior, para a atividade do dia (painel do professor).
+            let anterior = null;
+            try { anterior = (await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`))?.[0]?.data || null; }
+            catch (e) { anterior = null; }
             await sbUser(identity, '/user_state', {
                 method: 'POST',
                 headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
@@ -3591,6 +3842,13 @@ Respond ONLY with valid JSON, no markdown:
             });
             try { await trackCampaignProgress(identity, safePayload); }
             catch (e) { console.error('[campaign-tracker]', e?.message || e); }
+            const delta = anterior ? deltaAtividade(anterior, safePayload) : { minis: 0, xp: 0 };
+            if (delta.minis || delta.xp) {
+                try {
+                    await sb('/rpc/somar_atividade', { method: 'POST', body: JSON.stringify({
+                        p_user: identity.appUserId, p_dia: diaBrasil(), p_minis: delta.minis, p_xp: delta.xp }) });
+                } catch (e) { console.error('[atividade]', e?.code || e?.message || e); }
+            }
         }
         res.status(200).json({ success: true }); return;
     }
@@ -4014,6 +4272,21 @@ Respond ONLY with valid JSON, no markdown:
         res.status(410).json({ error: 'legacy_auth_retired' }); return;
     }
 
+    // GET /api/agenda.ics?hora=HH:MM — evento diario do plano de hoje (publico, sem dado do aluno).
+    if (req.method === 'GET' && url === '/api/agenda.ics') {
+        const _rl = await checkRateLimit(req, 'track', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const hora = new URL(req.url, 'http://x').searchParams.get('hora') || '19:00';
+        const ics = icsDaAgenda(hora);
+        if (!ics) { res.status(400).json({ error: 'hora_invalida' }); return; }
+        res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+        res.setHeader('Content-Disposition', 'inline; filename="ingles-com-a-yara.ics"');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.statusCode = 200;
+        res.end(ics);
+        return;
+    }
+
     // GET /api/me?userId=xxx → returns subscription/plan info
     // Used by frontend to gate Pro/Super features in real time.
     // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
@@ -4028,10 +4301,13 @@ Respond ONLY with valid JSON, no markdown:
         if (plan !== 'free' && row.plan_expires_at) {
             if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
         }
+        // A home mostra "1ª ligação: 3 min grátis" ou o convite ao Super.
+        const vozTeste = effectivePlan === 'super' ? null : await estadoTesteDeVoz(identity.appUserId);
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.status(200).json({
             plan: effectivePlan,
             planExpiresAt: row.plan_expires_at || null,
+            vozTeste,
         });
         return;
     }
@@ -5622,39 +5898,45 @@ Rules:
     }
 
     // ── Lyrics Proxy ──────────────────────────────────────────────────────────
+    // Both routes used to pass lyrics.ovh's status and body straight through,
+    // with no deadline: a slow provider held the function until Vercel killed
+    // it, and an HTML error page reached a client that expects JSON. Now each
+    // call has a deadline, the answer is checked, and a failure is a JSON error
+    // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
-        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+        const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
-        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`, { timeoutMs: 7000 });
+            if (status !== 200 || !Array.isArray(json?.data)) throw new Error(`lyrics_ovh_${status}`);
+            res.status(200).json({ data: json.data.slice(0, 7) });
+        } catch (e) {
+            console.error('[lyrics-search]', e.message);
+            res.status(502).json({ error: 'music_search_unavailable', message: 'O serviço de músicas não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
         const p = new URL(`https://x.com${req.url}`).searchParams;
-        const artist = p.get('artist') || '';
-        const title  = p.get('title')  || '';
+        const artist = String(p.get('artist') || '').trim().slice(0, 100);
+        const title  = String(p.get('title')  || '').trim().slice(0, 150);
         if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
-        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeoutMs: 7000 });
+            const lyrics = typeof json?.lyrics === 'string' ? json.lyrics.trim() : '';
+            if (status === 200 && lyrics) { res.status(200).json({ lyrics }); return; }
+            if (status === 404 || (status === 200 && !lyrics)) {
+                res.status(404).json({ error: 'lyrics_not_found', message: 'Não achamos a letra desta música.' });
+                return;
+            }
+            throw new Error(`lyrics_ovh_${status}`);
+        } catch (e) {
+            console.error('[lyrics]', e.message);
+            res.status(502).json({ error: 'lyrics_unavailable', message: 'O serviço de letras não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
@@ -5724,7 +6006,7 @@ Rules:
     // POST /api/homework → the homework the teacher sees in teacher_homework.html.
     // components.js sends it from every lesson with a Homework tab
     // (autoEnviarLicaoDeCasa). The limits repeat the table's
-    // (202610180001_licao_de_casa.sql), so a bad request gets a 400 here
+    // (202611010003_licao_de_casa.sql), so a bad request gets a 400 here
     // instead of a refusal from RLS.
     if (req.method === 'POST' && url === '/api/homework') {
         assertCsrf(req);
@@ -5748,6 +6030,110 @@ Rules:
             }),
         });
         res.status(200).json({ success: true, id: result?.[0]?.id || null }); return;
+    }
+
+    // ── Turma: o aluno entra pelo link do professor e pode sair quando quiser ──
+    // GET /api/turma?c=<código> → { professor, nome, jaEsta }   (aluno logado)
+    if (req.method === 'GET' && url === '/api/turma') {
+        const identity = await requireAppUser(req, res);
+        const codigo = String(new URL(req.url, 'http://x').searchParams.get('c') || '').toLowerCase();
+        if (!/^[a-z0-9]{8}$/.test(codigo)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
+        const t = (await sb(`/turmas?codigo=eq.${codigo}&select=professor_id,nome`))?.[0];
+        if (!t) { res.status(404).json({ error: 'turma_nao_encontrada' }); return; }
+        const prof = (await sb(`/accounts?id=eq.${encodeURIComponent(t.professor_id)}&select=name`))?.[0];
+        const ja = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(t.professor_id)}&aluno_id=eq.${encodeURIComponent(identity.appUserId)}&select=aluno_id`);
+        res.status(200).json({ professor: textoParaPrompt(prof?.name || 'Professor').slice(0, 60), nome: t.nome, jaEsta: Array.isArray(ja) && ja.length > 0, proprio: t.professor_id === identity.appUserId });
+        return;
+    }
+
+    // POST /api/turma/entrar { codigo } · POST /api/turma/sair { codigo }
+    if (req.method === 'POST' && (url === '/api/turma/entrar' || url === '/api/turma/sair')) {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const limited = await checkRateLimit(req, 'turma', identity.appUserId);
+        if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        const codigo = String((await readBody(req)).codigo || '').toLowerCase();
+        if (!/^[a-z0-9]{8}$/.test(codigo)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
+        const t = (await sb(`/turmas?codigo=eq.${codigo}&select=professor_id`))?.[0];
+        if (!t) { res.status(404).json({ error: 'turma_nao_encontrada' }); return; }
+        if (t.professor_id === identity.appUserId) { res.status(400).json({ error: 'propria_turma' }); return; }
+        if (url === '/api/turma/entrar') {
+            await sb('/turma_alunos', { method: 'POST', headers: { 'Prefer': 'resolution=ignore-duplicates,return=minimal' },
+                body: JSON.stringify({ professor_id: t.professor_id, aluno_id: identity.appUserId }) });
+            await writeSecurityAudit(req, 'turma.entrar', 'turma', t.professor_id);
+        } else {
+            await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(t.professor_id)}&aluno_id=eq.${encodeURIComponent(identity.appUserId)}`, { method: 'DELETE' });
+            await writeSecurityAudit(req, 'turma.sair', 'turma', t.professor_id);
+        }
+        res.status(200).json({ ok: true }); return;
+    }
+
+    // ── Painel do professor ──────────────────────────────────────────────────
+    // GET /api/professor/turma → { codigo, nome, alunos: [{ id, nome, ...resumoAluno }] }
+    if (req.method === 'GET' && url === '/api/professor/turma') {
+        const identity = await requireProfessor(req, res);
+        const profId = identity.appUserId;
+        let turma = (await sb(`/turmas?professor_id=eq.${encodeURIComponent(profId)}&select=codigo,nome`))?.[0];
+        if (!turma) {
+            const criada = await sb('/turmas', { method: 'POST', headers: { 'Prefer': 'return=representation' },
+                body: JSON.stringify({ codigo: novoCodigoTurma(), professor_id: profId }) });
+            turma = criada?.[0];
+            if (!turma) throw new HttpError(502, 'database_error', 'Could not create the class.');
+        }
+        const membros = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(profId)}&select=aluno_id,entrou_em&order=entrou_em.asc&limit=500`);
+        const ids = (Array.isArray(membros) ? membros : []).map(m => m.aluno_id);
+        let alunos = [];
+        if (ids.length) {
+            const lista = ids.map(i => `"${String(i).replace(/["\\]/g, '')}"`).join(',');
+            const desde = diaBrasil(new Date(Date.now() - 13 * 86400000));
+            const [contas, estados, atividade, licoes] = await Promise.all([
+                sb(`/accounts?id=in.(${encodeURIComponent(lista)})&select=id,name,avatar`),
+                sb(`/user_state?user_id=in.(${encodeURIComponent(lista)})&select=user_id,data,updated_at`),
+                sb(`/atividade_diaria?user_id=in.(${encodeURIComponent(lista)})&dia=gte.${desde}&select=user_id,dia,minis,xp&order=dia.asc`),
+                sb(`/homework_submissions?user_id=in.(${encodeURIComponent(lista)})&select=id,user_id,lesson_id,lesson_title,xp_earned,submitted_at&order=submitted_at.desc&limit=2000`),
+            ]);
+            const por = (rows, k) => { const m = new Map(); for (const r of (Array.isArray(rows) ? rows : [])) { if (!m.has(r[k])) m.set(r[k], []); m.get(r[k]).push(r); } return m; };
+            const cm = por(contas, 'id'), em = por(estados, 'user_id'), am = por(atividade, 'user_id'), lm = por(licoes, 'user_id');
+            const hoje = diaBrasil();
+            alunos = (Array.isArray(membros) ? membros : []).map(m => {
+                const c = cm.get(m.aluno_id)?.[0] || {};
+                const e = em.get(m.aluno_id)?.[0] || {};
+                return {
+                    id: m.aluno_id,
+                    nome: textoParaPrompt(c.name || 'Aluno').slice(0, 60),
+                    avatar: String(c.avatar || '🐾').slice(0, 8),
+                    entrouEm: m.entrou_em,
+                    ...resumoAluno({ state: e.data, atualizadoEm: e.updated_at, atividade: am.get(m.aluno_id) || [], licoes: lm.get(m.aluno_id) || [], hoje }),
+                };
+            });
+        }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ codigo: turma.codigo, nome: turma.nome, hoje: diaBrasil(), alunos, licoesDisponiveis: true });
+        return;
+    }
+
+    // POST /api/professor/remover { alunoId } — tira o aluno da turma.
+    if (req.method === 'POST' && url === '/api/professor/remover') {
+        assertCsrf(req);
+        const identity = await requireProfessor(req, res);
+        const alunoId = String((await readBody(req)).alunoId || '');
+        if (!/^[A-Za-z0-9_-]{1,80}$/.test(alunoId)) { res.status(400).json({ error: 'aluno_invalido' }); return; }
+        await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(identity.appUserId)}&aluno_id=eq.${encodeURIComponent(alunoId)}`, { method: 'DELETE' });
+        await writeSecurityAudit(req, 'turma.remover', 'account', alunoId);
+        res.status(200).json({ ok: true }); return;
+    }
+
+    // GET /api/professor/licao?id=<uuid> — o texto de uma lição de casa de um aluno DA TURMA.
+    if (req.method === 'GET' && url === '/api/professor/licao') {
+        const identity = await requireProfessor(req, res);
+        const id = String(new URL(req.url, 'http://x').searchParams.get('id') || '');
+        if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(400).json({ error: 'id_invalido' }); return; }
+        const row = (await sb(`/homework_submissions?id=eq.${id}&select=id,user_id,lesson_id,lesson_title,answers,xp_earned,submitted_at`))?.[0];
+        const membro = row && await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(identity.appUserId)}&aluno_id=eq.${encodeURIComponent(row.user_id)}&select=aluno_id`);
+        if (!row || !Array.isArray(membro) || !membro.length) { res.status(404).json({ error: 'not_found' }); return; }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ id: row.id, lessonId: row.lesson_id, titulo: row.lesson_title, respostas: row.answers, xp: row.xp_earned, em: row.submitted_at });
+        return;
     }
 
     // GET /api/homework — list submissions (teacher/admin session only).
@@ -5803,3 +6189,10 @@ Rules:
     }
   }
 };
+
+// Pure helpers, exposed for tests only.
+module.exports._internos = { buscarJsonExterno, checkRateLimit, icsDaAgenda };
+// For tests: the teacher panel's pure helpers (tests/professor.test.js).
+module.exports._professor = { deltaAtividade, resumoAluno, novoCodigoTurma };
+// For tests: the free voice-call trial (tests/realtime-voice.test.js).
+module.exports._vozTeste = { liberarTesteDeVoz, estadoTesteDeVoz, VOZ_TESTE_MIN };

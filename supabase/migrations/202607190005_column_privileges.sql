@@ -2,7 +2,7 @@
 -- porque public.homework_submissions não existia, e as permissões de user_state
 -- abaixo desfariam a 202609260001 (o upsert do progresso precisa de UPDATE em
 -- user_id). A tabela da lição de casa e o RLS dela estão em
--- 202610180001_licao_de_casa.sql; o resto já vale pela 202609260001.
+-- 202611010003_licao_de_casa.sql (que substituiu a 202610180001); o resto já vale pela 202609260001.
 
 begin;
 
