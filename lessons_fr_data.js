@@ -16,75 +16,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Bonjour",
-        "pt": "Olá / Bom dia [bon-JUR]"
+        "pt": "Olá / Bom dia"
       },
       {
         "en": "Bonsoir",
-        "pt": "Boa tarde (fim do dia) / Boa noite [bon-SUAR]"
+        "pt": "Boa tarde (fim do dia) / Boa noite"
       },
       {
         "en": "Bonne nuit",
-        "pt": "Boa noite (ao dormir) [bôn NUÍ]"
+        "pt": "Boa noite (ao dormir)"
       },
       {
         "en": "Salut",
-        "pt": "Oi / Tchau (informal) [sa-LÜ]"
+        "pt": "Oi / Tchau (informal)"
       },
       {
         "en": "Au revoir",
-        "pt": "Tchau / Até logo [ô rã-VUAR]"
+        "pt": "Tchau / Até logo"
       },
       {
         "en": "À bientôt",
-        "pt": "Até breve [a biãn-TÔ]"
+        "pt": "Até breve"
       },
       {
         "en": "À demain",
-        "pt": "Até amanhã [a dã-MÃ]"
+        "pt": "Até amanhã"
       },
       {
         "en": "Merci",
-        "pt": "Obrigado(a) [mer-SI]"
+        "pt": "Obrigado(a)"
       },
       {
         "en": "De rien",
-        "pt": "De nada [dã RIÃ]"
+        "pt": "De nada"
       },
       {
         "en": "S'il vous plaît",
-        "pt": "Por favor (formal) [sil vu PLÉ]"
+        "pt": "Por favor (formal)"
       },
       {
         "en": "S'il te plaît",
-        "pt": "Por favor (informal) [sil tã PLÉ]"
+        "pt": "Por favor (informal)"
       },
       {
         "en": "Excusez-moi",
-        "pt": "Com licença / Desculpe [eks-kü-zê MUÁ]"
+        "pt": "Com licença / Desculpe"
       },
       {
         "en": "Pardon",
-        "pt": "Perdão / Com licença [par-DÔN]"
+        "pt": "Perdão / Com licença"
       },
       {
         "en": "Oui",
-        "pt": "Sim [UÍ]"
+        "pt": "Sim"
       },
       {
         "en": "Non",
-        "pt": "Não [NÔN]"
+        "pt": "Não"
       },
       {
         "en": "Enchanté(e)",
-        "pt": "Muito prazer [ãn-chãn-TÊ]"
+        "pt": "Muito prazer"
       },
       {
         "en": "Monsieur",
-        "pt": "Senhor [mã-SIÊ]"
+        "pt": "Senhor"
       },
       {
         "en": "Madame",
-        "pt": "Senhora [ma-DAM]"
+        "pt": "Senhora"
       }
     ],
     "expressions": [
@@ -136,7 +136,7 @@ const LESSONS_FR = [
       "rules": [
         "<b>Tu vs. Vous — Quando usar cada um?:</b> Com desconhecidos, em lojas ou no trabalho: \"Bonjour Monsieur, comment allez-vous ?\" (Na França, \"Bonjour\" + \"Vous\" é a chave que abre todas as portas. Na dúvida, escolha sempre \"vous\"!)",
         "<b>Bonjour vs. Bonne journée (Chegada vs. Despedida):</b> Ao entrar na padaria: \"Bonjour Madame !\" (Pense assim: Bonjour / Bonsoir = chegada. Bonne journée / Bonne soirée = despedida desejando um bom resto de dia/noite.)",
-        "<b>Segredos da Pronúncia Francesa para Brasileiros:</b> \"OU\" tem som de \"U\" brasileiro: Bonjour = [bon-JUR], vous = [VU], oui = [UÍ]. (O \"U\" sozinho em francês (como em \"tu\" e \"salut\") é o famoso biquinho com som de \"I\" [ü]!)"
+        "<b>Segredos da Pronúncia Francesa para Brasileiros:</b> \"OU\" tem som de \"U\" brasileiro: Bonjour, vous, oui. (O \"U\" sozinho em francês (como em \"tu\" e \"salut\") é o famoso biquinho com som de \"I\"!)"
       ],
       "table": {
         "headers": [
@@ -233,7 +233,7 @@ const LESSONS_FR = [
           "Enchanté",
           "À bientôt"
         ],
-        "why": "\"S'il vous plaît\" [sil vu PLÉ] é a forma educada (\"vous\") de dizer \"por favor\"."
+        "why": "\"S'il vous plaît\" é a forma educada (\"vous\") de dizer \"por favor\"."
       },
       {
         "q": "Se alguém lhe diz \"Merci beaucoup !\", qual é uma resposta adequada?",
@@ -266,7 +266,7 @@ const LESSONS_FR = [
           "Como \"ÓI\"",
           "É sempre muda"
         ],
-        "why": "Em francês, \"OU\" tem o som exato do nosso \"U\" em português ([u])."
+        "why": "Em francês, \"OU\" tem o som exato do nosso \"U\" em português."
       },
       {
         "q": "Complete: \"Bonjour ! Je ___ Yara, je suis brésilienne.\"",
@@ -306,75 +306,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Un / Une",
-        "pt": "Um / Uma (1) [Ã / ÜN]"
+        "pt": "Um / Uma (1)"
       },
       {
         "en": "Deux",
-        "pt": "Dois (2) [DØ]"
+        "pt": "Dois (2)"
       },
       {
         "en": "Trois",
-        "pt": "Três (3) [TRUÁ]"
+        "pt": "Três (3)"
       },
       {
         "en": "Quatre",
-        "pt": "Quatro (4) [KÁTR]"
+        "pt": "Quatro (4)"
       },
       {
         "en": "Cinq",
-        "pt": "Cinco (5) [SÃK]"
+        "pt": "Cinco (5)"
       },
       {
         "en": "Six",
-        "pt": "Seis (6) [SIS]"
+        "pt": "Seis (6)"
       },
       {
         "en": "Sept",
-        "pt": "Sete (7) [SÉT]"
+        "pt": "Sete (7)"
       },
       {
         "en": "Huit",
-        "pt": "Oito (8) [UÍT]"
+        "pt": "Oito (8)"
       },
       {
         "en": "Neuf",
-        "pt": "Nove (9) [NŒF]"
+        "pt": "Nove (9)"
       },
       {
         "en": "Dix",
-        "pt": "Dez (10) [DIS]"
+        "pt": "Dez (10)"
       },
       {
         "en": "Onze",
-        "pt": "Onze (11) [ÔNZ]"
+        "pt": "Onze (11)"
       },
       {
         "en": "Douze",
-        "pt": "Doze (12) [DUZ]"
+        "pt": "Doze (12)"
       },
       {
         "en": "Treize",
-        "pt": "Treze (13) [TRÉZ]"
+        "pt": "Treze (13)"
       },
       {
         "en": "Quatorze",
-        "pt": "Quatorze (14) [ka-TÓRZ]"
+        "pt": "Quatorze (14)"
       },
       {
         "en": "Quinze",
-        "pt": "Quinze (15) [KÃZ]"
+        "pt": "Quinze (15)"
       },
       {
         "en": "Seize",
-        "pt": "Dezesseis (16) [SÉZ]"
+        "pt": "Dezesseis (16)"
       },
       {
         "en": "Dix-sept / Dix-huit",
-        "pt": "Dezessete (17) / Dezoito (18) [di-SÉT / di-ZUÍT]"
+        "pt": "Dezessete (17) / Dezoito (18)"
       },
       {
         "en": "Dix-neuf / Vingt",
-        "pt": "Dezenove (19) / Vinte (20) [diz-NŒF / VÃ]"
+        "pt": "Dezenove (19) / Vinte (20)"
       }
     ],
     "expressions": [
@@ -424,14 +424,14 @@ const LESSONS_FR = [
     "grammar": {
       "title": "De 11 a 16 vs. 17 a 19 (Simples vs. Compostos)",
       "rules": [
-        "<b>De 11 a 16 vs. 17 a 19 (Simples vs. Compostos):</b> 11 a 16 têm nomes próprios terminados em \"-ze\": onze, douze, treize, quatorze, quinze, seize. (No número 7 (sept [SÉT]), o \"p\" nunca é pronunciado, mas o \"t\" final soa forte!)",
-        "<b>A Pronúncia de Six (6), Huit (8), Neuf (9) e Dix (10):</b> Sozinhos: six [SIS], dix [DIS]. Antes de consoante, o som final cai: six livres [si LIVR], dix cafés [di ka-FÊ]. (Essa costura sonora entre palavras chama-se \"liaison\" e é o que deixa seu francês com ritmo nativo!)",
+        "<b>De 11 a 16 vs. 17 a 19 (Simples vs. Compostos):</b> 11 a 16 têm nomes próprios terminados em \"-ze\": onze, douze, treize, quatorze, quinze, seize. (No número 7 (sept), o \"p\" nunca é pronunciado, mas o \"t\" final soa forte!)",
+        "<b>A Pronúncia de Six (6), Huit (8), Neuf (9) e Dix (10):</b> Sozinhos: six e dix soam o S/X final. Antes de consoante, o som final cai: six livres, dix cafés. (Essa costura sonora entre palavras chama-se \"liaison\" e é o que deixa seu francês com ritmo nativo!)",
         "<b>Dizer a Idade: Sempre com AVOIR + ANS:</b> J'ai vingt ans. / Elle a quinze ans. (Diferente do português onde podemos dizer \"Tenho 20\", em francês nunca omitimos \"ans\": J'ai vingt ans!)"
       ],
       "table": {
         "headers": [
           "Número",
-          "Francês & Pronúncia",
+          "Francês",
           "Exemplo Prático"
         ],
         "rows": [
@@ -442,7 +442,7 @@ const LESSONS_FR = [
           ],
           [
             "6 a 10",
-            "six, sept [sét], huit, neuf, dix",
+            "six, sept, huit, neuf, dix",
             "Le cours commence à huit heures."
           ],
           [
@@ -452,7 +452,7 @@ const LESSONS_FR = [
           ],
           [
             "17 a 20",
-            "dix-sept, dix-huit, dix-neuf, vingt [vã]",
+            "dix-sept, dix-huit, dix-neuf, vingt",
             "J'ai vingt ans."
           ]
         ]
@@ -468,7 +468,7 @@ const LESSONS_FR = [
           "seize",
           "cinq"
         ],
-        "why": "14 = quatorze, 15 = quinze [KÃZ], 16 = seize [SÉZ]."
+        "why": "14 = quatorze, 15 = quinze, 16 = seize."
       },
       {
         "q": "Qual é o resultado de \"douze + huit\" em francês?",
@@ -479,7 +479,7 @@ const LESSONS_FR = [
           "dix-neuf",
           "seize"
         ],
-        "why": "12 (douze) + 8 (huit) = 20 (vingt [VÃ])."
+        "why": "12 (douze) + 8 (huit) = 20 (vingt)."
       },
       {
         "q": "Como você diz \"Eu tenho 18 anos\" em francês?",
@@ -494,14 +494,14 @@ const LESSONS_FR = [
       },
       {
         "q": "Na palavra \"sept\" (7), qual letra é muda e qual é pronunciada?",
-        "a": "O \"p\" é mudo e o \"t\" é pronunciado [SÉT]",
+        "a": "O \"p\" é mudo e o \"t\" é pronunciado",
         "opts": [
-          "O \"p\" é mudo e o \"t\" é pronunciado [SÉT]",
-          "O \"t\" é mudo e o \"p\" é pronunciado [SÉP]",
-          "Ambos são mudos [SÉ]",
-          "Ambos são pronunciados [SÉPT]"
+          "O \"p\" é mudo e o \"t\" é pronunciado",
+          "O \"t\" é mudo e o \"p\" é pronunciado",
+          "Ambos são mudos",
+          "Ambos são pronunciados"
         ],
-        "why": "\"Sept\" pronuncia-se [SÉT] — o P desaparece na fala!"
+        "why": "\"Sept\" pronuncia-se — o P desaparece na fala!"
       },
       {
         "q": "Como se pergunta \"Quanto custa isso?\" em francês?",
@@ -516,12 +516,12 @@ const LESSONS_FR = [
       },
       {
         "q": "Como soa a ligação (liaison) em \"dix euros\"?",
-        "a": "[di-ZØ-RÔ] (com som de Z)",
+        "a": "O X soa como Z",
         "opts": [
-          "[di-ZØ-RÔ] (com som de Z)",
-          "[dis Ø-RÔ] (com som de S)",
-          "[di-KØ-RÔ]",
-          "[dix] mudo"
+          "O X soa como Z",
+          "O X soa como S",
+          "O X soa como K",
+          "O X fica mudo"
         ],
         "why": "Antes de vogal, o X final de \"deux\", \"six\" e \"dix\" ganha som de Z!"
       },
@@ -596,75 +596,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Rouge",
-        "pt": "Vermelho(a) [RUJ]"
+        "pt": "Vermelho(a)"
       },
       {
         "en": "Bleu / Bleue",
-        "pt": "Azul [BLØ]"
+        "pt": "Azul"
       },
       {
         "en": "Vert / Verte",
-        "pt": "Verde [VÉR / VÉRT] [VÉR / VÉRT]"
+        "pt": "Verde"
       },
       {
         "en": "Jaune",
-        "pt": "Amarelo(a) [JÔN]"
+        "pt": "Amarelo(a)"
       },
       {
         "en": "Blanc / Blanche",
-        "pt": "Branco / Branca [BLÃ / BLÃCH]"
+        "pt": "Branco / Branca"
       },
       {
         "en": "Noir / Noire",
-        "pt": "Preto / Preta [NUAR]"
+        "pt": "Preto / Preta"
       },
       {
         "en": "Gris / Grise",
-        "pt": "Cinza [GRI / GRIZ]"
+        "pt": "Cinza"
       },
       {
         "en": "Rose",
-        "pt": "Rosa [RÔZ]"
+        "pt": "Rosa"
       },
       {
         "en": "Orange",
-        "pt": "Laranja (invariável!) [ô-RÃJ]"
+        "pt": "Laranja (invariável!)"
       },
       {
         "en": "Violet / Violette",
-        "pt": "Roxo / Violeta [viô-LÉ / viô-LÉT]"
+        "pt": "Roxo / Violeta"
       },
       {
         "en": "Marron",
-        "pt": "Marrom (invariável!) [ma-RÔN]"
+        "pt": "Marrom (invariável!)"
       },
       {
         "en": "Grand / Grande",
-        "pt": "Grande / Alto(a) [GRÃ / GRÃD]"
+        "pt": "Grande / Alto(a)"
       },
       {
         "en": "Petit / Petite",
-        "pt": "Pequeno(a) / Baixo(a) [pã-TI / pã-TÍT]"
+        "pt": "Pequeno(a) / Baixo(a)"
       },
       {
         "en": "Beau / Belle",
-        "pt": "Bonito / Bonita [BÔ / BÉL]"
+        "pt": "Bonito / Bonita"
       },
       {
         "en": "Joli / Jolie",
-        "pt": "Bonitinho(a) / Lindo(a) [jô-LI]"
+        "pt": "Bonitinho(a) / Lindo(a)"
       },
       {
         "en": "Clair",
-        "pt": "Claro (tom de cor) [KLÉR]"
+        "pt": "Claro (tom de cor)"
       },
       {
         "en": "Foncé",
-        "pt": "Escuro (tom de cor) [fôn-SÊ]"
+        "pt": "Escuro (tom de cor)"
       },
       {
         "en": "La couleur",
-        "pt": "A cor [la ku-LŒR]"
+        "pt": "A cor"
       }
     ],
     "expressions": [
@@ -714,7 +714,7 @@ const LESSONS_FR = [
     "grammar": {
       "title": "Feminino das Cores (Quando muda o som e quando não muda)",
       "rules": [
-        "<b>Feminino das Cores (Quando muda o som e quando não muda):</b> Ganham -E no feminino (e a consoante passa a soar!): vert [VÉR] → verte [VÉRT]; gris [GRI] → grise [GRIZ]. (No masculino \"vert\" [vér] o T é mudo; no feminino \"verte\" [vért] o E faz o T ganhar voz!)",
+        "<b>Feminino das Cores (Quando muda o som e quando não muda):</b> Ganham -E no feminino (e a consoante passa a soar!): vert → verte; gris → grise. (No masculino \"vert\" o T é mudo; no feminino \"verte\" o E faz o T ganhar voz!)",
         "<b>As Duas Cores Rebeldes: Orange e Marron (Invariáveis!):</b> Une robe orange / Des robes orange (sem -s!). (Por que são invariáveis? Porque vêm de frutas (a laranja e a castanha marron)! Em francês, cores que têm nome de fruta ou pedra nunca variam.)",
         "<b>Posição dos Adjetivos: Cores DEPOIS, Tamanho/Beleza ANTES:</b> Cores vão DEPOIS do substantivo: un chat noir, une voiture bleue. (Você pode combinar os dois: \"Une belle robe rouge\" (Um lindo vestido vermelho — belle antes, rouge depois!).)"
       ],
@@ -726,13 +726,13 @@ const LESSONS_FR = [
         ],
         "rows": [
           [
-            "vert [vér]",
-            "verte [vért]",
+            "vert",
+            "verte",
             "un pull vert / une robe verte"
           ],
           [
-            "blanc [blã]",
-            "blanche [blãch]",
+            "blanc",
+            "blanche",
             "un vin blanc / une maison blanche"
           ],
           [
@@ -758,7 +758,7 @@ const LESSONS_FR = [
           "blanca",
           "blanc"
         ],
-        "why": "O feminino de \"blanc\" [BLÃ] é \"blanche\" [BLÃCH]: une maison blanche."
+        "why": "O feminino de \"blanc\" é \"blanche\": une maison blanche."
       },
       {
         "q": "Quais são as duas cores que NUNCA mudam no feminino nem ganham \"-s\" no plural?",
@@ -791,7 +791,7 @@ const LESSONS_FR = [
           "une verte chemise",
           "un chemise vert"
         ],
-        "why": "Como \"la chemise\" é feminina, \"vert\" recebe \"-e\": une chemise verte [VÉRT]."
+        "why": "Como \"la chemise\" é feminina, \"vert\" recebe \"-e\": une chemise verte."
       },
       {
         "q": "Qual destas cores JÁ termina com \"-e\" no masculino e por isso não muda no feminino?",
@@ -886,75 +886,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "La mère / Maman",
-        "pt": "A mãe / Mamãe [la MÉR / ma-MÃ]"
+        "pt": "A mãe / Mamãe"
       },
       {
         "en": "Le père / Papa",
-        "pt": "O pai / Papai [lã PÉR / pa-PÁ]"
+        "pt": "O pai / Papai"
       },
       {
         "en": "Les parents",
-        "pt": "Os pais (pai e mãe) / Parentes [lê pa-RÃ]"
+        "pt": "Os pais (pai e mãe) / Parentes"
       },
       {
         "en": "Le frère",
-        "pt": "O irmão [lã FRÉR]"
+        "pt": "O irmão"
       },
       {
         "en": "La sœur",
-        "pt": "A irmã [la SŒR]"
+        "pt": "A irmã"
       },
       {
         "en": "Le fils",
-        "pt": "O filho (pronuncia-se o S!) [lã FIS]"
+        "pt": "O filho (pronuncia-se o S!)"
       },
       {
         "en": "La fille",
-        "pt": "A filha / A menina [la FÍI]"
+        "pt": "A filha / A menina"
       },
       {
         "en": "Les enfants",
-        "pt": "Os filhos / As crianças [lê zãn-FÃ]"
+        "pt": "Os filhos / As crianças"
       },
       {
         "en": "Le mari / La femme",
-        "pt": "O marido / A esposa (ou mulher) [lã ma-RI / la FAM]"
+        "pt": "O marido / A esposa (ou mulher)"
       },
       {
         "en": "Le grand-père",
-        "pt": "O avô [lã grãn-PÉR]"
+        "pt": "O avô"
       },
       {
         "en": "La grand-mère",
-        "pt": "A avó [la grãn-MÉR]"
+        "pt": "A avó"
       },
       {
         "en": "Les grands-parents",
-        "pt": "Os avós [lê grãn-pa-RÃ]"
+        "pt": "Os avós"
       },
       {
         "en": "L'oncle",
-        "pt": "O tio [LÔNKL]"
+        "pt": "O tio"
       },
       {
         "en": "La tante",
-        "pt": "A tia [la TÃT]"
+        "pt": "A tia"
       },
       {
         "en": "Le cousin / La cousine",
-        "pt": "O primo / A prima [lã ku-ZÃ / la ku-ZÍN]"
+        "pt": "O primo / A prima"
       },
       {
         "en": "L'ami / L'amie",
-        "pt": "O amigo / A amiga [la-MI]"
+        "pt": "O amigo / A amiga"
       },
       {
         "en": "Le chien / Le chat",
-        "pt": "O cachorro / O gato [lã CHIÃ / lã CHÁ]"
+        "pt": "O cachorro / O gato"
       },
       {
         "en": "Fils / Fille unique",
-        "pt": "Filho(a) único(a) [fis / fíi ü-NÍK]"
+        "pt": "Filho(a) único(a)"
       }
     ],
     "expressions": [
@@ -1004,9 +1004,9 @@ const LESSONS_FR = [
     "grammar": {
       "title": "Os Possessivos: Mon / Ma / Mes (Meu, Minha, Meus/Minhas)",
       "rules": [
-        "<b>Os Possessivos: Mon / Ma / Mes (Meu, Minha, Meus/Minhas):</b> Masculino singular: mon père, mon frère, mon livre (meu) · ton (teu) · son (dele/dela). (No plural não há diferença entre masculino e feminino: \"mes frères\" e \"mes sœurs\" usam MES [mê]!)",
+        "<b>Os Possessivos: Mon / Ma / Mes (Meu, Minha, Meus/Minhas):</b> Masculino singular: mon père, mon frère, mon livre (meu) · ton (teu) · son (dele/dela). (No plural não há diferença entre masculino e feminino: \"mes frères\" e \"mes sœurs\" usam MES!)",
         "<b>A Regra de Ouro antes de Vogal: \"Mon amie\" (e NÃO \"Ma amie\"!):</b> Mon amie Camille (Minha amiga Camille — amie começa com A!). (Se a palavra feminina tiver um adjetivo consoante no meio, o \"ma\" volta: \"Ma bonne amie\" (Minha boa amiga)!)",
-        "<b>Pronúncias Especiais da Família: Femme, Fils e Fille:</b> La femme (a esposa/mulher) pronuncia-se [la FAM] (com som de A, mesmo escrita com E!). (Guarde este trio sonoro: femme = [FAM], fils = [FIS], fille = [FÍI]!)"
+        "<b>Pronúncias Especiais da Família: Femme, Fils e Fille:</b> La femme (a esposa/mulher): o \"e\" tem som de A, mesmo escrito com E! (Guarde este trio sonoro: femme, fils, fille!)"
       ],
       "table": {
         "headers": [
@@ -1069,18 +1069,18 @@ const LESSONS_FR = [
           "mon parents / ma sœurs",
           "les parents / la sœurs"
         ],
-        "why": "No plural, \"mes\" [MÊ] serve tanto para o masculino quanto para o feminino!"
+        "why": "No plural, \"mes\" serve tanto para o masculino quanto para o feminino!"
       },
       {
         "q": "Como se pronuncia a palavra \"femme\" (esposa / mulher) em francês?",
-        "a": "[FAM] (com som de A)",
+        "a": "O E soa como A",
         "opts": [
-          "[FAM] (com som de A)",
-          "[FÊM] (com som de Ê)",
-          "[FÍM] (com som de I)",
-          "[FÔM] (com som de Ô)"
+          "O E soa como A",
+          "O E soa como Ê",
+          "O E soa como I",
+          "O E soa como Ô"
         ],
-        "why": "Apesar de escrita com E, \"femme\" pronuncia-se [FAM]!"
+        "why": "Apesar de escrita com E, \"femme\" pronuncia-se!"
       },
       {
         "q": "Como você pergunta \"Você tem irmãos e irmãs?\" em francês?",
@@ -1146,7 +1146,7 @@ const LESSONS_FR = [
           "Eu gosto de...",
           "Até logo..."
         ],
-        "why": "\"Voici\" [vua-SI] serve para apresentar pessoas ou apontar coisas (\"Voici ma famille !\")."
+        "why": "\"Voici\" serve para apresentar pessoas ou apontar coisas (\"Voici ma famille !\")."
       }
     ],
     "speak": [
@@ -1175,75 +1175,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Je suis",
-        "pt": "Eu sou / Eu estou [jã SUÍ]"
+        "pt": "Eu sou / Eu estou"
       },
       {
         "en": "Tu es",
-        "pt": "Você é / está (informal) [tü É]"
+        "pt": "Você é / está (informal)"
       },
       {
         "en": "Il est / Elle est",
-        "pt": "Ele(a) é / está [i-LÉ / é-LÉ]"
+        "pt": "Ele(a) é / está"
       },
       {
         "en": "Nous sommes",
-        "pt": "Nós somos / estamos [nu SÓM]"
+        "pt": "Nós somos / estamos"
       },
       {
         "en": "Vous êtes",
-        "pt": "Vocês são/estão · O(a) sr(a) é/está [vu ZÉT]"
+        "pt": "Vocês são/estão · O(a) sr(a) é/está"
       },
       {
         "en": "Ils sont / Elles sont",
-        "pt": "Eles(as) são / estão [il SÔN / él SÔN]"
+        "pt": "Eles(as) são / estão"
       },
       {
         "en": "J'ai / Tu as / Il a",
-        "pt": "Eu tenho / Tu tens / Ele tem [JÊ / tü Á / i-LÁ]"
+        "pt": "Eu tenho / Tu tens / Ele tem"
       },
       {
         "en": "Nous avons / Vous avez / Ils ont",
-        "pt": "Nós temos / Vocês têm / Eles têm [nu za-VÔN / vu za-VÊ / il ZÔN]"
+        "pt": "Nós temos / Vocês têm / Eles têm"
       },
       {
         "en": "Avoir faim",
-        "pt": "Estar com fome (lit. ter fome) [a-VUAR FÃ]"
+        "pt": "Estar com fome (lit. ter fome)"
       },
       {
         "en": "Avoir soif",
-        "pt": "Estar com sede [a-VUAR SUÁF]"
+        "pt": "Estar com sede"
       },
       {
         "en": "Avoir froid / chaud",
-        "pt": "Estar com frio / calor [a-VUAR FRUÁ / CHÔ]"
+        "pt": "Estar com frio / calor"
       },
       {
         "en": "Avoir sommeil",
-        "pt": "Estar com sono [a-VUAR sô-MÉI]"
+        "pt": "Estar com sono"
       },
       {
         "en": "Avoir peur (de)",
-        "pt": "Estar com medo (de) [a-VUAR PŒR]"
+        "pt": "Estar com medo (de)"
       },
       {
         "en": "Avoir raison / tort",
-        "pt": "Ter razão / Estar errado(a) [a-VUAR rê-ZÔN / TÓR]"
+        "pt": "Ter razão / Estar errado(a)"
       },
       {
         "en": "Avoir besoin de",
-        "pt": "Precisar de (ter necessidade de) [a-VUAR bã-ZUÃ dã]"
+        "pt": "Precisar de (ter necessidade de)"
       },
       {
         "en": "Avoir envie de",
-        "pt": "Estar com vontade de [a-VUAR ãn-VI dã]"
+        "pt": "Estar com vontade de"
       },
       {
         "en": "Fatigué(e)",
-        "pt": "Cansado(a) (usa ÊTRE!) [fa-ti-GUÊ]"
+        "pt": "Cansado(a) (usa ÊTRE!)"
       },
       {
         "en": "Prêt(e) / Content(e)",
-        "pt": "Pronto(a) / Feliz (usam ÊTRE!) [PRÉ / PRÉT · kôn-TÃ / kôn-TÃT]"
+        "pt": "Pronto(a) / Feliz (usam ÊTRE!)"
       }
     ],
     "expressions": [
@@ -1293,7 +1293,7 @@ const LESSONS_FR = [
     "grammar": {
       "title": "Être = Ser E Estar (Um verbo só para os dois!)",
       "rules": [
-        "<b>Être = Ser E Estar (Um verbo só para os dois!):</b> Identidade / profissão / nacionalidade: Je suis étudiant(e), elle est médecin. (Atenção à pronúncia de \"Ils sont\" [il SÔN] (eles são — com S puro) vs. \"Ils ont\" [il ZÔN] (eles têm — com som de Z pela liaison!).)",
+        "<b>Être = Ser E Estar (Um verbo só para os dois!):</b> Identidade / profissão / nacionalidade: Je suis étudiant(e), elle est médecin. (Atenção à pronúncia de \"Ils sont\" (eles são — com S puro) vs. \"Ils ont\" (eles têm — com som de Z pela liaison!).)",
         "<b>Sensações Físicas usam AVOIR (e não Être!):</b> J'ai faim (fome) · J'ai soif (sede) · J'ai sommeil (sono). (Já \"fatigué(e)\" (cansado), \"malade\" (doente) e \"prêt(e)\" (pronto) são adjetivos, então usam ÊTRE: Je suis fatigué(e)!)",
         "<b>O Pronome \"ON\" — O Segredo do Francês Falado:</b> Formal / escrito: Nous sommes prêts · Nous avons faim. (Dominar o \"on\" (= a gente / nós) faz você entender 90% das conversas reais na França!)"
       ],
@@ -1331,8 +1331,8 @@ const LESSONS_FR = [
           ],
           [
             "ils / elles",
-            "ils/elles sont ici [il SÔN]",
-            "ils/elles ont deux enfants [il ZÔN]"
+            "ils/elles sont ici",
+            "ils/elles ont deux enfants"
           ]
         ]
       }
@@ -1351,14 +1351,14 @@ const LESSONS_FR = [
       },
       {
         "q": "Qual é a diferença sonora entre \"Ils sont\" (eles são) e \"Ils ont\" (eles têm)?",
-        "a": "\"Ils sont\" tem som de S [il SÔN] e \"Ils ont\" tem som de Z [il ZÔN]",
+        "a": "\"Ils sont\" tem som de S e \"Ils ont\" tem som de Z",
         "opts": [
-          "\"Ils sont\" tem som de S [il SÔN] e \"Ils ont\" tem som de Z [il ZÔN]",
+          "\"Ils sont\" tem som de S e \"Ils ont\" tem som de Z",
           "Ambos têm som idêntico",
           "\"Ils sont\" tem som de Z e \"Ils ont\" tem som de S",
           "O \"s\" final é pronunciado nos dois"
         ],
-        "why": "Em \"Ils ont\", o S de \"ils\" junta-se à vogal de \"ont\" produzindo som de Z [il ZÔN]!"
+        "why": "Em \"Ils ont\", o S de \"ils\" junta-se à vogal de \"ont\" produzindo som de Z!"
       },
       {
         "q": "Qual frase está CORRETA para dizer \"Estou cansada, mas estou pronta\"?",
@@ -1402,7 +1402,7 @@ const LESSONS_FR = [
           "sommes",
           "sont"
         ],
-        "why": "A conjugação de \"être\" para \"vous\" é \"vous êtes\" [vu ZÉT]."
+        "why": "A conjugação de \"être\" para \"vous\" é \"vous êtes\"."
       },
       {
         "q": "No francês falado do dia a dia, como os franceses costumam dizer \"Nós estamos prontos / A gente está pronto\"?",
@@ -1475,75 +1475,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Le pain / La baguette",
-        "pt": "O pão / A baguete [lã PÃ / la ba-GUÉT]"
+        "pt": "O pão / A baguete"
       },
       {
         "en": "Le croissant",
-        "pt": "O croissant [lã krua-SÃ]"
+        "pt": "O croissant"
       },
       {
         "en": "Le fromage",
-        "pt": "O queijo [lã frô-MÁJ]"
+        "pt": "O queijo"
       },
       {
         "en": "Le beurre",
-        "pt": "A manteiga [lã BŒR]"
+        "pt": "A manteiga"
       },
       {
         "en": "Le poulet",
-        "pt": "O frango [lã pu-LÉ]"
+        "pt": "O frango"
       },
       {
         "en": "Le poisson",
-        "pt": "O peixe [lã pua-SÔN]"
+        "pt": "O peixe"
       },
       {
         "en": "La viande",
-        "pt": "A carne [la VIÃD]"
+        "pt": "A carne"
       },
       {
         "en": "La salade",
-        "pt": "A salada [la sa-LÁD]"
+        "pt": "A salada"
       },
       {
         "en": "La soupe",
-        "pt": "A sopa [la SUP]"
+        "pt": "A sopa"
       },
       {
         "en": "Le riz / Les pâtes",
-        "pt": "O arroz / O macarrão [lã RI / lê PÁT]"
+        "pt": "O arroz / O macarrão"
       },
       {
         "en": "L'eau (minérale / plate)",
-        "pt": "A água (mineral / sem gás) [LÔ]"
+        "pt": "A água (mineral / sem gás)"
       },
       {
         "en": "Le café / Le thé",
-        "pt": "O café / O chá [lã ka-FÊ / lã TÊ]"
+        "pt": "O café / O chá"
       },
       {
         "en": "Le lait",
-        "pt": "O leite [lã LÉ]"
+        "pt": "O leite"
       },
       {
         "en": "Le jus d'orange",
-        "pt": "O suco de laranja [lã jü dô-RÃJ]"
+        "pt": "O suco de laranja"
       },
       {
         "en": "Le gâteau / La crêpe",
-        "pt": "O bolo / O crepe [lã ga-TÔ / la KRÉP]"
+        "pt": "O bolo / O crepe"
       },
       {
         "en": "Le petit-déjeuner",
-        "pt": "O café da manhã [lã pã-ti de-jœ-NÊ]"
+        "pt": "O café da manhã"
       },
       {
         "en": "Le déjeuner / Le dîner",
-        "pt": "O almoço / O jantar [lã de-jœ-NÊ / lã di-NÊ]"
+        "pt": "O almoço / O jantar"
       },
       {
         "en": "L'addition",
-        "pt": "A conta (no restaurante) [la-di-SIÔN]"
+        "pt": "A conta (no restaurante)"
       }
     ],
     "expressions": [
@@ -1736,7 +1736,7 @@ const LESSONS_FR = [
           "nous mangez",
           "nous mangent"
         ],
-        "why": "Mantemos o \"e\" depois do G em \"nous mangeons\" [nu mãn-JÔN] para preservar o som suave de J!"
+        "why": "Mantemos o \"e\" depois do G em \"nous mangeons\" para preservar o som suave de J!"
       }
     ],
     "speak": [
@@ -1765,75 +1765,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Lundi",
-        "pt": "Segunda-feira [lãn-DI]"
+        "pt": "Segunda-feira"
       },
       {
         "en": "Mardi",
-        "pt": "Terça-feira [mar-DI]"
+        "pt": "Terça-feira"
       },
       {
         "en": "Mercredi",
-        "pt": "Quarta-feira [mér-krã-DI]"
+        "pt": "Quarta-feira"
       },
       {
         "en": "Jeudi",
-        "pt": "Quinta-feira [jœ-DI]"
+        "pt": "Quinta-feira"
       },
       {
         "en": "Vendredi",
-        "pt": "Sexta-feira [vãn-drã-DI]"
+        "pt": "Sexta-feira"
       },
       {
         "en": "Samedi",
-        "pt": "Sábado [sam-DI]"
+        "pt": "Sábado"
       },
       {
         "en": "Dimanche",
-        "pt": "Domingo [di-MÃCH]"
+        "pt": "Domingo"
       },
       {
         "en": "Janvier / Février",
-        "pt": "Janeiro / Fevereiro [jãn-VIÊ / fe-vri-IÊ]"
+        "pt": "Janeiro / Fevereiro"
       },
       {
         "en": "Mars / Avril",
-        "pt": "Março / Abril (pronuncia-se o S e o L!) [MÁRS / a-VRIL]"
+        "pt": "Março / Abril (pronuncia-se o S e o L!)"
       },
       {
         "en": "Mai / Juin",
-        "pt": "Maio / Junho [MÉ / JUÃ]"
+        "pt": "Maio / Junho"
       },
       {
         "en": "Juillet / Août",
-        "pt": "Julho / Agosto [jüi-IÉ / ÚT]"
+        "pt": "Julho / Agosto"
       },
       {
         "en": "Septembre / Octobre",
-        "pt": "Setembro / Outubro [sep-TÃBR / ók-TÓBR]"
+        "pt": "Setembro / Outubro"
       },
       {
         "en": "Novembre / Décembre",
-        "pt": "Novembro / Dezembro [nô-VÃBR / de-SÃBR]"
+        "pt": "Novembro / Dezembro"
       },
       {
         "en": "Aujourd'hui",
-        "pt": "Hoje [ô-jur-DUÍ]"
+        "pt": "Hoje"
       },
       {
         "en": "Demain / Hier",
-        "pt": "Amanhã / Ontem [dã-MÃ / i-ÉR]"
+        "pt": "Amanhã / Ontem"
       },
       {
         "en": "La semaine / Le week-end",
-        "pt": "A semana / O fim de semana [la sã-MÉN / lã ui-KÉND]"
+        "pt": "A semana / O fim de semana"
       },
       {
         "en": "Le mois / L'année",
-        "pt": "O mês / O ano [lã MUÁ / la-NÊ]"
+        "pt": "O mês / O ano"
       },
       {
         "en": "Le premier (1er)",
-        "pt": "Primeiro (dia 1º do mês) [lã prã-MIÊ]"
+        "pt": "Primeiro (dia 1º do mês)"
       }
     ],
     "expressions": [
@@ -1885,7 +1885,7 @@ const LESSONS_FR = [
       "rules": [
         "<b>\"Lundi\" vs. \"Le lundi\" (Esta segunda vs. Toda segunda!):</b> Sem \"le\" = um dia específico (nesta semana): \"Lundi, je vais chez le médecin.\" (Na segunda-feira vou ao médico). (Lembre-se: Lundi = nesta segunda; Le lundi = todas as segundas-feiras!)",
         "<b>Como Dizer Datas: \"Le premier\" (Dia 1º) vs. Outros Dias:</b> Dia 1º do mês: C'est le premier janvier / le premier mai. (Em francês, dias da semana e meses do ano escrevem-se com letra minúscula (lundi, janvier) quando estão no meio da frase!)",
-        "<b>Pronúncia de \"Mars\" (Março) e \"Août\" (Agosto):</b> Mars (março) pronuncia-se o S final bem claro: [MÁRS]. (No dia \"samedi\" (sábado), o E central é mudo: pronuncia-se [sam-DI] em duas sílabas!)"
+        "<b>Pronúncia de \"Mars\" (Março) e \"Août\" (Agosto):</b> Mars (março): o S final é bem claro. (No dia \"samedi\" (sábado), o E central é mudo: são duas sílabas!)"
       ],
       "table": {
         "headers": [
@@ -1912,7 +1912,7 @@ const LESSONS_FR = [
           [
             "en + mês",
             "Em + mês do ano",
-            "Mon anniversaire est en août [ÚT]."
+            "Mon anniversaire est en août."
           ]
         ]
       }
@@ -1964,14 +1964,14 @@ const LESSONS_FR = [
       },
       {
         "q": "Como se pronuncia o mês de agosto (\"août\") em francês?",
-        "a": "[ÚT] (o \"a\" é mudo e o \"t\" soa)",
+        "a": "O A é mudo e o T soa",
         "opts": [
-          "[ÚT] (o \"a\" é mudo e o \"t\" soa)",
-          "[a-Ú]",
-          "[a-ÚT]",
-          "[ÔT]"
+          "O A é mudo e o T soa",
+          "O A soa e o T fica mudo",
+          "Soam o A, o U e o T",
+          "Soa como \"ôt\""
         ],
-        "why": "\"Août\" pronuncia-se [ÚT], em uma única sílaba!"
+        "why": "\"Août\" pronuncia-se, em uma única sílaba!"
       },
       {
         "q": "Quais são os dias úteis de segunda a sexta em ordem correta?",
@@ -2055,75 +2055,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Quelle heure est-il ?",
-        "pt": "Que horas são? [kél ŒR é-TIL?]"
+        "pt": "Que horas são?"
       },
       {
         "en": "Il est une heure",
-        "pt": "É uma hora (1h00) [i-lé ü-NŒR]"
+        "pt": "É uma hora (1h00)"
       },
       {
         "en": "Il est deux heures",
-        "pt": "São duas horas [dø-ZŒR] [i-lé dø-ZŒR]"
+        "pt": "São duas horas"
       },
       {
         "en": "Il est midi",
-        "pt": "É meio-dia (12h00) [i-lé mi-DI]"
+        "pt": "É meio-dia (12h00)"
       },
       {
         "en": "Il est minuit",
-        "pt": "É meia-noite (00h00) [i-lé mi-NUÍ]"
+        "pt": "É meia-noite (00h00)"
       },
       {
         "en": "Et quart",
-        "pt": "E quinze (lit. e um quarto) [ê KÁR]"
+        "pt": "E quinze (lit. e um quarto)"
       },
       {
         "en": "Et demie",
-        "pt": "E meia (30 min) [ê dã-MI]"
+        "pt": "E meia (30 min)"
       },
       {
         "en": "Moins le quart",
-        "pt": "Quinze para as... (lit. menos um quarto) [muã lã KÁR]"
+        "pt": "Quinze para as... (lit. menos um quarto)"
       },
       {
         "en": "Pile",
-        "pt": "Em ponto [PÍL]"
+        "pt": "Em ponto"
       },
       {
         "en": "Du matin",
-        "pt": "Da manhã [dü ma-TÃ]"
+        "pt": "Da manhã"
       },
       {
         "en": "De l'après-midi",
-        "pt": "Da tarde [dã la-pré-mi-DI]"
+        "pt": "Da tarde"
       },
       {
         "en": "Du soir",
-        "pt": "Da noite [dü SUAR]"
+        "pt": "Da noite"
       },
       {
         "en": "À quelle heure... ?",
-        "pt": "A que horas...? [a kél ŒR?]"
+        "pt": "A que horas...?"
       },
       {
         "en": "Tôt / Tard",
-        "pt": "Cedo / Tarde [TÔ / TÁR]"
+        "pt": "Cedo / Tarde"
       },
       {
         "en": "Se réveiller / Se lever",
-        "pt": "Acordar / Levantar-se [sã re-vê-IÊ / sã lã-VÊ]"
+        "pt": "Acordar / Levantar-se"
       },
       {
         "en": "Se coucher",
-        "pt": "Deitar-se / Ir dormir [sã ku-CHÊ]"
+        "pt": "Deitar-se / Ir dormir"
       },
       {
         "en": "En avance / En retard",
-        "pt": "Adiantado(a) / Atrasado(a) [ã na-VÃS / ãn rã-TÁR]"
+        "pt": "Adiantado(a) / Atrasado(a)"
       },
       {
         "en": "Rendez-vous",
-        "pt": "Compromisso / Horário marcado / Encontro [rãn-dê-VU]"
+        "pt": "Compromisso / Horário marcado / Encontro"
       }
     ],
     "expressions": [
@@ -2180,29 +2180,24 @@ const LESSONS_FR = [
       "table": {
         "headers": [
           "Horário",
-          "Em Francês (Sempre \"Il est...\")",
-          "Pronúncia"
+          "Em Francês (Sempre \"Il est...\")"
         ],
         "rows": [
           [
             "8h00 / 12h00 / 00h00",
-            "Il est huit heures / midi / minuit",
-            "[i-lé uí-TŒR / mi-DI / mi-NUÍ]"
+            "Il est huit heures / midi / minuit"
           ],
           [
             "8h15",
-            "Il est huit heures et quart",
-            "[i-lé uí-TŒR ê KÁR]"
+            "Il est huit heures et quart"
           ],
           [
             "8h30",
-            "Il est huit heures et demie",
-            "[i-lé uí-TŒR ê dã-MI]"
+            "Il est huit heures et demie"
           ],
           [
             "8h45",
-            "Il est neuf heures moins le quart",
-            "[i-lé nœ-VŒR muã lã KÁR]"
+            "Il est neuf heures moins le quart"
           ]
         ]
       }
@@ -2345,75 +2340,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Quel temps fait-il ?",
-        "pt": "Como está o tempo? [kél TÃ fé-TIL?]"
+        "pt": "Como está o tempo?"
       },
       {
         "en": "Il fait beau",
-        "pt": "O tempo está bom / bonito [il fé BÔ]"
+        "pt": "O tempo está bom / bonito"
       },
       {
         "en": "Il fait mauvais",
-        "pt": "O tempo está ruim / feio [il fé mô-VÉ]"
+        "pt": "O tempo está ruim / feio"
       },
       {
         "en": "Il fait chaud",
-        "pt": "Está calor / quente [il fé CHÔ]"
+        "pt": "Está calor / quente"
       },
       {
         "en": "Il fait froid",
-        "pt": "Está frio [il fé FRUÁ]"
+        "pt": "Está frio"
       },
       {
         "en": "Il fait frais / doux",
-        "pt": "Está fresquinho / ameno [il fé FRÉ / DU]"
+        "pt": "Está fresquinho / ameno"
       },
       {
         "en": "Il pleut / La pluie",
-        "pt": "Está chovendo / A chuva [il PLØ / la PLUÍ]"
+        "pt": "Está chovendo / A chuva"
       },
       {
         "en": "Il neige / La neige",
-        "pt": "Está nevando / A neve [il NÉJ / la NÉJ]"
+        "pt": "Está nevando / A neve"
       },
       {
         "en": "Il y a du soleil",
-        "pt": "Está fazendo sol (há sol) [i-li-á dü sô-LÉI]"
+        "pt": "Está fazendo sol (há sol)"
       },
       {
         "en": "Il y a du vent",
-        "pt": "Está ventando (há vento) [i-li-á dü VÃ]"
+        "pt": "Está ventando (há vento)"
       },
       {
         "en": "Il y a des nuages",
-        "pt": "Está nublado (há nuvens) [i-li-á dê nü-ÁJ]"
+        "pt": "Está nublado (há nuvens)"
       },
       {
         "en": "Il y a de l'orage",
-        "pt": "Há tempestade / trovoada [i-li-á dã lô-RÁJ]"
+        "pt": "Há tempestade / trovoada"
       },
       {
         "en": "Le printemps",
-        "pt": "A primavera (usa AU printemps!) [lã prãn-TÃ]"
+        "pt": "A primavera (usa AU printemps!)"
       },
       {
         "en": "L'été",
-        "pt": "O verão (usa EN été) [le-TÊ]"
+        "pt": "O verão (usa EN été)"
       },
       {
         "en": "L'automne",
-        "pt": "O outono (usa EN automne) [lô-TÓN]"
+        "pt": "O outono (usa EN automne)"
       },
       {
         "en": "L'hiver",
-        "pt": "O inverno (usa EN hiver [ã ni-VÉR]) [li-VÉR]"
+        "pt": "O inverno (usa EN hiver)"
       },
       {
         "en": "Le parapluie",
-        "pt": "O guarda-chuva [lã pa-ra-PLUÍ]"
+        "pt": "O guarda-chuva"
       },
       {
         "en": "Les degrés",
-        "pt": "Os graus (temperatura) [lê dã-GRÊ]"
+        "pt": "Os graus (temperatura)"
       }
     ],
     "expressions": [
@@ -2464,7 +2459,7 @@ const LESSONS_FR = [
       "title": "As 3 Estruturas do Clima: Il fait vs. Il y a vs. Verbo Direto",
       "rules": [
         "<b>As 3 Estruturas do Clima: Il fait vs. Il y a vs. Verbo Direto:</b> IL FAIT + adjetivo: Il fait beau, il fait mauvais, il fait chaud, il fait froid, il fait frais. (Compare: \"Il fait froid\" (Está frio lá fora — clima) vs. \"J'ai froid\" (Eu estou com frio — sensação pessoal)!)",
-        "<b>As Preposições das Estações: Por que \"AU printemps\" e \"EN été\"?:</b> Começam com som de vogal → usam EN: en été [ã ne-TÊ], en automne [ã nô-TÓN], en hiver [ã ni-VÉR]. (Em \"l'hiver\" [li-VÉR], o R final é pronunciado! Já em \"l'automne\" [lô-TÓN], o M é mudo e soa só o N!)",
+        "<b>As Preposições das Estações: Por que \"AU printemps\" e \"EN été\"?:</b> Começam com som de vogal → usam EN: en été, en automne, en hiver. (Em \"l'hiver\", o R final é pronunciado! Já em \"l'automne\", o M é mudo e soa só o N!)",
         "<b>Futuro Próximo para Previsão do Tempo (Aller + Infinitivo):</b> Il va pleuvoir cet après-midi (Vai chover hoje à tarde). (Basta usar \"Il va\" + faire / pleuvoir / neiger / y avoir para falar do tempo de amanhã!)"
       ],
       "table": {
@@ -2577,14 +2572,14 @@ const LESSONS_FR = [
       },
       {
         "q": "Como se pronuncia a palavra \"hiver\" (inverno)?",
-        "a": "[i-VÉR] (H mudo e R final pronunciado)",
+        "a": "O H é mudo e o R final soa",
         "opts": [
-          "[i-VÉR] (H mudo e R final pronunciado)",
-          "[i-VÊ] (R mudo)",
-          "[ri-VÉR]",
-          "[i-VÉRN]"
+          "O H é mudo e o R final soa",
+          "O H é mudo e o R final também",
+          "O H soa como R",
+          "Termina em som de N"
         ],
-        "why": "Diferente dos verbos em -er, o substantivo \"hiver\" tem o R final pronunciado: [i-VÉR]."
+        "why": "Diferente dos verbos em -er, o substantivo \"hiver\" tem o R final pronunciado."
       },
       {
         "q": "O que significa \"Il fait un froid de canard\"?",
@@ -2635,75 +2630,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Où est... ? / Où se trouve... ?",
-        "pt": "Onde fica...? [u É / u sã TRUV]"
+        "pt": "Onde fica...?"
       },
       {
         "en": "À droite",
-        "pt": "À direita [a DRUÁT]"
+        "pt": "À direita"
       },
       {
         "en": "À gauche",
-        "pt": "À esquerda [a GÔCH]"
+        "pt": "À esquerda"
       },
       {
         "en": "Tout droit",
-        "pt": "Sempre em frente / Reto [tu DRUÁ]"
+        "pt": "Sempre em frente / Reto"
       },
       {
         "en": "Près de / À côté de",
-        "pt": "Perto de / Ao lado de [PRÉ dã / a kô-TÊ dã]"
+        "pt": "Perto de / Ao lado de"
       },
       {
         "en": "Loin de",
-        "pt": "Longe de [LUÃ dã]"
+        "pt": "Longe de"
       },
       {
         "en": "En face de",
-        "pt": "Em frente a [ãn FÁS dã]"
+        "pt": "Em frente a"
       },
       {
         "en": "Au coin de la rue",
-        "pt": "Na esquina da rua [ô KUÃ dã la RÜ]"
+        "pt": "Na esquina da rua"
       },
       {
         "en": "La gare / Le métro",
-        "pt": "A estação de trem / O metrô [la GÁR / lã me-TRÔ]"
+        "pt": "A estação de trem / O metrô"
       },
       {
         "en": "La boulangerie",
-        "pt": "A padaria [la bu-lãn-jã-RI]"
+        "pt": "A padaria"
       },
       {
         "en": "La pharmacie / L'hôpital",
-        "pt": "A farmácia / O hospital [la far-ma-SI / lô-pi-TÁL]"
+        "pt": "A farmácia / O hospital"
       },
       {
         "en": "Le musée / Le parc",
-        "pt": "O museu / O parque [lã mü-ZÊ / lã PÁRK]"
+        "pt": "O museu / O parque"
       },
       {
         "en": "La banque / Le supermarché",
-        "pt": "O banco / O supermercado [la BÃK / lã sü-pér-mar-CHÊ]"
+        "pt": "O banco / O supermercado"
       },
       {
         "en": "L'hôtel / L'aéroport",
-        "pt": "O hotel / O aeroporto [lô-TÉL / la-e-rô-PÓR]"
+        "pt": "O hotel / O aeroporto"
       },
       {
         "en": "Le pont / La place",
-        "pt": "A ponte / A praça [lã PÔN / la PLÁS]"
+        "pt": "A ponte / A praça"
       },
       {
         "en": "Le feu rouge",
-        "pt": "O semáforo / sinal [lã fø RUJ]"
+        "pt": "O semáforo / sinal"
       },
       {
         "en": "À pied / En métro / En bus",
-        "pt": "A pé / De metrô / De ônibus [a PIÊ / ãn me-TRÔ / ãn BÜS]"
+        "pt": "A pé / De metrô / De ônibus"
       },
       {
         "en": "Ici / Là-bas",
-        "pt": "Aqui / Logo ali (lá) [i-SI / la-BÁ]"
+        "pt": "Aqui / Logo ali (lá)"
       }
     ],
     "expressions": [
@@ -2755,7 +2750,7 @@ const LESSONS_FR = [
       "rules": [
         "<b>Ir a Algum Lugar: Aller + AU / À LA / À L' / AUX:</b> Lugar masculino (à + le = AU): Je vais au parc, au musée, au cinéma, au supermarché. (Se você vai à casa ou consultório de uma PESSOA, use CHEZ: \"Je vais chez le médecin / chez mon ami\"!)",
         "<b>Preposições de Localização com DE (Du / De la / De l'):</b> Masculino (de + le = DU): La banque est à côté du musée / en face du parc. (Sempre que o lugar vier no final da frase sem outro complemento, tire o \"de\": \"C'est juste à côté !\" (Fica bem ao lado!).)",
-        "<b>Dando Direções com Educação (Imperativo com Vous: -EZ):</b> Allez tout droit (Vá reto / Siga em frente). (Repare na diferença sonora: \"tout droit\" [tu DRUÁ] (masculino, T mudo) vs. \"à droite\" [a DRUÁT] (feminino, T pronunciado)!)"
+        "<b>Dando Direções com Educação (Imperativo com Vous: -EZ):</b> Allez tout droit (Vá reto / Siga em frente). (Repare na diferença sonora: \"tout droit\" (masculino, T mudo) vs. \"à droite\" (feminino, T pronunciado)!)"
       ],
       "table": {
         "headers": [
@@ -2834,14 +2829,14 @@ const LESSONS_FR = [
       },
       {
         "q": "Qual é a diferença de pronúncia entre \"tout droit\" (reto) e \"à droite\" (à direita)?",
-        "a": "Em \"tout droit\" [tu DRUÁ] o T final é mudo; em \"à droite\" [a DRUÁT] o T é pronunciado",
+        "a": "Em \"tout droit\" o T final é mudo; em \"à droite\" o T é pronunciado",
         "opts": [
-          "Em \"tout droit\" [tu DRUÁ] o T final é mudo; em \"à droite\" [a DRUÁT] o T é pronunciado",
+          "Em \"tout droit\" o T final é mudo; em \"à droite\" o T é pronunciado",
           "Ambos têm o T pronunciado",
           "Ambos têm o T mudo",
           "\"Tout droit\" significa à esquerda"
         ],
-        "why": "O \"-e\" final em \"droite\" faz a consoante T soar claramente: [a DRUÁT]!"
+        "why": "O \"-e\" final em \"droite\" faz a consoante T soar claramente:!"
       },
       {
         "q": "Como você diz \"Fica a cinco minutos a pé\" em francês?",
@@ -2925,75 +2920,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Les vêtements",
-        "pt": "As roupas [lê vêt-MÃ]"
+        "pt": "As roupas"
       },
       {
         "en": "Un pantalon / Un jean",
-        "pt": "Uma calça / Uma calça jeans [ãn pãn-ta-LÔN / ãn DJÍN]"
+        "pt": "Uma calça / Uma calça jeans"
       },
       {
         "en": "Une chemise / Un t-shirt",
-        "pt": "Uma camisa / Uma camiseta [ün chã-MÍZ / ãn ti-CHŒRT]"
+        "pt": "Uma camisa / Uma camiseta"
       },
       {
         "en": "Une robe / Une jupe",
-        "pt": "Um vestido / Uma saia [ün RÓB / ün JÜP]"
+        "pt": "Um vestido / Uma saia"
       },
       {
         "en": "Un pull",
-        "pt": "Um suéter / blusa de lã [ãn PÜL]"
+        "pt": "Um suéter / blusa de lã"
       },
       {
         "en": "Un manteau / Une veste",
-        "pt": "Um sobretudo (casaco longo) / Uma jaqueta (ou blazer) [ãn mãn-TÔ / ün VÉST]"
+        "pt": "Um sobretudo (casaco longo) / Uma jaqueta (ou blazer)"
       },
       {
         "en": "Des chaussures / Des baskets",
-        "pt": "Sapatos / Tênis [dê chô-SÜR / dê bas-KÉT]"
+        "pt": "Sapatos / Tênis"
       },
       {
         "en": "Des chaussettes",
-        "pt": "Meias [dê chô-SÉT]"
+        "pt": "Meias"
       },
       {
         "en": "Une écharpe / Un chapeau",
-        "pt": "Um cachecol (lenço) / Um chapéu [ü ne-CHÁRP / ãn cha-PÔ]"
+        "pt": "Um cachecol (lenço) / Um chapéu"
       },
       {
         "en": "Un sac / Des lunettes",
-        "pt": "Uma bolsa (ou mochila) / Óculos [ãn SÁK / dê lü-NÉT]"
+        "pt": "Uma bolsa (ou mochila) / Óculos"
       },
       {
         "en": "La taille / La pointure",
-        "pt": "O tamanho (de roupa) / O número (de calçado) [la TÁI / la puãn-TÜR]"
+        "pt": "O tamanho (de roupa) / O número (de calçado)"
       },
       {
         "en": "La cabine d'essayage",
-        "pt": "O provador [la ka-BÍN dê-sê-IÁJ]"
+        "pt": "O provador"
       },
       {
         "en": "Cher / Pas cher",
-        "pt": "Caro / Barato [CHÉR / pá CHÉR]"
+        "pt": "Caro / Barato"
       },
       {
         "en": "Les soldes",
-        "pt": "As liquidações / promoções [lê SÓLD]"
+        "pt": "As liquidações / promoções"
       },
       {
         "en": "Par carte / En espèces",
-        "pt": "No cartão / Em dinheiro vivo [par KÁRT / ã nes-PÉS]"
+        "pt": "No cartão / Em dinheiro vivo"
       },
       {
         "en": "Ce / Cet (masc. sing.)",
-        "pt": "Este / Esse (antes de consoante / vogal) [SÃ / SÉT]"
+        "pt": "Este / Esse (antes de consoante / vogal)"
       },
       {
         "en": "Cette (fem. sing.)",
-        "pt": "Esta / Essa [SÉT]"
+        "pt": "Esta / Essa"
       },
       {
         "en": "Ces (plural)",
-        "pt": "Estes / Estas / Esses / Essas [SÊ]"
+        "pt": "Estes / Estas / Esses / Essas"
       }
     ],
     "expressions": [
@@ -3043,7 +3038,7 @@ const LESSONS_FR = [
     "grammar": {
       "title": "Os Demonstrativos: CE, CET, CETTE, CES (Este/Esta/Estes/Estas)",
       "rules": [
-        "<b>Os Demonstrativos: CE, CET, CETTE, CES (Este/Esta/Estes/Estas):</b> Masculino singular + consoante (CE [sã]): ce pantalon, ce pull, ce manteau. (\"Cet\" (masc. antes de vogal) e \"Cette\" (feminino) têm exatamente a mesma pronúncia [SÉT]!)",
+        "<b>Os Demonstrativos: CE, CET, CETTE, CES (Este/Esta/Estes/Estas):</b> Masculino singular + consoante (CE): ce pantalon, ce pull, ce manteau. (\"Cet\" (masc. antes de vogal) e \"Cette\" (feminino) têm exatamente a mesma pronúncia!)",
         "<b>Singular em Português, Masculino/Feminino Diferente em Francês!:</b> Un pantalon / Un jean = masculino e singular em francês (\"une calça\" → un pantalon noir). (Lembre-se sempre deste par invertido em relação ao português: UN pantalon (masc.) e UNE robe (fem.)!)",
         "<b>La Taille (Roupa) vs. La Pointure (Sapato):</b> Para camisas, vestidos, calças e casacos: Quelle est votre taille ? (Je fais du M / du 38). (\"Très\" = muito (intensidade normal: très joli); \"Trop\" = demais / em excesso (trop petit = pequeno demais)!)"
       ],
@@ -3055,22 +3050,22 @@ const LESSONS_FR = [
         ],
         "rows": [
           [
-            "ce [sã]",
+            "ce",
             "Masc. sing. + consoante",
             "ce pantalon, ce pull, ce manteau"
           ],
           [
-            "cet [sét]",
+            "cet",
             "Masc. sing. + vogal / H mudo",
             "cet imperméable, cet hôtel"
           ],
           [
-            "cette [sét]",
+            "cette",
             "Feminino singular (todas)",
             "cette robe, cette chemise, cette écharpe"
           ],
           [
-            "ces [sê]",
+            "ces",
             "Plural (masculino e feminino)",
             "ces chaussures, ces vêtements"
           ]
@@ -3098,7 +3093,7 @@ const LESSONS_FR = [
           "Porque estão no plural",
           "Porque são roupas caras"
         ],
-        "why": "Antes de substantivo masculino singular iniciado por vogal ou H mudo, \"ce\" vira \"cet\" [SÉT]!"
+        "why": "Antes de substantivo masculino singular iniciado por vogal ou H mudo, \"ce\" vira \"cet\"!"
       },
       {
         "q": "Qual demonstrativo usamos no plural para ambos os gêneros (\"estes sapatos / estas camisas\")?",
@@ -3109,7 +3104,7 @@ const LESSONS_FR = [
           "ceux",
           "cet"
         ],
-        "why": "\"Ces\" [SÊ] é o único demonstrativo plural para masculino e feminino!"
+        "why": "\"Ces\" é o único demonstrativo plural para masculino e feminino!"
       },
       {
         "q": "Como você pergunta à vendedora \"Posso experimentar, por favor?\" em francês?",
@@ -3215,75 +3210,75 @@ const LESSONS_FR = [
     "vocab": [
       {
         "en": "Hier",
-        "pt": "Ontem [i-ÉR]"
+        "pt": "Ontem"
       },
       {
         "en": "Avant-hier",
-        "pt": "Anteontem [a-vãn-ti-ÉR]"
+        "pt": "Anteontem"
       },
       {
         "en": "La semaine dernière",
-        "pt": "Na semana passada [la sã-MÉN dér-NIÉR]"
+        "pt": "Na semana passada"
       },
       {
         "en": "Le mois dernier / L'année dernière",
-        "pt": "No mês passado / No ano passado [lã MUÁ dér-NIÊ / la-NÊ dér-NIÉR]"
+        "pt": "No mês passado / No ano passado"
       },
       {
         "en": "J'ai parlé / J'ai mangé",
-        "pt": "Eu falei / Eu comi (verbos em -ER → -É) [jê par-LÊ / jê mãn-JÊ]"
+        "pt": "Eu falei / Eu comi (verbos em -ER → -É)"
       },
       {
         "en": "J'ai visité / J'ai acheté",
-        "pt": "Eu visitei / Eu comprei [jê vi-zi-TÊ / jê a-chã-TÊ]"
+        "pt": "Eu visitei / Eu comprei"
       },
       {
         "en": "J'ai fini / J'ai choisi",
-        "pt": "Eu terminei / Eu escolhi (verbos em -IR → -I) [jê fi-NI / jê chua-ZI]"
+        "pt": "Eu terminei / Eu escolhi (verbos em -IR → -I)"
       },
       {
         "en": "J'ai fait",
-        "pt": "Eu fiz (particípio de faire) [jê FÉ]"
+        "pt": "Eu fiz (particípio de faire)"
       },
       {
         "en": "J'ai vu",
-        "pt": "Eu vi / assisti (particípio de voir) [jê VÜ]"
+        "pt": "Eu vi / assisti (particípio de voir)"
       },
       {
         "en": "J'ai pris",
-        "pt": "Eu tomei / peguei (particípio de prendre) [jê PRI]"
+        "pt": "Eu tomei / peguei (particípio de prendre)"
       },
       {
         "en": "J'ai bu / J'ai lu",
-        "pt": "Eu bebi (boire) / Eu li (lire) [jê BÜ / jê LÜ]"
+        "pt": "Eu bebi (boire) / Eu li (lire)"
       },
       {
         "en": "J'ai eu / J'ai été",
-        "pt": "Eu tive (avoir) / Eu fui ou estive (être) [jê Ü / jê e-TÊ]"
+        "pt": "Eu tive (avoir) / Eu fui ou estive (être)"
       },
       {
         "en": "Je suis allé(e)",
-        "pt": "Eu fui (aller usa ÊTRE!) [jã suí za-LÊ]"
+        "pt": "Eu fui (aller usa ÊTRE!)"
       },
       {
         "en": "Je suis arrivé(e) / parti(e)",
-        "pt": "Eu cheguei / Eu parti (usam ÊTRE!) [jã suí za-ri-VÊ / par-TI]"
+        "pt": "Eu cheguei / Eu parti (usam ÊTRE!)"
       },
       {
         "en": "Je suis venu(e) / rentré(e)",
-        "pt": "Eu vim / Eu voltei para casa (usam ÊTRE!) [jã suí vã-NÜ / rãn-TRÊ]"
+        "pt": "Eu vim / Eu voltei para casa (usam ÊTRE!)"
       },
       {
         "en": "Je suis resté(e)",
-        "pt": "Eu fiquei / permaneci (usa ÊTRE!) [jã suí res-TÊ]"
+        "pt": "Eu fiquei / permaneci (usa ÊTRE!)"
       },
       {
         "en": "C'était magnifique !",
-        "pt": "Foi magnífico / Estava incrível! [se-TÉ ma-nhi-FÍK!]"
+        "pt": "Foi magnífico / Estava incrível!"
       },
       {
         "en": "D'abord / Ensuite / Enfin",
-        "pt": "Primeiro / Depois / Finalmente [da-BÓR / ãn-SUÍT / ãn-FÃ]"
+        "pt": "Primeiro / Depois / Finalmente"
       }
     ],
     "expressions": [
@@ -3331,10 +3326,10 @@ const LESSONS_FR = [
       "Salut Camille ! Oui, c'était magnifique ! J'ai fait beaucoup de choses."
     ],
     "grammar": {
-      "title": "A Fórmula do Passé Composé: [Auxiliar no Presente] + [Particípio]",
+      "title": "A Fórmula do Passé Composé: +",
       "rules": [
-        "<b>A Fórmula do Passé Composé: [Auxiliar no Presente] + [Particípio]:</b> Verbos terminados em -ER trocam -er por -É (mesmo som de -er [ê]!): parler → parlé, manger → mangé, visiter → visité. (Dica de pronúncia de ouro: \"manger\" (infinitivo) e \"mangé\" (particípio) têm EXATAMENTE o mesmo som [mãn-JÊ]! Quem diferencia é o \"J'ai\" antes!)",
-        "<b>Quando Usar AVOIR vs. Quando Usar ÊTRE (A Casa do Être):</b> Com AVOIR (não muda no feminino/plural): Elle a mangé, nous avons visité, ils ont vu. (Na fala, \"allé\", \"allée\", \"allés\" e \"allées\" pronunciam-se TODOS iguais [a-LÊ]! A diferença aparece na escrita.)",
+        "<b>A Fórmula do Passé Composé: +:</b> Verbos terminados em -ER trocam -er por -É (mesmo som de -er!): parler → parlé, manger → mangé, visiter → visité. (Dica de pronúncia de ouro: \"manger\" (infinitivo) e \"mangé\" (particípio) têm EXATAMENTE o mesmo som! Quem diferencia é o \"J'ai\" antes!)",
+        "<b>Quando Usar AVOIR vs. Quando Usar ÊTRE (A Casa do Être):</b> Com AVOIR (não muda no feminino/plural): Elle a mangé, nous avons visité, ils ont vu. (Na fala, \"allé\", \"allée\", \"allés\" e \"allées\" pronunciam-se TODOS iguais! A diferença aparece na escrita.)",
         "<b>A Negação no Passé Composé: \"Ne... pas\" Abraça o Auxiliar!:</b> Com avoir: Je n'ai pas compris (Eu não entendi) · Il n'a pas travaillé hier. (Fórmula da negativa: Sujeito + NE + (ai / suis) + PAS + particípio!)"
       ],
       "table": {
@@ -3421,7 +3416,7 @@ const LESSONS_FR = [
           "Troca-se \"-er\" por \"-u\"",
           "Não muda nada"
         ],
-        "why": "100% dos verbos terminados em \"-er\" formam o particípio passado com \"-é\" [ê]!"
+        "why": "100% dos verbos terminados em \"-er\" formam o particípio passado com \"-é\"!"
       },
       {
         "q": "Como fica a frase \"J'ai compris\" na forma NEGATIVA (\"Eu não entendi\")?",

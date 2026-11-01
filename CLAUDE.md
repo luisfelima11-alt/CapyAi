@@ -93,6 +93,27 @@ botão, SEO, PDF ou fala da Yara.
 - Endereço que não existe mostra o `404.html` (últimas rotas do `vercel.json`: `handle: filesystem` e depois o
   404; o dev-server faz o mesmo). Ele usa só caminhos absolutos, porque aparece em qualquer pasta.
 
+## Curso de francês: sem pronúncia escrita, e voz da OpenAI (regra do Luis, 19/out/2026)
+
+O curso de francês **não mostra a pronúncia escrita** ("Bonjour [bon-JUR]"): nem nos cards de vocabulário,
+nem na tabela de verbos, na aba Speak, nos padrões, nos quizzes, na trilha diária ou nas folhas em PDF.
+O aluno aprende ouvindo (botão 🔊) e vendo o francês escrito.
+
+- **Os HTML e a trilha são gerados.** Nunca edite `fr_aula_XX.html` nem `lessons_fr_data.js` à mão: a próxima
+  geração desfaz. Edite `scripts/fr-lessons-part1.mjs` / `part2.mjs` e rode:
+  `node scripts/build-fr-aulas.mjs && node scripts/build-fr-trail.mjs && node scripts/build-lesson-data.js`
+  (a trilha lê `data/lessons/201..212.json`, não o `lessons_fr_data.js`). Depois as folhas:
+  `node scripts/gera-folha-aula.mjs --curso fr_aula`.
+- `scripts/fr-sem-pronuncia.mjs` tira os colchetes de tudo que os geradores produzem e **falha a geração**
+  se sobrar um. Quiz que perguntava "como se pronuncia?" com a pronúncia escrita nas alternativas foi
+  reescrito com palavras ("O E soa como A"). Aula nova de francês não leva campo `phon`.
+- Mudou dado da trilha? Troque a etiqueta `?v=` do `fetch('data/lessons/…')` em `lessons.html` e `quadro.html`
+  (o `/data/` fica em cache por 1 dia).
+- **Voz:** `tts-fr.js` usa a voz da OpenAI com sotaque francês (`/api/tts?lang=fr`, `gpt-4o-mini-tts`) pelo
+  `CapyAudio` (funciona no iPhone) e cai na voz do navegador só se a OpenAI falhar. Ela lê só a frase em
+  francês: o que está entre parênteses (tradução, "(e)" de Enchanté(e)) fica na tela e a voz pula.
+- Teste: `tests/frances-sem-pronuncia.test.js`.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
@@ -595,6 +616,40 @@ deixar a IA gerar so as outras 2-3.
 (`/api/quiz`, `/api/flashcard-deck`, `/api/dialogue-scene`). **Nao foram tocados** —
 a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
 defeito vale para eles.
+
+## Home nova (29/out/2026)
+
+- `6_Home_Forest_Expedition.html` + `assets/js/pages/home.js` (`window.CapyHome`): saudação, 🔥 sequência e ⭐ nível,
+  semana (seg-dom), cartão da ligação, plano de hoje e "Continuar o curso". O resto do site foi para "Mais para praticar".
+- A semana marca os dias da **sequência atual** (`streakDays` terminando em `lastPracticeDate`); o app não guarda o
+  histórico de dias. O ⚡ de créditos da maquete ficou de fora: o `aiUsageLimit` do Store (3) não bate com o servidor (20/dia).
+- Cartão da ligação: `teste` (vozTeste disponível, "1ª ligação: 3 min grátis"), `super`, `convite` (teste usado → Super)
+  e `normal`. Os dados vêm do evento `capyPlanoHoje` do `plano-hoje-cartao.js` (sem 2º `/api/me`).
+  O botão abre `ai_chat.html#ligar`: o telefone pulsa e espera o toque (o navegador exige o gesto para microfone e som).
+  Nunca prometer "sem limite" no Super: ele tem `VOZ_MINUTOS_MES`.
+- "Continuar o curso" = última aula aberta no `classes.html` (`localStorage.capyUltimaAula`); as aulas não marcam conclusão.
+  Aula > 5 para quem é grátis volta para o `classes.html` (paywall).
+- Menu de baixo: Início · Trilha · Cursos · Jogos · Mais (Yara AI foi para o Mais). Eventos `home_*` no `/api/track`.
+
+## Plano de hoje e "Pôr na agenda" (29/out/2026)
+
+- `plano-hoje.js` (`window.CapyPlano`) monta 3 tarefas de 5 min **sem IA**: próxima mini-lição da trilha
+  (`capyLastMini_en` ou a 1ª incompleta), conversa com a Yara (ligação no Super ou teste grátis; senão chat) e
+  revisão (`/api/memory`, `lessons.html?review=1`). O "Meu Plano" semanal com IA continua no `study_plan.html`.
+- "Feito" vem de marcas com data gravadas onde a coisa acontece: `capyLastMini_en.at` + mini concluída,
+  `capyConversaDia` (`ai_chat.html`) e `capyRevisaoDia` (modo revisão). Nunca de uma foto tirada na home.
+- Horário em `Store.state.horarioEstudo` (padrão 19:00). Google: link `calendar.google.com/...&recur=RRULE:FREQ=DAILY`.
+  iPhone/Outlook: `GET /api/agenda.ics?hora=HH:MM` (evento diário de 15 min com alarme; só aceita HH:MM).
+- O cartão (`assets/js/plano-hoje-cartao.js`) monta tudo por `textContent`.
+
+## Ligação de teste: 3 minutos grátis, uma vez só (28/out/2026)
+
+- Quem não é Super (free e pro) liga **uma vez**, por 3 minutos (`VOZ_TESTE_MIN`), e só com e-mail
+  confirmado (`liberarTesteDeVoz` em `api/index.js`). O teto global de US$ é checado antes, para nunca gastar o teste.
+- A marca `__vozteste_<aluno>` no `user_state` nasce no 1º token. Dentro desses 3 minutos o aluno religa com o
+  que sobrou (até 3 tokens); depois, `403 plano_sem_voz` com `teste: 'usado'` (ou `'confirmar_email'`).
+- O token responde `teste: true`, e o `conversa-core.js` desliga quando acabam os minutos liberados (motivo
+  `teste` ou `cota`), não só aos 15 min. `/api/me` devolve `vozTeste: 'disponivel' | 'usado'` para a home.
 
 ## Custo da ligacao por voz: calculado e guardado (14/set/2026)
 

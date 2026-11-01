@@ -3,9 +3,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FR_LESSONS_1_6 } from './fr-lessons-part1.mjs';
 import { FR_LESSONS_7_12 } from './fr-lessons-part2.mjs';
+import { semPronuncia, limpaDeep, limpaTabela, confere } from './fr-sem-pronuncia.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ALL_LESSONS = [...FR_LESSONS_1_6, ...FR_LESSONS_7_12];
+const ALL_LESSONS = semPronuncia([...FR_LESSONS_1_6, ...FR_LESSONS_7_12]);
 
 const VERB_LISTS = {
   1: ['Saluer', "S'appeler", 'Parler', 'Venir', 'Remercier'],
@@ -147,7 +148,7 @@ const builtTrail = ALL_LESSONS.map(l => {
     emoji: l.emoji,
     lang: 'fr',
     verbs: VERB_LISTS[l.num],
-    vocab: l.vocab.map(v => ({ en: v.en, pt: `${v.pt} ${v.phon}` })),
+    vocab: l.vocab.map(v => ({ en: v.en, pt: v.pt })),
     expressions: l.expressions.map(e => ({
       expr: e.expr,
       meaning: e.pt,
@@ -157,7 +158,7 @@ const builtTrail = ALL_LESSONS.map(l => {
     grammar: {
       title: `${l.patterns[0].title}`,
       rules: l.patterns.map(p => `<b>${p.title}:</b> ${p.certo[0].replace(/^✅\s*/, '')} (${p.tip})`),
-      table: GRAMMAR_TABLES[l.num],
+      table: limpaTabela(GRAMMAR_TABLES[l.num]),
     },
     quiz: l.quiz.map(q => ({
       q: q.q,
@@ -169,9 +170,13 @@ const builtTrail = ALL_LESSONS.map(l => {
   };
 });
 
+const FINAL = limpaDeep(builtTrail);
+const ERROS = confere(FINAL);
+if (ERROS.length) { console.error(ERROS.join('\n')); process.exit(1); }
+
 const outJs = `// Capy Yara Adventures — French Daily-Trail Lessons (12 Units · IDs 201–212)
 // Renovado em Português (BR) -> Francês (fr-FR), alinhado com fr_aula_01..12.html.
-const LESSONS_FR = ${JSON.stringify(builtTrail, null, 2)};
+const LESSONS_FR = ${JSON.stringify(FINAL, null, 2)};
 
 if (typeof window !== 'undefined') window.LESSONS_FR = LESSONS_FR;
 `;
