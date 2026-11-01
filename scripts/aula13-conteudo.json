@@ -173,74 +173,69 @@
     }
   ],
   "gramatica": {
-    "titulo": "Grammar: números, preços e datas — do jeito que se fala",
-    "sub": "Um único ponto, e é o que mais trava na hora de falar com fornecedor: <strong>dizer números em voz alta</strong>. Errar um dígito do código ou um zero do preço custa uma peça errada.",
-    "blocos": [
+    "titulo": "Patterns: números, preços e datas — do jeito que se fala",
+    "personagens": {
+      "YARA": "a Brazilian woman technician (thirties, brown skin, shoulder-length curly black hair, dark navy work shirt and pants)",
+      "MIKE": "an American salesman (forties, light skin, short blond hair and a short blond beard, light gray quarter-zip pullover)"
+    },
+    "cenaAbertura": "A wide split scene divided down the middle. On the left, {YARA} sits at her desk in a small GPS repair workshop, recording a voice message on her phone. On the right, {MIKE} stands in a big parts warehouse with tall shelves, listening to his phone, with flat cornfields through the window.",
+    "slides": [
       {
-        "n": 1,
-        "t": "Código de peça: dígito por dígito",
-        "ex": "\"AG-44072\" → \"A, G, four, four, oh, seven, two\"",
-        "corpo": "Código não é um número grande: diga <strong>letra por letra e dígito por dígito</strong>. O zero no meio de código costuma virar <strong>oh</strong>.<br><br>✅ AG-44072 → <strong>A, G, four, four, oh, seven, two</strong><br>✅ KX-2051 → <strong>K, X, two, oh, five, one</strong><br><br>❌ A, G, <s>forty-four thousand and seventy-two</s>."
+        "padrao": "AG-44072 → A, G, **four, four, oh**, seven, two",
+        "cena": "Close view at a workshop desk: {YARA} holds a small electronic GPS part up close to her eyes, studying it carefully, while she speaks slowly into her phone, which rests on a small stand in front of her.",
+        "frases": [
+          {"en": "The part number is **A, G, four, four, oh, seven, two**.", "pt": "O código da peça é AG-44072."},
+          {"en": "Hi Mike, I need a spare part: **K, X, two, oh, five, one**.", "pt": "Oi, Mike, preciso de uma peça de reposição: a KX-2051."},
+          {"en": "Do you have **T, R, six, oh, one** in stock?", "pt": "Vocês têm a TR-601 em estoque?"},
+          {"en": "Just to confirm: **P, L, three, oh, oh, six**?", "pt": "Só pra confirmar: PL-3006?"},
+          {"en": "Please put part **C, B, nine, oh, three** on the invoice.", "pt": "Por favor, coloque a peça CB-903 na nota fiscal."},
+          {"en": "I'll attach a photo of part **D, X, five, oh, two**.", "pt": "Vou anexar uma foto da peça DX-502."}
+        ]
       },
       {
-        "n": 2,
-        "t": "Preço em dólar: dollars and cents",
-        "ex": "\"$89.90\" → \"eighty-nine dollars and ninety cents\"",
-        "corpo": "O jeito claro e seguro é <strong>… dollars and … cents</strong>.<br><br>✅ $89.90 → <strong>eighty-nine dollars and ninety cents</strong><br>✅ $12.50 → <strong>twelve dollars and fifty cents</strong><br><br>No dia a dia o americano também diz só <em>eighty-nine ninety</em> — entenda quando ouvir, mas use a forma completa para não haver dúvida."
+        "padrao": "$89.90 → eighty-nine **dollars and** ninety **cents**",
+        "cena": "In a bright warehouse office, {MIKE} sits at his desk holding a coiled GPS antenna cable up in one hand and his phone close to his mouth in the other, smiling as he records a voice message. A few plain coins lie on the desk.",
+        "frases": [
+          {"en": "The unit price is **eighty-nine dollars and ninety cents**.", "pt": "O preço unitário é US$ 89,90."},
+          {"en": "The antenna cable costs **twelve dollars and fifty cents**.", "pt": "O cabo da antena custa US$ 12,50."},
+          {"en": "Shipping to Brazil is **thirty-five dollars and twenty cents**.", "pt": "O frete para o Brasil é US$ 35,20."},
+          {"en": "Did you say **nineteen dollars and fifty cents**?", "pt": "Você disse US$ 19,50?"},
+          {"en": "Each spare part is **sixty dollars and seventy-five cents**.", "pt": "Cada peça de reposição custa US$ 60,75."},
+          {"en": "The new connector is **seven dollars and eighty cents**.", "pt": "O conector novo custa US$ 7,80."}
+        ]
       },
       {
-        "n": 3,
-        "t": "hundred e thousand sem -s · vírgula no milhar",
-        "ex": "\"$1,250\" → \"one thousand two hundred and fifty dollars\"",
-        "corpo": "Depois de um número, <strong>hundred</strong> e <strong>thousand</strong> nunca levam <strong>-s</strong>.<br><br>✅ $215 → <strong>two hundred and fifteen</strong> dollars<br>❌ two <s>hundreds</s> and fifteen<br><br>⚠️ Atenção: em inglês a <strong>vírgula separa o milhar</strong> e o <strong>ponto separa os centavos</strong> — o contrário do Brasil.<br><em>$1,250.00 = mil duzentos e cinquenta dólares.</em>"
+        "padrao": "$1,250 → one **thousand** two **hundred** and fifty dollars",
+        "cena": "At the workshop counter, {YARA} listens to a voice message on her phone with wide eyes and raised eyebrows. In front of her stand several open cardboard boxes holding round GPS antennas and a new GPS receiver.",
+        "frases": [
+          {"en": "The total is **two hundred** and fifteen dollars.", "pt": "O total é US$ 215."},
+          {"en": "Three antennas cost **nine hundred** dollars.", "pt": "Três antenas custam US$ 900."},
+          {"en": "The new receiver costs **one thousand two hundred** and fifty dollars.", "pt": "O receptor novo custa US$ 1.250."},
+          {"en": "The invoice is for **three thousand** dollars.", "pt": "A nota fiscal é de US$ 3.000."},
+          {"en": "With the exchange rate, one part is about **five hundred** reais.", "pt": "Com o câmbio, uma peça sai por uns R$ 500."},
+          {"en": "The autosteer kit is **four thousand five hundred** dollars.", "pt": "O kit de piloto automático custa US$ 4.500."}
+        ]
       },
       {
-        "n": 4,
-        "t": "Datas com número ordinal",
-        "ex": "\"Oct 3\" → \"October third\"",
-        "corpo": "Em data, o número vira <strong>ordinal</strong>: first, second, third, fourth, fifth… tenth, twentieth.<br><br>✅ Oct 3 → <strong>October third</strong> (ou <em>the third of October</em>)<br>✅ Oct 21 → <strong>October twenty-first</strong><br><br>❌ October <s>three</s>."
+        "padrao": "Oct 3 → October **third** · Oct 21 → October **twenty-first**",
+        "cena": "Wide view of a warehouse loading dock: {MIKE} tapes a small cardboard box shut on a packing table, his phone propped beside it, while a delivery truck waits at the open loading door under a clear morning sky.",
+        "frases": [
+          {"en": "We can ship it on **October third**.", "pt": "Podemos despachar no dia 3 de outubro."},
+          {"en": "The invoice date is **September thirtieth**.", "pt": "A data da nota fiscal é 30 de setembro."},
+          {"en": "With customs, the part arrives around **October twenty-first**.", "pt": "Com a alfândega, a peça chega por volta do dia 21 de outubro."},
+          {"en": "**October twelfth** isn't a business day in Brazil.", "pt": "O dia 12 de outubro não é dia útil no Brasil."},
+          {"en": "Can you ship the spare part on **November first**?", "pt": "Você pode despachar a peça de reposição no dia 1º de novembro?"},
+          {"en": "I'll send you a voice message on **November second**.", "pt": "Eu te mando uma mensagem de voz no dia 2 de novembro."}
+        ]
       }
     ],
-    "tabela": {
-      "cabecalho": [
-        "O que é",
-        "Escrito",
-        "Como falar",
-        "Cuidado"
-      ],
-      "linhas": [
-        [
-          "Código de peça",
-          "AG-44072",
-          "A, G, four, four, oh, seven, two",
-          "dígito por dígito"
-        ],
-        [
-          "Preço",
-          "$89.90",
-          "eighty-nine dollars and ninety cents",
-          "dollars and … cents"
-        ],
-        [
-          "Centenas",
-          "$215",
-          "two hundred and fifteen dollars",
-          "hundred sem -s"
-        ],
-        [
-          "Milhares",
-          "$1,250",
-          "one thousand two hundred and fifty",
-          "vírgula = milhar"
-        ],
-        [
-          "Data",
-          "Oct 3",
-          "October third",
-          "número ordinal"
-        ]
-      ]
-    }
+    "revisao": [
+      {"padrao": 0, "en": "The second part number is **T, D, eight, oh, four**.", "pt": "O código da segunda peça é TD-804."},
+      {"padrao": 1, "en": "Express shipping is **fifty-two dollars and forty cents**.", "pt": "O frete expresso custa US$ 52,40."},
+      {"padrao": 2, "en": "Customs will be about **eight hundred** reais.", "pt": "A alfândega vai dar uns R$ 800."},
+      {"padrao": 3, "en": "I'll pay the invoice on **October fifteenth**.", "pt": "Eu pago a nota fiscal no dia 15 de outubro."}
+    ],
+    "cenaRevisao": "Late afternoon in the small repair workshop, with golden sunlight streaming through the window: {YARA} smiles as she opens a small cardboard box that has just arrived and lifts out the new GPS part, her phone on the desk beside her."
   },
   "conversation": [
     {

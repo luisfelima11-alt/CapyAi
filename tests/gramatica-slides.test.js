@@ -1,0 +1,242 @@
+'use strict';
+
+// A aba Grammar das aulas dos cursos em slides de exemplos (regra do Luis,
+// 05/out/2026): um padrão por slide, 5 frases ou mais com tradução e áudio, o
+// título é só o padrão, e o deck fecha com uma revisão de frases novas. Cada
+// slide tem uma imagem gerada e abre em tela cheia, como o vocabulário.
+// O módulo é ESM (scripts/lib/gramatica-slides.mjs), por isso o import dinâmico.
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+
+const ROOT = path.resolve(__dirname, '..');
+const modulo = () => import(pathToFileURL(path.join(ROOT, 'scripts/lib/gramatica-slides.mjs')).href);
+
+const frases = (n, base = 'I **am** here') => Array.from({ length: n }, (_, i) => ({ en: `${base} ${i}.`, pt: `Eu estou aqui ${i}.` }));
+const aula = (mudar = g => g) => ({ gramatica: mudar({
+  titulo: 'Grammar: o verbo TO BE',
+  personagens: { LUAN: 'a young man (green shirt)' },
+  cenaAbertura: '{LUAN} waves hello in a workshop.',
+  slides: [
+    { padrao: 'I **am**', cena: '{LUAN} points at himself.', frases: frases(5) },
+    { padrao: 'you **are**', cena: 'A farmer points at a friend.', frases: frases(5, 'You **are** here') },
+    { padrao: 'he **is**', cena: 'Two people look at a tractor.', frases: frases(5, 'He **is** here') },
+  ],
+  revisao: [0, 1, 2].map(i => ({ padrao: i, en: `It **is** new ${i}.`, pt: `É novo ${i}.` })),
+  cenaRevisao: '{LUAN} walks into a field at sunset.',
+}) });
+
+function falhas(c, opcoes) {
+  return modulo().then(({ checarSlides }) => {
+    const r = [];
+    checarSlides(c, (ok, msg) => { if (!ok) r.push(msg); }, opcoes);
+    return r;
+  });
+}
+
+// Uma pasta temporária com as imagens de um deck de 5 slides.
+function pastaComImagens(slug, total, { pular = -1, pesada = -1 } = {}) {
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'gs-'));
+  fs.mkdirSync(path.join(raiz, 'assets/img/gramatica'), { recursive: true });
+  for (let k = 0; k < total; k++) {
+    if (k === pular) continue;
+    fs.writeFileSync(path.join(raiz, `assets/img/gramatica/${slug}-${k}.webp`), Buffer.alloc(k === pesada ? 201 * 1024 : 1024));
+  }
+  return raiz;
+}
+
+test('the deck renders the opening, one slide per pattern and the review, with text escaped and audio in plain text', async () => {
+  const { blocoGramaticaSlides } = await modulo();
+  const c = aula(g => ({ ...g, slides: [{ padrao: 'Tom & <Jerry> **are**', cena: 'x', frases: [
+    { en: 'Say "<b>hi</b>" — I\'m **here**.', pt: 'Diga <oi>.' }, ...frases(4)] }, ...g.slides.slice(1)] }));
+  const html = blocoGramaticaSlides(c, { slug: 'teste01' });
+  assert.equal((html.match(/class="gs-slide/g) || []).length, 3 + 2);
+  assert.match(html, /^<div id="tab-grammar" class="tab-content fade-in hidden">/);
+  assert.equal((html.match(/<section class="gs-slide[^>]*hidden>/g) || []).length, 4, 'only the first slide starts visible');
+  assert.match(html, /Tom &amp; &lt;Jerry&gt; <strong class="text-emerald-300">are<\/strong>/);
+  assert.match(html, /Say &quot;&lt;b&gt;hi&lt;\/b&gt;&quot; — I'm <strong class="text-emerald-600">here<\/strong>\./);
+  assert.match(html, /data-say="Say &quot;&lt;b&gt;hi&lt;\/b&gt;&quot; — I'm here\."/, 'audio reads the sentence without the asterisks');
+  assert.match(html, /<p class="gs-pt text-slate-500 text-sm mt-0\.5">Diga &lt;oi&gt;\.<\/p>/);
+  assert.doesNotMatch(html, /<b>hi<\/b>|<Jerry>/);
+  assert.match(html, /id="gs-xp"[^>]*disabled/, 'the +20 XP waits for the last slide');
+});
+
+test('every slide carries its image and a fullscreen button, and the behaviour comes from gramatica-slides.js', async () => {
+  const { blocoGramaticaSlides, VERSAO_JS } = await modulo();
+  const html = blocoGramaticaSlides(aula(), { slug: 'agro09' });
+  const imgs = html.match(/<img class="gs-img[^>]*>/g) || [];
+  assert.equal(imgs.length, 5, 'one image per slide');
+  imgs.forEach((tag, k) => {
+    assert.match(tag, new RegExp(`src="assets/img/gramatica/agro09-${k}\\.webp"`));
+    assert.match(tag, /alt=""/);
+    assert.match(tag, /loading="lazy"/);
+    assert.match(tag, /width="1024" height="768"/, 'the page keeps the space before the image loads');
+  });
+  assert.equal((html.match(/class="gs-expandir/g) || []).length, 5, 'one fullscreen button per slide');
+  assert.match(html, new RegExp(`<script src="gramatica-slides\\.js\\?v=${VERSAO_JS}"></script>`));
+  assert.doesNotMatch(html, /<script>/, 'no inline script left in the tab');
+  assert.throws(() => blocoGramaticaSlides(aula()), /slug/, 'without the slug there is no image name');
+});
+
+test('with the repo root, each image address carries a version taken from the file, so a new image is never served from an old cache', async () => {
+  // sw.js serves images cache-first: on 15/out the pilot swapped its provisional
+  // images at the same address, and a Preview already opened kept the old ones.
+  const { blocoGramaticaSlides, enderecoDaImagem } = await modulo();
+  const raiz = fs.mkdtempSync(path.join(os.tmpdir(), 'gs-v-'));
+  fs.mkdirSync(path.join(raiz, 'assets/img/gramatica'), { recursive: true });
+  const grava = (k, conteudo) => fs.writeFileSync(path.join(raiz, `assets/img/gramatica/agro09-${k}.webp`), conteudo);
+  for (let k = 0; k < 5; k++) grava(k, `imagem ${k}`);
+  const antes = enderecoDaImagem('agro09', 1, raiz);
+  assert.match(antes, /^assets\/img\/gramatica\/agro09-1\.webp\?v=[0-9a-f]{10}$/);
+  grava(1, 'imagem nova');
+  const depois = enderecoDaImagem('agro09', 1, raiz);
+  assert.notEqual(depois, antes, 'a new image gets a new address');
+  assert.equal(enderecoDaImagem('agro09', 2, raiz), enderecoDaImagem('agro09', 2, raiz), 'the same file keeps its address');
+  assert.equal(enderecoDaImagem('agro09', 1), 'assets/img/gramatica/agro09-1.webp', 'without the root, the plain path');
+  assert.equal(enderecoDaImagem('agro09', 7, raiz), 'assets/img/gramatica/agro09-7.webp', 'a missing file is left to the validator');
+  const html = blocoGramaticaSlides(aula(), { slug: 'agro09', raiz });
+  assert.ok(html.includes(`src="${depois}"`), 'the deck uses the versioned address');
+  fs.rmSync(raiz, { recursive: true, force: true });
+});
+
+test('the validator takes a good deck and refuses short patterns, missing parts, long sentences and old accordions', async () => {
+  assert.deepEqual(await falhas(aula()), []);
+  const msg = async m => (await falhas(aula(m))).join(' | ');
+  assert.match(await msg(g => ({ ...g, slides: [{ ...g.slides[0], frases: frases(4) }, ...g.slides.slice(1)] })), /5 frases ou mais/);
+  assert.match(await msg(g => ({ ...g, revisao: [...g.revisao.slice(0, 2), { padrao: 2, en: 'It **is** ok.', pt: '' }] })), /inglês e tradução/);
+  assert.match(await msg(g => ({ ...g, revisao: [...g.revisao.slice(0, 2), { padrao: 2, en: 'It is ok.', pt: 'Ok.' }] })), /destaca a parte do padrão/);
+  assert.match(await msg(g => ({ ...g, revisao: g.revisao.slice(0, 2) })), /revisão com uma frase de cada padrão/);
+  assert.match(await msg(g => ({ ...g, revisao: [...g.revisao.slice(0, 2), { padrao: 2, en: 'I **am** here 0.', pt: 'x' }] })), /frases novas/);
+  assert.match(await msg(g => ({ ...g, blocos: [] })), /acordeão antigo/);
+  assert.match(await msg(g => ({ ...g, slides: [{ ...g.slides[0], padrao: '❌ I **is**' }, ...g.slides.slice(1)] })), /só o padrão/);
+  assert.match(await msg(g => ({ titulo: g.titulo, blocos: [], tabela: {} })), /gramática em slides/);
+  const longa = (await falhas(aula(g => ({ ...g, slides: [{ ...g.slides[0], frases: [...frases(4), { en: 'I **am** here with my very good friends from the farm today.', pt: 'x' }] }, ...g.slides.slice(1)] })), { teto: 10 })).join(' | ');
+  assert.match(longa, /até 10 palavras/);
+});
+
+test('the validator asks for a scene per slide, known characters and the image files', async () => {
+  const msg = async (m, o) => (await falhas(aula(m), o)).join(' | ');
+  assert.match(await msg(g => ({ ...g, slides: [{ ...g.slides[0], cena: ' ' }, ...g.slides.slice(1)] })), /cena da imagem.*slides 1\b/);
+  assert.match(await msg(g => ({ ...g, cenaRevisao: undefined })), /cena da imagem.*slides 4\b/);
+  assert.match(await msg(g => ({ ...g, cenaAbertura: '{JACK} waves.' })), /\{JACK\}/);
+
+  const ok = pastaComImagens('agro09', 5);
+  assert.deepEqual(await falhas(aula(), { slug: 'agro09', raiz: ok }), []);
+  assert.match(await msg(g => g, { slug: 'agro09', raiz: pastaComImagens('agro09', 5, { pular: 3 }) }), /imagem de cada slide existe.*agro09-3\.webp/);
+  assert.match(await msg(g => g, { slug: 'agro09', raiz: pastaComImagens('agro09', 5, { pesada: 2 }) }), /até 200 KB.*agro09-2\.webp/);
+});
+
+test('the image prompt joins the shared style, the scene and the full character description', async () => {
+  const { promptDaImagem, cenasDoDeck, ESTILO_IMAGEM } = await modulo();
+  const g = aula().gramatica;
+  const prompts = cenasDoDeck(g).map(c => promptDaImagem(g, c));
+  assert.equal(prompts.length, 5);
+  for (const p of prompts) {
+    assert.ok(p.startsWith(ESTILO_IMAGEM.antes) && p.endsWith(ESTILO_IMAGEM.depois));
+    assert.match(p, /No text, no letters/);
+    assert.doesNotMatch(p, /\{[A-Z]/);
+  }
+  assert.match(prompts[0], /shading\. A young man \(green shirt\) waves hello/, 'the character description replaces {LUAN}, starting the sentence in capitals');
+});
+
+test('every converted lesson passes the validator, has its images and ships the deck it describes', async () => {
+  const { checarSlides, VERSAO_JS, MAX_KB_IMAGEM } = await modulo();
+  const fontes = fs.readdirSync(path.join(ROOT, 'scripts'))
+    .filter(f => /^(aula|agro|med|interview)\d+-(conteudo|gramatica)\.json$/.test(f))
+    .map(f => ({ f, c: JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', f), 'utf8')) }))
+    .filter(({ c }) => c.gramatica && c.gramatica.slides);
+  assert.ok(fontes.length >= 2, 'the pilot lessons are converted');
+  const pagina = f => {
+    const [, curso, n] = f.match(/^([a-z]+)(\d+)/);
+    return {
+      slug: `${curso === 'aula' ? 'gps' : curso}${n}`,
+      arquivo: { aula: `gpstronic_aula_${n}.html`, agro: `agro_aula_${n}.html` }[curso] || null,
+    };
+  };
+  for (const { f, c } of fontes) {
+    const { slug, arquivo } = pagina(f);
+    const erros = [];
+    checarSlides(c, (ok, m) => { if (!ok) erros.push(m); }, { teto: c.tetoPalavras || 14, slug, raiz: ROOT });
+    assert.deepEqual(erros, [], f);
+    if (!arquivo) continue;
+    const html = fs.readFileSync(path.join(ROOT, arquivo), 'utf8');
+    // As aulas feitas à mão (aulaNN-gramatica.json) nem sempre têm o <!-- CONVERSATION: a aba vai até a próxima.
+    const ini = html.indexOf('<div id="tab-grammar"');
+    const aba = html.slice(ini, html.indexOf('<div id="tab-', ini + 10));
+    const total = c.gramatica.slides.length + 2;
+    assert.equal((aba.match(/class="gs-slide/g) || []).length, total, arquivo);
+    assert.equal((aba.match(/<img class="gs-img/g) || []).length, total, arquivo + ': one image per slide');
+    for (let k = 0; k < total; k++) {
+      const img = path.join(ROOT, `assets/img/gramatica/${slug}-${k}.webp`);
+      // The ?v= is the start of the file's hash: an image swapped without regenerating the page fails here.
+      const v = require('node:crypto').createHash('sha256').update(fs.readFileSync(img)).digest('hex').slice(0, 10);
+      assert.ok(aba.includes(`src="assets/img/gramatica/${slug}-${k}.webp?v=${v}"`), `${arquivo}: slide ${k} points to the current version of its image`);
+      const cabeca = fs.readFileSync(img).subarray(0, 12);
+      assert.ok(cabeca.subarray(0, 4).toString() === 'RIFF' && cabeca.subarray(8, 12).toString() === 'WEBP', `${slug}-${k}: a real WebP`);
+      assert.ok(fs.statSync(img).size <= MAX_KB_IMAGEM * 1024, `${slug}-${k}: up to ${MAX_KB_IMAGEM} KB`);
+    }
+    const nFrases = c.gramatica.slides.reduce((n, s) => n + s.frases.length, 0) + c.gramatica.revisao.length;
+    assert.equal((aba.match(/data-say=/g) || []).length, nFrases, arquivo + ': one audio button per sentence');
+    assert.ok(aba.includes(`<script src="gramatica-slides.js?v=${VERSAO_JS}"></script>`), arquivo + ': loads the deck script');
+    assert.doesNotMatch(aba, /toggleAccordion/, arquivo + ': no accordion left');
+  }
+});
+
+test('gramatica-slides.js parses, drives the deck and builds the fullscreen view', () => {
+  const codigo = fs.readFileSync(path.join(ROOT, 'gramatica-slides.js'), 'utf8');
+  assert.doesNotThrow(() => new Function(codigo));
+  assert.match(codigo, /gs-foco/, 'the fullscreen overlay');
+  assert.match(codigo, /gs-revelado/, 'the translation stays hidden until revealed');
+  assert.match(codigo, /Date\.now\(\) - abertoEm < 400/, 'the ghost-click guard from vocab-focus.js');
+  // A tela cheia clona o slide; o único innerHTML é o esqueleto fixo do overlay.
+  assert.doesNotMatch(codigo, /innerHTML\s*=\s*(?=\S)(?![`'"])/, 'no HTML built from page text');
+  assert.doesNotMatch(codigo, /innerHTML\s*=\s*`[^`]*\$\{/, 'no interpolation in the overlay markup');
+});
+
+test('every asset type a page loads is published by vercel.json (the slide images were not)', () => {
+  // 19/out: the slide images (.webp) never reached the Preview: vercel.json
+  // only publishes the asset types listed in "builds", and .webp was missing.
+  // The PDFs had the same bug before. Any assets/... file a page references
+  // must match an "assets/**/*.<ext>" build.
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const raiz = path.resolve(__dirname, '..');
+  const builds = JSON.parse(fs.readFileSync(path.join(raiz, 'vercel.json'), 'utf8')).builds.map(b => b.src);
+  const tipos = new Set();
+  for (const f of fs.readdirSync(raiz).filter(n => n.endsWith('.html'))) {
+    for (const m of fs.readFileSync(path.join(raiz, f), 'utf8').matchAll(/["'(]assets\/[^"'()?\s]+\.([a-z0-9]+)(?:[?"')\s])/gi)) tipos.add(m[1].toLowerCase());
+  }
+  assert.ok(tipos.has('webp'), 'the slide images are referenced');
+  for (const ext of tipos) assert.ok(builds.includes(`assets/**/*.${ext}`), `vercel.json does not publish assets/**/*.${ext}`);
+});
+
+test('nothing the student sees says "Grammar": the title loses the prefix and the carousel is "padrões"', async () => {
+  const { blocoGramaticaSlides } = await modulo();
+  const html = blocoGramaticaSlides(aula(), { slug: 'agro09' });
+  const visivel = html.replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
+  assert.doesNotMatch(visivel, /gram[aá]tic|grammar/i);
+  assert.match(html, /<h2 class="text-2xl font-black text-navy mb-1">O verbo TO BE<\/h2>/);
+  assert.match(html, /aria-label="Slides dos padrões"/);
+  const comPatterns = blocoGramaticaSlides(aula(g => ({ ...g, titulo: 'Patterns: falar do tempo' })), { slug: 'agro10' });
+  assert.match(comPatterns, /<h2 class="text-2xl font-black text-navy mb-1">Falar do tempo<\/h2>/, 'the tab is already called Patterns');
+});
+
+test('hand-made lessons without proximoPasso() get the deck without the "Continuar" button', async () => {
+  const { blocoGramaticaSlides } = await modulo();
+  assert.match(blocoGramaticaSlides(aula(), { slug: 'gps05' }), /onclick="proximoPasso\(\)"/);
+  const semContinuar = blocoGramaticaSlides(aula(), { slug: 'gps05', continuar: false });
+  assert.doesNotMatch(semContinuar, /proximoPasso/);
+  assert.match(semContinuar, /<script src="gramatica-slides\.js\?v=/);
+});
+
+test('the lesson PDF reads the patterns from the slides, and aplicar-slides only swaps the Patterns tab', () => {
+  const folha = fs.readFileSync(path.join(ROOT, 'scripts/gera-folha-aula.mjs'), 'utf8');
+  assert.match(folha, /querySelectorAll\('\.gs-slide'\)/);
+  const aplicar = fs.readFileSync(path.join(ROOT, 'scripts/aplicar-slides.mjs'), 'utf8');
+  assert.match(aplicar, /checarSlides\(c, ok, \{ teto: c\.tetoPalavras \|\| 14, slug, raiz: RAIZ \}\)/);
+  assert.match(aplicar, /continuar = \/function\\s\+proximoPasso/);
+  assert.match(aplicar, /🧩 Patterns/);
+});

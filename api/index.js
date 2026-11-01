@@ -128,6 +128,58 @@ const VOZ_MINUTOS_MES = { free: 0, pro: 0, super: 60 };
 // nao so contra aluno. Estourou, ninguem liga ate o dono liberar.
 const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 
+// Ligacao de teste (28/out/2026, decisao do Luis): quem nao e Super liga UMA vez,
+// com 3 minutos gratis. E o que vende o Super, entao so conta conta com e-mail
+// confirmado (senao cada e-mail inventado vira 3 minutos de graca).
+//
+// A marca e uma linha `__vozteste_<aluno>` no user_state, gravada no PRIMEIRO
+// token: o teste vale 3 minutos de relogio a partir dali. Se a ligacao cair ou
+// nao conectar, o aluno religa dentro desses 3 minutos e recebe o que sobrou
+// (no maximo 3 tokens). Depois disso, nunca mais. Na duvida (banco fora), nega:
+// minuto gratis por falha nossa e dinheiro que ninguem pagou.
+const VOZ_TESTE_MIN = 3;
+const VOZ_TESTE_TOKENS = 3;
+
+async function liberarTesteDeVoz(identity, agora = Date.now()) {
+    const alunoId = identity && identity.appUserId;
+    if (!alunoId) return { ok: false, motivo: 'login' };
+    if (!identity.session?.user?.email_confirmed_at) return { ok: false, motivo: 'confirmar_email' };
+    const chave = `__vozteste_${alunoId}`;
+    const iso = new Date(agora).toISOString();
+    let linha = null;
+    try {
+        const criada = await sb('/user_state', {
+            method: 'POST',
+            headers: { 'Prefer': 'resolution=ignore-duplicates,return=representation' },
+            body: JSON.stringify({ user_id: chave, data: { em: iso, ligacoes: 1 }, updated_at: iso }),
+        });
+        if (Array.isArray(criada) && criada.length) return { ok: true, minutos: VOZ_TESTE_MIN, primeira: true };
+        const lida = await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}&select=data`);
+        linha = Array.isArray(lida) ? lida[0] : null;
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    const inicio = Date.parse(linha?.data?.em || '');
+    const ligacoes = Number(linha?.data?.ligacoes) || 1;
+    const sobra = VOZ_TESTE_MIN - (agora - inicio) / 60000;
+    if (!Number.isFinite(inicio) || sobra < 0.5 || ligacoes >= VOZ_TESTE_TOKENS) return { ok: false, motivo: 'usado' };
+    try {
+        await sb(`/user_state?user_id=eq.${encodeURIComponent(chave)}`, {
+            method: 'PATCH', headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ data: { em: linha.data.em, ligacoes: ligacoes + 1 }, updated_at: iso }),
+        });
+    } catch (e) { return { ok: false, motivo: 'indisponivel' }; }
+    return { ok: true, minutos: Math.round(sobra * 10) / 10, primeira: false };
+}
+
+// Para a home: 'disponivel' (nunca ligou) ou 'usado'. So le; nunca marca.
+async function estadoTesteDeVoz(alunoId) {
+    if (!alunoId) return null;
+    try {
+        const r = await sb(`/user_state?user_id=eq.${encodeURIComponent(`__vozteste_${alunoId}`)}&select=data`);
+        if (!Array.isArray(r)) return null;
+        return r.length ? 'usado' : 'disponivel';
+    } catch (e) { return null; }
+}
+
 const RATE_LIMITS = {
     chat:         { free:  20, pro: 200, super: 500 },  // per day
     music:        { free:   3, pro:  50, super: 150 },
@@ -139,6 +191,8 @@ const RATE_LIMITS = {
     // fazia cada música custar 2 créditos e o aluno ficar sem no 5º uso.
     'lyrics-search': { free: 60, pro: 300, super: 600 },
     tts:          { free: 200, pro:1000, super:2000 },
+    // Entrar/sair de turma: não é IA, só um teto contra abuso de códigos.
+    turma:        { free:  20, pro:  20, super:  20 },
     // Conversa por voz: cada chamada aberta consome contínuo enquanto durar,
     // então este balde conta SESSÕES por dia. O teto de minutos vive no cliente
     // (desliga sozinho) — é o número que o piloto existe para medir.
@@ -164,6 +218,8 @@ const TRACK_EVENTS = new Set([
     'mini_start', 'mini_complete', 'quiz_finish', 'review_start', 'review_finish',
     'boss_start', 'boss_win', 'newsline_search',
     'push_card_visto', 'push_sim', 'push_negou', 'push_adiou', 'push_nunca', 'push_ignorou', 'ios_dica_vista',
+    // Home nova: o que o aluno toca nela (contagem por dia, sem dado do aluno).
+    'home_ligar', 'home_super', 'home_chat', 'home_curso', 'home_plano',
 ]);
 
 async function getUserPlan(userId) {
@@ -524,6 +580,92 @@ async function isAdminReq(req, res) {
         if (identity?.kind === 'user' && identity.session.user?.app_metadata?.role === 'admin') return true;
     } catch (e) { /* no valid session — fall through to false */ }
     return false;
+}
+
+// ── Painel do professor (19/out/2026) ─────────────────────────────────────────
+// Papel 'teacher' ou 'admin' no app_metadata (só o admin do Supabase muda). MFA só
+// com ADMIN_REQUIRE_MFA=true, como no isAdminReq. O professor vê apenas os alunos
+// que entraram na turma dele pelo link (turma_alunos): o servidor filtra sempre.
+async function requireProfessor(req, res) {
+    const identity = await requireAppUser(req, res);
+    const role = identity.session?.user?.app_metadata?.role || 'student';
+    if (!['teacher', 'admin'].includes(role)) throw new HttpError(403, 'forbidden', 'Insufficient permissions.');
+    const producao = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+    if (process.env.ADMIN_REQUIRE_MFA === 'true' && producao && identity.session?.jwt?.aal !== 'aal2') {
+        throw new HttpError(403, 'mfa_required', 'Multi-factor authentication is required.');
+    }
+    return identity;
+}
+
+const diaBrasil = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+
+// Quanto o aluno avançou entre dois estados salvos: mini-lições novas e XP ganho.
+// Um aparelho atrasado que salva menos não gera número negativo.
+function deltaAtividade(antes, depois) {
+    const a = new Set(Array.isArray(antes?.completedMinis) ? antes.completedMinis.map(String) : []);
+    const novos = Array.isArray(depois?.completedMinis) ? depois.completedMinis.filter(k => !a.has(String(k))).length : 0;
+    const xp = Math.max(0, (Number(depois?.xp) || 0) - (Number(antes?.xp) || 0));
+    return { minis: Math.min(novos, 50), xp: Math.min(xp, 5000) };
+}
+
+// Resumo de um aluno para o painel: só números e datas, nada do que ele escreveu
+// fora da lição de casa.
+function resumoAluno({ state, atualizadoEm, atividade = [], licoes = [], hoje = diaBrasil() }) {
+    const s = state && typeof state === 'object' ? state : {};
+    const ultimoDia = [s.lastPracticeDate, atividade.length ? atividade.map(a => a.dia).sort().pop() : '', atualizadoEm ? diaBrasil(new Date(atualizadoEm)) : '']
+        .filter(d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''))).sort().pop() || null;
+    const diasSem = ultimoDia ? Math.max(0, Math.round((Date.parse(hoje + 'T12:00:00Z') - Date.parse(ultimoDia + 'T12:00:00Z')) / 86400000)) : null;
+    const minis = Array.isArray(s.completedMinis) ? s.completedMinis : [];
+    const porIdioma = {};
+    for (const k of minis) { const lang = String(k).includes(':') ? String(k).split(':')[0] : 'en'; porIdioma[lang] = (porIdioma[lang] || 0) + 1; }
+    const hojeAtiv = atividade.find(a => a.dia === hoje);
+    const ultimaLicao = licoes.length ? licoes.map(l => l.submitted_at).sort().pop() : null;
+    const diasSemLicao = ultimaLicao ? Math.round((Date.now() - Date.parse(ultimaLicao)) / 86400000) : null;
+    const alertas = [];
+    if (diasSem === null) alertas.push('nunca_praticou');
+    else if (diasSem >= 3) alertas.push('sumido');
+    if (licoes.length && diasSemLicao >= 7) alertas.push('licao_atrasada');
+    return {
+        ultimoDia, diasSem,
+        sequencia: Math.max(0, Number(s.streakDays) || 0),
+        xp: Math.max(0, Number(s.xp) || 0),
+        trilhaHoje: !!(hojeAtiv && hojeAtiv.minis > 0),
+        minisHoje: hojeAtiv ? hojeAtiv.minis : 0,
+        minisPorIdioma: porIdioma,
+        licoesConcluidas: Array.isArray(s.completedLessons) ? s.completedLessons.length : 0,
+        dias14: atividade.filter(a => a.minis > 0 || a.xp > 0).map(a => ({ dia: a.dia, minis: a.minis, xp: a.xp })),
+        licoes: licoes.slice(0, 30).map(l => ({ id: l.id, lessonId: l.lesson_id, titulo: l.lesson_title, em: l.submitted_at, xp: l.xp_earned })),
+        alertas,
+    };
+}
+
+const novoCodigoTurma = () => Array.from(crypto.randomBytes(8), b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');
+
+// "Pôr na agenda" do plano de hoje (29/out/2026): um evento diário de 15 min no
+// horário do aluno, com alarme na hora. Sem dado do aluno: só o horário, de uma
+// lista fechada (HH:MM). iPhone e Outlook abrem o .ics; o Google usa o link.
+function icsDaAgenda(hora, agora = new Date()) {
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hora || ''))) return null;
+    const [hh, mm] = hora.split(':');
+    const dia = agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).replace(/-/g, '');
+    const carimbo = agora.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    return [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Capy English//Plano de hoje//PT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+        'BEGIN:VTIMEZONE', 'TZID:America/Sao_Paulo',
+        'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:-0300', 'TZOFFSETTO:-0300', 'TZNAME:-03', 'END:STANDARD',
+        'END:VTIMEZONE',
+        'BEGIN:VEVENT',
+        `UID:capy-ingles-${hh}${mm}@capyenglish.com.br`,
+        `DTSTAMP:${carimbo}`,
+        `DTSTART;TZID=America/Sao_Paulo:${dia}T${hh}${mm}00`,
+        'DURATION:PT15M',
+        'RRULE:FREQ=DAILY',
+        'SUMMARY:Inglês com a Yara 🐾',
+        'DESCRIPTION:Seu plano de hoje: trilha\\, conversa com a Yara e revisão (15 min).\\nhttps://www.capyenglish.com.br/',
+        'URL:https://www.capyenglish.com.br/',
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Hora do inglês com a Yara!', 'TRIGGER:PT0M', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR', '',
+    ].join('\r\n');
 }
 
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -2618,17 +2760,8 @@ module.exports = async (req, res) => {
             }
             const plano = await getUserPlan(alunoId);
             const cota = VOZ_MINUTOS_MES[plano] || 0;
-            if (cota <= 0) {
-                res.status(403).json({
-                    error: 'plano_sem_voz',
-                    message: 'A conversa por voz faz parte do plano Super.',
-                    plano,
-                    acao: '/account.html',
-                });
-                return;
-            }
-            // Freio global antes da cota individual: se o site estourou o teto,
-            // nao adianta o aluno ter minutos sobrando.
+            // Freio global antes de tudo: se o site estourou o teto, nao adianta
+            // o aluno ter minutos sobrando, e o teste gratis nao pode ser gasto.
             const geral = await consumoVozDoMes(null);
             if (geral && geral.usd >= VOZ_TETO_USD_MES) {
                 console.error('[voz] teto mensal de USD atingido', geral.usd.toFixed(2), 'de', VOZ_TETO_USD_MES);
@@ -2638,7 +2771,25 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            const meu = await consumoVozDoMes(alunoId);
+            if (cota <= 0) {
+                // Sem voz no plano: a ligacao de teste, uma vez so.
+                const teste = await liberarTesteDeVoz(req._securityIdentity);
+                if (!teste.ok) {
+                    res.status(403).json({
+                        error: 'plano_sem_voz',
+                        message: teste.motivo === 'confirmar_email'
+                            ? 'Confirme seu e-mail para usar a ligação de teste grátis.'
+                            : 'A conversa por voz faz parte do plano Super.',
+                        plano,
+                        teste: teste.motivo,
+                        acao: '/account.html',
+                    });
+                    return;
+                }
+                req._vozRestante = teste.minutos;
+                req._vozTeste = true;
+            }
+            const meu = req._vozTeste ? null : await consumoVozDoMes(alunoId);
             // consumoVozDoMes devolve null quando nao conseguiu ler o banco. Nesse
             // caso libera: derrubar aluno pagante por falha nossa de leitura e pior
             // do que deixar passar uma ligacao. O freio global acima ja segura o pior.
@@ -2652,7 +2803,7 @@ module.exports = async (req, res) => {
                 });
                 return;
             }
-            req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
+            if (!req._vozTeste) req._vozRestante = meu ? Math.max(0, cota - meu.minutos) : cota;
         }
 
 
@@ -2840,6 +2991,7 @@ module.exports = async (req, res) => {
         const expiresAt = dados.expires_at || (dados.client_secret && dados.client_secret.expires_at);
 
         res.status(200).json({ minutosRestantes: req._vozRestante == null ? null : Number(req._vozRestante.toFixed(1)),
+            teste: req._vozTeste === true,
             value: valor,
             expiresAt: Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null,
             model: REALTIME_MODEL,
@@ -3675,6 +3827,10 @@ Respond ONLY with valid JSON, no markdown:
             delete safePayload.planType;
             delete safePayload.subscription;
             if ('xp' in safePayload) safePayload.xp = Math.max(0, Math.min(10000000, Number(safePayload.xp) || 0));
+            // O estado anterior, para a atividade do dia (painel do professor).
+            let anterior = null;
+            try { anterior = (await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`))?.[0]?.data || null; }
+            catch (e) { anterior = null; }
             await sbUser(identity, '/user_state', {
                 method: 'POST',
                 headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
@@ -3686,6 +3842,13 @@ Respond ONLY with valid JSON, no markdown:
             });
             try { await trackCampaignProgress(identity, safePayload); }
             catch (e) { console.error('[campaign-tracker]', e?.message || e); }
+            const delta = anterior ? deltaAtividade(anterior, safePayload) : { minis: 0, xp: 0 };
+            if (delta.minis || delta.xp) {
+                try {
+                    await sb('/rpc/somar_atividade', { method: 'POST', body: JSON.stringify({
+                        p_user: identity.appUserId, p_dia: diaBrasil(), p_minis: delta.minis, p_xp: delta.xp }) });
+                } catch (e) { console.error('[atividade]', e?.code || e?.message || e); }
+            }
         }
         res.status(200).json({ success: true }); return;
     }
@@ -4109,6 +4272,21 @@ Respond ONLY with valid JSON, no markdown:
         res.status(410).json({ error: 'legacy_auth_retired' }); return;
     }
 
+    // GET /api/agenda.ics?hora=HH:MM — evento diario do plano de hoje (publico, sem dado do aluno).
+    if (req.method === 'GET' && url === '/api/agenda.ics') {
+        const _rl = await checkRateLimit(req, 'track', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+        const hora = new URL(req.url, 'http://x').searchParams.get('hora') || '19:00';
+        const ics = icsDaAgenda(hora);
+        if (!ics) { res.status(400).json({ error: 'hora_invalida' }); return; }
+        res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+        res.setHeader('Content-Disposition', 'inline; filename="ingles-com-a-yara.ics"');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        res.statusCode = 200;
+        res.end(ics);
+        return;
+    }
+
     // GET /api/me?userId=xxx → returns subscription/plan info
     // Used by frontend to gate Pro/Super features in real time.
     // Cache: private 60s (don't broadcast plan to CDN, but allow short browser cache).
@@ -4123,10 +4301,13 @@ Respond ONLY with valid JSON, no markdown:
         if (plan !== 'free' && row.plan_expires_at) {
             if (new Date(row.plan_expires_at) < new Date()) effectivePlan = 'free';
         }
+        // A home mostra "1ª ligação: 3 min grátis" ou o convite ao Super.
+        const vozTeste = effectivePlan === 'super' ? null : await estadoTesteDeVoz(identity.appUserId);
         res.setHeader('Cache-Control', 'private, max-age=60');
         res.status(200).json({
             plan: effectivePlan,
             planExpiresAt: row.plan_expires_at || null,
+            vozTeste,
         });
         return;
     }
@@ -5844,6 +6025,110 @@ Rules:
         res.status(200).json({ success: true, id: result?.[0]?.id || null }); return;
     }
 
+    // ── Turma: o aluno entra pelo link do professor e pode sair quando quiser ──
+    // GET /api/turma?c=<código> → { professor, nome, jaEsta }   (aluno logado)
+    if (req.method === 'GET' && url === '/api/turma') {
+        const identity = await requireAppUser(req, res);
+        const codigo = String(new URL(req.url, 'http://x').searchParams.get('c') || '').toLowerCase();
+        if (!/^[a-z0-9]{8}$/.test(codigo)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
+        const t = (await sb(`/turmas?codigo=eq.${codigo}&select=professor_id,nome`))?.[0];
+        if (!t) { res.status(404).json({ error: 'turma_nao_encontrada' }); return; }
+        const prof = (await sb(`/accounts?id=eq.${encodeURIComponent(t.professor_id)}&select=name`))?.[0];
+        const ja = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(t.professor_id)}&aluno_id=eq.${encodeURIComponent(identity.appUserId)}&select=aluno_id`);
+        res.status(200).json({ professor: textoParaPrompt(prof?.name || 'Professor').slice(0, 60), nome: t.nome, jaEsta: Array.isArray(ja) && ja.length > 0, proprio: t.professor_id === identity.appUserId });
+        return;
+    }
+
+    // POST /api/turma/entrar { codigo } · POST /api/turma/sair { codigo }
+    if (req.method === 'POST' && (url === '/api/turma/entrar' || url === '/api/turma/sair')) {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const limited = await checkRateLimit(req, 'turma', identity.appUserId);
+        if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        const codigo = String((await readBody(req)).codigo || '').toLowerCase();
+        if (!/^[a-z0-9]{8}$/.test(codigo)) { res.status(400).json({ error: 'codigo_invalido' }); return; }
+        const t = (await sb(`/turmas?codigo=eq.${codigo}&select=professor_id`))?.[0];
+        if (!t) { res.status(404).json({ error: 'turma_nao_encontrada' }); return; }
+        if (t.professor_id === identity.appUserId) { res.status(400).json({ error: 'propria_turma' }); return; }
+        if (url === '/api/turma/entrar') {
+            await sb('/turma_alunos', { method: 'POST', headers: { 'Prefer': 'resolution=ignore-duplicates,return=minimal' },
+                body: JSON.stringify({ professor_id: t.professor_id, aluno_id: identity.appUserId }) });
+            await writeSecurityAudit(req, 'turma.entrar', 'turma', t.professor_id);
+        } else {
+            await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(t.professor_id)}&aluno_id=eq.${encodeURIComponent(identity.appUserId)}`, { method: 'DELETE' });
+            await writeSecurityAudit(req, 'turma.sair', 'turma', t.professor_id);
+        }
+        res.status(200).json({ ok: true }); return;
+    }
+
+    // ── Painel do professor ──────────────────────────────────────────────────
+    // GET /api/professor/turma → { codigo, nome, alunos: [{ id, nome, ...resumoAluno }] }
+    if (req.method === 'GET' && url === '/api/professor/turma') {
+        const identity = await requireProfessor(req, res);
+        const profId = identity.appUserId;
+        let turma = (await sb(`/turmas?professor_id=eq.${encodeURIComponent(profId)}&select=codigo,nome`))?.[0];
+        if (!turma) {
+            const criada = await sb('/turmas', { method: 'POST', headers: { 'Prefer': 'return=representation' },
+                body: JSON.stringify({ codigo: novoCodigoTurma(), professor_id: profId }) });
+            turma = criada?.[0];
+            if (!turma) throw new HttpError(502, 'database_error', 'Could not create the class.');
+        }
+        const membros = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(profId)}&select=aluno_id,entrou_em&order=entrou_em.asc&limit=500`);
+        const ids = (Array.isArray(membros) ? membros : []).map(m => m.aluno_id);
+        let alunos = [];
+        if (ids.length) {
+            const lista = ids.map(i => `"${String(i).replace(/["\\]/g, '')}"`).join(',');
+            const desde = diaBrasil(new Date(Date.now() - 13 * 86400000));
+            const [contas, estados, atividade, licoes] = await Promise.all([
+                sb(`/accounts?id=in.(${encodeURIComponent(lista)})&select=id,name,avatar`),
+                sb(`/user_state?user_id=in.(${encodeURIComponent(lista)})&select=user_id,data,updated_at`),
+                sb(`/atividade_diaria?user_id=in.(${encodeURIComponent(lista)})&dia=gte.${desde}&select=user_id,dia,minis,xp&order=dia.asc`),
+                sb(`/homework_submissions?user_id=in.(${encodeURIComponent(lista)})&select=id,user_id,lesson_id,lesson_title,xp_earned,submitted_at&order=submitted_at.desc&limit=2000`),
+            ]);
+            const por = (rows, k) => { const m = new Map(); for (const r of (Array.isArray(rows) ? rows : [])) { if (!m.has(r[k])) m.set(r[k], []); m.get(r[k]).push(r); } return m; };
+            const cm = por(contas, 'id'), em = por(estados, 'user_id'), am = por(atividade, 'user_id'), lm = por(licoes, 'user_id');
+            const hoje = diaBrasil();
+            alunos = (Array.isArray(membros) ? membros : []).map(m => {
+                const c = cm.get(m.aluno_id)?.[0] || {};
+                const e = em.get(m.aluno_id)?.[0] || {};
+                return {
+                    id: m.aluno_id,
+                    nome: textoParaPrompt(c.name || 'Aluno').slice(0, 60),
+                    avatar: String(c.avatar || '🐾').slice(0, 8),
+                    entrouEm: m.entrou_em,
+                    ...resumoAluno({ state: e.data, atualizadoEm: e.updated_at, atividade: am.get(m.aluno_id) || [], licoes: lm.get(m.aluno_id) || [], hoje }),
+                };
+            });
+        }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ codigo: turma.codigo, nome: turma.nome, hoje: diaBrasil(), alunos, licoesDisponiveis: true });
+        return;
+    }
+
+    // POST /api/professor/remover { alunoId } — tira o aluno da turma.
+    if (req.method === 'POST' && url === '/api/professor/remover') {
+        assertCsrf(req);
+        const identity = await requireProfessor(req, res);
+        const alunoId = String((await readBody(req)).alunoId || '');
+        if (!/^[A-Za-z0-9_-]{1,80}$/.test(alunoId)) { res.status(400).json({ error: 'aluno_invalido' }); return; }
+        await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(identity.appUserId)}&aluno_id=eq.${encodeURIComponent(alunoId)}`, { method: 'DELETE' });
+        await writeSecurityAudit(req, 'turma.remover', 'account', alunoId);
+        res.status(200).json({ ok: true }); return;
+    }
+
+    // GET /api/professor/licao?id=<uuid> — o texto de uma lição de casa de um aluno DA TURMA.
+    if (req.method === 'GET' && url === '/api/professor/licao') {
+        const identity = await requireProfessor(req, res);
+        const id = String(new URL(req.url, 'http://x').searchParams.get('id') || '');
+        if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(400).json({ error: 'id_invalido' }); return; }
+        const row = (await sb(`/homework_submissions?id=eq.${id}&select=id,user_id,lesson_id,lesson_title,answers,xp_earned,submitted_at`))?.[0];
+        const membro = row && await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(identity.appUserId)}&aluno_id=eq.${encodeURIComponent(row.user_id)}&select=aluno_id`);
+        if (!row || !Array.isArray(membro) || !membro.length) { res.status(404).json({ error: 'not_found' }); return; }
+        res.setHeader('Cache-Control', 'no-store');
+        res.status(200).json({ id: row.id, lessonId: row.lesson_id, titulo: row.lesson_title, respostas: row.answers, xp: row.xp_earned, em: row.submitted_at });
+        return;
+    }
+
     // GET /api/homework — list submissions (teacher/admin session only).
     if (req.method === 'GET' && url.startsWith('/api/homework')) {
         await requireRole(req, res, ['admin', 'teacher']);
@@ -5896,4 +6181,8 @@ Rules:
 };
 
 // Pure helpers, exposed for tests only.
-module.exports._internos = { buscarJsonExterno, checkRateLimit };
+module.exports._internos = { buscarJsonExterno, checkRateLimit, icsDaAgenda };
+// For tests: the teacher panel's pure helpers (tests/professor.test.js).
+module.exports._professor = { deltaAtividade, resumoAluno, novoCodigoTurma };
+// For tests: the free voice-call trial (tests/realtime-voice.test.js).
+module.exports._vozTeste = { liberarTesteDeVoz, estadoTesteDeVoz, VOZ_TESTE_MIN };

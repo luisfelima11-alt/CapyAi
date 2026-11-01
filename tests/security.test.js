@@ -139,6 +139,7 @@ test('sensitive pages use local scripts and contain no executable inline handler
   const pages = [
     '4_Login_Capy_Yara_Welcomes_You.html', 'set-password.html', 'account.html',
     'admin.html', 'admin-antigo.html', 'admin-metrics.html', 'teacher_homework.html',
+    'professor.html', 'turma.html',
   ];
   for (const page of pages) {
     const source = fs.readFileSync(path.join(ROOT, page), 'utf8');
@@ -210,6 +211,50 @@ test('in production, reads from our own pages pass the AI gate with cookies; oth
   assert.equal(saida.outroSite.erro, 'invalid_origin');
   assert.equal(saida.escritaSemCsrf.status, 403);
   assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
+});
+
+test('a silent session refresh keeps the tab\'s CSRF token, so the next POST still passes', () => {
+  // Access tokens last about an hour; the next request renews them in
+  // getAuthenticatedSession. setSessionCookies issued a NEW CSRF cookie there,
+  // while the page had read its token once, at load: every later POST from that
+  // tab got 403 invalid_csrf until a reload (the mic in lessons.html, 29/set).
+  const saida = execFileSync(process.execPath, ['-e', `
+    global.fetch = async url => {
+      const r = (status, obj) => ({ ok: status < 400, status, text: async () => JSON.stringify(obj) });
+      if (String(url).endsWith('/auth/v1/user')) return r(401, { msg: 'JWT expired' });
+      if (String(url).includes('grant_type=refresh_token')) {
+        return r(200, { access_token: 'a2', refresh_token: 'r2', expires_in: 3600, user: { id: 'u1' } });
+      }
+      return r(404, {});
+    };
+    const S = require('./api/security');
+    const C = S.COOKIE_NAMES;
+    const resposta = () => ({ h: {}, setHeader(k, v) { this.h[k.toLowerCase()] = v; }, getHeader(k) { return this.h[k.toLowerCase()]; } });
+    const tokenDaAba = 'A'.repeat(43);
+    (async () => {
+      // "Ouvir exemplo": a GET with the expired access cookie renews the session.
+      const res = resposta();
+      await S.getAuthenticatedSession({ headers: { cookie: C.refresh + '=r1; ' + C.csrf + '=' + tokenDaAba } }, res);
+      const novo = [].concat(res.getHeader('set-cookie') || []).find(c => c.startsWith(C.csrf + '='));
+      const cookieCsrf = novo ? novo.split(';')[0].slice(C.csrf.length + 1) : null;
+      // The mic: a POST with the tab's token and the cookie the browser now holds.
+      let post = 'passa';
+      try {
+        S.assertCsrf({ headers: { origin: 'https://www.capyenglish.com.br', 'x-csrf-token': tokenDaAba,
+          cookie: C.access + '=a2; ' + C.csrf + '=' + cookieCsrf } });
+      } catch (e) { post = e.code; }
+      const noLogin = S.setSessionCookies(resposta(), { access_token: 'a3', refresh_token: 'r3', expires_in: 3600 });
+      console.log(JSON.stringify({ cookieCsrf, post, loginTrocou: noLogin !== tokenDaAba && /^[A-Za-z0-9_-]{43}$/.test(noLogin) }));
+    })();
+  `], {
+    cwd: ROOT, encoding: 'utf8',
+    env: { ...process.env, ...SEM_CHAVES, NODE_ENV: 'production', APP_ORIGIN: 'https://www.capyenglish.com.br',
+      SUPABASE_URL: 'https://supabase.invalid', SUPABASE_PUBLISHABLE_KEY: 'pk' },
+  });
+  const r = JSON.parse(saida.trim().split('\n').pop());
+  assert.equal(r.cookieCsrf, 'A'.repeat(43), 'the renewal must keep the CSRF token the tab holds');
+  assert.equal(r.post, 'passa');
+  assert.equal(r.loginTrocou, true, 'a new session (login) still gets a new token');
 });
 
 test('npm audit gate: production gets no exception; a dev-only one holds only until its date', () => {
@@ -291,9 +336,67 @@ test('Google Analytics: only the compatibility CSP allows Google, and only publi
     assert.doesNotMatch(fs.readFileSync(path.join(ROOT, page), 'utf8'), /analytics\.js/, `${page} is hardened and must not load analytics.js`);
   }
   const sem = pages.filter(page => !hardened.includes(page) && !['offline.html', 'voice-test.html', 'pixel_preview.html'].includes(page))
-    .filter(page => !/<script src="analytics\.js\?v=[^"]+" defer><\/script>/.test(fs.readFileSync(path.join(ROOT, page), 'utf8')));
+    .filter(page => !/<script src="\/?analytics\.js\?v=[^"]+" defer><\/script>/.test(fs.readFileSync(path.join(ROOT, page), 'utf8')));
+  // 404.html usa /analytics.js: ela é servida em qualquer caminho, então só aceita endereço absoluto.
   assert.deepEqual(sem, [], 'public pages without analytics.js');
   const source = fs.readFileSync(path.join(ROOT, 'analytics.js'), 'utf8');
   assert.doesNotThrow(() => new Function(source));
   assert.match(source, /DOMINIOS\.includes\(location\.hostname\)/, 'analytics.js must stay off on Previews and localhost');
+});
+
+test('the Super voice minutes on the sales pages match the server quota', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const minutos = Number(api.match(/const VOZ_MINUTOS_MES = \{[^}]*super:\s*(\d+)/)[1]);
+  assert.ok(minutos > 0);
+  for (const f of ['landing.html', 'assets/js/pages/account-1.js']) {
+    const texto = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const citados = [...texto.matchAll(/(\d+) min(?:utos)?(?:\/| por )mês/g)].map(m => Number(m[1]));
+    assert.ok(citados.length > 0, `${f} mentions the voice minutes`);
+    assert.deepEqual([...new Set(citados)], [minutos], `${f} must say ${minutos} min/mês`);
+  }
+});
+
+test('every page in the sitemap has its own search description, without the forbidden words', () => {
+  const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  const paginas = [...sitemap.matchAll(/<loc>https:\/\/www\.capyenglish\.com\.br\/([^<]*)<\/loc>/g)].map(m => m[1] || 'landing.html');
+  assert.ok(paginas.length > 100);
+  const vistas = new Map();
+  for (const p of paginas) {
+    const cabeca = fs.readFileSync(path.join(ROOT, p), 'utf8').split('</head>')[0];
+    const tag = (cabeca.match(/<meta\s[^>]*name="description"[^>]*>/) || [''])[0];
+    assert.ok(tag, `${p}: no meta description`);
+    // Só atributos bem formados: uma aspa solta dentro do texto cortava a descrição.
+    assert.match(tag.replace(/\s[\w:-]+="[^"]*"/g, ''), /^<meta\s*\/?>$/, `${p}: broken meta description`);
+    const d = tag.match(/content="([^"]*)"/)[1];
+    assert.ok(d.length >= 50, `${p}: description too short`);
+    assert.doesNotMatch(d, /gram[aá]tic|grammar/i, `${p}: "gramática" in the description (CLAUDE.md)`);
+    assert.ok(!vistas.has(d), `${p}: same description as ${vistas.get(d)}`);
+    vistas.set(d, p);
+  }
+});
+
+test('no page escapes & twice in its meta tags', () => {
+  for (const f of fs.readdirSync(ROOT).filter(n => n.endsWith('.html'))) {
+    const cabeca = fs.readFileSync(path.join(ROOT, f), 'utf8').split('</head>')[0];
+    for (const tag of cabeca.match(/<meta\s[^>]*>/g) || []) assert.ok(!tag.includes('&amp;amp;'), `${f}: ${tag.slice(0, 80)}`);
+  }
+});
+
+test('unknown addresses get the branded 404 page, which is not indexed', () => {
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  assert.deepEqual(config.routes.slice(-2), [{ handle: 'filesystem' }, { src: '/(.*)', status: 404, dest: '/404.html' }]);
+  const pagina = fs.readFileSync(path.join(ROOT, '404.html'), 'utf8');
+  assert.match(pagina, /<meta name="robots" content="noindex"\/>/);
+  // Servida em qualquer caminho (/a/b/c): links e imagens só com caminho absoluto.
+  for (const [, url] of pagina.matchAll(/(?:href|src)="([^"]*)"/g)) assert.match(url, /^(\/|https:\/\/)/, url);
+});
+
+test('the old "Grammar Lab" name is gone: the page is the Laboratório de Padrões', () => {
+  for (const f of fs.readdirSync(ROOT).filter(n => n.endsWith('.html') || n.endsWith('.js'))) {
+    assert.ok(!fs.readFileSync(path.join(ROOT, f), 'utf8').includes('Grammar Lab'), `${f} still says "Grammar Lab"`);
+  }
+  const lab = fs.readFileSync(path.join(ROOT, 'grammar_lab.html'), 'utf8');
+  assert.match(lab, /<title>Laboratório de Padrões — /);
+  // Os ids internos (grammarDone, grammar_star, data-filter="grammar") continuam; o aluno não os vê.
+  assert.doesNotMatch(lab, /gramátic|Grammar/);
 });
