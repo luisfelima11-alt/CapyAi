@@ -218,6 +218,11 @@ function construir(n) {
     t = t.split('GPS9').join('GPS' + n);
     t = t.split('gps9').join(sufixo);
 
+    // 9a. O nome do cliente no balão do diálogo. O molde (aula 09) diz "Marcos";
+    //     cada aula tem o seu cliente (Carlos, Mike, Daniel…): dialogo.json → nomes.client.
+    const nomeCliente = (d.nomes && d.nomes.client) || 'Marcos';
+    t = t.split("'🙋 Marcos'").join(`'🙋 ${nomeCliente.replace(/['\\<>]/g, '')}'`);
+
     // 9b. Regra do Luis (12/out/2026): a palavra "grammar/gramática" não aparece para o aluno.
     //     O id interno tab-grammar e a chave 'grammar' ficam: o self-study.js depende deles.
     t = t.split("rotulo:'📐 Grammar'").join("rotulo:'🧩 Patterns'");
@@ -250,6 +255,7 @@ function validar({ t, d, c, n, nn }) {
     ok(c.quiz.every(q => new Set(q.opts).size === q.opts.length), 'sem opção repetida no quiz');
     ok(d.linhas.filter(x => !x.extra).length === 12, '12 falas na versão curta');
     ok(d.linhas.filter(x => x.extra).length === 8, '8 falas extras');
+    ok(t.includes(`'🙋 ${(d.nomes && d.nomes.client) || 'Marcos'}'`), `balão do cliente com o nome certo (${(d.nomes && d.nomes.client) || 'Marcos'})`);
     ok(t.includes('id="dialogue-lines"') && t.includes('id="speak-grid"'), 'contrato de DOM do listening-lab');
     const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
     ok(!/gram[aá]tic|grammar/i.test(visivel), 'sem a palavra proibida gramática/grammar (regra de 12/out)');
