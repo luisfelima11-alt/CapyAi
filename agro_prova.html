@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Prova Final — Agro English: avaliação de 30 minutos com 40 questões sobre rotina de fazenda, máquinas agrícolas, clima, colheita, Listening e Speaking.">
+    <title>Capy.ai — Prova Final Agro English (30 Minutos)</title>
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0fdf4;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .blank-pill {
+            display: inline-block;
+            min-width: 110px;
+            padding: 2px 12px;
+            margin: 0 4px;
+            border-bottom: 3px dashed #15803d;
+            background: #dcfce7;
+            color: #14532d;
+            font-weight: 800;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .blank-pill.filled {
+            border-bottom-style: solid;
+            background: #bbf7d0;
+            color: #052e16;
+        }
+
+        .opt-card {
+            transition: all 0.18s ease;
+        }
+
+        .opt-card:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #16a34a;
+            background-color: #f0fdf4;
+        }
+
+        .opt-card.selected {
+            border-color: #15803d;
+            background-color: #dcfce7;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+        }
+
+        .q-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .q-dot.active {
+            outline: 3px solid #15803d;
+            outline-offset: 2px;
+        }
+
+        @keyframes pulse-urgent {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .timer-urgent {
+            animation: pulse-urgent 1s infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Top Exam Header -->
+    <header class="bg-green-950 text-white sticky top-0 z-40 shadow-lg border-b border-green-800">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <a href="classes_agro.html"
+                    class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+                    title="Voltar para Central Agro English">
+                    <i class="fa-solid fa-arrow-left text-green-300"></i>
+                </a>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[11px] font-extrabold uppercase tracking-widest bg-green-500/30 text-green-200 px-2.5 py-0.5 rounded-full border border-green-400/30">
+                            <i class="fa-solid fa-tractor mr-1"></i> Agro English Final Exam
+                        </span>
+                        <span class="text-xs text-green-300 hidden sm:inline">• 40 Questões • Duração: 30 min</span>
+                    </div>
+                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight">Prova Final — Agro English (Campo &amp; Operações)</h1>
+                </div>
+            </div>
+
+            <!-- Live Timer + Finish Button -->
+            <div class="flex items-center gap-3">
+                <div id="timer-box"
+                    class="flex items-center gap-2.5 bg-green-900/90 border border-green-700 px-4 py-2 rounded-2xl shadow-inner">
+                    <i id="timer-icon" class="fa-regular fa-clock text-green-300 text-lg"></i>
+                    <div class="leading-none">
+                        <p class="text-[10px] uppercase tracking-wider text-green-300 font-bold">Tempo Restante</p>
+                        <p id="timer-display" class="text-lg sm:text-xl font-extrabold font-mono tracking-wider">30:00</p>
+                    </div>
+                </div>
+                <button id="pause-btn" onclick="togglePauseTimer()"
+                    class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition hidden sm:inline-flex items-center gap-1.5"
+                    title="Pausar/Retomar cronômetro">
+                    <i class="fa-solid fa-pause"></i> <span>Pausar</span>
+                </button>
+                <button id="finish-top-btn" onclick="confirmSubmitExam()"
+                    class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white text-xs sm:text-sm font-extrabold shadow-md transition hidden items-center gap-2">
+                    <i class="fa-solid fa-flag-checkered"></i> Finalizar Prova
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="w-full bg-green-900 h-1.5">
+            <div id="exam-progress-bar" class="bg-gradient-to-r from-green-400 via-lime-400 to-amber-400 h-1.5 transition-all duration-300"
+                style="width: 0%"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8">
+
+        <!-- START SCREEN -->
+        <section id="start-screen" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-br from-green-800 via-emerald-900 to-lime-950 p-8 sm:p-10 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-white/10 text-[150px] pointer-events-none">
+                    <i class="fa-solid fa-tractor"></i>
+                </div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-green-200 text-xs font-bold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-wheat-awn text-amber-300"></i> Avaliação Oficial • Agro English
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold mb-3 leading-tight">Prova Final — Agro English (Fazenda &amp; Safra)</h2>
+                <p class="text-green-100 text-sm sm:text-base max-w-2xl leading-relaxed">
+                    Esta avaliação testa seu inglês prático para fazendas nos EUA, Canadá e Austrália: completar frases com a
+                    <strong>preposição ou expressão correta do campo</strong>, máquinas, plantio, colheita, ações no passado/presente/futuro,
+                    <strong>Listening de instruções pelo rádio</strong> e <strong>Speaking operacional</strong>.
+                </p>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6">
+                <!-- Exam Breakdown Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-green-50/70 border border-green-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-green-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">1. Preposições &amp; Expressões da Fazenda (12 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Complete frases com <em>on the farm, in the field, at dawn, on Monday, in October, into the grain bin</em> e mais.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-tractor"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">2. Máquinas, Plantio, Colheita &amp; Tempos de Ação (16 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Manutenção diária, clima, pulverização, ações concluídas (<em>have harvested, had rained</em>) e planos de safra.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-orange-50/70 border border-orange-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">3. Listening — Instruções do Gerente da Fazenda (6 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Ouça as orientações sobre talhões, umidade de colheita, abastecimento e vento na pulverização.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">4. Speaking — Comunicação no Campo (6 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Complete a frase agrícola e fale em voz alta no microfone (ou valide no modo silencioso).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules bar -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-green-600 text-base"></i>
+                        <span><strong>30 minutos</strong> de tempo total sugerido (45s por questão)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-check-double text-green-600 text-base"></i>
+                        <span>Nota de aprovação: <strong>70% (28/40 acertos)</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-left-right text-amber-600 text-base"></i>
+                        <span>Navegação livre entre as 40 questões</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    <div class="flex flex-wrap gap-2">
+                        <a href="mini_prova.html?curso=agro&bloco=1"
+                            class="text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 border border-green-200 px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-bolt"></i> Mini-Prova 1 (Aulas 01–10)
+                        </a>
+                        <a href="mini_prova.html?curso=agro&bloco=2"
+                            class="text-xs font-bold text-green-700 hover:text-green-900 bg-green-50 hover:bg-green-100 border border-green-200 px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-bolt"></i> Mini-Prova 2 (Aulas 11–20)
+                        </a>
+                    </div>
+                    <button onclick="startExam()"
+                        class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-base shadow-lg shadow-green-600/25 transition flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-play"></i> Começar Prova Agro English (30 min)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXAM WORKSPACE -->
+        <section id="exam-screen" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Left / Main Question Area -->
+            <div class="lg:col-span-8 space-y-5">
+                <div class="bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                        <span id="q-section-badge"
+                            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-green-100 text-green-800">
+                            <i class="fa-solid fa-seedling"></i> Expressões da Fazenda
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span id="q-counter" class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Questão 1 de 40</span>
+                            <button onclick="toggleFlagCurrent()" id="flag-btn"
+                                class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-300 text-xs font-bold transition flex items-center gap-1"
+                                title="Marcar para revisar depois">
+                                <i class="fa-regular fa-bookmark"></i> <span>Revisar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p id="q-instruction" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                        Complete a frase com a alternativa correta:
+                    </p>
+
+                    <!-- LISTENING AUDIO BOX -->
+                    <div id="listening-box" class="hidden mb-6 p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5">
+                                <button onclick="playCurrentAudio(1)"
+                                    class="w-14 h-14 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white shadow-md flex items-center justify-center text-xl transition shrink-0">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                </button>
+                                <div>
+                                    <p class="text-xs font-extrabold uppercase tracking-wider text-amber-800">Áudio da Fazenda — Rádio Operacional</p>
+                                    <p class="text-xs text-amber-700 mt-0.5">Ouça o gerente ou operador e escolha a alternativa correta.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="playCurrentAudio(1)"
+                                    class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+                                    <i class="fa-solid fa-play mr-1"></i> Normal (1x)
+                                </button>
+                                <button onclick="playCurrentAudio(0.78)"
+                                    class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+                                    <i class="fa-solid fa-tortoise mr-1"></i> Lento (0.8x)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Sentence -->
+                    <div id="q-sentence" class="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed mb-2">
+                    </div>
+                    <p id="q-translation" class="text-xs sm:text-sm text-slate-500 italic mb-6"></p>
+
+                    <!-- Options Grid -->
+                    <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    </div>
+
+                    <!-- SPEAKING BOX -->
+                    <div id="speaking-box" class="hidden mt-6 p-5 rounded-2xl bg-blue-50/90 border border-blue-200 space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-200/70 px-2.5 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-microphone mr-1"></i> Etapa de Speaking no Campo
+                                </span>
+                                <p class="text-xs text-blue-900 mt-1.5">
+                                    1º Escolha a opção acima que completa a frase agrícola.<br>
+                                    2º Ouça o modelo e pronuncie a frase completa em voz alta.
+                                </p>
+                            </div>
+                            <button onclick="playSpeakingTarget()"
+                                class="px-3 py-2 rounded-xl bg-white hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold shrink-0 transition">
+                                <i class="fa-solid fa-volume-high mr-1"></i> Ouvir Frase
+                            </button>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-white border border-blue-200">
+                            <p class="text-[11px] font-bold uppercase text-slate-400">Frase Alvo para Pronunciar:</p>
+                            <p id="speaking-target-text" class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5"></p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="mic-record-btn" onclick="startSpeechRecognition()"
+                                class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-microphone"></i> Gravar Minha Voz
+                            </button>
+                            <button onclick="markSpeakingSelfVerified()"
+                                class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold transition">
+                                <i class="fa-solid fa-check text-green-600 mr-1"></i> Pronunciei em voz alta (Sem microfone)
+                            </button>
+                            <span id="speaking-status" class="text-xs font-bold text-slate-600"></span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <button id="prev-btn" onclick="prevQuestion()"
+                            class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition flex items-center gap-2 disabled:opacity-40">
+                            <i class="fa-solid fa-arrow-left"></i> Anterior
+                        </button>
+
+                        <span id="answered-count-label" class="text-xs font-bold text-slate-500">0 / 40 respondidas</span>
+
+                        <button id="next-btn" onclick="nextQuestion()"
+                            class="px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2">
+                            <span>Próxima</span> <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right / Question Map Sidebar -->
+            <aside class="lg:col-span-4 bg-white rounded-3xl shadow-md border border-slate-200 p-5 sticky top-24 space-y-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-green-600"></i> Mapa da Prova (40)
+                    </h3>
+                    <span id="sidebar-pct" class="text-xs font-extrabold text-green-700 bg-green-50 px-2.5 py-1 rounded-full">0% concluído</span>
+                </div>
+
+                <!-- Legend -->
+                <div class="flex flex-wrap gap-3 text-[11px] text-slate-500 border-b border-slate-100 pb-3">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-green-600 inline-block"></span> Respondida</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Em branco</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400 inline-block"></span> Revisar</span>
+                </div>
+
+                <div id="question-map-grid" class="grid grid-cols-8 gap-2">
+                </div>
+
+                <div class="space-y-1.5 pt-2 border-t border-slate-100 text-xs">
+                    <p class="font-bold text-slate-400 uppercase text-[10px] tracking-wider mb-1">Ir direto para seção:</p>
+                    <button onclick="goToQuestion(0)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-seedling text-green-600 w-4"></i> Expressões da Fazenda</span>
+                        <span class="text-slate-400">01–12</span>
+                    </button>
+                    <button onclick="goToQuestion(12)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-tractor text-amber-600 w-4"></i> Máquinas, Safra &amp; Ações</span>
+                        <span class="text-slate-400">13–28</span>
+                    </button>
+                    <button onclick="goToQuestion(28)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-headphones text-orange-500 w-4"></i> Listening no Campo</span>
+                        <span class="text-slate-400">29–34</span>
+                    </button>
+                    <button onclick="goToQuestion(34)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-microphone text-blue-600 w-4"></i> Speaking Operacional</span>
+                        <span class="text-slate-400">35–40</span>
+                    </button>
+                </div>
+
+                <button onclick="confirmSubmitExam()"
+                    class="w-full py-3.5 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-flag-checkered"></i> Entregar e Ver Nota
+                </button>
+            </aside>
+        </section>
+
+        <!-- RESULTS SCREEN -->
+        <section id="results-screen" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+                <div id="result-banner" class="bg-gradient-to-r from-green-800 to-emerald-900 p-8 text-white text-center">
+                    <div id="result-badge-icon" class="w-20 h-20 rounded-3xl bg-white/15 mx-auto flex items-center justify-center text-4xl mb-4">
+                        🌾
+                    </div>
+                    <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold">Resultado da Prova Final — Agro English</h2>
+                    <p id="result-subtitle" class="text-green-100 text-sm mt-1"></p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto mt-6">
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-green-200 font-bold">Nota Final</p>
+                            <p id="res-score-pct" class="text-2xl font-extrabold mt-0.5">0%</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-green-200 font-bold">Acertos</p>
+                            <p id="res-score-raw" class="text-2xl font-extrabold mt-0.5">0 / 40</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-green-200 font-bold">Tempo Gasto</p>
+                            <p id="res-time-spent" class="text-2xl font-extrabold mt-0.5">00:00</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-green-200 font-bold">Speaking</p>
+                            <p id="res-speaking-done" class="text-2xl font-extrabold mt-0.5">0 / 6</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <h3 class="font-extrabold text-slate-800 text-base">Desempenho por Habilidade</h3>
+                    <div id="section-breakdown" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                        <a href="classes_agro.html"
+                            class="px-5 py-3 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar para Central Agro English
+                        </a>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="filterReview('wrong')"
+                                class="px-4 py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-circle-xmark mr-1"></i> Ver Apenas Erros
+                            </button>
+                            <button onclick="filterReview('all')"
+                                class="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-list-check mr-1"></i> Ver Todas as 40
+                            </button>
+                            <button onclick="restartExam()"
+                                class="px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-xs sm:text-sm shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Refazer Prova
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Answer Key -->
+            <div class="bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8 space-y-4">
+                <h3 class="font-extrabold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart text-green-600"></i> Gabarito Comentado da Prova
+                </h3>
+                <div id="review-list" class="space-y-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ============================================================================
+        // 40 QUESTÕES DA PROVA FINAL — AGRO ENGLISH (30 MINUTOS)
+        // Sem palavras proibidas, com gabaritos estáticos distribuídos (0, 1, 2, 3)
+        // e embaralhamento Fisher-Yates com trava anti-repetição de letra.
+        // ============================================================================
+        const EXAM_QUESTIONS = [
+            // --- PARTE 1: PREPOSIÇÕES & EXPRESSÕES DA FAZENDA (1 a 12) ---
+            {
+                id: 1,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "My cousin has worked ____ a large soybean and corn farm in Iowa for three seasons.",
+                translation: "Meu primo trabalha em uma grande fazenda de soja e milho em Iowa há três safras.",
+                options: ["on", "in", "at", "to"],
+                ans: 0,
+                explanation: "Em inglês, sempre dizemos 'on a farm' (em uma fazenda), mas 'in the field' (no campo/talhão)."
+            },
+            {
+                id: 2,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "During harvest season, all combine operators start their inspection ____ 6:00 AM sharp.",
+                translation: "Durante a época de colheita, todos os operadores de colheitadeira começam a inspeção às 6h00 em ponto.",
+                options: ["on", "at", "in", "by"],
+                ans: 1,
+                explanation: "Para horários exatos (6:00 AM, dawn, noon), usamos sempre 'at'."
+            },
+            {
+                id: 3,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "We are going to start planting the north field ____ Monday morning.",
+                translation: "Nós vamos começar a plantar o talhão norte na segunda-feira de manhã.",
+                options: ["in", "at", "on", "to"],
+                ans: 2,
+                explanation: "Para dias da semana ou manhã/tarde de um dia específico (Monday morning), usamos 'on'."
+            },
+            {
+                id: 4,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "In the Midwest, corn harvest usually reaches its peak ____ October.",
+                translation: "No Meio-Oeste americano, a colheita do milho geralmente atinge seu pico em outubro.",
+                options: ["on", "at", "by", "in"],
+                ans: 3,
+                explanation: "Para meses do ano e estações (in October, in spring, in autumn), usamos 'in'."
+            },
+            {
+                id: 5,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "Park the grain cart ____ the machine shed before the rainstorm hits.",
+                translation: "Estacione a carreta graneleira dentro do barracão de máquinas antes que a tempestade chegue.",
+                options: ["inside", "onto", "between", "above"],
+                ans: 0,
+                explanation: "'Inside the machine shed' (ou 'in the machine shed') indica dentro do galpão/barracão."
+            },
+            {
+                id: 6,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "The semi-truck is waiting ____ the edge of the field to unload the combine.",
+                translation: "A carreta rodoviária está esperando na borda/cabeceira do talhão para descarregar a colheitadeira.",
+                options: ["in", "at", "into", "over"],
+                ans: 1,
+                explanation: "Para pontos de referência na extremidade ('na borda do talhão'), usamos 'at the edge of the field'."
+            },
+            {
+                id: 7,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "When the grain tank is full, swing out the auger and unload the soybeans ____ the grain cart.",
+                translation: "Quando o graneleiro estiver cheio, abra o tubo de descarga e descarregue a soja para dentro da carreta graneleira.",
+                options: ["at", "from", "into", "under"],
+                ans: 2,
+                explanation: "Para movimento de entrada de grãos em um reservatório ou carreta, usamos 'into the grain cart / into the bin'."
+            },
+            {
+                id: 8,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "Never apply herbicide ____ a windy day because chemical drift can damage neighboring crops.",
+                translation: "Nunca aplique herbicida em um dia de muito vento porque a deriva química pode danificar lavouras vizinhas.",
+                options: ["in", "at", "to", "on"],
+                ans: 3,
+                explanation: "Com expressões que contêm a palavra 'day' (on a windy day, on a rainy day), usamos 'on'."
+            },
+            {
+                id: 9,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "Keep the PTO safety shield ____ place at all times while operating the auger.",
+                translation: "Mantenha a capa de proteção da tomada de força (TDP/PTO) no lugar o tempo todo ao operar a rosca transportadora.",
+                options: ["in", "on", "at", "by"],
+                ans: 0,
+                explanation: "A expressão fixa para 'no lugar / devidamente instalada' é 'in place'."
+            },
+            {
+                id: 10,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "Our planter is set ____ 30-inch row spacing for this corn variety.",
+                translation: "Nossa plantadeira está configurada para espaçamento entre linhas de 30 polegadas para esta variedade de milho.",
+                options: ["in", "to", "by", "from"],
+                ans: 1,
+                explanation: "Usamos 'set to' (ou 'set at') para indicar a regulagem ou configuração da máquina."
+            },
+            {
+                id: 11,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "Always grease the universal joints ____ every ten hours of operation.",
+                translation: "Sempre engraxe as cruzetas/juntas universais a cada dez horas de operação.",
+                options: ["on", "at", "after", "into"],
+                ans: 2,
+                explanation: "'After every ten hours of operation' indica o intervalo regular de lubrificação."
+            },
+            {
+                id: 12,
+                section: "Expressões da Fazenda",
+                type: "expression",
+                sentence: "The cattle are grazing ____ the south pasture near the creek.",
+                translation: "O gado está pastando no pasto sul perto do córrego.",
+                options: ["at", "to", "onto", "in"],
+                ans: 3,
+                explanation: "Para áreas cercadas como pastos e talhões, usamos 'in the south pasture'."
+            },
+
+            // --- PARTE 2: MÁQUINAS, PLANTIO, COLHEITA & TEMPOS DE AÇÃO (13 a 28) ---
+            {
+                id: 13,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "Before starting the tractor engine every morning, you must check the ____ with the dipstick.",
+                translation: "Antes de dar partida no motor do trator todas as manhãs, você deve verificar o nível do óleo do motor com a vareta.",
+                options: ["engine oil level", "grain moisture", "wind speed", "seed population"],
+                ans: 0,
+                explanation: "'Dipstick' é a vareta usada para medir o nível do óleo do motor ('engine oil level')."
+            },
+            {
+                id: 14,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "We ____ harvesting Field 12 because heavy rain started twenty minutes ago.",
+                translation: "Nós paramos de colher o Talhão 12 porque uma chuva forte começou há vinte minutos.",
+                options: ["will stop tomorrow", "have just stopped", "were stopping", "stop every year"],
+                ans: 1,
+                explanation: "'Have just stopped' expressa uma ação que acabou de ocorrer com impacto imediato na operação atual."
+            },
+            {
+                id: 15,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "While I ____ the sprayer boom yesterday, I noticed a clogged nozzle at the right tip.",
+                translation: "Enquanto eu estava inspecionando a barra do pulverizador ontem, notei um bico entupido na ponta direita.",
+                options: ["inspect", "have inspected", "was inspecting", "will inspect"],
+                ans: 2,
+                explanation: "Para uma ação em andamento no passado ('was inspecting') quando algo foi percebido ('noticed')."
+            },
+            {
+                id: 16,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "By the time the frost arrived in November, we ____ all two thousand acres of corn.",
+                translation: "Quando a geada chegou em novembro, nós já tínhamos colhido todos os dois mil acres de milho.",
+                options: ["harvest", "are harvesting", "will harvest", "had already harvested"],
+                ans: 3,
+                explanation: "Para uma ação concluída antes de outro evento no passado ('By the time the frost arrived'), usamos 'had already harvested'."
+            },
+            {
+                id: 17,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "Look at those dark clouds building in the west! It ____ here within half an hour.",
+                translation: "Olhe para aquelas nuvens escuras se formando a oeste! Vai chover aqui dentro de meia hora.",
+                options: ["is going to rain", "rained", "has rained", "rains yesterday"],
+                ans: 0,
+                explanation: "Quando há evidência visível no céu ('dark clouds'), usamos 'is going to rain' para previsão imediata."
+            },
+            {
+                id: 18,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "The soybean moisture is still at 18%, so we need to run the ____ at the storage bin.",
+                translation: "A umidade da soja ainda está em 18%, então precisamos ligar o secador de grãos no silo.",
+                options: ["seed drill", "grain dryer and aeration fans", "front loader", "fencing pliers"],
+                ans: 1,
+                explanation: "Com grãos colhidos acima da umidade de armazenamento seguro, utiliza-se o secador e ventiladores de aeração ('grain dryer and aeration fans')."
+            },
+            {
+                id: 19,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "Our crew ____ planting soybeans since 5:30 AM, and we have covered 400 acres so far.",
+                translation: "Nossa equipe está plantando soja desde as 5h30 da manhã, e já cobrimos 400 acres até agora.",
+                options: ["planted", "was planting", "has been", "will be"],
+                ans: 2,
+                explanation: "Para uma atividade iniciada às 5h30 da manhã e que continua até o presente ('since 5:30 AM'), usamos 'has been planting'."
+            },
+            {
+                id: 20,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "To prevent herbicide carryover into the next crop, always ____ the sprayer tank thoroughly.",
+                translation: "Para evitar contaminação residual de herbicida na próxima cultura, sempre faça a tríplice lavagem/enxágue completo do tanque do pulverizador.",
+                options: ["overload", "unplug", "harvest", "triple-rinse and clean"],
+                ans: 3,
+                explanation: "'Triple-rinse and clean' (tríplice lavagem e limpeza) é o procedimento essencial após trocar de produto químico."
+            },
+            {
+                id: 21,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "If the soil temperature stays below 50°F (10°C), corn seeds ____ much more slowly.",
+                translation: "Se a temperatura do solo permanecer abaixo de 50°F (10°C), as sementes de milho germinam muito mais devagar.",
+                options: ["germinate", "germinated", "would have germinated", "having germinated"],
+                ans: 0,
+                explanation: "Para fatos agronômicos e condições reais, usamos o presente ('germinate' / 'will germinate')."
+            },
+            {
+                id: 22,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "Which part of the combine harvester cuts and gathers the crop at the front of the machine?",
+                translation: "Qual parte da colheitadeira corta e recolhe a cultura na frente da máquina?",
+                options: ["The chaff spreader", "The header (platform / corn head)", "The rear axle", "The cab mirror"],
+                ans: 1,
+                explanation: "'The header' (plataforma de corte ou plataforma de milho 'corn head') vai acoplada na frente da colheitadeira."
+            },
+            {
+                id: 23,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "Before hooking up a hydraulic implement, wipe the ____ clean to keep dirt out of the system.",
+                translation: "Antes de engatar um implemento hidráulico, limpe os engates rápidos para manter a sujeira fora do sistema.",
+                options: ["windshield wipers", "exhaust pipe", "hydraulic quick couplers", "seat belt"],
+                ans: 2,
+                explanation: "'Hydraulic quick couplers' são os engates rápidos hidráulicos que devem ser limpos antes da conexão."
+            },
+            {
+                id: 24,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "If we had checked the radiator screen at noon, the tractor engine ____ in the afternoon.",
+                translation: "Se tivéssemos verificado a tela do radiador ao meio-dia, o motor do trator não teria superaquecido à tarde.",
+                options: ["will not overheat", "does not overheat", "is not overheating", "would not have overheated"],
+                ans: 3,
+                explanation: "Para falar de algo no passado que teria evitado um problema ('If we had checked'), usamos 'would not have overheated'."
+            },
+            {
+                id: 25,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "What does 'no-till farming' mean in modern agriculture?",
+                translation: "O que significa 'no-till farming' na agricultura moderna?",
+                options: ["Planting directly into crop residue without plowing the soil", "Harvesting crops at night without headlights", "Growing crops without any seeds", "Selling grain without a truck"],
+                ans: 0,
+                explanation: "'No-till farming' é o plantio direto na palhada ('crop residue / stubble') sem revolver ou arar o solo."
+            },
+            {
+                id: 26,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "By Friday evening, our team ____ applying nitrogen fertilizer to all the wheat fields.",
+                translation: "Até sexta-feira à noite, nossa equipe terá terminado de aplicar fertilizante nitrogenado em todos os talhões de trigo.",
+                options: ["finished", "will have finished", "was finishing", "finishes yesterday"],
+                ans: 1,
+                explanation: "Com um prazo futuro ('By Friday evening'), usamos 'will have finished' para indicar que a aplicação estará concluída."
+            },
+            {
+                id: 27,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "The air filter warning light came on because dry chaff and dust ____ the primary filter element.",
+                translation: "A luz de alerta do filtro de ar acendeu porque palha seca e poeira obstruíram o elemento filtrante primário.",
+                options: ["will clog tomorrow", "clogging", "have clogged", "are clog"],
+                ans: 2,
+                explanation: "'Have clogged' (ou 'clogged') indica a obstrução que causou o acendimento do alerta no painel."
+            },
+            {
+                id: 28,
+                section: "Máquinas, Safra & Ações",
+                type: "context",
+                sentence: "When filling the sprayer with chemicals, you must wear ____ to protect your eyes and skin.",
+                translation: "Ao abastecer o pulverizador com defensivos químicos, você deve usar EPI (óculos, luvas e avental) para proteger seus olhos e pele.",
+                options: ["flip-flops and shorts", "only a baseball cap", "headphones", "PPE: safety goggles, chemical-resistant gloves, and an apron"],
+                ans: 3,
+                explanation: "PPE (Personal Protective Equipment / EPI) inclui óculos de proteção, luvas nitrílicas/químicas e avental."
+            },
+
+            // --- PARTE 3: LISTENING NO CAMPO (29 a 34) ---
+            {
+                id: 29,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "Hey Lucas, stop spraying Field 8 right now. The wind speed just reached twenty miles per hour, and we are getting too much drift.",
+                sentence: "Por que o gerente pediu para parar a pulverização no Talhão 8?",
+                translation: "Ouça o áudio do rádio e escolha o motivo correto.",
+                options: ["O vento chegou a 20 mph e está causando muita deriva", "Acabou a semente de milho na plantadeira", "O pneu traseiro da carreta furou", "O silo de grãos já está vazio"],
+                ans: 0,
+                explanation: "O gerente avisa: 'The wind speed just reached twenty miles per hour, and we are getting too much drift.'"
+            },
+            {
+                id: 30,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "Please set the planter seeding depth to two inches because the topsoil is dry this week.",
+                sentence: "No áudio: 'Please set the planter seeding depth to ____.'",
+                translation: "Qual é a profundidade de plantio solicitada no áudio?",
+                options: ["five inches", "two inches", "half an inch", "ten inches"],
+                ans: 1,
+                explanation: "O áudio instrui: 'set the planter seeding depth to two inches'."
+            },
+            {
+                id: 31,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "Before you take the tractor to the south field, top off the diesel tank and the DEF tank by the fuel station.",
+                sentence: "O que o operador deve fazer antes de levar o trator para o talhão sul?",
+                translation: "Ouça a instrução e marque a ação correta.",
+                options: ["Trocar o para-brisa da cabine", "Lavar a colheitadeira com água quente", "Completar o tanque de diesel e o tanque de Arla (DEF)", "Desmontar a caixa de câmbio"],
+                ans: 2,
+                explanation: "'Top off the diesel tank and the DEF tank' significa completar o diesel e o fluido DEF (Arla 32)."
+            },
+            {
+                id: 32,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "The soybean sample from Bin 3 tested at thirteen percent moisture, which is safe for storage.",
+                sentence: "No áudio: 'The soybean sample from Bin 3 tested at ____ moisture.'",
+                translation: "Qual foi a umidade medida na amostra do Silo 3?",
+                options: ["twenty-two percent", "nineteen percent", "eight percent", "thirteen percent"],
+                ans: 3,
+                explanation: "O áudio informa: 'tested at thirteen percent moisture, which is safe for storage'."
+            },
+            {
+                id: 33,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "Bring the grain cart alongside the combine on the left side so we can unload on the go.",
+                sentence: "O que significa a operação 'unload on the go' mencionada no áudio?",
+                translation: "Ouça o comando do operador da colheitadeira e responda.",
+                options: ["Descarregar os grãos em movimento sem parar a colheitadeira", "Desligar o motor da colheitadeira no galpão", "Calibrar os pneus na oficina", "Abastecer semente com a plantadeira levantada"],
+                ans: 0,
+                explanation: "'Unload on the go' é a descarga em movimento da colheitadeira para a carreta graneleira ('grain cart')."
+            },
+            {
+                id: 34,
+                section: "Listening no Campo",
+                type: "listening",
+                audioText: "We have a broken shear bolt on the grain auger. Grab a half-inch wrench from the toolbox in the pickup truck.",
+                sentence: "Qual ferramenta o operador pediu para pegar na caminhonete?",
+                translation: "Ouça o áudio e identifique a ferramenta solicitada.",
+                options: ["Um martelo de borracha", "Uma chave de meia polegada (a half-inch wrench)", "Uma motosserra", "Um multímetro digital"],
+                ans: 1,
+                explanation: "O áudio pede: 'Grab a half-inch wrench from the toolbox in the pickup truck.'"
+            },
+
+            // --- PARTE 4: SPEAKING OPERACIONAL (35 a 40) ---
+            {
+                id: 35,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "The grain tank is full, and I am ready to ____.",
+                translation: "Complete e fale em voz alta: 'O tanque graneleiro está cheio e estou pronto para descarregar.'",
+                options: ["unloading", "unloaded", "unload", "unloads"],
+                ans: 2,
+                speakingTarget: "The grain tank is full, and I am ready to unload.",
+                explanation: "Após 'ready to', usamos o verbo na forma base: 'ready to unload'."
+            },
+            {
+                id: 36,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "We have already ____ all the grease points on the header.",
+                translation: "Complete e fale em voz alta: 'Nós já lubrificamos todos os pontos de graxa na plataforma.'",
+                options: ["lubricate", "lubricating", "lubricates", "lubricated"],
+                ans: 3,
+                speakingTarget: "We have already lubricated all the grease points on the header.",
+                explanation: "Com 'have already', usamos o particípio passado 'lubricated'."
+            },
+            {
+                id: 37,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "I am checking the hydraulic oil level ____ the sight glass.",
+                translation: "Complete e fale em voz alta: 'Estou verificando o nível do óleo hidráulico no visor de nível.'",
+                options: ["in", "to", "from", "into"],
+                ans: 0,
+                speakingTarget: "I am checking the hydraulic oil level in the sight glass.",
+                explanation: "'In the sight glass' (ou 'through the sight glass') refere-se ao visor transparente do reservatório hidráulico."
+            },
+            {
+                id: 38,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "We cannot spray this afternoon because it is too ____.",
+                translation: "Complete e fale em voz alta: 'Não podemos pulverizar esta tarde porque está ventando demais.'",
+                options: ["wind", "windy", "winds", "winding"],
+                ans: 1,
+                speakingTarget: "We cannot spray this afternoon because it is too windy.",
+                explanation: "Após 'it is too', usamos o adjetivo climático 'windy' (ventando muito)."
+            },
+            {
+                id: 39,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "We will finish planting the north field ____ sunset.",
+                translation: "Complete e fale em voz alta: 'Nós terminaremos de plantar o talhão norte até o pôr do sol.'",
+                options: ["in", "on", "by", "into"],
+                ans: 2,
+                speakingTarget: "We will finish planting the north field by sunset.",
+                explanation: "Para indicar prazo limite ('até o pôr do sol'), usamos 'by sunset'."
+            },
+            {
+                id: 40,
+                section: "Speaking Operacional",
+                type: "speaking",
+                sentence: "Please lower the three-point hitch ____ before backing up.",
+                translation: "Complete e fale em voz alta: 'Por favor, abaixe o engate de três pontos devagar antes de dar ré.'",
+                options: ["slow", "slower than", "slowest", "slowly"],
+                ans: 3,
+                speakingTarget: "Please lower the three-point hitch slowly before backing up.",
+                explanation: "Para descrever o modo como a ação ('lower') deve ser feita, usamos 'slowly' (devagar)."
+            }
+        ];
+
+        // ============================================================================
+        // STATE & SHUFFLE
+        // ============================================================================
+        let currentIdx = 0;
+        let userAnswers = new Array(EXAM_QUESTIONS.length).fill(null);
+        let flaggedQuestions = new Array(EXAM_QUESTIONS.length).fill(false);
+        let speakingCompleted = new Array(EXAM_QUESTIONS.length).fill(false);
+        let remainingSeconds = 30 * 60;
+        let timerInterval = null;
+        let isPaused = false;
+        let examSubmitted = false;
+
+        function prepareShuffledOptions() {
+            let lastCorrectPos = -1;
+            EXAM_QUESTIONS.forEach((q) => {
+                if (typeof q._origAns === 'undefined') {
+                    q._origOptions = [...q.options];
+                    q._origAns = q.ans;
+                }
+                const correctText = q._origOptions[q._origAns];
+                const pool = [...q._origOptions];
+
+                for (let attempt = 0; attempt < 8; attempt++) {
+                    for (let i = pool.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [pool[i], pool[j]] = [pool[j], pool[i]];
+                    }
+                    const newPos = pool.indexOf(correctText);
+                    if (newPos !== lastCorrectPos || attempt === 7) {
+                        lastCorrectPos = newPos;
+                        break;
+                    }
+                }
+
+                q.options = pool;
+                q.ans = pool.indexOf(correctText);
+            });
+        }
+
+        function startExam() {
+            prepareShuffledOptions();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('exam-screen').classList.remove('hidden');
+            document.getElementById('finish-top-btn').classList.remove('hidden');
+            document.getElementById('finish-top-btn').classList.add('inline-flex');
+
+            buildQuestionMap();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                if (isPaused || examSubmitted) return;
+                remainingSeconds--;
+                updateTimerUI();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("⏰ O tempo de 30 minutos terminou! Sua prova será corrigida automaticamente.");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const mins = Math.floor(Math.max(0, remainingSeconds) / 60);
+            const secs = Math.max(0, remainingSeconds) % 60;
+            const display = document.getElementById('timer-display');
+            const box = document.getElementById('timer-box');
+            display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            if (remainingSeconds <= 300) {
+                box.className = "flex items-center gap-2.5 bg-rose-900 border border-rose-500 px-4 py-2 rounded-2xl timer-urgent";
+            }
+        }
+
+        function togglePauseTimer() {
+            if (examSubmitted) return;
+            isPaused = !isPaused;
+            const btn = document.getElementById('pause-btn');
+            if (isPaused) {
+                btn.innerHTML = `<i class="fa-solid fa-play text-green-400"></i> <span>Retomar</span>`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>Pausar</span>`;
+            }
+        }
+
+        function buildQuestionMap() {
+            const grid = document.getElementById('question-map-grid');
+            grid.innerHTML = '';
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `map-dot-${idx}`;
+                btn.className = 'q-dot bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200';
+                btn.textContent = idx + 1;
+                btn.onclick = () => goToQuestion(idx);
+                grid.appendChild(btn);
+            });
+            updateQuestionMapStyles();
+        }
+
+        function updateQuestionMapStyles() {
+            let answeredCount = 0;
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const dot = document.getElementById(`map-dot-${idx}`);
+                if (!dot) return;
+                const isAnswered = userAnswers[idx] !== null;
+                if (isAnswered) answeredCount++;
+
+                let base = 'q-dot ';
+                if (flaggedQuestions[idx]) {
+                    base += 'bg-amber-400 text-slate-900 border border-amber-500 ';
+                } else if (isAnswered) {
+                    base += 'bg-green-600 text-white border border-green-700 ';
+                } else {
+                    base += 'bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200 ';
+                }
+
+                if (idx === currentIdx) base += 'active ';
+                dot.className = base;
+            });
+
+            const pct = Math.round((answeredCount / EXAM_QUESTIONS.length) * 100);
+            document.getElementById('exam-progress-bar').style.width = `${pct}%`;
+            document.getElementById('sidebar-pct').textContent = `${pct}% concluído`;
+            document.getElementById('answered-count-label').textContent = `${answeredCount} / ${EXAM_QUESTIONS.length} respondidas`;
+        }
+
+        function renderQuestion(idx) {
+            currentIdx = idx;
+            const q = EXAM_QUESTIONS[idx];
+
+            document.getElementById('q-counter').textContent = `Questão ${idx + 1} de ${EXAM_QUESTIONS.length}`;
+
+            const badge = document.getElementById('q-section-badge');
+            if (q.type === 'expression') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-green-100 text-green-800';
+                badge.innerHTML = `<i class="fa-solid fa-seedling"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Complete a frase agrícola com a preposição ou expressão correta:';
+            } else if (q.type === 'context') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800';
+                badge.innerHTML = `<i class="fa-solid fa-tractor"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Escolha a alternativa que completa a situação de campo corretamente:';
+            } else if (q.type === 'listening') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-orange-100 text-orange-800';
+                badge.innerHTML = `<i class="fa-solid fa-headphones"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Ouça a comunicação no rádio da fazenda e escolha a alternativa correta:';
+            } else if (q.type === 'speaking') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800';
+                badge.innerHTML = `<i class="fa-solid fa-microphone-lines"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Complete a frase e pronuncie em voz alta:';
+            }
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flaggedQuestions[idx]) {
+                flagBtn.className = 'px-2.5 py-1 rounded-lg bg-amber-100 border border-amber-400 text-amber-800 text-xs font-bold transition flex items-center gap-1';
+                flagBtn.innerHTML = `<i class="fa-solid fa-bookmark"></i> <span>Marcada</span>`;
+            } else {
+                flagBtn.className = 'px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-300 text-xs font-bold transition flex items-center gap-1';
+                flagBtn.innerHTML = `<i class="fa-regular fa-bookmark"></i> <span>Revisar</span>`;
+            }
+
+            const selectedOptIdx = userAnswers[idx];
+            const selectedText = selectedOptIdx !== null ? q.options[selectedOptIdx] : '______';
+            const pillClass = selectedOptIdx !== null ? 'blank-pill filled' : 'blank-pill';
+            const formattedSentence = q.sentence.replace('____', `<span class="${pillClass}">${selectedText}</span>`);
+            document.getElementById('q-sentence').innerHTML = formattedSentence;
+            document.getElementById('q-translation').textContent = q.translation || '';
+
+            const listeningBox = document.getElementById('listening-box');
+            if (q.type === 'listening') {
+                listeningBox.classList.remove('hidden');
+            } else {
+                listeningBox.classList.add('hidden');
+            }
+
+            const speakingBox = document.getElementById('speaking-box');
+            if (q.type === 'speaking') {
+                speakingBox.classList.remove('hidden');
+                document.getElementById('speaking-target-text').textContent = q.speakingTarget;
+                const statusEl = document.getElementById('speaking-status');
+                if (speakingCompleted[idx]) {
+                    statusEl.className = 'text-xs font-extrabold text-green-600';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pronúncia registrada com sucesso!';
+                } else {
+                    statusEl.className = 'text-xs font-bold text-slate-500';
+                    statusEl.textContent = 'Aguardando sua leitura em voz alta...';
+                }
+            } else {
+                speakingBox.classList.add('hidden');
+            }
+
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, optIdx) => {
+                const isSelected = userAnswers[idx] === optIdx;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `opt-card text-left p-4 rounded-2xl border-2 flex items-center gap-3.5 ${isSelected ? 'selected' : 'border-slate-200 bg-white'}`;
+                btn.onclick = () => selectOption(optIdx);
+
+                btn.innerHTML = `
+                    <span class="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 ${isSelected ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                        ${letters[optIdx]}
+                    </span>
+                    <span class="font-bold text-sm sm:text-base text-slate-800">${opt}</span>
+                `;
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = idx === 0;
+            const nextBtn = document.getElementById('next-btn');
+            if (idx === EXAM_QUESTIONS.length - 1) {
+                nextBtn.innerHTML = `<span>Finalizar Prova</span> <i class="fa-solid fa-flag-checkered"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Próxima</span> <i class="fa-solid fa-arrow-right"></i>`;
+            }
+
+            updateQuestionMapStyles();
+        }
+
+        function selectOption(optIdx) {
+            if (examSubmitted) return;
+            userAnswers[currentIdx] = optIdx;
+            renderQuestion(currentIdx);
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) renderQuestion(currentIdx - 1);
+        }
+
+        function nextQuestion() {
+            if (currentIdx < EXAM_QUESTIONS.length - 1) {
+                renderQuestion(currentIdx + 1);
+            } else {
+                confirmSubmitExam();
+            }
+        }
+
+        function goToQuestion(idx) {
+            renderQuestion(idx);
+        }
+
+        function toggleFlagCurrent() {
+            flaggedQuestions[currentIdx] = !flaggedQuestions[currentIdx];
+            renderQuestion(currentIdx);
+        }
+
+        function speakText(text, rate = 1.0) {
+            if (!('speechSynthesis' in window)) {
+                alert('Seu navegador não suporta síntese de voz.');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = rate;
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang.startsWith('en-') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Microsoft'))) || voices.find(v => v.lang.startsWith('en'));
+            if (enVoice) utter.voice = enVoice;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function playCurrentAudio(rate = 1.0) {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (q && q.audioText) {
+                speakText(q.audioText, rate);
+            }
+        }
+
+        function playSpeakingTarget() {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (q && q.speakingTarget) {
+                speakText(q.speakingTarget, 0.95);
+            }
+        }
+
+        function startSpeechRecognition() {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (!q || q.type !== 'speaking') return;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const statusEl = document.getElementById('speaking-status');
+            const recBtn = document.getElementById('mic-record-btn');
+
+            if (!SpeechRecognition) {
+                speakingCompleted[currentIdx] = true;
+                statusEl.className = 'text-xs font-extrabold text-green-600';
+                statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Navegador sem Web Speech: pronúncia validada no modo autoverificação!';
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 2;
+
+            recBtn.disabled = true;
+            recBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ouvindo... Fale agora!';
+            statusEl.className = 'text-xs font-bold text-blue-700';
+            statusEl.textContent = 'Microfone ativo...';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                speakingCompleted[currentIdx] = true;
+                statusEl.className = 'text-xs font-extrabold text-green-600';
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Captado: "${transcript}" — Excelente!`;
+            };
+
+            recognition.onerror = () => {
+                statusEl.className = 'text-xs font-bold text-amber-700';
+                statusEl.textContent = 'Não foi possível captar o áudio. Tente novamente ou use o botão ao lado.';
+            };
+
+            recognition.onend = () => {
+                recBtn.disabled = false;
+                recBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Gravar Minha Voz';
+            };
+
+            recognition.start();
+        }
+
+        function markSpeakingSelfVerified() {
+            speakingCompleted[currentIdx] = true;
+            const statusEl = document.getElementById('speaking-status');
+            statusEl.className = 'text-xs font-extrabold text-green-600';
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Leitura em voz alta confirmada!';
+        }
+
+        function confirmSubmitExam() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                const ok = confirm(`Você ainda tem ${unanswered} questão(ões) sem resposta. Deseja finalizar e corrigir a prova mesmo assim?`);
+                if (!ok) return;
+            } else {
+                const ok = confirm('Deseja entregar sua Prova Final Agro English e ver sua nota agora?');
+                if (!ok) return;
+            }
+            submitExam();
+        }
+
+        function submitExam() {
+            examSubmitted = true;
+            if (timerInterval) clearInterval(timerInterval);
+            window.speechSynthesis && window.speechSynthesis.cancel();
+
+            document.getElementById('exam-screen').classList.add('hidden');
+            document.getElementById('finish-top-btn').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            let correctTotal = 0;
+            const stats = {
+                expression: { label: 'Expressões da Fazenda', correct: 0, total: 0 },
+                context: { label: 'Máquinas, Safra & Ações', correct: 0, total: 0 },
+                listening: { label: 'Listening no Campo', correct: 0, total: 0 },
+                speaking: { label: 'Speaking Operacional', correct: 0, total: 0 }
+            };
+
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const isCorrect = userAnswers[idx] === q.ans;
+                if (isCorrect) correctTotal++;
+                if (stats[q.type]) {
+                    stats[q.type].total++;
+                    if (isCorrect) stats[q.type].correct++;
+                }
+            });
+
+            const pct = Math.round((correctTotal / EXAM_QUESTIONS.length) * 100);
+            const spentSec = (30 * 60) - Math.max(0, remainingSeconds);
+            const spentM = Math.floor(spentSec / 60);
+            const spentS = spentSec % 60;
+            const speakingCount = speakingCompleted.filter(Boolean).length;
+
+            document.getElementById('res-score-pct').textContent = `${pct}%`;
+            document.getElementById('res-score-raw').textContent = `${correctTotal} / ${EXAM_QUESTIONS.length}`;
+            document.getElementById('res-time-spent').textContent = `${String(spentM).padStart(2, '0')}:${String(spentS).padStart(2, '0')}`;
+            document.getElementById('res-speaking-done').textContent = `${speakingCount} / 6`;
+
+            const banner = document.getElementById('result-banner');
+            const titleEl = document.getElementById('result-title');
+            const subEl = document.getElementById('result-subtitle');
+            const iconEl = document.getElementById('result-badge-icon');
+
+            if (pct >= 70) {
+                banner.className = 'bg-gradient-to-r from-green-600 via-emerald-600 to-green-800 p-8 text-white text-center';
+                iconEl.textContent = '🏆';
+                titleEl.textContent = 'Aprovado no Exame Agro English!';
+                subEl.textContent = 'Excelente domínio de inglês para operações agrícolas, máquinas, plantio, pulverização e colheita!';
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 110, spread: 80, origin: { y: 0.6 } });
+                }
+            } else {
+                banner.className = 'bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 p-8 text-white text-center';
+                iconEl.textContent = '🌾';
+                titleEl.textContent = 'Quase lá! Continue Praticando no Campo';
+                subEl.textContent = 'Revise o gabarito comentado abaixo para reforçar o vocabulário de máquinas e safra e tente novamente.';
+            }
+
+            const breakdownContainer = document.getElementById('section-breakdown');
+            breakdownContainer.innerHTML = '';
+            Object.values(stats).forEach(st => {
+                const sPct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-2xl bg-slate-50 border border-slate-200';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-2">
+                        <span>${st.label}</span>
+                        <span>${st.correct} / ${st.total} (${sPct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-green-600 h-2.5 rounded-full" style="width:${sPct}%"></div>
+                    </div>
+                `;
+                breakdownContainer.appendChild(card);
+            });
+
+            filterReview('all');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterReview(mode) {
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = userAns === q.ans;
+                if (mode === 'wrong' && isCorrect) return;
+
+                const item = document.createElement('div');
+                item.className = `p-5 rounded-2xl border ${isCorrect ? 'bg-green-50/40 border-green-200' : 'bg-rose-50/40 border-rose-200'}`;
+
+                const userText = userAns !== null ? `${letters[userAns]}) ${q.options[userAns]}` : 'Não respondida';
+                const correctText = `${letters[q.ans]}) ${q.options[q.ans]}`;
+
+                item.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-extrabold uppercase tracking-wider ${isCorrect ? 'text-green-700' : 'text-rose-700'}">
+                            ${isCorrect ? '<i class="fa-solid fa-circle-check mr-1"></i> Acertou' : '<i class="fa-solid fa-circle-xmark mr-1"></i> Errou'} — Questão ${idx + 1} (${q.section})
+                        </span>
+                    </div>
+                    <p class="font-bold text-slate-800 text-sm sm:text-base mb-1">${q.sentence.replace('____', `<span class="underline text-green-700">${q.options[q.ans]}</span>`)}</p>
+                    <p class="text-xs text-slate-500 italic mb-3">${q.translation || ''}</p>
+                    <div class="flex flex-wrap gap-4 text-xs mb-2">
+                        <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-rose-700 font-bold'}">Sua resposta: ${userText}</span>
+                        ${!isCorrect ? `<span class="text-green-700 font-extrabold">Correta: ${correctText}</span>` : ''}
+                    </div>
+                    <p class="text-xs text-slate-600 bg-white/80 p-3 rounded-xl border border-slate-200/80">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <strong>Explicação:</strong> ${q.explanation}
+                    </p>
+                `;
+                list.appendChild(item);
+            });
+
+            if (list.children.length === 0) {
+                list.innerHTML = `<p class="text-sm font-bold text-green-700 text-center py-6">🎉 Parabéns! Você não errou nenhuma questão!</p>`;
+            }
+        }
+
+        function restartExam() {
+            userAnswers = new Array(EXAM_QUESTIONS.length).fill(null);
+            flaggedQuestions = new Array(EXAM_QUESTIONS.length).fill(false);
+            speakingCompleted = new Array(EXAM_QUESTIONS.length).fill(false);
+            remainingSeconds = 30 * 60;
+            isPaused = false;
+            examSubmitted = false;
+
+            document.getElementById('results-screen').classList.add('hidden');
+            startExam();
+        }
+    </script>
+</body>
+
+</html>

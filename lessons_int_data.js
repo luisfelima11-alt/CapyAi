@@ -1,9 +1,5 @@
-// ── Trilha de Prática Diária — Curso Intermediate ──────────────────────────
-// 40 lições (ids 401-440).
-// O vocabulário é de PALAVRAS que o aluno usa falando — não de termos de
-// gramática. A frase de exemplo é que carrega a estrutura da lição.
-// Schema idêntico ao JADSON_LESSONS de lessons.html.
-
+// ── Intermediate Course Daily Trail Data ──
+// 49 lições (ids 401-449): 39 lições das aulas + 10 unidades de Revisão Intensiva.
 const LESSONS_INT = [
   {
     "id": 401,
@@ -252,8 +248,8 @@ const LESSONS_INT = [
         "q": "She ___ (study) English for two hours.",
         "a": "studied",
         "opts": [
-          "studied",
           "study",
+          "studied",
           "studys",
           "studying"
         ]
@@ -262,9 +258,9 @@ const LESSONS_INT = [
         "q": "They ___ (travel) to Peru last year.",
         "a": "travelled",
         "opts": [
-          "travelled",
-          "travel",
           "travels",
+          "travel",
+          "travelled",
           "traveling"
         ]
       },
@@ -272,10 +268,10 @@ const LESSONS_INT = [
         "q": "We ___ (stop) at a small café.",
         "a": "stopped",
         "opts": [
-          "stopped",
+          "stopping",
           "stoped",
           "stop",
-          "stopping"
+          "stopped"
         ]
       },
       {
@@ -539,8 +535,8 @@ const LESSONS_INT = [
         "q": "I ___ (go) to the market this morning.",
         "a": "went",
         "opts": [
-          "went",
           "goed",
+          "went",
           "gone",
           "go"
         ]
@@ -549,9 +545,9 @@ const LESSONS_INT = [
         "q": "She ___ (see) an old friend downtown.",
         "a": "saw",
         "opts": [
-          "saw",
-          "seen",
           "see",
+          "seen",
+          "saw",
           "seed"
         ]
       },
@@ -559,10 +555,10 @@ const LESSONS_INT = [
         "q": "He ___ (say) the meeting was cancelled.",
         "a": "said",
         "opts": [
-          "said",
+          "saying",
           "sayed",
           "says",
-          "saying"
+          "said"
         ]
       },
       {
@@ -579,8 +575,8 @@ const LESSONS_INT = [
         "q": "They ___ (come) home very late.",
         "a": "came",
         "opts": [
-          "came",
           "comed",
+          "came",
           "come",
           "coming"
         ]
@@ -836,9 +832,9 @@ const LESSONS_INT = [
         "q": "I ___ (read) when you called.",
         "a": "was reading",
         "opts": [
-          "was reading",
-          "were reading",
           "reading",
+          "were reading",
+          "was reading",
           "read"
         ]
       },
@@ -846,10 +842,10 @@ const LESSONS_INT = [
         "q": "They ___ (work) late on the project.",
         "a": "were working",
         "opts": [
-          "were working",
+          "working",
           "was working",
           "worked",
-          "working"
+          "were working"
         ]
       },
       {
@@ -866,8 +862,8 @@ const LESSONS_INT = [
         "q": "___ you studying at nine last night?",
         "a": "Were",
         "opts": [
-          "Were",
           "Was",
+          "Were",
           "Did",
           "Are"
         ]
@@ -876,9 +872,9 @@ const LESSONS_INT = [
         "q": "It ___ (rain) hard all morning.",
         "a": "was raining",
         "opts": [
-          "was raining",
-          "were raining",
           "rained",
+          "were raining",
+          "was raining",
           "raining"
         ]
       }
@@ -1133,10 +1129,10 @@ const LESSONS_INT = [
         "q": "___ I was cooking, the phone rang.",
         "a": "While",
         "opts": [
-          "While",
+          "Since",
           "When",
           "Ago",
-          "Since"
+          "While"
         ]
       },
       {
@@ -1153,8 +1149,8 @@ const LESSONS_INT = [
         "q": "All of a ___, the music stopped.",
         "a": "sudden",
         "opts": [
-          "sudden",
           "moment",
+          "sudden",
           "instant",
           "while"
         ]
@@ -1163,9 +1159,9 @@ const LESSONS_INT = [
         "q": "While she was cooking, he ___ (clean).",
         "a": "was cleaning",
         "opts": [
-          "was cleaning",
-          "cleaned",
           "clean",
+          "cleaned",
+          "was cleaning",
           "cleans"
         ]
       },
@@ -1173,10 +1169,10 @@ const LESSONS_INT = [
         "q": "Just ___, the lights went out.",
         "a": "then",
         "opts": [
-          "then",
+          "moment",
           "when",
           "while",
-          "moment"
+          "then"
         ]
       }
     ],
@@ -1440,8 +1436,8 @@ const LESSONS_INT = [
         "q": "She ___ (finish) her homework.",
         "a": "has finished",
         "opts": [
-          "has finished",
           "have finished",
+          "has finished",
           "finished",
           "finish"
         ]
@@ -1450,9 +1446,9 @@ const LESSONS_INT = [
         "q": "We ___ (not/finish) yet.",
         "a": "haven't finished",
         "opts": [
-          "haven't finished",
-          "hasn't finished",
           "didn't finish",
+          "hasn't finished",
+          "haven't finished",
           "not finished"
         ]
       },
@@ -1460,10 +1456,10 @@ const LESSONS_INT = [
         "q": "___ you ever been to Japan?",
         "a": "Have",
         "opts": [
-          "Have",
+          "Do",
           "Has",
           "Did",
-          "Do"
+          "Have"
         ]
       },
       {
@@ -1728,8 +1724,8 @@ const LESSONS_INT = [
         "q": "Have you ___ been to Japan?",
         "a": "ever",
         "opts": [
-          "ever",
           "never",
+          "ever",
           "already",
           "yet"
         ]
@@ -1738,9 +1734,9 @@ const LESSONS_INT = [
         "q": "I have ___ tried sushi before.",
         "a": "never",
         "opts": [
-          "never",
-          "ever",
           "yet",
+          "ever",
+          "never",
           "just"
         ]
       },
@@ -1748,10 +1744,10 @@ const LESSONS_INT = [
         "q": "I have ___ finished my homework.",
         "a": "already",
         "opts": [
-          "already",
+          "since",
           "yet",
           "ever",
-          "since"
+          "already"
         ]
       },
       {
@@ -1768,8 +1764,8 @@ const LESSONS_INT = [
         "q": "She has ___ arrived — give her a minute.",
         "a": "just",
         "opts": [
-          "just",
           "yet",
+          "just",
           "ever",
           "already"
         ]
@@ -2025,9 +2021,9 @@ const LESSONS_INT = [
         "q": "By the time I arrived, they ___ (leave).",
         "a": "had left",
         "opts": [
-          "had left",
-          "have left",
           "left",
+          "have left",
+          "had left",
           "were leaving"
         ]
       },
@@ -2035,10 +2031,10 @@ const LESSONS_INT = [
         "q": "I ___ (already/decide) before she called.",
         "a": "had already decided",
         "opts": [
-          "had already decided",
+          "was deciding",
           "have already decided",
           "already decided",
-          "was deciding"
+          "had already decided"
         ]
       },
       {
@@ -2055,8 +2051,8 @@ const LESSONS_INT = [
         "q": "___ you decided before the meeting?",
         "a": "Had",
         "opts": [
-          "Had",
           "Have",
+          "Had",
           "Did",
           "Was"
         ]
@@ -2065,9 +2061,9 @@ const LESSONS_INT = [
         "q": "We ___ (eat) before the movie started.",
         "a": "had eaten",
         "opts": [
-          "had eaten",
-          "have eaten",
           "ate",
+          "have eaten",
+          "had eaten",
           "were eating"
         ]
       }
@@ -2322,10 +2318,10 @@ const LESSONS_INT = [
         "q": "I had studied ___ the test started.",
         "a": "before",
         "opts": [
-          "before",
+          "until",
           "after",
           "since",
-          "until"
+          "before"
         ]
       },
       {
@@ -2342,8 +2338,8 @@ const LESSONS_INT = [
         "q": "By the time we got there, it ___ (close).",
         "a": "had closed",
         "opts": [
-          "had closed",
           "closed",
+          "had closed",
           "has closed",
           "was closing"
         ]
@@ -2352,9 +2348,9 @@ const LESSONS_INT = [
         "q": "As soon as I ___ (finish), I called her.",
         "a": "had finished",
         "opts": [
-          "had finished",
-          "finished",
           "have finished",
+          "finished",
+          "had finished",
           "was finishing"
         ]
       },
@@ -2362,10 +2358,10 @@ const LESSONS_INT = [
         "q": "We waited ___ the rain had stopped.",
         "a": "until",
         "opts": [
-          "until",
+          "since",
           "before",
           "after",
-          "since"
+          "until"
         ]
       }
     ],
@@ -2629,8 +2625,8 @@ const LESSONS_INT = [
         "q": "That trip was a turning ___ in my life.",
         "a": "point",
         "opts": [
-          "point",
           "moment",
+          "point",
           "time",
           "change"
         ]
@@ -2639,9 +2635,9 @@ const LESSONS_INT = [
         "q": "I finally left my comfort ___.",
         "a": "zone",
         "opts": [
-          "zone",
-          "place",
           "area",
+          "place",
+          "zone",
           "space"
         ]
       },
@@ -2649,10 +2645,10 @@ const LESSONS_INT = [
         "q": "I ___ (be) more capable than I thought.",
         "a": "was",
         "opts": [
-          "was",
+          "had been",
           "have been",
           "am",
-          "had been"
+          "was"
         ]
       },
       {
@@ -2916,8 +2912,8 @@ const LESSONS_INT = [
         "q": "She ___ (graduate) from university last year.",
         "a": "graduated",
         "opts": [
-          "graduated",
           "has graduated",
+          "graduated",
           "graduate",
           "graduating"
         ]
@@ -2926,9 +2922,9 @@ const LESSONS_INT = [
         "q": "They got ___ in December.",
         "a": "married",
         "opts": [
-          "married",
-          "marriage",
           "marry",
+          "marriage",
+          "married",
           "marrying"
         ]
       },
@@ -2936,10 +2932,10 @@ const LESSONS_INT = [
         "q": "My father ___ (retire) last year.",
         "a": "retired",
         "opts": [
-          "retired",
+          "retiring",
           "has retired",
           "retire",
-          "retiring"
+          "retired"
         ]
       },
       {
@@ -2956,8 +2952,8 @@ const LESSONS_INT = [
         "q": "Buying our first house was a big ___.",
         "a": "milestone",
         "opts": [
-          "milestone",
           "birth",
+          "milestone",
           "divorce",
           "anniversary"
         ]
@@ -3213,9 +3209,9 @@ const LESSONS_INT = [
         "q": "While I ___ dinner, the phone rang.",
         "a": "was cooking",
         "opts": [
-          "was cooking",
-          "cooked",
           "cook",
+          "cooked",
+          "was cooking",
           "have cooked"
         ]
       },
@@ -3223,10 +3219,10 @@ const LESSONS_INT = [
         "q": "By the time I arrived, she ___ already left.",
         "a": "had",
         "opts": [
-          "had",
+          "did",
           "has",
           "was",
-          "did"
+          "had"
         ]
       },
       {
@@ -3243,8 +3239,8 @@ const LESSONS_INT = [
         "q": "I ___ just finished my report.",
         "a": "have",
         "opts": [
-          "have",
           "had",
+          "have",
           "was",
           "did"
         ]
@@ -3253,9 +3249,9 @@ const LESSONS_INT = [
         "q": "Suddenly, the lights ___ out.",
         "a": "went",
         "opts": [
-          "went",
-          "go",
           "were going",
+          "go",
+          "went",
           "have gone"
         ]
       }
@@ -3510,10 +3506,10 @@ const LESSONS_INT = [
         "q": "Once ___ a time, there was a small company.",
         "a": "upon",
         "opts": [
-          "upon",
+          "at",
           "on",
           "in",
-          "at"
+          "upon"
         ]
       },
       {
@@ -3530,8 +3526,8 @@ const LESSONS_INT = [
         "q": "___, my colleague was preparing the presentation.",
         "a": "Meanwhile",
         "opts": [
-          "Meanwhile",
           "First",
+          "Meanwhile",
           "Finally",
           "Yet"
         ]
@@ -3540,9 +3536,9 @@ const LESSONS_INT = [
         "q": "The story had an unexpected ___.",
         "a": "twist",
         "opts": [
-          "twist",
-          "memory",
           "setting",
+          "memory",
+          "twist",
           "character"
         ]
       },
@@ -3550,10 +3546,10 @@ const LESSONS_INT = [
         "q": "To make a long story ___, we won the contract.",
         "a": "short",
         "opts": [
-          "short",
+          "fast",
           "long",
           "end",
-          "fast"
+          "short"
         ]
       }
     ],
@@ -3817,8 +3813,8 @@ const LESSONS_INT = [
         "q": "___ you hurry, you will miss the bus.",
         "a": "Unless",
         "opts": [
-          "Unless",
           "If",
+          "Unless",
           "Because",
           "Since"
         ]
@@ -3827,9 +3823,9 @@ const LESSONS_INT = [
         "q": "If she ___ hard, she will pass.",
         "a": "studies",
         "opts": [
-          "studies",
-          "study",
           "will study",
+          "study",
+          "studies",
           "studied"
         ]
       },
@@ -3837,10 +3833,10 @@ const LESSONS_INT = [
         "q": "I will call you as soon as I ___.",
         "a": "arrive",
         "opts": [
-          "arrive",
+          "arriving",
           "will arrive",
           "arrived",
-          "arriving"
+          "arrive"
         ]
       },
       {
@@ -4104,8 +4100,8 @@ const LESSONS_INT = [
         "q": "If I ___ more time, I would travel more.",
         "a": "had",
         "opts": [
-          "had",
           "have",
+          "had",
           "has",
           "will have"
         ]
@@ -4114,9 +4110,9 @@ const LESSONS_INT = [
         "q": "If I ___ you, I would accept the offer.",
         "a": "were",
         "opts": [
-          "were",
-          "was",
           "am",
+          "was",
+          "were",
           "be"
         ]
       },
@@ -4124,10 +4120,10 @@ const LESSONS_INT = [
         "q": "What ___ you do if you won the lottery?",
         "a": "would",
         "opts": [
-          "would",
+          "did",
           "will",
           "do",
-          "did"
+          "would"
         ]
       },
       {
@@ -4144,8 +4140,8 @@ const LESSONS_INT = [
         "q": "If she had the chance, she ___ move abroad.",
         "a": "would",
         "opts": [
-          "would",
           "will",
+          "would",
           "can",
           "did"
         ]
@@ -4401,9 +4397,9 @@ const LESSONS_INT = [
         "q": "\"I am tired,\" she said. → She said she ___ tired.",
         "a": "was",
         "opts": [
-          "was",
-          "is",
           "were",
+          "is",
+          "was",
           "be"
         ]
       },
@@ -4411,10 +4407,10 @@ const LESSONS_INT = [
         "q": "\"I will call you.\" → He said he ___ call me.",
         "a": "would",
         "opts": [
-          "would",
+          "could",
           "will",
           "can",
-          "could"
+          "would"
         ]
       },
       {
@@ -4431,8 +4427,8 @@ const LESSONS_INT = [
         "q": "She said that she ___ tired that day.",
         "a": "was",
         "opts": [
-          "was",
           "is",
+          "was",
           "be",
           "were"
         ]
@@ -4441,9 +4437,9 @@ const LESSONS_INT = [
         "q": "___ him, the deal is closed.",
         "a": "According to",
         "opts": [
-          "According to",
-          "Apparently at",
           "Said by",
+          "Apparently at",
+          "According to",
           "Told to"
         ]
       }
@@ -4693,10 +4689,10 @@ const LESSONS_INT = [
         "q": "She ___ me that she was tired.",
         "a": "told",
         "opts": [
-          "told",
+          "spoke",
           "said",
           "asked",
-          "spoke"
+          "told"
         ]
       },
       {
@@ -4713,8 +4709,8 @@ const LESSONS_INT = [
         "q": "She asked ___ I was ready.",
         "a": "if",
         "opts": [
-          "if",
           "that",
+          "if",
           "what",
           "said"
         ]
@@ -4723,9 +4719,9 @@ const LESSONS_INT = [
         "q": "Could you ___ me the time, please?",
         "a": "tell",
         "opts": [
-          "tell",
-          "say",
           "ask",
+          "say",
+          "tell",
           "speak"
         ]
       },
@@ -4733,10 +4729,10 @@ const LESSONS_INT = [
         "q": "He asked ___ time the meeting started.",
         "a": "what",
         "opts": [
-          "what",
+          "who",
           "if",
           "that",
-          "who"
+          "what"
         ]
       }
     ],
@@ -4995,8 +4991,8 @@ const LESSONS_INT = [
         "q": "The bridge ___ built in 1998.",
         "a": "was",
         "opts": [
-          "was",
           "is",
+          "was",
           "were",
           "been"
         ]
@@ -5005,9 +5001,9 @@ const LESSONS_INT = [
         "q": "The cars ___ manufactured in Brazil.",
         "a": "are",
         "opts": [
-          "are",
-          "is",
           "was",
+          "is",
+          "are",
           "be"
         ]
       },
@@ -5015,10 +5011,10 @@ const LESSONS_INT = [
         "q": "This app was designed ___ a small team.",
         "a": "by",
         "opts": [
-          "by",
+          "to",
           "from",
           "with",
-          "to"
+          "by"
         ]
       },
       {
@@ -5282,8 +5278,8 @@ const LESSONS_INT = [
         "q": "The company ___ founded in 1995.",
         "a": "was",
         "opts": [
-          "was",
           "is",
+          "was",
           "has",
           "were"
         ]
@@ -5292,9 +5288,9 @@ const LESSONS_INT = [
         "q": "The contract ___ signed last week.",
         "a": "was",
         "opts": [
-          "was",
-          "is",
           "has been",
+          "is",
+          "was",
           "were"
         ]
       },
@@ -5302,10 +5298,10 @@ const LESSONS_INT = [
         "q": "It ___ been confirmed that the event will happen.",
         "a": "has",
         "opts": [
-          "has",
+          "had",
           "was",
           "is",
-          "had"
+          "has"
         ]
       },
       {
@@ -5322,8 +5318,8 @@ const LESSONS_INT = [
         "q": "The meeting was ___ at the last minute.",
         "a": "canceled",
         "opts": [
-          "canceled",
           "cancel",
+          "canceled",
           "canceling",
           "cancels"
         ]
@@ -5579,9 +5575,9 @@ const LESSONS_INT = [
         "q": "I have worked here ___ three years.",
         "a": "for",
         "opts": [
-          "for",
-          "since",
           "at",
+          "since",
+          "for",
           "in"
         ]
       },
@@ -5589,10 +5585,10 @@ const LESSONS_INT = [
         "q": "I have worked here ___ 2021.",
         "a": "since",
         "opts": [
-          "since",
+          "from",
           "for",
           "at",
-          "from"
+          "since"
         ]
       },
       {
@@ -5609,8 +5605,8 @@ const LESSONS_INT = [
         "q": "I ___ applying for a new position this week.",
         "a": "am",
         "opts": [
-          "am",
           "have",
+          "am",
           "was",
           "is"
         ]
@@ -5619,9 +5615,9 @@ const LESSONS_INT = [
         "q": "He signed a new ___ last week.",
         "a": "contract",
         "opts": [
-          "contract",
-          "salary",
           "feedback",
+          "salary",
+          "contract",
           "goal"
         ]
       }
@@ -5876,10 +5872,10 @@ const LESSONS_INT = [
         "q": "A few years ago, I ___ working in a different field.",
         "a": "was",
         "opts": [
-          "was",
+          "were",
           "am",
           "have been",
-          "were"
+          "was"
         ]
       },
       {
@@ -5896,8 +5892,8 @@ const LESSONS_INT = [
         "q": "The turning point ___ when I decided to change jobs.",
         "a": "was",
         "opts": [
-          "was",
           "is",
+          "was",
           "has been",
           "were"
         ]
@@ -5906,9 +5902,9 @@ const LESSONS_INT = [
         "q": "If I could go back, I ___ take more risks.",
         "a": "would",
         "opts": [
-          "would",
-          "will",
           "did",
+          "will",
+          "would",
           "had"
         ]
       },
@@ -5916,10 +5912,10 @@ const LESSONS_INT = [
         "q": "Looking back, every challenge helped me ___.",
         "a": "grow",
         "opts": [
-          "grow",
+          "grows",
           "grew",
           "growing",
-          "grows"
+          "grow"
         ]
       }
     ],
@@ -6183,8 +6179,8 @@ const LESSONS_INT = [
         "q": "She has ___ university degree.",
         "a": "a",
         "opts": [
-          "a",
           "an",
+          "a",
           "the",
           "some"
         ]
@@ -6193,9 +6189,9 @@ const LESSONS_INT = [
         "q": "He waited for ___ hour.",
         "a": "an",
         "opts": [
-          "an",
-          "a",
           "the",
+          "a",
+          "an",
           "some"
         ]
       },
@@ -6203,10 +6199,10 @@ const LESSONS_INT = [
         "q": "This is ___ honest answer.",
         "a": "an",
         "opts": [
-          "an",
+          "some",
           "a",
           "the",
-          "some"
+          "an"
         ]
       },
       {
@@ -6470,8 +6466,8 @@ const LESSONS_INT = [
         "q": "She plays ___ piano beautifully.",
         "a": "the",
         "opts": [
-          "the",
           "a",
+          "the",
           "an",
           "(no article)"
         ]
@@ -6480,9 +6476,9 @@ const LESSONS_INT = [
         "q": "He plays ___ football every Sunday.",
         "a": "(no article)",
         "opts": [
-          "(no article)",
-          "the",
           "a",
+          "the",
+          "(no article)",
           "an"
         ]
       },
@@ -6490,10 +6486,10 @@ const LESSONS_INT = [
         "q": "___ sun is very bright today.",
         "a": "The",
         "opts": [
-          "The",
+          "(no article)",
           "A",
           "An",
-          "(no article)"
+          "The"
         ]
       },
       {
@@ -6510,8 +6506,8 @@ const LESSONS_INT = [
         "q": "It's ___ best day of my life.",
         "a": "the",
         "opts": [
-          "the",
           "a",
+          "the",
           "an",
           "(no article)"
         ]
@@ -6767,9 +6763,9 @@ const LESSONS_INT = [
         "q": "You ___ wear a seatbelt in the car.",
         "a": "must",
         "opts": [
-          "must",
-          "should",
           "might",
+          "should",
+          "must",
           "could"
         ]
       },
@@ -6777,10 +6773,10 @@ const LESSONS_INT = [
         "q": "You ___ come to the party if you don't want to.",
         "a": "don't have to",
         "opts": [
-          "don't have to",
+          "can't",
           "must not",
           "shouldn't",
-          "can't"
+          "don't have to"
         ]
       },
       {
@@ -6797,8 +6793,8 @@ const LESSONS_INT = [
         "q": "Employees ___ follow the safety rules.",
         "a": "have to",
         "opts": [
-          "have to",
           "might",
+          "have to",
           "should",
           "could"
         ]
@@ -6807,9 +6803,9 @@ const LESSONS_INT = [
         "q": "You ___ not park here.",
         "a": "must",
         "opts": [
-          "must",
-          "should",
           "don't have to",
+          "should",
+          "must",
           "might"
         ]
       }
@@ -7064,10 +7060,10 @@ const LESSONS_INT = [
         "q": "The lights are off, they ___ be out.",
         "a": "must",
         "opts": [
-          "must",
+          "should",
           "might",
           "can't",
-          "should"
+          "must"
         ]
       },
       {
@@ -7084,8 +7080,8 @@ const LESSONS_INT = [
         "q": "He answered in French, he ___ be from Quebec.",
         "a": "must",
         "opts": [
-          "must",
           "might not",
+          "must",
           "can't",
           "should"
         ]
@@ -7094,9 +7090,9 @@ const LESSONS_INT = [
         "q": "That ___ be right, I just spoke to her yesterday.",
         "a": "can't",
         "opts": [
-          "can't",
-          "must",
           "might",
+          "must",
+          "can't",
           "should"
         ]
       },
@@ -7104,10 +7100,10 @@ const LESSONS_INT = [
         "q": "The ground is wet, it ___ have rained last night.",
         "a": "must",
         "opts": [
-          "must",
+          "should",
           "might",
           "can't",
-          "should"
+          "must"
         ]
       }
     ],
@@ -7365,8 +7361,8 @@ const LESSONS_INT = [
         "q": "The car ___ is parked outside is mine.",
         "a": "which",
         "opts": [
-          "which",
           "who",
+          "which",
           "where",
           "whose"
         ]
@@ -7375,9 +7371,9 @@ const LESSONS_INT = [
         "q": "The book ___ I read last week was amazing.",
         "a": "that",
         "opts": [
-          "that",
-          "who",
           "where",
+          "who",
+          "that",
           "whose"
         ]
       },
@@ -7385,10 +7381,10 @@ const LESSONS_INT = [
         "q": "I need someone ___ can help me.",
         "a": "who",
         "opts": [
-          "who",
+          "whose",
           "which",
           "where",
-          "whose"
+          "who"
         ]
       },
       {
@@ -7652,8 +7648,8 @@ const LESSONS_INT = [
         "q": "The city ___ I was born is very small.",
         "a": "where",
         "opts": [
-          "where",
           "when",
+          "where",
           "whose",
           "who"
         ]
@@ -7662,9 +7658,9 @@ const LESSONS_INT = [
         "q": "I remember the day ___ we met.",
         "a": "when",
         "opts": [
-          "when",
-          "where",
           "whose",
+          "where",
+          "when",
           "who"
         ]
       },
@@ -7672,10 +7668,10 @@ const LESSONS_INT = [
         "q": "The man ___ car broke down called a mechanic.",
         "a": "whose",
         "opts": [
-          "whose",
+          "when",
           "who",
           "where",
-          "when"
+          "whose"
         ]
       },
       {
@@ -7692,8 +7688,8 @@ const LESSONS_INT = [
         "q": "This is the company ___ products I always buy.",
         "a": "whose",
         "opts": [
-          "whose",
           "who",
+          "whose",
           "where",
           "when"
         ]
@@ -7949,9 +7945,9 @@ const LESSONS_INT = [
         "q": "I enjoy ___ (swim) in the sea.",
         "a": "swimming",
         "opts": [
-          "swimming",
-          "to swim",
           "swim",
+          "to swim",
+          "swimming",
           "swam"
         ]
       },
@@ -7959,10 +7955,10 @@ const LESSONS_INT = [
         "q": "He suggested ___ (go) to the beach.",
         "a": "going",
         "opts": [
-          "going",
+          "went",
           "to go",
           "go",
-          "went"
+          "going"
         ]
       },
       {
@@ -7979,8 +7975,8 @@ const LESSONS_INT = [
         "q": "She is good at ___ (cook).",
         "a": "cooking",
         "opts": [
-          "cooking",
           "to cook",
+          "cooking",
           "cook",
           "cooked"
         ]
@@ -7989,9 +7985,9 @@ const LESSONS_INT = [
         "q": "This museum is worth ___ (visit).",
         "a": "visiting",
         "opts": [
-          "visiting",
-          "to visit",
           "visit",
+          "to visit",
+          "visiting",
           "visited"
         ]
       }
@@ -8246,10 +8242,10 @@ const LESSONS_INT = [
         "q": "We decided ___ (travel) in July.",
         "a": "to travel",
         "opts": [
-          "to travel",
+          "travelled",
           "travelling",
           "travel",
-          "travelled"
+          "to travel"
         ]
       },
       {
@@ -8266,8 +8262,8 @@ const LESSONS_INT = [
         "q": "I remember ___ (buy) this book years ago.",
         "a": "buying",
         "opts": [
-          "buying",
           "to buy",
+          "buying",
           "buy",
           "bought"
         ]
@@ -8276,9 +8272,9 @@ const LESSONS_INT = [
         "q": "He stopped ___ (smoke) last year.",
         "a": "smoking",
         "opts": [
-          "smoking",
-          "to smoke",
           "smoke",
+          "to smoke",
+          "smoking",
           "smoked"
         ]
       },
@@ -8286,10 +8282,10 @@ const LESSONS_INT = [
         "q": "She managed ___ (arrive) on time.",
         "a": "to arrive",
         "opts": [
-          "to arrive",
+          "arrived",
           "arriving",
           "arrive",
-          "arrived"
+          "to arrive"
         ]
       }
     ],
@@ -8553,8 +8549,8 @@ const LESSONS_INT = [
         "q": "I've always ___ (want) to learn how to paint.",
         "a": "wanted",
         "opts": [
-          "wanted",
           "want",
+          "wanted",
           "wants",
           "to want"
         ]
@@ -8563,9 +8559,9 @@ const LESSONS_INT = [
         "q": "She dreams ___ (live) by the sea.",
         "a": "of living",
         "opts": [
-          "of living",
-          "to live",
           "living",
+          "to live",
+          "of living",
           "of to live"
         ]
       },
@@ -8573,10 +8569,10 @@ const LESSONS_INT = [
         "q": "Someday I'd like ___ (move) abroad.",
         "a": "to move",
         "opts": [
-          "to move",
+          "moved",
           "moving",
           "move",
-          "moved"
+          "to move"
         ]
       },
       {
@@ -8840,8 +8836,8 @@ const LESSONS_INT = [
         "q": "If I ___ design my life, I'd travel more.",
         "a": "could",
         "opts": [
-          "could",
           "can",
+          "could",
           "will",
           "must"
         ]
@@ -8850,9 +8846,9 @@ const LESSONS_INT = [
         "q": "I want a life ___ I feel free.",
         "a": "where",
         "opts": [
-          "where",
-          "who",
           "which",
+          "who",
+          "where",
           "whose"
         ]
       },
@@ -8860,10 +8856,10 @@ const LESSONS_INT = [
         "q": "I want to be someone ___ inspires others.",
         "a": "who",
         "opts": [
-          "who",
+          "whose",
           "where",
           "which",
-          "whose"
+          "who"
         ]
       },
       {
@@ -8880,8 +8876,8 @@ const LESSONS_INT = [
         "q": "At the end of the day, what truly matters ___ family.",
         "a": "is",
         "opts": [
-          "is",
           "are",
+          "is",
           "was",
           "be"
         ]
@@ -9137,9 +9133,9 @@ const LESSONS_INT = [
         "q": "I ___ (use to) play soccer every Sunday.",
         "a": "used to",
         "opts": [
-          "used to",
-          "use to",
           "uses to",
+          "use to",
+          "used to",
           "using to"
         ]
       },
@@ -9147,10 +9143,10 @@ const LESSONS_INT = [
         "q": "She ___ (not/use to) like coffee.",
         "a": "didn't use to",
         "opts": [
-          "didn't use to",
+          "didn't used to",
           "doesn't use to",
           "not used to",
-          "didn't used to"
+          "didn't use to"
         ]
       },
       {
@@ -9167,8 +9163,8 @@ const LESSONS_INT = [
         "q": "We ___ (use to) travel every summer.",
         "a": "used to",
         "opts": [
-          "used to",
           "use to",
+          "used to",
           "uses to",
           "were use to"
         ]
@@ -9177,9 +9173,9 @@ const LESSONS_INT = [
         "q": "As a child, I ___ (be) afraid of the dark.",
         "a": "used to be",
         "opts": [
-          "used to be",
-          "use to be",
           "was used to",
+          "use to be",
+          "used to be",
           "am used to"
         ]
       }
@@ -9434,10 +9430,10 @@ const LESSONS_INT = [
         "q": "Every summer, we ___ (would) visit our grandparents.",
         "a": "would",
         "opts": [
-          "would",
+          "get used to",
           "use to",
           "used",
-          "get used to"
+          "would"
         ]
       },
       {
@@ -9454,8 +9450,8 @@ const LESSONS_INT = [
         "q": "It took me months to ___ (get used to) the cold climate.",
         "a": "get used to",
         "opts": [
-          "get used to",
           "getting used",
+          "get used to",
           "use to",
           "used"
         ]
@@ -9464,9 +9460,9 @@ const LESSONS_INT = [
         "q": "❌ 'I would have a dog.' is wrong because 'have' is a ___.",
         "a": "state",
         "opts": [
-          "state",
-          "action",
           "habit",
+          "action",
+          "state",
           "gerund"
         ]
       },
@@ -9474,10 +9470,10 @@ const LESSONS_INT = [
         "q": "She is still ___ (get used to) her new job.",
         "a": "getting used to",
         "opts": [
-          "getting used to",
+          "use to",
           "get used to",
           "used to",
-          "use to"
+          "getting used to"
         ]
       }
     ],
@@ -9741,8 +9737,8 @@ const LESSONS_INT = [
         "q": "She wishes she ___ (live) closer to her family.",
         "a": "lived",
         "opts": [
-          "lived",
           "lives",
+          "lived",
           "living",
           "live"
         ]
@@ -9751,9 +9747,9 @@ const LESSONS_INT = [
         "q": "I wish I ___ (be) taller.",
         "a": "were",
         "opts": [
-          "were",
-          "was",
           "am",
+          "was",
+          "were",
           "be"
         ]
       },
@@ -9761,10 +9757,10 @@ const LESSONS_INT = [
         "q": "He wishes he ___ (speak) English fluently.",
         "a": "spoke",
         "opts": [
-          "spoke",
+          "spoken",
           "speaks",
           "speaking",
-          "spoken"
+          "spoke"
         ]
       },
       {
@@ -10028,8 +10024,8 @@ const LESSONS_INT = [
         "q": "I wish I ___ (study) harder for the exam.",
         "a": "had studied",
         "opts": [
-          "had studied",
           "studied",
+          "had studied",
           "have studied",
           "study"
         ]
@@ -10038,9 +10034,9 @@ const LESSONS_INT = [
         "q": "If only I ___ (not/say) that to her!",
         "a": "hadn't said",
         "opts": [
-          "hadn't said",
-          "didn't say",
           "haven't said",
+          "didn't say",
+          "hadn't said",
           "not said"
         ]
       },
@@ -10048,10 +10044,10 @@ const LESSONS_INT = [
         "q": "I wish you ___ (stop) interrupting me.",
         "a": "would stop",
         "opts": [
-          "would stop",
+          "will stop",
           "stopped",
           "stop",
-          "will stop"
+          "would stop"
         ]
       },
       {
@@ -10068,8 +10064,8 @@ const LESSONS_INT = [
         "q": "❌ I wish I would be taller → ✅ I wish I ___ taller.",
         "a": "were",
         "opts": [
-          "were",
           "would be",
+          "were",
           "had been",
           "am"
         ]
@@ -10325,9 +10321,9 @@ const LESSONS_INT = [
         "q": "You're happy, ___ you?",
         "a": "aren't",
         "opts": [
-          "aren't",
-          "isn't",
           "don't",
+          "isn't",
+          "aren't",
           "weren't"
         ]
       },
@@ -10335,10 +10331,10 @@ const LESSONS_INT = [
         "q": "She works here, ___ she?",
         "a": "doesn't",
         "opts": [
-          "doesn't",
+          "won't",
           "isn't",
           "hasn't",
-          "won't"
+          "doesn't"
         ]
       },
       {
@@ -10355,8 +10351,8 @@ const LESSONS_INT = [
         "q": "You can swim, ___ you?",
         "a": "can't",
         "opts": [
-          "can't",
           "don't",
+          "can't",
           "won't",
           "aren't"
         ]
@@ -10365,9 +10361,9 @@ const LESSONS_INT = [
         "q": "They haven't left, ___ they?",
         "a": "have",
         "opts": [
-          "have",
-          "haven't",
           "did",
+          "haven't",
+          "have",
           "don't"
         ]
       }
@@ -10623,10 +10619,10 @@ const LESSONS_INT = [
         "q": "I'm right, ___ I?",
         "a": "aren't",
         "opts": [
-          "aren't",
+          "don't",
           "amn't",
           "isn't",
-          "don't"
+          "aren't"
         ]
       },
       {
@@ -10643,8 +10639,8 @@ const LESSONS_INT = [
         "q": "Close the door, ___ you?",
         "a": "will",
         "opts": [
-          "will",
           "do",
+          "will",
           "are",
           "won't"
         ]
@@ -10653,9 +10649,9 @@ const LESSONS_INT = [
         "q": "You never call your mother, ___ you?",
         "a": "do",
         "opts": [
-          "do",
-          "don't",
           "are",
+          "don't",
+          "do",
           "aren't"
         ]
       },
@@ -10663,10 +10659,10 @@ const LESSONS_INT = [
         "q": "There's a problem, ___ there?",
         "a": "isn't",
         "opts": [
-          "isn't",
+          "hasn't",
           "aren't",
           "doesn't",
-          "hasn't"
+          "isn't"
         ]
       }
     ],
@@ -10931,8 +10927,8 @@ const LESSONS_INT = [
         "q": "The phone is ringing — I ___ (will) answer it!",
         "a": "'ll",
         "opts": [
-          "'ll",
           "am going to",
+          "'ll",
           "would",
           "was going to"
         ]
@@ -10941,9 +10937,9 @@ const LESSONS_INT = [
         "q": "Look at those clouds — it ___ (going to) rain!",
         "a": "is going to",
         "opts": [
-          "is going to",
-          "will",
           "would",
+          "will",
+          "is going to",
           "is"
         ]
       },
@@ -10951,10 +10947,10 @@ const LESSONS_INT = [
         "q": "I've already decided — I'm ___ (going to) change jobs.",
         "a": "going to",
         "opts": [
-          "going to",
+          "is",
           "will",
           "would",
-          "is"
+          "going to"
         ]
       },
       {
@@ -11218,8 +11214,8 @@ const LESSONS_INT = [
         "q": "I ___ (meet) my mentor at 3pm tomorrow.",
         "a": "am meeting",
         "opts": [
-          "am meeting",
           "will meet",
+          "am meeting",
           "meet",
           "meets"
         ]
@@ -11228,9 +11224,9 @@ const LESSONS_INT = [
         "q": "The train ___ (leave) at 9:15.",
         "a": "leaves",
         "opts": [
-          "leaves",
-          "is leaving",
           "will leave",
+          "is leaving",
+          "leaves",
           "left"
         ]
       },
@@ -11238,10 +11234,10 @@ const LESSONS_INT = [
         "q": "By 2030, I ___ (pay off) my house.",
         "a": "will have paid off",
         "opts": [
-          "will have paid off",
+          "have paid off",
           "will pay off",
           "am paying off",
-          "have paid off"
+          "will have paid off"
         ]
       },
       {
@@ -11258,8 +11254,8 @@ const LESSONS_INT = [
         "q": "By next year, she ___ (graduate) from university.",
         "a": "will have graduated",
         "opts": [
-          "will have graduated",
           "will graduate",
+          "will have graduated",
           "is graduating",
           "graduates"
         ]
@@ -11515,9 +11511,9 @@ const LESSONS_INT = [
         "q": "Where do you ___ yourself in five years?",
         "a": "see",
         "opts": [
-          "see",
-          "saw",
           "seeing",
+          "saw",
+          "see",
           "seen"
         ]
       },
@@ -11525,10 +11521,10 @@ const LESSONS_INT = [
         "q": "I ___ (use to) feel invisible at my old job.",
         "a": "used to",
         "opts": [
-          "used to",
+          "was",
           "use to",
           "would",
-          "was"
+          "used to"
         ]
       },
       {
@@ -11545,8 +11541,8 @@ const LESSONS_INT = [
         "q": "I'm ___ (going to) build my own career.",
         "a": "going to",
         "opts": [
-          "going to",
           "will",
+          "going to",
           "would",
           "used to"
         ]
@@ -11555,9 +11551,9 @@ const LESSONS_INT = [
         "q": "What would you do if you knew you couldn't ___?",
         "a": "fail",
         "opts": [
-          "fail",
-          "failed",
           "failing",
+          "failed",
+          "fail",
           "fails"
         ]
       }
@@ -11572,299 +11568,2018 @@ const LESSONS_INT = [
   },
   {
     "id": 440,
-    "title": "Intermediate Course Review: Grand Finale",
-    "emoji": "🎓",
+    "title": "Revisão 1 · Expressões de Tempo: ON, IN & AT",
+    "emoji": "📅",
     "verbs": [
-      "To Review",
-      "To Practice",
-      "To Improve",
-      "To Celebrate"
+      "To Schedule",
+      "To Meet",
+      "To Start",
+      "To Arrive"
     ],
     "vocab": [
       {
-        "en": "used to",
-        "pt": "costumava",
-        "ex": "I used to struggle with English grammar."
+        "en": "on Monday",
+        "pt": "na segunda-feira",
+        "ex": "Our team meeting is on Monday at 9 a.m."
       },
       {
-        "en": "would (past habit)",
-        "pt": "costumava (repetido)",
-        "ex": "We would practice every single day."
+        "en": "on Tuesdays",
+        "pt": "às terças-feiras",
+        "ex": "I have English classes on Tuesdays and Thursdays."
       },
       {
-        "en": "wish",
-        "pt": "desejar",
-        "ex": "I wish I had started learning sooner."
+        "en": "on Friday afternoon",
+        "pt": "na sexta-feira à tarde",
+        "ex": "Are you free on Friday afternoon?"
       },
       {
-        "en": "if only",
-        "pt": "se ao menos",
-        "ex": "If only I had practiced more at the beginning."
+        "en": "on Saturday night",
+        "pt": "no sábado à noite",
+        "ex": "We are going out on Saturday night."
       },
       {
-        "en": "to be honest",
-        "pt": "pra ser sincero",
-        "ex": "To be honest, it is not easy, is it?"
+        "en": "in the morning",
+        "pt": "de manhã",
+        "ex": "She loves studying in the morning."
       },
       {
-        "en": "isn't it?",
-        "pt": "não é?",
-        "ex": "English is challenging, isn't it?"
+        "en": "in the afternoon",
+        "pt": "à tarde",
+        "ex": "I usually go to the gym in the afternoon."
       },
       {
-        "en": "will",
-        "pt": "futuro (will)",
-        "ex": "I will keep practicing every week."
+        "en": "in the evening",
+        "pt": "no começo da noite",
+        "ex": "They watch movies together in the evening."
       },
       {
-        "en": "going to",
-        "pt": "futuro (going to)",
-        "ex": "I'm going to review this course again."
+        "en": "at night",
+        "pt": "à noite (tarde)",
+        "ex": "I hate driving late at night."
       },
       {
-        "en": "future perfect",
-        "pt": "futuro perfeito",
-        "ex": "By next year, I will have finished the advanced course."
+        "en": "at 7 p.m.",
+        "pt": "às 19h",
+        "ex": "The class starts at 7 p.m. sharp."
       },
       {
-        "en": "to review",
-        "pt": "revisar",
-        "ex": "Let's review everything we've learned."
+        "en": "at midnight",
+        "pt": "à meia-noite",
+        "ex": "The streets are quiet at midnight."
       },
       {
-        "en": "to improve",
-        "pt": "melhorar",
-        "ex": "My English has really improved this year."
+        "en": "in July",
+        "pt": "em julho",
+        "ex": "It gets cold here in July."
       },
       {
-        "en": "progress",
-        "pt": "progresso",
-        "ex": "Look at all the progress you've made!"
+        "en": "in 2023",
+        "pt": "em 2023",
+        "ex": "My sister moved to Canada in 2023."
       },
       {
-        "en": "to celebrate",
-        "pt": "comemorar",
-        "ex": "It's time to celebrate finishing the course."
+        "en": "in five years",
+        "pt": "daqui a cinco anos",
+        "ex": "Where do you see yourself in five years?"
       },
       {
-        "en": "achievement",
-        "pt": "conquista",
-        "ex": "Finishing this course is a big achievement."
+        "en": "in ten minutes",
+        "pt": "daqui a dez minutos",
+        "ex": "Dinner will be ready in ten minutes."
       },
       {
-        "en": "confident",
-        "pt": "confiante",
-        "ex": "I feel much more confident now."
+        "en": "on July 15th",
+        "pt": "no dia 15 de julho",
+        "ex": "The conference is on July 15th."
       },
       {
-        "en": "fluency",
-        "pt": "fluência",
-        "ex": "Fluency takes time and consistent practice."
-      },
-      {
-        "en": "to look forward to",
-        "pt": "estar ansioso por",
-        "ex": "I am looking forward to seeing you."
-      },
-      {
-        "en": "to master",
-        "pt": "dominar",
-        "ex": "You're starting to master these structures."
-      },
-      {
-        "en": "milestone",
-        "pt": "marco",
-        "ex": "This is an important milestone in your journey."
-      },
-      {
-        "en": "consistency",
-        "pt": "consistência",
-        "ex": "Consistency is the key to learning a language."
-      },
-      {
-        "en": "to keep practicing",
-        "pt": "continuar praticando",
-        "ex": "Keep practicing, and you'll keep improving."
-      },
-      {
-        "en": "next level",
-        "pt": "próximo nível",
-        "ex": "You're ready for the next level."
-      },
-      {
-        "en": "to look back",
-        "pt": "olhar para trás",
-        "ex": "Looking back, you've come a long way."
-      },
-      {
-        "en": "journey",
-        "pt": "jornada",
-        "ex": "This has been an amazing learning journey."
-      },
-      {
-        "en": "to graduate",
-        "pt": "se formar",
-        "ex": "By the end of this year, I will have graduated."
-      },
-      {
-        "en": "to reflect",
-        "pt": "refletir",
-        "ex": "Take a moment to reflect on your progress."
-      },
-      {
-        "en": "proud",
-        "pt": "orgulhoso",
-        "ex": "You should be proud of everything you've learned."
-      },
-      {
-        "en": "challenge",
-        "pt": "desafio",
-        "ex": "Every lesson was a new challenge."
-      },
-      {
-        "en": "to set a new goal",
-        "pt": "definir uma nova meta",
-        "ex": "Now it's time to set a new goal."
-      },
-      {
-        "en": "congratulations",
-        "pt": "parabéns",
-        "ex": "Congratulations on finishing the Intermediate course!"
+        "en": "on my birthday",
+        "pt": "no meu aniversário",
+        "ex": "We always travel on my birthday."
       }
     ],
     "expressions": [
       {
-        "expr": "You've come a long way, haven't you?",
-        "meaning": "Você percorreu um longo caminho, não é?",
-        "example": "You've come a long way, haven't you?"
+        "expr": "on Monday morning",
+        "meaning": "na segunda-feira de manhã",
+        "example": "Call me on Monday morning at nine."
       },
       {
-        "expr": "I used to..., but now I...",
-        "meaning": "Eu costumava..., mas agora eu...",
-        "example": "I used to be afraid to speak, but now I feel confident."
+        "expr": "in the morning, not at night",
+        "meaning": "de manhã, não à noite",
+        "example": "I study better in the morning, not at night."
       },
       {
-        "expr": "I wish I had started sooner",
-        "meaning": "Eu queria ter começado mais cedo",
-        "example": "I wish I had started sooner, but I'm glad I'm here now."
+        "expr": "at 8 o'clock sharp",
+        "meaning": "às 8 horas em ponto",
+        "example": "The train leaves at 8 o'clock sharp."
       },
       {
-        "expr": "I'm going to keep practicing",
-        "meaning": "Eu vou continuar praticando",
-        "example": "I'm going to keep practicing every day."
+        "expr": "in two weeks",
+        "meaning": "daqui a duas semanas",
+        "example": "Our vacation starts in two weeks."
       }
     ],
     "sentences": [
-      "You've come a long way, haven't you?",
-      "I used to be afraid to speak English, but now I feel confident.",
-      "I wish I had started learning English sooner.",
-      "This grammar is tricky, isn't it?",
-      "I'm going to keep practicing every single day.",
-      "By next year, I will have finished the Advanced course.",
-      "We would review new words together every week.",
-      "Congratulations on finishing the Intermediate course!"
+      "Our team meeting is scheduled on Monday at 9 a.m.",
+      "She loves studying in the morning, but she hates working late at night.",
+      "My sister moved to Canada in July and started her new job in 2023.",
+      "Are you free on Friday afternoon at three o'clock?",
+      "Where do you see yourself in five years?",
+      "I usually study English on Mondays and Wednesdays in the evening.",
+      "We are going to a farewell dinner on Saturday night.",
+      "Dinner will be ready in ten minutes!"
     ],
     "grammar": {
-      "title": "Revisão Geral: Used To, Wish, Question Tags & Futuro",
+      "title": "Padrões de Tempo: ON, IN e AT",
       "rules": [
-        "USED TO / WOULD descrevem hábitos e estados do passado que mudaram: I used to struggle, but I improved.",
-        "WISH + passado (presente) ou passado perfeito (arrependimento) expressa desejos: I wish I had started sooner.",
-        "QUESTION TAGS confirmam informação com a regra do espelho: You've improved, haven't you?",
-        "WILL / GOING TO / futuro perfeito e contínuo descrevem planos e previsões: I'm going to keep practicing."
+        "Use ON para dias da semana e datas com dia: on Monday, on Friday night, on July 15th.",
+        "Use IN THE para manhã, tarde e começo da noite: in the morning, in the afternoon, in the evening.",
+        "Use AT para horários no relógio e para a noite tarde: at 7 p.m., at midnight, at night.",
+        "Use IN para meses sozinhos, anos e prazo futuro: in July, in 2023, in five years."
       ],
       "table": {
         "headers": [
-          "Tópico",
-          "Estrutura-chave",
-          "Exemplo",
-          "Aula de origem"
+          "Palavra",
+          "Quando usar",
+          "Exemplo Certo",
+          "Evite dizer"
         ],
         "rows": [
           [
-            "Hábitos passados",
-            "used to / would",
-            "I used to struggle with grammar.",
-            "Lição 16"
+            "ON",
+            "Dias da semana e datas",
+            "on Monday / on Friday night",
+            "in Monday / at Monday"
           ],
           [
-            "Desejos/arrependimentos",
-            "wish + past / past perfect",
-            "I wish I had started sooner.",
-            "Lição 17"
+            "IN",
+            "Partes do dia / meses / anos",
+            "in the morning / in July",
+            "on the morning / at July"
           ],
           [
-            "Confirmação",
-            "question tags",
-            "You've improved, haven't you?",
-            "Lição 18"
-          ],
-          [
-            "Futuro",
-            "will / going to / future perfect",
-            "I'm going to keep practicing.",
-            "Lição 19"
+            "AT",
+            "Horas exatas e \"at night\"",
+            "at 7 p.m. / at night",
+            "in night / on 7 p.m."
           ]
         ]
       }
     },
     "quiz": [
       {
-        "q": "I ___ (use to) struggle with grammar, but now it's easy.",
-        "a": "used to",
+        "q": "Our team meeting is scheduled ___ at 9 a.m.",
+        "a": "on Monday",
         "opts": [
-          "used to",
-          "use to",
-          "would to",
-          "using to"
+          "in Monday",
+          "on the Monday",
+          "at Monday",
+          "on Monday"
         ]
       },
       {
-        "q": "I wish I ___ (start) learning English sooner.",
-        "a": "had started",
+        "q": "She prefers studying ___ instead of working late ___.",
+        "a": "in the morning / at night",
         "opts": [
-          "had started",
-          "started",
-          "start",
-          "would start"
+          "in the morning / at night",
+          "at morning / on night",
+          "on the morning / in night",
+          "in morning / at the night"
         ]
       },
       {
-        "q": "You've improved a lot, ___ you?",
-        "a": "haven't",
+        "q": "My brother moved to Toronto ___ and bought his apartment ___.",
+        "a": "in October / in 2022",
         "opts": [
-          "haven't",
-          "aren't",
-          "don't",
-          "didn't"
+          "on October / on 2022",
+          "in October / in 2022",
+          "in the October / at 2022",
+          "at October / in 2022"
         ]
       },
       {
-        "q": "I'm ___ (going to) keep practicing every day.",
-        "a": "going to",
+        "q": "Are you coming to the farewell dinner ___?",
+        "a": "on Saturday night",
         "opts": [
-          "going to",
-          "will",
-          "used to",
-          "would"
+          "at Saturday night",
+          "in Saturday night",
+          "on Saturday night",
+          "on the Saturday night"
         ]
       },
       {
-        "q": "By next year, I ___ (finish) the Advanced course.",
-        "a": "will have finished",
+        "q": "Where do you see yourself ___?",
+        "a": "in five years",
         "opts": [
-          "will have finished",
-          "will finish",
-          "am finishing",
-          "finished"
+          "on five years",
+          "for five years",
+          "at five years",
+          "in five years"
+        ]
+      },
+      {
+        "q": "Our online English class starts ___ 7:30 p.m. ___ Tuesdays.",
+        "a": "at / on",
+        "opts": [
+          "at / on",
+          "in / on",
+          "on / at",
+          "at / in"
         ]
       }
     ],
     "speak": [
-      "You've come a long way, haven't you?",
-      "I used to be afraid to speak English, but now I feel confident.",
-      "I wish I had started learning English sooner.",
-      "I'm going to keep practicing every single day.",
-      "Congratulations on finishing the Intermediate course!"
+      "Our team meeting is scheduled on Monday at nine.",
+      "I prefer studying in the morning, not at night.",
+      "Are you free on Friday afternoon at three o'clock?",
+      "My sister moved to Canada in July.",
+      "Where do you see yourself in five years?"
+    ]
+  },
+  {
+    "id": 441,
+    "title": "Revisão 2 · Dia a Dia: By Accident, On Purpose & On Time",
+    "emoji": "😬",
+    "verbs": [
+      "To Delete",
+      "To Ignore",
+      "To Arrive",
+      "To Travel"
+    ],
+    "vocab": [
+      {
+        "en": "by accident",
+        "pt": "sem querer / por acidente",
+        "ex": "I deleted your file by accident."
+      },
+      {
+        "en": "on purpose",
+        "pt": "de propósito",
+        "ex": "He ignored my message on purpose."
+      },
+      {
+        "en": "on time",
+        "pt": "pontualmente no horário",
+        "ex": "The train arrived right on time."
+      },
+      {
+        "en": "in time",
+        "pt": "a tempo (antes que seja tarde)",
+        "ex": "We got to the gate just in time."
+      },
+      {
+        "en": "by the time",
+        "pt": "quando / no momento em que",
+        "ex": "By the time we arrived, the movie had started."
+      },
+      {
+        "en": "on my own",
+        "pt": "sozinho / por conta própria",
+        "ex": "I travelled to Portugal on my own."
+      },
+      {
+        "en": "by myself",
+        "pt": "sozinho(a)",
+        "ex": "She fixed the computer all by herself."
+      },
+      {
+        "en": "by subway",
+        "pt": "de metrô",
+        "ex": "I usually go to work by subway."
+      },
+      {
+        "en": "by bus",
+        "pt": "de ônibus",
+        "ex": "They went to the beach by bus."
+      },
+      {
+        "en": "on foot",
+        "pt": "a pé",
+        "ex": "The bakery is close, so let's go on foot."
+      },
+      {
+        "en": "in a hurry",
+        "pt": "com pressa",
+        "ex": "I sent the wrong file because I was in a hurry."
+      },
+      {
+        "en": "at the last minute",
+        "pt": "na última hora",
+        "ex": "They cancelled the trip at the last minute."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "by accident, not on purpose",
+        "meaning": "sem querer, não de propósito",
+        "example": "I broke the cup by accident, not on purpose!"
+      },
+      {
+        "expr": "arrive on time",
+        "meaning": "chegar pontualmente no horário",
+        "example": "Please make sure you arrive on time."
+      },
+      {
+        "expr": "just in time",
+        "meaning": "bem a tempo",
+        "example": "We arrived at the airport just in time."
+      },
+      {
+        "expr": "by the time I got there",
+        "meaning": "quando eu cheguei lá",
+        "example": "By the time I got there, everyone had left."
+      }
+    ],
+    "sentences": [
+      "I am so sorry! I deleted your presentation file by accident.",
+      "He didn't forget to call you — he ignored your message on purpose.",
+      "The train leaves at 8:00 sharp, so please arrive on time.",
+      "By the time we arrived at the cinema, the movie had already started.",
+      "When I first travelled to Portugal, I went completely on my own.",
+      "I usually go to work by subway, or I walk on foot."
+    ],
+    "grammar": {
+      "title": "Expressões Naturais do Dia a Dia",
+      "rules": [
+        "Diga sempre \"by accident\" (sem querer) e \"on purpose\" (de propósito).",
+        "\"On time\" significa pontualmente no horário; \"in time\" significa a tempo.",
+        "\"By the time\" conecta um momento no passado ou futuro a algo que já tinha acontecido.",
+        "Meios de transporte usam BY (by subway, by car), mas \"a pé\" é sempre ON foot."
+      ],
+      "table": {
+        "headers": [
+          "Expressão",
+          "Significado",
+          "Exemplo",
+          "Pegadinha"
+        ],
+        "rows": [
+          [
+            "by accident",
+            "sem querer",
+            "I did it by accident.",
+            "Nunca diga \"on accident\""
+          ],
+          [
+            "on purpose",
+            "de propósito",
+            "He did it on purpose.",
+            "Nunca diga \"by purpose\""
+          ],
+          [
+            "on time",
+            "pontualmente",
+            "Please arrive on time.",
+            "Diferente de \"in the time\""
+          ],
+          [
+            "by the time",
+            "quando (já...)",
+            "By the time I arrived...",
+            "Diferente de \"on the time\""
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "I am so sorry! I deleted your presentation file ___!",
+        "a": "by accident",
+        "opts": [
+          "by accident",
+          "in accident",
+          "on accident",
+          "with accident"
+        ]
+      },
+      {
+        "q": "He didn't forget to invite you — he left you out ___.",
+        "a": "on purpose",
+        "opts": [
+          "by purpose",
+          "on purpose",
+          "in purpose",
+          "for purpose"
+        ]
+      },
+      {
+        "q": "The interview starts at 9:00 sharp, so please arrive ___.",
+        "a": "on time",
+        "opts": [
+          "in the time",
+          "at time",
+          "on time",
+          "by time"
+        ]
+      },
+      {
+        "q": "___ we got to the airport, the check-in desk had already closed.",
+        "a": "By the time",
+        "opts": [
+          "At time",
+          "On the time",
+          "In the time",
+          "By the time"
+        ]
+      },
+      {
+        "q": "When she moved to London, she lived ___ for two years.",
+        "a": "on her own",
+        "opts": [
+          "on her own",
+          "by her own",
+          "in her own",
+          "at her own"
+        ]
+      },
+      {
+        "q": "I usually go to the office ___, but today I came ___.",
+        "a": "by subway / on foot",
+        "opts": [
+          "on subway / by foot",
+          "by subway / on foot",
+          "in subway / on foot",
+          "by the subway / with foot"
+        ]
+      }
+    ],
+    "speak": [
+      "I deleted your presentation file by accident.",
+      "He ignored your message on purpose.",
+      "Please make sure you arrive on time.",
+      "By the time we arrived, the movie had already started.",
+      "I went to Portugal completely on my own."
+    ]
+  },
+  {
+    "id": 442,
+    "title": "Revisão 3 · Combinações: Look Forward To, Depend On & Good At",
+    "emoji": "🤩",
+    "verbs": [
+      "To Look Forward",
+      "To Depend",
+      "To Decide",
+      "To Enjoy"
+    ],
+    "vocab": [
+      {
+        "en": "look forward to seeing",
+        "pt": "aguardar ansiosamente para ver",
+        "ex": "We look forward to seeing you!"
+      },
+      {
+        "en": "look forward to hearing",
+        "pt": "aguardar retorno / notícias",
+        "ex": "I look forward to hearing from you."
+      },
+      {
+        "en": "look forward to travelling",
+        "pt": "estar ansioso para viajar",
+        "ex": "She is looking forward to travelling."
+      },
+      {
+        "en": "depend on",
+        "pt": "depender de / contar com",
+        "ex": "It depends on the weather."
+      },
+      {
+        "en": "interested in",
+        "pt": "interessado(a) em",
+        "ex": "He is interested in photography."
+      },
+      {
+        "en": "good at",
+        "pt": "bom / boa em",
+        "ex": "She is really good at taking portraits."
+      },
+      {
+        "en": "afraid of",
+        "pt": "com medo de",
+        "ex": "I used to be afraid of speaking in public."
+      },
+      {
+        "en": "tired of",
+        "pt": "cansado(a) de",
+        "ex": "We are tired of waiting in traffic."
+      },
+      {
+        "en": "decide to start",
+        "pt": "decidir começar",
+        "ex": "She decided to start her own business."
+      },
+      {
+        "en": "enjoy running",
+        "pt": "gostar de administrar / correr",
+        "ex": "She really enjoys running her company."
+      },
+      {
+        "en": "promise to call",
+        "pt": "prometer ligar",
+        "ex": "He promised to call me back."
+      },
+      {
+        "en": "finish writing",
+        "pt": "terminar de escrever",
+        "ex": "I have just finished writing the email."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "looking forward to seeing you",
+        "meaning": "ansioso para te ver",
+        "example": "Everyone is looking forward to seeing you there!"
+      },
+      {
+        "expr": "it depends on the weather",
+        "meaning": "depende do clima",
+        "example": "Whether we go to the beach depends on the weather."
+      },
+      {
+        "expr": "interested in / good at",
+        "meaning": "interessado em / bom em",
+        "example": "She is interested in art and good at painting."
+      },
+      {
+        "expr": "decided to start / enjoys working",
+        "meaning": "decidiu começar / gosta de trabalhar",
+        "example": "He decided to start early and enjoys working from home."
+      }
+    ],
+    "sentences": [
+      "We are really looking forward to seeing you at the conference!",
+      "Whether we go to the beach tomorrow depends on the weather.",
+      "She has always been interested in photography and good at taking portraits.",
+      "After years as a translator, she decided to start her own company.",
+      "He really enjoys working with international clients.",
+      "I am looking forward to practising my English every single day."
+    ],
+    "grammar": {
+      "title": "Combinações que Sempre Andam Juntas",
+      "rules": [
+        "Depois de \"look forward to\", a ação vem sempre com -ING: looking forward to seeing / to meeting.",
+        "Em inglês dizemos sempre \"depend ON\" (jamais \"depend of\").",
+        "Usamos \"interested IN\" (interessado em) e \"good AT\" (bom em).",
+        "Decide, want e plan pedem \"TO + ação\"; já enjoy, finish e avoid pedem \"-ING\"."
+      ],
+      "table": {
+        "headers": [
+          "Expressão",
+          "Continuação",
+          "Exemplo Correto",
+          "Erro Comum"
+        ],
+        "rows": [
+          [
+            "look forward to",
+            "+ ação com -ING",
+            "looking forward to seeing",
+            "looking forward to see"
+          ],
+          [
+            "depend",
+            "+ ON",
+            "It depends on you.",
+            "It depends of you."
+          ],
+          [
+            "interested / good",
+            "IN / AT",
+            "interested in / good at",
+            "interested on / good in"
+          ],
+          [
+            "decide / enjoy",
+            "to do / doing",
+            "decided to go / enjoys going",
+            "decided going / enjoys to go"
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "We are really looking forward ___ you at the dinner on Saturday!",
+        "a": "to seeing",
+        "opts": [
+          "to see",
+          "to seeing",
+          "for seeing",
+          "at seeing"
+        ]
+      },
+      {
+        "q": "Whether we have the barbecue outside depends ___ the weather.",
+        "a": "on",
+        "opts": [
+          "of",
+          "in",
+          "on",
+          "from"
+        ]
+      },
+      {
+        "q": "She has always been interested ___ design and really good ___ drawing.",
+        "a": "in / at",
+        "opts": [
+          "on / in",
+          "about / at",
+          "in / on",
+          "in / at"
+        ]
+      },
+      {
+        "q": "After five years, he finally decided ___ his own business and enjoys ___ it.",
+        "a": "to open / running",
+        "opts": [
+          "to open / running",
+          "opening / to run",
+          "to open / to run",
+          "open / running"
+        ]
+      },
+      {
+        "q": "I used to be afraid ___ making mistakes when speaking English.",
+        "a": "of",
+        "opts": [
+          "in",
+          "of",
+          "to",
+          "for"
+        ]
+      },
+      {
+        "q": "I am really looking forward ___ my English every single day!",
+        "a": "to practising",
+        "opts": [
+          "to practise",
+          "for practising",
+          "to practising",
+          "in practise"
+        ]
+      }
+    ],
+    "speak": [
+      "We are really looking forward to seeing you next month.",
+      "Whether we go tomorrow depends on the weather.",
+      "She is interested in photography and good at taking portraits.",
+      "She finally decided to start her own company.",
+      "I am looking forward to practising my English every single day."
+    ]
+  },
+  {
+    "id": 443,
+    "title": "Revisão 4 · Passado na Prática: Simple Past vs. Past Continuous",
+    "emoji": "⏪",
+    "verbs": [
+      "To Cook",
+      "To Go Out",
+      "To Wait",
+      "To Start"
+    ],
+    "vocab": [
+      {
+        "en": "went out",
+        "pt": "apagou / saiu",
+        "ex": "The lights suddenly went out."
+      },
+      {
+        "en": "was cooking",
+        "pt": "estava cozinhando",
+        "ex": "While I was cooking dinner, the phone rang."
+      },
+      {
+        "en": "were waiting",
+        "pt": "estavam esperando",
+        "ex": "They were waiting for the bus when it started to rain."
+      },
+      {
+        "en": "last summer",
+        "pt": "no verão passado",
+        "ex": "Where did you go on vacation last summer?"
+      },
+      {
+        "en": "last night",
+        "pt": "ontem à noite",
+        "ex": "What were you doing at 9 p.m. last night?"
+      },
+      {
+        "en": "two years ago",
+        "pt": "há dois anos",
+        "ex": "He moved to São Paulo two years ago."
+      },
+      {
+        "en": "suddenly",
+        "pt": "de repente",
+        "ex": "Suddenly, it started to rain heavily."
+      },
+      {
+        "en": "while",
+        "pt": "enquanto (ação longa)",
+        "ex": "While she was driving, she saw an old friend."
+      },
+      {
+        "en": "when",
+        "pt": "quando (ação que interrompe)",
+        "ex": "I was sleeping when the alarm went off."
+      },
+      {
+        "en": "did you go",
+        "pt": "você foi (pergunta)",
+        "ex": "Where did you go yesterday?"
+      },
+      {
+        "en": "didn't know",
+        "pt": "não sabia",
+        "ex": "I didn't know you were in town."
+      },
+      {
+        "en": "realised",
+        "pt": "percebeu",
+        "ex": "She realised she had forgotten her keys."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "While I was cooking...",
+        "meaning": "Enquanto eu estava cozinhando...",
+        "example": "While I was cooking dinner, the lights went out."
+      },
+      {
+        "expr": "Where did you go...?",
+        "meaning": "Para onde você foi...?",
+        "example": "Where did you go on vacation last summer?"
+      },
+      {
+        "expr": "when it suddenly started",
+        "meaning": "quando de repente começou",
+        "example": "We were walking when it suddenly started to rain."
+      },
+      {
+        "expr": "two years ago",
+        "meaning": "há dois anos (tempo fechado)",
+        "example": "I started this course two years ago."
+      }
+    ],
+    "sentences": [
+      "While I was cooking dinner last night, the lights suddenly went out.",
+      "Where did you go on vacation last summer? We went to Italy!",
+      "They were waiting for the bus when it suddenly started to rain heavily.",
+      "What were you doing yesterday at 8 p.m.?",
+      "I didn't hear my phone because I was taking a shower.",
+      "She met her best friend while she was studying in Dublin."
+    ],
+    "grammar": {
+      "title": "Contando Histórias no Passado: Ação em Andamento vs. Interrupção",
+      "rules": [
+        "Com datas fechadas (yesterday, last summer, in 2022), usamos o passado direto: went, worked, did you go.",
+        "Para uma ação longa que estava acontecendo no meio do caminho, usamos WAS / WERE + -ING: was cooking, were waiting.",
+        "Quando uma ação longa é interrompida por algo rápido: \"While I was cooking (longa), the lights went out (rápida)\".",
+        "Em perguntas e negativas no passado fechado, o \"did / didn't\" deixa a ação na forma base: Where did you go?"
+      ],
+      "table": {
+        "headers": [
+          "Situação",
+          "Forma",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Fato concluído c/ data",
+            "went / started / did... go",
+            "Where did you go last summer?"
+          ],
+          [
+            "Em andamento no passado",
+            "was / were + -ING",
+            "I was cooking dinner at 8 p.m."
+          ],
+          [
+            "Andamento + Interrupção",
+            "was doing + happened",
+            "They were waiting when it started to rain."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "While I ___ dinner last night, the lights suddenly ___.",
+        "a": "was cooking / went out",
+        "opts": [
+          "cooked / were going out",
+          "have cooked / went out",
+          "was cooking / went out",
+          "was cooking / were going out"
+        ]
+      },
+      {
+        "q": "Where ___ you ___ on vacation last summer?",
+        "a": "did / go",
+        "opts": [
+          "have / gone",
+          "were / going",
+          "do / go",
+          "did / go"
+        ]
+      },
+      {
+        "q": "They ___ for the bus when it suddenly ___ to rain heavily.",
+        "a": "were waiting / started",
+        "opts": [
+          "were waiting / started",
+          "have waited / started",
+          "are waiting / starts",
+          "waited / was starting"
+        ]
+      },
+      {
+        "q": "I ___ hear your call because I ___ a shower at that moment.",
+        "a": "didn't / was taking",
+        "opts": [
+          "don't / took",
+          "didn't / was taking",
+          "haven't / was taking",
+          "wasn't / took"
+        ]
+      },
+      {
+        "q": "She ___ her husband while she ___ in Canada in 2019.",
+        "a": "met / was living",
+        "opts": [
+          "was meeting / lived",
+          "has met / lived",
+          "met / was living",
+          "meets / is living"
+        ]
+      },
+      {
+        "q": "What ___ you ___ yesterday at 9 p.m. when the storm began?",
+        "a": "were / doing",
+        "opts": [
+          "did / do",
+          "have / done",
+          "are / doing",
+          "were / doing"
+        ]
+      }
+    ],
+    "speak": [
+      "While I was cooking dinner last night, the lights suddenly went out.",
+      "Where did you go on vacation last summer?",
+      "They were waiting for the bus when it started to rain.",
+      "I didn't hear the phone because I was taking a shower.",
+      "What were you doing yesterday at eight o'clock?"
+    ]
+  },
+  {
+    "id": 444,
+    "title": "Revisão 5 · Experiências e Duração: Have Been, For & Since",
+    "emoji": "⏳",
+    "verbs": [
+      "To Live",
+      "To Finish",
+      "To Send",
+      "To Know"
+    ],
+    "vocab": [
+      {
+        "en": "have been to",
+        "pt": "já estive em (experiência)",
+        "ex": "I have been to London three times."
+      },
+      {
+        "en": "for three years",
+        "pt": "há três anos (duração)",
+        "ex": "We have lived here for three years."
+      },
+      {
+        "en": "since 2021",
+        "pt": "desde 2021 (início)",
+        "ex": "We have lived here since 2021."
+      },
+      {
+        "en": "haven't finished yet",
+        "pt": "ainda não terminei",
+        "ex": "I haven't finished the report yet."
+      },
+      {
+        "en": "has already sent",
+        "pt": "já enviou",
+        "ex": "Maria has already sent hers."
+      },
+      {
+        "en": "have just arrived",
+        "pt": "acabei de chegar",
+        "ex": "We have just arrived at the hotel."
+      },
+      {
+        "en": "have you ever",
+        "pt": "você já (alguma vez na vida)",
+        "ex": "Have you ever tried Thai food?"
+      },
+      {
+        "en": "never",
+        "pt": "nunca",
+        "ex": "I have never missed a flight."
+      },
+      {
+        "en": "so far",
+        "pt": "até agora",
+        "ex": "We have visited four cities so far."
+      },
+      {
+        "en": "recently",
+        "pt": "recentemente",
+        "ex": "Have you spoken to Lucas recently?"
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "for three years / since 2021",
+        "meaning": "há três anos / desde 2021",
+        "example": "We have lived here for three years, since 2021."
+      },
+      {
+        "expr": "haven't finished yet",
+        "meaning": "ainda não terminei",
+        "example": "I haven't finished the report yet."
+      },
+      {
+        "expr": "has already sent",
+        "meaning": "já enviou",
+        "example": "She has already sent the email."
+      },
+      {
+        "expr": "I have been to... / My last trip was in...",
+        "meaning": "Já fui a... / Minha última viagem foi em...",
+        "example": "I have been to London three times, and my last trip was in 2022."
+      }
+    ],
+    "sentences": [
+      "I have been to London three times in my life, and my last trip was in 2022.",
+      "We have lived in this apartment for three years, since we got married in 2021.",
+      "I haven't finished the report yet, but Maria has already sent hers.",
+      "She has worked at this hospital for five years, since she graduated.",
+      "Have you ever spoken English in a job interview?",
+      "Look at all the progress you have made so far!"
+    ],
+    "grammar": {
+      "title": "Experiências de Vida, FOR vs. SINCE e Already / Yet",
+      "rules": [
+        "Experiências de vida sem data fechada usam HAVE / HAS + 3ª forma: \"I have been to London three times\".",
+        "Se dissermos QUANDO aconteceu (\"in 2022\", \"last year\"), voltamos para o passado simples: \"My last trip was in 2022\".",
+        "FOR mostra o tempo de duração (for three years); SINCE mostra o ponto exato de início (since 2021 / since Monday).",
+        "ALREADY indica que já aconteceu (has already sent); YET no final indica \"ainda não\" (haven't finished yet)."
+      ],
+      "table": {
+        "headers": [
+          "Situação",
+          "Exemplo Certo",
+          "Por quê?"
+        ],
+        "rows": [
+          [
+            "Sem data (experiência)",
+            "I have been to London 3 times.",
+            "Importa a experiência até hoje"
+          ],
+          [
+            "Com data fechada",
+            "My last trip was in 2022.",
+            "\"in 2022\" fechou o tempo no passado"
+          ],
+          [
+            "Duração vs. Início",
+            "for 3 years / since 2021",
+            "FOR = duração · SINCE = partida"
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "I ___ to London three times in my life, and my last trip ___ in 2022.",
+        "a": "have been / was",
+        "opts": [
+          "went / has been",
+          "have gone / has been",
+          "was / was",
+          "have been / was"
+        ]
+      },
+      {
+        "q": "We have lived in this apartment ___ three years, ___ we got married.",
+        "a": "for / since",
+        "opts": [
+          "for / since",
+          "during / since",
+          "since / for",
+          "from / for"
+        ]
+      },
+      {
+        "q": "I ___ the report yet, but Maria ___ hers.",
+        "a": "haven't finished / has already sent",
+        "opts": [
+          "didn't finish / already sent",
+          "haven't finished / has already sent",
+          "wasn't finishing / had sent",
+          "don't finish / is sending"
+        ]
+      },
+      {
+        "q": "___ you ever ___ a presentation in English?",
+        "a": "Have / given",
+        "opts": [
+          "Are / giving",
+          "Did / give",
+          "Have / given",
+          "Were / given"
+        ]
+      },
+      {
+        "q": "She ___ at this company since last March.",
+        "a": "has worked",
+        "opts": [
+          "worked",
+          "works",
+          "is working",
+          "has worked"
+        ]
+      },
+      {
+        "q": "I ___ that movie last weekend with my friends.",
+        "a": "watched",
+        "opts": [
+          "watched",
+          "was watched",
+          "have watched",
+          "am watching"
+        ]
+      }
+    ],
+    "speak": [
+      "I have been to London three times in my life.",
+      "We have lived here for three years, since 2021.",
+      "I haven't finished the report yet, but Maria has already sent hers.",
+      "Have you ever given a presentation in English?",
+      "My English has really improved this year."
+    ]
+  },
+  {
+    "id": 445,
+    "title": "Revisão 6 · Antes do Passado & Ações Contínuas: Had Done & Have Been Doing",
+    "emoji": "🕰️",
+    "verbs": [
+      "To Realise",
+      "To Leave",
+      "To Wait",
+      "To Look"
+    ],
+    "vocab": [
+      {
+        "en": "have been looking",
+        "pt": "venho olhando / estou olhando há...",
+        "ex": "I have been looking at this screen since 8 a.m."
+      },
+      {
+        "en": "have been learning",
+        "pt": "venho aprendendo / estudo há...",
+        "ex": "I have been learning English for two years."
+      },
+      {
+        "en": "had already started",
+        "pt": "já tinha começado",
+        "ex": "The movie had already started when we arrived."
+      },
+      {
+        "en": "had left",
+        "pt": "tinha esquecido / deixado",
+        "ex": "She realised she had left her passport at home."
+      },
+      {
+        "en": "had already closed",
+        "pt": "já tinha fechado",
+        "ex": "The check-in desk had already closed."
+      },
+      {
+        "en": "had been waiting",
+        "pt": "já estávamos esperando (antes de outra coisa)",
+        "ex": "We had been waiting for an hour before the waiter came."
+      },
+      {
+        "en": "must have left",
+        "pt": "deve ter saído (certeza)",
+        "ex": "His car isn't here — he must have left already."
+      },
+      {
+        "en": "am working today",
+        "pt": "estou trabalhando hoje",
+        "ex": "Normally I work from home, but today I am working at the office."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "have been looking since 8 a.m.",
+        "meaning": "estou olhando desde as 8h",
+        "example": "My eyes are tired because I have been looking at this screen since 8 a.m."
+      },
+      {
+        "expr": "realised she had left",
+        "meaning": "percebeu que tinha deixado",
+        "example": "When Sarah got to the station, she realised she had left her passport at home."
+      },
+      {
+        "expr": "had been waiting for an hour",
+        "meaning": "já estávamos esperando há uma hora",
+        "example": "We had been waiting for an hour before the food arrived."
+      },
+      {
+        "expr": "must have left already",
+        "meaning": "já deve ter saído",
+        "example": "Lucas isn't answering — he must have left already."
+      }
+    ],
+    "sentences": [
+      "Normally I work from home on Fridays, but today I am working at the main office.",
+      "My eyes are tired because I have been looking at this computer screen since 8 a.m.",
+      "When Sarah got to the station, she realised she had left her passport at home.",
+      "We had been waiting for over an hour before the waiter finally brought our food.",
+      "By the time we got to the airport, the check-in desk had already closed.",
+      "Lucas isn't answering his phone and his car isn't outside. He must have left already."
+    ],
+    "grammar": {
+      "title": "Ações que Continuam até Agora vs. O que Aconteceu Antes no Passado",
+      "rules": [
+        "Rotina usa \"work\", mas o que está acontecendo hoje/agora usa \"am/is/are + -ING\" (today I am working).",
+        "Ação que começou no passado e continua até agora usa HAVE / HAS BEEN + -ING: \"have been looking since 8 a.m.\".",
+        "O que aconteceu ANTES de outro momento no passado usa HAD + 3ª forma: \"she realised she had left her passport\".",
+        "Para quanto tempo algo já durava antes de outro evento no passado, usamos HAD BEEN + -ING: \"had been waiting\"."
+      ],
+      "table": {
+        "headers": [
+          "Ideia",
+          "Estrutura",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Começou antes e continua agora",
+            "have / has been + -ING",
+            "I have been studying since 8 a.m."
+          ],
+          [
+            "Aconteceu antes de outro passado",
+            "had + 3ª forma",
+            "The movie had already started."
+          ],
+          [
+            "Durava antes de outro passado",
+            "had been + -ING",
+            "We had been waiting for an hour before he arrived."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "Normally I ___ from home on Fridays, but today I ___ at the main office.",
+        "a": "work / am working",
+        "opts": [
+          "work / am working",
+          "am working / work",
+          "worked / have worked",
+          "work / work"
+        ]
+      },
+      {
+        "q": "My eyes are tired because I ___ at this computer screen since 8 a.m.",
+        "a": "have been looking",
+        "opts": [
+          "am looking",
+          "have been looking",
+          "looked",
+          "was looking"
+        ]
+      },
+      {
+        "q": "When Sarah got to the station, she realised she ___ her passport at home.",
+        "a": "had left",
+        "opts": [
+          "has left",
+          "was leaving",
+          "had left",
+          "leaves"
+        ]
+      },
+      {
+        "q": "We ___ for over an hour before the waiter finally brought our food.",
+        "a": "had been waiting",
+        "opts": [
+          "are waiting",
+          "have been waiting",
+          "were waiting",
+          "had been waiting"
+        ]
+      },
+      {
+        "q": "Lucas isn't answering his phone and his car isn't outside. He ___ left already.",
+        "a": "must have",
+        "opts": [
+          "must have",
+          "should",
+          "can have",
+          "must to"
+        ]
+      },
+      {
+        "q": "By the time I arrived on Monday morning, everyone ___ the meeting.",
+        "a": "had already started",
+        "opts": [
+          "has already started",
+          "had already started",
+          "already starts",
+          "was starting"
+        ]
+      }
+    ],
+    "speak": [
+      "Normally I work from home, but today I am working at the office.",
+      "I have been looking at this screen since eight in the morning.",
+      "She realised she had left her passport at home.",
+      "We had been waiting for an hour before the waiter brought our food.",
+      "He must have left already."
+    ]
+  },
+  {
+    "id": 446,
+    "title": "Revisão 7 · Hábitos Antigos & Costume: Used To vs. Be Used To",
+    "emoji": "🔄",
+    "verbs": [
+      "To Use To",
+      "To Switch",
+      "To Wake Up",
+      "To Feel"
+    ],
+    "vocab": [
+      {
+        "en": "used to be",
+        "pt": "costumava ser",
+        "ex": "I used to be very shy when speaking English."
+      },
+      {
+        "en": "used to drink",
+        "pt": "costumava beber",
+        "ex": "I used to drink four cups of coffee a day."
+      },
+      {
+        "en": "used to live",
+        "pt": "costumava morar",
+        "ex": "We used to live in a small town."
+      },
+      {
+        "en": "didn't use to like",
+        "pt": "não costumava gostar",
+        "ex": "I didn't use to like waking up early."
+      },
+      {
+        "en": "did you use to",
+        "pt": "você costumava...?",
+        "ex": "Did you use to play soccer at school?"
+      },
+      {
+        "en": "am used to waking up",
+        "pt": "estou acostumado a acordar",
+        "ex": "Now I am used to waking up at 6 a.m."
+      },
+      {
+        "en": "get used to",
+        "pt": "acostumar-se a",
+        "ex": "It took me a month to get used to the cold weather."
+      },
+      {
+        "en": "anymore",
+        "pt": "não mais",
+        "ex": "I don't drink soda anymore."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "I used to be shy, but now...",
+        "meaning": "Eu costumava ser tímido, mas agora...",
+        "example": "I used to be very shy, but now I feel confident."
+      },
+      {
+        "expr": "I am used to waking up early",
+        "meaning": "Estou acostumado a acordar cedo",
+        "example": "I am used to waking up early on Mondays."
+      },
+      {
+        "expr": "switched to green tea",
+        "meaning": "troquei para chá verde",
+        "example": "Since last month I have switched to green tea."
+      },
+      {
+        "expr": "five years ago",
+        "meaning": "há cinco anos",
+        "example": "Five years ago, I used to feel nervous in public."
+      }
+    ],
+    "sentences": [
+      "I used to be very shy when speaking English, but now I feel much more confident.",
+      "I used to drink four cups of coffee a day, but since last month I have switched to green tea.",
+      "Five years ago, I used to feel nervous when speaking in public.",
+      "She is used to speaking English every day at her new job.",
+      "Did you use to live in another city when you were a child?",
+      "It didn't take long to get used to working from home."
+    ],
+    "grammar": {
+      "title": "Costumava Fazer (Used To) vs. Estar Acostumado (Be Used To + -ING)",
+      "rules": [
+        "USED TO + ação base mostra algo que acontecia no passado e não acontece mais: \"I used to be shy\".",
+        "Nunca use \"use to\" (sem D) em frases afirmativas sobre o passado.",
+        "BE USED TO + -ING significa \"estar acostumado com algo hoje\": \"I am used to waking up early\".",
+        "GET USED TO + -ING significa o processo de se acostumar: \"I got used to driving in São Paulo\"."
+      ],
+      "table": {
+        "headers": [
+          "Forma",
+          "Significado",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "used to + ação base",
+            "costumava fazer (passado)",
+            "I used to live in Curitiba."
+          ],
+          [
+            "am/is/are used to + -ING",
+            "estou acostumado a (hoje)",
+            "I am used to waking up early."
+          ],
+          [
+            "got used to + -ING",
+            "me acostumei a",
+            "She got used to speaking English."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "I ___ be very shy when speaking English, but now I feel much more confident.",
+        "a": "used to",
+        "opts": [
+          "use to",
+          "used to",
+          "would to",
+          "am used to"
+        ]
+      },
+      {
+        "q": "She lives in London now, so she ___ driving on the left side of the road.",
+        "a": "is used to",
+        "opts": [
+          "used to",
+          "use to",
+          "is used to",
+          "would"
+        ]
+      },
+      {
+        "q": "Five years ago, I ___ drink four cups of coffee every morning.",
+        "a": "used to",
+        "opts": [
+          "am used to",
+          "use to",
+          "was used",
+          "used to"
+        ]
+      },
+      {
+        "q": "___ you ___ play video games when you were a kid?",
+        "a": "Did / use to",
+        "opts": [
+          "Did / use to",
+          "Were / used to",
+          "Do / use to",
+          "Have / used to"
+        ]
+      },
+      {
+        "q": "At first it was hard, but I quickly got used ___ in English at meetings.",
+        "a": "to speaking",
+        "opts": [
+          "to speak",
+          "to speaking",
+          "speaking",
+          "for speaking"
+        ]
+      },
+      {
+        "q": "He ___ like vegetables, but now he eats salad every day.",
+        "a": "didn't use to",
+        "opts": [
+          "doesn't use to",
+          "wasn't used to",
+          "didn't use to",
+          "wouldn't to"
+        ]
+      }
+    ],
+    "speak": [
+      "I used to be very shy when speaking English.",
+      "Five years ago, I used to feel nervous in public.",
+      "I used to drink four cups of coffee a day.",
+      "Now I am used to waking up early.",
+      "She got used to speaking English at work."
+    ]
+  },
+  {
+    "id": 447,
+    "title": "Revisão 8 · Planos e Futuro: Will, Going To & Will Be Doing",
+    "emoji": "🔮",
+    "verbs": [
+      "To Answer",
+      "To Call",
+      "To Fly",
+      "To Complete"
+    ],
+    "vocab": [
+      {
+        "en": "will answer",
+        "pt": "vou atender (decisão na hora)",
+        "ex": "The phone is ringing! Don't worry, I will answer it."
+      },
+      {
+        "en": "are going to call",
+        "pt": "vai ligar (plano já decidido)",
+        "ex": "I know you are going to call a client in five minutes."
+      },
+      {
+        "en": "will be flying",
+        "pt": "estarei voando (em andamento no futuro)",
+        "ex": "At 8 p.m. tonight, I will be flying to Buenos Aires."
+      },
+      {
+        "en": "will have completed",
+        "pt": "já terei concluído (meta até data futura)",
+        "ex": "By this time next year, I will have completed my B2 course."
+      },
+      {
+        "en": "as soon as",
+        "pt": "assim que",
+        "ex": "As soon as she gets back, she will send you a message."
+      },
+      {
+        "en": "by this time next year",
+        "pt": "até esta época no ano que vem",
+        "ex": "By this time next year, we will have moved."
+      },
+      {
+        "en": "tonight at 8 p.m.",
+        "pt": "hoje à noite às 20h",
+        "ex": "Don't call me tonight at 8 p.m."
+      },
+      {
+        "en": "gets back",
+        "pt": "voltar (depois de as soon as / when)",
+        "ex": "Wait here until she gets back."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "Don't worry, I will...",
+        "meaning": "Não se preocupe, eu vou... (na hora)",
+        "example": "Don't worry, I will answer the phone!"
+      },
+      {
+        "expr": "I am going to...",
+        "meaning": "Eu vou... (plano já combinado)",
+        "example": "I am going to start my new project on Monday."
+      },
+      {
+        "expr": "I will be flying at that time",
+        "meaning": "Estarei voando nesse horário",
+        "example": "At 8 p.m. tonight, I will be flying to Buenos Aires."
+      },
+      {
+        "expr": "By next year, I will have...",
+        "meaning": "Até o ano que vem, já terei...",
+        "example": "By next year, I will have completed my certification."
+      }
+    ],
+    "sentences": [
+      "\"The phone is ringing!\" — \"Don't worry, I will answer it!\"",
+      "I know you are going to call a client in five minutes.",
+      "Don't call me at 8 p.m. tonight because I will be flying to Buenos Aires at that exact time.",
+      "As soon as she gets back from the airport tonight, she will send you a message.",
+      "By this time next year, I will have completed my B2 certification.",
+      "What are you going to do after you finish the exam?"
+    ],
+    "grammar": {
+      "title": "As 4 Formas de Falar do Futuro na Prática",
+      "rules": [
+        "WILL é usado para decisões tomadas na hora em que falamos e promessas: \"Don't worry, I will answer it!\".",
+        "BE GOING TO é usado para planos e intenções já decididos antes: \"I am going to call a client\".",
+        "WILL BE + -ING mostra o que estará em andamento num horário exato do futuro: \"At 8 p.m., I will be flying\".",
+        "WILL HAVE + 3ª forma mostra o que já estará concluído até uma data futura (\"By next year, I will have completed\"), e após \"as soon as / when\" usamos o presente (\"As soon as she gets back, she will send\")."
+      ],
+      "table": {
+        "headers": [
+          "Situação Futura",
+          "Forma",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Decisão na hora",
+            "will + ação",
+            "I will answer the phone!"
+          ],
+          [
+            "Plano já combinado",
+            "am/is/are going to + ação",
+            "She is going to travel on Friday."
+          ],
+          [
+            "Em andamento no futuro",
+            "will be + -ING",
+            "I will be flying at 8 p.m. tonight."
+          ],
+          [
+            "Concluído até data futura",
+            "will have + 3ª forma",
+            "By 2027, I will have graduated."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "\"The phone is ringing!\" — \"Don't worry, I ___ it! I know you ___ a client in five minutes.\"",
+        "a": "will answer / are going to call",
+        "opts": [
+          "am going to answer / will call",
+          "answer / call",
+          "will answer / are going to call",
+          "answered / were calling"
+        ]
+      },
+      {
+        "q": "Don't call me at 8 p.m. tonight because I ___ to Buenos Aires at that exact time.",
+        "a": "will be flying",
+        "opts": [
+          "will fly",
+          "flew",
+          "have flown",
+          "will be flying"
+        ]
+      },
+      {
+        "q": "As soon as she ___ from the airport tonight, she ___ you a message.",
+        "a": "gets back / will send",
+        "opts": [
+          "gets back / will send",
+          "got back / would send",
+          "is getting back / sent",
+          "will get back / sends"
+        ]
+      },
+      {
+        "q": "By this time next year, I ___ my B2 certification.",
+        "a": "will have completed",
+        "opts": [
+          "will complete",
+          "will have completed",
+          "have completed",
+          "completed"
+        ]
+      },
+      {
+        "q": "Look at those dark clouds! It ___ rain in a few minutes.",
+        "a": "is going to",
+        "opts": [
+          "will have",
+          "was going to",
+          "is going to",
+          "used to"
+        ]
+      },
+      {
+        "q": "When the meeting ___ tomorrow morning, I ___ you the summary.",
+        "a": "ends / will email",
+        "opts": [
+          "will end / email",
+          "ended / would email",
+          "is ending / emailed",
+          "ends / will email"
+        ]
+      }
+    ],
+    "speak": [
+      "Don't worry, I will answer the phone!",
+      "At eight tonight, I will be flying to Buenos Aires.",
+      "As soon as she gets back, she will send you a message.",
+      "By this time next year, I will have completed my certification.",
+      "I am going to review my notes before Monday."
+    ]
+  },
+  {
+    "id": 448,
+    "title": "Revisão 9 · Situações Imaginárias & Desejos: If & I Wish",
+    "emoji": "💭",
+    "verbs": [
+      "To Wish",
+      "To Practise",
+      "To Invite",
+      "To Start"
+    ],
+    "vocab": [
+      {
+        "en": "I wish I had practised",
+        "pt": "Eu gostaria de ter praticado",
+        "ex": "I failed the test — I wish I had practised harder!"
+      },
+      {
+        "en": "I wish I had started",
+        "pt": "Eu gostaria de ter começado",
+        "ex": "I really wish I had started conversation earlier."
+      },
+      {
+        "en": "If I knew I couldn't fail",
+        "pt": "Se eu soubesse que não poderia falhar",
+        "ex": "If I knew I couldn't fail, I would start my own business."
+      },
+      {
+        "en": "I would move abroad",
+        "pt": "Eu me mudaria para o exterior",
+        "ex": "If I had the chance, I would move abroad."
+      },
+      {
+        "en": "If I had known",
+        "pt": "Se eu soubesse (no passado)",
+        "ex": "If I had known you were in town, I would have invited you!"
+      },
+      {
+        "en": "would have invited",
+        "pt": "teria convidado",
+        "ex": "We would have invited you for coffee."
+      },
+      {
+        "en": "would have learned",
+        "pt": "teria aprendido",
+        "ex": "If I hadn't been afraid, I would have learned faster."
+      },
+      {
+        "en": "aren't you?",
+        "pt": "não é? / não vai?",
+        "ex": "You're coming on Saturday night, aren't you?"
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "I really wish I had...",
+        "meaning": "Eu realmente gostaria de ter...",
+        "example": "I really wish I had started practising earlier!"
+      },
+      {
+        "expr": "If I knew..., I would...",
+        "meaning": "Se eu soubesse (hoje)..., eu faria...",
+        "example": "If I knew I couldn't fail, I would open a company."
+      },
+      {
+        "expr": "If I had known..., I would have...",
+        "meaning": "Se eu tivesse sabido (no passado)..., eu teria feito...",
+        "example": "If I had known you were here, I would have called you."
+      },
+      {
+        "expr": "..., haven't you? / ..., aren't you?",
+        "meaning": "Confirmação no fim da frase",
+        "example": "You have finished all the lessons, haven't you?"
+      }
+    ],
+    "sentences": [
+      "I failed the interview because I didn't prepare. I really wish I had practised harder!",
+      "If I knew I couldn't fail, I would start my own international business.",
+      "If I had known you were in town last weekend, I would have invited you for coffee!",
+      "If I hadn't been so afraid of making mistakes, I would have learned much faster.",
+      "You have already finished all 20 lessons of the course, haven't you?",
+      "You're coming to the farewell dinner on Saturday night, aren't you?"
+    ],
+    "grammar": {
+      "title": "Desejos (Wish), Situações Imaginárias (If) e Confirmações",
+      "rules": [
+        "Para arrependimentos sobre o passado, usamos WISH + HAD + 3ª forma: \"I wish I had practised harder\".",
+        "Para imaginar algo hoje: \"If I knew / If I had..., I would + ação\" (If I knew I couldn't fail, I would start...).",
+        "Para imaginar um passado diferente: \"If I had known..., I would have + 3ª forma\" (I would have invited you).",
+        "Para confirmar no final da frase, espelhamos o auxiliar: \"You have finished..., haven't you?\" / \"You're coming..., aren't you?\"."
+      ],
+      "table": {
+        "headers": [
+          "Situação",
+          "Padrão",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Arrependimento do passado",
+            "wish + had + 3ª forma",
+            "I wish I had started earlier."
+          ],
+          [
+            "Hipótese no presente/futuro",
+            "If + passado -> would + ação",
+            "If I knew, I would tell you."
+          ],
+          [
+            "Hipótese sobre o passado",
+            "If + had + 3ª -> would have + 3ª",
+            "If I had known, I would have invited you."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "I failed the interview because I didn't prepare. I really wish I ___ harder!",
+        "a": "had practised",
+        "opts": [
+          "practised",
+          "have practised",
+          "would practise",
+          "had practised"
+        ]
+      },
+      {
+        "q": "If I ___ you were in town last weekend, I ___ you for coffee!",
+        "a": "had known / would have invited",
+        "opts": [
+          "had known / would have invited",
+          "know / will invite",
+          "knew / would invite",
+          "have known / invited"
+        ]
+      },
+      {
+        "q": "If I knew I couldn't fail, I ___ my own international business.",
+        "a": "would start",
+        "opts": [
+          "will start",
+          "would start",
+          "would have started",
+          "started"
+        ]
+      },
+      {
+        "q": "You have already finished all 20 lessons of the Intermediate course, ___?",
+        "a": "haven't you",
+        "opts": [
+          "aren't you",
+          "didn't you",
+          "haven't you",
+          "don't you"
+        ]
+      },
+      {
+        "q": "You're coming to the farewell dinner on Saturday night, ___?",
+        "a": "aren't you",
+        "opts": [
+          "don't you",
+          "won't you",
+          "isn't it",
+          "aren't you"
+        ]
+      },
+      {
+        "q": "If I hadn't been so afraid of making mistakes, I ___ much faster.",
+        "a": "would have learned",
+        "opts": [
+          "would have learned",
+          "learned",
+          "will learn",
+          "had learned"
+        ]
+      }
+    ],
+    "speak": [
+      "I really wish I had practised harder!",
+      "If I knew I couldn't fail, I would start my own business.",
+      "If I had known you were in town, I would have invited you.",
+      "You have already finished all twenty lessons, haven't you?",
+      "You're coming on Saturday night, aren't you?"
+    ]
+  },
+  {
+    "id": 449,
+    "title": "Revisão 10 · Grande Simulado Geral B1 → B2 (Aquecimento Final)",
+    "emoji": "🏆",
+    "verbs": [
+      "To Master",
+      "To Succeed",
+      "To Complete",
+      "To Celebrate"
+    ],
+    "vocab": [
+      {
+        "en": "on Monday morning",
+        "pt": "na segunda de manhã",
+        "ex": "By the time I arrived on Monday morning, everyone had started."
+      },
+      {
+        "en": "in the morning / at night",
+        "pt": "de manhã / à noite",
+        "ex": "She studies in the morning and rests at night."
+      },
+      {
+        "en": "by accident / on purpose",
+        "pt": "sem querer / de propósito",
+        "ex": "It happened by accident, not on purpose."
+      },
+      {
+        "en": "look forward to practising",
+        "pt": "ansioso para praticar",
+        "ex": "I look forward to practising every day."
+      },
+      {
+        "en": "depends on",
+        "pt": "depende de",
+        "ex": "Everything depends on your preparation."
+      },
+      {
+        "en": "for two years / since 2022",
+        "pt": "há dois anos / desde 2022",
+        "ex": "I have been learning for two years, since 2022."
+      },
+      {
+        "en": "was cooking / went out",
+        "pt": "estava cozinhando / apagou",
+        "ex": "While I was cooking, the lights went out."
+      },
+      {
+        "en": "had already closed",
+        "pt": "já tinha fechado",
+        "ex": "By the time we got there, the desk had already closed."
+      },
+      {
+        "en": "will be flying",
+        "pt": "estarei voando",
+        "ex": "At 8 p.m. tonight, I will be flying."
+      },
+      {
+        "en": "will have completed",
+        "pt": "já terei concluído",
+        "ex": "By next year, I will have completed B2."
+      },
+      {
+        "en": "had known / would have invited",
+        "pt": "tivesse sabido / teria convidado",
+        "ex": "If I had known, I would have invited you."
+      },
+      {
+        "en": "wish I had started",
+        "pt": "gostaria de ter começado",
+        "ex": "I wish I had started earlier."
+      }
+    ],
+    "expressions": [
+      {
+        "expr": "By the time I arrived on Monday morning...",
+        "meaning": "Quando cheguei na segunda de manhã...",
+        "example": "By the time I arrived on Monday morning, everyone had already started."
+      },
+      {
+        "expr": "I have been learning English for two years",
+        "meaning": "Estudo inglês há dois anos",
+        "example": "I have been learning English for two years, and I feel confident now."
+      },
+      {
+        "expr": "As soon as she gets back, she will send...",
+        "meaning": "Assim que ela voltar, ela enviará...",
+        "example": "As soon as she gets back, she will send you a message."
+      },
+      {
+        "expr": "Ready for the Final Exam!",
+        "meaning": "Pronto(a) para a Prova Final!",
+        "example": "I reviewed all 10 units and I am ready for the Final Exam!"
+      }
+    ],
+    "sentences": [
+      "By the time I arrived at the meeting on Monday morning, everyone had already started.",
+      "I have been learning English for two years, and I feel much more confident now.",
+      "While I was cooking dinner last night, the lights suddenly went out.",
+      "As soon as she gets back from the airport tonight, she will send you a message.",
+      "If I had known you were in town last weekend, I would have invited you for coffee!",
+      "I am really looking forward to practising my English every single day."
+    ],
+    "grammar": {
+      "title": "Checklist Final antes da Prova de 30 Minutos",
+      "rules": [
+        "Dias da semana pedem ON (on Monday); partes do dia pedem IN THE (in the morning), exceto AT night; horas pedem AT (at 7 p.m.).",
+        "Lembre dos pares certeiros: by accident vs. on purpose · on time vs. by the time · for (duração) vs. since (início).",
+        "Look forward to pede ação com -ING (to seeing, to practising), e depend pede sempre ON.",
+        "Nos tempos verbais, observe as pistas de tempo da frase: last summer (did/went), while (was cooking), since 8 a.m. (have been looking), before/by the time no passado (had left / had been waiting), at 8 p.m. tonight (will be flying), by next year (will have completed)."
+      ],
+      "table": {
+        "headers": [
+          "Pista na Frase",
+          "Resposta Certa",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Dia da semana (Monday, Friday)",
+            "ON",
+            "on Monday morning / on Friday night"
+          ],
+          [
+            "While + passado",
+            "was/were + -ING / passado",
+            "While I was cooking, the lights went out."
+          ],
+          [
+            "Since 8 a.m. / for 2 years (até hoje)",
+            "have/has been + -ING",
+            "I have been studying since 8 a.m."
+          ],
+          [
+            "By the time + passado",
+            "had + 3ª forma",
+            "By the time we arrived, it had started."
+          ]
+        ]
+      }
+    },
+    "quiz": [
+      {
+        "q": "By the time I arrived at the meeting ___ morning, everyone ___ started.",
+        "a": "on Monday / had already",
+        "opts": [
+          "on Monday / had already",
+          "in Monday / has already",
+          "at Monday / already",
+          "on the Monday / was"
+        ]
+      },
+      {
+        "q": "I ___ English ___ two years, and I feel much more confident now.",
+        "a": "have been learning / for",
+        "opts": [
+          "am learning / since",
+          "have been learning / for",
+          "learned / for",
+          "was learning / during"
+        ]
+      },
+      {
+        "q": "Oops! I deleted your file ___ — I swear I didn't do it ___!",
+        "a": "by accident / on purpose",
+        "opts": [
+          "on accident / by purpose",
+          "in accident / on purpose",
+          "by accident / on purpose",
+          "by accident / for purpose"
+        ]
+      },
+      {
+        "q": "We are really looking forward ___ you at the conference, and everything depends ___ the flight schedule.",
+        "a": "to seeing / on",
+        "opts": [
+          "to seeing / of",
+          "to see / of",
+          "for seeing / on",
+          "to seeing / on"
+        ]
+      },
+      {
+        "q": "As soon as she ___ tonight, she ___ you the final numbers.",
+        "a": "gets back / will send",
+        "opts": [
+          "gets back / will send",
+          "will get back / sends",
+          "got back / would send",
+          "is getting back / sent"
+        ]
+      },
+      {
+        "q": "If I ___ you needed help last week, I ___ you right away!",
+        "a": "had known / would have called",
+        "opts": [
+          "knew / would call",
+          "had known / would have called",
+          "know / will call",
+          "have known / called"
+        ]
+      }
+    ],
+    "speak": [
+      "By the time I arrived on Monday morning, everyone had already started.",
+      "I have been learning English for two years, and I feel confident now.",
+      "As soon as she gets back tonight, she will send you a message.",
+      "If I had known you were in town, I would have invited you for coffee.",
+      "I am really looking forward to practising my English every single day."
     ]
   }
 ];

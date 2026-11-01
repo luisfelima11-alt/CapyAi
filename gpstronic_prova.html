@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Prova Final — GPS Tronic (Inglês Técnico Agrícola): avaliação de 30 minutos com 40 questões de expressões de oficina, preposições, diagnóstico, tempos de ação, Listening e Speaking.">
+    <title>Capy.ai — Prova Final GPS Tronic (30 Minutos)</title>
+    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0fdf4;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .blank-pill {
+            display: inline-block;
+            min-width: 110px;
+            padding: 2px 12px;
+            margin: 0 4px;
+            border-bottom: 3px dashed #059669;
+            background: #ecfdf5;
+            color: #065f46;
+            font-weight: 800;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .blank-pill.filled {
+            border-bottom-style: solid;
+            background: #d1fae5;
+            color: #064e3b;
+        }
+
+        .opt-card {
+            transition: all 0.18s ease;
+        }
+
+        .opt-card:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .opt-card.selected {
+            border-color: #059669;
+            background-color: #ecfdf5;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .q-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .q-dot.active {
+            outline: 3px solid #059669;
+            outline-offset: 2px;
+        }
+
+        @keyframes pulse-urgent {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .timer-urgent {
+            animation: pulse-urgent 1s infinite;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Top Exam Header -->
+    <header class="bg-emerald-950 text-white sticky top-0 z-40 shadow-lg border-b border-emerald-800">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <a href="classes_gpstronic.html"
+                    class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+                    title="Voltar para Central GPS Tronic">
+                    <i class="fa-solid fa-arrow-left text-emerald-300"></i>
+                </a>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="text-[11px] font-extrabold uppercase tracking-widest bg-emerald-500/30 text-emerald-200 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
+                            <i class="fa-solid fa-satellite-dish mr-1"></i> GPS Tronic Final Exam
+                        </span>
+                        <span class="text-xs text-emerald-300 hidden sm:inline">• 40 Questões • Duração: 30 min</span>
+                    </div>
+                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight">Prova Final — GPS Tronic (Inglês Técnico)</h1>
+                </div>
+            </div>
+
+            <!-- Live Timer + Finish Button -->
+            <div class="flex items-center gap-3">
+                <div id="timer-box"
+                    class="flex items-center gap-2.5 bg-emerald-900/90 border border-emerald-700 px-4 py-2 rounded-2xl shadow-inner">
+                    <i id="timer-icon" class="fa-regular fa-clock text-emerald-300 text-lg"></i>
+                    <div class="leading-none">
+                        <p class="text-[10px] uppercase tracking-wider text-emerald-300 font-bold">Tempo Restante</p>
+                        <p id="timer-display" class="text-lg sm:text-xl font-extrabold font-mono tracking-wider">30:00</p>
+                    </div>
+                </div>
+                <button id="pause-btn" onclick="togglePauseTimer()"
+                    class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition hidden sm:inline-flex items-center gap-1.5"
+                    title="Pausar/Retomar cronômetro">
+                    <i class="fa-solid fa-pause"></i> <span>Pausar</span>
+                </button>
+                <button id="finish-top-btn" onclick="confirmSubmitExam()"
+                    class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-extrabold shadow-md transition hidden items-center gap-2">
+                    <i class="fa-solid fa-flag-checkered"></i> Finalizar Prova
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="w-full bg-emerald-900 h-1.5">
+            <div id="exam-progress-bar" class="bg-gradient-to-r from-emerald-400 via-teal-400 to-lime-400 h-1.5 transition-all duration-300"
+                style="width: 0%"></div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8">
+
+        <!-- START SCREEN -->
+        <section id="start-screen" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="bg-gradient-to-br from-emerald-800 via-emerald-900 to-teal-950 p-8 sm:p-10 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-white/10 text-[150px] pointer-events-none">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                </div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-bold uppercase tracking-wider mb-4">
+                    <i class="fa-solid fa-award text-amber-300"></i> Avaliação Oficial • GPS Tronic
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold mb-3 leading-tight">Prova Final — GPS Tronic (Bancada &amp; Campo)</h2>
+                <p class="text-emerald-100 text-sm sm:text-base max-w-2xl leading-relaxed">
+                    Esta avaliação testa seu domínio de inglês técnico para agricultura de precisão: completar frases com a
+                    <strong>palavra, preposição ou expressão técnica correta</strong>, diagnóstico de cabos/sensores, ações no passado/presente/futuro,
+                    <strong>Listening de suporte técnico</strong> e <strong>Speaking no rádio/bancada</strong>.
+                </p>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6">
+                <!-- Exam Breakdown Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">1. Preposições &amp; Expressões de Oficina (12 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Complete frases com <em>on the bench, in the field, at the connector, on Monday, by hand, out of range</em> e mais.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">2. Diagnóstico, Passado, Presente &amp; Futuro (16 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Relatórios de reparo, ações concluídas (<em>has updated, had blown</em>), testes em andamento e previsão de reparo.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">3. Listening — Áudio de Campo &amp; Suporte (6 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Ouça o relato do operador ou engenheiro e complete ou identifique a falha exata no sistema GPS/ISOBUS.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-100 flex items-start gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 font-bold">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">4. Speaking — Pronúncia Técnica (6 questões)</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">Complete a frase técnica e fale em voz alta no microfone (ou valide no modo silencioso se estiver sem microfone).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules bar -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-emerald-600 text-base"></i>
+                        <span><strong>30 minutos</strong> de tempo total sugerido (45s por questão)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-check-double text-emerald-600 text-base"></i>
+                        <span>Nota de aprovação: <strong>70% (28/40 acertos)</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-Left-right text-amber-600 text-base"></i>
+                        <span>Navegação livre entre as 40 questões</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    <div class="flex flex-wrap gap-2">
+                        <a href="mini_prova.html?curso=gpstronic&bloco=1"
+                            class="text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-bolt"></i> Mini-Prova 1 (Aulas 01–10)
+                        </a>
+                        <a href="mini_prova.html?curso=gpstronic&bloco=2"
+                            class="text-xs font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-bolt"></i> Mini-Prova 2 (Aulas 11–18)
+                        </a>
+                    </div>
+                    <button onclick="startExam()"
+                        class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-play"></i> Começar Prova GPS Tronic (30 min)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXAM WORKSPACE -->
+        <section id="exam-screen" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- Left / Main Question Area -->
+            <div class="lg:col-span-8 space-y-5">
+                <!-- Category & Question Header Card -->
+                <div class="bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                        <span id="q-section-badge"
+                            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+                            <i class="fa-solid fa-puzzle-piece"></i> Expressões &amp; Preposições
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span id="q-counter" class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Questão 1 de 40</span>
+                            <button onclick="toggleFlagCurrent()" id="flag-btn"
+                                class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-300 text-xs font-bold transition flex items-center gap-1"
+                                title="Marcar para revisar depois">
+                                <i class="fa-regular fa-bookmark"></i> <span>Revisar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Context / Hint Tag -->
+                    <p id="q-instruction" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                        Complete a frase com a alternativa correta:
+                    </p>
+
+                    <!-- LISTENING AUDIO BOX -->
+                    <div id="listening-box" class="hidden mb-6 p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3.5">
+                                <button onclick="playCurrentAudio(1)"
+                                    class="w-14 h-14 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white shadow-md flex items-center justify-center text-xl transition shrink-0">
+                                    <i class="fa-solid fa-volume-high"></i>
+                                </button>
+                                <div>
+                                    <p class="text-xs font-extrabold uppercase tracking-wider text-amber-800">Áudio Técnico — Rádio / Suporte</p>
+                                    <p class="text-xs text-amber-700 mt-0.5">Ouça o relato técnico e escolha a alternativa que completa ou responde à chamada.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="playCurrentAudio(1)"
+                                    class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+                                    <i class="fa-solid fa-play mr-1"></i> Normal (1x)
+                                </button>
+                                <button onclick="playCurrentAudio(0.78)"
+                                    class="px-3 py-2 rounded-xl bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+                                    <i class="fa-solid fa-tortoise mr-1"></i> Lento (0.8x)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Sentence -->
+                    <div id="q-sentence" class="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed mb-2">
+                    </div>
+                    <p id="q-translation" class="text-xs sm:text-sm text-slate-500 italic mb-6"></p>
+
+                    <!-- Options Grid -->
+                    <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    </div>
+
+                    <!-- SPEAKINGPRACTICE BOX -->
+                    <div id="speaking-box" class="hidden mt-6 p-5 rounded-2xl bg-blue-50/90 border border-blue-200 space-y-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-800 bg-blue-200/70 px-2.5 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-microphone mr-1"></i> Etapa de Speaking Técnico
+                                </span>
+                                <p class="text-xs text-blue-900 mt-1.5">
+                                    1º Escolha a opção acima que completa a frase técnica.<br>
+                                    2º Ouça o modelo e pronuncie a frase completa em voz alta para gravar.
+                                </p>
+                            </div>
+                            <button onclick="playSpeakingTarget()"
+                                class="px-3 py-2 rounded-xl bg-white hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold shrink-0 transition">
+                                <i class="fa-solid fa-volume-high mr-1"></i> Ouvir Frase
+                            </button>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-white border border-blue-200">
+                            <p class="text-[11px] font-bold uppercase text-slate-400">Frase Alvo para Pronunciar:</p>
+                            <p id="speaking-target-text" class="text-sm sm:text-base font-extrabold text-slate-800 mt-0.5"></p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button id="mic-record-btn" onclick="startSpeechRecognition()"
+                                class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-microphone"></i> Gravar Minha Voz
+                            </button>
+                            <button onclick="markSpeakingSelfVerified()"
+                                class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold transition">
+                                <i class="fa-solid fa-check text-emerald-600 mr-1"></i> Pronunciei em voz alta (Sem microfone)
+                            </button>
+                            <span id="speaking-status" class="text-xs font-bold text-slate-600"></span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <button id="prev-btn" onclick="prevQuestion()"
+                            class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold transition flex items-center gap-2 disabled:opacity-40">
+                            <i class="fa-solid fa-arrow-left"></i> Anterior
+                        </button>
+
+                        <span id="answered-count-label" class="text-xs font-bold text-slate-500">0 / 40 respondidas</span>
+
+                        <button id="next-btn" onclick="nextQuestion()"
+                            class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2">
+                            <span>Próxima</span> <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right / Question Map Sidebar -->
+            <aside class="lg:col-span-4 bg-white rounded-3xl shadow-md border border-slate-200 p-5 sticky top-24 space-y-5">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-extrabold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-emerald-600"></i> Mapa da Prova (40)
+                    </h3>
+                    <span id="sidebar-pct" class="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">0% concluído</span>
+                </div>
+
+                <!-- Legend -->
+                <div class="flex flex-wrap gap-3 text-[11px] text-slate-500 border-b border-slate-100 pb-3">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Respondida</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Em branco</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400 inline-block"></span> Revisar</span>
+                </div>
+
+                <!-- 40 Question Dots -->
+                <div id="question-map-grid" class="grid grid-cols-8 gap-2">
+                </div>
+
+                <!-- Section Filter Shortcuts -->
+                <div class="space-y-1.5 pt-2 border-t border-slate-100 text-xs">
+                    <p class="font-bold text-slate-400 uppercase text-[10px] tracking-wider mb-1">Ir direto para seção:</p>
+                    <button onclick="goToQuestion(0)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-puzzle-piece text-emerald-600 w-4"></i> Preposições &amp; Oficina</span>
+                        <span class="text-slate-400">01–12</span>
+                    </button>
+                    <button onclick="goToQuestion(12)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-microchip text-teal-600 w-4"></i> Diagnóstico &amp; Tempos de Ação</span>
+                        <span class="text-slate-400">13–28</span>
+                    </button>
+                    <button onclick="goToQuestion(28)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-headphones text-amber-500 w-4"></i> Listening Técnico</span>
+                        <span class="text-slate-400">29–34</span>
+                    </button>
+                    <button onclick="goToQuestion(34)" class="w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-50 font-semibold text-slate-700 flex justify-between">
+                        <span><i class="fa-solid fa-microphone text-blue-600 w-4"></i> Speaking Técnico</span>
+                        <span class="text-slate-400">35–40</span>
+                    </button>
+                </div>
+
+                <button onclick="confirmSubmitExam()"
+                    class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-flag-checkered"></i> Entregar e Ver Nota
+                </button>
+            </aside>
+        </section>
+
+        <!-- RESULTS SCREEN -->
+        <section id="results-screen" class="hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+                <div id="result-banner" class="bg-gradient-to-r from-emerald-800 to-teal-900 p-8 text-white text-center">
+                    <div id="result-badge-icon" class="w-20 h-20 rounded-3xl bg-white/15 mx-auto flex items-center justify-center text-4xl mb-4">
+                        🏆
+                    </div>
+                    <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold">Resultado da Prova Final — GPS Tronic</h2>
+                    <p id="result-subtitle" class="text-emerald-100 text-sm mt-1"></p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto mt-6">
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-emerald-200 font-bold">Nota Final</p>
+                            <p id="res-score-pct" class="text-2xl font-extrabold mt-0.5">0%</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-emerald-200 font-bold">Acertos</p>
+                            <p id="res-score-raw" class="text-2xl font-extrabold mt-0.5">0 / 40</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-emerald-200 font-bold">Tempo Gasto</p>
+                            <p id="res-time-spent" class="text-2xl font-extrabold mt-0.5">00:00</p>
+                        </div>
+                        <div class="bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                            <p class="text-[11px] uppercase tracking-wider text-emerald-200 font-bold">Speaking</p>
+                            <p id="res-speaking-done" class="text-2xl font-extrabold mt-0.5">0 / 6</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown by Section -->
+                <div class="p-6 sm:p-8 space-y-6">
+                    <h3 class="font-extrabold text-slate-800 text-base">Desempenho por Habilidade</h3>
+                    <div id="section-breakdown" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                        <a href="classes_gpstronic.html"
+                            class="px-5 py-3 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar para Central GPS Tronic
+                        </a>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="filterReview('wrong')"
+                                class="px-4 py-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-circle-xmark mr-1"></i> Ver Apenas Erros
+                            </button>
+                            <button onclick="filterReview('all')"
+                                class="px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition">
+                                <i class="fa-solid fa-list-check mr-1"></i> Ver Todas as 40
+                            </button>
+                            <button onclick="restartExam()"
+                                class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Refazer Prova
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Answer Key / Review List -->
+            <div class="bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-8 space-y-4">
+                <h3 class="font-extrabold text-slate-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart text-emerald-600"></i> Gabarito Comentado da Prova
+                </h3>
+                <div id="review-list" class="space-y-4"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // ============================================================================
+        // 40 QUESTÕES DA PROVA FINAL — GPS TRONIC (30 MINUTOS)
+        // Sem palavras proibidas, com gabaritos estáticos distribuídos (0, 1, 2, 3)
+        // e embaralhamento Fisher-Yates com trava anti-repetição de letra.
+        // ============================================================================
+        const EXAM_QUESTIONS = [
+            // --- PARTE 1: PREPOSIÇÕES & EXPRESSÕES TÉCNICAS DE OFICINA (1 a 12) ---
+            {
+                id: 1,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Place the autopilot controller ____ the test bench before connecting the power supply.",
+                translation: "Coloque o controlador do piloto automático na bancada de teste antes de conectar a fonte de alimentação.",
+                options: ["on", "in", "at", "into"],
+                ans: 0,
+                explanation: "Usamos 'on the test bench' (sobre a superfície da bancada de teste)."
+            },
+            {
+                id: 2,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The technician found green corrosion ____ Pin 7 of the ISOBUS harness.",
+                translation: "O técnico encontrou corrosão verde no Pino 7 do chicote ISOBUS.",
+                options: ["in", "on", "to", "between"],
+                ans: 1,
+                explanation: "Para contato superficial em um pino ou terminal, usamos 'on Pin 7'."
+            },
+            {
+                id: 3,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The sprayer lost RTK correction while working ____ the field yesterday afternoon.",
+                translation: "O pulverizador perdeu a correção RTK enquanto trabalhava no campo ontem à tarde.",
+                options: ["on", "at", "in", "over"],
+                ans: 2,
+                explanation: "Em inglês agrícola, dizemos 'in the field' (no campo/na lavoura)."
+            },
+            {
+                id: 4,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Our new batch of GNSS receivers will arrive ____ Monday morning.",
+                translation: "Nosso novo lote de receptores GNSS chegará na segunda-feira de manhã.",
+                options: ["in", "at", "by", "on"],
+                ans: 3,
+                explanation: "Para dias da semana (Monday) ou partes de um dia específico (Monday morning), usamos sempre 'on'."
+            },
+            {
+                id: 5,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Never pull the harness ____ the wires; always grip the connector body.",
+                translation: "Nunca puxe o chicote pelos fios; sempre segure pelo corpo do conector.",
+                options: ["by", "with", "on", "for"],
+                ans: 0,
+                explanation: "A expressão correta para indicar por onde algo é segurado ou puxado é 'pull by the wires'."
+            },
+            {
+                id: 6,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The CAN bus resistance must be ____ 58 and 62 ohms when both terminators are connected.",
+                translation: "A resistência da rede CAN deve estar entre 58 e 62 ohms quando ambos os terminadores estão conectados.",
+                options: ["among", "between", "inside", "under"],
+                ans: 1,
+                explanation: "Para faixa entre dois limites numéricos (58 e 62 ohms), usamos 'between ... and ...'."
+            },
+            {
+                id: 7,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Tighten the antenna mounting bracket ____ hand first so you don't strip the threads.",
+                translation: "Aperte o suporte de fixação da antena manualmente primeiro para não espanar a rosca.",
+                options: ["with", "in", "by", "on"],
+                ans: 2,
+                explanation: "A expressão fixa para 'manualmente / com a mão' é 'by hand'."
+            },
+            {
+                id: 8,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The steering valve is completely ____ of calibration after the hydraulic repair.",
+                translation: "A válvula de direção está completamente fora de calibração após o reparo hidráulico.",
+                options: ["off", "away", "down", "out"],
+                ans: 3,
+                explanation: "A expressão técnica para 'fora de calibração' é 'out of calibration' (assim como 'out of range')."
+            },
+            {
+                id: 9,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Set your digital multimeter ____ DC voltage before probing the battery terminals.",
+                translation: "Ajuste seu multímetro digital para tensão contínua (DC) antes de testar os terminais da bateria.",
+                options: ["to", "in", "at", "with"],
+                ans: 0,
+                explanation: "Usamos 'set the multimeter to DC voltage / to ohms' para selecionar a escala do instrumento."
+            },
+            {
+                id: 10,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The moisture sensor is mounted ____ the bottom of the clean grain elevator.",
+                translation: "O sensor de umidade é montado na parte inferior do elevador de grãos limpos.",
+                options: ["in", "at", "to", "over"],
+                ans: 1,
+                explanation: "Para pontos específicos como topo ou base, usamos 'at the bottom of' / 'at the top of'."
+            },
+            {
+                id: 11,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "Check if there is a short circuit ____ ground on the 12V supply line.",
+                translation: "Verifique se há um curto-circuito para o terra na linha de alimentação de 12V.",
+                options: ["in", "by", "to", "for"],
+                ans: 2,
+                explanation: "Em eletrônica automotiva e agrícola, 'curto para o terra' é 'a short circuit to ground' (ou 'short to ground')."
+            },
+            {
+                id: 12,
+                section: "Preposições & Oficina",
+                type: "expression",
+                sentence: "The telemetry modem connects to the farm server ____ a 4G cellular network.",
+                translation: "O modem de telemetria conecta-se ao servidor da fazenda através de uma rede celular 4G.",
+                options: ["into", "onto", "beside", "via"],
+                ans: 3,
+                explanation: "Para meio de transmissão ou protocolo, usamos 'via' (ou 'through')."
+            },
+
+            // --- PARTE 2: DIAGNÓSTICO, PASSADO, PRESENTE & FUTURO (13 a 28) ---
+            {
+                id: 13,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "While the operator ____ the headland turn, the steering motor suddenly disengaged.",
+                translation: "Enquanto o operador estava fazendo a manobra de cabeceira, o motor de direção desacoplou de repente.",
+                options: ["was making", "makes", "has made", "will make"],
+                ans: 0,
+                explanation: "Para uma ação em andamento no passado interrompida por uma falha súbita, usamos 'was making'."
+            },
+            {
+                id: 14,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "We ____ the firmware on all three displays, and the system is ready for field testing now.",
+                translation: "Nós já atualizamos o firmware nos três monitores, e o sistema está pronto para teste de campo agora.",
+                options: ["updated yesterday", "have already updated", "were updating", "update"],
+                ans: 1,
+                explanation: "Para ação concluída com resultado direto no presente ('is ready now'), usamos 'have already updated'."
+            },
+            {
+                id: 15,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "When I opened the ECU housing, I saw that water ____ inside through a cracked seal.",
+                translation: "Quando abri a carcaça da ECU, vi que a água tinha entrado por uma vedação rachada.",
+                options: ["leaks", "is leaking", "had leaked", "will leak"],
+                ans: 2,
+                explanation: "A infiltração de água aconteceu antes de abrir a carcaça no passado: usamos 'had leaked'."
+            },
+            {
+                id: 16,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "If the CAN bus resistance reads 120 ohms instead of 60 ohms, it means one termination resistor ____.",
+                translation: "Se a resistência da rede CAN marcar 120 ohms em vez de 60 ohms, significa que um resistor de terminação está faltando ou aberto.",
+                options: ["was worked", "will be fine", "had calibrated", "is missing or open"],
+                ans: 3,
+                explanation: "Dois resistores de 120 Ω em paralelo resultam em 60 Ω. Ler 120 Ω indica que um terminador está desconectado ou aberto ('is missing or open')."
+            },
+            {
+                id: 17,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "This tractor ____ losing GPS signal since the thunderstorm on Tuesday.",
+                translation: "Este trator vem perdendo sinal de GPS desde a tempestade de terça-feira.",
+                options: ["has been", "was", "is", "had"],
+                ans: 0,
+                explanation: "Com 'since + ponto no passado' para algo que começou lá atrás e continua até agora, usamos 'has been losing'."
+            },
+            {
+                id: 18,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "Look at those burnt tracks on the circuit board! That voltage regulator ____.",
+                translation: "Olhe para aquelas trilhas queimadas na placa! Aquele regulador de tensão não vai funcionar / queimou.",
+                options: ["worked fine", "is definitely blown", "was calibrating", "has signal"],
+                ans: 1,
+                explanation: "Diante de evidência visível na placa ('burnt tracks'), concluímos que o componente está queimado ('is definitely blown')."
+            },
+            {
+                id: 19,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "Before you replace the Expensive ECU, always ____ the fuse and the ground connection first.",
+                translation: "Antes de substituir a ECU cara, sempre verifique o fusível e a conexão de aterramento primeiro.",
+                options: ["checking", "checked", "check", "to check"],
+                ans: 2,
+                explanation: "Em instruções de procedimento técnico, usamos o verbo na forma base ('check')."
+            },
+            {
+                id: 20,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "By the time the courier arrives at 5 PM, our bench team ____ repairing the harness.",
+                translation: "Até a hora em que o entregador chegar às 17h, nossa equipe de bancada já terá terminado de reparar o chicote.",
+                options: ["finished", "finishes", "was finishing", "will have finished"],
+                ans: 3,
+                explanation: "Com 'By the time + prazo futuro', usamos 'will have finished' para indicar que o reparo estará concluído antes desse horário."
+            },
+            {
+                id: 21,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "If the voltage drops below 10.5 volts during cranking, the monitor ____ automatically.",
+                translation: "Se a tensão cair abaixo de 10,5 volts durante a partida, o monitor reinicia automaticamente.",
+                options: ["reboots", "rebooted", "would have rebooted", "is reboot"],
+                ans: 0,
+                explanation: "Para um comportamento técnico constante/causa e efeito real, usamos o presente simples ('reboots')."
+            },
+            {
+                id: 22,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "If the technician had used heat-shrink tubing, moisture ____ the splice.",
+                translation: "Se o técnico tivesse usado tubo termoencolhível, a umidade não teria penetrado na emenda.",
+                options: ["will not enter", "would not have entered", "does not enter", "is not entering"],
+                ans: 1,
+                explanation: "Para analisar uma falha passada que poderia ter sido evitada ('If + had used'), usamos 'would not have entered'."
+            },
+            {
+                id: 23,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "The flow meter impeller is stuck because dried fertilizer ____ inside the housing.",
+                translation: "O rotor do fluxômetro está travado porque fertilizante seco acumulou dentro da carcaça.",
+                options: ["will build up", "builds up tomorrow", "has built up", "building up"],
+                ans: 2,
+                explanation: "'Has built up' expressa o acúmulo ocorrido que explica o travamento atual ('is stuck')."
+            },
+            {
+                id: 24,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "After soldering the broken wire, remember to insulate the joint with ____.",
+                translation: "Após soldar o fio rompido, lembre-se de isolar a emenda com tubo termoencolhível.",
+                options: ["spark plugs", "hydraulic oil", "boom nozzles", "heat-shrink tubing"],
+                ans: 3,
+                explanation: "'Heat-shrink tubing' (tubo termoencolhível) é o isolante padrão de bancada para reparo de chicotes."
+            },
+            {
+                id: 25,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "The display shows 'No Communication with Steering Controller'. What should you check first?",
+                translation: "O monitor mostra 'Sem Comunicação com o Controlador de Direção'. O que você deve verificar primeiro?",
+                options: ["Power supply, fuse, and CAN bus connection to the controller", "Tire pressure on the rear trailer", "Cabin air conditioning filter", "Windshield wiper fluid level"],
+                ans: 0,
+                explanation: "Quando um módulo some da rede, o primeiro passo é checar alimentação (12V/terra), fusível e linhas CAN High/Low."
+            },
+            {
+                id: 26,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "We ____ this intermittent harness fault for two hours before we found the loose crimp.",
+                translation: "Nós estávamos rastreando essa falha intermitente no chicote por duas horas antes de encontrarmos a crimpagem frouxa.",
+                options: ["trace", "had been tracing", "will trace", "are tracing"],
+                ans: 1,
+                explanation: "Para enfatizar a duração de uma atividade anterior a outra no passado ('before we found'), usamos 'had been tracing'."
+            },
+            {
+                id: 27,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "Make sure the coaxial antenna cable is not ____ sharply behind the cabin seat.",
+                translation: "Certifique-se de que o cabo coaxial da antena não esteja dobrado/amassado de forma brusca atrás do banco da cabine.",
+                options: ["calibrated", "updated", "kinked or pinched", "downloaded"],
+                ans: 2,
+                explanation: "'Kinked or pinched' significa dobrado com vinco ou esmagado, o que atenua o sinal de RF da antena GPS."
+            },
+            {
+                id: 28,
+                section: "Diagnóstico & Tempos de Ação",
+                type: "context",
+                sentence: "Once the wheel angle sensor is replaced, you ____ perform a full steering calibration.",
+                translation: "Assim que o sensor de ângulo de roda for substituído, você deve realizar uma calibração completa de direção.",
+                options: ["did", "having", "were", "must"],
+                ans: 3,
+                explanation: "'Must perform' indica obrigatoriedade técnica após trocar o sensor de ângulo de roda (WAS)."
+            },
+
+            // --- PARTE 3: LISTENING TÉCNICO (29 a 34) ---
+            {
+                id: 29,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "Tech support, we have a voltage drop on the main harness. It reads 12.4 volts at the battery, but only 9.1 volts at the display connector.",
+                sentence: "De acordo com o áudio, qual é a tensão medida no conector do monitor?",
+                translation: "Ouça o áudio técnico e identifique o valor medido no conector do monitor.",
+                options: ["9.1 volts", "12.4 volts", "5.0 volts", "24.0 volts"],
+                ans: 0,
+                explanation: "O técnico relata: 'It reads 12.4 volts at the battery, but only 9.1 volts at the display connector.'"
+            },
+            {
+                id: 30,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "Before disconnecting the ECU, turn off the master switch and wait thirty seconds for the system to power down completely.",
+                sentence: "No áudio: 'Before disconnecting the ECU, turn off the ____ and wait thirty seconds.'",
+                translation: "Ouça e complete com o componente mencionado.",
+                options: ["hydraulic pump", "master switch", "section valve", "beacon light"],
+                ans: 1,
+                explanation: "O áudio instrui: 'turn off the master switch and wait thirty seconds'."
+            },
+            {
+                id: 31,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "The planter monitor is not counting seeds on Row 4 because the optical sensor lens is covered in dust.",
+                sentence: "Por que a Linha 4 (Row 4) não está contando sementes segundo o áudio?",
+                translation: "Ouça o diagnóstico da plantadeira e escolha o motivo correto.",
+                options: ["O fusível principal queimou", "A antena GPS caiu do teto", "A lente do sensor óptico está coberta de poeira", "O trator está sem óleo diesel"],
+                ans: 2,
+                explanation: "O áudio explica: 'because the optical sensor lens is covered in dust'."
+            },
+            {
+                id: 32,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "I measured the CAN bus resistance with the power off, and it showed 60 ohms between CAN High and CAN Low.",
+                sentence: "No áudio: 'It showed ____ between CAN High and CAN Low.'",
+                translation: "Qual foi o valor de resistência medido na rede CAN?",
+                options: ["120 ohms", "0 ohms", "12 volts", "60 ohms"],
+                ans: 3,
+                explanation: "O técnico diz claramente: 'it showed 60 ohms between CAN High and CAN Low' (valor normal de barramento CAN com 2 terminadores)."
+            },
+            {
+                id: 33,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "Please send the replacement RTK radio module to our workshop by Friday afternoon.",
+                sentence: "No áudio: 'Please send the replacement RTK radio module to our workshop ____.'",
+                translation: "Qual é o prazo informado no áudio?",
+                options: ["by Friday afternoon", "on Monday morning", "in two weeks", "at midnight"],
+                ans: 0,
+                explanation: "O áudio solicita: 'to our workshop by Friday afternoon'."
+            },
+            {
+                id: 34,
+                section: "Listening Técnico",
+                type: "listening",
+                audioText: "Boom section number three stays open because the solenoid valve diaphragm is torn.",
+                sentence: "Qual é o defeito na seção número 3 da barra de pulverização?",
+                translation: "Ouça o áudio e identifique a causa de a seção permanecer aberta.",
+                options: ["O cabo da antena está desconectado", "O diafragma da válvula solenoide está rasgado", "A tela do monitor está trincada", "A bateria está totalmente carregada"],
+                ans: 1,
+                explanation: "O áudio afirma: 'Boom section number three stays open because the solenoid valve diaphragm is torn.'"
+            },
+
+            // --- PARTE 4: SPEAKING TÉCNICO (35 a 40) ---
+            {
+                id: 35,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "The voltage at Pin 1 is ____ twelve point five volts.",
+                translation: "Complete a frase e pronuncie em voz alta: 'A tensão no Pino 1 está lendo 12,5 volts.'",
+                options: ["read", "to read", "reading", "reads to"],
+                ans: 2,
+                speakingTarget: "The voltage at Pin 1 is reading twelve point five volts.",
+                explanation: "Dizemos 'is reading 12.5 volts' para informar a leitura atual no multímetro."
+            },
+            {
+                id: 36,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "There is an open circuit ____ the CAN Low wire.",
+                translation: "Complete e fale em voz alta: 'Há um circuito aberto no fio CAN Low.'",
+                options: ["at", "to", "with", "on"],
+                ans: 3,
+                speakingTarget: "There is an open circuit on the CAN Low wire.",
+                explanation: "Para falhas em uma linha ou fio específico, usamos 'on the CAN Low wire'."
+            },
+            {
+                id: 37,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "We need to ____ the wheel angle sensor in the field.",
+                translation: "Complete e fale em voz alta: 'Precisamos calibrar o sensor de ângulo de roda no campo.'",
+                options: ["calibrate", "calibrating", "calibrated", "calibration"],
+                ans: 0,
+                speakingTarget: "We need to calibrate the wheel angle sensor in the field.",
+                explanation: "Após 'need to', usamos o verbo na forma base: 'need to calibrate'."
+            },
+            {
+                id: 38,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "Please turn ____ the master switch before unplugging the harness.",
+                translation: "Complete e fale em voz alta: 'Por favor, desligue a chave geral antes de desconectar o chicote.'",
+                options: ["out", "off", "down", "away"],
+                ans: 1,
+                speakingTarget: "Please turn off the master switch before unplugging the harness.",
+                explanation: "Para desligar um interruptor ou chave geral, usamos 'turn off'."
+            },
+            {
+                id: 39,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "The RTK receiver has locked ____ eighteen satellites.",
+                translation: "Complete e fale em voz alta: 'O receptor RTK fixou sinal em dezoito satélites.'",
+                options: ["in", "at", "onto", "from"],
+                ans: 2,
+                speakingTarget: "The RTK receiver has locked onto eighteen satellites.",
+                explanation: "A expressão técnica para 'fixar/travar sinal em satélites' é 'lock onto satellites'."
+            },
+            {
+                id: 40,
+                section: "Speaking Técnico",
+                type: "speaking",
+                sentence: "We have already ____ the broken connector on the bench.",
+                translation: "Complete e fale em voz alta: 'Nós já substituímos o conector quebrado na bancada.'",
+                options: ["replace", "replacing", "replaces", "replaced"],
+                ans: 3,
+                speakingTarget: "We have already replaced the broken connector on the bench.",
+                explanation: "Com 'have already', usamos o particípio passado 'replaced'."
+            }
+        ];
+
+        // ============================================================================
+        // STATE & SHUFFLE
+        // ============================================================================
+        let currentIdx = 0;
+        let userAnswers = new Array(EXAM_QUESTIONS.length).fill(null);
+        let flaggedQuestions = new Array(EXAM_QUESTIONS.length).fill(false);
+        let speakingCompleted = new Array(EXAM_QUESTIONS.length).fill(false);
+        let remainingSeconds = 30 * 60;
+        let timerInterval = null;
+        let isPaused = false;
+        let examSubmitted = false;
+
+        function prepareShuffledOptions() {
+            let lastCorrectPos = -1;
+            EXAM_QUESTIONS.forEach((q) => {
+                if (typeof q._origAns === 'undefined') {
+                    q._origOptions = [...q.options];
+                    q._origAns = q.ans;
+                }
+                const correctText = q._origOptions[q._origAns];
+                const pool = [...q._origOptions];
+
+                for (let attempt = 0; attempt < 8; attempt++) {
+                    for (let i = pool.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [pool[i], pool[j]] = [pool[j], pool[i]];
+                    }
+                    const newPos = pool.indexOf(correctText);
+                    if (newPos !== lastCorrectPos || attempt === 7) {
+                        lastCorrectPos = newPos;
+                        break;
+                    }
+                }
+
+                q.options = pool;
+                q.ans = pool.indexOf(correctText);
+            });
+        }
+
+        function startExam() {
+            prepareShuffledOptions();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('exam-screen').classList.remove('hidden');
+            document.getElementById('finish-top-btn').classList.remove('hidden');
+            document.getElementById('finish-top-btn').classList.add('inline-flex');
+
+            buildQuestionMap();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                if (isPaused || examSubmitted) return;
+                remainingSeconds--;
+                updateTimerUI();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("⏰ O tempo de 30 minutos terminou! Sua prova será corrigida automaticamente.");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const mins = Math.floor(Math.max(0, remainingSeconds) / 60);
+            const secs = Math.max(0, remainingSeconds) % 60;
+            const display = document.getElementById('timer-display');
+            const box = document.getElementById('timer-box');
+            display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            if (remainingSeconds <= 300) {
+                box.className = "flex items-center gap-2.5 bg-rose-900 border border-rose-500 px-4 py-2 rounded-2xl timer-urgent";
+            }
+        }
+
+        function togglePauseTimer() {
+            if (examSubmitted) return;
+            isPaused = !isPaused;
+            const btn = document.getElementById('pause-btn');
+            if (isPaused) {
+                btn.innerHTML = `<i class="fa-solid fa-play text-emerald-400"></i> <span>Retomar</span>`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> <span>Pausar</span>`;
+            }
+        }
+
+        function buildQuestionMap() {
+            const grid = document.getElementById('question-map-grid');
+            grid.innerHTML = '';
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `map-dot-${idx}`;
+                btn.className = 'q-dot bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200';
+                btn.textContent = idx + 1;
+                btn.onclick = () => goToQuestion(idx);
+                grid.appendChild(btn);
+            });
+            updateQuestionMapStyles();
+        }
+
+        function updateQuestionMapStyles() {
+            let answeredCount = 0;
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const dot = document.getElementById(`map-dot-${idx}`);
+                if (!dot) return;
+                const isAnswered = userAnswers[idx] !== null;
+                if (isAnswered) answeredCount++;
+
+                let base = 'q-dot ';
+                if (flaggedQuestions[idx]) {
+                    base += 'bg-amber-400 text-slate-900 border border-amber-500 ';
+                } else if (isAnswered) {
+                    base += 'bg-emerald-500 text-white border border-emerald-600 ';
+                } else {
+                    base += 'bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200 ';
+                }
+
+                if (idx === currentIdx) base += 'active ';
+                dot.className = base;
+            });
+
+            const pct = Math.round((answeredCount / EXAM_QUESTIONS.length) * 100);
+            document.getElementById('exam-progress-bar').style.width = `${pct}%`;
+            document.getElementById('sidebar-pct').textContent = `${pct}% concluído`;
+            document.getElementById('answered-count-label').textContent = `${answeredCount} / ${EXAM_QUESTIONS.length} respondidas`;
+        }
+
+        function renderQuestion(idx) {
+            currentIdx = idx;
+            const q = EXAM_QUESTIONS[idx];
+
+            document.getElementById('q-counter').textContent = `Questão ${idx + 1} de ${EXAM_QUESTIONS.length}`;
+
+            const badge = document.getElementById('q-section-badge');
+            if (q.type === 'expression') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800';
+                badge.innerHTML = `<i class="fa-solid fa-puzzle-piece"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Complete a frase técnica com a preposição ou expressão correta:';
+            } else if (q.type === 'context') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-teal-100 text-teal-800';
+                badge.innerHTML = `<i class="fa-solid fa-microchip"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Escolha a alternativa que completa o diagnóstico ou relatório corretamente:';
+            } else if (q.type === 'listening') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800';
+                badge.innerHTML = `<i class="fa-solid fa-headphones"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Ouça o áudio técnico e escolha a alternativa correta:';
+            } else if (q.type === 'speaking') {
+                badge.className = 'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800';
+                badge.innerHTML = `<i class="fa-solid fa-microphone-lines"></i> ${q.section}`;
+                document.getElementById('q-instruction').textContent = 'Complete a frase e pronuncie em voz alta:';
+            }
+
+            const flagBtn = document.getElementById('flag-btn');
+            if (flaggedQuestions[idx]) {
+                flagBtn.className = 'px-2.5 py-1 rounded-lg bg-amber-100 border border-amber-400 text-amber-800 text-xs font-bold transition flex items-center gap-1';
+                flagBtn.innerHTML = `<i class="fa-solid fa-bookmark"></i> <span>Marcada</span>`;
+            } else {
+                flagBtn.className = 'px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:text-amber-600 hover:border-amber-300 text-xs font-bold transition flex items-center gap-1';
+                flagBtn.innerHTML = `<i class="fa-regular fa-bookmark"></i> <span>Revisar</span>`;
+            }
+
+            const selectedOptIdx = userAnswers[idx];
+            const selectedText = selectedOptIdx !== null ? q.options[selectedOptIdx] : '______';
+            const pillClass = selectedOptIdx !== null ? 'blank-pill filled' : 'blank-pill';
+            const formattedSentence = q.sentence.replace('____', `<span class="${pillClass}">${selectedText}</span>`);
+            document.getElementById('q-sentence').innerHTML = formattedSentence;
+            document.getElementById('q-translation').textContent = q.translation || '';
+
+            const listeningBox = document.getElementById('listening-box');
+            if (q.type === 'listening') {
+                listeningBox.classList.remove('hidden');
+            } else {
+                listeningBox.classList.add('hidden');
+            }
+
+            const speakingBox = document.getElementById('speaking-box');
+            if (q.type === 'speaking') {
+                speakingBox.classList.remove('hidden');
+                document.getElementById('speaking-target-text').textContent = q.speakingTarget;
+                const statusEl = document.getElementById('speaking-status');
+                if (speakingCompleted[idx]) {
+                    statusEl.className = 'text-xs font-extrabold text-emerald-600';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Pronúncia registrada com sucesso!';
+                } else {
+                    statusEl.className = 'text-xs font-bold text-slate-500';
+                    statusEl.textContent = 'Aguardando sua leitura em voz alta...';
+                }
+            } else {
+                speakingBox.classList.add('hidden');
+            }
+
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((opt, optIdx) => {
+                const isSelected = userAnswers[idx] === optIdx;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `opt-card text-left p-4 rounded-2xl border-2 flex items-center gap-3.5 ${isSelected ? 'selected' : 'border-slate-200 bg-white'}`;
+                btn.onclick = () => selectOption(optIdx);
+
+                btn.innerHTML = `
+                    <span class="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-xs shrink-0 ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}">
+                        ${letters[optIdx]}
+                    </span>
+                    <span class="font-bold text-sm sm:text-base text-slate-800">${opt}</span>
+                `;
+                optsContainer.appendChild(btn);
+            });
+
+            document.getElementById('prev-btn').disabled = idx === 0;
+            const nextBtn = document.getElementById('next-btn');
+            if (idx === EXAM_QUESTIONS.length - 1) {
+                nextBtn.innerHTML = `<span>Finalizar Prova</span> <i class="fa-solid fa-flag-checkered"></i>`;
+                nextBtn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2';
+            } else {
+                nextBtn.innerHTML = `<span>Próxima</span> <i class="fa-solid fa-arrow-right"></i>`;
+                nextBtn.className = 'px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-2';
+            }
+
+            updateQuestionMapStyles();
+        }
+
+        function selectOption(optIdx) {
+            if (examSubmitted) return;
+            userAnswers[currentIdx] = optIdx;
+            renderQuestion(currentIdx);
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) renderQuestion(currentIdx - 1);
+        }
+
+        function nextQuestion() {
+            if (currentIdx < EXAM_QUESTIONS.length - 1) {
+                renderQuestion(currentIdx + 1);
+            } else {
+                confirmSubmitExam();
+            }
+        }
+
+        function goToQuestion(idx) {
+            renderQuestion(idx);
+        }
+
+        function toggleFlagCurrent() {
+            flaggedQuestions[currentIdx] = !flaggedQuestions[currentIdx];
+            renderQuestion(currentIdx);
+        }
+
+        // ============================================================================
+        // LISTENING (TTS) & SPEAKING (WEB SPEECH API)
+        // ============================================================================
+        function speakText(text, rate = 1.0) {
+            if (!('speechSynthesis' in window)) {
+                alert('Seu navegador não suporta síntese de voz.');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = rate;
+            const voices = window.speechSynthesis.getVoices();
+            const enVoice = voices.find(v => v.lang.startsWith('en-') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Microsoft'))) || voices.find(v => v.lang.startsWith('en'));
+            if (enVoice) utter.voice = enVoice;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function playCurrentAudio(rate = 1.0) {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (q && q.audioText) {
+                speakText(q.audioText, rate);
+            }
+        }
+
+        function playSpeakingTarget() {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (q && q.speakingTarget) {
+                speakText(q.speakingTarget, 0.95);
+            }
+        }
+
+        function startSpeechRecognition() {
+            const q = EXAM_QUESTIONS[currentIdx];
+            if (!q || q.type !== 'speaking') return;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const statusEl = document.getElementById('speaking-status');
+            const recBtn = document.getElementById('mic-record-btn');
+
+            if (!SpeechRecognition) {
+                speakingCompleted[currentIdx] = true;
+                statusEl.className = 'text-xs font-extrabold text-emerald-600';
+                statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Navegador sem Web Speech: pronúncia validada no modo autoverificação!';
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 2;
+
+            recBtn.disabled = true;
+            recBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Ouvindo... Fale agora!';
+            statusEl.className = 'text-xs font-bold text-blue-700';
+            statusEl.textContent = 'Microfone ativo...';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                speakingCompleted[currentIdx] = true;
+                statusEl.className = 'text-xs font-extrabold text-emerald-600';
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Captado: "${transcript}" — Excelente!`;
+            };
+
+            recognition.onerror = () => {
+                statusEl.className = 'text-xs font-bold text-amber-700';
+                statusEl.textContent = 'Não foi possível captar o áudio. Tente novamente ou use o botão ao lado.';
+            };
+
+            recognition.onend = () => {
+                recBtn.disabled = false;
+                recBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> Gravar Minha Voz';
+            };
+
+            recognition.start();
+        }
+
+        function markSpeakingSelfVerified() {
+            speakingCompleted[currentIdx] = true;
+            const statusEl = document.getElementById('speaking-status');
+            statusEl.className = 'text-xs font-extrabold text-emerald-600';
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Leitura em voz alta confirmada!';
+        }
+
+        // ============================================================================
+        // SUBMIT & GRADING
+        // ============================================================================
+        function confirmSubmitExam() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                const ok = confirm(`Você ainda tem ${unanswered} questão(ões) sem resposta. Deseja finalizar e corrigir a prova mesmo assim?`);
+                if (!ok) return;
+            } else {
+                const ok = confirm('Deseja entregar sua Prova Final GPS Tronic e ver sua nota agora?');
+                if (!ok) return;
+            }
+            submitExam();
+        }
+
+        function submitExam() {
+            examSubmitted = true;
+            if (timerInterval) clearInterval(timerInterval);
+            window.speechSynthesis && window.speechSynthesis.cancel();
+
+            document.getElementById('exam-screen').classList.add('hidden');
+            document.getElementById('finish-top-btn').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            let correctTotal = 0;
+            const stats = {
+                expression: { label: 'Preposições & Oficina', correct: 0, total: 0, color: 'emerald' },
+                context: { label: 'Diagnóstico & Tempos de Ação', correct: 0, total: 0, color: 'teal' },
+                listening: { label: 'Listening Técnico', correct: 0, total: 0, color: 'amber' },
+                speaking: { label: 'Speaking Técnico', correct: 0, total: 0, color: 'blue' }
+            };
+
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const isCorrect = userAnswers[idx] === q.ans;
+                if (isCorrect) correctTotal++;
+                if (stats[q.type]) {
+                    stats[q.type].total++;
+                    if (isCorrect) stats[q.type].correct++;
+                }
+            });
+
+            const pct = Math.round((correctTotal / EXAM_QUESTIONS.length) * 100);
+            const spentSec = (30 * 60) - Math.max(0, remainingSeconds);
+            const spentM = Math.floor(spentSec / 60);
+            const spentS = spentSec % 60;
+            const speakingCount = speakingCompleted.filter(Boolean).length;
+
+            document.getElementById('res-score-pct').textContent = `${pct}%`;
+            document.getElementById('res-score-raw').textContent = `${correctTotal} / ${EXAM_QUESTIONS.length}`;
+            document.getElementById('res-time-spent').textContent = `${String(spentM).padStart(2, '0')}:${String(spentS).padStart(2, '0')}`;
+            document.getElementById('res-speaking-done').textContent = `${speakingCount} / 6`;
+
+            const banner = document.getElementById('result-banner');
+            const titleEl = document.getElementById('result-title');
+            const subEl = document.getElementById('result-subtitle');
+            const iconEl = document.getElementById('result-badge-icon');
+
+            if (pct >= 70) {
+                banner.className = 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-800 p-8 text-white text-center';
+                iconEl.textContent = '🏆';
+                titleEl.textContent = 'Aprovado no Exame GPS Tronic!';
+                subEl.textContent = 'Excelente domínio de inglês técnico para diagnóstico de bancada, cabos, sensores e GPS agrícola!';
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 110, spread: 80, origin: { y: 0.6 } });
+                }
+            } else {
+                banner.className = 'bg-gradient-to-r from-amber-600 via-orange-600 to-rose-700 p-8 text-white text-center';
+                iconEl.textContent = '🛠️';
+                titleEl.textContent = 'Quase lá! Continue Praticando na Bancada';
+                subEl.textContent = 'Revise o gabarito comentado abaixo para reforçar os termos técnicos e tente novamente.';
+            }
+
+            const breakdownContainer = document.getElementById('section-breakdown');
+            breakdownContainer.innerHTML = '';
+            Object.values(stats).forEach(st => {
+                const sPct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+                const card = document.createElement('div');
+                card.className = 'p-4 rounded-2xl bg-slate-50 border border-slate-200';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-xs font-extrabold text-slate-700 mb-2">
+                        <span>${st.label}</span>
+                        <span>${st.correct} / ${st.total} (${sPct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-emerald-600 h-2.5 rounded-full" style="width:${sPct}%"></div>
+                    </div>
+                `;
+                breakdownContainer.appendChild(card);
+            });
+
+            filterReview('all');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterReview(mode) {
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            EXAM_QUESTIONS.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = userAns === q.ans;
+                if (mode === 'wrong' && isCorrect) return;
+
+                const item = document.createElement('div');
+                item.className = `p-5 rounded-2xl border ${isCorrect ? 'bg-emerald-50/40 border-emerald-200' : 'bg-rose-50/40 border-rose-200'}`;
+
+                const userText = userAns !== null ? `${letters[userAns]}) ${q.options[userAns]}` : 'Não respondida';
+                const correctText = `${letters[q.ans]}) ${q.options[q.ans]}`;
+
+                item.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-extrabold uppercase tracking-wider ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                            ${isCorrect ? '<i class="fa-solid fa-circle-check mr-1"></i> Acertou' : '<i class="fa-solid fa-circle-xmark mr-1"></i> Errou'} — Questão ${idx + 1} (${q.section})
+                        </span>
+                    </div>
+                    <p class="font-bold text-slate-800 text-sm sm:text-base mb-1">${q.sentence.replace('____', `<span class="underline text-emerald-700">${q.options[q.ans]}</span>`)}</p>
+                    <p class="text-xs text-slate-500 italic mb-3">${q.translation || ''}</p>
+                    <div class="flex flex-wrap gap-4 text-xs mb-2">
+                        <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}">Sua resposta: ${userText}</span>
+                        ${!isCorrect ? `<span class="text-emerald-700 font-extrabold">Correta: ${correctText}</span>` : ''}
+                    </div>
+                    <p class="text-xs text-slate-600 bg-white/80 p-3 rounded-xl border border-slate-200/80">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <strong>Explicação:</strong> ${q.explanation}
+                    </p>
+                `;
+                list.appendChild(item);
+            });
+
+            if (list.children.length === 0) {
+                list.innerHTML = `<p class="text-sm font-bold text-emerald-700 text-center py-6">🎉 Parabéns! Você não errou nenhuma questão!</p>`;
+            }
+        }
+
+        function restartExam() {
+            userAnswers = new Array(EXAM_QUESTIONS.length).fill(null);
+            flaggedQuestions = new Array(EXAM_QUESTIONS.length).fill(false);
+            speakingCompleted = new Array(EXAM_QUESTIONS.length).fill(false);
+            remainingSeconds = 30 * 60;
+            isPaused = false;
+            examSubmitted = false;
+
+            document.getElementById('results-screen').classList.add('hidden');
+            startExam();
+        }
+    </script>
+</body>
+
+</html>

@@ -53,7 +53,7 @@ const AI_ROUTE_KEYS = new Map([
     ['/api/personalize', 'personalize'], ['/api/transcribe', 'transcribe'],
     ['/api/correct-writing', 'chat'], ['/api/study-plan', 'study-plan'], ['/api/music', 'music'],
     ['/api/lyrics-search', 'lyrics-search'], ['/api/lyrics', 'lyrics'], ['/api/tts', 'tts'],
-    ['/api/realtime-token', 'realtime'],
+    ['/api/realtime-token', 'realtime'], ['/api/quadro-ai', 'chat'],
 ]);
 
 // ── Kiwify product → plan mapping ──────────────────────────────────────────
@@ -185,6 +185,25 @@ function privacySafeIpKey(req) {
     return crypto.createHmac('sha256', salt).update(requestIp(req)).digest('hex').slice(0, 32);
 }
 
+// Routes in AI_ROUTE_KEYS that call no AI: the proxies to the lyrics catalogue.
+// A visitor's 3 daily AI uses are for AI. Searching a song and fetching its
+// lyrics have their own limit (the free plan's), so the Music Lab analysis is
+// still reachable after the search (decision of 28/set).
+const ROTAS_SEM_IA = new Set(['lyrics-search', 'lyrics']);
+
+// A read (GET/HEAD) carrying our cookies. Browsers send Sec-Fetch-Site on every
+// request (Chrome 76+, Firefox 90+, Safari 16.4+): only our own pages
+// ("same-origin") or the student typing the URL ("none") may use the cookies,
+// so another site can't spend a student's quota. Without the header (old
+// browser, script) the read goes through: anyone may already call these routes
+// without cookies, under the per-IP limit.
+function assertLeituraDoProprioSite(req) {
+    const site = String(req.headers['sec-fetch-site'] || '').toLowerCase();
+    if (site && site !== 'same-origin' && site !== 'none') {
+        throw new HttpError(403, 'invalid_origin', 'Request origin is not allowed.');
+    }
+}
+
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
@@ -197,11 +216,12 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         : trusted?.kind === 'guest'
             ? `g:${trusted.guestId}|ip:${privacySafeIpKey(req)}`
             : `ip:${privacySafeIpKey(req)}`;
-    const effectiveKey = isGuest ? 'guest-ai' : key;
+    const guestAi = isGuest && !ROTAS_SEM_IA.has(key);
+    const effectiveKey = guestAi ? 'guest-ai' : key;
     const bucket = `${identityKey}|${effectiveKey}|${today}`;
     const plan = isGuest ? 'free' : await getUserPlan(appUserId);
-    const limit = isGuest ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
-    const minuteLimit = isGuest ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
+    const limit = guestAi ? 3 : ((RATE_LIMITS[key] || RATE_LIMITS.chat)[plan] || 10);
+    const minuteLimit = guestAi ? 2 : Math.max(3, Math.min(60, Math.ceil(limit / 10)));
 
     // Prefer the atomic Supabase RPC (consume_rate_limit) when it's available.
     // If the migration for that RPC hasn't been applied yet, fall back to a
@@ -2089,6 +2109,31 @@ function sanitizeAiOutput(value, depth = 0) {
     return value;
 }
 
+// ── GET to an outside JSON API, with a deadline ─────────────────────────────
+// Resolves { status, json } (json is null when the body is not JSON, e.g. an
+// HTML error page) and rejects only on a network error or when the deadline
+// passes, so a route can tell "not found" from "provider down".
+function buscarJsonExterno(alvo, { timeoutMs = 7000 } = {}) {
+    return new Promise((resolve, reject) => {
+        let pronto = false;
+        let prazo = null;
+        const fim = (erro, valor) => { if (pronto) return; pronto = true; clearTimeout(prazo); if (erro) reject(erro); else resolve(valor); };
+        const pedido = https.get(alvo, { headers: { 'User-Agent': 'CapyEnglish/1.0 (+https://capyenglish.com.br)', Accept: 'application/json' } }, r => {
+            let corpo = '';
+            r.setEncoding('utf8');
+            r.on('data', c => { corpo += c; if (corpo.length > 2000000) pedido.destroy(new Error('resposta_grande_demais')); });
+            r.on('end', () => {
+                let json = null;
+                try { json = JSON.parse(corpo); } catch (e) { json = null; }
+                fim(null, { status: r.statusCode, json });
+            });
+            r.on('error', erro => fim(erro));
+        });
+        prazo = setTimeout(() => { pedido.destroy(new Error('timeout')); fim(new Error('timeout')); }, timeoutMs);
+        pedido.on('error', erro => fim(erro));
+    });
+}
+
 // ── GET with redirect following (Google News RSS 302s on some hl/gl combos) ─
 function httpsGetFollow(urlStr, maxRedirects = 3) {
     return new Promise((resolve, reject) => {
@@ -2483,8 +2528,17 @@ module.exports = async (req, res) => {
     if (aiKey && url !== '/api/realtime-token') {
         // Requests carrying session cookies must prove same-session intent.
         // Anonymous visitors retain the existing rate-limited access.
+        // Writes prove it with the CSRF token. Reads (lyrics search, lyrics,
+        // TTS, daily challenge, word of the day) come from a same-origin fetch,
+        // which sends neither Origin nor the token: assertCsrf refused every one
+        // of them in production (403 invalid_origin), so a signed-in student saw
+        // "Nenhuma música encontrada" in the Music Lab and lost the Nova voice.
+        // For reads the browser's Sec-Fetch-Site tells who is asking.
         const sessionCookies = parseCookies(req);
-        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) assertCsrf(req);
+        if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.guest]) {
+            if (req.method === 'GET' || req.method === 'HEAD') assertLeituraDoProprioSite(req);
+            else assertCsrf(req);
+        }
         const limited = await checkRateLimit(req, aiKey, null);
         if (!limited.ok) { rateLimitedResponse(res, limited); return; }
     }
@@ -3533,6 +3587,47 @@ Respond ONLY with valid JSON, no markdown:
         });
         messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
         callOpenAI(messages, 120, 0.85, res, req); return;
+    }
+
+    if (req.method === 'POST' && url === '/api/quadro-ai') {
+        const { history, message, sala = 'geral' } = await readBody(req);
+        const _rl = await checkRateLimit(req, 'chat', null);
+        if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
+
+        const salaLimpa = textoParaPrompt(sala, 30) || 'geral';
+        const targetLang = salaLimpa === 'frances' ? 'French' : salaLimpa === 'turkish' ? 'Turkish' : 'English';
+        const contextoSala = {
+            gpstronic: 'agricultural GPS, autopilot, wiring harnesses, sensors, CAN bus and workshop troubleshooting',
+            agro: 'farming, tractors, planting, spraying, harvesting and agribusiness',
+            med: 'medical consultations, patient symptoms and hospital routine',
+            interview: 'job interviews, career experience and professional answers',
+            business: 'business meetings, emails, negotiations and corporate routine',
+            travel: 'airports, hotels, restaurants and travel situations',
+            intermediate: 'natural B1-B2 everyday expressions, prepositions (on/in/at) and past/present/future actions',
+            advanced: 'advanced C1 fluency, idioms and nuanced communication',
+        }[salaLimpa] || 'practical everyday communication';
+
+        const system = [
+            `You are Yara, the AI teaching assistant inside the live interactive whiteboard (Quadro Branco) of Capy English.`,
+            `Current whiteboard room: "${salaLimpa}" (focus: ${contextoSala}, target language: ${targetLang}).`,
+            `When the teacher or student asks for sentences, phrases, examples, vocabulary, expressions, questions, dialogues, or explanations, you MUST generate clear, natural items ready to be placed as visual cards on the whiteboard.`,
+            `IMPORTANT: Never use the words "gramática", "grammar", "chunk" or "chunks" in your output. Use "expressões", "padrões" or "combinações naturais".`,
+            `Always respond ONLY with a valid JSON object (no markdown fences) in this exact format:`,
+            `{"reply":"Short, warm message in Portuguese explaining or presenting what you created","cards":[{"badge":"#1 · Expressão","en":"Main sentence or term in ${targetLang}","pt":"Portuguese translation or short tip"}]}`,
+            `Rules for "cards":`,
+            `- If the user asks for N sentences/examples/words (e.g. "5 frases em inglês"), return exactly N items in "cards" (up to 12 items).`,
+            `- Even if the user asks a general question or explanation, include 2 to 4 helpful example cards in "cards" so they can be added to the whiteboard.`,
+            `- Keep "badge" short (e.g., "Frase 1", "Exemplo 2", "Vocabulário", "Pergunta").`,
+            `- Keep "en" natural and accurate in ${targetLang}, and "pt" as the clear Brazilian Portuguese translation.`,
+        ].join('\n');
+
+        const messages = [{ role: 'system', content: system }];
+        (Array.isArray(history) ? history.slice(-10) : []).forEach(m => {
+            const texto = String(m?.content ?? m?.text ?? '').slice(0, 600);
+            if (texto) messages.push({ role: (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user', content: texto });
+        });
+        messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
+        callOpenAI(messages, 1000, 0.75, res, req); return;
     }
 
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
@@ -5622,39 +5717,45 @@ Rules:
     }
 
     // ── Lyrics Proxy ──────────────────────────────────────────────────────────
+    // Both routes used to pass lyrics.ovh's status and body straight through,
+    // with no deadline: a slow provider held the function until Vercel killed
+    // it, and an HTML error page reached a client that expects JSON. Now each
+    // call has a deadline, the answer is checked, and a failure is a JSON error
+    // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
-        const q = new URL(`https://x.com${req.url}`).searchParams.get('q') || '';
+        const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
-        const target = `https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics search failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/suggest/${encodeURIComponent(q)}`, { timeoutMs: 7000 });
+            if (status !== 200 || !Array.isArray(json?.data)) throw new Error(`lyrics_ovh_${status}`);
+            res.status(200).json({ data: json.data.slice(0, 7) });
+        } catch (e) {
+            console.error('[lyrics-search]', e.message);
+            res.status(502).json({ error: 'music_search_unavailable', message: 'O serviço de músicas não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
     if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
         const p = new URL(`https://x.com${req.url}`).searchParams;
-        const artist = p.get('artist') || '';
-        const title  = p.get('title')  || '';
+        const artist = String(p.get('artist') || '').trim().slice(0, 100);
+        const title  = String(p.get('title')  || '').trim().slice(0, 150);
         if (!artist || !title) { res.status(400).json({ error: 'artist and title required' }); return; }
-        const target = `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`;
-        https.get(target, { headers: { 'User-Agent': 'CapyEnglish/1.0' } }, (r) => {
-            let d = '';
-            r.on('data', c => d += c);
-            r.on('end', () => {
-                res.setHeader('Content-Type', 'application/json');
-                if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
-                res.status(r.statusCode).end(d);
-            });
-        }).on('error', () => res.status(502).json({ error: 'lyrics fetch failed' }));
+        try {
+            const { status, json } = await buscarJsonExterno(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`, { timeoutMs: 7000 });
+            const lyrics = typeof json?.lyrics === 'string' ? json.lyrics.trim() : '';
+            if (status === 200 && lyrics) { res.status(200).json({ lyrics }); return; }
+            if (status === 404 || (status === 200 && !lyrics)) {
+                res.status(404).json({ error: 'lyrics_not_found', message: 'Não achamos a letra desta música.' });
+                return;
+            }
+            throw new Error(`lyrics_ovh_${status}`);
+        } catch (e) {
+            console.error('[lyrics]', e.message);
+            res.status(502).json({ error: 'lyrics_unavailable', message: 'O serviço de letras não respondeu. Tente de novo em instantes.' });
+        }
         return;
     }
 
@@ -5793,3 +5894,6 @@ Rules:
     }
   }
 };
+
+// Pure helpers, exposed for tests only.
+module.exports._internos = { buscarJsonExterno, checkRateLimit };

@@ -130,13 +130,34 @@
         <span class="text-4xl" aria-hidden="true">🛰️</span>
         <div class="flex-1 min-w-0">
           <p class="font-black text-lg text-navy">Capivara da oficina</p>
-          <p class="text-slate-500 text-sm">O dia a dia do conserto de GPS e da vida lá fora. Foco em falar, não em gramática.</p>
+          <p class="text-slate-500 text-sm">O dia a dia do conserto de GPS e da vida lá fora. Foco em falar com naturalidade na prática.</p>
         </div>
         <span class="bg-pink-500 text-white font-black px-5 py-2.5 rounded-full text-sm flex-shrink-0">Conversar →</span>
       </div>
     </a>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10" id="lessons-grid"></div>
+
+    <!-- Prova Final do Curso GPS Tronic -->
+    <div class="relative overflow-hidden rounded-3xl border-2 border-emerald-400 bg-gradient-to-br from-emerald-950 via-teal-900 to-emerald-900 text-white p-6 md:p-8 shadow-xl mb-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-start gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-400/20 border border-emerald-300/40 flex items-center justify-center text-3xl flex-shrink-0">🏆</div>
+          <div>
+            <div class="inline-flex items-center gap-2 bg-emerald-400/20 border border-emerald-300/40 text-emerald-200 text-[11px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full mb-2">
+              Exame Final · 30 Minutos · 40 Questões
+            </div>
+            <h3 class="text-2xl font-black leading-tight mb-1">Prova Final — GPS Tronic (Bancada &amp; Campo)</h3>
+            <p class="text-white/80 text-sm max-w-2xl leading-relaxed">
+              Avaliação oficial de encerramento: expressões e preposições de oficina (<em>on the bench, in the field, on Pin 7, by hand</em>), diagnóstico de rede CAN/ISOBUS, ações no passado/presente/futuro, Listening técnico e Speaking!
+            </p>
+          </div>
+        </div>
+        <a href="gpstronic_prova.html" class="w-full md:w-auto text-center bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-navy font-black px-7 py-4 rounded-2xl shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex-shrink-0">
+          🚀 Fazer Prova Final GPS Tronic →
+        </a>
+      </div>
+    </div>
 
     <div class="bg-white border-2 border-emerald-100 rounded-3xl p-6 flex items-start gap-4">
       <span class="text-3xl flex-shrink-0">💡</span>
@@ -203,7 +224,7 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=som2"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -306,6 +327,27 @@ LESSONS.forEach((l, i) => {
     <div class="h-1 shine bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400"></div>
   `;
   grid.appendChild(card);
+
+  if (l.n === 10 || l.n === LESSONS.length) {
+    const bloco = l.n === 10 ? 1 : 2;
+    const rangeLabel = bloco === 1 ? '01 a 10' : '11 a 14';
+    const miniCard = document.createElement('div');
+    miniCard.className = 'col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-teal-50 to-green-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm';
+    miniCard.innerHTML = `
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl font-black shrink-0 shadow">⚡</div>
+        <div>
+          <span class="inline-block text-[10px] font-black uppercase tracking-widest bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full">Checkpoint a cada 10 Lições · 15 Minutos · 15 Questões</span>
+          <h3 class="font-black text-base text-navy mt-0.5">Mini-Prova ${bloco} — Aulas ${rangeLabel} (GPS Tronic)</h3>
+          <p class="text-xs text-slate-600">Avaliação rápida de bancada, cabos, sensores, Listening e Speaking das aulas ${rangeLabel}.</p>
+        </div>
+      </div>
+      <a href="mini_prova.html?curso=gpstronic&bloco=${bloco}" class="w-full sm:w-auto text-center bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-xl shadow transition shrink-0">
+        ⚡ Fazer Mini-Prova ${bloco} →
+      </a>
+    `;
+    grid.appendChild(miniCard);
+  }
 });
 
 document.addEventListener('planChanged', () => location.reload());

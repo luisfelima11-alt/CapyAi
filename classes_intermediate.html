@@ -62,7 +62,7 @@
     <div class="relative max-w-7xl mx-auto px-6 py-14">
       <a href="classes.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors mb-6">← Todos os Cursos</a>
       <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-bold mb-4">
-        🎯 20 aulas · B1 → B2 · Gramática avançada e conversação real
+        🎯 20 aulas · B1 → B2 · Expressões naturais e conversação real
       </div>
       <h1 class="text-4xl md:text-5xl font-black mb-3 leading-tight">
         🎯 Intermediate English<br><span class="text-rose-300">com Yara</span>
@@ -236,7 +236,7 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
+<script src="components.js?v=som2"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -244,25 +244,25 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 Components.mount('footer-placeholder', Components.renderFooter());
 
 const LESSONS = [
-  {n:1, emoji:'⏪', title:'Past Simple Deep Dive',    tags:['Grammar','Past'],          available:true, href:'intermediate_aula_01.html'},
-  {n:2, emoji:'🔄', title:'Past Continuous',           tags:['Grammar','Past'],          available:true, href:'intermediate_aula_02.html'},
-  {n:3, emoji:'✅', title:'Present Perfect',           tags:['Grammar','Experience'],    available:true, href:'intermediate_aula_03.html'},
-  {n:4, emoji:'🕰️', title:'Past Perfect',              tags:['Grammar','Advanced'],      available:true, href:'intermediate_aula_04.html'},
+  {n:1, emoji:'⏪', title:'Past Simple Deep Dive',    tags:['Passado','Ação Concluída'], available:true, href:'intermediate_aula_01.html'},
+  {n:2, emoji:'🔄', title:'Past Continuous',           tags:['Passado','Em Andamento'],   available:true, href:'intermediate_aula_02.html'},
+  {n:3, emoji:'✅', title:'Present Perfect',           tags:['Conexão','Experiências'],   available:true, href:'intermediate_aula_03.html'},
+  {n:4, emoji:'🕰️', title:'Past Perfect',              tags:['Passado','Sequência'],      available:true, href:'intermediate_aula_04.html'},
   {n:5, emoji:'💬', title:'Telling Your Story',        tags:['Conversation','Listening'], available:true, href:'intermediate_aula_05.html'},
-  {n:6, emoji:'🔀', title:'Mixed Past Tenses',         tags:['Grammar','Review'],         available:true, href:'intermediate_aula_06.html'},
+  {n:6, emoji:'🔀', title:'Mixed Past Tenses',         tags:['Narrativa','Review'],       available:true, href:'intermediate_aula_06.html'},
   {n:7, emoji:'🔢', title:'Many or Much?',           tags:['Quantidade','Fala do dia a dia'], available:true, href:'intermediate_aula_07.html'},
   {n:8, emoji:'🤷', title:'Some or Any?',            tags:['Quantidade','Fala do dia a dia'], available:true, href:'intermediate_aula_08.html'},
-  {n:9, emoji:'🔄', title:'Passive Voice',             tags:['Grammar','Professional'],   available:true, href:'intermediate_aula_09.html'},
+  {n:9, emoji:'🔄', title:'Passive Voice',             tags:['Foco na Ação','Professional'], available:true, href:'intermediate_aula_09.html'},
   {n:10,emoji:'🎭', title:'Conversation: My Career',  tags:['Conversation','Listening'], available:true, href:'intermediate_aula_10.html'},
-  {n:11,emoji:'📰', title:'Articles: A, An, The',     tags:['Grammar','Articles'],       available:true, href:'intermediate_aula_11.html'},
-  {n:12,emoji:'⚙️', title:'Modal Verbs Advanced',     tags:['Grammar','Modals'],         available:true, href:'intermediate_aula_12.html'},
-  {n:13,emoji:'🔗', title:'Relative Clauses',         tags:['Grammar','Clauses'],        available:true, href:'intermediate_aula_13.html'},
-  {n:14,emoji:'🎬', title:'Gerunds & Infinitives',    tags:['Grammar','Verbs'],          available:true, href:'intermediate_aula_14.html'},
+  {n:11,emoji:'📰', title:'Articles: A, An, The',     tags:['Precisão','Articles'],      available:true, href:'intermediate_aula_11.html'},
+  {n:12,emoji:'⚙️', title:'Modal Verbs Advanced',     tags:['Certeza & Dica','Modals'],  available:true, href:'intermediate_aula_12.html'},
+  {n:13,emoji:'🔗', title:'Relative Clauses',         tags:['Conexão','Fluência'],       available:true, href:'intermediate_aula_13.html'},
+  {n:14,emoji:'🎬', title:'Gerunds & Infinitives',    tags:['Combinações','Verbs'],      available:true, href:'intermediate_aula_14.html'},
   {n:15,emoji:'🌟', title:'Conversation: My Dream Life', tags:['Conversation','Listening'], available:true, href:'intermediate_aula_15.html'},
-  {n:16,emoji:'🔙', title:'Used to & Would',           tags:['Grammar','Past Habits'],    available:true, href:'intermediate_aula_16.html'},
-  {n:17,emoji:'🌠', title:'Wish & Regrets',            tags:['Grammar','Advanced'],       available:true, href:'intermediate_aula_17.html'},
-  {n:18,emoji:'❓', title:'Question Tags',             tags:['Grammar','Speaking'],       available:true, href:'intermediate_aula_18.html'},
-  {n:19,emoji:'🔮', title:'Future Forms',              tags:['Grammar','Future'],         available:true, href:'intermediate_aula_19.html'},
+  {n:16,emoji:'🔙', title:'Used to & Would',           tags:['Hábitos','Passado'],        available:true, href:'intermediate_aula_16.html'},
+  {n:17,emoji:'🌠', title:'Wish & Regrets',            tags:['Desejos','Hipóteses'],      available:true, href:'intermediate_aula_17.html'},
+  {n:18,emoji:'❓', title:'Question Tags',             tags:['Confirmação','Speaking'],   available:true, href:'intermediate_aula_18.html'},
+  {n:19,emoji:'🔮', title:'Future Forms',              tags:['Planos','Future'],          available:true, href:'intermediate_aula_19.html'},
   {n:20,emoji:'🎓', title:'Conversation: Looking Ahead', tags:['Conversation','Listening'], available:true, href:'intermediate_aula_20.html'},
 ];
 
@@ -312,6 +312,26 @@ LESSONS.forEach((l, i) => {
   `;
 
   grid.appendChild(card);
+
+  if (l.n % 10 === 0) {
+    const bloco = l.n / 10;
+    const miniCard = document.createElement('div');
+    miniCard.className = 'col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm';
+    miniCard.innerHTML = `
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-2xl font-black shrink-0 shadow">⚡</div>
+        <div>
+          <span class="inline-block text-[10px] font-black uppercase tracking-widest bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">Checkpoint a cada 10 Lições · 15 Minutos · 15 Questões</span>
+          <h3 class="font-black text-base text-navy mt-0.5">Mini-Prova ${bloco} — Lições ${bloco === 1 ? '01 a 10' : '11 a 20'} (Intermediate)</h3>
+          <p class="text-xs text-slate-600">Teste rápido com frases para completar, Listening e Speaking das lições ${bloco === 1 ? '01 a 10' : '11 a 20'}.</p>
+        </div>
+      </div>
+      <a href="mini_prova.html?curso=intermediate&bloco=${bloco}" class="w-full sm:w-auto text-center bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-xs sm:text-sm px-5 py-3 rounded-xl shadow transition shrink-0">
+        ⚡ Fazer Mini-Prova ${bloco} →
+      </a>
+    `;
+    grid.appendChild(miniCard);
+  }
 });
 
 try {

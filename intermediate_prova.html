@@ -297,8 +297,8 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=skins1"></script>
-<script src="tts-en.js?v=c52d7db"></script>
+<script src="components.js?v=som2"></script>
+<script src="tts-en.js?v=som1"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
@@ -771,11 +771,31 @@ function formatTime(sec) {
   return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
 }
 
+function prepareShuffledOptions() {
+  let lastCorrectPos = -1;
+  EXAM_QUESTIONS.forEach(q => {
+    const arr = [...q.opts];
+    for (let attempt = 0; attempt < 10; attempt++) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      const pos = arr.indexOf(q.ans);
+      if (pos !== lastCorrectPos) {
+        lastCorrectPos = pos;
+        break;
+      }
+    }
+    q._shuffledOpts = arr;
+  });
+}
+
 function startExam() {
   currentIdx = 0;
   remainingSec = EXAM_DURATION_SEC;
   examStartTime = Date.now();
   userResponses = {};
+  prepareShuffledOptions();
   if (activeMicIndex !== null && window.CapyMic) {
     CapyMic.cancel();
     activeMicIndex = null;
