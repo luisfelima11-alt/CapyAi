@@ -400,6 +400,7 @@ const Components = {
                     document.addEventListener('stateChanged', () => this.refreshStats());
                     this._statsListenerAdded = true;
                 }
+                this.posicionarStickies();
             }
             if (containerId === 'side-nav-placeholder') {
                 this.initSideNavScroll();
@@ -408,6 +409,34 @@ const Components = {
                 this.initMoreSheet();
             }
         }
+    },
+
+    // Barras "sticky top-0" das páginas (barra de passos e abas das aulas, barra
+    // da mini-prova...) grudavam no topo da janela, ATRÁS do menu fixo
+    // (#top-nav-bar, z-50, ~63 px). Ao rolar, o aluno perdia as setas ‹ › e as
+    // abas. Aqui elas passam a grudar logo abaixo do menu. Vale para as que já
+    // estão na página quando o menu é montado e para as que aparecem até o
+    // DOMContentLoaded; recalcula no resize. Estilo pelo CSSOM (el.style), que a
+    // CSP estrita aceita (um <style> novo seria bloqueado em account/login).
+    // O script de auto-esconder do menu (no template acima) nunca rodou: script
+    // dentro de innerHTML não executa. Então o menu fica sempre visível.
+    posicionarStickies() {
+        if (!document.getElementById('top-nav-bar')) return;
+        const aplicar = () => {
+            const nav = document.getElementById('top-nav-bar');
+            if (!nav) return;
+            const h = Math.round(nav.getBoundingClientRect().height);
+            if (!h) return;
+            document.querySelectorAll('.sticky.top-0').forEach(el => {
+                if (!nav.contains(el)) el.style.top = h + 'px';
+            });
+        };
+        aplicar();
+        if (this._stickiesPosicionados) return;
+        this._stickiesPosicionados = true;
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aplicar);
+        window.addEventListener('load', aplicar);
+        window.addEventListener('resize', aplicar);
     },
 
     // ── Icon system — outline SVGs replacing chapter/course emojis ───────────
