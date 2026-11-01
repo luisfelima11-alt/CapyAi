@@ -1257,9 +1257,12 @@ Rules: keep every reply under 2 sentences; use beginner ${targetLanguage}; alway
 
     fs.readFile(filePath, (error, content) => {
         if (error) {
-            if (error.code === 'ENOENT') {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
-                res.end('404 Not Found', 'utf-8');
+            if (error.code === 'ENOENT' || error.code === 'EISDIR') {
+                // Espelha a última rota do vercel.json: endereço que não existe mostra o 404.html.
+                fs.readFile(path.join(ROOT, '404.html'), (erro404, pagina) => {
+                    res.writeHead(404, { 'Content-Type': erro404 ? 'text/plain' : 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+                    res.end(req.method === 'HEAD' ? undefined : (erro404 ? '404 Not Found' : pagina));
+                });
             } else {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
                 res.end('Server Error: ' + error.code, 'utf-8');
