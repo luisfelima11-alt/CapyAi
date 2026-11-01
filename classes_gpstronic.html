@@ -353,18 +353,18 @@ LESSONS.forEach((l, i) => {
   `;
   grid.appendChild(card);
 
-  // Checkpoints: a Mini-Prova 1 cobre 01–10 e a 2 cobre 11–14 (mini_prova.html).
-  // As aulas 15–22 ainda não têm mini-prova; o card fica depois da 14.
-  if (l.n === 10 || l.n === 14) {
-    const bloco = l.n === 10 ? 1 : 2;
-    const rangeLabel = bloco === 1 ? '01 a 10' : '11 a 14';
+  // Checkpoints (mini_prova.html): a Mini-Prova 1 cobre 01–10, a 2 cobre 11–14
+  // e a 3 cobre 15–22. Cada card fica logo depois da última aula que a prova cobre.
+  const CHECKPOINTS = { 10: [1, '01 a 10'], 14: [2, '11 a 14'], 22: [3, '15 a 22'] };
+  if (CHECKPOINTS[l.n]) {
+    const [bloco, rangeLabel] = CHECKPOINTS[l.n];
     const miniCard = document.createElement('div');
     miniCard.className = 'col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 rounded-2xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-50 via-teal-50 to-green-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm';
     miniCard.innerHTML = `
       <div class="flex items-center gap-3.5">
         <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl font-black shrink-0 shadow">⚡</div>
         <div>
-          <span class="inline-block text-[10px] font-black uppercase tracking-widest bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full">Checkpoint a cada 10 Lições · 15 Minutos · 15 Questões</span>
+          <span class="inline-block text-[10px] font-black uppercase tracking-widest bg-emerald-200 text-emerald-900 px-2.5 py-0.5 rounded-full">Checkpoint · 15 Minutos · 15 Questões</span>
           <h3 class="font-black text-base text-navy mt-0.5">Mini-Prova ${bloco} — Aulas ${rangeLabel} (GPS Tronic)</h3>
           <p class="text-xs text-slate-600">Avaliação rápida de bancada, cabos, sensores, Listening e Speaking das aulas ${rangeLabel}.</p>
         </div>
