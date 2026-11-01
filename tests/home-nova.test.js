@@ -51,11 +51,11 @@ test('call card: free trial, Super, and the Super invite after the trial', () =>
   for (const c of Object.values(H.CARTAO)) assert.doesNotMatch(`${c.titulo} ${c.texto} ${c.sub}`, /sem limite|ilimitad/i);
 });
 
-test('continue card: last opened lesson, paywall respected, bad records ignored', () => {
+test('continue card: last opened lesson, every lesson free, bad records ignored', () => {
   const H = carregarHome();
   const r = { n: 14, title: 'Daily Routine', href: 'aula_14.html' };
   assert.deepEqual(puro(H.cursoAtual(r, 'pro')), { sub: 'Continuar o curso de inglês · Aula 14 de 44', titulo: 'Aula 14 — Daily Routine', pct: 32, href: 'aula_14.html' });
-  assert.equal(H.cursoAtual(r, 'free').href, 'classes.html');                     // aula paga: paywall do classes
+  assert.equal(H.cursoAtual(r, 'free').href, 'aula_14.html');                     // todas as aulas são grátis (01/nov/2026)
   assert.equal(H.cursoAtual({ ...r, n: 3, href: 'aula_03.html' }, 'free').href, 'aula_03.html');
   for (const ruim of [null, {}, { ...r, href: 'javascript:alert(1)' }, { ...r, n: 99 }, { ...r, title: 5 }]) {
     assert.equal(H.cursoAtual(ruim, 'super').href, 'classes.html');
