@@ -18,7 +18,7 @@
 
   // A mesma versao que a ai_chat.html e a entrevista.html carregam. Um teste
   // garante que as tres andam juntas.
-  const CORE_SRC = 'conversa-core.js?v=aula20260924';
+  const CORE_SRC = 'conversa-core.js?v=vt1';
 
   // ── Em que aula estamos ──────────────────────────────────────────────────
   // Aula de curso: o proprio nome do arquivo. Trilha (lessons.html): a licao
@@ -546,8 +546,10 @@
       },
       aoErro(mensagem, info) {
         const erro = info && info.erro;
-        if (erro === 'plano_sem_voz') {
-          addAviso('A ligação com a Yara faz parte do plano Super.', { href: 'account.html', texto: 'Ver planos' });
+        if (erro === 'plano_sem_voz' && info.teste === 'confirmar_email') {
+          addAviso('Confirme seu e-mail para usar a ligação de teste grátis (3 minutos).');
+        } else if (erro === 'plano_sem_voz') {
+          addAviso('Sua ligação de teste grátis já foi usada. Ligar sem limite faz parte do plano Super.', { href: 'account.html', texto: 'Ver planos' });
         } else if (erro === 'cota_de_voz') {
           addAviso('Você já usou os minutos de ligação deste mês. Eles renovam no dia 1º.');
         } else if (info && info.status === 401) {
@@ -561,7 +563,8 @@
         for (const div of vivas.values()) div.classList.remove('yw-viva');
         vivas.clear();
         if (dados) registrarUso(dados.uso, dados.duracaoMs);
-        const porque = { silencio: 'A ligação caiu depois de 3 minutos em silêncio.', tempo: 'A ligação chegou ao limite de 15 minutos.' }[motivo];
+        const porque = { silencio: 'A ligação caiu depois de 3 minutos em silêncio.', tempo: 'A ligação chegou ao limite de 15 minutos.',
+          teste: 'Acabaram seus 3 minutos grátis — ligar sem limite faz parte do plano Super.', cota: 'Acabaram seus minutos de voz deste mês.' }[motivo];
         addAviso((porque ? porque + ' ' : '') + 'Ligação encerrada. Se quiser, continue por escrito — eu lembro do que conversamos.');
         controles();
         estadoEl.textContent = '';

@@ -1,5 +1,132 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-10-19 — Curso de francês: pronúncia escrita em todo canto e voz do navegador
+
+**Sintoma:** as aulas de francês mostravam a pronúncia entre colchetes ("Bonjour [bon-JUR]") e a voz
+variava de aparelho para aparelho (e ficava muda no iPhone com a chave de silencioso).
+
+**Causa raiz:** a pronúncia estava em **cinco lugares** ao mesmo tempo: o campo `phon` (vocabulário e Speak),
+colchetes dentro de textos (verbos, expressões, quizzes, padrões), uma coluna inteira da tabela de horas da
+trilha, o texto fixo dos padrões e as folhas em PDF. A voz vinha do `tts-fr.js`, que usava a voz do navegador.
+Quizzes de "como se pronuncia?" tinham a pronúncia escrita como alternativa.
+
+**Correção:** `scripts/fr-sem-pronuncia.mjs` roda nos dois geradores e a geração falha se sobrar colchete.
+O `tts-fr.js` usa a voz da OpenAI (`lang=fr`) e pula o que está entre parênteses.
+
+**Armadilhas que me pegaram ao limpar (ficam aqui para a próxima vez):**
+- Tirar colchete de texto **sem olhar a estrutura**: `WO1_DATA[si]` virou `WO1_DATA` e quebrou o JavaScript.
+  O limpador só mexe em dados e em texto fixo, nunca em código.
+- Limpar a resposta certa (`a`) e **esquecer as alternativas** (`opts`, uma lista de textos): o quiz ficava sem
+  resposta certa. `confere()` valida resposta dentro das alternativas e alternativa vazia.
+- Arrumar a pontuação junto: em francês o espaço antes de `?` e `!` é o correto, e não pode sumir.
+- A trilha lê `data/lessons/<id>.json`, e não o `lessons_fr_data.js`: sem rodar `build-lesson-data.js` nada muda.
+
+**Como pegar isso de novo:**
+```bash
+node --test tests/frances-sem-pronuncia.test.js
+grep -rEc '\[[^]]*[A-ZÉ]{2,}[^]]*\]' data/lessons/20[1-9].json data/lessons/21[0-2].json   # só serve de olho; o teste é o juiz
+```
+
+
+---
+
+## 2026-10-19 — `aulas-contexto.json` "desatualizado" só com a máquina carregada
+
+**Sintoma:** com a CPU cheia, o teste `o api/aulas-contexto.json esta em dia com
+as paginas das aulas` (`tests/aula-contexto.test.js`) falhou uma vez com
+"rode `npm run aulas:contexto`", sem ninguém ter mexido em aula nenhuma.
+
+**Causa raiz:** `scripts/gera-contexto-aulas.js` avalia cada array das páginas
+com `vm.runInNewContext(..., { timeout: 200 })` e um `catch { continue; }` que
+engolia **qualquer** erro. Estourar o tempo era tratado igual a "o array
+referencia outra coisa, não é conteúdo": o array sumia em silêncio e o
+catálogo gerado saía menor que o commitado. Com 200ms e a máquina ocupada, os
+arrays grandes estouravam.
+
+**Correção:** timeout de 5s (só protege de laço infinito) e estouro vira
+**erro**, nunca saída menor.
+
+**Como pegar isso de novo:**
+```bash
+# Com timeout de 1ms a saída muda — prova que tempo influencia o resultado:
+sed 's/timeout: 5000 }/timeout: 1 }/' scripts/gera-contexto-aulas.js > scripts/_t.js && node -e "const g=require('./scripts/_t.js');try{g.gerar();console.log('nao estourou')}catch(e){console.log('erro alto, ok:',e.message)}"; rm scripts/_t.js
+```
+
+**Por que aconteceu:** `catch` genérico em gerador determinístico. Timeout é
+falha de ambiente, não dado; não pode virar "pula este item".
+
+---
+
+## 2026-10-19 — Teste da trilha francesa no CapyMic falhava às vezes com `['en']`
+
+**Sintoma:** o teste `trilha (lessons.html): a trava de 15s leva a fala para a
+correção, no idioma da trilha` (`tests/capy-mic.test.js`) falhava de vez em
+quando na suíte inteira com `expected ['fr'], actual ['en']`. Sozinho, passava
+sempre.
+
+**Causa raiz:** o teste abria `lessons.html` (lição 1, inglês), esperava só o
+`window.CapyMic` existir e então escrevia `CUR_TTS_LANG = 'fr-FR'` na mão. Mas a
+página ainda estava iniciando: o `DOMContentLoaded` da `lessons.html` é
+`async`, espera `carregarIndice()` e `garantirLicao(1)` (dois `fetch`) e só
+então chama `loadLesson(1)`, que **sobrescreve** `CUR_TTS_LANG = 'en-US'`. O
+evento `load` não espera esses `fetch`. Com a máquina folgada, o init acabava
+antes do teste escrever `fr-FR`; com a suíte inteira rodando, o init terminava
+**depois**, entre o `fr-FR` do teste e a trava de 15s, e o `toggleMic` lia `en`.
+Não era vazamento de estado: cada teste tem navegador e contexto próprios.
+
+**Correção:** o teste abre a trilha francesa de verdade
+(`lessons.html?lesson=201`) e espera a condição real,
+`currentLesson.id === 201 && CUR_TTS_LANG === 'fr-FR'`, antes de tocar no
+microfone. Sem `sleep`, e o teste agora cobre também o caminho
+lição → idioma do `loadLesson`, que antes era pulado.
+
+**Como pegar isso de novo:**
+```bash
+# Teste de página que mexe em global sem esperar o init async acabar:
+grep -nE "^\s+[A-Z_]{4,} = " tests/*.test.js
+# Prova determinística: segure o init até depois do ajuste manual, ex. esperar
+# currentLesson antes de page.clock.runFor(15_000) — o teste antigo falha 100%.
+```
+
+**Por que aconteceu:** `waitUntil: 'load'` + "a lib carregou" não quer dizer
+"a página terminou de iniciar". Se a página tem init `async` que escreve no
+mesmo estado que o teste, espere o **resultado** do init (a lição carregada),
+não um sinal vizinho.
+
+---
+
+## 2026-10-18 — "Traduzir palavras para" sempre voltava para Spanish
+
+**Sintoma:** em Configurações, o Luis escolhia o idioma da tradução dos flashcards,
+saía da página e, ao voltar, estava 🇪🇸 Spanish de novo. Em todos os usuários.
+
+**Causa raiz:** o `<select id="lang-select">` da `settings.html` não tinha `onchange`.
+O idioma só era gravado dentro de `saveAll()`, que é o botão "Salvar" **da skin**, e
+esse botão ainda saía mais cedo se o `Auth.saveAvatar()` falhasse. O padrão era
+`'Spanish'` (na `settings.html` e no `translateWord()` do flashcard), então todo
+aparelho novo começava em espanhol. O mesmo valia para "Efeitos sonoros", "Leitura
+em voz alta", "Recursos de IA" e a dificuldade: só o modo escuro gravava na hora.
+
+**Correção:** `salvarConfig()` grava o `capySettings` no momento da troca (idioma,
+interruptores e dificuldade) e mostra "✅ Ajustes salvos!". O padrão virou
+`'Portuguese'`, que é a primeira opção da lista. O `saveAll()` grava as configurações
+antes da skin.
+
+**Como pegar isso de novo:**
+```bash
+grep -n 'onchange="setLang' settings.html          # o seletor grava na troca
+grep -n "translateLang || 'Spanish'" *.html         # tem que voltar vazio
+```
+
+**Regra:** toda configuração grava na hora em que muda. Um botão "Salvar" de outra
+seção não pode ser o único caminho para gravar nada.
+
+**Fica para depois:** as configurações vivem só no `localStorage`. O
+`GET /api/db?type=settings` devolve `null` em produção, então elas não acompanham a
+conta entre aparelhos.
+
+---
+
 ## 2026-10-18 — No iPhone, logado, nenhuma aula tinha som (computador e tablet sim)
 
 **Sintoma:** o Luis e outro aluno, logados, no iPhone: o 🔊 não fazia som nenhum.
