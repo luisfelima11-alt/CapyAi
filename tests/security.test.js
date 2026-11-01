@@ -212,6 +212,50 @@ test('in production, reads from our own pages pass the AI gate with cookies; oth
   assert.equal(saida.escritaSemCsrf.erro, 'invalid_csrf');
 });
 
+test('a silent session refresh keeps the tab\'s CSRF token, so the next POST still passes', () => {
+  // Access tokens last about an hour; the next request renews them in
+  // getAuthenticatedSession. setSessionCookies issued a NEW CSRF cookie there,
+  // while the page had read its token once, at load: every later POST from that
+  // tab got 403 invalid_csrf until a reload (the mic in lessons.html, 29/set).
+  const saida = execFileSync(process.execPath, ['-e', `
+    global.fetch = async url => {
+      const r = (status, obj) => ({ ok: status < 400, status, text: async () => JSON.stringify(obj) });
+      if (String(url).endsWith('/auth/v1/user')) return r(401, { msg: 'JWT expired' });
+      if (String(url).includes('grant_type=refresh_token')) {
+        return r(200, { access_token: 'a2', refresh_token: 'r2', expires_in: 3600, user: { id: 'u1' } });
+      }
+      return r(404, {});
+    };
+    const S = require('./api/security');
+    const C = S.COOKIE_NAMES;
+    const resposta = () => ({ h: {}, setHeader(k, v) { this.h[k.toLowerCase()] = v; }, getHeader(k) { return this.h[k.toLowerCase()]; } });
+    const tokenDaAba = 'A'.repeat(43);
+    (async () => {
+      // "Ouvir exemplo": a GET with the expired access cookie renews the session.
+      const res = resposta();
+      await S.getAuthenticatedSession({ headers: { cookie: C.refresh + '=r1; ' + C.csrf + '=' + tokenDaAba } }, res);
+      const novo = [].concat(res.getHeader('set-cookie') || []).find(c => c.startsWith(C.csrf + '='));
+      const cookieCsrf = novo ? novo.split(';')[0].slice(C.csrf.length + 1) : null;
+      // The mic: a POST with the tab's token and the cookie the browser now holds.
+      let post = 'passa';
+      try {
+        S.assertCsrf({ headers: { origin: 'https://www.capyenglish.com.br', 'x-csrf-token': tokenDaAba,
+          cookie: C.access + '=a2; ' + C.csrf + '=' + cookieCsrf } });
+      } catch (e) { post = e.code; }
+      const noLogin = S.setSessionCookies(resposta(), { access_token: 'a3', refresh_token: 'r3', expires_in: 3600 });
+      console.log(JSON.stringify({ cookieCsrf, post, loginTrocou: noLogin !== tokenDaAba && /^[A-Za-z0-9_-]{43}$/.test(noLogin) }));
+    })();
+  `], {
+    cwd: ROOT, encoding: 'utf8',
+    env: { ...process.env, ...SEM_CHAVES, NODE_ENV: 'production', APP_ORIGIN: 'https://www.capyenglish.com.br',
+      SUPABASE_URL: 'https://supabase.invalid', SUPABASE_PUBLISHABLE_KEY: 'pk' },
+  });
+  const r = JSON.parse(saida.trim().split('\n').pop());
+  assert.equal(r.cookieCsrf, 'A'.repeat(43), 'the renewal must keep the CSRF token the tab holds');
+  assert.equal(r.post, 'passa');
+  assert.equal(r.loginTrocou, true, 'a new session (login) still gets a new token');
+});
+
 test('npm audit gate: production gets no exception; a dev-only one holds only until its date', () => {
   // 04/out: a high advisory for braces (no fixed release) reached us only through
   // tailwindcss 3, a dev tool, and failed every CI run. scripts/audit.js keeps
@@ -270,4 +314,16 @@ test('a Vercel Preview accepts sign-in from its own URLs; production still accep
   `;
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'preview' }, corpo), { deploy: 201, branch: 201, outroPreview: 403, site: 201 });
   assert.deepEqual(rodarApiEm({ ...env, VERCEL_ENV: 'production' }, corpo), { deploy: 403, branch: 403, outroPreview: 403, site: 201 });
+});
+
+test('the Super voice minutes on the sales pages match the server quota', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const minutos = Number(api.match(/const VOZ_MINUTOS_MES = \{[^}]*super:\s*(\d+)/)[1]);
+  assert.ok(minutos > 0);
+  for (const f of ['landing.html', 'assets/js/pages/account-1.js']) {
+    const texto = fs.readFileSync(path.join(ROOT, f), 'utf8');
+    const citados = [...texto.matchAll(/(\d+) min(?:utos)?(?:\/| por )mês/g)].map(m => Number(m[1]));
+    assert.ok(citados.length > 0, `${f} mentions the voice minutes`);
+    assert.deepEqual([...new Set(citados)], [minutos], `${f} must say ${minutos} min/mês`);
+  }
 });
