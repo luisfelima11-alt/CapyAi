@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Mini-Prova de 10 Lições | Capy English</title>
+<title>Mini-Prova | Capy English</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -36,7 +36,7 @@
       <a id="back-course-link" href="classes_intermediate.html" class="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm font-bold transition-colors mb-4">← Voltar ao Curso</a>
       <div class="flex flex-wrap items-center gap-2 mb-3">
         <span class="inline-flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/40 text-amber-200 rounded-full px-3.5 py-1 text-xs font-black uppercase tracking-wider">
-          ⚡ Mini-Prova · Checkpoint de 10 Lições
+          ⚡ Mini-Prova · Checkpoint do bloco
         </span>
         <span class="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-full px-3.5 py-1 text-xs font-bold">
           ⏱️ 15 Minutos · 15 Questões
@@ -46,7 +46,7 @@
         ⚡ Mini-Prova — Lições 1 a 10
       </h1>
       <p id="mini-exam-subtitle" class="text-white/80 text-sm md:text-base max-w-2xl">
-        Avalie o que você aprendeu nestas 10 lições: completar frases com expressões e preposições, situações práticas, listening e speaking!
+        Avalie o que você aprendeu nas lições deste bloco: completar frases com expressões e preposições, situações práticas, listening e speaking!
       </p>
 
       <!-- Switcher between Mini-Provas -->
@@ -87,9 +87,9 @@
         <div class="flex flex-col md:flex-row items-center gap-6 mb-6">
           <img src="yara.png?v=3" alt="Yara" class="w-24 h-24 rounded-full object-cover border-4 border-amber-300 shadow-md flex-shrink-0"/>
           <div>
-            <h2 id="intro-heading" class="text-2xl font-black text-navy mb-1">Pronto(a) para a Mini-Prova de 10 Lições?</h2>
+            <h2 id="intro-heading" class="text-2xl font-black text-navy mb-1">Pronto(a) para a Mini-Prova?</h2>
             <p id="intro-text" class="text-slate-600 text-sm leading-relaxed">
-              São <strong>15 questões rápidas (15 minutos)</strong> focadas exatamente nas 10 lições deste bloco: frases para completar com a alternativa correta, compreensão de áudio (Listening) e pronúncia no microfone (Speaking).
+              São <strong>15 questões rápidas (15 minutos)</strong> focadas exatamente nas lições deste bloco: frases para completar com a alternativa correta, compreensão de áudio (Listening) e pronúncia no microfone (Speaking).
             </p>
           </div>
         </div>
@@ -256,6 +256,30 @@ const MINI_EXAMS = {
       { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale em voz alta no microfone!', sentence:'Nice to meet you ___ Agrishow! Here is my business card.', fullTarget:'Nice to meet you at Agrishow! Here is my business card.', opts:['in','on','at','by'], ans:'at', rule:'Para eventos e feiras como a Agrishow, usamos AT: "at Agrishow"!' }
     ]
   },
+  'gpstronic_3': {
+    course: 'gpstronic',
+    bloco: 3,
+    backHref: 'classes_gpstronic.html',
+    title: '⚡ Mini-Prova 3 — GPS Tronic (Lições 15 a 22)',
+    subtitle: 'Calibração RTK, firmware, suporte por vídeo, garantia, treinamento de operador, estande na feira, relatório de conserto e emergência na colheita.',
+    questions: [
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Explicando a precisão da base RTK ao cliente (Aula 15):', sentence:'With RTK, the new system is accurate ___ two centimeters.', opts:['in','to','of','on'], ans:'to', rule:'Precisão de + medida = "accurate TO": "accurate to two centimeters".' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Pedindo para o operador mostrar a antena na videochamada (Aula 17):', sentence:'Can you point the camera ___ the antenna, please?', opts:['to','on','at','in'], ans:'at', rule:'Apontar para = "point AT": "Can you point the camera at the antenna?".' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Perguntando ao fornecedor se a peça tem garantia (Aula 18):', sentence:'I bought it two months ago. Is it still ___ warranty?', opts:['in','on','under','with'], ans:'under', rule:'Na garantia = "under warranty". Fora dela = "out of warranty".' },
+      { section:'expressoes', sectionLabel:'🛰️ Expressões da Oficina & Campo', promptPt:'Oferecendo uma demonstração no estande da feira (Aula 20):', sentence:'Would you like ___ a demo of our video support?', opts:['see','seeing','to see','saw'], ans:'to see', rule:'"Would you like TO + verbo?" é o convite educado: "Would you like to see a demo?".' },
+      { section:'contexto', sectionLabel:'🔧 Oficina, Fornecedor & Campo', promptPt:'Escrevendo o e-mail com o relatório do conserto (Aula 21):', sentence:'Please find ___ the invoice and the warranty certificate.', opts:['attach','attached','attaching','to attach'], ans:'attached', rule:'Fórmula fixa de e-mail: "Please find attached" + o documento.' },
+      { section:'contexto', sectionLabel:'🔧 Oficina, Fornecedor & Campo', promptPt:'Avisando o cliente durante a atualização de firmware (Aula 16):', sentence:'Please don\'t touch the screen ___ it\'s updating.', opts:['during','while','until','by'], ans:'while', rule:'"While" + frase (sujeito e verbo): "while it\'s updating". "During" vem antes de um substantivo: "during the update".' },
+      { section:'contexto', sectionLabel:'🔧 Oficina, Fornecedor & Campo', promptPt:'Ensinando a regra de segurança ao operador novo (Aula 19):', sentence:'If you ___ a person in front of the tractor, stop immediately.', opts:['will see','see','saw','seeing'], ans:'see', rule:'Instrução com "if": "If you see..., stop..." (presente depois do if, nada de will).' },
+      { section:'contexto', sectionLabel:'🔧 Oficina, Fornecedor & Campo', promptPt:'Combinando prazos da garantia com o fornecedor (Aula 18):', sentence:'The new receiver will arrive ___ next Friday, and I\'ll send the old one back ___ Monday.', opts:['until / until','by / by','in / on','for / at'], ans:'by / by', rule:'Prazo final = "by": "by next Friday", "by Monday". "Until" é para algo que continua até aquele momento.' },
+      { section:'contexto', sectionLabel:'🔧 Oficina, Fornecedor & Campo', promptPt:'Orientando o cliente numa emergência na colheita (Aula 22):', sentence:'Drive the combine manually ___ I arrive, and call me as soon as you ___ my car.', opts:['until / see','by / will see','while / saw','until / will see'], ans:'until / see', rule:'"Until I arrive" (até eu chegar) e "as soon as you see" — depois de until e de as soon as, o verbo fica no presente.' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'The calibration takes about thirty minutes. Before starting, make sure the tractor is turned off.', promptPt:'Ouça a técnica explicando a calibração e complete:', sentence:'The calibration takes ___, and before starting the tractor must be ___.', opts:['three hours / on','about thirty minutes / turned off','ten minutes / moving','one day / in the field'], ans:'about thirty minutes / turned off', rule:'O áudio diz: "It takes about thirty minutes. Before starting, make sure the tractor is turned off."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'I\'ve replaced the power connector and I\'ve updated the firmware. As you can see in photo two, the old connector is black.', promptPt:'Ouça o relatório do conserto e complete:', sentence:'The technician ___ the power connector and ___ the firmware.', opts:['ordered / deleted','replaced / updated','cleaned / turned off','tested / sold'], ans:'replaced / updated', rule:'Ouvimos: "I\'ve replaced the power connector and I\'ve updated the firmware."' },
+      { section:'listening', sectionLabel:'🎧 Listening Técnico', audioText:'I\'m leaving the shop now. I\'ll be there in forty minutes. Please send me a photo of the display as soon as you can.', promptPt:'Ouça a técnica na emergência e complete:', sentence:'She will be there in ___, and she wants ___.', opts:['four hours / a new combine','fourteen minutes / the invoice','forty minutes / a photo of the display','forty minutes / a cup of coffee'], ans:'forty minutes / a photo of the display', rule:'O áudio diz: "I\'ll be there in forty minutes. Please send me a photo of the display as soon as you can."' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale a frase completa no microfone!', sentence:'Our repairs are ___ than the big dealers.', fullTarget:'Our repairs are faster than the big dealers.', opts:['more fast','faster','fastest','fast'], ans:'faster', rule:'Adjetivo curto + -er + than: "faster than" (Aula 20).' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Grave sua voz dizendo a frase completa!', sentence:'Press and ___ the green button for three seconds.', fullTarget:'Press and hold the green button for three seconds.', opts:['hold','holding','to hold','held'], ans:'hold', rule:'Instrução de procedimento usa o verbo base: "Press and hold the green button" (Aula 19).' },
+      { section:'speaking', sectionLabel:'🗣️ Speaking Técnico', promptPt:'1º Complete a frase. 2º Fale em voz alta no microfone!', sentence:'It looks ___ the cable is loose.', fullTarget:'It looks like the cable is loose.', opts:['as','like','that','to'], ans:'like', rule:'"It looks like" + frase = "parece que": "It looks like the cable is loose" (Aula 17).' }
+    ]
+  },
   'agro_1': {
     course: 'agro',
     bloco: 1,
@@ -332,6 +356,7 @@ Object.entries(MINI_EXAMS).forEach(([k, ex]) => {
     intermediate_2: '🎯 Intermediate · Lições 11–20',
     gpstronic_1: '🛰️ GPS Tronic · Lições 1–10',
     gpstronic_2: '🛰️ GPS Tronic · Lições 11–14+',
+    gpstronic_3: '🛰️ GPS Tronic · Lições 15–22',
     agro_1: '🌱 Agro English · Lições 1–10',
     agro_2: '🌱 Agro English · Lições 11–20'
   };
@@ -658,9 +683,9 @@ function finishExam() {
   } catch (e) {}
 
   document.getElementById('res-emoji').textContent = passed ? '🏆' : '💪';
-  document.getElementById('res-title').textContent = passed ? 'Excelente! Checkpoint de 10 Lições Concluído!' : 'Bom treino! Revise o gabarito abaixo';
+  document.getElementById('res-title').textContent = passed ? 'Excelente! Checkpoint do bloco concluído!' : 'Bom treino! Revise o gabarito abaixo';
   document.getElementById('res-desc').textContent = passed
-    ? 'Você mandou muito bem nas 10 lições deste bloco e já pode avançar com segurança!'
+    ? 'Você mandou muito bem nas lições deste bloco e já pode avançar com segurança!'
     : 'Veja a explicação de cada frase abaixo e refaça a Mini-Prova quando quiser.';
   document.getElementById('res-score-pct').textContent = `${pct}%`;
   document.getElementById('res-score-raw').textContent = `${score} / ${total}`;
