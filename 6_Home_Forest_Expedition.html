@@ -8,7 +8,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Início — Capy English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link rel="manifest" href="manifest.json">
 <script>
@@ -25,36 +25,37 @@
           extend: {
             colors: {
               "navy": "#001f3f",
-              "pink-brand": "#ec4899", // tailwind pink-500
-              "green-brand": "#10b981", // tailwind emerald-500
-              "primary": "#001f3f", // Navy
-              "secondary": "#ec4899", // Pink
-              "tertiary": "#10b981", // Green
-              "on-primary": "#ffffff",
-              "background": "#ffffff",
-              "surface": "#f8fafc",
+              "pink-brand": "#ec4899",
+              "green-brand": "#10b981",
+              "fundo": "#f4f6fb",
             },
             fontFamily: {
               "headline": ["Plus Jakarta Sans"],
               "body": ["Plus Jakarta Sans"],
               "label": ["Plus Jakarta Sans"]
             },
-            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
           },
         },
       }
     </script>
 <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-    </style>
+  /* Home nova (29/out/2026): maquete aprovada "A com toques de B e C". */
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+  .ligar { background: linear-gradient(150deg, #001f3f 0%, #2e1065 70%, #ec4899 150%); }
+  .ligar.convite { background: linear-gradient(150deg, #001f3f 0%, #4c1d95 80%); }
+  .ligar .foto { box-shadow: 0 0 0 8px rgba(236,72,153,.2), 0 0 0 18px rgba(236,72,153,.08); }
+  .ligar .bola { background: #10b981; box-shadow: 0 10px 26px rgba(16,185,129,.55); }
+  .ligar.convite .bola { background: #ec4899; box-shadow: 0 10px 26px rgba(236,72,153,.5); }
+  .ligar a.acao:active .bola { transform: scale(.94); }
+  .dia b { display: grid; place-items: center; width: 2rem; height: 2rem; margin: .25rem auto 0; border-radius: 9999px; background: #fff; color: #001f3f; font-size: .8rem; }
+  .dia.feito b { background: #10b981; color: #fff; }
+  .dia.hoje b { background: #001f3f; color: #fff; box-shadow: 0 0 0 3px #fbcfe8; }
+  .dia.hoje.feito b { background: #10b981; }
+  @media (prefers-reduced-motion: no-preference) {
+    .pulso { animation: pulso 2.4s ease-in-out infinite; }
+    @keyframes pulso { 0%,100% { box-shadow: 0 10px 26px rgba(16,185,129,.55), 0 0 0 0 rgba(16,185,129,.45); } 50% { box-shadow: 0 10px 26px rgba(16,185,129,.55), 0 0 0 12px rgba(16,185,129,0); } }
+  }
+</style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
@@ -74,294 +75,92 @@
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 </head>
-<body class="bg-background text-slate-900 font-body selection:bg-pink-brand/30 selection:text-navy">
-<!-- Component Placeholders -->
+<body class="bg-white text-navy font-body selection:bg-pink-brand/30 selection:text-navy">
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
-<main class="md:pl-32 pt-28 px-6 max-w-7xl mx-auto">
-<!-- Greeting -->
-<section class="mb-6">
-<h1 class="font-headline text-3xl md:text-4xl font-extrabold text-navy leading-tight">
-  Bem-vindo de volta, <span class="text-pink-brand">explorador!</span>
-</h1>
-<p class="font-body text-base md:text-lg text-slate-500 mt-2 max-w-xl">
-  Aprenda inglês do seu jeito com a Yara. Aulas, jogos e conversa real que se adaptam a você.
-</p>
-</section>
+<main class="md:pl-32 pt-20 md:pt-24 px-4 md:px-8 pb-32 md:pb-12 max-w-6xl mx-auto">
 
-<!-- ── HERO: Fale com a Yara (pilar 3, destaque principal) ─────────────── -->
-<section class="mb-10">
-<div onclick="window.location.href='ai_chat.html'" class="group relative overflow-hidden rounded-[2rem] bg-navy shadow-2xl shadow-navy/30 cursor-pointer">
-<div class="grid md:grid-cols-2 items-stretch">
-
-  <!-- Left: video/avatar -->
-  <div class="relative h-56 md:h-auto">
-    <video autoplay loop muted playsinline class="w-full h-full object-cover object-top">
-      <source src="yara-chat.mp4" type="video/mp4"/>
-    </video>
-    <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-navy via-navy/10 to-transparent md:from-navy/90 md:via-navy/20 md:to-transparent"></div>
+<!-- Saudação + sequência e nível -->
+<header class="flex items-center justify-between gap-3">
+  <h1 class="font-headline text-2xl md:text-3xl font-extrabold leading-tight">
+    <span id="home-saudacao">Olá</span>,<br class="md:hidden"> <span id="home-nome" class="text-pink-brand">explorador!</span>
+  </h1>
+  <div class="flex gap-1.5 flex-none">
+    <a href="progress.html" class="bg-fundo rounded-full px-3 py-1.5 font-extrabold text-sm" title="Dias seguidos estudando">🔥 <span id="home-streak">0</span><span class="hidden md:inline"> dias</span></a>
+    <a href="progress.html" class="bg-fundo rounded-full px-3 py-1.5 font-extrabold text-sm" title="Seu nível">⭐ <span class="hidden md:inline">Nível </span><span id="home-nivel">1</span></a>
   </div>
+</header>
 
-  <!-- Right: text + CTA -->
-  <div class="relative z-10 p-6 md:p-8 flex flex-col justify-center gap-4">
-    <div class="flex items-center gap-2">
-      <span class="relative flex h-2.5 w-2.5">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+<!-- No celular: semana, ligação, plano, curso. No computador: ligação + curso à
+     esquerda, semana + plano à direita. -->
+<div class="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] gap-4 md:gap-6 mt-4 md:mt-6 md:items-start">
+
+  <!-- Semana (seg a dom) -->
+  <section class="md:col-start-2 md:row-start-1 bg-fundo rounded-[1.5rem] px-3 py-2.5" aria-label="Sua semana">
+    <ol id="home-semana" class="flex justify-between"></ol>
+  </section>
+
+  <!-- Ligação com a Yara (ou o convite para o Super, depois do teste grátis) -->
+  <section id="home-ligar" data-estado="normal" class="ligar md:col-start-1 md:row-start-1 md:row-span-2 relative overflow-hidden rounded-[2rem] text-white p-5 md:p-7 min-h-[228px] md:min-h-[330px]">
+    <p id="hl-selo" class="text-[11px] font-extrabold tracking-widest text-emerald-300">● YARA ONLINE</p>
+    <h2 id="hl-titulo" class="text-[22px] md:text-[32px] font-extrabold leading-tight mt-2 mb-1.5 max-w-[210px] max-[359px]:max-w-none md:max-w-[330px]">Pratique conversando agora</h2>
+    <p id="hl-texto" class="text-[13px] md:text-[15px] text-white/75 max-w-[210px] max-[359px]:max-w-none md:max-w-[300px]">Ligação de voz em inglês, no seu nível. Ela corrige com carinho e te devolve um resumo no fim.</p>
+    <a id="hl-acao" href="ai_chat.html#ligar" class="acao relative z-10 mt-4 inline-flex items-center gap-3 rounded-full pr-4">
+      <span id="hl-bola" class="bola pulso w-16 h-16 md:w-[76px] md:h-[76px] rounded-full grid place-items-center text-[26px] md:text-[30px] flex-none transition-transform" aria-hidden="true">📞</span>
+      <span>
+        <b id="hl-acao-titulo" class="block text-[15px]">Ligar para a Yara</b>
+        <small id="hl-acao-sub" class="block text-xs font-bold text-pink-200">Fale em inglês no seu ritmo</small>
       </span>
-      <p class="font-label text-emerald-300 text-xs font-black uppercase tracking-widest">Yara online</p>
+    </a>
+    <a id="hl-chat" href="ai_chat.html" class="relative z-10 block mt-3 text-xs font-bold text-white/70 hover:text-white w-fit">ou converse por mensagem →</a>
+    <img class="foto max-[359px]:hidden absolute rounded-full object-cover -right-6 top-7 w-[150px] h-[150px] md:right-7 md:top-auto md:bottom-7 md:w-[200px] md:h-[200px]" src="yara.png" alt="" width="230" height="230" onerror="this.remove()"/>
+  </section>
+
+  <!-- Seu plano de hoje (plano-hoje.js + plano-hoje-cartao.js, os mesmos do study_plan) -->
+  <section id="plano-hoje" class="md:col-start-2 md:row-start-2 md:row-span-2" aria-live="polite">
+    <div class="flex items-baseline justify-between gap-3">
+      <h2 class="text-[17px] font-extrabold">Seu plano de hoje</h2>
+      <span id="ph-resumo" class="text-sm font-extrabold text-pink-brand"></span>
     </div>
-    <h2 class="font-headline text-2xl md:text-3xl font-extrabold text-white leading-snug">
-      Puxa um papo em inglês agora — ela te espera 💬
-    </h2>
-
-    <!-- Mini chat preview -->
-    <div class="flex flex-col gap-2 max-w-sm">
-      <div class="self-start bg-white/10 text-white/90 text-sm font-body rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%]">
-        Hi! What did you do today? 🌿
-      </div>
-      <div class="self-end bg-pink-500 text-white text-sm font-body rounded-2xl rounded-br-md px-4 py-2.5 max-w-[85%]">
-        I went to the park with my dog!
-      </div>
+    <ul id="ph-itens" class="mt-2.5 bg-fundo rounded-[1.5rem] px-4 divide-y divide-slate-200"></ul>
+    <div class="mt-2.5 flex flex-wrap items-center gap-3 bg-fundo rounded-[1.5rem] px-4 py-3">
+      <label for="ph-hora" class="text-sm font-bold">⏰ Todo dia às</label>
+      <input id="ph-hora" type="time" step="300" class="bg-white border-0 rounded-full px-3 py-1.5 text-sm font-bold text-navy">
+      <span class="ml-auto flex flex-wrap gap-2">
+        <a id="ph-google" target="_blank" rel="noopener" class="whitespace-nowrap bg-navy text-white font-extrabold text-xs px-4 py-2 rounded-full" aria-label="Pôr no Google Agenda">📅 Google</a>
+        <a id="ph-ics" class="whitespace-nowrap bg-white text-navy font-extrabold text-xs px-4 py-2 rounded-full" aria-label="Pôr no calendário do iPhone ou Outlook">🍎 iPhone / Outlook</a>
+      </span>
     </div>
+  </section>
 
-    <!-- Escrever aqui mesmo. O texto vai por sessionStorage, não por query
-         string: é conteúdo do aluno e não tem por que aparecer na URL, no
-         histórico do navegador nem no Referer. -->
-    <form id="home-chat-form" onsubmit="event.preventDefault();event.stopPropagation();iniciarPapo();"
-          onclick="event.stopPropagation();"
-          class="mt-2 flex items-center gap-2 max-w-sm bg-white/10 border border-white/15 rounded-full pl-4 pr-1.5 py-1.5 focus-within:border-pink-400/60 focus-within:bg-white/[0.14] transition-colors">
-      <label for="home-chat-input" class="sr-only">Escreva sua mensagem para a Yara</label>
-      <input id="home-chat-input" type="text" autocomplete="off" maxlength="300"
-             placeholder="Escreva em inglês..."
-             class="flex-1 min-w-0 bg-transparent border-0 outline-none text-white text-sm font-body placeholder-white/45 py-1.5"/>
-      <button type="submit" aria-label="Começar a conversa"
-              class="shrink-0 inline-flex items-center justify-center gap-1.5 bg-pink-500 hover:bg-pink-400 text-white font-label font-black px-4 py-2.5 rounded-full text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-pink-500/30">
-        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">send</span>
-        <span class="hidden sm:inline">Enviar</span>
-      </button>
-    </form>
-    <p class="text-white/45 text-xs font-body -mt-1">Ou <button type="button" onclick="event.stopPropagation();iniciarPapo(true);" class="underline underline-offset-2 hover:text-white/80 transition-colors">só abrir o chat</button> e ver o que ela pergunta.</p>
-  </div>
-
-</div>
-</div>
-</section>
-
-<!-- ── 3 Pilares ─────────────────────────────────────────────────────── -->
-<section class="mb-12">
-<div class="grid md:grid-cols-3 gap-5">
-
-  <!-- Pilar 1: Trilha Diária -->
-  <div id="home-continue-card" onclick="goToLearning()" class="group bg-gradient-to-br from-amber-400 to-orange-500 rounded-[1.75rem] p-6 shadow-xl shadow-amber-500/20 cursor-pointer hover:-translate-y-1 active:scale-[0.99] transition-all flex flex-col">
-    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl mb-4">🛤️</div>
-    <p id="home-lesson-title" class="text-white font-black text-xl mb-1">Trilha Diária</p>
-    <p id="home-lesson-sub" class="text-amber-100 text-sm mb-4 flex-1">Suas lições diárias gamificadas — continue de onde parou!</p>
-    <div class="mb-3 bg-white/20 rounded-full h-2 overflow-hidden">
-      <div id="home-progress-bar" class="h-full bg-white rounded-full transition-all" style="width:0%"></div>
-    </div>
-    <span class="inline-flex items-center gap-1 bg-white/20 group-hover:bg-white/30 text-white font-bold text-sm px-4 py-2 rounded-full w-fit transition-all">Continuar trilha →</span>
-  </div>
-
-  <!-- Pilar 2: Cursos -->
-  <div onclick="window.location.href='classes.html'" class="group bg-gradient-to-br from-violet-500 to-purple-600 rounded-[1.75rem] p-6 shadow-xl shadow-violet-500/20 cursor-pointer hover:-translate-y-1 active:scale-[0.99] transition-all flex flex-col">
-    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl mb-4">📚</div>
-    <p class="text-white font-black text-xl mb-1">Cursos</p>
-    <p class="text-violet-200 text-sm mb-4 flex-1">7 cursos · 140+ aulas — inglês, francês e turco A1 completo.</p>
-    <span class="inline-flex items-center gap-1 bg-white/20 group-hover:bg-white/30 text-white font-bold text-sm px-4 py-2 rounded-full w-fit transition-all">Ver cursos →</span>
-  </div>
-
-  <!-- Pilar 3: Conversa ao vivo -->
-  <div onclick="window.location.href='ai_chat.html'" class="group bg-gradient-to-br from-pink-500 to-rose-600 rounded-[1.75rem] p-6 shadow-xl shadow-pink-500/20 cursor-pointer hover:-translate-y-1 active:scale-[0.99] transition-all flex flex-col">
-    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl mb-4">💬</div>
-    <p class="text-white font-black text-xl mb-1">Conversa ao vivo</p>
-    <p class="text-pink-200 text-sm mb-4 flex-1">Fale e ouça em inglês com a Yara, sua IA de conversação.</p>
-    <span class="inline-flex items-center gap-1 bg-white/20 group-hover:bg-white/30 text-white font-bold text-sm px-4 py-2 rounded-full w-fit transition-all">Começar conversa →</span>
-  </div>
-
+  <!-- Continuar o curso (a última aula aberta em classes.html) -->
+  <a id="home-curso" href="classes.html" class="md:col-start-1 md:row-start-3 flex gap-3 items-center bg-white rounded-[1.5rem] p-3 shadow-[0_6px_18px_rgba(0,31,63,.08)] hover:-translate-y-0.5 transition-transform">
+    <span class="w-[52px] h-[52px] rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 grid place-items-center text-2xl flex-none" aria-hidden="true">📘</span>
+    <span class="flex-1 min-w-0">
+      <small id="hc-sub" class="block text-xs font-semibold text-slate-500 mb-0.5">Comece o curso de inglês</small>
+      <b id="hc-titulo" class="block text-sm font-extrabold truncate">Aula 1 — To Have, Want, Need &amp; Like</b>
+      <span class="block h-1.5 rounded-full bg-slate-200 overflow-hidden mt-1.5"><i id="hc-barra" class="block h-full bg-green-brand rounded-full" style="width:0%"></i></span>
+    </span>
+    <span class="w-10 h-10 rounded-full bg-pink-brand text-white grid place-items-center font-extrabold flex-none" aria-hidden="true">→</span>
+  </a>
 </div>
 
-<!-- ── Simulação de entrevista ────────────────────────────────────────────
-     Faixa própria, fora da grade de 3 pilares: é um treino com hora marcada
-     ("tenho entrevista quinta"), não uma atividade do dia a dia. -->
-<div onclick="window.location.href='entrevista.html'"
-     class="group mt-5 bg-navy border-2 border-amber-400/40 rounded-[1.75rem] p-6 cursor-pointer hover:-translate-y-1 hover:border-amber-400/70 active:scale-[0.99] transition-all flex items-center gap-5 flex-wrap">
-  <div class="w-14 h-14 bg-amber-400/15 rounded-2xl flex items-center justify-center text-3xl flex-none">💼</div>
-  <div class="flex-1 min-w-[220px]">
-    <p class="text-white font-black text-xl mb-1">Treinar entrevista de emprego</p>
-    <p class="text-slate-300 text-sm">Ligação com um recrutador em inglês. Ele não corrige no meio —
-    a devolutiva vem no fim.</p>
-  </div>
-  <span class="inline-flex items-center gap-1 bg-amber-400 group-hover:bg-amber-300 text-navy font-black text-sm px-5 py-2.5 rounded-full w-fit transition-all flex-none">Simular agora →</span>
-</div>
-</section>
-
-<!-- Bento Grid: Daily Quest & Progress -->
-<section class="mb-14">
-<div class="grid md:grid-cols-3 gap-5">
-<!-- Daily Quest Card -->
-<div class="md:col-span-2 bg-slate-50 border border-slate-100 rounded-[2rem] p-6 flex flex-col gap-5 relative overflow-hidden">
-<div class="flex justify-between items-center relative z-10">
-<div>
-<h2 class="font-headline text-2xl font-extrabold text-navy">Missão do dia</h2>
-<p class="font-label text-slate-400 text-sm">Complete para ganhar estrelas da floresta!</p>
-</div>
-<div id="quest-counter" class="bg-navy text-white px-4 py-1.5 rounded-full font-bold text-sm">
-                        0 de 3 feitas
-                    </div>
-</div>
-<div id="quest-list" class="space-y-3 relative z-10"></div>
-<!-- Decorative element -->
-<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-navy/5 rotate-12" style="font-variation-settings: 'FILL' 1;">forest</span>
-</div>
-<!-- Profile Mini Stats -->
-<div class="bg-navy rounded-[2rem] p-6 flex flex-col items-center justify-center text-center gap-4 text-white">
-<div class="relative">
-<img alt="Yara avatar" class="w-24 h-24 rounded-full border-4 border-pink-brand object-cover" src="yara-avatar.png" onerror="this.onerror=null;this.src='yara.svg'"/>
-<div id="stat-level-badge" class="absolute -bottom-2 -right-2 bg-pink-brand text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md">12</div>
-</div>
-<div>
-<h3 id="stat-player-name" class="font-headline text-2xl font-bold">Olá, explorador!</h3>
-<p id="stat-level-text" class="font-label text-green-brand font-medium italic">Nível 12 · Brotinho</p>
-</div>
-<div class="w-full bg-slate-700 rounded-full h-3 mt-2">
-<div id="stat-xp-bar" class="bg-green-brand h-full rounded-full w-3/4"></div>
-</div>
-<p id="stat-xp-text" class="text-xs font-label text-slate-400">750 / 1000 XP para o nível 13</p>
-</div>
-</div>
-</section>
-<!-- Feature Grid: Interactive Zones -->
-<section class="mb-14">
-<h2 class="font-headline text-2xl md:text-3xl font-extrabold text-navy mb-6">Para onde agora?</h2>
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-<!-- Zone 1 -->
-<div onclick="window.location.href='2_Flashcard_Journey_Expedition_Edition.html'" class="group bg-gradient-to-br from-slate-50 to-blue-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-blue-100">
-<div class="w-14 h-14 bg-navy/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-navy/12 transition-all">
-<span class="material-symbols-outlined text-navy text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
-</div>
-<h4 class="font-headline text-base font-bold text-navy">Word Forest</h4>
-<p class="font-body text-xs text-slate-500 leading-relaxed">Flashcards e vocabulário do dia</p>
-</div>
-<!-- Zone 2 -->
-<div onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="group bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-pink-100">
-<div class="w-14 h-14 bg-pink-brand/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-pink-brand/12 transition-all">
-<span class="material-symbols-outlined text-pink-brand text-3xl" style="font-variation-settings: 'FILL' 1;">extension</span>
-</div>
-<h4 class="font-headline text-base font-bold text-pink-brand">Game Lake</h4>
-<p class="font-body text-xs text-slate-500 leading-relaxed">Quebra-cabeças e desafios de inglês</p>
-</div>
-<!-- Zone 3 -->
-<div onclick="window.location.href='3_Dialogue_Expedition_Yara_Turn.html'" class="group bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-emerald-100">
-<div class="w-14 h-14 bg-green-brand/8 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-green-brand/12 transition-all">
-<span class="material-symbols-outlined text-green-brand text-3xl" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
-</div>
-<h4 class="font-headline text-base font-bold text-green-brand">Yara Talk</h4>
-<p class="font-body text-xs text-slate-500 leading-relaxed">Pratique conversas de verdade</p>
-</div>
-<!-- Zone 4 -->
-<div onclick="window.location.href='progress.html'" class="group bg-gradient-to-br from-violet-50 to-purple-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-violet-100">
-
-<h4 class="font-headline text-base font-bold text-violet-600">Meu progresso</h4>
-<p class="font-body text-xs text-slate-500 leading-relaxed">Medalhas, XP e conquistas</p>
-</div>
-<!-- Zone 5 — AI Chat -->
-<div onclick="window.location.href='ai_chat.html'" class="group relative bg-gradient-to-br from-pink-50 to-purple-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-pink-200 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-pink-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-pink-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
-    <span class="material-symbols-outlined text-pink-500 text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-pink-600">Conversar com a Yara</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Fale com a Yara em inglês de verdade</p>
-</div>
-<!-- Zone 6 — Story Time -->
-<div onclick="window.location.href='story_time.html'" class="group relative bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-amber-200 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-amber-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-amber-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
-    <span class="material-symbols-outlined text-amber-600 text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-amber-600">AI Story Time</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">A Yara escreve uma história para você</p>
-</div>
-<!-- Zone 7 — Pronunciation Practice -->
-<div onclick="window.location.href='pronun_practice.html'" class="group relative bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-teal-100">
-  <div class="w-14 h-14 bg-teal-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-teal-500/20 transition-all">
-    <span class="material-symbols-outlined text-teal-600 text-3xl" style="font-variation-settings: 'FILL' 1;">mic</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-teal-600">Say It Right!</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Treine sua pronúncia</p>
-</div>
-<!-- Zone 8 — YouTube Lab -->
-<div onclick="window.location.href='youtube_lab.html'" class="group relative bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-red-100 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-red-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-red-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-red-500/20 transition-all">
-    <span class="material-symbols-outlined text-red-500 text-3xl" style="font-variation-settings: 'FILL' 1;">smart_display</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-red-500">YouTube Lab</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Aprenda inglês com vídeos do YouTube</p>
-</div>
-<!-- Zone 9 — Music Lab -->
-<div onclick="window.location.href='music_lab.html'" class="group relative bg-gradient-to-br from-purple-50 to-fuchsia-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-purple-100 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-purple-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-purple-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-500/20 transition-all">
-    <span class="material-symbols-outlined text-purple-500 text-3xl" style="font-variation-settings: 'FILL' 1;">music_note</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-purple-600">Music Lab</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Aprenda inglês com letras de música</p>
-</div>
-<!-- Zone 10 — Meu Plano -->
-<div onclick="window.location.href='study_plan.html'" class="group bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-indigo-100">
-  
-  <h4 class="font-headline text-base font-bold text-indigo-600">Meu Plano</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Seu plano de estudos semanal</p>
-</div>
-<!-- Zone 11 — Trilha Diária -->
-<div onclick="window.location.href='learn.html'" class="group bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-amber-100">
-  
-  <h4 class="font-headline text-base font-bold text-amber-600">Trilha Diária</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Lições gamificadas no seu ritmo</p>
-</div>
-<!-- Zone 12 — Cursos -->
-<div onclick="window.location.href='classes.html'" class="group bg-gradient-to-br from-violet-50 to-purple-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-violet-100">
-  <div class="w-14 h-14 bg-violet-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-violet-500/20 transition-all">
-    <span class="material-symbols-outlined text-violet-500 text-3xl" style="font-variation-settings: 'FILL' 1;">school</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-violet-600">Cursos</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">7 cursos · 140+ aulas · A1→B2</p>
-</div>
-<!-- Zone 13 — Newsline -->
-<div onclick="window.location.href='newsline.html'" class="group relative bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-pink-200 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-pink-500 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-pink-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
-    <span class="material-symbols-outlined text-pink-500 text-3xl" style="font-variation-settings: 'FILL' 1;">newspaper</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-pink-600">Newsline</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Aprenda com notícias de verdade</p>
-</div>
-<!-- Zone 14 — Historyline -->
-<div onclick="window.location.href='historyline.html'" class="group relative bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-[1.5rem] text-center flex flex-col gap-3 hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border border-amber-200 overflow-hidden">
-  <div class="absolute top-2.5 right-2.5 bg-amber-600 text-white font-label font-bold text-[10px] px-1.5 py-0.5 rounded-full">AI</div>
-  <div class="w-14 h-14 bg-amber-500/10 rounded-2xl mx-auto flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
-    <span class="material-symbols-outlined text-amber-600 text-3xl" style="font-variation-settings: 'FILL' 1;">history_edu</span>
-  </div>
-  <h4 class="font-headline text-base font-bold text-amber-700">Historyline</h4>
-  <p class="font-body text-xs text-slate-500 leading-relaxed">Aprenda idiomas com fatos históricos</p>
-</div>
-</div>
-</section>
-
-<!-- ── Lesson Trail ─────────────────────────────────────────────── -->
-<section class="mb-16">
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <h2 class="font-headline text-2xl font-extrabold text-navy">Trilha de aulas 📚</h2>
-      <p class="text-slate-400 text-sm">Siga a trilha, uma aula por vez</p>
-    </div>
-    <a href="lessons.html" class="text-pink-brand font-label font-bold text-sm hover:underline">Ver todas →</a>
-  </div>
-  <div id="lesson-trail" class="relative">
-    <div class="text-center py-10 text-slate-300 text-sm">Carregando trilha...</div>
-  </div>
+<!-- O resto do site (antes eram 14 blocos aqui) mora no "Mais". -->
+<section class="mt-10" aria-labelledby="home-mais-t">
+  <h2 id="home-mais-t" class="text-[17px] font-extrabold mb-3">Mais para praticar</h2>
+  <nav class="flex flex-wrap gap-2 text-sm font-bold">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-emerald-50">🎮 Jogos</a>
+    <a href="2_Flashcard_Journey_Expedition_Edition.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-cyan-50">🃏 Flashcards</a>
+    <a href="entrevista.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-violet-50">💼 Entrevista de emprego</a>
+    <a href="pronun_practice.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-teal-50">🎙️ Pronúncia</a>
+    <a href="story_time.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-pink-50">📖 Histórias</a>
+    <a href="youtube_lab.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-red-50">▶️ YouTube Lab</a>
+    <a href="music_lab.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-purple-50">🎵 Music Lab</a>
+    <a href="newsline.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-pink-50">📰 Newsline</a>
+    <a href="historyline.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-violet-50">📜 Historyline</a>
+    <a href="study_plan.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-indigo-50">🗓️ Plano da semana</a>
+    <a href="progress.html" class="bg-fundo rounded-full px-4 py-2 hover:bg-emerald-50">🏅 Meu progresso</a>
+  </nav>
 </section>
 
 </main>
@@ -374,7 +173,7 @@
 <script src="streak-overlay.js?v=land1"></script>
 <script src="levelup-overlay.js?v=land1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
-<script src="components.js?v=som2"></script>
+<script src="components.js?v=nav1"></script>
 <script>
     // Check onboarding before rendering — redirects if profile not set
     (async function() {
@@ -387,264 +186,8 @@
     Components.mount('side-nav-placeholder', Components.renderSideNav('home'));
     Components.mount('mobile-nav-placeholder', Components.renderMobileNav('home'));
     Components.mount('footer-placeholder', Components.renderFooter());
-
-    // ── Learning Path continue card ──────────────────────────────────────────
-    function goToLearning() {
-      if (!localStorage.getItem('capyPlacementDone')) {
-        window.location.href = 'placement_test.html';
-      } else {
-        window.location.href = 'learn.html';
-      }
-    }
-    (function() {
-      const TRAIL_TITLES = {
-        1:'To Have, Want, Need, Like',   2:'To Go, Do, Say, See',         3:'To Get, Make, Know, Take',
-        4:'To Come, Think, Look, Give',  5:'To Tell, Work, Feel, Leave',   6:'Modal Verbs: Can, Could, Should',
-        7:'Past Simple — Regular Verbs', 8:'Past Simple — Irregular Verbs',9:'Prepositions of Place',
-        10:'Quantifiers: Many, Much, More',11:'Adjectives & Comparatives', 12:'Future: Will & Going to',
-        13:'Work & Career',              14:'Technology & Digital Life',   15:'Travel & Tourism',
-        16:'Health & Wellness',          17:'My Home — There is / There are',18:'Past Continuous',
-        19:'Superlatives',               20:'MOST — Quantifier & Reference',21:'Can, Could & Would',
-        22:"Future with WILL & WON'T",   23:'Personalities & Moods',       24:'Still vs. Yet & Possessives',
-      };
-      const TRAIL_EMOJIS = {
-        1:'💬',2:'🚶',3:'🧠',4:'👀',5:'✉️',6:'⚡',7:'⏪',8:'🔄',9:'📍',10:'🔢',
-        11:'📊',12:'🔮',13:'💼',14:'💻',15:'✈️',16:'🏥',17:'🏠',18:'🎬',
-        19:'🏆',20:'📊',21:'🎯',22:'🚀',23:'😊',24:'⏳',
-      };
-      const rawDone = Store.state.completedLessons || [];
-      // Normalise: accept both numeric (1) and string ('j1') formats
-      const normId  = id => typeof id === 'string' && id.startsWith('j') ? parseInt(id.slice(1)) : parseInt(id);
-      const doneNums = [...new Set(rawDone.map(normId).filter(n => !isNaN(n)))];
-      const done  = doneNums;
-      const total = 24;
-      const pct   = Math.round((done.length / total) * 100);
-      // Find current lesson
-      let current = 1;
-      const start = parseInt(localStorage.getItem('capyStartLesson') || '1');
-      for (let i = start; i <= total; i++) {
-        if (!done.includes(i)) { current = i; break; }
-      }
-      const titleEl = document.getElementById('home-lesson-title');
-      const subEl   = document.getElementById('home-lesson-sub');
-      const barEl   = document.getElementById('home-progress-bar');
-      const trailLang = localStorage.getItem('capyTrailLang') || 'en';
-      if (trailLang === 'tr' && localStorage.getItem('capyPlacementDone')) {
-        const turkishIds = Array.from({length:36}, (_,i) => 301 + i);
-        const trDone = turkishIds.filter(id => Store.isLessonDone && Store.isLessonDone(id, 'tr')).length;
-        const last = JSON.parse(localStorage.getItem('capyLastMini_tr') || 'null');
-        titleEl.textContent = `🇹🇷 Trilha de Turco · ${trDone}/36 unidades`;
-        subEl.textContent = last ? `Continue a Aula ${last.lessonId - 300} · Dia ${last.miniNum}` : 'Comece suas minilições de turco A1';
-        if (barEl) barEl.style.width = `${Math.round(trDone / 36 * 100)}%`;
-        return;
-      }
-      if (titleEl) {
-        if (!localStorage.getItem('capyPlacementDone')) {
-          titleEl.textContent = 'Descubra seu nível de inglês →';
-          subEl.textContent   = 'Faça um teste de 2 minutos para começar';
-        } else {
-          const step = parseInt(localStorage.getItem('capyGuidedStep_' + current) || '0');
-          const stepLabels = ['Listening','Quiz','Game','Sentence Builder','Speak','Chat with Yara'];
-          titleEl.textContent = `${TRAIL_EMOJIS[current] || '📚'} Lesson ${current}: ${TRAIL_TITLES[current]}`;
-          subEl.textContent   = step > 0
-            ? `Continue — Step ${step + 1}/6 · ${stepLabels[step]}`
-            : `${done.length}/${total} aulas concluídas · ${pct}%`;
-        }
-      }
-      if (barEl) barEl.style.width = pct + '%';
-    })();
-
-    // ── Daily Quest Pool (10 options, 3 shown per day seeded by date) ──────────
-    const QUEST_POOL = [
-        { id:'flashcards',      label:'Complete a flashcard deck',        emoji:'🃏', href:'2_Flashcard_Journey_Expedition_Edition.html' },
-        { id:'dialogue',        label:'Termine um diálogo com a Yara',       emoji:'💬', href:'3_Dialogue_Expedition_Yara_Turn.html' },
-        { id:'games',           label:'Play a game in the pavilion',        emoji:'🎮', href:'5_Game_Pavilion_Forest_Edition.html' },
-        { id:'ai_chat',         label:'Chat with Yara (3 messages)',        emoji:'🤖', href:'ai_chat.html' },
-        { id:'story_time',      label:'Generate an AI story',               emoji:'📖', href:'story_time.html' },
-        { id:'daily_challenge', label:'Complete the daily challenge',       emoji:'⚡', href:'daily_challenge.html' },
-        { id:'word_scramble',   label:'Beat Word Scramble',                 emoji:'🔀', href:'word_scramble_game.html' },
-        { id:'spelling',        label:'Finish Spelling Bee',                emoji:'🐝', href:'spelling_bee_game.html' },
-        { id:'grammar',         label:'Complete uma lição do Grammar Lab',      emoji:'🔬', href:'grammar_lab.html' },
-        { id:'number_quest',    label:'Conquer Number Quest',               emoji:'🔢', href:'number_quest.html' },
-        { id:'lessons',         label:'Estude uma aula do Jadson',              emoji:'📖', href:'lessons.html' },
-    ];
-
-    function getDailyQuests() {
-        const today = capyHojeBR();
-        const seed  = parseInt(today.replace(/-/g, ''), 10);
-        const rng   = s => { const x = Math.sin(s) * 10000; return x - Math.floor(x); };
-        return [...QUEST_POOL]
-            .sort((a, b) => rng(seed + QUEST_POOL.indexOf(a)) - rng(seed + QUEST_POOL.indexOf(b)))
-            .slice(0, 3);
-    }
-
-    const DAILY_QUESTS = getDailyQuests();
-
-    function checkQuestBonus() {
-        const today    = capyHojeBR();
-        const key      = `capyQuestBonus_${today}`;
-        const allDone  = DAILY_QUESTS.every(q => Store.state.completedActivities[q.id]);
-        if (allDone && !localStorage.getItem(key)) {
-            localStorage.setItem(key, '1');
-            Store.addXP(30);
-            document.dispatchEvent(new CustomEvent('streakMilestone', {
-                detail: { days: Store.state.streakDays, msg: '🎉 All quests done! +30 bonus XP!' }
-            }));
-        }
-    }
-
-    function updateUI() {
-        const { xp, completedActivities } = Store.state;
-        const level    = Store.getLevel();
-        const xpCurrent = xp % 100;
-        const pct      = Math.min((xpCurrent / 100) * 100, 100);
-
-        const name = Store.state.playerName;
-        document.getElementById('stat-player-name').textContent = name ? `Olá, ${name}!` : 'Olá, explorador!';
-        document.getElementById('stat-level-badge').textContent = level;
-        document.getElementById('stat-level-text').textContent  = `Nível ${level} · Brotinho`;
-        document.getElementById('stat-xp-bar').style.width      = `${pct}%`;
-        document.getElementById('stat-xp-text').textContent     = `${xpCurrent} / 100 XP para o nível ${level + 1}`;
-
-        const done = DAILY_QUESTS.filter(q => completedActivities[q.id]).length;
-        document.getElementById('quest-counter').textContent = `${done} de ${DAILY_QUESTS.length} feitas`;
-
-        document.getElementById('quest-list').innerHTML = DAILY_QUESTS.map(q => {
-            const complete = completedActivities[q.id];
-            return complete
-                ? `<div class="bg-white p-4 rounded-2xl flex items-center gap-4 hover:shadow-md transition-shadow border border-slate-100">
-                     <span class="text-2xl">${q.emoji}</span>
-                     <span class="material-symbols-outlined text-green-brand text-2xl" style="font-variation-settings:'FILL' 1;">check_circle</span>
-                     <span class="font-body font-semibold text-sm text-slate-500 line-through">${q.label}</span>
-                   </div>`
-                : `<div class="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border-2 border-pink-brand/20">
-                     <span class="text-2xl">${q.emoji}</span>
-                     <span class="material-symbols-outlined text-slate-300 text-2xl">radio_button_unchecked</span>
-                     <span class="font-body font-semibold text-sm text-slate-700">${q.label}</span>
-                     <button onclick="window.location.href='${q.href}'" class="ml-auto bg-pink-brand text-white px-4 py-1.5 rounded-full text-xs font-bold active:scale-95 transition-all flex-shrink-0">Go →</button>
-                   </div>`;
-        }).join('') + (DAILY_QUESTS.every(q => completedActivities[q.id])
-            ? `<div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 p-4 rounded-2xl flex items-center gap-3 mt-2">
-                 <span class="text-2xl">🏆</span>
-                 <span class="font-body font-bold text-amber-700">All quests complete! Come back tomorrow for new ones!</span>
-               </div>`
-            : '');
-
-        checkQuestBonus();
-    }
-
-    updateUI();
-    document.addEventListener('stateChanged', updateUI);
-
-    // ── Lesson Trail ─────────────────────────────────────────────────────────
-    const TRAIL_LESSONS = [
-        {id:1,  title:'To Have, Want, Need, Like',      emoji:'💬', href:'lessons.html?lesson=1'},
-        {id:2,  title:'To Go, Do, Say, See',            emoji:'🚶', href:'lessons.html?lesson=2'},
-        {id:3,  title:'To Get, Make, Know, Take',       emoji:'🧠', href:'lessons.html?lesson=3'},
-        {id:4,  title:'To Come, Think, Look, Give',     emoji:'👀', href:'lessons.html?lesson=4'},
-        {id:5,  title:'To Tell, Work, Feel, Leave',     emoji:'✉️', href:'lessons.html?lesson=5'},
-        {id:6,  title:'Modal Verbs: Can, Could, Should',emoji:'⚡', href:'lessons.html?lesson=6'},
-        {id:7,  title:'Past Simple — Regular Verbs',    emoji:'⏪', href:'lessons.html?lesson=7'},
-        {id:8,  title:'Past Simple — Irregular Verbs',  emoji:'🔄', href:'lessons.html?lesson=8'},
-        {id:9,  title:'Prepositions of Place',          emoji:'📍', href:'lessons.html?lesson=9'},
-        {id:10, title:'Quantifiers: Many, Much, More',  emoji:'🔢', href:'lessons.html?lesson=10'},
-        {id:11, title:'Adjectives & Comparatives',      emoji:'📊', href:'lessons.html?lesson=11'},
-        {id:12, title:'Future: Will & Going to',        emoji:'🔮', href:'lessons.html?lesson=12'},
-        {id:13, title:'Work & Career',                  emoji:'💼', href:'lessons.html?lesson=13'},
-        {id:14, title:'Technology & Digital Life',      emoji:'💻', href:'lessons.html?lesson=14'},
-        {id:15, title:'Travel & Tourism',               emoji:'✈️', href:'lessons.html?lesson=15'},
-        {id:16, title:'Health & Wellness',              emoji:'🏥', href:'lessons.html?lesson=16'},
-        {id:17, title:'My Home — There is / There are', emoji:'🏠', href:'lessons.html?lesson=17'},
-        {id:18, title:'Past Continuous',                emoji:'🎬', href:'lessons.html?lesson=18'},
-        {id:19, title:'Superlatives',                   emoji:'🏆', href:'lessons.html?lesson=19'},
-        {id:20, title:'MOST — Quantifier & Reference',  emoji:'📊', href:'lessons.html?lesson=20'},
-        {id:21, title:'Can, Could & Would',             emoji:'🎯', href:'lessons.html?lesson=21'},
-        {id:22, title:"Future with WILL & WON'T",       emoji:'🚀', href:'lessons.html?lesson=22'},
-        {id:23, title:'Personalities & Moods',          emoji:'😊', href:'lessons.html?lesson=23'},
-        {id:24, title:'Still vs. Yet & Possessives',    emoji:'⏳', href:'lessons.html?lesson=24'},
-    ];
-
-    function renderLessonTrail() {
-        const rawCompleted = (Store.state.completedLessons || []);
-        const normId = id => typeof id === 'string' && id.startsWith('j') ? parseInt(id.slice(1)) : parseInt(id);
-        const completed = [...new Set(rawCompleted.map(normId).filter(n => !isNaN(n)))];
-        const trail     = document.getElementById('lesson-trail');
-        if (!trail) return;
-
-        // Show first 8 lessons
-        const visible = TRAIL_LESSONS.slice(0, 8);
-        const cols = visible.map((l, i) => {
-            const done     = completed.includes(l.id);
-            const unlocked = l.id === 1 || completed.includes(l.id - 1);
-            const side     = i % 2 === 0 ? 'mr-auto' : 'ml-auto'; // zigzag
-
-            let nodeClass, icon, badge;
-            if (done) {
-                nodeClass = 'bg-emerald-500 border-emerald-400 shadow-emerald-400/40';
-                icon      = '✓';
-                badge     = `<span class="absolute -top-1 -right-1 bg-yellow-400 text-yellow-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">Done</span>`;
-            } else if (unlocked) {
-                nodeClass = 'bg-pink-500 border-pink-400 shadow-pink-400/40 animate-pulse-slow';
-                icon      = l.emoji;
-                badge     = `<span class="absolute -top-1 -right-1 bg-blue-400 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">Novo!</span>`;
-            } else {
-                nodeClass = 'bg-slate-100 border-slate-200 shadow-none opacity-60';
-                icon      = '🔒';
-                badge     = '';
-            }
-
-            return `
-            <div class="flex ${i%2===0?'justify-start':'justify-end'} relative" style="margin-${i%2===0?'right':'left'}:${Math.min(i*8,40)}%">
-              ${i > 0 ? `<div class="absolute ${i%2===0?'right-1/2':'left-1/2'} top-0 w-0.5 h-6 bg-slate-200 -translate-y-6"></div>` : ''}
-              <button onclick="window.location.href='${unlocked||done ? l.href+'&guided=1' : 'learn.html'}'"
-                      class="relative group flex items-center gap-4 bg-white border-2 ${done?'border-emerald-200':unlocked?'border-pink-200':'border-slate-100'} rounded-3xl px-5 py-4 shadow-sm hover:shadow-md transition-all w-full max-w-xs hover:-translate-y-1 cursor-pointer">
-                <div class="relative">
-                  <div class="w-12 h-12 rounded-2xl border-4 ${nodeClass} flex items-center justify-center text-xl shadow-lg flex-shrink-0">
-                    ${icon}
-                  </div>
-                  ${badge}
-                </div>
-                <div class="text-left">
-                  <p class="text-[10px] font-bold text-slate-400 uppercase">Aula ${l.id}</p>
-                  <p class="font-bold text-navy text-sm leading-snug">${l.title}</p>
-                </div>
-                ${unlocked||done ? `<span class="material-symbols-outlined text-slate-300 ml-auto group-hover:text-pink-400 transition-colors">chevron_right</span>` : ''}
-              </button>
-            </div>`;
-        }).join('');
-
-        trail.innerHTML = `
-          <style>
-            @keyframes pulse-slow { 0%,100%{box-shadow:0 0 0 0 rgba(236,72,153,.4)} 50%{box-shadow:0 0 0 8px rgba(236,72,153,0)} }
-            .animate-pulse-slow { animation: pulse-slow 2s ease-in-out infinite; }
-          </style>
-          <div class="space-y-3">${cols}</div>
-          <a href="learn.html" class="mt-5 flex items-center justify-center gap-2 py-3 bg-white border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:border-pink-300 hover:text-pink-500 font-bold text-sm transition-all">
-            <span class="material-symbols-outlined text-base">expand_more</span>
-            Ver todas as 24 aulas na trilha →
-          </a>
-        `;
-    }
-
-    renderLessonTrail();
-    document.addEventListener('stateChanged', renderLessonTrail);
-
-    // ── Papo com a Yara direto da home ──────────────────────────────────────
-    // O aluno escreve aqui e cai no chat com a mensagem já enviada, em vez de
-    // atravessar uma tela em branco antes de dizer a primeira coisa.
-    function iniciarPapo(semTexto) {
-        const campo = document.getElementById('home-chat-input');
-        const texto = semTexto ? '' : (campo ? campo.value.trim() : '');
-        if (texto) {
-            try {
-                sessionStorage.setItem('capyPrimeiraMensagem', texto.slice(0, 300));
-            } catch (e) {
-                // Modo privado/cota: em vez de perder o texto do aluno, abre o
-                // chat mesmo assim — ele reescreve lá, com o teclado já aberto.
-            }
-        }
-        window.location.href = 'ai_chat.html';
-    }
-    window.iniciarPapo = iniciarPapo;
 </script>
+<script src="assets/js/pages/home.js?v=home1"></script>
+<script src="plano-hoje.js?v=ph1"></script>
+<script src="assets/js/plano-hoje-cartao.js?v=ph2"></script>
 </body></html>

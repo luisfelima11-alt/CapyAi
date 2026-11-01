@@ -248,7 +248,7 @@
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=skins1"></script>
-<script src="conversa-core.js?v=aula20260924"></script>
+<script src="conversa-core.js?v=vt1"></script>
 <script>
 'use strict';
 
@@ -440,8 +440,9 @@ const chamada = CapyChamada({
   },
   // A cota vinha na resposta do token e ninguem mostrava. Aluno cortado no
   // meio sem aviso previo e aluno que pede reembolso.
-  aoCota(minutos) {
+  aoCota(minutos, info) {
     const c = $('cota');
+    if (info && info.teste) { c.textContent = '🎁 Ligação de teste: ' + Math.max(1, Math.round(minutos)) + ' min grátis'; return; }
     if (minutos == null) { c.textContent = ''; c.className = 'cota'; return; }
     const m = Math.max(0, Math.round(minutos));
     c.textContent = m + ' min de voz restantes neste m\u00EAs';
@@ -464,7 +465,10 @@ const chamada = CapyChamada({
     if (colado) t.scrollTop = t.scrollHeight;
   },
   aoUso() { $('tempo').textContent = chamada.ligado() ? mmss(chamada.decorridoMs()) : ''; },
-  aoErro(msg) { avisar(msg, true); },
+  aoErro(msg, info) { avisar((info && info.erro === 'plano_sem_voz')
+      ? (info.teste === 'confirmar_email' ? 'Confirme seu e-mail para usar a ligação de teste grátis (3 minutos).'
+        : 'Sua ligação de teste grátis já foi usada. Ligar sem limite faz parte do plano Super.')
+      : msg, true); },
   aoDesligar(motivo, dados) {
     $('silenciar').hidden = true;
     $('ligar').textContent = '📞 Começar de novo';
@@ -473,6 +477,8 @@ const chamada = CapyChamada({
     $('painel-antes').style.display = '';
     if (motivo === 'silencio') avisar('Encerrei depois de 3 minutos de silêncio.');
     else if (motivo === 'tempo') avisar('Encerrei no limite de 15 minutos.');
+    else if (motivo === 'teste') avisar('Acabaram seus 3 minutos grátis. Para ligar sem limite, conheça o plano Super.');
+    else if (motivo === 'cota') avisar('Acabaram seus minutos de voz deste mês. Eles renovam no dia 1º.');
     registrarUso(dados.uso, dados.duracaoMs);
     pedirDevolutiva(dados.transcricao, dados.uso, dados.duracaoMs);
   },

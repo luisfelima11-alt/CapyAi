@@ -62,6 +62,23 @@
 
   <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
+    <!-- Plano de hoje (plano-hoje.js): 3 tarefas de 5 min, horario e agenda -->
+    <section id="plano-hoje" class="bg-white rounded-[1.5rem] shadow-sm p-5 md:p-6 mb-6 fade-in" aria-live="polite">
+      <div class="flex items-baseline justify-between gap-3">
+        <h2 class="text-lg font-black text-navy">Seu plano de hoje</h2>
+        <span id="ph-resumo" class="text-sm font-black text-pink-500"></span>
+      </div>
+      <ul id="ph-itens" class="mt-3 bg-slate-50 rounded-[1.5rem] px-4 divide-y divide-slate-200"></ul>
+      <div class="mt-3 flex flex-wrap items-center gap-3 bg-slate-50 rounded-[1.5rem] px-4 py-3">
+        <label for="ph-hora" class="text-sm font-bold text-navy">⏰ Todo dia às</label>
+        <input id="ph-hora" type="time" step="300" class="bg-white rounded-full px-3 py-1.5 text-sm font-bold text-navy">
+        <span class="ml-auto flex gap-2">
+          <a id="ph-google" target="_blank" rel="noopener" class="whitespace-nowrap bg-navy text-white font-black text-xs px-4 py-2 rounded-full" aria-label="Pôr no Google Agenda">📅 Google</a>
+          <a id="ph-ics" class="whitespace-nowrap bg-white text-navy font-black text-xs px-4 py-2 rounded-full" aria-label="Pôr no calendário do iPhone ou Outlook">🍎 iPhone / Outlook</a>
+        </span>
+      </div>
+    </section>
+
     <!-- Profile summary + generate button -->
     <div id="profile-summary" class="bg-white rounded-2xl border-2 border-slate-100 p-6 mb-6 fade-in">
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -113,7 +130,9 @@
 <script src="auth-secure.js?v=skins1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=som2"></script>
+<script src="components.js?v=nav1"></script>
+<script src="plano-hoje.js?v=ph1"></script>
+<script src="assets/js/plano-hoje-cartao.js?v=ph2"></script>
 <script>
 Components.mount('top-nav-placeholder', Components.renderTopNav('studyplan'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('studyplan'));
