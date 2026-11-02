@@ -28,13 +28,27 @@ import path from 'node:path';
 import vm from 'node:vm';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
-const FAIXA = [701, 712];
-const N_LICOES = 12;
+const FAIXA = [701, 728];
+const N_LICOES = 28;
 
 const licoes = [
     ...JSON.parse(fs.readFileSync(path.join(RAIZ, 'scripts/agro-trilha-a.json'), 'utf8')),
     ...JSON.parse(fs.readFileSync(path.join(RAIZ, 'scripts/agro-trilha-b.json'), 'utf8')),
-];
+    ...JSON.parse(fs.readFileSync(path.join(RAIZ, 'scripts/agro-trilha-c.json'), 'utf8')),
+    ...JSON.parse(fs.readFileSync(path.join(RAIZ, 'scripts/agro-trilha-d.json'), 'utf8')),
+].map(l => {
+    const copia = { ...l };
+    if (!copia.title && copia.unitTitle) { copia.title = copia.unitTitle; delete copia.unitTitle; }
+    if (!copia.emoji && copia.icon) { copia.emoji = copia.icon; delete copia.icon; }
+    if (Array.isArray(copia.verbs)) {
+        copia.verbs = copia.verbs.map(v => {
+            const base = String(v).split('—')[0].split('(')[0].trim();
+            return base.replace(/\b\w/g, c => c.toUpperCase());
+        });
+    }
+    delete copia.unit;
+    return copia;
+});
 
 // ── ids já usados por qualquer outro curso ─────────────────────────────────
 // Não confio em tabela escrita: leio o índice compilado, que é o que o app serve.
@@ -42,7 +56,7 @@ function idsOcupados() {
     const p = path.join(RAIZ, 'data/lessons-index.json');
     if (!fs.existsSync(p)) return new Set();
     const i = JSON.parse(fs.readFileSync(p, 'utf8'));
-    return new Set((i.lessons || i).map(l => l.id));
+    return new Set((i.lessons || i).map(l => l.id).filter(id => id < FAIXA[0] || id > FAIXA[1]));
 }
 
 const problemas = [];

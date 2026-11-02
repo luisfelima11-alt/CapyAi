@@ -19,6 +19,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -135,7 +136,7 @@ ${acc}
 ${tabela}
   </div>
   <button onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Entendi a gramática! (+20 XP)
+    ✓ Entendi o padrão! (+20 XP)
   </button>
   <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
@@ -148,6 +149,9 @@ function construir(n) {
     const d = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/agro${nn}-dialogo.json`), 'utf8'));
     const c = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/agro${nn}-conteudo.json`), 'utf8'));
     let t = fs.readFileSync(MOLDE, 'utf8');
+    // O molde (GPS 09) já traz o cartão da folha apontando para o PDF dele. Sai aqui; o
+    // gera-folha-aula.mjs põe o cartão certo desta aula.
+    t = t.replace(/<script src="folha-da-aula\.js[^>]*><\/script>\n?/, '');
     const sufixo = c.sufixo;                          // agro1
     const pastaAudio = `agro${nn}`;
 
@@ -169,7 +173,8 @@ function construir(n) {
 
     // 3. Seções com conteúdo
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
-    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION', blocoGramatica(c));
+    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio, raiz: RAIZ }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
@@ -225,6 +230,10 @@ function construir(n) {
     t = t.split('GPS9').join('AGRO' + n);
     t = t.split('gps9').join(sufixo);
 
+    // 10b. Regra do Luis (12/out/2026): a palavra "grammar/gramática" não aparece para o aluno.
+    //     O id interno tab-grammar e a chave 'grammar' ficam: o self-study.js depende deles.
+    t = t.split("rotulo:'📐 Grammar'").join("rotulo:'🧩 Patterns'");
+
     // 11. Aula sem verbo no vocabulário: não anunciar "Verbos"
     if (!c.vocab.some(v => v.verb)) {
         t = t.split("rotulo:'📚 Vocab + Verbos'").join("rotulo:'📚 Vocabulário'");
@@ -263,6 +272,8 @@ function validar({ t, d, c, n, nn }) {
     ok(c.quiz.every(q => new Set(q.opts).size === q.opts.length), 'sem opção repetida no quiz');
     ok(d.linhas.filter(x => !x.extra).length === 12, '12 falas na versão curta');
     ok(d.linhas.filter(x => x.extra).length === 8, '8 falas extras');
+    const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
+    ok(!/gram[aá]tic|grammar/i.test(visivel), 'sem a palavra proibida gramática/grammar (regra de 12/out)');
     ok(t.includes('id="dialogue-lines"') && t.includes('id="speak-grid"'), 'contrato de DOM do listening-lab');
 
     // Calibragem A0: o aluno é zero absoluto. Fala longa demais no diálogo é o
@@ -275,6 +286,9 @@ function validar({ t, d, c, n, nn }) {
 
     const img = fs.existsSync(path.join(RAIZ, d.imagem.arquivo));
     if (!img) console.log(`    ⚠ imagem ainda não gerada: ${d.imagem.arquivo} (node scripts/gen-dialogo-assets.mjs --imagem agro${nn})`);
+
+    // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `agro${nn}`, raiz: RAIZ });
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {

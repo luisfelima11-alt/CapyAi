@@ -49,24 +49,69 @@
     {"expr":"I'll call you by... with an estimate.","pt":"Eu ligo até... com uma estimativa.","emoji":"📞","usage":"fecha o check-in com prazo claro — o cliente sai sem precisar perguntar","example":"I'll call you by Thursday with an estimate."}
   ],
   "gramatica": {
-    "titulo": "Grammar: descrever o defeito para o técnico entender",
-    "sub": "Um único ponto, direto ao trabalho: em inglês, a forma de descrever o defeito muda conforme o tipo de problema. Às vezes ele <strong>se repete</strong>, às vezes <strong>não liga de jeito nenhum</strong>, às vezes só <strong>falta uma função</strong>.",
-    "blocos": [
-      {"n":1,"t":"It keeps + verbo-ing","ex":"\"It keeps turning off.\"","corpo":"<strong>Keep + verbo-ING</strong> descreve um problema que <strong>se repete</strong> — acontece de novo, e de novo.<br><br>✅ It <strong>keeps</strong> turning off.<br>✅ It <strong>keeps</strong> losing signal.<br><br>Depois de keeps vem sempre o verbo com <strong>-ing</strong>.<br>❌ It keeps <s>turn</s> off."},
-      {"n":2,"t":"It won't + verbo (base)","ex":"\"It won't turn on.\"","corpo":"<strong>Won't</strong> aqui não é sobre o futuro — ele descreve um equipamento que <strong>se recusa</strong> a funcionar, por mais que você tente.<br><br>✅ It <strong>won't</strong> turn on.<br>✅ It <strong>won't</strong> connect to the signal.<br><br>Depois de won't vem o verbo no <strong>base</strong>, sem -s e sem -ing.<br>❌ It won't <s>turns</s> on."},
-      {"n":3,"t":"It doesn't + verbo (base)","ex":"\"The screen doesn't show the map.\"","corpo":"<strong>Doesn't</strong> descreve uma função que <strong>falta</strong> — simplesmente não acontece, sem ideia de repetição ou recusa.<br><br>✅ The screen <strong>doesn't</strong> show the map.<br>✅ It <strong>doesn't</strong> make any noise.<br><br>O erro mais comum é colocar -s no verbo depois de doesn't.<br>❌ The screen doesn't <s>shows</s> the map."},
-      {"n":4,"t":"since + ponto no tempo","ex":"\"It's been like this since Tuesday.\"","corpo":"<strong>Since</strong> responde a pergunta <em>\"Since when?\"</em> com um <strong>ponto</strong> no tempo — um dia, uma data, um evento.<br><br>✅ <strong>Since</strong> Tuesday.<br>✅ It's been like this <strong>since</strong> last week.<br><br>Não confunda com <em>for</em>, que usa uma <strong>duração</strong>.<br>❌ Since <s>two days</s>. <em>(o certo é: for two days)</em>"}
+    "titulo": "Patterns: descrever o defeito para o técnico entender",
+    "personagens": {
+      "YARA": "a Brazilian woman technician (thirties, brown skin, shoulder-length curly black hair, dark navy work shirt and pants)",
+      "CARLOS": "a Brazilian farmer (fifties, tanned light brown skin, short graying black hair and a gray mustache, green cap, light blue plaid shirt and jeans)"
+    },
+    "cenaAbertura": "Wide view of the bright reception area of a small GPS repair workshop, with shelves of tools and spare parts on the back wall. {CARLOS} walks in through the open door carrying a GPS display in one hand and a small round antenna in the other, and {YARA}, standing alone behind the counter, greets him with a smile.",
+    "slides": [
+      {
+        "padrao": "It **keeps** + verbo**-ING**",
+        "cena": "{CARLOS} sits in the cab of a green tractor in a wide soybean field, frowning and tapping a GPS display whose screen keeps going dark, with small circular arrow icons floating around it and a loose cable dangling below.",
+        "frases": [
+          {"en": "My display **keeps turning** off.", "pt": "Meu display fica desligando toda hora."},
+          {"en": "The antenna **keeps losing** the signal.", "pt": "A antena fica perdendo o sinal."},
+          {"en": "The screen **keeps freezing** in the middle of the field.", "pt": "A tela fica travando no meio da lavoura."},
+          {"en": "This cable **keeps coming** loose.", "pt": "Este cabo vive se soltando."},
+          {"en": "It **keeps making** a strange noise.", "pt": "Ele fica fazendo um barulho estranho."},
+          {"en": "Carlos says it **keeps restarting** by itself.", "pt": "O Carlos diz que ele fica reiniciando sozinho."}
+        ]
+      },
+      {
+        "padrao": "It **won't** + verbo",
+        "cena": "At a workbench inside a small GPS repair workshop, {YARA} presses and holds the power button of a GPS display with a completely black screen, while {CARLOS} watches over her shoulder with his arms crossed and a worried face.",
+        "frases": [
+          {"en": "It **won't turn** on.", "pt": "Ele não liga de jeito nenhum."},
+          {"en": "The display **won't connect** to the antenna.", "pt": "O display não quer conectar com a antena."},
+          {"en": "I restarted it twice, but it still **won't work**.", "pt": "Eu reiniciei duas vezes, mas ele ainda não quer funcionar."},
+          {"en": "This old cable **won't fit** the new antenna.", "pt": "Este cabo velho não quer encaixar na antena nova."},
+          {"en": "The update **won't install** on the old display.", "pt": "A atualização não quer instalar no display antigo."},
+          {"en": "And now it **won't turn** off!", "pt": "E agora ele não quer desligar!"}
+        ]
+      },
+      {
+        "padrao": "It **doesn't** + verbo",
+        "cena": "At the edge of a soybean field, {YARA} and {CARLOS} stand beside a green tractor and look down at crooked, wavy wheel tracks in the soil behind it. In the open cab, the GPS display shows only an empty gray screen, and the small round antenna on the roof has no light.",
+        "frases": [
+          {"en": "The screen **doesn't show** the map.", "pt": "A tela não mostra o mapa."},
+          {"en": "It **doesn't make** any noise.", "pt": "Ele não faz nenhum barulho."},
+          {"en": "The display **doesn't save** my settings.", "pt": "O display não salva as minhas configurações."},
+          {"en": "The antenna **doesn't get** a good signal.", "pt": "A antena não pega um sinal bom."},
+          {"en": "The tractor **doesn't follow** the straight line.", "pt": "O trator não segue a linha reta."},
+          {"en": "The light on the antenna **doesn't blink**.", "pt": "A luz da antena não pisca."}
+        ]
+      },
+      {
+        "padrao": "**since** + ponto no tempo",
+        "cena": "At a small desk in the corner of a GPS repair workshop, {CARLOS} points at a wall calendar made of blank squares, with one square circled in green and a green arrow running from it to a later square, while {YARA} listens and writes on a clipboard.",
+        "frases": [
+          {"en": "Since when? **Since Tuesday**.", "pt": "Desde quando? Desde terça."},
+          {"en": "It's been like this **since last week**.", "pt": "Está assim desde a semana passada."},
+          {"en": "It hasn't worked **since the storm**.", "pt": "Ele não funciona desde a tempestade."},
+          {"en": "This scratch has been there **since the last harvest**.", "pt": "Esse arranhão está aí desde a última colheita."},
+          {"en": "Carlos has been waiting **since eight o'clock**.", "pt": "O Carlos está esperando desde as oito horas."},
+          {"en": "I've worked at GPS Tronic **since January**.", "pt": "Eu trabalho na GPS Tronic desde janeiro."}
+        ]
+      }
     ],
-    "tabela": {
-      "cabecalho": ["Situação", "O que dizer", "Exemplo", "Cuidado"],
-      "linhas": [
-        ["Problema que se repete", "It keeps + verbo-ing", "It keeps turning off.", "verbo sempre com -ing"],
-        ["Não liga de jeito nenhum", "It won't + verbo", "It won't turn on.", "verbo no base, sem -s"],
-        ["Falta uma função", "It doesn't + verbo", "The screen doesn't show the map.", "verbo no base, sem -s"],
-        ["Desde quando começou", "since + ponto no tempo", "It's been like this since Tuesday.", "since = ponto; for = duração"],
-        ["Perguntar o que já tentou", "Did you already try...?", "Did you already try anything?", "pergunta de rotina no check-in"]
-      ]
-    }
+    "revisao": [
+      {"padrao": 0, "en": "The tractor **keeps going** off the line.", "pt": "O trator fica saindo da linha."},
+      {"padrao": 1, "en": "The display **won't read** the USB stick.", "pt": "O display não quer ler o pen drive."},
+      {"padrao": 2, "en": "The GPS **doesn't find** any satellites.", "pt": "O GPS não encontra nenhum satélite."},
+      {"padrao": 3, "en": "The cable has been loose **since Monday**.", "pt": "O cabo está solto desde segunda."}
+    ],
+    "cenaRevisao": "At sunset outside a small GPS repair workshop, {CARLOS} walks toward his pickup truck holding a small blank paper receipt and waves goodbye, while {YARA} smiles and waves back from the open workshop door, with warm golden light over the yard."
   },
   "conversation": [
     {"q":"Um cliente chega com um problema. Pergunte o que está acontecendo.","starters":["Hi! What seems to...","Welcome to GPS Tronic. What...","How can I help you...?"],"words":["problem","help","seems"]},

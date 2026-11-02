@@ -293,41 +293,6 @@ function initTabs(tabNames) {
 }
 window.initTabs = initTabs;
 
-// ── HOMEWORK SAVE ─────────────────────────────────────────────────────────────
-/**
- * saveHomework(lessonId, lessonTitle, xp)
- * Collects all input/textarea values inside #tab-homework and POSTs to /api/homework.
- * Call this inside each lesson's submitHomeworkXX() before the local UI updates.
- */
-async function saveHomework(lessonId, lessonTitle, xp) {
-  const hwTab = document.getElementById('tab-homework');
-  const answers = {};
-  if (hwTab) {
-    hwTab.querySelectorAll('input[type="text"], textarea').forEach((el, i) => {
-      const key = el.id || el.placeholder?.slice(0, 30) || `field_${i}`;
-      answers[key] = el.value || '';
-    });
-  }
-  let userId = 'guest', studentName = 'Estudante';
-  try {
-    const s = JSON.parse(localStorage.getItem('capySession') || '{}');
-    userId = s.id || 'guest';
-    studentName = s.name || s.playerName || 'Estudante';
-  } catch(e) {}
-  // Also check Store for name
-  if (studentName === 'Estudante' && typeof Store !== 'undefined') {
-    try { studentName = Store.state?.playerName || studentName; } catch(e) {}
-  }
-  try {
-    await fetch('/api/homework', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, studentName, lessonId: String(lessonId), lessonTitle: lessonTitle || '', answers, xp: xp || 0 }),
-    });
-  } catch(e) { console.warn('[homework] save failed:', e); }
-}
-window.saveHomework = saveHomework;
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
 function initLesson(config) {
   _totalSections = config.totalSections || 5;

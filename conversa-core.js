@@ -46,7 +46,7 @@ function CapyChamada(opcoes) {
   // O 2o argumento diz POR QUE falhou ({status, erro} da resposta do token).
   // O widget das aulas usa para dizer "faz parte do plano Super" em vez do
   // generico; quem so le a mensagem (ai_chat, entrevista) nao muda nada.
-  function fail(s,msg) { if (active(s)) { end(s,'erro'); emit('aoErro',msg,{status:s.status||0,erro:s.erro||''}); } }
+  function fail(s,msg) { if (active(s)) { end(s,'erro'); emit('aoErro',msg,{status:s.status||0,erro:s.erro||'',teste:s.teste||''}); } }
   // Pedaco de fala chegando. Nao entra no `transcript` — so a versao final entra,
   // senao a devolutiva da Yara receberia a frase repetida em pedacos.
   function parcial(who,id,pedaco) {
@@ -104,8 +104,10 @@ function CapyChamada(opcoes) {
       // 3 min de silêncio e 15 min de chamada. O teto de minutos caiu de 20 para
       // 15 em 19/set: uma simulação de entrevista real dura 10-15 min, e 20 min
       // estourava o dobro da cota mensal que a landing vende no plano Super.
+      // Minutos que o servidor liberou (cota do mes ou ligacao de teste) cortam
+      // antes dos 15 min: a tela dizia "encerra sozinha" e nada encerrava.
       if(s.quiet>=180000) end(s,'silencio');
-      else if(now-s.started>=900000) end(s,'tempo');
+      else if(now-s.started>=(s.limite||900000)) end(s,s.limite&&s.limite<900000?(s.ehTeste?'teste':'cota'):'tempo');
     },250);
     emit('aoEstado','ouvindo');
     try { s.channel.send(JSON.stringify({type:'response.create'})); }
@@ -131,10 +133,14 @@ function CapyChamada(opcoes) {
       if(!active(s)) return;
       if(!r.ok||!cred||typeof cred.value!=='string'||!cred.value) {
         s.status=r.status; s.erro=cred&&typeof cred.error==='string'?cred.error.slice(0,40):'';
+        s.teste=cred&&typeof cred.teste==='string'?cred.teste.slice(0,20):'';
         messageError=({401:'Entre na sua conta para iniciar a chamada.',403:'Esta chamada não está disponível para sua conta. Confira seu acesso.',429:'Você atingiu o limite de chamadas. Tente mais tarde ou fale com o professor.',503:'A voz está indisponível no momento. Tente novamente mais tarde.'})[r.status] || 'Não foi possível abrir a chamada. Tente novamente.';
         throw Error('token unavailable');
       }
-      emit('aoCota', typeof cred.minutosRestantes === 'number' ? cred.minutosRestantes : null);
+      const minutos = typeof cred.minutosRestantes === 'number' ? cred.minutosRestantes : null;
+      s.limite = minutos == null ? 900000 : Math.min(900000, Math.max(0, minutos * 60000));
+      s.ehTeste = cred.teste === true;
+      emit('aoCota', minutos, { teste: s.ehTeste });
       s.pc=new RTCPeerConnection();
       s.audio=document.createElement('audio'); s.audio.autoplay=true; s.audio.hidden=true;
       s.audio.setAttribute('playsinline',''); s.audio.setAttribute('aria-hidden','true');

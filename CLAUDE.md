@@ -6,6 +6,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Capy Yara Adventures is a gamified English-learning platform for Brazilian students, centered on a capybara mascot named Yara 🐾. Built with vanilla HTML/CSS/JS (Tailwind CDN) + a Node.js dev server with OpenAI integration. No build step — all files are static except the API layer.
 
+## Sessão mestre: só ela revisa e publica (regra do Luis, 18/out/2026)
+
+Uma sessão do Claude é a **mestre** (a "capy na nuvem"). Toda funcionalidade feita por outra
+sessão passa pela revisão dela antes de ir ao ar, para não quebrar o site.
+
+**Toda outra sessão:**
+1. Cria o ramo a partir da `sync/estado-producao` (o que está no ar), nunca do `main`, que está parado em maio.
+2. Abre o PR para a `sync/estado-producao`, preenche o modelo `.github/pull_request_template.md` e para ali.
+3. **Nunca:** `vercel --prod`, `vercel promote`, push ou merge na `sync/estado-producao` ou no `main`, nem SQL
+   na produção. Isso é da mestre.
+4. Se a mestre pedir correção no PR, corrige no mesmo ramo.
+
+**A mestre:**
+- revisa o PR:
+  - CI, a suíte inteira com `PLAYWRIGHT_BROWSERS_PATH`, o e2e, o `scripts/audit.js` e o gitleaks;
+  - a mescla simulada com os outros PRs abertos;
+  - as regras deste arquivo e o SQL rodando antes do código;
+  - as etiquetas `?v=` e o Preview;
+- marca o PR com uma etiqueta:
+  - 🟢 **mestre: publicar** (correção de bug ou de segurança, verde e sem SQL): a mestre mescla sozinha;
+  - 🟡 **mestre: esperando** (o aluno vê a mudança, falta SQL, ou depende de outro PR): só vai ao ar depois
+    do ok do Luis no Preview ou da condição cumprida;
+  - 🔴 **mestre: corrigir**: volta para a sessão que fez, com o que corrigir no comentário;
+- **publica mesclando na `sync/estado-producao`**: a Production Branch do Vercel publica e promove sozinha,
+  e os crons vão junto;
+- confere o site no ar depois de publicar.
+
+Se der errado, a mestre volta pelo Vercel → Deployments → Instant Rollback, e depois abre um PR de revert.
+
 ## Antes de investigar um bug: leia BUGS-APRENDIDOS.md
 
 `BUGS-APRENDIDOS.md` guarda cada bug já consertado neste projeto, com a **causa raiz**
@@ -38,6 +67,21 @@ acompanhar a aula. A aula só está pronta quando a folha existe.
 - `assets/**/*.pdf` tem que estar nos builds do `vercel.json`. Fora da lista, o PDF dá 404 sem
   nenhum erro.
 
+## Botão "Tela cheia" para dar aula (pedido do Luis, 01/nov/2026)
+
+Só nas aulas do **GPS Tronic** e do **Agro English**:
+`<script src="tela-cheia.js?v=tc1"></script>`, logo antes do script da folha.
+
+- O botão coloca a página inteira em tela cheia, para projetar a aula. Ele não aumenta o texto.
+- Para sair, o mesmo botão ou o Esc.
+- Ele é flutuante, no canto inferior esquerdo.
+- Não aparece onde não há API de tela cheia (iPhone).
+- Os geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`) usam `gpstronic_aula_09.html`
+  como molde, e o molde já tem a tag. Por isso aula nova desses cursos nasce com o botão.
+- `tests/tela-cheia.test.js` garante:
+  - a tag uma vez em cada aula desses dois cursos;
+  - nenhuma outra página com o botão.
+
 ## Proibido: "gramática" e "grammar" (regra do Luis, 12/out/2026)
 
 O foco do site não é gramática, é **aprender com exemplos**. Por isso, as palavras
@@ -51,6 +95,52 @@ botão, SEO, PDF ou fala da Yara.
 - Os ids internos (`tab-grammar`, `'grammar'` na `ROTA`) continuam como estão: o aluno não os
   vê, e o `self-study.js` e o `listening-lab.js` dependem deles.
 - Os prompts da Yara mandam ensinar com exemplos e nunca dizer "grammar" ou "gramática".
+- O `grammar_lab.html` se chama **Laboratório de Padrões** (30/out/2026); a categoria de jogos do pavilhão
+  é "Padrões". O nome do arquivo e os ids (`grammarDone`, `grammar_star`, `data-filter="grammar"`) ficam.
+
+## SEO e página 404 (30/out/2026)
+
+- Toda página do `sitemap.xml` tem `<meta name="description">` própria (50+ caracteres, sem repetir e sem
+  "gramática"/"grammar"); `og:description` e `twitter:description` repetem o mesmo texto. Página nova no
+  sitemap sem descrição faz o `npm run test:security` falhar.
+- Nas metas, `&` vira `&amp;` **uma vez** (`&amp;amp;` aparecia literal no WhatsApp) e aspas dentro do texto
+  são curvas (“ ”): uma aspa reta fecha o `content` no meio.
+- Endereço que não existe mostra o `404.html` (últimas rotas do `vercel.json`: `handle: filesystem` e depois o
+  404; o dev-server faz o mesmo). Ele usa só caminhos absolutos, porque aparece em qualquer pasta.
+
+## Curso de francês: sem pronúncia escrita, e voz da OpenAI (regra do Luis, 19/out/2026)
+
+O curso de francês **não mostra a pronúncia escrita** ("Bonjour [bon-JUR]"): nem nos cards de vocabulário,
+nem na tabela de verbos, na aba Speak, nos padrões, nos quizzes, na trilha diária ou nas folhas em PDF.
+O aluno aprende ouvindo (botão 🔊) e vendo o francês escrito.
+
+- **Os HTML e a trilha são gerados.** Nunca edite `fr_aula_XX.html` nem `lessons_fr_data.js` à mão: a próxima
+  geração desfaz. Edite `scripts/fr-lessons-part1.mjs` / `part2.mjs` e rode:
+  `node scripts/build-fr-aulas.mjs && node scripts/build-fr-trail.mjs && node scripts/build-lesson-data.js`
+  (a trilha lê `data/lessons/201..212.json`, não o `lessons_fr_data.js`). Depois as folhas:
+  `node scripts/gera-folha-aula.mjs --curso fr_aula`.
+- `scripts/fr-sem-pronuncia.mjs` tira os colchetes de tudo que os geradores produzem e **falha a geração**
+  se sobrar um. Quiz que perguntava "como se pronuncia?" com a pronúncia escrita nas alternativas foi
+  reescrito com palavras ("O E soa como A"). Aula nova de francês não leva campo `phon`.
+- Mudou dado da trilha? Troque a etiqueta `?v=` do `fetch('data/lessons/…')` em `lessons.html` e `quadro.html`
+  (o `/data/` fica em cache por 1 dia).
+- **Voz:** `tts-fr.js` usa a voz da OpenAI com sotaque francês (`/api/tts?lang=fr`, `gpt-4o-mini-tts`) pelo
+  `CapyAudio` (funciona no iPhone) e cai na voz do navegador só se a OpenAI falhar. Ela lê só a frase em
+  francês: o que está entre parênteses (tradução, "(e)" de Enchanté(e)) fica na tela e a voz pula.
+- Teste: `tests/frances-sem-pronuncia.test.js`.
+
+## Lição de casa chega ao professor (18/out/2026)
+
+Toda aula com aba `#tab-homework` envia a entrega para `POST /api/homework` sozinha: o
+`components.js` (`autoEnviarLicaoDeCasa`) observa o clique no botão `onclick="submit…()"` da aba
+e, **se o botão ficou desabilitado**, manda as respostas escritas (inputs de texto e textareas).
+O professor vê tudo em `teacher_homework.html` (papel teacher/admin, com verificação em duas etapas).
+
+- Aula nova: basta um botão `submit…()` (`submitHomework12`, `submitReviewDone`…) dentro de `#tab-homework`, que se desabilita quando
+  a entrega vale. Não chame `fetch('/api/homework')` na página: o envio sairia duas vezes.
+- Visitante sem conta vê "Entre na sua conta para o professor ver"; erro de rede mostra "Tentar de novo".
+- Tabela `homework_submissions` (`202611010003_licao_de_casa.sql`, RLS com `private.current_account_id()`): o aluno grava e lê só as dele,
+  o painel lê pelo servidor. Até 18/out ela não existia e a entrega se perdia em silêncio.
 
 ## Jogo novo? Registre no game-celebra.js
 
@@ -87,6 +177,8 @@ get no exception and an advisory only the dev tools reach (Tailwind, Playwright)
 
 Vercel (project: `capy-yara-adventures`). Production URL: **https://capyenglish.com.br**
 
+Só a sessão mestre publica, mesclando na `sync/estado-producao` (veja "Sessão mestre"). Os comandos abaixo
+ficam para emergência, com o Luis, se a publicação pelo merge falhar:
 ```bash
 npx vercel --prod --force                 # always use --force to bypass cache
 npx vercel promote <deployment-url>       # OBRIGATORIO: sem isto o deploy nao vira producao oficial
@@ -108,18 +200,24 @@ fica so como reforco, se o `curl` no www nao mostrar o conteudo novo.
 
 Cache headers (`no-store`) are set globally in `vercel.json` for all routes to prevent stale deployments.
 
+A Preview runs in production mode from its own `*.vercel.app` URLs. Writes accept `APP_ORIGIN` and,
+only when `VERCEL_ENV=preview`, the deployment's `VERCEL_URL` / `VERCEL_BRANCH_URL` (`PREVIEW_ORIGINS`
+in `api/security.js`). Sign in there with a password: magic links and e-mails point to `APP_ORIGIN`.
+
 ## GitHub
 
 ```
 https://github.com/luisfelima11-alt/CapyAi.git
 ```
 
-Typical push after changes:
+Fluxo de toda sessão (menos a mestre): ramo novo a partir da `sync/estado-producao`, commit, push do
+ramo e PR para a `sync/estado-producao`. Nada de push no `main` nem de `vercel --prod`.
 ```bash
-git add <files>
-git commit -m "description"
-git push origin main
-npx vercel --prod --force
+git fetch origin sync/estado-producao
+git checkout -b claude/<assunto> origin/sync/estado-producao
+git add <arquivos>
+git commit -m "descrição"
+git push -u origin claude/<assunto>     # depois, abrir o PR para sync/estado-producao
 ```
 
 ## Architecture
@@ -139,7 +237,9 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 ```
 Valid `activeTab` values: `'home'`, `'classes'`, `'lessons'`, `'games'`, `'chat'`.
 
-**⚠️ Cache busting:** All pages reference `components.js?v=3`. When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+**⚠️ Cache busting:** All pages reference `components.js?v=som2` (also `tts-en.js?v=som1`, `listening-lab.js?v=som1`). When `components.js` changes, bump the version on ALL html files (use Node.js `fs.readdirSync` + `replace` loop, not sed).
+
+**⚠️ Sound on iPhone:** any audio that waits for the network must play through `CapyAudio.play(src, {onended, onerror, rate})` (components.js), never a `new Audio()` created after an `await`: iOS only plays an element first unlocked inside a tap. See BUGS-APRENDIDOS.md (2026-10-18).
 
 **⚠️ Chrome Auto-Translate:** The nav container uses `translate="no"` to prevent Chrome from auto-translating nav labels (e.g. "Cursos" → "Lessons"). Never remove this attribute.
 
@@ -192,6 +292,12 @@ async function sb(path, opts = {}) {
 
 `/api/db` GET/POST reads and upserts `user_state`. `/api/db/accounts` reads/writes `accounts`.
 Upsert uses `Prefer: resolution=merge-duplicates,return=minimal` header.
+
+**AI routes: reads vs writes (28/set/2026).** Writes need an allowed `Origin` and, with session cookies,
+the CSRF token. A same-origin GET sends neither, so a GET AI route with cookies (lyrics search, lyrics,
+TTS, daily challenge, word of the day) is checked by `Sec-Fetch-Site` instead (`assertLeituraDoProprioSite`).
+Test such rules with `NODE_ENV=production`: outside production a missing `Origin` passes and hides the bug.
+The lyrics proxies (`ROTAS_SEM_IA`) have their own limit and never spend a guest's AI uses.
 
 ### Lesson Architecture
 
@@ -539,6 +645,40 @@ deixar a IA gerar so as outras 2-3.
 a trilha nao usa nenhum deles. Se algum dia forem usados por aluno adulto, o mesmo
 defeito vale para eles.
 
+## Home nova (29/out/2026)
+
+- `6_Home_Forest_Expedition.html` + `assets/js/pages/home.js` (`window.CapyHome`): saudação, 🔥 sequência e ⭐ nível,
+  semana (seg-dom), cartão da ligação, plano de hoje e "Continuar o curso". O resto do site foi para "Mais para praticar".
+- A semana marca os dias da **sequência atual** (`streakDays` terminando em `lastPracticeDate`); o app não guarda o
+  histórico de dias. O ⚡ de créditos da maquete ficou de fora: o `aiUsageLimit` do Store (3) não bate com o servidor (20/dia).
+- Cartão da ligação: `teste` (vozTeste disponível, "1ª ligação: 3 min grátis"), `super`, `convite` (teste usado → Super)
+  e `normal`. Os dados vêm do evento `capyPlanoHoje` do `plano-hoje-cartao.js` (sem 2º `/api/me`).
+  O botão abre `ai_chat.html#ligar`: o telefone pulsa e espera o toque (o navegador exige o gesto para microfone e som).
+  Nunca prometer "sem limite" no Super: ele tem `VOZ_MINUTOS_MES`.
+- "Continuar o curso" = última aula aberta no `classes.html` (`localStorage.capyUltimaAula`); as aulas não marcam conclusão.
+  Aula > 5 para quem é grátis volta para o `classes.html` (paywall).
+- Menu de baixo: Início · Trilha · Cursos · Jogos · Mais (Yara AI foi para o Mais). Eventos `home_*` no `/api/track`.
+
+## Plano de hoje e "Pôr na agenda" (29/out/2026)
+
+- `plano-hoje.js` (`window.CapyPlano`) monta 3 tarefas de 5 min **sem IA**: próxima mini-lição da trilha
+  (`capyLastMini_en` ou a 1ª incompleta), conversa com a Yara (ligação no Super ou teste grátis; senão chat) e
+  revisão (`/api/memory`, `lessons.html?review=1`). O "Meu Plano" semanal com IA continua no `study_plan.html`.
+- "Feito" vem de marcas com data gravadas onde a coisa acontece: `capyLastMini_en.at` + mini concluída,
+  `capyConversaDia` (`ai_chat.html`) e `capyRevisaoDia` (modo revisão). Nunca de uma foto tirada na home.
+- Horário em `Store.state.horarioEstudo` (padrão 19:00). Google: link `calendar.google.com/...&recur=RRULE:FREQ=DAILY`.
+  iPhone/Outlook: `GET /api/agenda.ics?hora=HH:MM` (evento diário de 15 min com alarme; só aceita HH:MM).
+- O cartão (`assets/js/plano-hoje-cartao.js`) monta tudo por `textContent`.
+
+## Ligação de teste: 3 minutos grátis, uma vez só (28/out/2026)
+
+- Quem não é Super (free e pro) liga **uma vez**, por 3 minutos (`VOZ_TESTE_MIN`), e só com e-mail
+  confirmado (`liberarTesteDeVoz` em `api/index.js`). O teto global de US$ é checado antes, para nunca gastar o teste.
+- A marca `__vozteste_<aluno>` no `user_state` nasce no 1º token. Dentro desses 3 minutos o aluno religa com o
+  que sobrou (até 3 tokens); depois, `403 plano_sem_voz` com `teste: 'usado'` (ou `'confirmar_email'`).
+- O token responde `teste: true`, e o `conversa-core.js` desliga quando acabam os minutos liberados (motivo
+  `teste` ou `cota`), não só aos 15 min. `/api/me` devolve `vozTeste: 'disponivel' | 'usado'` para a home.
+
 ## Custo da ligacao por voz: calculado e guardado (14/set/2026)
 
 **O que existia:** o `conversa-core.js` ja contava os tokens reais de cada
@@ -574,6 +714,27 @@ Um `String.replace` com ela como ancora cai no primeiro — foi o que fiz, e o b
 do custo foi parar dentro do realtime-token, lendo `PRECO_VOZ` antes da declaracao
 (TDZ) e **derrubando a ligacao**. Ancore por indice do handler, nunca por uma
 linha que pode se repetir.
+
+## Google Analytics e aviso de cookies (19/out/2026)
+
+- `analytics.js` entra em toda página pública (`<script src="analytics.js?v=…" defer>` no `<head>`), nunca nas
+  páginas endurecidas (login, conta, admin, professor). Página nova pública: copie a tag; um teste falha sem ela.
+- Nada do Google carrega antes do "Aceitar" do aviso (LGPD). A escolha fica em `localStorage.capyCookies`, e a
+  política (`privacidade.html#cookies`) tem o botão que reabre o aviso.
+- O ID fica em `GA_ID` dentro do `analytics.js`. Com o ID provisório, ou fora de `capyenglish.com.br` (Preview,
+  localhost), o arquivo não faz nada.
+- Os eventos do `capyTrack` vão também para o GA, com o mesmo nome; cliques na Kiwify viram `begin_checkout`, e no
+  WhatsApp, `generate_lead`. Nunca mande dado pessoal ao GA: só nome do evento e id da lição.
+
+## Painel do professor e turma (19/out/2026)
+
+- O professor (papel `teacher` ou `admin` no `app_metadata`) abre `professor.html` e manda o link
+  `turma.html?c=<código>` aos alunos. O aluno só entra aceitando compartilhar o progresso (LGPD) e sai quando quiser.
+- O servidor só devolve alunos de `turma_alunos` do professor da sessão (`requireProfessor`); nunca aceite id de
+  professor vindo do navegador. Lição de casa abre só se o aluno é da turma.
+- `atividade_diaria` (mini-lições e XP por dia) sai da diferença entre o estado salvo e o anterior no `POST /api/db`
+  (`deltaAtividade`), sem nada novo no navegador. SQL: `202610190003_turmas.sql`, antes do código.
+- `professor.html` e `turma.html` são páginas endurecidas (CSP estrita): JS em `assets/js/pages/`, só `textContent`.
 
 ## Design System
 

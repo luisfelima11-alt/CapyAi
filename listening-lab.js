@@ -98,9 +98,14 @@
     // é controlar a velocidade, por isso o áudio é tocado aqui.
     const CACHE = 'capy-tts-v1';
     let audioAtual = null;
+    let vezDoAudio = 0;
 
     function pararAudio() {
-        if (audioAtual) { try { audioAtual.pause(); audioAtual.src = ''; } catch (e) { } audioAtual = null; }
+        if (audioAtual) {
+            if (window.CapyAudio) CapyAudio.stop();
+            else { try { audioAtual.onended = null; audioAtual.pause(); } catch (e) { } }
+            audioAtual = null;
+        }
         try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) { }
     }
 
@@ -118,6 +123,7 @@
         const limpo = String(texto || '').replace(/<[^>]+>/g, '').trim().slice(0, 300);
         if (!limpo) return;
         pararAudio();
+        const vez = ++vezDoAudio;
         const chave = `/__capy-tts-cache/${API_LANG}/${encodeURIComponent(limpo.toLowerCase())}`;
         try {
             let blob = null;
@@ -140,13 +146,23 @@
                     } catch (e) { }
                 }
             }
-            const a = new Audio(URL.createObjectURL(blob));
-            a.playbackRate = taxa;
-            audioAtual = a;
-            a.onended = () => { try { URL.revokeObjectURL(a.src); } catch (e) { } };
-            await a.play();
+            // Outro toque trocou de frase enquanto esta carregava.
+            if (vez !== vezDoAudio) return;
+            const src = URL.createObjectURL(blob);
+            const liberar = () => { try { URL.revokeObjectURL(src); } catch (e) { } };
+            // No iPhone só toca o elemento que o primeiro toque liberou (CapyAudio).
+            if (window.CapyAudio) {
+                audioAtual = CapyAudio.element();
+                await CapyAudio.play(src, { rate: taxa, onended: liberar });
+            } else {
+                const a = new Audio(src);
+                a.playbackRate = taxa;
+                audioAtual = a;
+                a.onended = liberar;
+                await a.play();
+            }
         } catch (e) {
-            falarNavegador(limpo, taxa * 0.9);
+            if (vez === vezDoAudio) falarNavegador(limpo, taxa * 0.9);
         }
     }
 
