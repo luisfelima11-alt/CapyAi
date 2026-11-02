@@ -80,8 +80,14 @@
       "src": "assets/**/*.png",
       "use": "@vercel/static"
     },
-    { "src": "assets/**/*.jpg", "use": "@vercel/static" },
-    { "src": "assets/**/*.webp", "use": "@vercel/static" },
+    {
+      "src": "assets/**/*.jpg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**/*.webp",
+      "use": "@vercel/static"
+    },
     {
       "src": "assets/**/*.mp3",
       "use": "@vercel/static"
@@ -178,45 +184,52 @@
           "value": "0"
         }
       ]
-    },
-    {
-      "source": "/components.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/components.js\\?v=:version",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)\\.js\\?v=:version",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/data/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=86400, stale-while-revalidate=604800"
-        }
-      ]
     }
   ],
   "routes": [
+    {
+      "src": "^/(?:4_Login_Capy_Yara_Welcomes_You\\.html|set-password\\.html|account\\.html|admin\\.html|admin-antigo\\.html|admin-metrics\\.html|teacher_homework\\.html|professor\\.html|turma\\.html)$",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; script-src-attr 'none'; style-src-elem 'self' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/.*$",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "no-referrer",
+        "Permissions-Policy": "camera=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
+        "Cross-Origin-Opener-Policy": "same-origin"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/(?!(?:4_Login_Capy_Yara_Welcomes_You|set-password|account|admin|admin-antigo|admin-metrics|teacher_homework|professor|turma)\\.html).*$",
+      "headers": {
+        "Content-Security-Policy": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://api.openai.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/sw\\.js$",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Service-Worker-Allowed": "/"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/.*\\.html$",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      },
+      "continue": true
+    },
     {
       "src": "^/(database\\.json|\\.env(?:\\..*)?|auth\\.js|api/security\\.js|supabase/.*|scripts/.*)$",
       "dest": "/api/index.js"
@@ -239,7 +252,13 @@
         "Cache-Control": "no-cache, no-store, must-revalidate"
       }
     },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "status": 404, "dest": "/404.html" }
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/404.html"
+    }
   ]
 }
