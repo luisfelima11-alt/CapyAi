@@ -25,7 +25,11 @@ async function loadSubmissions() {
   try {
     const res = await fetch('/api/homework', { credentials: 'same-origin' });
     if (res.status === 401 || res.status === 403) {
-      document.getElementById('login-err').textContent = 'Sessao sem permissao de professor.';
+      // In production the teacher route also demands two-step verification.
+      const erro = await res.json().catch(() => ({}));
+      document.getElementById('login-err').textContent = erro.error === 'mfa_required'
+        ? 'Ative a verificacao em duas etapas em admin.html para ver as entregas.'
+        : 'Sessao sem permissao de professor.';
       document.getElementById('login-err').classList.remove('hidden');
       document.getElementById('dashboard').classList.add('hidden');
       document.getElementById('login-screen').classList.remove('hidden');
@@ -42,7 +46,7 @@ async function loadSubmissions() {
   } catch(e) {
     area.innerHTML = `<div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6 text-center text-red-700">
       <div class="text-3xl mb-2">⚠️</div>
-      <p class="font-black">Erro ao carregar: ${e.message}</p>
+      <p class="font-black">Erro ao carregar: ${escHtml(e.message)}</p>
       <p class="text-sm mt-1">Verifique a conexão e tente novamente.</p>
     </div>`;
   }
@@ -64,7 +68,7 @@ function applyFilters() {
   if (sortBy === 'newest')  data.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
   if (sortBy === 'oldest')  data.sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
   if (sortBy === 'student') data.sort((a, b) => (a.student_name || '').localeCompare(b.student_name || ''));
-  if (sortBy === 'lesson')  data.sort((a, b) => Number(a.lesson_id) - Number(b.lesson_id));
+  if (sortBy === 'lesson')  data.sort((a, b) => String(a.lesson_id).localeCompare(String(b.lesson_id), 'pt-BR', { numeric: true }));
 
   renderSubmissions(data);
 }
@@ -107,7 +111,7 @@ function renderSubmissions(data) {
       <div class="bg-gradient-to-r from-violet-50 to-indigo-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-violet-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">
-            ${(s.student_name || '?').charAt(0).toUpperCase()}
+            ${escHtml((s.student_name || '?').charAt(0).toUpperCase())}
           </div>
           <div>
             <h3 class="font-black text-navy text-base">${escHtml(s.student_name || 'Sem nome')}</h3>
@@ -115,9 +119,9 @@ function renderSubmissions(data) {
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="bg-violet-100 text-violet-700 font-black text-xs px-3 py-1 rounded-full">Aula ${escHtml(s.lesson_id)}</span>
+          <span class="bg-violet-100 text-violet-700 font-black text-xs px-3 py-1 rounded-full">${escHtml(rotuloDaLicao(s.lesson_id))}</span>
           ${s.lesson_title ? `<span class="bg-slate-100 text-slate-600 font-bold text-xs px-3 py-1 rounded-full">${escHtml(s.lesson_title)}</span>` : ''}
-          <span class="bg-amber-100 text-amber-700 font-black text-xs px-3 py-1 rounded-full">+${s.xp_earned || 0} XP</span>
+          <span class="bg-amber-100 text-amber-700 font-black text-xs px-3 py-1 rounded-full">+${Number(s.xp_earned) || 0} XP</span>
           <span class="bg-slate-100 text-slate-500 font-bold text-xs px-3 py-1 rounded-full">🕐 ${dateStr}</span>
         </div>
       </div>
@@ -138,6 +142,18 @@ function renderSubmissions(data) {
       </div>
     </div>`;
   }).join('');
+}
+
+// Since 18/out the lessons send their file name ("agro_aula_09"); aula_32
+// used to send just the number.
+const CURSOS = { agro: 'Agro', gpstronic: 'GPS Tronic', med: 'Saude', interview: 'Entrevista',
+  intermediate: 'Intermediate', advanced: 'Advanced', business: 'Business', travel: 'Travel', fr: 'Frances' };
+function rotuloDaLicao(id) {
+  const s = String(id || '');
+  if (/^\d+$/.test(s)) return 'Aula ' + s;
+  const m = s.match(/^(?:([a-z]+)_)?aula_(\d+)$/);
+  if (!m) return s;
+  return (m[1] ? (CURSOS[m[1]] || m[1]) + ' · ' : '') + 'Aula ' + m[2];
 }
 
 function escHtml(str) {

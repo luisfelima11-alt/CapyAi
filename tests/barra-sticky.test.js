@@ -36,5 +36,5 @@ test('todas as páginas pedem a mesma versão do components.js (cache)', () => {
     for (const arq of paginas) {
         for (const m of fs.readFileSync(path.join(RAIZ, arq), 'utf8').matchAll(/components\.js\?v=([a-z0-9]+)/g)) versoes.add(m[1]);
     }
-    assert.deepEqual([...versoes], ['nav2'], `versões misturadas: ${[...versoes].join(', ')}`);
+    assert.equal(versoes.size, 1, `versões misturadas: ${[...versoes].join(', ')}`);
 });

@@ -129,6 +129,19 @@ O aluno aprende ouvindo (botão 🔊) e vendo o francês escrito.
   francês: o que está entre parênteses (tradução, "(e)" de Enchanté(e)) fica na tela e a voz pula.
 - Teste: `tests/frances-sem-pronuncia.test.js`.
 
+## Lição de casa chega ao professor (18/out/2026)
+
+Toda aula com aba `#tab-homework` envia a entrega para `POST /api/homework` sozinha: o
+`components.js` (`autoEnviarLicaoDeCasa`) observa o clique no botão `onclick="submit…()"` da aba
+e, **se o botão ficou desabilitado**, manda as respostas escritas (inputs de texto e textareas).
+O professor vê tudo em `teacher_homework.html` (papel teacher/admin, com verificação em duas etapas).
+
+- Aula nova: basta um botão `submit…()` (`submitHomework12`, `submitReviewDone`…) dentro de `#tab-homework`, que se desabilita quando
+  a entrega vale. Não chame `fetch('/api/homework')` na página: o envio sairia duas vezes.
+- Visitante sem conta vê "Entre na sua conta para o professor ver"; erro de rede mostra "Tentar de novo".
+- Tabela `homework_submissions` (`202611010003_licao_de_casa.sql`, RLS com `private.current_account_id()`): o aluno grava e lê só as dele,
+  o painel lê pelo servidor. Até 18/out ela não existia e a entrega se perdia em silêncio.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
