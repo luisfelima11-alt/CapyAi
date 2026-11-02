@@ -1,5 +1,33 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-02 — Os cabeçalhos de segurança do `vercel.json` nunca chegaram às páginas
+
+**Sintoma:** depois de publicar o PR #1 (CSP estrita nas páginas de login, conta, admin e professor),
+`curl -sD - https://www.capyenglish.com.br/account.html` não trazia CSP, `X-Frame-Options` nem
+`nosniff`. Só o `/` trazia.
+
+**Causa raiz:** o `vercel.json` usa `builds` + `routes`, o formato antigo. Nesse formato a Vercel
+ignora o bloco `headers` sem avisar: o deploy passa e os cabeçalhos simplesmente não saem. O `/` tinha
+os cabeçalhos porque a rota dele (`^/$` → `landing.html`) já os levava. Os testes liam o `headers` e
+ficavam verdes; ninguém tinha olhado a resposta de verdade.
+
+**Correção:**
+- `npm run headers` (`scripts/cabecalhos-para-routes.js`) copia cada regra do `headers` para uma rota
+  `continue: true` no começo de `routes`;
+- um teste falha se as rotas ficarem desatualizadas;
+- antes de ligar, as 259 páginas foram abertas no Chromium com a CSP que vão receber.
+
+**Como pegar isso de novo:**
+```bash
+curl -s -D - -o /dev/null https://www.capyenglish.com.br/account.html | grep -iE 'content-security|x-frame'
+npm run headers -- --check
+```
+
+**Regra:** cabeçalho de segurança só conta depois de visto na resposta da produção (ou do Preview),
+não no arquivo de configuração.
+
+---
+
 ## 2026-10-19 — Curso de francês: pronúncia escrita em todo canto e voz do navegador
 
 **Sintoma:** as aulas de francês mostravam a pronúncia entre colchetes ("Bonjour [bon-JUR]") e a voz
