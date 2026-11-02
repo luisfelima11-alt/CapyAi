@@ -737,3 +737,32 @@ test('the old "Grammar Lab" name is gone: the page is the Laboratório de Padrõ
   // Os ids internos (grammarDone, grammar_star, data-filter="grammar") continuam; o aluno não os vê.
   assert.doesNotMatch(lab, /gramátic|Grammar/);
 });
+
+test('the security headers reach the static pages: vercel.json routes carry every headers rule', () => {
+  // With `builds` + `routes`, Vercel ignores the `headers` block: until 02/nov/2026 no static
+  // page got the CSP, X-Frame-Options or nosniff (only "/", whose route had them). The rules
+  // are still written in `headers`; `npm run headers` copies them into `routes`.
+  const { montar, fonteParaRegex } = require('../scripts/cabecalhos-para-routes.js');
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  assert.deepEqual(config.routes, montar(config).routes, 'vercel.json routes are stale: run npm run headers');
+  const geradas = config.routes.filter(route => route.continue === true);
+  assert.equal(geradas.length, config.headers.length);
+  // The generated rules come before every routing rule, or a matched dest would skip them.
+  assert.ok(config.routes.slice(0, geradas.length).every(route => route.continue === true));
+  // Every route may only use keys Vercel accepts (an unknown key fails the deployment).
+  const permitidas = new Set(['src', 'dest', 'headers', 'continue', 'status', 'handle', 'methods', 'has', 'missing', 'check']);
+  for (const route of config.routes) for (const key of Object.keys(route)) assert.ok(permitidas.has(key), `route key ${key}`);
+  const casa = (page, key) => geradas.some(route => new RegExp(route.src).test(page) && route.headers[key]);
+  const strictRoute = geradas.find(route => route.src.includes('4_Login_Capy_Yara_Welcomes_You'));
+  for (const page of ['/account.html', '/admin.html', '/professor.html', '/turma.html']) {
+    assert.ok(new RegExp(strictRoute.src).test(page), `${page} gets the strict CSP`);
+    const outrasCsp = geradas.filter(route => route !== strictRoute && route.headers['Content-Security-Policy'] && new RegExp(route.src).test(page));
+    assert.deepEqual(outrasCsp, [], `${page} must get only the strict CSP`);
+  }
+  for (const page of ['/leaderboard.html', '/aula_05.html', '/agro_prova.html']) {
+    assert.equal(new RegExp(strictRoute.src).test(page), false);
+    assert.ok(casa(page, 'Content-Security-Policy'), `${page} gets the compatibility CSP`);
+    assert.ok(casa(page, 'X-Frame-Options') && casa(page, 'X-Content-Type-Options'), `${page} gets the base headers`);
+  }
+  assert.throws(() => fonteParaRegex('/(.*)\\.js\\?v=:version'), /query string/);
+});

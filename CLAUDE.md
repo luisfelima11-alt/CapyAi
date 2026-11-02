@@ -178,9 +178,14 @@ into it is publishing. Every other session works on a branch and opens a PR.
 
 - `vercel.json` sends `/api/*` to `api/index.js` and `/` to `landing.html`, and sets the security
   headers and two CSPs: strict for the hardened pages (login, set-password, account, admin,
-  admin-antigo, admin-metrics, teacher_homework — no inline script, local Tailwind), compatibility
-  for the rest. The strict rule's page list and the compatibility rule's exclusion must stay equal
-  (`tests/security.test.js` checks it).
+  admin-antigo, admin-metrics, teacher_homework, professor, turma — no inline script, local
+  Tailwind), compatibility for the rest. The strict rule's page list and the compatibility rule's
+  exclusion must stay equal (`tests/security.test.js` checks it).
+- **Headers are written in `headers` but only `routes` reach production.** With `builds` + `routes`,
+  Vercel ignores the `headers` block (until 02/nov/2026 no static page got the CSP or X-Frame-Options).
+  After editing `headers`, run `npm run headers`: it regenerates the `continue: true` routes at the top of
+  `routes` (a test fails if they are stale). Never add a key Vercel doesn't know to a route: the deploy fails.
+  `source` there can't match a query string (`?v=`), so long-cache rules for versioned files don't exist.
 - SQL in `supabase/migrations/` runs in the Supabase SQL editor **before** the code that needs it.
   Release steps and owner actions live in `SECURITY-ROLLOUT.md`.
 - `scripts/`, `tests/`, `supabase/` and `*.md` never ship (`.vercelignore`).
