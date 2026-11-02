@@ -1,6 +1,11 @@
 const forms = require('@tailwindcss/forms');
 
 module.exports = {
+  // Todo HTML que carrega security-pages.css e todo script da raiz que monta
+  // marcação nessas páginas (a barra de cima e a de baixo vêm do components.js,
+  // a foto da Capy do capy-skins.js). Arquivo fora desta lista não ganha CSS:
+  // em 15/10 a "Minha Conta" abriu com a Capy gigante e o menu sempre aberto.
+  // tests/security.test.js confere a lista e que o CSS está em dia.
   content: [
     './4_Login_Capy_Yara_Welcomes_You.html',
     './set-password.html',
@@ -10,6 +15,11 @@ module.exports = {
     './admin-metrics.html',
     './teacher_homework.html',
     './assets/js/pages/*.js',
+    './auth-secure.js',
+    './capy-skins.js',
+    './components.js',
+    './store.js',
+    './streak-overlay.js',
   ],
   theme: {
     extend: {
