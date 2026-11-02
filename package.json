@@ -6,7 +6,7 @@
     "audit": "node scripts/audit-lessons.js",
     "audit:local": "node scripts/audit-lessons.js --base=http://localhost:8765",
     "audit:debug": "node scripts/audit-lessons.js --headless=false",
-    "test:security": "node --test tests/security.test.js",
+    "test:security": "node --test tests/security.test.js tests/professor.test.js tests/plano-hoje.test.js tests/home-nova.test.js",
     "test:turkish": "node --test tests/turkish-course.test.js",
     "test:e2e:security": "playwright test --config=playwright.config.js",
     "security:check": "node scripts/audit.js && npm run test:security",
@@ -18,7 +18,7 @@
     "test:mic": "node --test tests/capy-mic.test.js",
     "test:music": "node --test tests/music-lab.test.js",
     "aulas:contexto": "node scripts/gera-contexto-aulas.js",
-    "test:aulas": "node --test tests/aula-contexto.test.js"
+    "test:aulas": "node --test tests/aula-contexto.test.js tests/tela-cheia.test.js tests/mini-prova.test.js tests/barra-sticky.test.js tests/migracoes.test.js"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",

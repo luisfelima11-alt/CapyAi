@@ -62,3 +62,14 @@ test('o cartão é montado sem innerHTML e só aceita PDF da pasta de folhas', (
     assert.ok(!/innerHTML/.test(js));
     assert.ok(js.includes('^assets\\/pdf\\/[a-z0-9_]+-folha\\.pdf$'));
 });
+
+test('o cartão de cada aula aponta para a folha DELA (o gerador não pode herdar a do molde)', () => {
+    for (const arq of fs.readdirSync(RAIZ).filter(n => /^[a-z_]*aula_\d+\.html$/.test(n))) {
+        const html = fs.readFileSync(path.join(RAIZ, arq), 'utf8');
+        const tags = html.match(/<script src="folha-da-aula\.js[^>]*>/g) || [];
+        assert.ok(tags.length <= 1, `${arq}: cartão da folha repetido`);
+        if (!tags.length) continue;
+        const pdf = (tags[0].match(/data-pdf="([^"]+)"/) || [])[1];
+        assert.equal(pdf, `assets/pdf/${arq.replace(/\.html$/, '')}-folha.pdf`, arq);
+    }
+});

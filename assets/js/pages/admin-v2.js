@@ -715,10 +715,10 @@ function painelLink(a) {
 }
 
 function painelSenha(a) {
-  const campo = el('input', { id: 'nova-senha', type: 'text', autocomplete: 'new-password', minlength: '8', placeholder: 'mínimo 8 caracteres' });
+  const campo = el('input', { id: 'nova-senha', type: 'text', autocomplete: 'new-password', minlength: '12', placeholder: 'mínimo 12 caracteres' });
   const botao = el('button', { type: 'button', class: 'botao botao--escuro', text: 'Definir senha', onclick: async () => {
     const senha = campo.value;
-    if (senha.length < 8) { toast('A senha precisa ter pelo menos 8 caracteres.', 'erro'); return; }
+    if (senha.length < 12) { toast('A senha precisa ter pelo menos 12 caracteres.', 'erro'); return; }
     botao.disabled = true;
     try {
       await postar('/api/admin/set-password', { email: a.email, password: senha });

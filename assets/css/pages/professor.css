@@ -1,0 +1,58 @@
+/* Painel do Professor. CSS próprio (a página é endurecida: sem Tailwind do CDN). */
+:root { --navy: #001f3f; --rosa: #ec4899; --verde: #10b981; --erro: #ba1a1a; --fundo: #f4f6fb; --cinza: #64748b; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--navy); font: 500 15px/1.5 "Plus Jakarta Sans", system-ui, sans-serif; }
+h1, h2, h3 { margin: 0; font-weight: 900; }
+h1 { font-size: 24px; } h2 { font-size: 18px; } h3 { font-size: 15px; margin-bottom: 8px; }
+.largura { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+.sub { color: var(--cinza); margin: 4px 0 0; font-size: 14px; }
+.topo { background: linear-gradient(135deg, var(--navy), #2e1065 60%, #7c3aed); color: #fff; padding: 22px 0; }
+.topo .sub { color: rgba(255,255,255,.7); }
+.topo-linha { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.topo-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+main { padding-top: 20px; padding-bottom: 48px; display: grid; gap: 16px; }
+#painel { display: grid; gap: 16px; }
+#painel[hidden] { display: none; }
+.cartao { background: #fff; border-radius: 1.5rem; padding: 20px; box-shadow: 0 4px 18px rgba(0,31,63,.06); }
+.centro { text-align: center; font-weight: 700; padding: 40px 20px; }
+.erro { color: var(--erro); }
+.botao { border: 0; border-radius: 9999px; padding: 10px 18px; font: 800 14px "Plus Jakarta Sans", system-ui, sans-serif; cursor: pointer; background: var(--navy); color: #fff; text-decoration: none; display: inline-block; }
+.botao:active { transform: scale(.98); }
+.botao.rosa { background: var(--rosa); }
+.botao.fantasma { background: rgba(255,255,255,.14); color: #fff; }
+.botao.fantasma.escuro { background: #eef2f7; color: var(--navy); }
+.botao.pequeno { padding: 6px 14px; font-size: 13px; }
+.botao.perigo { background: #fde8e8; color: var(--erro); }
+.convite { display: grid; gap: 12px; }
+.convite-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+.convite-linha input { flex: 1 1 260px; min-width: 0; border: 0; background: var(--fundo); border-radius: 9999px; padding: 10px 16px; font: 700 14px "Plus Jakarta Sans", system-ui, sans-serif; color: var(--navy); }
+.numeros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.numero { background: #fff; border-radius: 1.5rem; padding: 16px; box-shadow: 0 4px 18px rgba(0,31,63,.06); }
+.numero span { display: block; font-size: 28px; font-weight: 900; }
+.numero small { color: var(--cinza); font-weight: 700; }
+.alertas { margin: 10px 0 0; padding-left: 20px; }
+.alertas li { margin: 4px 0; }
+.linha-titulo { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+#busca { border: 0; background: var(--fundo); border-radius: 9999px; padding: 8px 14px; font: 600 14px "Plus Jakarta Sans", system-ui, sans-serif; }
+.tabela-rolagem { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 720px; }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--cinza); padding: 8px; }
+td { padding: 10px 8px; background: #fff; }
+tbody tr:nth-child(odd) td { background: #f8fafc; }
+td.aluno { font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.avatar { font-size: 20px; }
+td.ok { color: #047857; font-weight: 800; }
+td.nao { color: var(--erro); font-weight: 700; }
+.detalhe { border: 0; border-radius: 1.5rem; padding: 0; width: min(720px, calc(100vw - 32px)); max-height: 86vh; color: var(--navy); }
+.detalhe::backdrop { background: rgba(0,31,63,.55); }
+.detalhe-topo { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; background: var(--fundo); position: sticky; top: 0; }
+#det-corpo { padding: 4px 20px 20px; }
+.det-secao { padding-top: 16px; }
+.dias { display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; }
+.dia { border-radius: 8px; text-align: center; font-size: 11px; font-weight: 800; padding: 8px 0; }
+.dia.feito { background: var(--verde); color: #fff; }
+.dia.meio { background: #e0e7ff; color: var(--navy); }
+.dia.vazio { background: #f1f5f9; color: #94a3b8; }
+.licao { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; }
+.respostas { white-space: pre-wrap; background: var(--fundo); border-radius: 1rem; padding: 12px; font: 500 13px/1.5 ui-monospace, monospace; margin: 0 0 8px; max-height: 320px; overflow: auto; }
+@media (max-width: 720px) { .numeros { grid-template-columns: repeat(2, 1fr); } }

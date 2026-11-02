@@ -80,7 +80,7 @@ function renderPlan() {
   // Features list
   const items = isSuper ? [
     '✓ Tudo do Pro',
-    '✓ 10 min/mês de voz com Yara AI',
+    '✓ 60 min/mês de voz com Yara AI',
     '✓ Correção de pronúncia',
     '✓ Relatório de progresso semanal',
     '✓ Acesso prioritário a novas lições',

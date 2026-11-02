@@ -87,6 +87,7 @@
 <meta name="twitter:title" content="Lessons — Capy Yara English"/>
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<script src="analytics.js?v=ga1" defer></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
 
@@ -280,13 +281,13 @@
 </div>
 
 <script src="capy-skins.js?v=skins1"></script>
-<script src="auth-secure.js?v=m1015"></script>
+<script src="auth-secure.js?v=seg1"></script>
 <script src="memory.js?v=mem1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=m1018"></script>
+<script src="components.js?v=seg1"></script>
 <script src="celebration.js?v=cel3"></script>
-<script src="yara-widget.js?v=yw7"></script>
+<script src="yara-widget.js?v=yw8"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
 // LESSON DATA — All 24 Jadson lessons + custom lessons merged at boot
@@ -315,7 +316,7 @@ async function garantirLicao(id) {
   const custom = (window.Store && Store.state && Store.state.customLessons || []).find(l => l.id === id);
   if (custom) { LICOES_CARREGADAS.set(id, custom); return custom; }
   try {
-    const r = await fetch('data/lessons/' + id + '.json?v=gps24');
+    const r = await fetch('data/lessons/' + id + '.json?v=fr1');
     if (!r.ok) return null;
     const licao = await r.json();
     LICOES_CARREGADAS.set(id, licao);
@@ -507,6 +508,8 @@ function updateWeakWordSRS(lessonId, en, isCorrect) {
 }
 
 function initReviewMode() {
+  // O plano de hoje (plano-hoje.js) marca a revisao como feita quando ela abre.
+  try { localStorage.setItem('capyRevisaoDia', new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })); } catch (e) {}
   const sidebar = document.getElementById('lesson-sidebar');
   if (sidebar) sidebar.style.display = 'none';
   document.querySelectorAll('.md\\:hidden').forEach(el => {
@@ -1242,7 +1245,7 @@ const TRAIL_GAMES = {
 };
 const GAME_NAMES = {
   'word_match_game.html':'Word Match','fill_blank_game.html':'Fill in the Blank',
-  'grammar_lab.html':'Grammar Lab','matching_pairs_game.html':'Matching Pairs',
+  'grammar_lab.html':'Laboratório de Padrões','matching_pairs_game.html':'Matching Pairs',
   'sentence_builder_game.html':'Sentence Builder','spelling_bee_game.html':'Spelling Bee',
   'word_scramble_game.html':'Word Scramble','word_search_game.html':'Word Search',
   'hangman_game.html':'Hangman','berry_math_game.html':'Berry Math',

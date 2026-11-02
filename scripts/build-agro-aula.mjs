@@ -19,6 +19,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -172,7 +173,8 @@ function construir(n) {
 
     // 3. Seções com conteúdo
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
-    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION', blocoGramatica(c));
+    t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
+        c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio, raiz: RAIZ }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
@@ -270,7 +272,7 @@ function validar({ t, d, c, n, nn }) {
     ok(c.quiz.every(q => new Set(q.opts).size === q.opts.length), 'sem opção repetida no quiz');
     ok(d.linhas.filter(x => !x.extra).length === 12, '12 falas na versão curta');
     ok(d.linhas.filter(x => x.extra).length === 8, '8 falas extras');
-    const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"/g, '');
+    const visivel = t.replace(/<!--[\s\S]*?-->/g, '').replace(/tab-grammar|'grammar'|"grammar"|assets\/img\/gramatica\/|gramatica-slides\.js/g, '');
     ok(!/gram[aá]tic|grammar/i.test(visivel), 'sem a palavra proibida gramática/grammar (regra de 12/out)');
     ok(t.includes('id="dialogue-lines"') && t.includes('id="speak-grid"'), 'contrato de DOM do listening-lab');
 
@@ -284,6 +286,9 @@ function validar({ t, d, c, n, nn }) {
 
     const img = fs.existsSync(path.join(RAIZ, d.imagem.arquivo));
     if (!img) console.log(`    ⚠ imagem ainda não gerada: ${d.imagem.arquivo} (node scripts/gen-dialogo-assets.mjs --imagem agro${nn})`);
+
+    // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
+    checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `agro${nn}`, raiz: RAIZ });
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
