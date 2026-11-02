@@ -154,6 +154,32 @@ num `new Audio()` criado depois de um `await`.
 
 ---
 
+## 2026-09-30 — O chat da lição (`/api/lesson-chat`) respondia 500 no PR #1 (não chegou à produção)
+
+**Sintoma:** qualquer mensagem no chat de uma lição dava 500. Apareceu ao escrever o primeiro teste
+que chama a rota de verdade, antes de a branch ser publicada.
+
+**Causa raiz:** a rota montava o aluno com `nivelDoAluno()`. No merge com a produção (27/set), essa
+função saiu, porque a produção já lia o aluno com `perfilDoAluno()`. Só que a chamada ficou.
+`ReferenceError` dentro do handler, e daí o 500. O teste que existia só procurava o nome
+`nivelDoAluno(` no código-fonte, então passava.
+
+**Correção:** a rota usa `perfilDoAluno(appUserId, conta)`, igual ao `/api/chat`. Um teste chama a
+rota inteira num processo separado e espera o 503 de "sem chave de IA", não o 500.
+
+**Como pegar isso de novo:**
+```bash
+node --test --test-name-pattern="lesson chat runs end to end" tests/security.test.js
+# e, para qualquer nome que um merge deixou sem definição:
+npx eslint --no-config-lookup --rule '{"no-undef":"error"}' --global require,module,process,Buffer,__dirname,console,setTimeout,clearTimeout,setImmediate,URL,fetch,AbortController api/index.js api/security.js
+```
+
+**Por que aconteceu:** um teste que lê o código-fonte confere que o texto existe, não que ele roda.
+Rota nova ou refeita ganha pelo menos um teste que a executa. Depois de um merge grande, rode o
+`no-undef`.
+
+---
+
 ## 2026-09-29 — Com a página aberta há mais de ~1 h, todo envio dava 403 "CSRF validation failed"
 
 **Sintoma:** na fala da trilha (`lessons.html`, francês), o microfone mostrava "⚠️ Não deu para
@@ -356,7 +382,7 @@ token efemero da OpenAI nunca e emitido.
 `__Host-capy-csrf` e refiz a chamada mandando o header a mao. O mesmo endpoint
 respondeu **200** com o token. So depois disso toquei no HTML.
 
-**Correcao:** `<script src="auth-secure.js?v=c52d7db"></script>` antes do
+**Correcao:** `<script src="auth-secure.js?v=seg1"></script>` antes do
 `conversa-core.js` em `conversa.html` e `entrevista.html`.
 
 **Como pegar de novo:**
@@ -695,7 +721,7 @@ converte qualquer falha de escrita em `HttpError(502,'database_error')`, esconde
 mensagem real do PostgREST, então o erro não dizia qual coluna faltava.
 **Correção:** no bloco do `grant-plan` em `api/index.js`, gerar
 `userId = 'grant-' + crypto.randomBytes(8).toString('hex')` e mandar no insert.
-Confirmado em produção: `gavinhacarol@gmail.com → super (conta CRIADA agora)`.
+Confirmado em produção: `aluna@exemplo.com → super (conta CRIADA agora)`.
 **Como pegar isso de novo:**
 ```bash
 node scripts/cortesias.mjs                         # lista, nao escreve
@@ -721,7 +747,7 @@ progresso sumia ao recarregar a página.
 `auth-secure.js`. Os 20 `*_game.html` carregavam `store.js` mas nunca carregavam
 `auth-secure.js` — todo save caía em 403, e o `.catch(e => {})` de `store.js` engolia
 o erro em silêncio.
-**Correção:** inserida `<script src="auth-secure.js?v=c52d7db"></script>` imediatamente
+**Correção:** inserida `<script src="auth-secure.js?v=seg1"></script>` imediatamente
 antes da tag de `store.js` nos 20 `*_game.html` (mesma versão que `lessons.html` já
 usava). Feito por script node, idempotente — 20 alterados, 0 pulados (nenhum já tinha).
 **Como pegar isso de novo:**
@@ -761,7 +787,7 @@ Estado final esperado: **`todas ok`**. Qualquer outra saída é regressão.
 em duas levas. Ambas concluídas — ver estado final logo abaixo.**
 
 **Leva 1 — CORRIGIDA (2026-09-01):** as 18 páginas avulsas abaixo receberam
-`<script src="auth-secure.js?v=c52d7db"></script>` imediatamente antes de `store.js`,
+`<script src="auth-secure.js?v=seg1"></script>` imediatamente antes de `store.js`,
 mesmo padrão dos 20 jogos:
 `shop.html`, `daily_challenge.html`, `progress.html`, `pronun_practice.html`,
 `story_time.html`, `grammar_lab.html`, `reading_room.html`, `number_quest.html`,
@@ -879,7 +905,7 @@ Silencioso — o `.catch(e => {})` em `store.js` engolia o erro.
 **Causa raiz:** `POST /api/db` exige `X-CSRF-Token`. Esse header só é injetado pelo
 remendo em `window.fetch` dentro do `auth-secure.js`, e o `lessons.html` **não carregava
 o `auth-secure.js`** (apenas 15 de 201 páginas carregam; 0 das 124 aulas de curso).
-**Correção:** `<script src="auth-secure.js?v=...">` antes do `store.js` em
+**Correção:** `<script src="auth-secure.js?v=seg1">` antes do `store.js` em
 `lessons.html`, mais `Store.mergeFromServer()` para não retroceder progresso.
 **Como pegar isso de novo:**
 ```bash

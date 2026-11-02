@@ -421,10 +421,10 @@ ${patternCardsHtml}
 <div id="mobile-nav-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
-<script src="auth-secure.js?v=skins1"></script>
+<script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=hw2"></script>
+<script src="components.js?v=seg1"></script>
 <script>window.YARA_WIDGET={lang:'fr',lessonTitle:${JSON.stringify(l.title)},lessonNum:${l.num}};</script>
 <script src="tts-fr.js?v=fr1"></script>
 <script src="yara-widget.js?v=yw8"></script>

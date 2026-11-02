@@ -290,3 +290,22 @@ a.linha:hover { background: #FBFAF7; color: var(--navy); }
 @media (min-width: 720px) {
   .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* ── Verificação em 2 etapas (MFA) ─────────────────────────────────────── */
+.portao--sobre { z-index: 55; }   /* a ativação abre por cima do app */
+.mfa { text-align: left; margin-top: 6px; }
+.mfa .mfa__codigo {
+  min-height: 52px; font-size: 22px; font-weight: 800; letter-spacing: .4em;
+  text-align: center; font-variant-numeric: tabular-nums;
+}
+.mfa__qr {
+  width: 192px; height: 192px; margin: 4px auto; padding: 8px;
+  background: #fff; border: 1px solid var(--linha); border-radius: 12px;
+}
+.mfa__chave {
+  display: block; padding: 10px; border-radius: 10px; background: var(--selecionado);
+  font: 600 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; user-select: all;
+}
+.mfa-aviso { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 20px 0; }
+.mfa-aviso p { margin: 0; }
+.mfa-aviso .botao { white-space: nowrap; flex-shrink: 0; }

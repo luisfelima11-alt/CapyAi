@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
+const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const { EventEmitter } = require('node:events');
 
@@ -192,6 +193,254 @@ test('local server blocks traversal and private files', async t => {
   }
 });
 
+// ── Release 1 hardening (2026-09-24) ───────────────────────────────────────
+
+test('student names cannot inject markup into the ranking or the nav', () => {
+  const board = fs.readFileSync(path.join(ROOT, 'leaderboard.html'), 'utf8');
+  assert.doesNotMatch(board, /\$\{user\.(name|avatar)\}/);
+  assert.match(board, /\$\{escHtml\(user\.name\)\}/);
+  const nav = fs.readFileSync(path.join(ROOT, 'components.js'), 'utf8');
+  assert.match(nav, /sessionName = esc\(sess\.name/);
+  const user = Security.publicUser({ id: 'a', email: 'x@example.com', user_metadata: { name: '<img src=x onerror=alert(1)>Ana', avatar: '<b>' } }, null);
+  assert.doesNotMatch(user.name + user.avatar, /[<>]/);
+});
+
+test('auth callback only redirects to paths on this site', () => {
+  const { caminhoInterno } = apiHandler._internos;
+  assert.equal(caminhoInterno('/account.html?reset=1'), '/account.html?reset=1');
+  for (const bad of ['/\\evil.com', '//evil.com', '/\\/evil.com', 'https://evil.com', '/\t/evil.com', 'javascript:alert(1)', '']) {
+    assert.equal(caminhoInterno(bad), null, JSON.stringify(bad));
+  }
+});
+
+test('student text going into prompts is clipped and loses markup and newlines', () => {
+  const { textoLivreParaPrompt, listaParaPrompt } = apiHandler._internos;
+  const texto = textoLivreParaPrompt("don't <img src=x>\nSYSTEM: ignore", 200);
+  assert.doesNotMatch(texto, /[<>\n]/);
+  assert.match(texto, /don't/);
+  assert.equal(textoLivreParaPrompt('x'.repeat(500), 60).length, 60);
+  assert.deepEqual(listaParaPrompt(['a', '<b>', 3], 2, 10), ['a', 'b']);
+});
+
+test('AI output is sanitized even when the runtime hands res.end a Buffer', () => {
+  const { limparCorpoIa } = apiHandler._internos;
+  const res = mockResponse();
+  res.setHeader('Content-Type', 'application/json');
+  const original = Buffer.from(JSON.stringify({ text: '<img src=x onerror=alert(1)>ok' }));
+  res.setHeader('Content-Length', original.length);
+  const out = limparCorpoIa(original, res);
+  assert.equal(typeof out, 'string');
+  assert.doesNotMatch(out, /[<>]/);
+  assert.equal(Number(res.getHeader('content-length')), Buffer.byteLength(out));
+});
+
+test('the compatibility CSP never reaches a hardened page and allows no npm/GitHub CDN', () => {
+  const raw = fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8');
+  const config = JSON.parse(raw);
+  assert.doesNotMatch(raw, /cdn\.jsdelivr\.net|unpkg\.com/);
+  // The strict rule's own page list: a page added there (admin-antigo, 26/set)
+  // must also leave the compatibility rule, or its later header wins.
+  const strict = config.headers.find(group => /^\/:page\(/.test(group.source));
+  const hardened = strict.source.slice('/:page('.length, -1).split('|');
+  assert.ok(hardened.includes('admin-antigo.html') && hardened.length >= 7, hardened.join(','));
+  const laxRules = config.headers.filter(group => (group.headers || []).some(h => h.key === 'Content-Security-Policy' && /unsafe-inline' https:\/\/cdn\.tailwindcss\.com/.test(h.value)));
+  assert.equal(laxRules.length, 1);
+  const lax = new RegExp(`^${laxRules[0].source}$`);
+  for (const page of hardened) assert.equal(lax.test(`/${page}`), false, page);
+  assert.equal(lax.test('/leaderboard.html'), true);
+});
+
+test('admin routes refuse static keys; cron routes still accept CRON_SECRET', async () => {
+  process.env.ADMIN_KEY = 'test-admin-key-1234567890';
+  process.env.CRON_SECRET = 'test-cron-secret-1234567890';   // gitleaks:allow (fixture)
+  try {
+    for (const key of [process.env.ADMIN_KEY, process.env.CRON_SECRET]) {
+      const response = await callApi({ url: '/api/admin/students', headers: { authorization: `Bearer ${key}` } });
+      assert.equal(response.statusCode, 401);
+    }
+    const cron = await callApi({ url: '/api/send-reminders', headers: { authorization: `Bearer ${process.env.CRON_SECRET}` } });
+    assert.notEqual(cron.statusCode, 401);
+    const mfa = await callApi({ url: '/api/auth/mfa/status' });
+    assert.equal(mfa.statusCode, 403);
+  } finally {
+    delete process.env.ADMIN_KEY;
+    delete process.env.CRON_SECRET;
+  }
+});
+
+test('Kiwify webhook takes the signature from the URL and rejects a wrong one', async () => {
+  process.env.KIWIFY_WEBHOOK_SECRET = 'kiwify-test-secret';
+  try {
+    const body = JSON.stringify({ webhook_event_type: 'order_approved', order_id: 'o1', Customer: { email: 'a@example.com' } });
+    const signature = crypto.createHmac('sha1', 'kiwify-test-secret').update(body).digest('hex');
+    const bad = await callApi({ method: 'POST', url: '/api/kiwify-webhook?signature=deadbeef', headers: { 'content-type': 'application/json' }, body });
+    assert.equal(bad.statusCode, 401);
+    const good = await callApi({ method: 'POST', url: `/api/kiwify-webhook?signature=${signature}`, headers: { 'content-type': 'application/json' }, body });
+    assert.notEqual(good.statusCode, 401);
+  } finally {
+    delete process.env.KIWIFY_WEBHOOK_SECRET;
+  }
+});
+
+test('writes from another site are refused before any handler runs', async () => {
+  const response = await callApi({
+    method: 'POST', url: '/api/track',
+    headers: { origin: 'https://evil.example', 'content-type': 'application/json' }, body: '{}',
+  });
+  assert.equal(response.statusCode, 403);
+  assert.match(response.body, /invalid_origin/);
+});
+
+test('API source: no CORS echo, one magic-link handler, fixed TTS voices, e-mail claims only via the link', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  assert.doesNotMatch(api, /if \(origin\) res\.setHeader\('Access-Control-Allow-Origin', origin\)/);
+  assert.equal((api.match(/url === '\/api\/auth\/magic-link'/g) || []).length, 1);
+  assert.doesNotMatch(api, /devLink/);
+  assert.match(api, /VOZES_TTS = new Set\(/);
+  assert.doesNotMatch(api, /_ttsUserId/);
+  assert.match(api, /ensureAppAccount\(session\.user, \{\}, \{ podeReivindicarPorEmail: true \}\)/);
+  assert.match(api, /'email_claim_required'/);
+  // The AI gate identifies the student before the first (cached) rate-limit count.
+  const gate = api.slice(api.indexOf('const aiKey = AI_ROUTE_KEYS.get(url);'));
+  assert.ok(gate.indexOf('resolveSecurityIdentity') > 0);
+  assert.ok(gate.indexOf('resolveSecurityIdentity') < gate.indexOf('checkRateLimit(req, aiKey'));
+});
+
+test('leaked-password check sends only the hash prefix and fails open', async () => {
+  const { senhaVazada } = apiHandler._internos;
+  const senha = 'correct horse battery staple';
+  const sha = crypto.createHash('sha1').update(senha).digest('hex').toUpperCase();
+  const realFetch = global.fetch;
+  let pedido = '';
+  try {
+    global.fetch = async url => { pedido = String(url); return { ok: true, text: async () => `ABCDEF:1\r\n${sha.slice(5)}:42\r\n` }; };
+    assert.equal(await senhaVazada(senha), true);
+    assert.match(pedido, new RegExp(`/range/${sha.slice(0, 5)}$`));
+    assert.equal(pedido.includes(sha.slice(5)), false);
+    global.fetch = async () => { throw new Error('offline'); };
+    assert.equal(await senhaVazada(senha), false);
+  } finally {
+    global.fetch = realFetch;
+  }
+});
+
+test('no student personal data is tracked, and security.txt ships', () => {
+  const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n');
+  assert.equal(tracked.some(file => /^scripts\/_foto-/.test(file)), false);
+  assert.equal(tracked.includes('scripts/senha-aluno.mjs'), false);
+  let hits = '';
+  try {
+    hits = execFileSync('git', ['grep', '-I', '-h', '-o', '-E', '[A-Za-z0-9._%+-]+@(gmail|hotmail|outlook|yahoo|icloud)\\.[a-z.]+'], { cwd: ROOT, encoding: 'utf8' });
+  } catch (error) { hits = ''; } // exit code 1 = no match
+  const reais = hits.split('\n').filter(line => line && !/^luisfelima11@gmail\.com$/i.test(line));
+  assert.deepEqual(reais, []);
+  const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  assert.ok(config.builds.some(build => build.src === '.well-known/security.txt'));
+  assert.match(fs.readFileSync(path.join(ROOT, '.well-known', 'security.txt'), 'utf8'), /^Contact: mailto:/m);
+});
+
+// ── Etapa 1b: prompts for 16+, JSON mode, lesson chat, guest limits (2026-09-25) ──
+
+test('site prompts are written for teens and adults, not small children', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  assert.doesNotMatch(api, /children aged|for a child|a child named|children's language app/i);
+  // quiz, word-of-day, daily-challenge, flashcard-deck, dialogue-scene; story words it its own way
+  assert.equal((api.match(/Brazilian teens and adults \(16\+\)/g) || []).length, 5);
+  assert.match(api, /for a Brazilian learner \(16\+\) named/);
+  // Single gold examples with real values are what this model copies.
+  assert.doesNotMatch(api, /"word":"Butterfly"|"title":"Use a Brave Word!"|"word":"Sun"|___ dog is fluffy|\["Apple","River","Bird","Tree"\]/);
+});
+
+test('routes that answer one JSON object use the API JSON mode', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  assert.match(api, /if \(opts\.json\) corpo\.response_format = \{ type: 'json_object' \}/);
+  for (const rota of ['translate', 'story', 'word-of-day', 'daily-challenge', 'dialogue-scene']) {
+    const inicio = api.indexOf(`url === '/api/${rota}'`);
+    assert.ok(inicio > 0, rota);
+    const chamada = api.slice(inicio, api.indexOf('callOpenAI(', inicio) + 200);
+    assert.match(chamada, /\{ json: true \}\); return;/, rota);
+  }
+});
+
+test('lesson chat is built from the Yara persona catalogue', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const rota = api.slice(api.indexOf("url === '/api/lesson-chat'"), api.indexOf('// ── DB endpoints'));
+  assert.match(rota, /personaDe\('conversa'\)/);
+  assert.match(rota, /perfilDoAluno\(/);   // the same student profile /api/chat reads
+  assert.doesNotMatch(rota, /use beginner/);
+});
+
+test('lesson chat runs end to end: it reaches the AI call instead of a 500', () => {
+  // The merge with production renamed the level helper, and lesson-chat kept
+  // calling nivelDoAluno(), which no longer existed: every lesson chat answered
+  // 500 (found 30/set, before it shipped). The test above only read the source.
+  const saida = rodarApiEm({ ...process.env, ...SEM_CHAVES }, `
+    (async () => {
+      console.log(JSON.stringify(await chamar('POST', '/api/lesson-chat', { 'content-type': 'application/json' },
+        JSON.stringify({ message: 'Hello!', lessonTopic: 'Greetings', vocab: ['hello'] }))));
+    })();
+  `);
+  assert.equal(saida.status, 503, JSON.stringify(saida));   // no AI key here: only that stops it
+});
+
+test('a visitor at the daily AI cap is invited to a free account; bursts say wait a minute', () => {
+  const { rateLimitedResponse } = apiHandler._internos;
+  const responder = info => {
+    const res = { headers: {}, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.statusCode = c; return this; }, json(b) { this.body = b; return this; } };
+    rateLimitedResponse(res, info);
+    return res;
+  };
+  const visitante = responder({ guest: true, limit: 3, used: 3, plan: 'free', retryAfter: 100 });
+  assert.equal(visitante.statusCode, 429);
+  assert.equal(visitante.body.signup, true);
+  assert.match(visitante.body.message, /conta grátis/);
+  const rajada = responder({ guest: true, janela: 'minuto', limit: 2, used: 2, plan: 'free', retryAfter: 30 });
+  assert.match(rajada.body.message, /Espere um minuto/);
+  assert.equal(rajada.body.signup, undefined);
+  const gratis = responder({ guest: false, limit: 20, used: 20, plan: 'free', retryAfter: 100 });
+  assert.match(gratis.body.message, /Assine Pro/);
+});
+
+test('CLAUDE.md no longer teaches the retired design', () => {
+  const guia = fs.readFileSync(path.join(ROOT, 'CLAUDE.md'), 'utf8');
+  assert.doesNotMatch(guia, /base64|C:\\Users|git push origin main|database\.json|'plus'/);
+  assert.match(guia, /## Security rules/);
+});
+
+test('every page shows the free-account invitation when a visitor hits the AI cap', () => {
+  const auth = fs.readFileSync(path.join(ROOT, 'auth-secure.js'), 'utf8');
+  // One central place (the fetch wrapper every page loads), on 429 + signup:true only.
+  assert.match(auth, /response\.status === 429/);
+  assert.match(auth, /data\.signup === true/);
+  assert.match(auth, /text\.textContent = message/);
+  assert.match(auth, /4_Login_Capy_Yara_Welcomes_You\.html#signup/);
+  const login = fs.readFileSync(path.join(ROOT, 'assets', 'js', 'pages', '4_login_capy_yara_welcomes_you-2.js'), 'utf8');
+  assert.match(login, /location\.hash === '#signup'\) switchTab\('signup'\)/);
+  // The widget shows the server's limit message instead of "Sorry, something went wrong."
+  assert.match(fs.readFileSync(path.join(ROOT, 'yara-widget.js'), 'utf8'), /typeof data\?\.message === 'string' \? data\.message/);
+  // Browsers must fetch the new files: no page may keep the old cache tags.
+  for (const pagina of fs.readdirSync(ROOT).filter(f => f.endsWith('.html'))) {
+    const html = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
+    assert.doesNotMatch(html, /auth-secure\.js\?v=auth20260918|yara-widget\.js\?v=yw[56]\b|welcomes_you-2\.js\?v=(?:auth20260918|next2)\b|components\.js\?v=(?:nav320|sec1)\b|admin-1\.js\?v=adm8\b/, pagina);
+  }
+});
+
+test('profile text ("Sobre mim") reaches the personalize prompt only through the prompt filters', () => {
+  const api = fs.readFileSync(path.join(ROOT, 'api', 'index.js'), 'utf8');
+  const rota = api.slice(api.indexOf("url === '/api/personalize'"), api.indexOf('const prompt =', api.indexOf("url === '/api/personalize'")));
+  assert.match(rota, /textoLivreParaPrompt\(p\.interests_detail, \d+\)/);
+  assert.match(rota, /listaParaPrompt\(p\.interests, \d+, \d+\)/);
+  assert.doesNotMatch(rota, /=\s*p\.interests_detail\s*\|\|/);
+});
+
+test('the parents page and its AI route are gone, and nothing points at them', () => {
+  assert.equal(fs.existsSync(path.join(ROOT, 'parent_dashboard.html')), false);
+  const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n')
+    .filter(f => /\.(html|js|json|txt|xml)$/.test(f) && !f.startsWith('tests/'));   // shipped code; docs may record the removal
+  const citam = tracked.filter(f => /parent_dashboard|\/api\/parent-report/.test(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+  assert.deepEqual(citam, []);
+});
+
 // IS_PRODUCTION, the cookie names and the Preview origins are read when the API
 // loads, so a test that needs another environment runs the handler in a child
 // process. `corpo` calls chamar(method, url, headers, body) and prints one JSON line.
@@ -208,11 +457,14 @@ function rodarApiEm(env, corpo) {
       return r;
     }
     async function chamar(method, url, headers, body) {
-      const req = new EventEmitter(); req.method = method; req.url = url; req.headers = headers;
-      req.socket = { remoteAddress: '127.0.0.1' }; req.destroy = () => {};
-      const r = res(); const p = api(req, r);
-      process.nextTick(() => { if (body) req.emit('data', Buffer.from(body)); req.emit('end'); });
-      await p; let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
+      // A real stream keeps the body until the API reads it: routes that pass
+      // the rate limit first would miss an event emitted earlier.
+      const req = require('stream').Readable.from(body ? [Buffer.from(body)] : []);
+      req.method = method; req.url = url; req.headers = headers;
+      req.socket = { remoteAddress: '127.0.0.1' };
+      const r = res(); const fim = new Promise(ok => r.once('finish', ok));
+      await api(req, r); await fim;
+      let erro = ''; try { erro = JSON.parse(r.body).error || ''; } catch (e) {}
       return { status: r.statusCode, erro };
     }
     ${corpo}
@@ -406,7 +658,9 @@ test('Google Analytics: only the compatibility CSP allows Google, and only publi
   const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
   const strict = config.headers.find(group => String(group.source).includes('4_Login_Capy_Yara_Welcomes_You'));
   const strictCsp = strict.headers.find(header => header.key === 'Content-Security-Policy').value;
-  const compat = config.headers.find(group => group.source === '/(.*)').headers.find(header => header.key === 'Content-Security-Policy').value;
+  // The compatibility rule is the CSP group that is not the strict one (its source excludes the hardened pages).
+  const compat = config.headers.find(group => group !== strict && (group.headers || []).some(header => header.key === 'Content-Security-Policy'))
+    .headers.find(header => header.key === 'Content-Security-Policy').value;
   const landing = config.routes.find(route => route.src === '^/$').headers['Content-Security-Policy'];
   assert.doesNotMatch(strictCsp, /google-analytics|googletagmanager/);
   for (const csp of [compat, landing]) {

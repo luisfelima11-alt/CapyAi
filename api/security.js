@@ -257,6 +257,44 @@ async function refreshSession(refreshToken) {
   }
 }
 
+// ── MFA (TOTP) — Supabase Auth factors API, called with the user's own token ──
+// Verifying a code returns a new aal2 session (and Supabase signs the user's
+// other sessions out), which the caller stores with setSessionCookies.
+function bearer(accessToken) {
+  if (!accessToken) throw new HttpError(401, 'authentication_required', 'Authentication required.');
+  return { Authorization: `Bearer ${accessToken}` };
+}
+
+async function mfaEnroll(accessToken, friendlyName) {
+  return authRequest('/auth/v1/factors', {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({ factor_type: 'totp', friendly_name: friendlyName }),
+  });
+}
+
+async function mfaUnenroll(accessToken, factorId) {
+  return authRequest(`/auth/v1/factors/${encodeURIComponent(factorId)}`, {
+    method: 'DELETE',
+    headers: bearer(accessToken),
+  });
+}
+
+async function mfaChallengeAndVerify(accessToken, factorId, code) {
+  const id = encodeURIComponent(factorId);
+  const challenge = await authRequest(`/auth/v1/factors/${id}/challenge`, {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({}),
+  });
+  if (!challenge?.id) throw new HttpError(502, 'mfa_challenge_failed', 'Could not start the MFA challenge.');
+  return authRequest(`/auth/v1/factors/${id}/verify`, {
+    method: 'POST',
+    headers: bearer(accessToken),
+    body: JSON.stringify({ challenge_id: challenge.id, code }),
+  });
+}
+
 function decodeJwtPayload(token) {
   try {
     const part = String(token).split('.')[1];
@@ -359,13 +397,21 @@ async function requireRole(req, res, allowedRoles) {
   return { ...identity, role };
 }
 
+// Name and avatar are student-controlled (the account row and the Supabase
+// user_metadata are both writable by their owner) and the browser caches them
+// for the nav and the leaderboard. Strip markup here so no page has to be the
+// last line of defence.
+function semMarcacao(value, max) {
+  return String(value == null ? '' : value).replace(/[<>]/g, '').slice(0, max);
+}
+
 function publicUser(user, appUser = null) {
   return {
     id: appUser?.id || user?.id,
     authUserId: user?.id,
-    name: appUser?.name || user?.user_metadata?.name || '',
+    name: semMarcacao(appUser?.name || user?.user_metadata?.name || '', 80),
     email: user?.email || '',
-    avatar: appUser?.avatar || user?.user_metadata?.avatar || '🐾',
+    avatar: semMarcacao(appUser?.avatar || user?.user_metadata?.avatar || '🐾', 32) || '🐾',
     role: user?.app_metadata?.role || 'student',
   };
 }
@@ -392,6 +438,9 @@ module.exports = {
   getAuthenticatedSession,
   getRequestIdentity,
   exchangePkceCode,
+  mfaChallengeAndVerify,
+  mfaEnroll,
+  mfaUnenroll,
   parseCookies,
   publicUser,
   requestPasswordReset,
