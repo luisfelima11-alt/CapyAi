@@ -903,3 +903,14 @@ páginas carregavam o cliente que a satisfaz.
 node -e "console.log(require('./vercel.json').builds.map(b=>b.src).join('\n'))"
 ```
 **Por que aconteceu:** falha silenciosa. Nada no build avisa que um arquivo foi ignorado.
+
+
+## 2026-11-02 — A trilha nunca fechava a mini-lição
+
+- **Sintoma:** o aluno joga o dia 2 (ou toca em "Concluir" nos flashcards) e a trilha mostra só "1/12 done".
+- **Causa raiz:** `Store.completeMini` só rodava em `guidedLessonComplete`, depois do clique em "Continue". As telas finais
+  (`renderScrambleFinish`…) tinham `switchTool(...)` que saía do fluxo guiado; o "Concluir" do flashcard só gravava
+  progresso. E `markToolDone` comparava `activeSteps[guidedStep] === toolKey`: no passo `game` a chave é
+  `speed/scramble/typing`, então o banner "Continue" nem aparecia.
+- **Correção:** `markToolDone` conclui a mini no último passo; `botaoSeguir()` nas telas finais; "Concluir" avança.
+- **Denuncia em 5s:** `grep -n "onclick=\"switchTool(" lessons.html` dentro de `render*Finish` (tests/trilha-conclui-mini.test.js).

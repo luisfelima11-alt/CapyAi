@@ -397,10 +397,24 @@ function markToolDone(id, toolKey, stars) {
   renderProgressDashboard();
 
   // ── Guided mode: show Continue banner when current step finishes ─────────
-  if (GUIDED_MODE && activeSteps[guidedStep] === toolKey) {
+  // O passo "game" roda speed/scramble/typing in-page: a chave da ferramenta
+  // não é 'game'. Antes essa comparação falhava e nem o banner aparecia.
+  const passo = activeSteps[guidedStep];
+  const termina = passo === toolKey || (passo === 'game' && ['speed','scramble','typing'].includes(toolKey));
+  if (GUIDED_MODE && termina) {
     const banner = document.getElementById('guided-continue-banner');
     if (banner) { banner.style.display = 'block'; window.scrollTo({top:0,behavior:'smooth'}); }
+    // Último passo da mini: marca já. Se o aluno sair da página depois, não perde.
+    if (miniNum > 0 && guidedStep === activeSteps.length - 1 && window.Store) {
+      Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());
+    }
   }
+}
+// Botão do fim de cada atividade: no guiado segue a trilha, fora dele vai para a próxima aba.
+function botaoSeguir(proxima, rotulo) {
+  return GUIDED_MODE
+    ? '<button onclick="guidedNextStep()" class="px-5 py-3 bg-pink-500 hover:bg-pink-400 text-white font-black rounded-2xl shadow-md">Continuar na trilha →</button>'
+    : '<button onclick="switchTool(\'' + proxima + '\')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">' + rotulo + '</button>';
 }
 function addXPToProgress(id, amount) {
   const p = getLessonProgress(id);
@@ -1452,7 +1466,7 @@ function guidedLessonComplete() {
       if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
       Store.activateStreak();
     } else {
-      Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());  // calls completeLesson on mini 4
+      if (!Store.isMiniDone(currentLesson.id, miniNum, _lessonLanguage())) Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());  // calls completeLesson on mini 4
       // also save 'j' format so sidebar stays green
       if (isLastMini && _lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
     }
@@ -1786,7 +1800,7 @@ function renderVocab() {
         ${vocabIdx < vocab.length - 1
           ? `<button onclick="vocabGoTo(${vocabIdx+1})" class="px-4 py-2 bg-navy text-white rounded-2xl font-bold text-xs shadow-md">Próxima →</button>
              <button onclick="vocabGoTo(${vocabIdx+1})" class="px-4 py-2 bg-emerald-500 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-emerald-400 active:scale-95 transition-all">Sei essa ✓</button>`
-          : `<button onclick="markToolDone(currentLesson.id,'vocab')" class="px-4 py-2 bg-emerald-500 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-emerald-400 active:scale-95 transition-all">✓ Concluir</button>`
+          : `<button onclick="markToolDone(currentLesson.id,'vocab'); if (GUIDED_MODE) guidedNextStep(); else switchTool('quiz')" class="px-4 py-2 bg-emerald-500 text-white rounded-2xl font-bold text-xs shadow-md hover:bg-emerald-400 active:scale-95 transition-all">✓ Concluir</button>`
         }
       </div>
 
@@ -1957,7 +1971,7 @@ function renderQuizFinish() {
       </div>
       <div class="flex gap-3 justify-center">
         <button onclick="quizIdx=0;quizScore=0;quizDone=false;quizStreak=0;renderQuiz()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-all">🔄 Refazer</button>
-        <button onclick="switchTool('build')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90 transition-all">🏗️ Build →</button>
+        ${botaoSeguir('build','🏗️ Build →')}
       </div>
     </div>
   `;
@@ -2062,7 +2076,7 @@ function renderBuildDone() {
       <p class="text-slate-500 mb-5">Você completou todas as ${(shuffledSentences.length || currentLesson.sentences.length)} frases desta aula.</p>
       <div class="flex gap-3 justify-center">
         <button onclick="buildSentIdx=0;renderBuild()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
-        <button onclick="switchTool('expr')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">💬 Expressões →</button>
+        ${botaoSeguir('expr','💬 Expressões →')}
       </div>
     </div>
   `;
@@ -2562,7 +2576,7 @@ function renderListenFinish() {
       </div>
       <div class="flex gap-3 justify-center">
         <button onclick="listenIdx=0;listenScore=0;listenDone=false;listenStreak=0;renderListen()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
-        <button onclick="switchTool('typing')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">⌨️ Typing →</button>
+        ${botaoSeguir('typing','⌨️ Typing →')}
       </div>
     </div>
   `;
@@ -2682,7 +2696,7 @@ function renderTypingFinish() {
       <div class="flex justify-center gap-2 mb-5">${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}</div>
       <div class="flex gap-3 justify-center">
         <button onclick="typeIdx=0;typeScore=0;typeHints=0;typeDone=false;renderTyping()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
-        <button onclick="switchTool('speed')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">⏱️ Speed →</button>
+        ${botaoSeguir('speed','⏱️ Speed →')}
       </div>
     </div>
   `;
@@ -2816,7 +2830,7 @@ function renderSpeedFinish() {
       <div class="flex justify-center gap-2 mb-5">${[1,2,3].map(i=>`<span class="text-4xl">${i<=stars?'⭐':'☆'}</span>`).join('')}</div>
       <div class="flex gap-3 justify-center">
         <button onclick="speedIdx=0;speedScore=0;speedDone=false;speedStreak=0;speedMultiplier=1;renderSpeed()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
-        <button onclick="switchTool('scramble')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">🧩 Scramble →</button>
+        ${botaoSeguir('scramble','🧩 Scramble →')}
       </div>
     </div>
   `;
@@ -2977,7 +2991,7 @@ function renderScrambleFinish() {
       <div class="flex justify-center gap-2 mb-5"><span class="text-4xl">⭐</span><span class="text-4xl">⭐</span><span class="text-4xl">⭐</span></div>
       <div class="flex gap-3 justify-center">
         <button onclick="scrambleIdx=0;scrambleHints=0;scrambleDone=false;renderScramble()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl">🔄 Refazer</button>
-        <button onclick="switchTool('vocab')" class="px-5 py-3 bg-navy text-white font-bold rounded-2xl shadow-md hover:bg-navy/90">🃏 Início →</button>
+        ${botaoSeguir('vocab','🃏 Início →')}
       </div>
     </div>
   `;
