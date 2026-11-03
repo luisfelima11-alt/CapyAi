@@ -54,11 +54,11 @@ test('os quizzes de francês continuam coerentes (resposta entre as alternativas
   }
 });
 
-test('a trilha de francês (lessons_fr_data.js e data/lessons/201..212.json) não tem pronúncia escrita', () => {
+test('a trilha de francês (lessons_fr_data.js e data/lessons/201..242.json) não tem pronúncia escrita', () => {
   const sandbox = { window: {} };
   vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'lessons_fr_data.js'), 'utf8') + '\nwindow.__L = LESSONS_FR;', sandbox);
   const lic = sandbox.window.__L;
-  assert.equal(lic.length, 12);
+  assert.equal(lic.length, 42);
   for (const l of lic) {
     for (const t of textos(l)) assert.equal((t.match(PRONUNCIA) || []).filter(x => !/Auxiliar|Particípio/.test(x)).length, 0, `${l.id}: ${t.slice(0, 80)}`);
     for (const q of l.quiz) assert.ok(q.opts.includes(q.a) && q.opts.every(o => o && o.trim()), `${l.id}: quiz incoerente: ${q.q}`);

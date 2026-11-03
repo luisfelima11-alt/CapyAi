@@ -4,6 +4,12 @@ import { fileURLToPath } from 'node:url';
 import { FR_LESSONS_1_6 } from './fr-lessons-part1.mjs';
 import { FR_LESSONS_7_12 } from './fr-lessons-part2.mjs';
 import { semPronuncia, limpaDeep, limpaTabela, confere } from './fr-sem-pronuncia.mjs';
+// Blocos 4–6 (213–242, nov/2026): revisão com être & avoir e as conjugações dos dois.
+// Já vêm no formato da trilha (fr-trilha-helpers.mjs monta e confere as contagens).
+import { FR_TRILHA_213_218 } from './fr-trilha-part3a.mjs';
+import { FR_TRILHA_219_224 } from './fr-trilha-part3b.mjs';
+import { FR_TRILHA_225_232 } from './fr-trilha-part4a.mjs';
+import { FR_TRILHA_233_242 } from './fr-trilha-part4b.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ALL_LESSONS = semPronuncia([...FR_LESSONS_1_6, ...FR_LESSONS_7_12]);
@@ -170,11 +176,14 @@ const builtTrail = ALL_LESSONS.map(l => {
   };
 });
 
-const FINAL = limpaDeep(builtTrail);
+const NOVAS = [...FR_TRILHA_213_218, ...FR_TRILHA_219_224, ...FR_TRILHA_225_232, ...FR_TRILHA_233_242];
+const FINAL = limpaDeep([...builtTrail, ...NOVAS]);
+const ids = FINAL.map(l => l.id);
+if (new Set(ids).size !== ids.length || ids.some((id, i) => id !== 201 + i)) { console.error('ids da trilha fora de ordem ou repetidos'); process.exit(1); }
 const ERROS = confere(FINAL);
 if (ERROS.length) { console.error(ERROS.join('\n')); process.exit(1); }
 
-const outJs = `// Capy Yara Adventures — French Daily-Trail Lessons (12 Units · IDs 201–212)
+const outJs = `// Capy Yara Adventures — French Daily-Trail Lessons (${FINAL.length} Units · IDs 201–${200 + FINAL.length})
 // Renovado em Português (BR) -> Francês (fr-FR), alinhado com fr_aula_01..12.html.
 const LESSONS_FR = ${JSON.stringify(FINAL, null, 2)};
 
@@ -182,4 +191,4 @@ if (typeof window !== 'undefined') window.LESSONS_FR = LESSONS_FR;
 `;
 
 fs.writeFileSync(path.join(ROOT, 'lessons_fr_data.js'), outJs, 'utf8');
-console.log(`✓ Updated lessons_fr_data.js with ${builtTrail.length} enriched French units (201–212).`);
+console.log(`✓ Updated lessons_fr_data.js with ${FINAL.length} French units (201–${200 + FINAL.length}).`);

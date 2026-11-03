@@ -152,7 +152,7 @@ const cabecalho = `// ═══════════════════�
 // scripts/agro-trilha-a.json e -b.json. Não edite este arquivo à mão:
 // edite os JSON e rode o construtor de novo.
 //
-// Faixa de ids: 701-712 (en 1-110 · fr 201-212 · tr 301-336 · int 401-440 ·
+// Faixa de ids: 701-712 (en 1-110 · fr 201-242 · tr 301-336 · int 401-440 ·
 // gps 501-508 · interview 601-612 já estão ocupadas).
 //
 // Mix 50-50 entre vocabulário geral e vocabulário do agro é regra do curso e
