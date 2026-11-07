@@ -5,7 +5,7 @@
 // scripts/interview-trilha-a.json e -b.json. Não edite este arquivo à mão:
 // edite os JSON e rode o construtor de novo.
 //
-// Faixa de ids: 601-612 (en 1-110 · fr 201-212 · tr 301-336 · int 401-440 ·
+// Faixa de ids: 601-612 (en 1-110 · fr 201-242 · tr 301-336 · int 401-440 ·
 // gps 501-508 já estão ocupadas).
 //
 // ⚠️  Este arquivo é FONTE DE COMPILAÇÃO, não é lido pelo navegador. Depois de
