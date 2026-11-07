@@ -1,5 +1,23 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-07 — Toda aula gerada do GPS e do Agro pedia a escrita da aula 09
+
+**Sintoma:** no homework da Agro 13 (comparativos), a última tarefa pedia "Escreva 5 passos para o
+cliente reiniciar o monitor", e a Parte 2 do treino falava em "forma certa do imperativo". O mesmo
+texto aparecia nas 33 aulas montadas pelos geradores (GPS 10–27, Agro 01–15).
+
+**Causa raiz:** os dois geradores copiam o molde (`gpstronic_aula_09.html`) e trocam só o que conhecem.
+O título da Parte 2, a dica e a tarefa de escrita eram textos fixos da aula 09 que nenhum passo trocava,
+e a validação não olhava o texto do homework.
+
+**Correção:** `scripts/lib/homework-plus.mjs` troca esses textos em todas as aulas (escrita da própria
+aula ou um pedido neutro com os padrões dela) e o `validar()` dos dois geradores falha se o texto da
+aula 09 voltar. `tests/homework-plus.test.js` confere as 33 aulas.
+
+**Regra:** texto que vem do molde e não passa por nenhuma troca precisa de uma checagem no validador.
+
+---
+
 ## 2026-11-02 — Os cabeçalhos de segurança do `vercel.json` nunca chegaram às páginas
 
 **Sintoma:** depois de publicar o PR #1 (CSP estrita nas páginas de login, conta, admin e professor),

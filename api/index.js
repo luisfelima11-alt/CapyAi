@@ -659,12 +659,15 @@ function resumoAluno({ state, atualizadoEm, atividade = [], licoes = [], hoje = 
     const porIdioma = {};
     for (const k of minis) { const lang = String(k).includes(':') ? String(k).split(':')[0] : 'en'; porIdioma[lang] = (porIdioma[lang] || 0) + 1; }
     const hojeAtiv = atividade.find(a => a.dia === hoje);
-    const ultimaLicao = licoes.length ? licoes.map(l => l.submitted_at).sort().pop() : null;
+    // A preparação antes da aula (lessonId "<aula>-prep", 07/nov/2026) vai pela mesma tabela,
+    // mas não é lição de casa: não tira o aluno do alerta de lição atrasada.
+    const deCasa = licoes.filter(l => !/-prep$/.test(String(l.lesson_id || '')));
+    const ultimaLicao = deCasa.length ? deCasa.map(l => l.submitted_at).sort().pop() : null;
     const diasSemLicao = ultimaLicao ? Math.round((Date.now() - Date.parse(ultimaLicao)) / 86400000) : null;
     const alertas = [];
     if (diasSem === null) alertas.push('nunca_praticou');
     else if (diasSem >= 3) alertas.push('sumido');
-    if (licoes.length && diasSemLicao >= 7) alertas.push('licao_atrasada');
+    if (deCasa.length && diasSemLicao >= 7) alertas.push('licao_atrasada');
     return {
         ultimoDia, diasSem,
         sequencia: Math.max(0, Number(s.streakDays) || 0),

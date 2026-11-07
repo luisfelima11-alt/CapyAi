@@ -16,6 +16,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
+import { aplicarHomework, checarHomework } from './lib/homework-plus.mjs';
+import { aplicarPreparacao, checarPreparacao } from './lib/preparacao.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -202,6 +204,12 @@ function construir(n) {
     t = entre(t, 'function checkErrorGps9(){', '\n\nlet hwEntregue=false;',
         `function checkErrorGps9(){const inp=document.getElementById('err-gps9'),fb=document.getElementById('err-gps9-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(${j(aceitas)}.includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent=${j('❌ Quase. ' + c.homework.erro.dica)};fb.className='text-xs font-black text-red-500 mt-1';}}`);
 
+    // 6b. Homework: escrita desta aula (não a da aula 09) e, nas aulas com o homework
+    //     novo, as 8 tarefas e o card para o teacher (scripts/lib/homework-plus.mjs).
+    t = aplicarHomework(t, { c, d, n, pagina: `gpstronic_aula_${nn}`, raiz: RAIZ, curso: 'GPS Tronic', cor: '#0f766e' });
+    // 6c. 🎯 Prepare: a preparação antes da aula, no começo da rota (scripts/lib/preparacao.mjs).
+    t = aplicarPreparacao(t, { c });
+
     // 7. A chave do curso é a MESMA (mesmo curso) — só o número da aula muda.
     t = t.replace(/arr\.includes\(9\)/, `arr.includes(${n})`).replace(/arr\.push\(9\)/, `arr.push(${n})`);
 
@@ -244,7 +252,7 @@ function validar({ t, d, c, n, nn }) {
     ok(t.includes('capyGpstronicCompleted'), 'grava capyGpstronicCompleted');
     ok(t.includes(`arr.push(${n})`), `push(${n}) na chave do curso`);
     ok(!/Ã[©¡ªµ§]|â€/.test(t), 'zero mojibake');
-    ok((t.match(/id="tab-/g) || []).length === 8, '8 seções tab-*');
+    ok((t.match(/id="tab-/g) || []).length === 9, '9 seções tab-* (com o 🎯 Prepare)');
     ok(t.includes(`/assets/audio/gps${nn}/s20.mp3`), 'áudio da 20ª fala apontado');
     ok(fs.existsSync(path.join(RAIZ, d.imagem.arquivo)), 'imagem existe em disco');
     ok(c.vocab.length === 14, '14 palavras de vocabulário');
@@ -261,6 +269,8 @@ function validar({ t, d, c, n, nn }) {
     ok(!/gram[aá]tic|grammar/i.test(visivel), 'sem a palavra proibida gramática/grammar (regra de 12/out)');
     // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
     checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `gps${nn}`, raiz: RAIZ });
+    checarHomework(c, t, ok);
+    checarPreparacao(c, t, ok);
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {

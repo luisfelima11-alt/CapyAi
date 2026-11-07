@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 Updating the Firmware</h2>
   <p class="text-slate-500 text-sm mb-5">🔄 O monitor do Marcos trava toda semana. Você vai atualizar o firmware: avisa o que ele não pode fazer, explica o que vai mudar e confere se os mapas estão salvos.</p>
@@ -529,8 +531,8 @@
   <div id="practice-area"></div>
 
   <div class="mt-8 bg-white border-2 border-emerald-200 rounded-2xl p-6">
-    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a instrução</h3>
-    <p class="text-slate-500 text-xs mb-4">Escreva o verbo na forma certa do imperativo.</p>
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
     <div class="space-y-4" id="verbs-quiz"></div>
     <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
       Check Answers
@@ -568,7 +570,7 @@
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 16 — Updating the Firmware</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas interativas abaixo.</p>
+    <p class="text-white/70 text-sm">Complete as 4 tarefas abaixo.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -603,12 +605,14 @@
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 5 passos para o cliente reiniciar o monitor.</p><p class="text-slate-500 text-xs">Use o imperativo e os sequenciadores: First, Then, After that, Finally. E um "Don't…".</p></div>
+      <div><p class="font-black text-navy text-sm">Escreva 4 frases sobre o seu dia a dia usando o que você aprendeu nesta aula.</p><p class="text-slate-500 text-xs">Use os padrões da aula: DON'T + verbo · WHILE + verbo-ing · IT WILL + verbo.</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="First, turn off the monitor.&#10;Then wait ten seconds.&#10;After that, turn it on again.&#10;Don't pull the cable hard.&#10;Finally, try the autosteer again."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Today I'm updating the firmware on your display.&#10;It will fix the freezing problem.&#10;Have you saved your field maps?"></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps16()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
 </div>
 
@@ -632,6 +636,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1033,7 +1038,7 @@ mpGps16Render();
 function checkErrorGps16(){const inp=document.getElementById('err-gps16'),fb=document.getElementById('err-gps16-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["please don't touch the screen while it's updating","please do not touch the screen while it is updating","please don't touch the screen while it is updating","don't touch the screen while it's updating"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent="❌ Quase. Negativa com don't. E while it's updating, com -ing.";fb.className='text-xs font-black text-red-500 mt-1';}}
 
 let hwEntregue=false;
-function submitHomeworkGps16(){if(hwEntregue)return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps16()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
+function submitHomeworkGps16(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps16()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
 
 // Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
 (function retomar(){
@@ -1050,5 +1055,7 @@ function submitHomeworkGps16(){if(hwEntregue)return;hwEntregue=true;markSection(
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_16-folha.pdf"></script>
+<script>window.PREP={};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

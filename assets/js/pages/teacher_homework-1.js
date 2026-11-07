@@ -151,9 +151,9 @@ const CURSOS = { agro: 'Agro', gpstronic: 'GPS Tronic', med: 'Saude', interview:
 function rotuloDaLicao(id) {
   const s = String(id || '');
   if (/^\d+$/.test(s)) return 'Aula ' + s;
-  const m = s.match(/^(?:([a-z]+)_)?aula_(\d+)$/);
+  const m = s.match(/^(?:([a-z]+)_)?aula_(\d+)(-prep)?$/);
   if (!m) return s;
-  return (m[1] ? (CURSOS[m[1]] || m[1]) + ' · ' : '') + 'Aula ' + m[2];
+  return (m[3] ? '🎯 Preparação · ' : '') + (m[1] ? (CURSOS[m[1]] || m[1]) + ' · ' : '') + 'Aula ' + m[2];
 }
 
 function escHtml(str) {
