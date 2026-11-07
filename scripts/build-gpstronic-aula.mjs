@@ -17,6 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 import { aplicarHomework, checarHomework } from './lib/homework-plus.mjs';
+import { aplicarPreparacao, checarPreparacao } from './lib/preparacao.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -206,6 +207,8 @@ function construir(n) {
     // 6b. Homework: escrita desta aula (não a da aula 09) e, nas aulas com o homework
     //     novo, as 8 tarefas e o card para o teacher (scripts/lib/homework-plus.mjs).
     t = aplicarHomework(t, { c, d, n, pagina: `gpstronic_aula_${nn}`, raiz: RAIZ, curso: 'GPS Tronic', cor: '#0f766e' });
+    // 6c. 🎯 Prepare: a preparação antes da aula, no começo da rota (scripts/lib/preparacao.mjs).
+    t = aplicarPreparacao(t, { c });
 
     // 7. A chave do curso é a MESMA (mesmo curso) — só o número da aula muda.
     t = t.replace(/arr\.includes\(9\)/, `arr.includes(${n})`).replace(/arr\.push\(9\)/, `arr.push(${n})`);
@@ -249,7 +252,7 @@ function validar({ t, d, c, n, nn }) {
     ok(t.includes('capyGpstronicCompleted'), 'grava capyGpstronicCompleted');
     ok(t.includes(`arr.push(${n})`), `push(${n}) na chave do curso`);
     ok(!/Ã[©¡ªµ§]|â€/.test(t), 'zero mojibake');
-    ok((t.match(/id="tab-/g) || []).length === 8, '8 seções tab-*');
+    ok((t.match(/id="tab-/g) || []).length === 9, '9 seções tab-* (com o 🎯 Prepare)');
     ok(t.includes(`/assets/audio/gps${nn}/s20.mp3`), 'áudio da 20ª fala apontado');
     ok(fs.existsSync(path.join(RAIZ, d.imagem.arquivo)), 'imagem existe em disco');
     ok(c.vocab.length === 14, '14 palavras de vocabulário');
@@ -267,6 +270,7 @@ function validar({ t, d, c, n, nn }) {
     // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
     checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `gps${nn}`, raiz: RAIZ });
     checarHomework(c, t, ok);
+    checarPreparacao(c, t, ok);
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {

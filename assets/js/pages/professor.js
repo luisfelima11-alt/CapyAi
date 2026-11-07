@@ -117,7 +117,15 @@
       tr.appendChild(el('td', a.diasSem >= 3 || a.diasSem === null ? 'nao' : null, quando(a.diasSem)));
       const total = Object.values(a.minisPorIdioma || {}).reduce((n, v) => n + v, 0);
       tr.appendChild(el('td', null, total));
-      tr.appendChild(el('td', null, a.licoes.length ? `${a.licoes.length} · última ${dataCurta(a.licoes[0].em)}` : '—'));
+      // As preparações ("<aula>-prep") vêm na mesma lista: contam à parte, com 🎯.
+      const prep = l => /-prep$/.test(String(l.lessonId || ''));
+      const casa = a.licoes.filter(l => !prep(l)), preparo = a.licoes.find(prep);
+      const celula = el('td', null, casa.length ? `${casa.length} · última ${dataCurta(casa[0].em)}` : '—');
+      if (preparo) {
+        const aula = String(preparo.lessonId).match(/aula_(\d+)-prep$/);
+        celula.appendChild(el('span', 'preparo', ` · 🎯 preparou ${aula ? 'a aula ' + Number(aula[1]) : ''} em ${dataCurta(preparo.em)}`));
+      }
+      tr.appendChild(celula);
       const acao = el('td');
       const ver = el('button', 'botao pequeno', 'Ver');
       ver.type = 'button';

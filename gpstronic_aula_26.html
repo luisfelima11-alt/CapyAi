@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 I'm Sorry for the Trouble</h2>
   <p class="text-slate-500 text-sm mb-5">😤 O Marcos liga bravo: o piloto automático parou no plantio e o técnico faltou. Você pede desculpas e resolve. Ouça antes de ler a tradução.</p>
@@ -637,6 +639,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1057,5 +1060,7 @@ function submitHomeworkGps26(){if(hwEntregue)return;if(window.HomeworkPlus&&!Hom
 <script>window.HW_PLUS={"aula":26,"titulo":"I'm Sorry for the Trouble","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"I'm sorry ___ the trouble.","r":["for"],"dica":"por"},{"f":"I ___ for the delay.","r":["apologize"],"dica":"peço desculpas"},{"f":"The technician ___ come yesterday.","r":["didn't","did not"],"dica":"não (passado)"},{"f":"___ me check the system.","r":["let"],"dica":"deixa eu…"}],"compreensao":[{"q":"Why didn't the technician come yesterday?","opts":["His truck broke down.","He was sick.","He forgot the address."],"a":"His truck broke down."},{"q":"What will Pedro bring to the farm?","opts":["Two new cables.","A new monitor.","A new tractor."],"a":"Two new cables."}],"voz":["I'm sorry for the trouble.","I'll send Pedro right now."],"livre":{"pedido":"Write 2 sentences to an upset client: one apology and one promise (I'll…).","exemplo":"I apologize for the delay. I'll call you back in one hour."}};window.HW_ESTADO=function(){const er=document.getElementById('err-gps26-fb');return{ordem:WO_GPS26_DATA.map((x,i)=>wo_gps26[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps26_Done.size,MP_GPS26.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_26-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"Você já teve um cliente bravo? Conte em 1 frase o que aconteceu.","exemplo":"A client was angry because the GPS stopped."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

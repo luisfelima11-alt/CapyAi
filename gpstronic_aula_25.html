@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 Your Installation Quote</h2>
   <p class="text-slate-500 text-sm mb-5">🤝 O Carlos recebeu o orçamento do piloto automático para dois tratores e tem dúvidas. Você explica as opções e negocia. Ouça antes de ler a tradução.</p>
@@ -637,6 +639,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1057,5 +1060,7 @@ function submitHomeworkGps25(){if(hwEntregue)return;if(window.HomeworkPlus&&!Hom
 <script>window.HW_PLUS={"aula":25,"titulo":"Your Installation Quote","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"Option A ___ the autosteer and the monitor.","r":["includes"],"dica":"include (incluir)"},{"f":"The installation ___ two days.","r":["takes"],"dica":"take (levar tempo)"},{"f":"If you choose option B, you ___ get five percent off.","r":["will"],"dica":"vai (futuro)"},{"f":"How ___ ten percent?","r":["about"],"dica":"que tal"}],"compreensao":[{"q":"How much does option B cost?","opts":["Ninety thousand reais.","Nine thousand reais.","Ninety-five thousand reais."],"a":"Ninety thousand reais."},{"q":"What did Yara offer instead of ten percent?","opts":["A free training day.","A free antenna.","Twelve installments."],"a":"A free training day."}],"voz":["Option A includes the autosteer and the monitor.","How about ten percent?"],"livre":{"pedido":"Write 2 sentences offering a deal to a client, using If you…, you'll….","exemplo":"If you pay today, you'll get a free training day. If you buy two, you'll save money."}};window.HW_ESTADO=function(){const er=document.getElementById('err-gps25-fb');return{ordem:WO_GPS25_DATA.map((x,i)=>wo_gps25[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps25_Done.size,MP_GPS25.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_25-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"Como você apresenta o preço para um cliente que acha caro?","exemplo":"I explain what the price includes."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

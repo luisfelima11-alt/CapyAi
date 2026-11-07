@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 Yesterday We Harvested</h2>
   <p class="text-slate-500 text-sm mb-5">🚛 Segunda-feira no barracão. O Jack voltou de viagem e pergunta da colheita do fim de semana. Ouça antes de ler a tradução.</p>
@@ -637,6 +639,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1057,5 +1060,7 @@ function submitHomeworkAgro12(){if(hwEntregue)return;if(window.HomeworkPlus&&!Ho
 <script>window.HW_PLUS={"aula":12,"titulo":"Yesterday We Harvested","curso":"Agro English","cor":"#15803d","completar":[{"f":"We ___ the soybeans on Saturday.","r":["harvested"],"dica":"harvest (colher)"},{"f":"Pedro ___ the combine.","r":["operated"],"dica":"operate (operar)"},{"f":"___ it rain on Sunday?","r":["did"],"dica":"pergunta no passado"},{"f":"No, I ___ call the mechanic.","r":["didn't","did not"],"dica":"não (passado)"}],"compreensao":[{"q":"Quantos caminhões eles carregaram ontem?","opts":["Six trucks.","Two trucks.","Sixty trucks."],"a":"Six trucks."},{"q":"Quem trocou a correia da colheitadeira?","opts":["Pedro.","The mechanic.","Jack."],"a":"Pedro."}],"voz":["We harvested the soybeans on Saturday.","It didn't rain on Sunday."],"livre":{"pedido":"Escreva 2 frases sobre o que você fez ontem (verbos com -ed).","exemplo":"Yesterday I worked in the field. I cleaned the truck."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro12-fb');return{ordem:WO_AGRO12_DATA.map((x,i)=>wo_agro12[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro12_Done.size,MP_AGRO12.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_12-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"O que você fez no último fim de semana? Uma frase basta (pode misturar com português).","exemplo":"I worked on Saturday."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>
