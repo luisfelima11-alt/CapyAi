@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
+
+**Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas
+frases (as "VIAGEM 1, 2, 3…"), qualquer que fosse o pedido. Elas ainda eram coladas no quadro como se
+fossem a resposta.
+
+**Causa raiz:** desde que o chat entrou (18/out), a rota `/api/quadro-ai` respondia pelo `callOpenAI`,
+que devolve o envelope antigo `{candidates:[{content:{parts:[{text}]}}]}`. A lousa procura `cards` e
+`reply` no corpo; como não achava, caía no `generateLocalFallbackCards()` em silêncio. O fallback
+escondia o erro: na tela, "funcionava".
+
+**Correção:** a rota usa o `chatComplete` (modo JSON), confere o que o modelo mandou
+(`cartoesDaLousa`: até 12 cartões, só texto) e responde `{ reply, cards }`. Se a IA falha, responde
+502 com uma mensagem. A lousa mostra as frases prontas com um aviso e não cola sozinha. O texto da IA
+no chat entra por `textContent`. Testes: `tests/quadro-ai.test.js` e `tests/quadro-chat.spec.js`.
+
+**Regra:** rota que o navegador lê como JSON próprio não pode usar o `callOpenAI` (ele só serve a quem
+lê o envelope `candidates`). E fallback silencioso precisa de aviso na tela: senão o erro nunca aparece.
+
+---
+
 ## 2026-11-07 — Toda aula gerada do GPS e do Agro pedia a escrita da aula 09
 
 **Sintoma:** no homework da Agro 13 (comparativos), a última tarefa pedia "Escreva 5 passos para o

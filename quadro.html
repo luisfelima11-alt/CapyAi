@@ -2880,11 +2880,11 @@ function initQuadroAIChat() {
         itemRow.className = 'p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-2 hover:border-emerald-300 transition';
         const info = document.createElement('div');
         info.className = 'min-w-0 flex-1';
-        info.innerHTML = `
-          ${c.badge ? `<div class="text-[9px] font-black uppercase tracking-wider text-emerald-700">${c.badge}</div>` : ''}
-          <div class="font-extrabold text-navy text-xs leading-snug">${c.en}</div>
-          ${c.pt ? `<div class="text-[11px] text-slate-500">${c.pt}</div>` : ''}
-        `;
+        // Texto da IA: sempre textContent, nunca innerHTML.
+        const linha = (classe, texto) => { const d = document.createElement('div'); d.className = classe; d.textContent = texto; info.appendChild(d); };
+        if (c.badge) linha('text-[9px] font-black uppercase tracking-wider text-emerald-700', c.badge);
+        linha('font-extrabold text-navy text-xs leading-snug', c.en);
+        if (c.pt) linha('text-[11px] text-slate-500', c.pt);
         const addOneBtn = document.createElement('button');
         addOneBtn.type = 'button';
         addOneBtn.className = 'px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-800 border border-emerald-200 text-[10px] font-black flex-shrink-0 transition';
@@ -2928,6 +2928,7 @@ function initQuadroAIChat() {
     const loadingEl = appendLoadingBubble();
 
     let result = null;
+    let aviso = '';
     try {
       const resp = await fetch('/api/quadro-ai', {
         method: 'POST',
@@ -2938,27 +2939,39 @@ function initQuadroAIChat() {
           history: quadroChatHistory.slice(-8),
         }),
       });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data && (Array.isArray(data.cards) || data.reply)) {
-          result = {
-            reply: data.reply || 'Prontinho! Aqui estão os cartões para a lousa:',
-            cards: Array.isArray(data.cards) ? data.cards : [],
-          };
-        }
+      const data = await resp.json().catch(() => null);
+      if (resp.ok && data && (Array.isArray(data.cards) || data.reply)) {
+        result = {
+          reply: data.reply || 'Prontinho! Aqui estão os cartões para a lousa:',
+          cards: Array.isArray(data.cards) ? data.cards : [],
+        };
+      } else {
+        aviso = (data && typeof data.message === 'string' && data.message) || 'A Yara não respondeu agora.';
       }
-    } catch (e) {}
+    } catch (e) {
+      aviso = 'Sem conexão com a Yara agora.';
+    }
 
+    // Sem resposta da IA, as frases prontas aparecem no chat, avisadas e SEM
+    // colar sozinhas: antes elas entravam no quadro como se fossem a resposta.
+    let usouProntas = false;
     if (!result || (!result.cards.length && !result.reply)) {
       result = generateLocalFallbackCards(text);
+      result.reply = `⚠️ ${aviso || 'A Yara não respondeu agora.'} Separei frases prontas parecidas com o pedido — toque em “Colar” se quiser usar.`;
+      usouProntas = true;
     }
 
     loadingEl.remove();
 
-    quadroChatHistory.push({ role: 'user', content: text });
-    quadroChatHistory.push({ role: 'assistant', content: result.reply || '' });
+    // A conversa só guarda o que a IA respondeu de verdade — com as frases dos
+    // cartões, para "agora mais formal" saber de quais frases se trata.
+    if (!usouProntas) {
+      const frases = (result.cards || []).map(c => '- ' + String(c.en || '')).join('\n');
+      quadroChatHistory.push({ role: 'user', content: text });
+      quadroChatHistory.push({ role: 'assistant', content: [result.reply || '', frases].filter(Boolean).join('\n') });
+    }
 
-    const shouldAutoPaste = autoPasteEl ? autoPasteEl.checked : true;
+    const shouldAutoPaste = !usouProntas && (autoPasteEl ? autoPasteEl.checked : true);
     let pasted = false;
     if (shouldAutoPaste && Array.isArray(result.cards) && result.cards.length > 0) {
       insertAICardsOnBoard(result.cards);
