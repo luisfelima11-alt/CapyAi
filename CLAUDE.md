@@ -142,6 +142,31 @@ O professor vê tudo em `teacher_homework.html` (papel teacher/admin, com verifi
 - Tabela `homework_submissions` (`202611010003_licao_de_casa.sql`, RLS com `private.current_account_id()`): o aluno grava e lê só as dele,
   o painel lê pelo servidor. Até 18/out ela não existia e a entrega se perdia em silêncio.
 
+## GPS Tronic e Agro: homework maior, card para o teacher e 🎯 Prepare (07/nov/2026)
+
+Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Depois de mudar o
+`conteudo.json`, gere a aula de novo.
+
+- **Homework novo** (`scripts/lib/homework-plus.mjs` + `homework-plus.js`):
+  - vale nas aulas cujo `conteudo.json` tem `homework.completar`, `compreensao`, `voz`, `livre` e
+    `escrita`. Por enquanto: GPS 23–27 e Agro 11–15;
+  - são 8 tarefas. A 8 (escrita guiada, `#texto-guiado`) é obrigatória para entregar;
+  - na entrega, o campo `#placar` é o primeiro das respostas que o `components.js` manda ao professor;
+  - depois da entrega, o aluno ganha um card PNG 1080×1350 para compartilhar (Web Share; sem
+    ele, a imagem é baixada).
+- **Aulas sem o homework novo:** a escrita é um pedido neutro com os padrões da aula. O validador
+  falha se o texto fixo da aula 09 ("reiniciar o monitor", "imperativo") voltar.
+- **🎯 Prepare** (`scripts/lib/preparacao.mjs` + `preparacao.js`):
+  - é o primeiro passo da rota de toda aula gerada;
+  - mostra 6 palavras, o começo do diálogo, um quiz de 5 perguntas e um aquecimento
+    (`conteudo.json` → `preparacao.aquecimento`/`exemplo`; sem eles, uma pergunta neutra);
+  - ao terminar, manda `POST /api/homework` com `lessonId: "<aula>-prep"`. É a única chamada
+    direta ao endpoint numa aula. Ela fica fora do `#tab-homework`, e por isso não duplica a entrega.
+- **No painel:**
+  - o `professor.js` mostra "🎯 preparou a aula N" à parte das lições de casa;
+  - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
+- **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,

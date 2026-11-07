@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 What Are You Doing Now?</h2>
   <p class="text-slate-500 text-sm mb-5">📲 O Jack liga no meio da manhã. Você está no campo e conta o que cada um está fazendo agora. Ouça antes de ler a tradução.</p>
@@ -637,6 +639,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1057,5 +1060,7 @@ function submitHomeworkAgro11(){if(hwEntregue)return;if(window.HomeworkPlus&&!Ho
 <script>window.HW_PLUS={"aula":11,"titulo":"What Are You Doing Now?","curso":"Agro English","cor":"#15803d","completar":[{"f":"Pedro is ___ the irrigation pivot.","r":["fixing"],"dica":"fix (consertar)"},{"f":"They ___ cleaning the shed right now.","r":["are"],"dica":"be (eles)"},{"f":"We ___ using the drone today.","r":["aren't","are not"],"dica":"não estamos"},{"f":"___ you coming for lunch?","r":["are"],"dica":"pergunta com be"}],"compreensao":[{"q":"O que o Pedro está fazendo?","opts":["He's fixing the irrigation pivot.","He's driving the tractor.","He's cleaning the shed."],"a":"He's fixing the irrigation pivot."},{"q":"Por que eles não estão usando o drone?","opts":["The battery is charging.","It's raining.","Jack is using it."],"a":"The battery is charging."}],"voz":["I'm checking the soybean field.","We aren't using the drone today."],"livre":{"pedido":"Escreva 2 frases: o que você está fazendo agora e o que alguém perto de você está fazendo.","exemplo":"I'm studying English. My brother is watching TV."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro11-fb');return{ordem:WO_AGRO11_DATA.map((x,i)=>wo_agro11[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro11_Done.size,MP_AGRO11.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_11-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"O que você está fazendo agora? Responda em inglês, como o Luan: I'm …","exemplo":"I'm studying English."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

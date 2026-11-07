@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 Show Me on Video</h2>
   <p class="text-slate-500 text-sm mb-5">📱 O Rafael, operador novo da fazenda do Carlos, está sem sinal no trator. Por videochamada, você guia a câmera dele até achar o problema na antena.</p>
@@ -634,6 +636,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1052,5 +1055,7 @@ function submitHomeworkGps17(){if(hwEntregue)return;if(window.HomeworkPlus&&!Hom
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_17-folha.pdf"></script>
+<script>window.PREP={};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

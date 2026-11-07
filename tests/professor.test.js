@@ -41,6 +41,17 @@ test('resumoAluno: today, streak, days away and alerts', () => {
   assert.deepEqual(atrasado.alertas, ['licao_atrasada']);
 });
 
+test('resumoAluno: a preparação antes da aula ("-prep") não conta como lição de casa entregue', () => {
+  const hoje = '2026-10-19';
+  const antiga = { id: 'a', lesson_id: 'gpstronic_aula_24', lesson_title: 'Lesson 24', submitted_at: new Date(Date.now() - 9 * 86400000).toISOString(), xp_earned: 75 };
+  const prep = { id: 'p', lesson_id: 'gpstronic_aula_25-prep', lesson_title: '🎯 Preparação · Lesson 25', submitted_at: new Date().toISOString(), xp_earned: 20 };
+  const r = resumoAluno({ state: { lastPracticeDate: hoje }, hoje, licoes: [prep, antiga] });
+  assert.deepEqual(r.alertas, ['licao_atrasada'], 'preparou ontem, mas a lição de casa está atrasada');
+  assert.equal(r.licoes.length, 2, 'o painel recebe as duas e separa a preparação com 🎯');
+  // Só preparação, nenhuma lição de casa ainda: sem alerta de lição atrasada.
+  assert.deepEqual(resumoAluno({ state: { lastPracticeDate: hoje }, hoje, licoes: [prep] }).alertas, []);
+});
+
 test('class codes are 8 characters from an unambiguous alphabet', () => {
   for (let i = 0; i < 50; i++) assert.match(novoCodigoTurma(), /^[a-hjkmnp-z2-9]{8}$/);
 });

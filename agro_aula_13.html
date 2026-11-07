@@ -123,6 +123,8 @@
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
 <!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
+
 <div id="tab-dialogue" class="tab-content fade-in">
   <h2 class="text-2xl font-black text-navy mb-2">🎭 This Tractor Is Bigger</h2>
   <p class="text-slate-500 text-sm mb-5">🚜 Na revenda de máquinas, você e o Jack comparam um trator verde e um vermelho antes de decidir. Ouça antes de ler a tradução.</p>
@@ -637,6 +639,7 @@ Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes')
 // TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
 // boot, e o percurso a adota (ver adotarListening).
 const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
   {id:'dialogue',    rotulo:'🎭 Diálogo'},
   {id:'vocab',       rotulo:'📚 Vocabulário'},
   {id:'expressions', rotulo:'💬 Expressions'},
@@ -1057,5 +1060,7 @@ function submitHomeworkAgro13(){if(hwEntregue)return;if(window.HomeworkPlus&&!Ho
 <script>window.HW_PLUS={"aula":13,"titulo":"This Tractor Is Bigger","curso":"Agro English","cor":"#15803d","completar":[{"f":"The green tractor is ___ than the red one.","r":["bigger"],"dica":"big (grande)"},{"f":"The red tractor is ___ than the green one.","r":["cheaper"],"dica":"cheap (barato)"},{"f":"The green tractor is ___ expensive.","r":["more"],"dica":"mais"},{"f":"It's the ___ tractor for big fields.","r":["best"],"dica":"good → o melhor"}],"compreensao":[{"q":"Quanto o trator verde é mais caro?","opts":["About twenty percent.","About ten percent.","About fifty percent."],"a":"About twenty percent."},{"q":"Qual trator gasta menos combustível?","opts":["The green one.","The red one.","They use the same."],"a":"The green one."}],"voz":["The green tractor is bigger than the red one.","It's the most comfortable cab here."],"livre":{"pedido":"Compare duas coisas da sua vida (dois carros, duas cidades, dois celulares) em 2 frases.","exemplo":"My car is older than my father's car. São Paulo is bigger than my city."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro13-fb');return{ordem:WO_AGRO13_DATA.map((x,i)=>wo_agro13[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro13_Done.size,MP_AGRO13.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_13-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"Qual é melhor na fazenda: um trator grande ou um pequeno? Por quê?","exemplo":"The big tractor. It's stronger."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>
