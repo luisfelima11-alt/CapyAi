@@ -25,49 +25,105 @@
 <script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
 <style>
   *{font-family:'Plus Jakarta Sans',sans-serif}
-  /* Página de Cursos (01/nov/2026): continuar, meus cursos e catálogo à esquerda;
-     as aulas do Starter à direita (no celular, tudo numa coluna). Sem bordas de
-     1px: os blocos se separam pelo fundo, como pede o design system. */
-  .cursos-grade{display:grid;gap:22px}
-  .cursos-esq{display:grid;gap:22px;align-content:start;min-width:0}
-  .cursos-dir{min-width:0}
-  @media (min-width:1024px){
-    .cursos-grade{grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:28px;align-items:start}
-    .cursos-dir{position:sticky;top:96px}
-  }
-  .rotulo{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64708a;margin-bottom:10px}
-  .continua{background:#001f3f;color:#fff;border-radius:1.75rem;padding:18px;display:grid;gap:14px;position:relative;overflow:hidden}
-  .continua::after{content:"🦫";position:absolute;right:-6px;bottom:-16px;font-size:88px;opacity:.16;pointer-events:none}
-  .continua-selo{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f9a8d4}
-  .barra{height:6px;border-radius:9px;background:rgba(255,255,255,.15);overflow:hidden}
-  .barra span{display:block;height:100%;background:#10b981;border-radius:9px;transition:width .4s}
-  .barra-clara{background:#eef1f7}
-  .btn-rosa{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#ec4899;color:#fff;font-weight:800;border-radius:9999px;padding:12px 18px;transition:transform .15s}
-  .btn-rosa:active{transform:scale(.98)}
-  .btn-rosa:focus-visible,.cartao:focus-visible,.aula:focus-visible,.bloco>button:focus-visible{outline:3px solid #ec4899;outline-offset:2px}
-  .cartao{background:#fff;border-radius:1.25rem;padding:12px;display:grid;gap:4px;text-align:left;transition:box-shadow .15s,transform .15s}
-  .cartao:hover{box-shadow:0 6px 18px rgba(15,27,51,.08);transform:translateY(-2px)}
-  .cartao b{font-size:.9rem;line-height:1.2;color:#0f1b33}
+  /* Página de Cursos (07/nov/2026): o aluno acha o curso dele em um toque.
+     Topo colorido com busca, "Meus cursos" com progresso e "Continuar" direto
+     na próxima aula, catálogo com a cor de cada curso e as aulas do Starter
+     no fim. Sem bordas de 1px: os blocos se separam pelo fundo. */
+  [hidden]{display:none!important}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .topo{position:relative;overflow:hidden;color:#fff;border-radius:2rem;padding:22px 18px 18px;
+    background:linear-gradient(135deg,#001f3f 0%,#2e1065 55%,#7c3aed 100%)}
+  @media (min-width:768px){.topo{border-radius:3rem;padding:34px 36px 28px}}
+  .topo-deco{position:absolute;pointer-events:none;opacity:.14;font-size:64px;line-height:1}
+  .topo h1{font-size:2rem;font-weight:900;letter-spacing:-.02em;line-height:1.05}
+  @media (min-width:768px){.topo h1{font-size:2.6rem}}
+  .topo p{color:#d8d2f5}
+  .busca{position:relative;margin-top:16px;max-width:640px}
+  .busca input{width:100%;font-size:1rem;color:#0f1b33;background:#fff;border-radius:9999px;padding:14px 46px 14px 48px;
+    box-shadow:0 10px 30px -10px rgba(0,0,0,.45);outline:none}
+  .busca input::placeholder{color:#7c8698}
+  .busca input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+  .busca input:focus-visible{box-shadow:0 0 0 4px #f9a8d4,0 10px 30px -10px rgba(0,0,0,.45)}
+  .busca .lupa{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#7c3aed;font-size:22px;pointer-events:none}
+  .busca .limpar{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:9999px;
+    background:#eef1f7;color:#0f1b33;font-weight:900;display:none}
+  .busca.tem-texto .limpar{display:block}
+  .chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;font-size:.8rem;font-weight:800;border-radius:9999px;padding:8px 14px;background:rgba(255,255,255,.14);color:#fff;transition:background .15s,transform .15s}
+  .chip:hover{background:rgba(255,255,255,.24)}
+  .chip[aria-pressed="true"]{background:#fff;color:#2e1065}
+  .chip:active,.btn-rosa:active,.cartao:active{transform:scale(.98)}
+  .rotulo{font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64708a;margin-bottom:10px}
+  .barra{height:7px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}
+  .barra span{display:block;height:100%;background:#fff;border-radius:9px;transition:width .4s}
+  .barra-clara{background:rgba(15,27,51,.08)}
+  .barra-clara span{background:var(--c,#10b981)}
+  .btn-rosa{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#ec4899;color:#fff;font-weight:800;border-radius:9999px;padding:12px 20px;transition:transform .15s}
+  .btn-branco{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;color:var(--c);font-weight:800;border-radius:9999px;padding:12px 20px;transition:transform .15s}
+  .btn-branco:active{transform:scale(.98)}
+  /* Meus cursos */
+  .meus{display:grid;gap:12px}
+  @media (min-width:768px){.meus{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .curso-cor{--c:#7c3aed;position:relative;overflow:hidden;color:#fff;border-radius:1.5rem;padding:16px;display:grid;gap:10px;align-content:start;
+    background:var(--c);background:linear-gradient(135deg,var(--c) 0%,color-mix(in srgb,var(--c) 62%,#001f3f) 100%)}
+  .curso-cor .emo{position:absolute;right:-8px;bottom:-14px;font-size:84px;opacity:.2;pointer-events:none;line-height:1}
+  .curso-cor .selo{font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.8)}
+  .curso-cor h3{font-size:1.05rem;font-weight:900;line-height:1.2}
+  .curso-cor .linha{font-size:.8rem;color:rgba(255,255,255,.85);font-variant-numeric:tabular-nums}
+  .curso-cor .acoes{display:flex;flex-wrap:wrap;align-items:center;gap:10px;position:relative}
+  .curso-cor .ver{font-size:.78rem;font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px;opacity:.9}
+  .destaque{padding:20px}
+  @media (min-width:768px){.destaque{grid-column:span 2;padding:26px}.destaque h3{font-size:1.45rem}.destaque:only-child{grid-column:1/-1}}
+  .nivel{--c:#ec4899}
+  .destaque .aula-nome{font-size:1.15rem;font-weight:800;line-height:1.25}
+  /* Catálogo */
+  .grupo{border-radius:1.75rem;padding:14px;background:var(--g-claro,#f3f4f8)}
+  @media (min-width:768px){.grupo{padding:18px}}
+  .grupo h3{display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:900;color:var(--g,#0f1b33);margin:2px 4px 12px}
+  .grupo h3 i{font-style:normal;font-size:.72rem;font-weight:700;color:#64708a}
+  .cartoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  @media (min-width:768px){.cartoes{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (min-width:1100px){.cartoes{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  .cartao{--c:#7c3aed;background:#fff;border-radius:1.25rem;padding:12px;display:grid;gap:8px;align-content:start;text-align:left;
+    box-shadow:inset 0 4px 0 var(--c);transition:box-shadow .15s,transform .15s}
+  .cartao:hover{box-shadow:inset 0 4px 0 var(--c),0 10px 24px -8px color-mix(in srgb,var(--c) 45%,transparent);transform:translateY(-2px)}
+  .cartao .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:var(--claro,#f3e8ff)}
+  .cartao b{font-size:.95rem;line-height:1.2;color:#0f1b33}
   .cartao small{font-size:.74rem;color:#64708a;font-variant-numeric:tabular-nums}
-  .etiqueta{justify-self:start;font-size:.64rem;font-weight:800;border-radius:9999px;padding:2px 8px}
-  .painel{background:#fff;border-radius:1.75rem;padding:16px}
-  @media (min-width:768px){.painel{padding:22px}}
-  .bloco{border-radius:1.25rem;background:#eef1f7}
-  .bloco>button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:.88rem;color:#0f1b33;border-radius:1.25rem}
+  .pilula{justify-self:start;font-size:.66rem;font-weight:800;border-radius:9999px;padding:3px 9px;color:var(--c);background:var(--claro)}
+  .pilulas{display:flex;flex-wrap:wrap;gap:4px}
+  .btn-rosa:focus-visible,.btn-branco:focus-visible,.cartao:focus-visible,.aula:focus-visible,.bloco>button:focus-visible,.chip:focus-visible,.curso-cor a:focus-visible,.res-aula:focus-visible{outline:3px solid #ec4899;outline-offset:2px}
+  .vazio{background:#fff;border-radius:1.5rem;padding:22px;text-align:center;color:#64708a}
+  /* Resultado da busca dentro das aulas do Starter */
+  .res-aulas{display:grid;gap:6px}
+  @media (min-width:768px){.res-aulas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .res-aula{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:inset 4px 0 0 #7c3aed}
+  .res-aula b{font-size:.86rem;color:#0f1b33}
+  .res-aula small{display:block;font-size:.7rem;color:#64708a}
+  /* Aulas do Starter */
+  .painel{background:#fff;border-radius:2rem;padding:16px;overflow:hidden}
+  @media (min-width:768px){.painel{padding:24px;border-radius:3rem}}
+  .painel-topo{margin:-16px -16px 14px;padding:18px 16px;background:linear-gradient(135deg,#f3e8ff,#fce7f3)}
+  @media (min-width:768px){.painel-topo{margin:-24px -24px 18px;padding:22px 24px}}
+  .blocos{display:grid;gap:8px}
+  @media (min-width:1024px){.blocos{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
+  .bloco{border-radius:1.25rem;background:#f3f0fb}
+  .bloco>button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:.88rem;color:#2e1065;border-radius:1.25rem}
   .bloco>button span{font-weight:600;color:#64708a;font-size:.76rem;font-variant-numeric:tabular-nums}
   .aulas{display:grid;gap:4px;padding:0 6px 6px}
   .aula{display:grid;grid-template-columns:28px 24px minmax(0,1fr) auto;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:10px;transition:box-shadow .15s}
   .aula:hover{box-shadow:0 4px 14px rgba(15,27,51,.08)}
-  .aula .n{font-size:.75rem;font-weight:800;color:#64708a;font-variant-numeric:tabular-nums;text-align:center}
+  .aula .n{font-size:.75rem;font-weight:800;color:#7c3aed;font-variant-numeric:tabular-nums;text-align:center}
   .aula .t{min-width:0}
   .aula .t b{display:block;font-size:.86rem;font-weight:700;color:#0f1b33;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .aula .t small{font-size:.7rem;color:#64708a}
   .aula .st{font-size:.72rem;font-weight:800;border-radius:9999px;padding:3px 10px;white-space:nowrap}
   .st-feita{background:#dcfce7;color:#15803d}
   .st-prox{background:#ec4899;color:#fff}
-  .st-abrir{background:#eef1f7;color:#0f1b33}
+  .st-abrir{background:#f3f0fb;color:#2e1065}
   .aula.proxima{box-shadow:0 0 0 2px #ec4899}
-  @media (prefers-reduced-motion:reduce){.cartao,.aula,.btn-rosa,.barra span{transition:none}}
+  @media (prefers-reduced-motion:reduce){.cartao,.aula,.btn-rosa,.btn-branco,.chip,.barra span{transition:none}}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -81,54 +137,60 @@
 <div id="side-nav-placeholder"></div>
 
 <main class="md:pl-24 pb-32 md:pb-10">
-  <div class="cursos-wrap max-w-6xl mx-auto px-4 md:px-8 pt-20 md:pt-24">
+  <div class="cursos-wrap max-w-6xl mx-auto px-4 md:px-8 pt-20 md:pt-24 grid gap-7">
 
-    <header class="cursos-cab mb-5">
-      <h1 class="text-3xl md:text-4xl font-black text-navy tracking-tight">Cursos</h1>
-      <p class="text-slate-500 text-sm md:text-base mt-1">Continue de onde parou ou escolha um curso novo. Todas as aulas são grátis.</p>
+    <!-- Topo: título, busca e filtros por grupo -->
+    <header class="topo">
+      <span class="topo-deco" style="right:18px;top:14px" aria-hidden="true">🦫</span>
+      <span class="topo-deco" style="right:110px;bottom:-10px;font-size:44px" aria-hidden="true">📚</span>
+      <span class="topo-deco hidden md:block" style="right:220px;top:26px;font-size:40px" aria-hidden="true">🌎</span>
+      <h1>Cursos</h1>
+      <p class="text-sm md:text-base mt-1.5 max-w-xl">Continue de onde parou ou ache um curso novo. Todas as aulas são grátis.</p>
+      <div class="busca" id="busca-caixa" role="search">
+        <label for="busca" class="vh">Buscar curso ou aula</label>
+        <span class="lupa material-symbols-outlined" aria-hidden="true">search</span>
+        <input id="busca" type="search" autocomplete="off" enterkeyhint="search" placeholder="Buscar curso ou aula…"/>
+        <button type="button" class="limpar" id="busca-limpar" aria-label="Limpar a busca">✕</button>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Filtrar cursos por tipo"></div>
     </header>
 
-    <div class="cursos-grade">
-      <div class="cursos-esq">
+    <p id="busca-status" class="vh" aria-live="polite"></p>
 
-        <!-- Continue de onde parou -->
-        <section id="continua" class="continua" aria-label="Continue de onde parou">
-          <div class="min-w-0">
-            <p class="continua-selo">Continue de onde parou</p>
-            <h2 id="continua-titulo" class="text-lg md:text-xl font-black leading-snug mt-1">Aula 1 · To Have, Want, Need &amp; Like</h2>
-            <p id="continua-sub" class="text-sm mt-1" style="color:#c7d2e6">Starter · Jadson's Course</p>
-          </div>
-          <div class="grid gap-2.5">
-            <div class="barra" aria-hidden="true"><span id="continua-barra" style="width:0%"></span></div>
-            <a id="continua-btn" href="aula_01.html" class="btn-rosa">Começar aula 1 →</a>
-          </div>
-        </section>
+    <!-- Meus cursos: os que o aluno já começou, com "Continuar" direto na próxima aula -->
+    <section id="meus-sec" aria-labelledby="meus-titulo">
+      <p id="meus-titulo" class="rotulo">Meus cursos</p>
+      <div id="meus" class="meus"></div>
+    </section>
 
-        <!-- Meus cursos: os que o aluno já abriu -->
-        <section id="meus" class="hidden" aria-labelledby="meus-titulo">
-          <p id="meus-titulo" class="rotulo">Meus cursos</p>
-          <div id="meus-lista" class="grid grid-cols-2 gap-2.5"></div>
-        </section>
+    <!-- Busca: aulas do Starter que batem com o texto -->
+    <section id="res-aulas-sec" class="hidden" aria-labelledby="res-aulas-titulo">
+      <p id="res-aulas-titulo" class="rotulo">Aulas do Starter</p>
+      <div id="res-aulas" class="res-aulas"></div>
+    </section>
 
-        <!-- Catálogo -->
-        <section aria-labelledby="explorar-titulo">
-          <p id="explorar-titulo" class="rotulo">Explorar cursos</p>
-          <div id="grupos" class="grid gap-4"></div>
-        </section>
+    <!-- Catálogo -->
+    <section aria-labelledby="explorar-titulo">
+      <p id="explorar-titulo" class="rotulo">Todos os cursos</p>
+      <div id="grupos" class="grid gap-4"></div>
+      <div id="busca-vazia" class="vazio hidden">
+        <p class="text-3xl" aria-hidden="true">🔎</p>
+        <p class="font-black text-navy mt-1">Nenhum curso com "<span id="busca-termo"></span>"</p>
+        <p class="text-sm mt-1">Tente outra palavra, como "trabalho", "viagem" ou "iniciante".</p>
       </div>
+    </section>
 
-      <div class="cursos-dir">
-        <!-- Aulas do Starter -->
-        <section id="lessons-panel" class="painel" aria-labelledby="painel-titulo">
-          <div class="flex items-center justify-between gap-2 flex-wrap">
-            <h2 id="painel-titulo" class="text-lg font-black text-navy">🎓 Starter · Jadson's Course</h2>
-            <span id="starter-progress-text" class="text-xs font-bold text-slate-500 tabular-nums">0 de 44 aulas</span>
-          </div>
-          <div class="barra barra-clara mt-2" aria-hidden="true"><span id="starter-progress-bar" style="width:0%"></span></div>
-          <div id="blocos" class="grid gap-2 mt-4"></div>
-        </section>
+    <!-- Aulas do Starter -->
+    <section id="lessons-panel" class="painel" aria-labelledby="painel-titulo">
+      <div class="painel-topo">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <h2 id="painel-titulo" class="text-lg md:text-xl font-black" style="color:#2e1065">🎓 Starter · Jadson's Course</h2>
+          <span id="starter-progress-text" class="text-xs font-bold text-slate-600 tabular-nums">0 de 44 aulas</span>
+        </div>
+        <div class="barra barra-clara mt-2" style="--c:#7c3aed" aria-hidden="true"><span id="starter-progress-bar" style="width:0%"></span></div>
       </div>
-    </div>
+      <div id="blocos" class="blocos"></div>
+    </section>
   </div>
 
 <!-- SEO:indice-aulas -->
@@ -264,11 +326,33 @@ const GRUPOS = [
     { id: 'gpstronic',    em: '📡', nome: 'GPS Tronic',            nivel: 'A2 → B1', aulas: 27, turma: true },
     { id: 'agro',         em: '🚜', nome: 'Agro English',          nivel: 'A0 → A1', aulas: 15, turma: true },
     { id: 'med',          em: '🩺', nome: 'Medical English',       nivel: 'A0 → A2', aulas: 10 } ] },
-  { nome: 'Outros idiomas', cor: '#d97706', cursos: [
+  { nome: 'Outros idiomas', cor: '#be123c', cursos: [
     { id: 'francais',     em: '🇫🇷', nome: 'Français',             nivel: 'A1 → A2', aulas: 12 },
     { id: 'turkish',      em: '🇹🇷', nome: 'Türkçe',               nivel: 'A1 → A2', aulas: 36 } ] },
 ];
 const CURSO_POR_ID = Object.fromEntries(GRUPOS.flatMap(g => g.cursos.map(c => [c.id, c])));
+
+// A cara de cada curso (07/nov/2026): a cor do cartão, as palavras que a busca
+// entende e onde o progresso dele fica guardado. `chave` é a lista de aulas
+// concluídas que as próprias aulas gravam (ex.: gpstronic_aula_15 grava 15 em
+// capyGpstronicCompleted) e `prefixo` monta o link da próxima aula
+// (gpstronic → gpstronic_aula_16.html). Sem chave, o cartão leva ao curso.
+// Fica separado de GRUPOS para que mudar a contagem de aulas lá não mexa aqui.
+const VISUAL = {
+  starter:      { cor: '#7c3aed', claro: '#f3e8ff', busca: 'ingles geral iniciante basico comecar do zero jadson verbos' },
+  intermediate: { cor: '#059669', claro: '#d1fae5', busca: 'ingles geral intermediario', chave: 'capyIntermediateCompleted', prefixo: 'intermediate' },
+  advanced:     { cor: '#db2777', claro: '#fce7f3', busca: 'ingles geral avancado fluencia', chave: 'capyAdvancedCompleted', prefixo: 'advanced' },
+  business:     { cor: '#2563eb', claro: '#dbeafe', busca: 'negocios trabalho empresa reuniao email corporativo', chave: 'capyBizCompleted', prefixo: 'business' },
+  interview:    { cor: '#a21caf', claro: '#fae8ff', busca: 'entrevista emprego vaga curriculo trabalho', chave: 'capyInterviewCompleted', prefixo: 'interview' },
+  travel:       { cor: '#ea580c', claro: '#ffedd5', busca: 'viagem viajar turismo aeroporto hotel ferias', chave: 'capyTravelCompleted', prefixo: 'travel' },
+  gpstronic:    { cor: '#0f766e', claro: '#ccfbf1', busca: 'gps tronic agricultura de precisao trator piloto automatico tecnico', chave: 'capyGpstronicCompleted', prefixo: 'gpstronic' },
+  agro:         { cor: '#15803d', claro: '#dcfce7', busca: 'agro agronomia agricultura fazenda campo trator safra rural', chave: 'capyAgroCompleted', prefixo: 'agro' },
+  med:          { cor: '#dc2626', claro: '#fee2e2', busca: 'medico medicina saude hospital paciente', chave: 'capyMedCompleted', prefixo: 'med' },
+  francais:     { cor: '#0369a1', claro: '#e0f2fe', busca: 'frances french franca outro idioma', chave: 'capyFrCompleted', prefixo: 'fr' },
+  turkish:      { cor: '#be123c', claro: '#ffe4e6', busca: 'turco turquia turkce outro idioma' },
+};
+// O nome curto de cada grupo no filtro do topo.
+const CHIP = { 'Inglês geral': 'Inglês geral', 'Inglês para o trabalho': 'Trabalho', 'Inglês profissional': 'Profissional', 'Outros idiomas': 'Outros idiomas' };
 
 const ler = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const gravar = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -354,56 +438,194 @@ function abrirAula(l) {
   window.location.href = l.href;
 }
 
-// ── Continue de onde parou ────────────────────────────────────────────────
-(function () {
-  let ultima = null;
-  try { ultima = JSON.parse(ler('capyUltimaAula') || 'null'); } catch (e) {}
-  const valida = ultima && LESSONS.find(l => l.n === Number(ultima.n) && l.href === ultima.href);
-  // Se a última aula aberta já foi concluída, sugere a próxima pendente.
-  const alvo = valida && !feita(valida.n) ? valida : proxima;
-  const comecou = totalFeitas > 0 || !!valida;
-  document.getElementById('continua-titulo').textContent = `Aula ${alvo.n} · ${alvo.title}`;
-  document.getElementById('continua-sub').textContent = `Starter · Jadson's Course · ${totalFeitas} de ${LESSONS.length} aulas`;
-  document.getElementById('continua-barra').style.width = Math.round((totalFeitas / LESSONS.length) * 100) + '%';
-  const btn = document.getElementById('continua-btn');
-  btn.href = alvo.href;
-  btn.textContent = `${comecou ? 'Continuar' : 'Começar'} aula ${alvo.n} →`;
-  btn.addEventListener('click', e => { e.preventDefault(); abrirAula(alvo); });
-  if (!comecou) document.querySelector('.continua-selo').textContent = 'Comece por aqui';
-})();
+// A próxima aula do Starter: a última aberta, se ainda não foi feita; senão a
+// primeira pendente.
+let ultimaStarter = null;
+try { ultimaStarter = JSON.parse(ler('capyUltimaAula') || 'null'); } catch (e) {}
+const ultimaValida = ultimaStarter && LESSONS.find(l => l.n === Number(ultimaStarter.n) && l.href === ultimaStarter.href);
+const alvoStarter = ultimaValida && !feita(ultimaValida.n) ? ultimaValida : proxima;
+
+// Progresso de um curso: { feitas, total, prox: {n, href, titulo?} | null }.
+// null quando o curso não guarda progresso que esta página consiga ler.
+function progresso(id) {
+  const c = CURSO_POR_ID[id], v = VISUAL[id] || {};
+  if (id === 'starter') {
+    return { feitas: totalFeitas, total: LESSONS.length,
+      prox: totalFeitas >= LESSONS.length ? null : { n: alvoStarter.n, href: alvoStarter.href, titulo: alvoStarter.title } };
+  }
+  if (!c || !v.chave || !v.prefixo) return null;
+  let lista = [];
+  try { lista = JSON.parse(ler(v.chave) || '[]'); } catch (e) {}
+  const feitasC = new Set((Array.isArray(lista) ? lista : []).map(Number).filter(n => Number.isInteger(n) && n >= 1 && n <= c.aulas));
+  let n = 1;
+  while (feitasC.has(n)) n++;
+  return { feitas: feitasC.size, total: c.aulas,
+    prox: n <= c.aulas ? { n, href: `${v.prefixo}_aula_${String(n).padStart(2, '0')}.html` } : null };
+}
+
+// Os cursos do aluno: os que ele abriu por aqui (do mais recente) e os que
+// têm alguma aula feita, mesmo que ele tenha chegado por outro caminho.
+function meusCursos() {
+  const ids = cursosVistos();
+  if ((totalFeitas > 0 || ultimaValida) && !ids.includes('starter')) ids.push('starter');
+  COURSE_IDS.forEach(id => { if (!ids.includes(id) && (progresso(id)?.feitas || 0) > 0) ids.push(id); });
+  return ids.filter(id => CURSO_POR_ID[id]);
+}
+
+function irPara(id, href) {
+  if (id === 'starter') {
+    const l = LESSONS.find(x => x.href === href);
+    if (l) { abrirAula(l); return; }
+    selectCourse('starter');
+    return;
+  }
+  marcarVisto(id);
+  window.location.href = href;
+}
+
+const estilo = id => { const v = VISUAL[id] || VISUAL.starter; return `--c:${v.cor};--claro:${v.claro}`; };
+const destinoCurso = id => (id === 'starter' ? '#lessons-panel' : CURSOS[id]);
 
 // ── Meus cursos ───────────────────────────────────────────────────────────
-(function () {
-  const ids = cursosVistos();
-  if ((totalFeitas > 0 || ler('capyUltimaAula')) && !ids.includes('starter')) ids.unshift('starter');
-  if (!ids.length) return;
-  document.getElementById('meus').classList.remove('hidden');
-  document.getElementById('meus-lista').innerHTML = ids.slice(0, 4).map(id => {
-    const c = CURSO_POR_ID[id];
-    const linha = id === 'starter' ? `${totalFeitas} de ${c.aulas} aulas` : `${c.aulas} aulas · ${c.nivel}`;
-    const pct = id === 'starter' ? Math.round((totalFeitas / c.aulas) * 100) : null;
-    return `<button type="button" class="cartao" data-curso="${id}">
-      <span class="text-xl" aria-hidden="true">${c.em}</span>
-      <b>${esc(c.nome)}</b><small>${esc(linha)}</small>
-      ${pct === null ? '' : `<div class="barra barra-clara mt-1" aria-hidden="true"><span style="width:${pct}%"></span></div>`}
-    </button>`;
-  }).join('');
-})();
+function cartaoMeu(id, destaque) {
+  const c = CURSO_POR_ID[id], p = progresso(id);
+  const pct = p ? Math.round((p.feitas / p.total) * 100) : 0;
+  const href = p?.prox?.href || destinoCurso(id);
+  const acao = !p ? 'Abrir curso →'
+    : !p.prox ? 'Revisar o curso →'
+    : p.feitas === 0 && !(id === 'starter' && ultimaValida) ? `Começar aula ${p.prox.n} →`
+    : `Continuar aula ${p.prox.n} →`;
+  const linha = p ? `${p.feitas} de ${p.total} aulas feitas` : `${c.aulas} aulas · ${c.nivel}`;
+  return `<article class="curso-cor${destaque ? ' destaque' : ''}" style="${estilo(id)}">
+    <span class="emo" aria-hidden="true">${c.em}</span>
+    ${destaque ? '<p class="selo">Continue de onde parou</p>' : ''}
+    <h3><span aria-hidden="true">${c.em}</span> ${esc(c.nome)}</h3>
+    ${destaque && p?.prox?.titulo ? `<p class="aula-nome">Aula ${p.prox.n} · ${esc(p.prox.titulo)}</p>` : ''}
+    <div class="grid gap-1.5">
+      <p class="linha">${esc(linha)}</p>
+      ${p ? `<div class="barra" aria-hidden="true"><span style="width:${pct}%"></span></div>` : ''}
+    </div>
+    <div class="acoes">
+      <a class="btn-branco" href="${esc(href)}" data-ir="${id}">${esc(acao)}</a>
+      <a class="ver" href="${esc(destinoCurso(id))}" data-curso-ver="${id}">Ver todas as aulas</a>
+    </div>
+  </article>`;
+}
+
+function desenharMeus() {
+  const ids = meusCursos();
+  const raiz = document.getElementById('meus');
+  if (!ids.length) {
+    // Aluno novo: o Starter como ponto de partida e o teste de nível como atalho.
+    document.getElementById('meus-titulo').textContent = 'Comece por aqui';
+    raiz.innerHTML = cartaoMeu('starter', true).replace('Continue de onde parou', 'Primeiro curso') + `
+      <article class="curso-cor nivel">
+        <span class="emo" aria-hidden="true">🧭</span>
+        <p class="selo">Não sabe seu nível?</p>
+        <h3>Teste de nível</h3>
+        <p class="linha">Perguntas rápidas para descobrir o seu nível e por onde começar.</p>
+        <div class="acoes"><a class="btn-branco" href="placement_test.html">Fazer o teste →</a></div>
+      </article>`;
+    return;
+  }
+  raiz.innerHTML = ids.slice(0, 5).map((id, i) => cartaoMeu(id, i === 0)).join('');
+}
 
 // ── Catálogo ──────────────────────────────────────────────────────────────
-document.getElementById('grupos').innerHTML = GRUPOS.map(g => `
-  <div class="grid gap-2">
-    <h3 class="flex items-center gap-2 text-sm font-black text-navy"><span class="w-2 h-2 rounded-full" style="background:${g.cor}" aria-hidden="true"></span>${esc(g.nome)}</h3>
-    <div class="grid grid-cols-2 gap-2">${g.cursos.map(c => `
-      <button type="button" class="cartao" data-curso="${c.id}">
-        <span class="flex items-center gap-2"><span class="text-xl" aria-hidden="true">${c.em}</span><b>${esc(c.nome)}</b></span>
-        <small>${c.aulas} aulas · ${esc(c.nivel)}</small>
-        ${c.turma ? '<span class="etiqueta" style="background:#e0f2f1;color:#0f766e">Turma fechada</span>' : ''}
-      </button>`).join('')}
-    </div>
-  </div>`).join('');
+function desenharCatalogo() {
+  document.getElementById('grupos').innerHTML = GRUPOS.map((g, k) => `
+    <div class="grupo" data-grupo="${k}" style="--g:${g.cor};--g-claro:color-mix(in srgb,${g.cor} 9%,#fff)">
+      <h3><span class="w-2.5 h-2.5 rounded-full" style="background:${g.cor}" aria-hidden="true"></span>${esc(g.nome)} <i>${g.cursos.length} cursos</i></h3>
+      <div class="cartoes">${g.cursos.map(c => {
+        const p = progresso(c.id);
+        const pct = p && p.feitas ? Math.round((p.feitas / p.total) * 100) : 0;
+        return `
+        <button type="button" class="cartao" data-curso="${c.id}" style="${estilo(c.id)}">
+          <span class="ic" aria-hidden="true">${c.em}</span>
+          <b>${esc(c.nome)}</b>
+          <span class="pilulas"><span class="pilula">${esc(c.nivel)}</span>${c.turma ? '<span class="pilula">Turma fechada</span>' : ''}</span>
+          <small>${pct ? `${p.feitas} de ${p.total} aulas feitas` : `${c.aulas} aulas`}</small>
+          ${pct ? `<div class="barra barra-clara" aria-hidden="true"><span style="width:${pct}%"></span></div>` : ''}
+        </button>`;
+      }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ── Busca e filtros ───────────────────────────────────────────────────────
+// Sem acento e sem maiúscula: "frances" acha "Français", "medico" acha "Medical".
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const textoCurso = (g, c) => norm([c.nome, c.nivel, g.nome, VISUAL[c.id]?.busca, c.turma ? 'turma' : ''].join(' '));
+let grupoAtivo = -1;
+
+function desenharChips() {
+  const chips = [{ k: -1, nome: 'Todos' }, ...GRUPOS.map((g, k) => ({ k, nome: CHIP[g.nome] || g.nome }))];
+  document.getElementById('chips').innerHTML = chips.map(ch =>
+    `<button type="button" class="chip" data-chip="${ch.k}" aria-pressed="${ch.k === grupoAtivo}">${esc(ch.nome)}</button>`).join('');
+}
+
+function filtrar() {
+  const campo = document.getElementById('busca');
+  const q = campo.value.trim();
+  const termos = norm(q).split(/\s+/).filter(Boolean);
+  document.getElementById('busca-caixa').classList.toggle('tem-texto', !!q);
+  const casa = t => termos.every(x => t.includes(x));
+  let achados = 0;
+  GRUPOS.forEach((g, k) => {
+    const caixa = document.querySelector(`.grupo[data-grupo="${k}"]`);
+    let visiveis = 0;
+    g.cursos.forEach(c => {
+      const ok = (grupoAtivo === -1 || grupoAtivo === k) && casa(textoCurso(g, c));
+      caixa.querySelector(`[data-curso="${c.id}"]`).hidden = !ok;
+      if (ok) visiveis++;
+    });
+    caixa.hidden = visiveis === 0;
+    achados += visiveis;
+  });
+  // Com texto na busca, "Meus cursos" sai da frente e entram as aulas do
+  // Starter que batem (título ou tema).
+  const buscando = termos.length > 0;
+  document.getElementById('meus-sec').hidden = buscando || grupoAtivo !== -1;
+  const aulas = buscando ? LESSONS.filter(l => casa(norm(l.title + ' ' + l.tags.map(etiqueta).join(' ')))).slice(0, 8) : [];
+  document.getElementById('res-aulas-sec').classList.toggle('hidden', !aulas.length);
+  document.getElementById('res-aulas').innerHTML = aulas.map(l => `
+    <a class="res-aula" href="${l.href}" data-aula-busca="${l.n}">
+      <span class="text-xl" aria-hidden="true">${l.emoji}</span>
+      <span class="min-w-0"><b>Aula ${l.n} · ${esc(l.title)}</b><small>${feita(l.n) ? '✓ Feita · ' : ''}${l.tags.map(etiqueta).map(esc).join(' · ')}</small></span>
+    </a>`).join('');
+  const vazio = achados === 0 && !aulas.length;
+  document.getElementById('busca-vazia').classList.toggle('hidden', !vazio);
+  document.getElementById('busca-termo').textContent = q;
+  document.getElementById('busca-status').textContent = !buscando ? ''
+    : vazio ? 'Nenhum resultado' : `${achados} ${achados === 1 ? 'curso' : 'cursos'} e ${aulas.length} ${aulas.length === 1 ? 'aula' : 'aulas'} encontrados`;
+}
+
+desenharMeus();
+desenharCatalogo();
+desenharChips();
+
+document.getElementById('busca').addEventListener('input', filtrar);
+document.getElementById('busca-limpar').addEventListener('click', () => {
+  const campo = document.getElementById('busca');
+  campo.value = '';
+  filtrar();
+  campo.focus();
+});
+document.getElementById('chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-chip]');
+  if (!b) return;
+  grupoAtivo = Number(b.dataset.chip);
+  document.querySelectorAll('#chips [data-chip]').forEach(x => x.setAttribute('aria-pressed', String(Number(x.dataset.chip) === grupoAtivo)));
+  filtrar();
+});
 
 document.addEventListener('click', e => {
+  const ir = e.target.closest('[data-ir]');
+  if (ir) { e.preventDefault(); irPara(ir.dataset.ir, ir.getAttribute('href')); return; }
+  const ver = e.target.closest('[data-curso-ver]');
+  if (ver) { e.preventDefault(); selectCourse(ver.dataset.cursoVer); return; }
+  const aulaBusca = e.target.closest('[data-aula-busca]');
+  if (aulaBusca) { e.preventDefault(); abrirAula(LESSONS.find(l => l.n === Number(aulaBusca.dataset.aulaBusca))); return; }
   const b = e.target.closest('[data-curso]');
   if (b) selectCourse(b.dataset.curso);
 });
