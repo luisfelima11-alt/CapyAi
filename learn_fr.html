@@ -108,12 +108,15 @@ Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha de Francês: 12 unidades × 4 mini-lições (48 etapas) ─────────────
+// ── Trilha de Francês: 42 unidades × 4 mini-lições (168 etapas) ─────────────
 const BLOCKS = [
-  { id: 'all', label: 'Todas (12)' },
+  { id: 'all', label: 'Todas (42)' },
   { id: 'b1',  label: 'Bloco 1 · Primeiros Passos (1–4)' },
   { id: 'b2',  label: 'Bloco 2 · Cotidiano na França (5–8)' },
   { id: 'b3',  label: 'Bloco 3 · Viagem & Passado (9–12)' },
+  { id: 'b4',  label: 'Bloco 4 · Revisão com Être & Avoir (13–24)' },
+  { id: 'b5',  label: 'Bloco 5 · Être & Avoir no Presente (25–32)' },
+  { id: 'b6',  label: 'Bloco 6 · Passado e Futuro (33–42)' },
 ];
 
 const TRAIL_FR = [
@@ -129,6 +132,36 @@ const TRAIL_FR = [
   { id:210, num:10, block:'b3', emoji:'🧭', title:'Les Directions',        sub:'Direções, Lugares da Cidade e Transporte', aula:'fr_aula_10.html' },
   { id:211, num:11, block:'b3', emoji:'🛍️', title:'Les Vêtements',         sub:'Roupas, Compras e Demonstrativos',         aula:'fr_aula_11.html' },
   { id:212, num:12, block:'b3', emoji:'⏪', title:'Le Passé Composé',      sub:'Falando do Passado com Avoir e Être',      aula:'fr_aula_12.html' },
+  { id:213, num:13, block:'b4', emoji:'🤝', title:'Se Présenter avec Être & Avoir', sub:'Quem eu sou, de onde sou e quantos anos tenho', aula:'fr_aula_01.html' },
+  { id:214, num:14, block:'b4', emoji:'🔢', title:'Les Chiffres avec Avoir', sub:'Idade, preços, quantidades e "il y a"', aula:'fr_aula_02.html' },
+  { id:215, num:15, block:'b4', emoji:'🎨', title:'Les Couleurs avec Être & Avoir', sub:'Descrever coisas e pessoas: "il est bleu", "elle a les yeux verts"', aula:'fr_aula_03.html' },
+  { id:216, num:16, block:'b4', emoji:'👨‍👩‍👧', title:'La Famille avec Être & Avoir', sub:'Quem são, como são e quantos são na sua família', aula:'fr_aula_04.html' },
+  { id:217, num:17, block:'b4', emoji:'🌡️', title:'Sensations : Avoir faim, Être fatigué', sub:'Fome, sede, frio, medo e como você está', aula:'fr_aula_05.html' },
+  { id:218, num:18, block:'b4', emoji:'🥐', title:'Au Café avec Être & Avoir', sub:'Pedir, recusar e dizer do que você tem vontade', aula:'fr_aula_06.html' },
+  { id:219, num:19, block:'b4', emoji:'📅', title:'L\'Agenda avec Être & Avoir', sub:'Que dia é hoje, compromissos e aniversários', aula:'fr_aula_07.html' },
+  { id:220, num:20, block:'b4', emoji:'⏰', title:'L\'Heure avec Être & Avoir', sub:'Que horas são, estar atrasado e ter tempo', aula:'fr_aula_08.html' },
+  { id:221, num:21, block:'b4', emoji:'🌦️', title:'La Météo : Il fait, Il y a, J\'ai froid', sub:'O tempo lá fora e como você se sente', aula:'fr_aula_09.html' },
+  { id:222, num:22, block:'b4', emoji:'🧭', title:'En Ville avec Être & Avoir', sub:'Onde fica, se tem e quando você está perdido', aula:'fr_aula_10.html' },
+  { id:223, num:23, block:'b4', emoji:'🛍️', title:'Les Achats avec Être & Avoir', sub:'Na loja: tamanho, preço e "vocês têm em azul?"', aula:'fr_aula_11.html' },
+  { id:224, num:24, block:'b4', emoji:'⏪', title:'Hier : J\'ai été, J\'ai eu, Je suis allé', sub:'Contar o que aconteceu com être e avoir no passado', aula:'fr_aula_12.html' },
+  { id:225, num:25, block:'b5', emoji:'1️⃣', title:'Être au Singulier : je suis, tu es, il est', sub:'As três formas de "ser/estar" para uma pessoa', aula:'fr_aula_05.html' },
+  { id:226, num:26, block:'b5', emoji:'👥', title:'Être au Pluriel : nous sommes, vous êtes, ils sont', sub:'Ser e estar para "nós", "vocês" e "eles"', aula:'fr_aula_05.html' },
+  { id:227, num:27, block:'b5', emoji:'🎒', title:'Avoir au Singulier : j\'ai, tu as, il a', sub:'Ter, possuir e ter sensações para uma pessoa', aula:'fr_aula_05.html' },
+  { id:228, num:28, block:'b5', emoji:'🧺', title:'Avoir au Pluriel : nous avons, vous avez, ils ont', sub:'Ter para "nós", "vocês" e "eles" (e o som de ILS ONT)', aula:'fr_aula_05.html' },
+  { id:229, num:29, block:'b5', emoji:'🚫', title:'La Négation : je ne suis pas, je n\'ai pas', sub:'Negar com être e avoir (e o "pas de")', aula:'fr_aula_05.html' },
+  { id:230, num:30, block:'b5', emoji:'❓', title:'Les Questions : Tu es… ? Est-ce que tu as… ?', sub:'Três jeitos de perguntar com être e avoir', aula:'fr_aula_05.html' },
+  { id:231, num:31, block:'b5', emoji:'🧩', title:'Les Expressions avec Avoir', sub:'Precisar, ter vontade, parecer, ter dor e ter pressa', aula:'fr_aula_05.html' },
+  { id:232, num:32, block:'b5', emoji:'🎭', title:'Les Expressions avec Être', sub:'Estar fazendo, estar prestes a, estar de acordo, estar a fim', aula:'fr_aula_05.html' },
+  { id:233, num:33, block:'b6', emoji:'🔍', title:'C\'est, Il est, Il y a', sub:'Três jeitos de dizer "é" e "tem" sem errar', aula:'fr_aula_05.html' },
+  { id:234, num:34, block:'b6', emoji:'📝', title:'Passé Composé avec Avoir : j\'ai parlé', sub:'O passado da maioria dos verbos: AVOIR + particípio', aula:'fr_aula_12.html' },
+  { id:235, num:35, block:'b6', emoji:'🧠', title:'Les Participes Irréguliers : été, eu, fait, pris', sub:'Os particípios que fogem da regra (e são os mais usados)', aula:'fr_aula_12.html' },
+  { id:236, num:36, block:'b6', emoji:'🏠', title:'Passé Composé avec Être : je suis allé(e)', sub:'Os verbos de movimento que usam ÊTRE como ajudante', aula:'fr_aula_12.html' },
+  { id:237, num:37, block:'b6', emoji:'⚖️', title:'Avoir ou Être ? Le Grand Choix', sub:'Qual ajudante usar no passado (e os verbos que usam os dois)', aula:'fr_aula_12.html' },
+  { id:238, num:38, block:'b6', emoji:'🕰️', title:'L\'Imparfait d\'Être : j\'étais, c\'était', sub:'Como as coisas eram: descrições e lembranças', aula:'fr_aula_12.html' },
+  { id:239, num:39, block:'b6', emoji:'🧸', title:'L\'Imparfait d\'Avoir : j\'avais, il y avait', sub:'O que você tinha, a idade que tinha e o que havia', aula:'fr_aula_12.html' },
+  { id:240, num:40, block:'b6', emoji:'🎬', title:'J\'ai eu ou J\'avais ? Passé Composé ou Imparfait', sub:'O cenário (imparfait) e o acontecimento (passé composé)', aula:'fr_aula_12.html' },
+  { id:241, num:41, block:'b6', emoji:'🔮', title:'Le Futur : je serai, j\'aurai', sub:'Planos e promessas com être e avoir no futuro', aula:'fr_aula_12.html' },
+  { id:242, num:42, block:'b6', emoji:'🏆', title:'Grande Révision : Être & Avoir dans Tous les Temps', sub:'Presente, passado e futuro numa só lição', aula:'fr_aula_12.html' },
 ];
 
 const TOTAL_NODES = TRAIL_FR.length * 4;
@@ -216,7 +249,7 @@ function render() {
             </div>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
-            <a href="${l.aula}" class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-full">📖 Aula ${l.num}</a>
+            <a href="${l.aula}" class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-full">📖 Aula ${Number((l.aula.match(/(\d+)/) || [0, l.num])[1])}</a>
             <span class="text-xs font-black px-2.5 py-1 rounded-full ${unitDone === 4 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${unitDone}/4</span>
           </div>
         </div>
