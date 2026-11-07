@@ -1,0 +1,19 @@
+/* Capy no YouTube — o que precisa ficar FORA do shadow DOM.
+   Injetado pelo manifest (não por <style>), então a CSP do YouTube não interfere. */
+
+/* Com a legenda da Capy na tela, a do YouTube some (senão ficam duas). */
+#movie_player.capy-ligado .ytp-caption-window-container { display: none !important; }
+
+#capy-legendas-host {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  z-index: 50;              /* acima do vídeo, abaixo dos menus do player */
+  pointer-events: none;
+  transition: bottom .2s ease;
+}
+/* Controles do player escondidos → a legenda desce. */
+#movie_player.ytp-autohide #capy-legendas-host { bottom: 22px; }
+/* Durante anúncio, nada da Capy. */
+#movie_player.ad-showing #capy-legendas-host { display: none !important; }

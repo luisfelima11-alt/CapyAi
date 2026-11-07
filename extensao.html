@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Capy no YouTube — legenda dupla e tradução por clique | Capy English</title>
+<meta name="description" content="Extensão da Capy para Chrome e Edge: legenda em inglês e português ao mesmo tempo, tradução da palavra clicada, frase a frase e as palavras salvas na sua revisão."/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>tailwind.config={theme:{extend:{colors:{navy:'#001f3f'},fontFamily:{sans:['Plus Jakarta Sans','sans-serif']}}}}</script>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
+<link rel="canonical" href="https://www.capyenglish.com.br/extensao.html"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Capy no YouTube | Capy English"/>
+<meta property="og:description" content="Legenda em inglês e português ao mesmo tempo, tradução da palavra clicada e frase a frase."/>
+<meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<script src="analytics.js?v=ga1" defer></script>
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .botao { border-radius: 9999px; transition: transform .15s ease, box-shadow .15s ease; }
+  .botao:active { transform: scale(.98); }
+  .botao:disabled { opacity: .55; cursor: not-allowed; }
+  kbd { font: inherit; font-weight: 800; background: #fff; color: #001f3f; border-radius: .5rem; padding: .1rem .55rem; box-shadow: 0 2px 0 #cbd5e1; }
+  .palavra-demo { border-radius: .4rem; padding: 0 .1em; }
+  .palavra-demo.ativa { background: #ec4899; }
+  @keyframes subir { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .subir { animation: subir .45s ease both; }
+</style>
+</head>
+<body class="bg-slate-50 text-navy min-h-screen">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-24 pb-32 md:pb-12">
+
+  <!-- ── HERO ───────────────────────────────────────────────────────────── -->
+  <section class="bg-gradient-to-br from-navy via-violet-950 to-pink-700 text-white px-4 pt-24 pb-14 md:pt-28 rounded-b-[3rem]">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+      <div class="subir">
+        <span class="inline-block bg-white/15 text-pink-100 text-xs font-extrabold uppercase tracking-wider px-4 py-1.5 rounded-full mb-4">Novo · Chrome e Edge</span>
+        <h1 class="text-4xl md:text-5xl font-black leading-tight mb-4">Aprenda inglês vendo <span class="text-pink-300">YouTube</span></h1>
+        <p class="text-white/80 text-lg mb-6">A Capy coloca a legenda em <strong>inglês e português ao mesmo tempo</strong>, traduz a palavra que você clicar e guarda tudo na sua revisão.</p>
+        <a href="#comecar" class="botao inline-block bg-pink-500 hover:bg-pink-400 text-white font-extrabold px-7 py-3.5 shadow-lg shadow-pink-500/30">Começar agora ↓</a>
+      </div>
+
+      <!-- Demonstração: um vídeo "de mentira" com a legenda dupla -->
+      <div class="subir" style="animation-delay:.1s" aria-hidden="true">
+        <div class="relative aspect-[4/3] sm:aspect-video rounded-[1.5rem] overflow-hidden bg-gradient-to-br from-slate-800 via-slate-700 to-emerald-900 shadow-2xl">
+          <div class="absolute inset-0 flex items-center justify-center text-7xl opacity-80">🏞️</div>
+          <div class="absolute top-3 left-3 bg-black/40 rounded-full px-3 py-1 text-xs font-bold">▶ 2:14 / 9:30</div>
+          <div class="absolute left-1/2 -translate-x-1/2 bottom-[46%] w-56 bg-white text-navy rounded-2xl p-3 shadow-xl text-left">
+            <div class="flex items-center gap-2"><b class="text-lg font-black flex-1">looking forward</b><span class="bg-slate-100 rounded-full w-7 h-7 flex items-center justify-center text-sm">🔊</span></div>
+            <div class="text-emerald-700 font-extrabold">ansiosa por</div>
+            <div class="hidden sm:block text-slate-500 text-xs">Esperando algo bom com alegria.</div>
+            <div class="mt-2 bg-pink-500 text-white text-xs font-extrabold rounded-full py-1.5 text-center">⭐ Salvar na revisão</div>
+          </div>
+          <div class="absolute left-1/2 -translate-x-1/2 bottom-4 w-[88%] text-center">
+            <div class="inline-flex gap-1 bg-black/60 rounded-full px-2 py-1 text-xs mb-1.5"><span class="font-extrabold text-pink-200 px-1">🦫 Capy</span><span class="px-1">⏮</span><span class="px-1">🔁</span><span class="px-1">⏭</span></div>
+            <div class="bg-black/70 rounded-xl px-3 py-1.5">
+              <div class="font-bold text-sm md:text-base">I've been <span class="palavra-demo ativa">looking forward</span> to this trip</div>
+              <div class="text-emerald-200 text-xs md:text-sm">Eu estava ansiosa por esta viagem</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── O QUE ELA FAZ ──────────────────────────────────────────────────── -->
+  <section class="max-w-5xl mx-auto px-4 -mt-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-[1.5rem] p-5 shadow-sm"><div class="text-3xl mb-2">🇺🇸🇧🇷</div><h3 class="font-black mb-1">Legenda dupla</h3><p class="text-sm text-slate-600">Inglês em cima, português embaixo. Esconda o português quando quiser se desafiar.</p></div>
+      <div class="bg-white rounded-[1.5rem] p-5 shadow-sm"><div class="text-3xl mb-2">👆</div><h3 class="font-black mb-1">Clique na palavra</h3><p class="text-sm text-slate-600">O vídeo pausa e a Capy traduz com o sentido daquela frase, com áudio.</p></div>
+      <div class="bg-white rounded-[1.5rem] p-5 shadow-sm"><div class="text-3xl mb-2">⭐</div><h3 class="font-black mb-1">Salve na revisão</h3><p class="text-sm text-slate-600">A palavra entra na sua “Revisão de palavras” e a Yara treina com você depois.</p></div>
+      <div class="bg-white rounded-[1.5rem] p-5 shadow-sm"><div class="text-3xl mb-2">🔁</div><h3 class="font-black mb-1">Frase a frase</h3><p class="text-sm text-slate-600">Volte, repita ou pule uma frase. Ou deixe o vídeo pausar no fim de cada uma.</p></div>
+    </div>
+  </section>
+
+  <!-- ── COMO COMEÇAR ───────────────────────────────────────────────────── -->
+  <section id="comecar" class="max-w-3xl mx-auto px-4 mt-14 scroll-mt-24">
+    <h2 class="text-3xl font-black mb-2">Como começar</h2>
+    <p class="text-slate-600 mb-6">Leva 1 minuto. Funciona no computador, no Chrome e no Edge.</p>
+
+    <div id="aviso-celular" class="hidden bg-pink-50 text-pink-900 rounded-[1.5rem] p-4 mb-5 font-semibold">📱 Extensões não funcionam no navegador do celular. Abra esta página no computador.</div>
+
+    <ol class="space-y-4">
+      <li class="bg-white rounded-[2rem] p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <span class="shrink-0 w-9 h-9 rounded-full bg-navy text-white font-black flex items-center justify-center">1</span>
+          <div class="flex-1">
+            <h3 class="font-black text-lg">Instale a extensão</h3>
+            <p class="text-sm text-slate-600 mb-3">Um clique na loja do navegador. Depois, volte para esta página.</p>
+            <div id="lojas" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="bg-white rounded-[2rem] p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <span class="shrink-0 w-9 h-9 rounded-full bg-navy text-white font-black flex items-center justify-center">2</span>
+          <div class="flex-1">
+            <h3 class="font-black text-lg">Conecte sua conta Capy</h3>
+            <p class="text-sm text-slate-600 mb-3">Para traduzir por clique e salvar as palavras na <em>sua</em> revisão.</p>
+            <div id="estado" class="rounded-[1.5rem] bg-slate-100 p-4" aria-live="polite">
+              <p class="font-semibold text-slate-500">Verificando…</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li class="bg-white rounded-[2rem] p-6 shadow-sm">
+        <div class="flex items-start gap-4">
+          <span class="shrink-0 w-9 h-9 rounded-full bg-navy text-white font-black flex items-center justify-center">3</span>
+          <div class="flex-1">
+            <h3 class="font-black text-lg">Abra um vídeo em inglês</h3>
+            <p class="text-sm text-slate-600 mb-3">Qualquer vídeo com legenda em inglês (feita por pessoas ou automática). A Capy liga sozinha. Atalhos:</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+              <div class="bg-slate-100 rounded-2xl p-3 text-center"><kbd>A</kbd><div class="mt-1 text-slate-600">frase anterior</div></div>
+              <div class="bg-slate-100 rounded-2xl p-3 text-center"><kbd>S</kbd><div class="mt-1 text-slate-600">repetir</div></div>
+              <div class="bg-slate-100 rounded-2xl p-3 text-center"><kbd>D</kbd><div class="mt-1 text-slate-600">próxima</div></div>
+              <div class="bg-slate-100 rounded-2xl p-3 text-center"><kbd>Q</kbd><div class="mt-1 text-slate-600">pausar no fim</div></div>
+            </div>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener" class="botao inline-block mt-4 bg-navy text-white font-extrabold px-6 py-3">Abrir o YouTube ↗</a>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── PERGUNTAS ──────────────────────────────────────────────────────── -->
+  <section class="max-w-3xl mx-auto px-4 mt-14">
+    <h2 class="text-2xl font-black mb-4">Perguntas frequentes</h2>
+    <div class="space-y-3">
+      <details class="bg-white rounded-[1.5rem] p-5 shadow-sm"><summary class="font-extrabold cursor-pointer">O que a extensão vê?</summary>
+        <p class="text-sm text-slate-600 mt-2">Só a legenda do vídeo do YouTube que está aberto. Para a Capy vão apenas a palavra que você clica (com a frase dela, para traduzir certo) e as palavras que você salva. Ela não lê seu histórico, suas outras abas nem o que você digita. Detalhes na <a class="text-pink-600 font-bold" href="privacidade.html">Política de Privacidade</a>.</p></details>
+      <details class="bg-white rounded-[1.5rem] p-5 shadow-sm"><summary class="font-extrabold cursor-pointer">Preciso pagar?</summary>
+        <p class="text-sm text-slate-600 mt-2">A legenda dupla e o frase a frase são grátis. A tradução por clique usa inteligência artificial: no plano grátis são 30 palavras por dia; no Pro, 300.</p></details>
+      <details class="bg-white rounded-[1.5rem] p-5 shadow-sm"><summary class="font-extrabold cursor-pointer">Funciona no celular?</summary>
+        <p class="text-sm text-slate-600 mt-2">Não. O Chrome e o Edge do celular não aceitam extensões. Use no computador.</p></details>
+      <details class="bg-white rounded-[1.5rem] p-5 shadow-sm"><summary class="font-extrabold cursor-pointer">O vídeo não mostrou a legenda da Capy.</summary>
+        <p class="text-sm text-slate-600 mt-2">O vídeo precisa ter legenda em inglês. Se tiver e mesmo assim não aparecer, ligue o botão <strong>CC</strong> do player e escolha <em>English</em>. A tradução em português é a automática do YouTube.</p></details>
+      <details class="bg-white rounded-[1.5rem] p-5 shadow-sm"><summary class="font-extrabold cursor-pointer">Como desconectar?</summary>
+        <p class="text-sm text-slate-600 mt-2">No passo 2 desta página, toque em “Desconectar”. Isso desliga a extensão em todos os computadores onde você conectou.</p></details>
+    </div>
+  </section>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+<div id="footer-placeholder"></div>
+
+<script src="capy-skins.js?v=skins1"></script>
+<script src="auth-secure.js?v=seg1"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="components.js?v=seg1"></script>
+<script>
+  Components.mount('top-nav-placeholder', Components.renderTopNav('youtube'));
+  Components.mount('side-nav-placeholder', Components.renderSideNav('youtube'));
+  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('youtube'));
+  Components.mount('footer-placeholder', Components.renderFooter());
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// Conectar a extensão "Capy no YouTube" à conta do aluno
+// ══════════════════════════════════════════════════════════════════════════════
+// A página não sabe o id da extensão: fala com o conector.js dela (content
+// script que só roda aqui) por window.postMessage na mesma origem. A chave sai
+// do POST /api/extensao/conectar, vai direto para a extensão e não fica em
+// lugar nenhum da página (nem no DOM, nem no localStorage).
+// ══════════════════════════════════════════════════════════════════════════════
+(function () {
+  'use strict';
+
+  // Preencher quando a extensão for aprovada nas lojas.
+  const LOJAS = [
+    { nome: 'Chrome', url: '' },
+    { nome: 'Edge', url: '' },
+  ];
+
+  const caixa = document.getElementById('estado');
+  const pendentes = new Map();
+  let seq = 0;
+
+  function el(tag, classe, texto) {
+    const e = document.createElement(tag);
+    if (classe) e.className = classe;
+    if (texto != null) e.textContent = texto;
+    return e;
+  }
+
+  function botao(texto, classe, aoClicar) {
+    const b = el('button', 'botao font-extrabold px-6 py-3 ' + classe, texto);
+    b.type = 'button';
+    b.addEventListener('click', aoClicar);
+    return b;
+  }
+
+  function falarComExtensao(tipo, extra, espera) {
+    return new Promise(resolve => {
+      const id = 'p' + (++seq) + '-' + Date.now();
+      const t = setTimeout(() => { pendentes.delete(id); resolve(null); }, espera || 4000);
+      pendentes.set(id, r => { clearTimeout(t); resolve(r); });
+      window.postMessage(Object.assign({ capyExt: 1, id, tipo }, extra || {}), location.origin);
+    });
+  }
+
+  window.addEventListener('message', e => {
+    if (e.source !== window || e.origin !== location.origin) return;
+    const d = e.data;
+    if (!d || d.capyExt !== 1 || !String(d.tipo || '').endsWith(':resposta')) return;
+    const f = pendentes.get(d.id);
+    if (f) { pendentes.delete(d.id); f(d); }
+  });
+
+  function lojas() {
+    const area = document.getElementById('lojas');
+    area.replaceChildren();
+    const prontas = LOJAS.filter(l => l.url);
+    if (!prontas.length) {
+      area.append(el('p', 'text-sm font-bold text-pink-700 bg-pink-50 rounded-full px-4 py-2', '🚀 Chegando às lojas do Chrome e do Edge. Avisamos você quando estiver lá!'));
+      return;
+    }
+    for (const l of prontas) {
+      const a = el('a', 'botao inline-block bg-pink-500 hover:bg-pink-400 text-white font-extrabold px-6 py-3', 'Adicionar ao ' + l.nome);
+      a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+      area.append(a);
+    }
+  }
+
+  function mostrar(estado, dados) {
+    caixa.replaceChildren();
+    caixa.dataset.estado = estado;
+    dados = dados || {};
+    if (estado === 'entrar') {
+      caixa.append(el('p', 'font-semibold mb-3', 'Entre na sua conta Capy para conectar a extensão.'));
+      const a = el('a', 'botao inline-block bg-pink-500 text-white font-extrabold px-6 py-3', 'Entrar na minha conta');
+      a.href = '4_Login_Capy_Yara_Welcomes_You.html?next=extensao.html';
+      caixa.append(a);
+    } else if (estado === 'instalar') {
+      caixa.append(el('p', 'font-semibold mb-3', 'Ainda não encontramos a extensão neste navegador. Instale (passo 1) e recarregue esta página.'));
+      caixa.append(botao('Já instalei, recarregar', 'bg-navy text-white', () => location.reload()));
+    } else if (estado === 'conectar') {
+      caixa.append(el('p', 'font-semibold mb-3', '✅ Extensão encontrada. Falta conectar à sua conta.'));
+      caixa.append(botao('Conectar extensão', 'bg-pink-500 hover:bg-pink-400 text-white', conectar));
+    } else if (estado === 'conectado') {
+      const p = el('p', 'font-extrabold text-emerald-700 mb-1', '✓ Conectada' + (dados.nome ? ' como ' + dados.nome : ''));
+      caixa.append(p, el('p', 'text-sm text-slate-600 mb-3', 'Pronto! Abra um vídeo em inglês no YouTube.'));
+      caixa.append(botao('Desconectar', 'bg-white text-navy', desconectar));
+    } else if (estado === 'trabalhando') {
+      caixa.append(el('p', 'font-semibold text-slate-500', dados.texto || 'Um instante…'));
+    }
+    if (dados.erro) caixa.append(el('p', 'text-sm font-bold text-red-700 mt-3', dados.erro));
+  }
+
+  const ERROS = {
+    rede: 'A extensão não conseguiu falar com a Capy. Confira a internet e tente de novo.',
+    recarregar: 'A extensão foi atualizada. Recarregue esta página e tente de novo.',
+    'sem-conta': 'A Capy recusou a conexão. Tente de novo.',
+    servidor: 'A Capy está instável agora. Tente de novo em instantes.',
+  };
+
+  async function conectar() {
+    mostrar('trabalhando', { texto: 'Conectando…' });
+    let token = null;
+    try {
+      const r = await fetch('/api/extensao/conectar', { method: 'POST' });
+      if (r.status === 401) { mostrar('entrar'); return; }
+      if (!r.ok) throw new Error('http ' + r.status);
+      token = (await r.json()).token;
+    } catch (_) {
+      mostrar('conectar', { erro: 'Não deu para gerar a conexão agora. Tente de novo.' });
+      return;
+    }
+    const resp = await falarComExtensao('conectar', { token }, 10000);
+    token = null;
+    if (resp && resp.ok) { mostrar('conectado', { nome: resp.nome }); return; }
+    if (!resp) { mostrar('instalar'); return; }
+    mostrar('conectar', { erro: ERROS[resp.erro] || 'Não deu certo. Tente de novo.' });
+  }
+
+  async function desconectar() {
+    mostrar('trabalhando', { texto: 'Desconectando…' });
+    try {
+      const r = await fetch('/api/extensao/desconectar', { method: 'POST' });
+      if (!r.ok && r.status !== 401) throw new Error('http ' + r.status);
+    } catch (_) {
+      mostrar('conectado', { erro: 'Não deu para desconectar agora. Tente de novo.' });
+      return;
+    }
+    await falarComExtensao('desconectar', {}, 3000);
+    mostrar('conectar');
+  }
+
+  async function iniciar() {
+    lojas();
+    if (matchMedia('(pointer: coarse)').matches && innerWidth < 900) document.getElementById('aviso-celular').classList.remove('hidden');
+    const user = window.Auth ? await Auth.ready() : null;
+    if (!user || user.role === 'guest') { mostrar('entrar'); return; }
+    const r = await falarComExtensao('ping', {}, 1500);
+    if (!r) { mostrar('instalar'); return; }
+    mostrar(r.conectado ? 'conectado' : 'conectar', { nome: r.nome });
+  }
+
+  iniciar();
+})();
+</script>
+</body>
+</html>

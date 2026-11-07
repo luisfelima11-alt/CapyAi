@@ -33,11 +33,13 @@ const {
     requireRole,
     safeEqual,
     setSessionCookies,
+    signExtensao,
     signInWithPassword,
     signOut,
     signUpWithPassword,
     updatePassword,
     verifyEmailToken,
+    verifyExtensao,
 } = Security;
 
 const MAX_JSON_BODY = 256 * 1024;
@@ -220,6 +222,10 @@ const RATE_LIMITS = {
     // Memoria da Yara: uma extracao curta por conversa livre. Balde proprio para
     // nao gastar a cota de chat do aluno com uma coisa que ele nem ve acontecer.
     memoria:      { free:  10, pro:  30, super:  30 },
+    // Extensão do navegador (YouTube): traduzir a palavra clicada (IA, curta)
+    // e salvar na revisão (sem IA, só um teto contra abuso).
+    'extensao-traduzir': { free: 30, pro: 300, super: 600 },
+    'extensao-salvar':   { free: 100, pro: 300, super: 300 },
 };
 
 // Whitelist of funnel-analytics events accepted by POST /api/track.
@@ -2441,6 +2447,200 @@ function limparCorpoIa(body, res) {
     } catch (_) { return body; }
 }
 
+// ── Memória: palavras que o aluno erra (mem_<appUserId>) ──────────────────────
+// Usada pelo /api/memory (aulas) e pelo /api/extensao/salvar (YouTube). Quem
+// chama já resolveu o appUserId pela sessão ou pela chave da extensão: o id
+// nunca vem do corpo do pedido.
+//
+// `sb()` (chave de serviço), não `sbUser()`. A RLS do user_state exige
+// `user_id::text = current_account_id()` — uma linha sintética `mem_<id>`
+// seria rejeitada pela política. É a mesma razão pela qual as linhas
+// `__analytics_*` e `__admin_goals` já usam sb(). Quem garante o isolamento é
+// quem resolveu o appUserId, não a RLS.
+async function lerMemoria(appUserId) {
+    const rows = await sb(`/user_state?user_id=eq.${encodeURIComponent('mem_' + appUserId)}&select=data,updated_at`);
+    const d = rows?.[0];
+    return { words: Array.isArray(d?.data?.words) ? d.data.words : [], updatedAt: d?.updated_at || null };
+}
+
+async function mesclarMemoria(appUserId, entrando) {
+    const chave = w => String(w?.en || '').trim().toLowerCase();
+    const limpar = w => ({
+        en:       String(w.en || '').slice(0, 60),
+        pt:       w.pt == null ? null : String(w.pt).slice(0, 80),
+        source:   String(w.source || '').slice(0, 40),
+        lessonId: Number(w.lessonId) || 0,
+        mastered: Boolean(w.mastered),
+        srs: {
+            streak:  Math.max(0, Math.min(99, Number(w?.srs?.streak) || 0)),
+            nextDue: Math.max(0, Number(w?.srs?.nextDue) || 0),
+        },
+    });
+
+    const atual = await lerMemoria(appUserId);
+    const mapa = new Map();
+    for (const w of atual.words) { const k = chave(w); if (k) mapa.set(k, limpar(w)); }
+
+    // União comutativa: em conflito vence o MAIOR srs.streak. Assim a ordem
+    // em que os aparelhos sincronizam deixa de importar — sincronizar A
+    // depois de B dá o mesmo resultado que B depois de A.
+    for (const bruto of entrando.slice(0, 400)) {
+        const k = chave(bruto);
+        if (!k) continue;
+        const novo = limpar(bruto);
+        const velho = mapa.get(k);
+        if (!velho) { mapa.set(k, novo); continue; }
+        const vence = novo.srs.streak > velho.srs.streak ? novo : velho;
+        mapa.set(k, {
+            ...vence,
+            // Domínio é fato positivo: uma vez dominada, fica dominada. Numa
+            // união, ausência seria ambígua ("dominei" e "nunca vi neste
+            // aparelho" ficariam idênticos) — por isso a flag, não a remoção.
+            mastered: velho.mastered || novo.mastered,
+            pt:       velho.pt || novo.pt,
+        });
+    }
+
+    // Teto explícito, ANTES do sanitizeStoredJson, que corta arrays em 100
+    // em silêncio. Quem decide o corte é esta regra, com ordem que faz
+    // sentido (o que vence mais cedo fica), não o truncamento cego.
+    const words = [...mapa.values()]
+        .sort((a, b) => (a.mastered - b.mastered) || (a.srs.nextDue - b.srs.nextDue))
+        .slice(0, 80);
+
+    await sb('/user_state', {
+        method: 'POST',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({
+            user_id:    'mem_' + appUserId,
+            data:       { words },
+            updated_at: new Date().toISOString(),
+        }),
+    });
+    return { words, updatedAt: new Date().toISOString() };
+}
+
+// ── Extensão do navegador (YouTube), 07/nov/2026 ─────────────────────────────
+// A extensão chama de chrome-extension://<id>, sem cookie: as rotas abaixo se
+// autenticam só pela chave (Authorization: Bearer cx1…) que o aluno gera em
+// /extensao.html (POST /api/extensao/conectar, com sessão e CSRF). A chave
+// tem revisão: POST /api/extensao/desconectar sobe a revisão e todas as chaves
+// antigas param de valer. A revisão vive numa linha sintética `__ext_<id>`.
+//
+// Nunca respondem com Access-Control-Allow-Origin: a extensão tem permissão de
+// host e não precisa de CORS, e nenhuma página da web pode ler a resposta.
+const ORIGEM_DE_EXTENSAO = /^(chrome-extension|moz-extension):\/\/[a-z0-9-]{1,64}$/i;
+
+function origemDaExtensaoOk(origin) {
+    if (!origin) return true;   // o service worker da extensão e as ferramentas podem não mandar Origin
+    if (!ORIGEM_DE_EXTENSAO.test(origin)) return false;
+    // Depois de publicada na Chrome Web Store, EXTENSION_IDS fixa os ids aceitos.
+    const ids = String(process.env.EXTENSION_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
+    return !ids.length || ids.includes(origin.split('://')[1]);
+}
+
+async function revisaoDaExtensao(appUserId) {
+    const rows = await sb(`/user_state?user_id=eq.${encodeURIComponent('__ext_' + appUserId)}&select=data`);
+    return Math.max(0, Number(rows?.[0]?.data?.rev) || 0);
+}
+
+async function usuarioDaExtensao(req) {
+    const m = String(req.headers.authorization || '').match(/^Bearer\s+(cx1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/);
+    const p = m ? verifyExtensao(m[1]) : null;
+    const desconectada = () => new HttpError(401, 'extensao_desconectada', 'Conecte a extensão de novo em capyenglish.com.br/extensao.html.');
+    if (!p) throw desconectada();
+    const [contas, rev] = await Promise.all([
+        sb(`/accounts?id=eq.${encodeURIComponent(p.u)}&select=id,name,auth_user_id&limit=1`),
+        revisaoDaExtensao(p.u),
+    ]);
+    const conta = Array.isArray(contas) ? contas[0] : null;
+    if (!conta || String(conta.auth_user_id) !== p.a || rev !== p.r) throw desconectada();
+    const identity = { kind: 'user', authUserId: p.a, appUserId: conta.id, appAccount: conta, via: 'extensao' };
+    req._securityIdentity = identity;
+    return identity;
+}
+
+// O que a extensão salva vai para a revisão (lessons.html?review=1), que monta
+// os botões com innerHTML e onclick="…'palavra'…". O texto nasce na legenda
+// de um vídeo de terceiros e passa pela IA: uma aspa dupla ali vira atributo
+// novo no botão (XSS sem precisar de < >). Por isso só passa o que uma palavra
+// e uma tradução precisam ter — nada de aspas duplas, crases, & ou barras.
+function palavraDaExtensao(v) {
+    return String(v || '').normalize('NFC').replace(/[’`´]/g, "'")
+        .replace(/[^\p{L}\p{M}\p{N}' -]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+}
+function traducaoDaExtensao(v, max = 80) {
+    return String(v || '').normalize('NFC').replace(/['`´]/g, '’')
+        .replace(/[^\p{L}\p{M}\p{N} ,.;:!?()’-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
+async function rotaDaExtensao(req, res, url) {
+    if (!origemDaExtensaoOk(req.headers.origin || '')) throw new HttpError(403, 'invalid_origin', 'Request origin is not allowed.');
+    if (req.method === 'OPTIONS') { res.status(204).end(); return; }
+    const identity = await usuarioDaExtensao(req);
+
+    // GET /api/extensao/eu → { nome, plano }: o popup mostra "Conectado como …".
+    if (req.method === 'GET' && url === '/api/extensao/eu') {
+        const nome = String(identity.appAccount.name || '').replace(/[<>&"']/g, '').trim().split(/\s+/)[0].slice(0, 40);
+        res.status(200).json({ nome, plano: await getUserPlan(identity.appUserId) });
+        return;
+    }
+
+    // POST /api/extensao/traduzir { palavra, frase } → { traducao, explicacao }
+    // A palavra clicada na legenda, traduzida no sentido daquela frase.
+    if (req.method === 'POST' && url === '/api/extensao/traduzir') {
+        const body = await readBody(req, 4096);
+        const palavra = textoLivreParaPrompt(body.palavra, 40);
+        const frase = textoLivreParaPrompt(body.frase, 300);
+        if (!palavra) throw new HttpError(400, 'palavra_obrigatoria', 'Envie a palavra.');
+        const limite = await checkRateLimit(req, 'extensao-traduzir', null);
+        if (!limite.ok) { rateLimitedResponse(res, limite); return; }
+        if (!CHAT_KEY) throw new HttpError(503, 'ia_indisponivel', 'A tradução está indisponível agora.');
+        const pedido = `Translate the English word or expression "${palavra}" into Brazilian Portuguese, with the meaning it has in this sentence: "${frase || palavra}".\n`
+            + 'Respond ONLY with valid JSON: {"traducao": "the Portuguese translation (1 to 4 words)", "explicacao": "one short sentence in Portuguese explaining the meaning here"}';
+        let saida = {};
+        try {
+            const r = await chatComplete([{ role: 'user', content: pedido }], { maxTokens: 120, temperature: 0.2, json: true, rota: '/api/extensao/traduzir', timeout: 20000 });
+            saida = JSON.parse(r.text || '{}');
+        } catch (e) {
+            console.error('[extensao] traduzir', e.message);
+            throw new HttpError(502, 'ia_falhou', 'A IA não respondeu agora. Tente de novo.');
+        }
+        res.status(200).json({
+            traducao: traducaoDaExtensao(saida.traducao),
+            explicacao: traducaoDaExtensao(saida.explicacao, 200),
+        });
+        return;
+    }
+
+    // POST /api/extensao/salvar { palavra, traducao } → entra na revisão
+    // ("Revisão das minhas palavras") pela mesma mescla do /api/memory.
+    if (req.method === 'POST' && url === '/api/extensao/salvar') {
+        const body = await readBody(req, 4096);
+        const en = palavraDaExtensao(body.palavra);
+        if (!en) throw new HttpError(400, 'palavra_obrigatoria', 'Envie a palavra.');
+        const pt = traducaoDaExtensao(body.traducao) || null;
+        const limite = await checkRateLimit(req, 'extensao-salvar', null);
+        if (!limite.ok) { rateLimitedResponse(res, limite); return; }
+        const mem = await mesclarMemoria(identity.appUserId, [
+            { en, pt, source: 'youtube', lessonId: 0, mastered: false, srs: { streak: 0, nextDue: 0 } },
+        ]);
+        res.status(200).json({ ok: true, salvas: mem.words.filter(w => w.source === 'youtube').length });
+        return;
+    }
+
+    // GET /api/extensao/palavras → as palavras salvas do YouTube (popup).
+    if (req.method === 'GET' && url === '/api/extensao/palavras') {
+        const mem = await lerMemoria(identity.appUserId);
+        res.status(200).json({
+            palavras: mem.words.filter(w => w && w.source === 'youtube').slice(0, 40).map(w => ({ en: w.en, pt: w.pt || null })),
+        });
+        return;
+    }
+
+    res.status(404).json({ error: 'not_found' });
+}
+
 module.exports = async (req, res) => {
   try {
     applyApiHeaders(res);
@@ -2650,6 +2850,15 @@ module.exports = async (req, res) => {
             res.status(e.status || 500).end(e.status === 413 ? 'payload too large' : 'internal error');
             return;
         }
+    }
+
+    // ── Extensão do navegador: antes da trava de origem do site ──────────────
+    // Vêm de chrome-extension://…, sem cookie, com a chave no Authorization.
+    // Conectar e desconectar são chamadas do NOSSO site (sessão + CSRF) e
+    // seguem o caminho normal, lá embaixo, junto do /api/memory.
+    if (url.startsWith('/api/extensao/') && url !== '/api/extensao/conectar' && url !== '/api/extensao/desconectar') {
+        await rotaDaExtensao(req, res, url);
+        return;
     }
 
     // Writes must come from our own pages. Browsers always send Origin on
@@ -4191,83 +4400,39 @@ Respond ONLY with valid JSON, no markdown:
     // GET  /api/memory → { words: [...], updatedAt }
     // POST /api/memory { words: [...] } → mescla por UNIÃO e devolve o resultado
     if ((req.method === 'GET' || req.method === 'POST') && url === '/api/memory') {
-        const identity = await requireAppUser(req, res);
         // O id é DERIVADO da sessão, nunca do corpo do pedido: um aluno não tem
         // como pedir a memória de outro.
-        const memId = 'mem_' + identity.appUserId;
-
-        // `sb()` (chave de serviço), não `sbUser()`. A RLS do user_state exige
-        // `user_id::text = current_account_id()` — uma linha sintética `mem_<id>`
-        // seria rejeitada pela política. É a mesma razão pela qual as linhas
-        // `__analytics_*` e `__admin_goals` já usam sb(). Quem garante o
-        // isolamento aqui é o requireAppUser acima, não a RLS.
-        const lerMem = async () => {
-            const rows = await sb(`/user_state?user_id=eq.${encodeURIComponent(memId)}&select=data,updated_at`);
-            const d = rows?.[0];
-            return { words: Array.isArray(d?.data?.words) ? d.data.words : [], updatedAt: d?.updated_at || null };
-        };
-
-        if (req.method === 'GET') { res.status(200).json(await lerMem()); return; }
+        const identity = await requireAppUser(req, res);
+        if (req.method === 'GET') { res.status(200).json(await lerMemoria(identity.appUserId)); return; }
 
         assertCsrf(req);
         const body = await readBody(req);
         const entrando = Array.isArray(body.words) ? body.words : [];
-        if (!entrando.length) { res.status(200).json(await lerMem()); return; }
+        if (!entrando.length) { res.status(200).json(await lerMemoria(identity.appUserId)); return; }
+        res.status(200).json(await mesclarMemoria(identity.appUserId, entrando));
+        return;
+    }
 
-        const chave = w => String(w?.en || '').trim().toLowerCase();
-        const limpar = w => ({
-            en:       String(w.en || '').slice(0, 60),
-            pt:       w.pt == null ? null : String(w.pt).slice(0, 80),
-            source:   String(w.source || '').slice(0, 40),
-            lessonId: Number(w.lessonId) || 0,
-            mastered: Boolean(w.mastered),
-            srs: {
-                streak:  Math.max(0, Math.min(99, Number(w?.srs?.streak) || 0)),
-                nextDue: Math.max(0, Number(w?.srs?.nextDue) || 0),
-            },
-        });
-
-        const atual = await lerMem();
-        const mapa = new Map();
-        for (const w of atual.words) { const k = chave(w); if (k) mapa.set(k, limpar(w)); }
-
-        // União comutativa: em conflito vence o MAIOR srs.streak. Assim a ordem
-        // em que os aparelhos sincronizam deixa de importar — sincronizar A
-        // depois de B dá o mesmo resultado que B depois de A.
-        for (const bruto of entrando.slice(0, 400)) {
-            const k = chave(bruto);
-            if (!k) continue;
-            const novo = limpar(bruto);
-            const velho = mapa.get(k);
-            if (!velho) { mapa.set(k, novo); continue; }
-            const vence = novo.srs.streak > velho.srs.streak ? novo : velho;
-            mapa.set(k, {
-                ...vence,
-                // Domínio é fato positivo: uma vez dominada, fica dominada. Numa
-                // união, ausência seria ambígua ("dominei" e "nunca vi neste
-                // aparelho" ficariam idênticos) — por isso a flag, não a remoção.
-                mastered: velho.mastered || novo.mastered,
-                pt:       velho.pt || novo.pt,
+    // ── Extensão: gerar e cancelar a chave (do nosso site, com sessão) ────────
+    // POST /api/extensao/conectar → { token, exp, nome }. A página /extensao.html
+    // entrega a chave à extensão (o content script da extensão lê da página).
+    // POST /api/extensao/desconectar → sobe a revisão: toda chave antiga para.
+    if (req.method === 'POST' && (url === '/api/extensao/conectar' || url === '/api/extensao/desconectar')) {
+        assertCsrf(req);
+        const identity = await requireAppUser(req, res);
+        const rev = await revisaoDaExtensao(identity.appUserId);
+        if (url === '/api/extensao/desconectar') {
+            await sb('/user_state', {
+                method: 'POST',
+                headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+                body: JSON.stringify({ user_id: '__ext_' + identity.appUserId, data: { rev: rev + 1 }, updated_at: new Date().toISOString() }),
             });
+            res.status(200).json({ ok: true });
+            return;
         }
-
-        // Teto explícito, ANTES do sanitizeStoredJson, que corta arrays em 100
-        // em silêncio. Quem decide o corte é esta regra, com ordem que faz
-        // sentido (o que vence mais cedo fica), não o truncamento cego.
-        const words = [...mapa.values()]
-            .sort((a, b) => (a.mastered - b.mastered) || (a.srs.nextDue - b.srs.nextDue))
-            .slice(0, 80);
-
-        await sb('/user_state', {
-            method: 'POST',
-            headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({
-                user_id:    memId,
-                data:       { words },
-                updated_at: new Date().toISOString(),
-            }),
-        });
-        res.status(200).json({ words, updatedAt: new Date().toISOString() });
+        const { token, exp } = signExtensao({ appUserId: identity.appUserId, authUserId: identity.authUserId, rev });
+        const nome = String(identity.appAccount?.name || '').replace(/[<>&"']/g, '').trim().split(/\s+/)[0].slice(0, 40);
+        res.status(200).json({ token, exp, nome });
         return;
     }
 

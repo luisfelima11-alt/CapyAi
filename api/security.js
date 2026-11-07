@@ -350,6 +350,44 @@ function verifyGuest(token) {
   } catch { return null; }
 }
 
+// ── Chave da extensão do navegador (07/nov/2026) ─────────────────────────────
+// A extensão (YouTube) fala com a API de outra origem (chrome-extension://…),
+// onde os cookies da sessão não valem. O aluno logado gera esta chave em
+// /extensao.html; ela vai no cabeçalho Authorization: Bearer e só abre as rotas
+// /api/extensao/*. Como não é credencial ambiente (cookie), não há CSRF.
+// - assinada com uma chave DERIVADA (domínio separado): uma assinatura de
+//   visitante nunca vale como chave de extensão, e vice-versa;
+// - `r` é a revisão: "Desconectar" sobe a revisão no servidor e mata todas as
+//   chaves antigas; `exp` limita a 90 dias.
+function extensaoSecret() {
+  const base = guestSecret();
+  return base ? crypto.createHmac('sha256', base).update('capy-extensao-v1').digest() : null;
+}
+
+function signExtensao({ appUserId, authUserId, rev = 0, dias = 90 }) {
+  const secret = extensaoSecret();
+  if (!secret) throw new HttpError(503, 'extensao_not_configured', 'Extension tokens are not configured.');
+  const agora = Math.floor(Date.now() / 1000);
+  const payload = { t: 'ext', u: String(appUserId), a: String(authUserId), r: Number(rev) || 0, iat: agora, exp: agora + dias * 86400 };
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', secret).update(encoded).digest('base64url');
+  return { token: `cx1.${encoded}.${signature}`, exp: payload.exp };
+}
+
+function verifyExtensao(token) {
+  const secret = extensaoSecret();
+  const partes = String(token || '').split('.');
+  if (!secret || partes.length !== 3 || partes[0] !== 'cx1') return null;
+  const [, encoded, signature] = partes;
+  const expected = crypto.createHmac('sha256', secret).update(encoded).digest('base64url');
+  if (!safeEqual(signature, expected)) return null;
+  try {
+    const p = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
+    if (p.t !== 'ext' || !p.u || !p.a || !p.exp || p.exp < Math.floor(Date.now() / 1000)) return null;
+    return p;
+  } catch { return null; }
+}
+
 function createGuestSession(res) {
   const payload = {
     id: `guest_${crypto.randomBytes(16).toString('hex')}`,
@@ -448,9 +486,11 @@ module.exports = {
   requireRole,
   safeEqual,
   setSessionCookies,
+  signExtensao,
   signInWithPassword,
   signOut,
   signUpWithPassword,
   updatePassword,
   verifyEmailToken,
+  verifyExtensao,
 };

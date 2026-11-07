@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "Capy English — legendas no YouTube",
+  "short_name": "Capy no YouTube",
+  "version": "0.1.0",
+  "description": "Legenda em inglês e português ao mesmo tempo, tradução da palavra clicada e frase a frase. Salva as palavras na sua revisão da Capy.",
+  "icons": {
+    "16": "icones/capy-16.png",
+    "32": "icones/capy-32.png",
+    "48": "icones/capy-48.png",
+    "128": "icones/capy-128.png"
+  },
+  "action": {
+    "default_title": "Capy no YouTube",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icones/capy-16.png",
+      "32": "icones/capy-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.capyenglish.com.br/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "yt-captura.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "legendas.js",
+        "yt-overlay.js"
+      ],
+      "css": [
+        "yt-overlay.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.capyenglish.com.br/extensao.html*",
+        "https://capyenglish.com.br/extensao.html*"
+      ],
+      "js": [
+        "conector.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "minimum_chrome_version": "111"
+}

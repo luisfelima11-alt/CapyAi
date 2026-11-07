@@ -167,6 +167,47 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
   - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
 - **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
 
+## Extensão "Capy no YouTube" (Fase 1, 07/nov/2026)
+
+Pasta `extensao/` (Manifest V3, Chrome e Edge). Ela não vai para o site: está no `.vercelignore`.
+O pacote da loja sai com `npm run extensao:zip` → `dist/capy-no-youtube-<versão>.zip`. Suba
+`version` no `extensao/manifest.json` a cada envio à loja.
+
+- **Captura da legenda** (`yt-captura.js`, mundo MAIN):
+  - o `/api/timedtext` do YouTube só responde com o token `pot` que o próprio player gera;
+  - por isso a extensão observa o pedido do player (XHR e fetch), reaproveita a URL e pede a
+    mesma faixa em `json3`, em inglês e com `tlang=pt`;
+  - se o vídeo não pediu legenda, ela chama `movie_player.setOption('captions','track',{languageCode:'en'})`;
+  - este arquivo não usa `chrome.*` e não fala com a Capy.
+- **Tela** (`yt-overlay.js` + `legendas.js`, mundo isolado):
+  - um shadow DOM dentro do `#movie_player` com a linha EN (palavras clicáveis), a linha PT, a
+    barra ⏮ 🔁 ⏭ e a bolha de tradução;
+  - atalhos: A anterior, S repetir, D próxima, Q pausar no fim de cada frase;
+  - **sem `innerHTML`**: o YouTube exige Trusted Types, e o teste falha se aparecer;
+  - toda a lógica pura fica em `legendas.js` (testada no Node).
+- **Conta** (`background.js` + `conector.js`):
+  - o aluno logado abre `extensao.html` e toca em "Conectar";
+  - o site chama `POST /api/extensao/conectar` (sessão + CSRF), que devolve a chave `cx1.…` (HMAC, 90 dias);
+  - a chave vai por `postMessage` ao `conector.js` e dele ao service worker. Ela nunca fica na
+    página nem no content script do YouTube;
+  - "Desconectar" (`POST /api/extensao/desconectar`) sobe a revisão em `user_state.__ext_<id>`,
+    e todas as chaves antigas param de valer.
+- **API da extensão** (`rotaDaExtensao`, antes da trava de origem do site):
+  - autenticação só pelo `Authorization: Bearer cx1…`, sem cookie e sem CORS;
+  - origem aceita: ausente ou `chrome-extension://`. Com a extensão publicada, preencha
+    `EXTENSION_IDS` (ids separados por vírgula) na Vercel;
+  - `GET /api/extensao/eu`;
+  - `POST /api/extensao/traduzir` (IA, balde `extensao-traduzir`);
+  - `POST /api/extensao/salvar` (entra em `mem_<id>` com `source:'youtube'` e aparece na
+    "Revisão de palavras");
+  - `GET /api/extensao/palavras`.
+- **Lojas:** quando aprovada, coloque os links em `LOJAS` no `extensao.html`. Antes disso, a página
+  mostra "Chegando às lojas".
+- **Testes:**
+  - `npm run test:extensao` (API, service worker, legendas);
+  - `tests/extensao.spec.js`: a extensão de verdade num Chromium com uma página falsa do
+    YouTube. Nenhum pedido sai para a internet.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
@@ -883,6 +924,8 @@ Source of truth: the `if (req.method === … && url === …)` blocks in `api/ind
   `/api/word-of-day`, `/api/daily-challenge`, `/api/newsline`, `/api/historyline`,
   `/api/youtube`, `/api/personalize`, `/api/correct-writing`, `/api/study-plan`, `/api/music`,
   `/api/lyrics-search`, `/api/lyrics`, `/api/transcribe`, `GET /api/tts`.
+- **Browser extension (`Authorization: Bearer cx1…`, no cookie):** `GET /api/extensao/eu | palavras`,
+  `POST /api/extensao/traduzir | salvar`. From the site (session + CSRF): `POST /api/extensao/conectar | desconectar`.
 - **Voice:** `POST /api/realtime-token`, `/api/conversa-uso`, `/api/conversa-feedback`, `GET /api/personas`.
 - **Admin (admin session, aal2 with `ADMIN_REQUIRE_MFA=true`):** `/api/admin/*` — overview, students,
   courtesies, grant-plan, revoke-plan, login-link, set-password, broadcast, campaign, funnel, voz,

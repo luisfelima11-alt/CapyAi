@@ -534,11 +534,21 @@ function initReviewMode() {
     if (main) main.appendChild(container);
   }
 
-  reviewWords = gatherWeakWords().slice(0, 10);
-  reviewIdx = 0; reviewScore = 0; reviewXP = 0; reviewDominated = 0; reviewScheduled = 0;
-  // Analytics: review session started (cross-lesson, no single lessonId)
-  if (window.capyTrack) capyTrack('review_start');
-  renderReviewStep();
+  // Palavras salvas fora deste navegador (outro aparelho, extensão do YouTube)
+  // só chegam pela sincronização do CapyMemory, que o memory.js faz 1,5 s depois
+  // de abrir. Quem chega aqui direto (botão "Revisar minhas palavras" da
+  // extensão) veria a fila sem elas: espera a sincronização, até 2,5 s.
+  container.innerHTML = '<p class="text-center text-white/60 font-bold py-10">Carregando suas palavras…</p>';
+  const sincronizada = window.CapyMemory
+    ? Promise.race([Promise.resolve(CapyMemory.sync({ forcar: true })).catch(() => null), new Promise(r => setTimeout(r, 2500))])
+    : Promise.resolve();
+  sincronizada.then(() => {
+    reviewWords = gatherWeakWords().slice(0, 10);
+    reviewIdx = 0; reviewScore = 0; reviewXP = 0; reviewDominated = 0; reviewScheduled = 0;
+    // Analytics: review session started (cross-lesson, no single lessonId)
+    if (window.capyTrack) capyTrack('review_start');
+    renderReviewStep();
+  });
 }
 
 function renderReviewStep() {
