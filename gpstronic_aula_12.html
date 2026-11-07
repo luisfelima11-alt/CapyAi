@@ -529,8 +529,8 @@
   <div id="practice-area"></div>
 
   <div class="mt-8 bg-white border-2 border-emerald-200 rounded-2xl p-6">
-    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a instrução</h3>
-    <p class="text-slate-500 text-xs mb-4">Escreva o verbo na forma certa do imperativo.</p>
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
     <div class="space-y-4" id="verbs-quiz"></div>
     <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
       Check Answers
@@ -568,7 +568,7 @@
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 12 — It's Ready!</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas interativas abaixo.</p>
+    <p class="text-white/70 text-sm">Complete as 4 tarefas abaixo.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -603,12 +603,14 @@
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 5 passos para o cliente reiniciar o monitor.</p><p class="text-slate-500 text-xs">Use o imperativo e os sequenciadores: First, Then, After that, Finally. E um "Don't…".</p></div>
+      <div><p class="font-black text-navy text-sm">Escreva 4 frases sobre o seu dia a dia usando o que você aprendeu nesta aula.</p><p class="text-slate-500 text-xs">Use os padrões da aula: We've replaced · Yara has cleaned · We've cleaned · We've found · We've done · We installed it yesterday · We did it on Monday.</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="First, turn off the monitor.&#10;Then wait ten seconds.&#10;After that, turn it on again.&#10;Don't pull the cable hard.&#10;Finally, try the autosteer again."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Good news: your display is ready.&#10;We've replaced the cable.&#10;We've tightened the connection."></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps12()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
 </div>
 
@@ -1033,7 +1035,7 @@ mpGps12Render();
 function checkErrorGps12(){const inp=document.getElementById('err-gps12'),fb=document.getElementById('err-gps12-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["we installed the update yesterday","we installed it yesterday","we installed the firmware update yesterday"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent="❌ Quase. Quando você diz QUANDO (yesterday), o inglês usa o past simple — não o We've.";fb.className='text-xs font-black text-red-500 mt-1';}}
 
 let hwEntregue=false;
-function submitHomeworkGps12(){if(hwEntregue)return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps12()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
+function submitHomeworkGps12(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps12()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
 
 // Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
 (function retomar(){

@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
+import { aplicarHomework, checarHomework } from './lib/homework-plus.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -206,6 +207,10 @@ function construir(n) {
     t = entre(t, 'function checkErrorGps9(){', '\n\nlet hwEntregue=false;',
         `function checkErrorGps9(){const inp=document.getElementById('err-gps9'),fb=document.getElementById('err-gps9-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(${j(aceitas)}.includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent=${j('❌ Quase. ' + c.homework.erro.dica)};fb.className='text-xs font-black text-red-500 mt-1';}}`);
 
+    // 6b. Homework: escrita desta aula (não a da aula 09) e, nas aulas com o homework
+    //     novo, as 8 tarefas e o card para o teacher (scripts/lib/homework-plus.mjs).
+    t = aplicarHomework(t, { c, d, n, pagina: `agro_aula_${nn}`, raiz: RAIZ, curso: 'Agro English', cor: '#15803d' });
+
     // 7. Curso Agro: hub, chave de conclusão e rótulo próprios.
     //    Sem isso a aula do Luan marcaria progresso na trilha do GPS Tronic.
     t = t.split('classes_gpstronic.html').join('classes_agro.html');
@@ -289,6 +294,7 @@ function validar({ t, d, c, n, nn }) {
 
     // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
     checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `agro${nn}`, raiz: RAIZ });
+    checarHomework(c, t, ok);
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
