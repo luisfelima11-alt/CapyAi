@@ -529,8 +529,8 @@
   <div id="practice-area"></div>
 
   <div class="mt-8 bg-white border-2 border-emerald-200 rounded-2xl p-6">
-    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a instrução</h3>
-    <p class="text-slate-500 text-xs mb-4">Escreva o verbo na forma certa do imperativo.</p>
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
     <div class="space-y-4" id="verbs-quiz"></div>
     <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
       Check Answers
@@ -563,12 +563,13 @@
 
 <!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
   <div class="bg-gradient-to-br from-emerald-500 to-green-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 24 — Can You See My Screen?</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas interativas abaixo.</p>
+    <p class="text-white/70 text-sm">São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -600,15 +601,19 @@
     </div>
   </div>
 
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 5 passos para o cliente reiniciar o monitor.</p><p class="text-slate-500 text-xs">Use o imperativo e os sequenciadores: First, Then, After that, Finally. E um "Don't…".</p></div>
+      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">8</span>
+      <div><p class="font-black text-navy text-sm">Guie o cliente pela tela</p><p class="text-slate-500 text-xs">Escreva 4 frases para um cliente achar um botão na tela. Use pedidos educados (Could you…?) e lugares (at the top, next to, on the left).</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="First, turn off the monitor.&#10;Then wait ten seconds.&#10;After that, turn it on again.&#10;Don't pull the cable hard.&#10;Finally, try the autosteer again."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Could you open the settings, please?&#10;Tap the gear icon at the top right.&#10;The wifi button is next to the clock.&#10;Can you see it now?"></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps24()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
 </div>
 
@@ -1033,7 +1038,7 @@ mpGps24Render();
 function checkErrorGps24(){const inp=document.getElementById('err-gps24'),fb=document.getElementById('err-gps24-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["could you open the app please"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent="❌ Quase. Depois de could you, o verbo vem puro, sem to.";fb.className='text-xs font-black text-red-500 mt-1';}}
 
 let hwEntregue=false;
-function submitHomeworkGps24(){if(hwEntregue)return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps24()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
+function submitHomeworkGps24(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps24()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
 
 // Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
 (function retomar(){
@@ -1049,6 +1054,8 @@ function submitHomeworkGps24(){if(hwEntregue)return;hwEntregue=true;markSection(
 <script src="listening-lab.js?v=som1"></script>
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
+<script>window.HW_PLUS={"aula":24,"titulo":"Can You See My Screen?","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"___ you connect it to the farm wifi, please?","r":["could"],"dica":"poderia"},{"f":"Tap the gear icon at the top ___.","r":["right"],"dica":"direita"},{"f":"It's ___ to the camera icon.","r":["next"],"dica":"ao lado"},{"f":"I've ___ it. The filter was on another farm.","r":["found"],"dica":"find (achar)"}],"compreensao":[{"q":"Why didn't Daniel see the saved lines?","opts":["The filter was on another farm.","The monitor was off.","The wifi was broken."],"a":"The filter was on another farm."},{"q":"What did Yara ask Daniel to read to her?","opts":["The code on the screen.","The field name.","The serial number."],"a":"The code on the screen."}],"voz":["Could you connect it to the farm wifi, please?","I can see your screen now."],"livre":{"pedido":"Write 2 polite requests for a client, using Could you… and Can you….","exemplo":"Could you restart the monitor, please? Can you read the code to me?"}};window.HW_ESTADO=function(){const er=document.getElementById('err-gps24-fb');return{ordem:WO_GPS24_DATA.map((x,i)=>wo_gps24[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps24_Done.size,MP_GPS24.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_24-folha.pdf"></script>
 </body>
 </html>

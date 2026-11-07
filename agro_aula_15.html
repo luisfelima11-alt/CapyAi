@@ -529,8 +529,8 @@
   <div id="practice-area"></div>
 
   <div class="mt-8 bg-white border-2 border-emerald-200 rounded-2xl p-6">
-    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a instrução</h3>
-    <p class="text-slate-500 text-xs mb-4">Escreva o verbo na forma certa do imperativo.</p>
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
     <div class="space-y-4" id="verbs-quiz"></div>
     <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
       Check Answers
@@ -563,12 +563,13 @@
 
 <!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
   <div class="bg-gradient-to-br from-emerald-500 to-green-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 15 — Next Season We Will Plant Soy</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas interativas abaixo.</p>
+    <p class="text-white/70 text-sm">São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -600,15 +601,19 @@
     </div>
   </div>
 
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 5 passos para o cliente reiniciar o monitor.</p><p class="text-slate-500 text-xs">Use o imperativo e os sequenciadores: First, Then, After that, Finally. E um "Don't…".</p></div>
+      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">8</span>
+      <div><p class="font-black text-navy text-sm">O plano da próxima safra</p><p class="text-slate-500 text-xs">Escreva 3 ou 4 frases para o Jack com o plano da próxima safra: o que vão plantar, quando e quem vai fazer cada coisa. Use going to e will.</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="First, turn off the monitor.&#10;Then wait ten seconds.&#10;After that, turn it on again.&#10;Don't pull the cable hard.&#10;Finally, try the autosteer again."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="We're going to plant corn in field C.&#10;We're going to start in October.&#10;Pedro is going to drive the planter.&#10;I'll buy the seeds next week."></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkAgro15()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
 </div>
 
@@ -1033,7 +1038,7 @@ mpAgro15Render();
 function checkErrorAgro15(){const inp=document.getElementById('err-agro15'),fb=document.getElementById('err-agro15-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["i think it will rain in october"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent="❌ Quase. Depois de will, o verbo vem puro, sem -s.";fb.className='text-xs font-black text-red-500 mt-1';}}
 
 let hwEntregue=false;
-function submitHomeworkAgro15(){if(hwEntregue)return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkAgro15()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
+function submitHomeworkAgro15(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkAgro15()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
 
 // Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
 (function retomar(){
@@ -1049,6 +1054,8 @@ function submitHomeworkAgro15(){if(hwEntregue)return;hwEntregue=true;markSection
 <script src="listening-lab.js?v=som1"></script>
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
+<script>window.HW_PLUS={"aula":15,"titulo":"Next Season We Will Plant Soy","curso":"Agro English","cor":"#15803d","completar":[{"f":"We're ___ to plant soy in field A.","r":["going"],"dica":"going to"},{"f":"I ___ call the supplier tomorrow.","r":["will"],"dica":"vou (decisão agora)"},{"f":"Field B ___ going to rest.","r":["is"],"dica":"be"},{"f":"It ___ be easy.","r":["won't","will not"],"dica":"não vai (will)"}],"compreensao":[{"q":"O que eles vão plantar no talhão A?","opts":["Soy.","Corn.","Nothing. It's going to rest."],"a":"Soy."},{"q":"Quando a plantadeira nova vai chegar?","opts":["Next month.","Tomorrow.","In October."],"a":"Next month."}],"voz":["We're going to plant soy in field A.","I'll send it by email today."],"livre":{"pedido":"Escreva 2 frases sobre os seus planos para o próximo mês (going to).","exemplo":"Next month I'm going to visit my parents. I'm going to study English every day."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro15-fb');return{ordem:WO_AGRO15_DATA.map((x,i)=>wo_agro15[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro15_Done.size,MP_AGRO15.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_15-folha.pdf"></script>
 </body>
 </html>

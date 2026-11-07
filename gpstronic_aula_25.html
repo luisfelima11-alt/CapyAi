@@ -529,8 +529,8 @@
   <div id="practice-area"></div>
 
   <div class="mt-8 bg-white border-2 border-emerald-200 rounded-2xl p-6">
-    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a instrução</h3>
-    <p class="text-slate-500 text-xs mb-4">Escreva o verbo na forma certa do imperativo.</p>
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
     <div class="space-y-4" id="verbs-quiz"></div>
     <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
       Check Answers
@@ -563,12 +563,13 @@
 
 <!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
   <div class="bg-gradient-to-br from-emerald-500 to-green-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 25 — Your Installation Quote</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas interativas abaixo.</p>
+    <p class="text-white/70 text-sm">São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -600,15 +601,19 @@
     </div>
   </div>
 
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 5 passos para o cliente reiniciar o monitor.</p><p class="text-slate-500 text-xs">Use o imperativo e os sequenciadores: First, Then, After that, Finally. E um "Don't…".</p></div>
+      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">8</span>
+      <div><p class="font-black text-navy text-sm">O orçamento por mensagem</p><p class="text-slate-500 text-xs">Escreva para um cliente explicando duas opções: o que cada uma inclui, quanto custa e quanto tempo leva. Termine com uma oferta (If you…, you'll…).</p></div>
     </div>
-    <textarea rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="First, turn off the monitor.&#10;Then wait ten seconds.&#10;After that, turn it on again.&#10;Don't pull the cable hard.&#10;Finally, try the autosteer again."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Option A includes the monitor and costs fifty thousand reais.&#10;Option B also includes RTK and costs ninety thousand.&#10;The installation takes two days.&#10;If you choose B this week, you'll get a free training day."></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps25()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
 </div>
 
@@ -1033,7 +1038,7 @@ mpGps25Render();
 function checkErrorGps25(){const inp=document.getElementById('err-gps25'),fb=document.getElementById('err-gps25-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["how much does option b cost"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-emerald-600 mt-1';}else{fb.textContent="❌ Quase. Depois de does, o verbo vem puro, sem -s.";fb.className='text-xs font-black text-red-500 mt-1';}}
 
 let hwEntregue=false;
-function submitHomeworkGps25(){if(hwEntregue)return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps25()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;}
+function submitHomeworkGps25(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkGps25()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
 
 // Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
 (function retomar(){
@@ -1049,6 +1054,8 @@ function submitHomeworkGps25(){if(hwEntregue)return;hwEntregue=true;markSection(
 <script src="listening-lab.js?v=som1"></script>
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
+<script>window.HW_PLUS={"aula":25,"titulo":"Your Installation Quote","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"Option A ___ the autosteer and the monitor.","r":["includes"],"dica":"include (incluir)"},{"f":"The installation ___ two days.","r":["takes"],"dica":"take (levar tempo)"},{"f":"If you choose option B, you ___ get five percent off.","r":["will"],"dica":"vai (futuro)"},{"f":"How ___ ten percent?","r":["about"],"dica":"que tal"}],"compreensao":[{"q":"How much does option B cost?","opts":["Ninety thousand reais.","Nine thousand reais.","Ninety-five thousand reais."],"a":"Ninety thousand reais."},{"q":"What did Yara offer instead of ten percent?","opts":["A free training day.","A free antenna.","Twelve installments."],"a":"A free training day."}],"voz":["Option A includes the autosteer and the monitor.","How about ten percent?"],"livre":{"pedido":"Write 2 sentences offering a deal to a client, using If you…, you'll….","exemplo":"If you pay today, you'll get a free training day. If you buy two, you'll save money."}};window.HW_ESTADO=function(){const er=document.getElementById('err-gps25-fb');return{ordem:WO_GPS25_DATA.map((x,i)=>wo_gps25[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps25_Done.size,MP_GPS25.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_25-folha.pdf"></script>
 </body>
 </html>
