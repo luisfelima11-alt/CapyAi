@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-09 — Typing da lição cobrava outra palavra
+
+**Sintoma:** no Typing da lição 1 (`lessons.html`), a tela pedia "Informação". O aluno digitava
+"information" e levava erro; as letras da correção mostravam "w-a-t-e-r". O 💡 Hint também dava as
+letras de outra palavra.
+
+**Causa raiz:** o `renderTyping()` mostra os cartões embaralhados (`shuffledVocab`, até 15), mas o
+`checkTyping()` e o `useTypeHint()` liam `currentLesson.vocab[typeIdx]`, na ordem original. Com
+qualquer embaralhamento, a palavra da tela e a palavra cobrada eram diferentes. O fim do Typing
+também usava a lista inteira: numa lição com mais de 15 palavras, ele tentaria um 16º cartão que não
+existe. Estava assim desde o código original. Ouvir, Speed e Vocab já usavam a mesma lista para
+mostrar e conferir.
+
+**Correção:** `typingVocab()` é a lista única do Typing (mostrar, conferir, dica e fim).
+`tests/typing.spec.js` embaralha de propósito e confere os três pontos. Os testes falham no código
+antigo.
+
+**Regra:** exercício que embaralha precisa ler a mesma lista em tudo: mostrar, conferir, dica e fim.
+
+---
+
 ## 2026-11-07 — Toda aula gerada do GPS e do Agro pedia a escrita da aula 09
 
 **Sintoma:** no homework da Agro 13 (comparativos), a última tarefa pedia "Escreva 5 passos para o
