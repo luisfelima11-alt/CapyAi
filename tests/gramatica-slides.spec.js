@@ -3,6 +3,8 @@ const { test, expect } = require('playwright/test');
 // A aba Grammar em slides (gramatica-slides.js): clicar no slide abre a tela
 // cheia, como o vocabulário; ela navega junto com o deck da página, esconde a
 // tradução até a pessoa pedir e libera o +20 XP no último slide.
+// Desde 12/nov a página tem um segundo deck (Key Expressions, aula-molde.js), por isso os
+// seletores do Patterns ficam dentro do #gs-deck.
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -24,7 +26,7 @@ const contador = page => page.locator('#gs-foco .gs-foco-contador');
 const traducao = page => page.locator('#gs-foco .gs-pt').first();
 
 test('clicking a slide opens it fullscreen and the arrows move both views', async ({ page }) => {
-  await page.locator('.gs-slide:not([hidden]) .gs-img').click();
+  await page.locator('#gs-deck .gs-slide:not([hidden]) .gs-img').click();
   await expect(foco(page)).toBeVisible();
   await expect(contador(page)).toHaveText('1 / 6');
   await expect(page.locator('body')).toHaveClass(/gs-travado/);
@@ -38,12 +40,12 @@ test('clicking a slide opens it fullscreen and the arrows move both views', asyn
   await page.keyboard.press('Escape');
   await expect(foco(page)).toBeHidden();
   await expect(page.locator('body')).not.toHaveClass(/gs-travado/);
-  await expect(page.locator('.gs-slide:not([hidden])')).toHaveAttribute('data-i', '1');
+  await expect(page.locator('#gs-deck .gs-slide:not([hidden])')).toHaveAttribute('data-i', '1');
 });
 
 test('the translation stays hidden until asked, and the audio reads the plain sentence', async ({ page }) => {
   await page.locator('#gs-prox').click();
-  await page.locator('.gs-slide:not([hidden]) .gs-expandir').click();
+  await page.locator('#gs-deck .gs-slide:not([hidden]) .gs-expandir').click();
   await expect(contador(page)).toHaveText('2 / 6');
   await expect(traducao(page)).toBeHidden();
 
@@ -60,18 +62,32 @@ test('the translation stays hidden until asked, and the audio reads the plain se
 
 test('the audio button on the page plays without opening the fullscreen', async ({ page }) => {
   await page.locator('#gs-prox').click();
-  await page.locator('.gs-slide:not([hidden]) .gs-ouvir').first().click();
+  await page.locator('#gs-deck .gs-slide:not([hidden]) .gs-ouvir').first().click();
   await expect.poll(() => page.evaluate(() => window.__falou)).toEqual(['I am Luan.']);
   await expect(foco(page)).toBeHidden();
 });
 
 test('reaching the last slide in fullscreen unlocks the +20 XP', async ({ page }) => {
   await expect(page.locator('#gs-xp')).toBeDisabled();
-  await page.locator('.gs-slide:not([hidden]) .gs-img').click();
+  await page.locator('#gs-deck .gs-slide:not([hidden]) .gs-img').click();
   for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowRight');
   await expect(contador(page)).toHaveText('6 / 6');
   await expect(page.locator('#gs-foco .gs-foco-next')).toBeHidden();
   await page.locator('#gs-foco .gs-foco-fechar').click();
   await expect(page.locator('#gs-xp')).toBeEnabled();
   await expect(page.locator('#gs-xp')).toContainText('Vi todos os exemplos');
+});
+
+test('Key Expressions: o deck de slides navega e credita a seção ao chegar no último', async ({ page }) => {
+  await page.evaluate(() => irParaPasso(ROTA.findIndex(s => s.id === 'expressions'), { rolar: false }));
+  const deck = page.locator('#expr-grid .ex-deck');
+  const total = await page.evaluate(() => EXPR_DATA.length + 1);
+  await expect(deck.locator('.gs-slide')).toHaveCount(total);
+  await expect(deck.locator('.gs-pos')).toHaveText(`Slide 1 de ${total}`);
+  expect(await page.evaluate(() => creditadas.has('expressions'))).toBe(false);
+  for (let i = 1; i < total; i++) await deck.locator('.gs-prox').click();
+  await expect(deck.locator('.gs-pos')).toHaveText(`Slide ${total} de ${total}`);
+  await expect.poll(() => page.evaluate(() => creditadas.has('expressions'))).toBe(true);
+  await deck.locator('.gs-slide:not([hidden]) .gs-ouvir').first().click();
+  await expect.poll(() => page.evaluate(() => window.__falou.length)).toBe(1);
 });
