@@ -2396,7 +2396,8 @@ function showLessonPopup() {
 
 function closePopup() {
   lessonPopup.classList.add('hidden');
-  lessonPopupTrigger?.focus();
+  const trigger = lessonPopupTrigger?.id ? document.getElementById(lessonPopupTrigger.id) : lessonPopupTrigger;
+  trigger?.focus();
 }
 // Close on backdrop click
 lessonPopup.addEventListener('click', e => {
@@ -2725,7 +2726,24 @@ function renderStreakRisco() {
   el.classList.remove('hidden');
 }
 
-document.addEventListener('stateChanged', () => { renderQuestsCard(); renderStreakRisco(); });
+function trailCompletionSnapshot() {
+  return JSON.stringify([Store.state.completedLessons, Store.state.completedMinis]);
+}
+
+let renderedTrailCompletion = trailCompletionSnapshot();
+document.addEventListener('stateChanged', () => {
+  renderQuestsCard();
+  renderStreakRisco();
+  const completion = trailCompletionSnapshot();
+  if (completion === renderedTrailCompletion) return;
+  renderedTrailCompletion = completion;
+
+  const focusedNode = document.activeElement?.closest('#trail-container button[id]');
+  renderTrail();
+  updateTrailCounter();
+  if (currentTrailLang !== 'fr') buildContinueCard();
+  if (focusedNode) document.getElementById(focusedNode.id)?.focus({ preventScroll: true });
+});
 
 setLevelBadge();
 buildContinueCard();

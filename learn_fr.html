@@ -61,7 +61,7 @@
         <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
           <div id="fr-progress-bar" class="h-full bg-gradient-to-r from-blue-400 to-indigo-300 rounded-full transition-all" style="width:0%"></div>
         </div>
-        <span id="fr-progress-label" class="text-xs font-black text-blue-200">0 / 48</span>
+        <span id="fr-progress-label" class="text-xs font-black text-blue-200"></span>
       </div>
     </div>
 
@@ -182,6 +182,19 @@ function miniDone(lessonId, miniNum) {
 }
 
 function nextMini() {
+  try {
+    const last = JSON.parse(localStorage.getItem('capyLastMini_fr') || 'null');
+    const lesson = TRAIL_FR.find(unit => unit.id === last?.lessonId);
+    if (lesson && [1, 2, 3, 4].includes(last.miniNum) && !miniDone(lesson.id, last.miniNum)) {
+      return { lesson, mini: last.miniNum, resumed: true };
+    }
+  } catch { /* Ignore invalid resume data. */ }
+
+  for (const lesson of TRAIL_FR) for (let mini = 1; mini <= 4; mini++) {
+    if (!miniDone(lesson.id, mini) && Number(localStorage.getItem(`capyGuidedStep_${lesson.id}_fr_m${mini}`)) > 0) {
+      return { lesson, mini, resumed: true };
+    }
+  }
   for (const l of TRAIL_FR) for (let m = 1; m <= 4; m++)
     if (!miniDone(l.id, m)) return { lesson: l, mini: m };
   return null;
@@ -261,16 +274,14 @@ function render() {
   document.getElementById('fr-progress-bar').style.width = Math.round(doneTotal / TOTAL_NODES * 100) + '%';
   document.getElementById('fr-progress-label').textContent = doneTotal + ' / ' + TOTAL_NODES;
 
+  document.getElementById('fr-continue').classList.toggle('hidden', !next);
+  document.getElementById('fr-done').classList.toggle('hidden', !!next);
   if (next) {
-    const c = document.getElementById('fr-continue');
-    c.classList.remove('hidden');
     document.getElementById('fr-cont-emoji').textContent = next.lesson.emoji;
     document.getElementById('fr-cont-title').textContent = `Unidade ${String(next.lesson.num).padStart(2,'0')} · ${next.lesson.title}`;
     document.getElementById('fr-cont-sub').textContent = `Jour ${next.mini} — ${DAY_SUBS[next.mini-1]}`;
     document.getElementById('fr-cont-btn').onclick = () => openMini(next.lesson.id, next.mini);
-    document.getElementById('fr-cont-kicker').textContent = doneTotal === 0 ? 'Comece por aqui' : 'Continuar de onde parou';
-  } else {
-    document.getElementById('fr-done').classList.remove('hidden');
+    document.getElementById('fr-cont-kicker').textContent = next.resumed ? 'Continuar de onde parou' : doneTotal === 0 ? 'Comece por aqui' : 'Próxima mini-lição';
   }
 }
 
