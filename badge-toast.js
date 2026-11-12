@@ -5,7 +5,11 @@
  * Usage: BadgeToast.show('explorer') — or it fires automatically via
  *        the 'badgeUnlocked' CustomEvent dispatched by store.js.
  */
-(function () {
+(function initBadgeToast() {
+    if (!document.body) {
+        document.addEventListener('DOMContentLoaded', initBadgeToast, { once: true });
+        return;
+    }
     const BADGE_META = {
         tree_warden:    { icon: 'eco',                      color: '#10b981', label: 'Tree Warden',     msg: 'You mastered the forest words! 🌿' },
         fast_tracker:   { icon: 'rocket_launch',            color: '#ec4899', label: 'Fast Tracker',    msg: 'Lightning-fast learner! 🚀' },
