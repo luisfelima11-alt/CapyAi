@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Fazer só o Dia 1 da trilha fechava a lição inteira
+
+**Sintoma:** o aluno fazia o Dia 1 (Listen & Quiz) de uma lição da Trilha, acertava 60% ou mais do quiz e via
+"🏆 Lesson Complete!" no lugar de "Day 1 Complete". De volta à trilha, os Dias 2, 3 e 4 apareciam feitos, a
+lição contava como concluída e a retomada pulava para a lição seguinte.
+
+**Causa raiz:** o `renderQuizFinish` do `lessons.html` chamava `Store.completeLesson` sempre que o quiz passava
+de 60%, também no modo guiado. Logo depois, o `guidedLessonComplete` chamava `Store.completeMini(id, 1)`. Como
+ainda não havia nenhum dia gravado, o `isTrailLessonDone` caía no marcador antigo (`completedLessons`), achava
+que era uma lição terminada no formato antigo e o `completeMini` gravava os 4 dias de uma vez.
+
+**Correção:** no modo guiado o quiz não marca mais a lição (nem mostra "Lição concluída!"): quem fecha a lição
+é o `guidedLessonComplete`, com os 4 dias. O modo livre (sem `guided=1`) continua como era.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (faz o Dia 1 no modo guiado e volta para a trilha).
+
+**Por que aconteceu:** a regra dos 4 dias entrou no `store.js` com uma ponte para o progresso antigo
+("sem nenhum dia gravado, vale o `completedLessons`"), mas o quiz continuava escrevendo esse mesmo marcador.
+Marcador de compatibilidade não pode continuar sendo escrito pelo fluxo novo.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas

@@ -2048,11 +2048,14 @@ function renderQuizFinish() {
   if (window.Store) {
     Store.activateStreak();
     Store.completeActivity('lessons');
-    if (pct >= 60) {
+    // No modo guiado (a trilha) quem fecha a lição é o guidedLessonComplete:
+    // ela só conta com os 4 dias. Marcar aqui fazia o quiz do Dia 1 valer pela
+    // lição inteira (o completeMini lia esse marcador como conclusão antiga).
+    if (pct >= 60 && !GUIDED_MODE) {
       Store.completeLesson(currentLesson.id, _lessonLanguage());
       if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
     }
-    if (pct >= 60 && window.CapyCelebra) {
+    if (pct >= 60 && !GUIDED_MODE && window.CapyCelebra) {
       CapyCelebra.mostrar({ tipo: 'licao', titulo: 'Lição concluída!',
                             subtitulo: currentLesson.emoji + ' ' + currentLesson.title });
     }
