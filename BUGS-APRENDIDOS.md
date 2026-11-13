@@ -1,5 +1,25 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Com a página aberta na virada do dia, o freeze não protegia a sequência
+
+**Sintoma:** aluno com 🧊 Streak Freeze (80 🫐) faltou um dia, deixou a página aberta desde a noite anterior e
+estudou depois da meia-noite: a sequência recomeçou em 1 e o freeze continuou no bolso, sem uso.
+
+**Causa raiz:** o freeze só é conferido no `resolverStreak`, que roda ao ABRIR o app (`checkDailyReset`). O
+`activateStreak` olhava o buraco entre a última prática e hoje e, com dois dias de distância, recomeçava em 1
+sem passar pelo freeze.
+
+**Correção:** o `activateStreak` chama o `resolverStreak` (que é idempotente) antes de contar o dia. Com
+freeze, a sequência continua; sem freeze, recomeça em 1 como antes.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` ("página aberta na virada do dia"), com o relógio
+falso avançando no meio do teste.
+
+**Por que aconteceu:** regra de "virada do dia" amarrada ao carregamento da página. Quem estuda à noite deixa
+a aba aberta; toda regra que depende do dia tem que valer também no momento da ação.
+
+---
+
 ## 2026-11-13 — Relógio adiantado zerava a sequência de quem estudou
 
 **Sintoma:** aluno com o celular alguns minutos adiantado estudava às 23h55. O celular gravava a prática

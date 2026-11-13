@@ -442,6 +442,9 @@ const Store = {
         const hoje = capyHojeBR();
         this.trazerDatasParaHoje(hoje);
         if (this.state.lastPracticeDate === hoje) return;    // já contou hoje
+        // Página aberta desde antes da meia-noite: o checkDailyReset não rodou
+        // hoje, então o freeze tem que ser conferido aqui também.
+        this.resolverStreak();
 
         const ancora = [this.state.lastPracticeDate || '',
                         this.state.streakCoveredThrough || ''].sort().pop();
