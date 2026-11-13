@@ -40,10 +40,12 @@
     }
 
     // Próxima mini-lição em inglês: continua de onde parou; senão, a 1ª incompleta.
-    function proximaMini(indice, feitas, ultima) {
+    // `licaoFeita(id)` é a regra da trilha (Store.isTrailLessonDone): conta a lição
+    // terminada no formato antigo, que não tem os dias gravados.
+    function proximaMini(indice, feitas, ultima, licaoFeita) {
         const ok = new Set((feitas || []).map(String));
         const licoes = (indice || []).filter(l => (l.lang || 'en') === 'en' && l.id >= 1 && l.id < 200).map(l => l.id).sort((a, b) => a - b);
-        const feita = (id, n) => ok.has(`${id}_${n}`);
+        const feita = (id, n) => ok.has(`${id}_${n}`) || (typeof licaoFeita === 'function' && licaoFeita(id));
         let ini = 0;
         if (ultima && licoes.includes(Number(ultima.lessonId))) ini = licoes.indexOf(Number(ultima.lessonId));
         for (let i = ini; i < licoes.length; i++) {
@@ -65,7 +67,9 @@
         ]);
         let ultima = null;
         try { ultima = JSON.parse(ler('capyLastMini_en') || 'null'); } catch (e) {}
-        const prox = proximaMini(indice || [], s.completedMinis, ultima);
+        const licaoFeita = window.Store && typeof Store.isTrailLessonDone === 'function'
+            ? id => Store.isTrailLessonDone(id, 'en') : null;
+        const prox = proximaMini(indice || [], s.completedMinis, ultima, licaoFeita);
         const licao = prox && (indice || []).find(l => l.id === prox.lessonId);
         const palavras = memoria && Array.isArray(memoria.words) ? memoria.words.length : 0;
         const plano = (me && me.plan) || s.planType || 'free';

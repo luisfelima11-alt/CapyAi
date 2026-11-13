@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — O "Plano de hoje" mandava refazer lições que a Trilha já dava como feitas
+
+**Sintoma:** quem terminou lições no formato antigo (a lição inteira de uma vez, antes das minilições) via na home
+e no `study_plan.html` "Trilha: mini-lição 1 · Aula 1", enquanto a Trilha (`learn.html`) mostrava essas lições
+concluídas e retomava na primeira pendente.
+
+**Causa raiz:** o `proximaMini` do `plano-hoje.js` só olhava a lista `completedMinis`. Lição terminada no formato
+antigo não tem os dias gravados, só o `completedLessons`, e a regra da trilha (`Store.isTrailLessonDone`) conta
+essas lições como feitas.
+
+**Correção:** o `proximaMini` recebe a regra da trilha (`Store.isTrailLessonDone(id, 'en')`) e pula a lição que a
+trilha dá como concluída. Sem o `Store` na página, continua como era.
+
+**Como pegar isso de novo:** `tests/plano-hoje.test.js` (roda o `store.js` e o `plano-hoje.js` de verdade com um
+aluno do formato antigo; está no `npm run test:security`).
+
+**Por que aconteceu:** a "próxima lição" é calculada em três lugares (trilha, cartão "Continue" e plano da home), e
+só a trilha foi atualizada quando a regra dos 4 dias entrou. Quem calcula progresso pergunta ao `store.js`.
+
+---
+
 ## 2026-11-13 — Desafio da Yara colava como HTML o que o aluno e a IA escreviam
 
 **Sintoma:** no Desafio da Yara (o chefe no fim de cada capítulo da Trilha, `lessons.html?boss=…`), uma mensagem
