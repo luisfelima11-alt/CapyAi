@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Relógio adiantado zerava a sequência de quem estudou
+
+**Sintoma:** aluno com o celular alguns minutos adiantado estudava às 23h55. O celular gravava a prática
+como "amanhã". Quando o relógio voltava ao certo, ou quando o estado chegava ao computador (que está com a
+hora certa), a sequência de dias ia a zero, e praticar de novo recomeçava em 1.
+
+**Causa raiz:** `resolverStreak` tratava data de prática no futuro (`gap < 0`) como dado inválido e zerava
+`streakDays`. O `activateStreak` também recomeçava em 1 nesse caso. O merge entre aparelhos leva a data mais
+recente, então a data do futuro se espalhava para os outros aparelhos do aluno.
+
+**Correção:** `trazerDatasParaHoje(hoje)`, chamado no `resolverStreak` e no `activateStreak`: data de prática
+(ou de freeze) depois de hoje vira hoje. A prática aconteceu de verdade, no máximo agora, então conta como
+"praticou hoje". A migração antiga já fazia o mesmo com o rótulo UTC.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` (3 testes de relógio adiantado, com o `store.js`
+real e relógio falso).
+
+**Por que aconteceu:** data que vem do relógio do aparelho não é confiável. Toda conta de "quantos dias
+desde" precisa decidir o que fazer com uma data no futuro em vez de tratá-la como erro e apagar progresso.
+
+---
+
 ## 2026-11-13 — Trocar de aba na lição pagava o XP do Quiz e do Listen de novo
 
 **Sintoma:** no `lessons.html`, depois de terminar o Quiz (ou o Listen), bastava clicar em outra aba e
