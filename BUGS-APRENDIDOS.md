@@ -22,6 +22,50 @@ marca dessas que bloqueia uma página precisa olhar também o que o servidor sab
 
 ---
 
+## 2026-11-13 — Provas finais do GPS e do Agro abriam sem estilo nenhum
+
+**Sintoma:** `gpstronic_prova.html` e `agro_prova.html` abriam como texto cru, sem cores, sem layout e com
+quadradinhos no lugar dos ícones. Na mesma varredura: a foto da Yara na barra lateral do `lessons.html` dava 404.
+
+**Causa raiz:** as duas provas pediam `assets/css/tailwind.css`, arquivo que nunca existiu (entrou assim
+em 3d71819), e o Font Awesome do cdnjs, que a CSP bloqueia (`style-src` só aceita o próprio site e o Google
+Fonts). O `lessons.html` apontava para `capy Yara teacher generated pic.png`, que saiu do repositório na
+sincronização com a produção (565f43a). Nada no build nem nos testes conferia se o arquivo pedido existe.
+
+**Correção:** Tailwind do CDN, como as outras páginas; Font Awesome 6.4.0 servido pelo próprio site em
+`assets/vendor/` (CSS + as duas fontes usadas); `assets/**/*.woff2` no `builds` do `vercel.json`, senão as
+fontes não subiriam (mesma armadilha do favicon); a foto virou `yara-quadrado-v1.jpg`.
+
+**Como pegar isso de novo:** `tests/arquivos-do-deploy.test.js` (no `npm run test:security`, roda no CI)
+confere que todo `src`/`href` local das páginas e todo `url()` dos CSS existe **e** entra na lista branca
+do `vercel.json`.
+
+**Por que aconteceu:** um arquivo que falta não quebra nada na hora; a página só fica feia. E a varredura da
+produção (`page.on('requestfailed')` + respostas 4xx) só roda quando alguém lembra.
+
+---
+
+## 2026-11-09 — Typing da lição cobrava outra palavra
+
+**Sintoma:** no Typing da lição 1 (`lessons.html`), a tela pedia "Informação". O aluno digitava
+"information" e levava erro; as letras da correção mostravam "w-a-t-e-r". O 💡 Hint também dava as
+letras de outra palavra.
+
+**Causa raiz:** o `renderTyping()` mostra os cartões embaralhados (`shuffledVocab`, até 15), mas o
+`checkTyping()` e o `useTypeHint()` liam `currentLesson.vocab[typeIdx]`, na ordem original. Com
+qualquer embaralhamento, a palavra da tela e a palavra cobrada eram diferentes. O fim do Typing
+também usava a lista inteira: numa lição com mais de 15 palavras, ele tentaria um 16º cartão que não
+existe. Estava assim desde o código original. Ouvir, Speed e Vocab já usavam a mesma lista para
+mostrar e conferir.
+
+**Correção:** `typingVocab()` é a lista única do Typing (mostrar, conferir, dica e fim).
+`tests/typing.spec.js` embaralha de propósito e confere os três pontos. Os testes falham no código
+antigo.
+
+**Regra:** exercício que embaralha precisa ler a mesma lista em tudo: mostrar, conferir, dica e fim.
+
+---
+
 ## 2026-11-07 — Toda aula gerada do GPS e do Agro pedia a escrita da aula 09
 
 **Sintoma:** no homework da Agro 13 (comparativos), a última tarefa pedia "Escreva 5 passos para o
