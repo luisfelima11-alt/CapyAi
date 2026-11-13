@@ -304,3 +304,24 @@ test('homework submit uses its own rate limit', async () => {
   assert.ok([...banco.limites.keys()].some(b => b.startsWith('u:auth-ana|homework|')), 'counted per student, not per IP');
 });
 
+// ── 6. IA de texto: erro respondia 200 e não tinha prazo ───────────────────
+test('chat: an AI failure is not a 200, and a stalled AI call has a deadline', async () => {
+  iaStatus = 500;
+  const falhou = await chamar('POST', '/api/chat', { origin: ORIGEM, 'content-type': 'application/json' }, { message: 'hello', history: [] });
+  assert.notEqual(falhou.status, 200, 'the widget stored the error as Yara\'s reply because the status was 200');
+  assert.doesNotMatch(falhou.body, /org-123/);
+  iaStatus = 200;
+  await chamar('POST', '/api/chat', { origin: ORIGEM, 'content-type': 'application/json' }, { message: 'hello again', history: [] });
+  const chat = chamadasIa.filter(c => c.path === '/v1/chat/completions');
+  assert.ok(chat.length >= 2);
+  assert.ok(chat.every(c => Number(c.timeout) > 0 && Number(c.timeout) <= 60000), 'callOpenAI has no deadline: a stalled AI holds the function until Vercel kills it');
+  // A IA travada: quando o prazo vence, o aluno recebe um erro, não espera para sempre.
+  iaTravada = true;
+  const antes = chamadasIa.length;
+  const pendente = chamar('POST', '/api/chat', { origin: ORIGEM, 'content-type': 'application/json' }, { message: 'are you there?', history: [] });
+  while (chamadasIa.length === antes) await new Promise(ok => setImmediate(ok));
+  chamadasIa.at(-1).req.emit('timeout');
+  const travou = await pendente;
+  assert.equal(travou.status, 502);
+  assert.equal(chamadasIa.at(-1).req.destruida, true, 'the stalled request is torn down');
+});

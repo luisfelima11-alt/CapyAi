@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Quando a IA falhava, a resposta era "200 OK" e sem prazo
+
+**Sintoma:** com a OpenAI fora do ar (ou sem crédito), as rotas de IA de texto (`/api/chat`, quiz, tradução,
+história…) respondiam **200** com `{error:{…}}`. O widget da Yara guarda na conversa toda resposta 200: a
+mensagem "A IA não respondeu agora" voltava para a IA no próximo pedido como se a Yara tivesse dito aquilo. E
+com a OpenAI travada, sem responder, a função ficava pendurada até a Vercel matar.
+
+**Causa raiz:** o `callOpenAI` respondia `res.status(200)` no erro do provedor e não passava `timeout` ao
+`https.request` (o `chatComplete` sempre teve 45 s).
+
+**Correção:** erro do provedor responde **502** (mesmo corpo, mesma mensagem genérica), e o pedido à IA tem
+prazo de 45 s; vencido, o pedido é desfeito e o aluno recebe 502. As páginas já liam a mensagem do corpo em
+qualquer status. A cota do dia continua gasta quando a IA falha (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (IA com 500 → resposta não é 200 e não
+vaza o texto do provedor; IA travada → 502 quando o prazo vence).
+
+**Por que aconteceu:** "não quebrar a tela" virou "dizer que deu certo". Erro precisa de status de erro: é
+o que o navegador usa para decidir o que guardar.
+
+---
+
 ## 2026-11-13 — O envio de lição de casa não tinha limite nenhum
 
 **Sintoma:** um aluno logado (ou um script com a sessão dele) podia mandar `POST /api/homework` sem parar:

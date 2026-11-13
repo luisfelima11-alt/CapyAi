@@ -796,21 +796,28 @@ function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
     // an array (quiz, flashcard-deck, lesson-quiz) can't use it.
     if (opts.json) corpo.response_format = { type: 'json_object' };
     const postData = JSON.stringify(corpo);
+    // Deadline like chatComplete's: without it a stalled provider held the
+    // function (and the student's "digitando…") until Vercel killed it.
     const options = {
         hostname: CHAT_HOST,
         path:     CHAT_PATH,
         method:   'POST',
-        headers:  chatHeaders(Buffer.byteLength(postData))
+        headers:  chatHeaders(Buffer.byteLength(postData)),
+        timeout:  45000,
     };
     const apiReq = https.request(options, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
+            if (res.headersSent) return;
             res.setHeader('Content-Type', 'application/json');
             if (apiRes.statusCode !== 200) {
                 // The provider's message can name the org, key or model: log it, answer generically.
+                // 502, not 200: the Yara widget keeps every 200 reply in the
+                // conversation, so the error text came back to the AI as if
+                // Yara had said it.
                 console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
+                res.status(502).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
                 return;
             }
             try {
@@ -823,7 +830,13 @@ function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
             }
         });
     });
-    apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
+    apiReq.on('timeout', () => apiReq.destroy(new Error('timeout')));
+    apiReq.on('error', err => {
+        console.error('[ai] request', err.message);
+        if (res.headersSent) return;
+        res.setHeader('Content-Type', 'application/json');
+        res.status(502).end(JSON.stringify({ error: { code: 502, message: 'Erro de conexão com a IA.' } }));
+    });
     apiReq.write(postData);
     apiReq.end();
 }
