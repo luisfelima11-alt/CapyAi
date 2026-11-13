@@ -219,7 +219,7 @@
         <!-- Messages -->
         <div id="aichat-messages" class="p-4 space-y-3 min-h-[200px] max-h-80 overflow-y-auto bg-slate-50/50"></div>
         <!-- Input -->
-        <div class="border-t border-slate-100 p-4 flex gap-2 bg-white">
+        <div id="aichat-compose" class="border-t border-slate-100 p-4 flex gap-2 bg-white">
           <input id="aichat-input" type="text" placeholder="Type your answer in English…"
                  class="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none focus:border-pink-400 transition-colors"
                  onkeydown="if(event.key==='Enter')sendChat()"/>
@@ -228,7 +228,25 @@
             Send →
           </button>
         </div>
-        <!-- Done button (appears after 3+ exchanges) -->
+        <div id="aichat-writing-option" hidden class="px-4 pb-4 bg-white text-sm text-slate-700">
+          <p id="aichat-writing-notice" role="status"></p>
+          <button type="button" onclick="openChatWritingPractice()" class="mt-2 font-bold text-violet-700 underline">Fazer prática escrita</button>
+        </div>
+        <form id="aichat-writing-form" hidden onsubmit="finishChatWritingPractice(event)" class="p-4 border-t border-slate-100 bg-white space-y-3">
+          <p id="aichat-writing-instructions" class="font-bold text-slate-800"></p>
+          <p class="text-sm text-slate-600">Use o vocabulário da lição. Esta prática é independente e não oferece correção automática.</p>
+          <label class="block text-sm font-bold">Escreva uma frase sobre o tema da lição.
+            <textarea required rows="2" class="block w-full border border-slate-300 rounded-xl p-2"></textarea>
+          </label>
+          <label class="block text-sm font-bold">Faça uma pergunta que você usaria numa conversa sobre esse tema.
+            <textarea required rows="2" class="block w-full border border-slate-300 rounded-xl p-2"></textarea>
+          </label>
+          <label class="block text-sm font-bold">Responda à sua pergunta com uma frase completa.
+            <textarea required rows="2" class="block w-full border border-slate-300 rounded-xl p-2"></textarea>
+          </label>
+          <button type="submit" class="w-full bg-emerald-600 text-white font-black rounded-xl p-3">Concluir prática escrita</button>
+        </form>
+        <!-- Done button (appears after three successful exchanges) -->
         <div id="aichat-done-row" style="display:none" class="px-4 pb-5 bg-white">
           <button onclick="markToolDone(currentLesson.id,'aichat',3)"
                   class="w-full bg-emerald-500 text-white font-black py-3 rounded-xl text-sm hover:bg-emerald-400 active:scale-95 transition-all">
@@ -283,7 +301,7 @@
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="memory.js?v=mem1"></script>
-<script src="store.js?v=xpfix"></script>
+<script src="store.js?v=trail-progress"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="components.js?v=seg1"></script>
 <script src="celebration.js?v=cel3"></script>
@@ -356,9 +374,9 @@ function trilhaDoCurso(id) {
   if (n >= 601) return 'learn_interview.html';
   if (n >= 501) return 'learn_gpstronic.html';
   if (n >= 401) return 'learn_intermediate.html';
-  if (n >= 301) return 'learn_tr.html';
+  if (n >= 301) return 'learn.html?lang=tr';
   if (n >= 201) return 'learn_fr.html';
-  return 'learn.html';
+  return 'learn.html?lang=en';
 }
 
 // {pos, total} da lição dentro do curso dela — ex.: a 508 vira {pos: 8, total: 8}.
@@ -969,6 +987,11 @@ function renderAIChat() {
   document.getElementById('aichat-topic').textContent = '📖 ' + currentLesson.title;
   document.getElementById('aichat-messages').innerHTML = '';
   document.getElementById('aichat-done-row').style.display = 'none';
+  const writingForm = document.getElementById('aichat-writing-form');
+  writingForm.reset();
+  writingForm.hidden = true;
+  document.getElementById('aichat-compose').classList.remove('hidden');
+  document.getElementById('aichat-writing-option').hidden = true;
   document.getElementById('aichat-input').value = '';
   document.getElementById('aichat-input').placeholder = _lessonLanguage() === 'tr'
     ? 'Türkçe cevap yazın… (ou peça ajuda em português)'
@@ -976,6 +999,9 @@ function renderAIChat() {
       ? 'Écrivez votre réponse en français… (ou peça ajuda em português)'
       : 'Type your answer in English…';
   updateAIRemainingBadge();
+  if (window.Store && Store.getRemainingAI() === 0) {
+    offerChatWritingPractice('Você usou as mensagens disponíveis hoje. Ainda dá para concluir o Dia 4.');
+  }
   // Yara opens the conversation
   const opener = _lessonLanguage() === 'tr'
     ? `Harika! “${currentLesson.title}” dersini bitirdin. 🌟 Bugün öğrendiğin bir Türkçe kelime söyler misin?`
@@ -993,11 +1019,12 @@ function appendChatMsg(who, text) {
   if (who === 'yara') {
     div.className = 'flex gap-2 items-start';
     div.innerHTML = `<span class="text-xl mt-0.5 flex-shrink-0">🐾</span>
-      <div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]">${text}</div>`;
+      <div class="bg-pink-50 border border-pink-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%] whitespace-pre-wrap"></div>`;
   } else {
     div.className = 'flex gap-2 items-start justify-end';
-    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]">${text}</div>`;
+    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%] whitespace-pre-wrap"></div>`;
   }
+  div.querySelector('div').textContent = text;
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
   // Click-to-translate on Yara's questions only — never on the student's own answer
@@ -1018,14 +1045,50 @@ function updateAIRemainingBadge() {
   badge.style.display = rem > 0 ? 'block' : 'none';
 }
 
+function offerChatWritingPractice(message) {
+  if (!GUIDED_MODE || miniNum !== 4 || chatExchanges >= 3) return false;
+  document.getElementById('aichat-writing-notice').textContent = message;
+  document.getElementById('aichat-writing-option').hidden = false;
+  return true;
+}
+
+function openChatWritingPractice() {
+  if (document.getElementById('aichat-input').disabled) return;
+  const languages = { en: 'inglês', fr: 'francês', tr: 'turco' };
+  const language = languages[_lessonLanguage()] || languages.en;
+  document.getElementById('aichat-writing-instructions').textContent = `Pratique em ${language} · ${currentLesson.title}`;
+  const form = document.getElementById('aichat-writing-form');
+  document.getElementById('aichat-compose').classList.add('hidden');
+  document.getElementById('aichat-writing-option').hidden = true;
+  form.hidden = false;
+  form.querySelector('textarea').focus();
+}
+
+function finishChatWritingPractice(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (form.hidden || !GUIDED_MODE || miniNum !== 4 || activeSteps[guidedStep] !== 'aichat') return;
+  const empty = [...form.querySelectorAll('textarea')].find(field => !field.value.trim());
+  if (empty) {
+    empty.value = '';
+    empty.reportValidity();
+    return;
+  }
+  form.hidden = true;
+  markToolDone(currentLesson.id, 'aichat', 3);
+  guidedNextStep();
+}
+
 async function sendChat() {
   const input = document.getElementById('aichat-input');
   const msg = input.value.trim();
-  if (!msg) return;
+  if (!msg || input.disabled) return;
 
   // ── AI gate ──
   if (!Store.consumeAI()) {
-    showPaywallModal();
+    if (!offerChatWritingPractice('Você usou as mensagens disponíveis hoje. Ainda dá para concluir o Dia 4.')) {
+      showPaywallModal();
+    }
     return;
   }
   updateAIRemainingBadge();
@@ -1034,9 +1097,6 @@ async function sendChat() {
   input.disabled = true;
   appendChatMsg('student', msg);
   chatHistory.push({ role: 'user', text: msg });
-  chatExchanges++;
-  // Show done button after 3 exchanges
-  if (chatExchanges >= 3) document.getElementById('aichat-done-row').style.display = 'block';
   // Show typing indicator
   const el = document.getElementById('aichat-messages');
   const typing = document.createElement('div');
@@ -1050,20 +1110,33 @@ async function sendChat() {
     const resp = await fetch('/api/lesson-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(25000),
       body: JSON.stringify({ history: chatHistory.slice(-6), message: msg,
                              lessonTopic: currentLesson.title, vocab, lang: _lessonLanguage() })
     });
+    if (!resp.ok) throw new Error('Chat request failed');
     const data = await resp.json();
-    const reply = data.candidates[0].content.parts[0].text;
-    typing.remove();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof reply !== 'string' || !reply.trim()) throw new Error('Chat reply is empty');
     appendChatMsg('yara', reply);
     chatHistory.push({ role: 'model', text: reply });
+    chatExchanges++;
+    if (chatExchanges >= 3) {
+      document.getElementById('aichat-done-row').style.display = 'block';
+      document.getElementById('aichat-writing-option').hidden = true;
+      document.getElementById('aichat-writing-form').hidden = true;
+    } else if (Store.getRemainingAI() === 0) {
+      offerChatWritingPractice('Você usou as mensagens disponíveis hoje. Ainda dá para concluir o Dia 4.');
+    }
   } catch(e) {
+    chatHistory.pop();
+    appendChatMsg('yara', 'A conversa está indisponível no momento. Você pode tentar novamente. 🐾');
+    offerChatWritingPractice('A Yara não conseguiu responder. Você pode concluir o Dia 4 com a prática escrita.');
+  } finally {
     typing.remove();
-    appendChatMsg('yara', 'Oops, I lost my train of thought! Try again? 🐾');
+    input.disabled = false;
+    input.focus();
   }
-  input.disabled = false;
-  input.focus();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1470,6 +1543,7 @@ function guidedLessonComplete() {
   const DAY_LABELS = { 1: 'Listen & Quiz', 2: 'Game', 3: 'Build & Speak', 4: 'Chat with Yara' };
   const isFullMode = miniNum === 0;
   const isLastMini = miniNum === 4;
+  let lessonFinished = isFullMode || (!window.Store && isLastMini);
 
   // Calculate XP for this session
   const fullXP    = currentLesson.xp || 50;
@@ -1478,15 +1552,13 @@ function guidedLessonComplete() {
   if (window.Store) {
     Store.addXP(xpReward);
     if (isFullMode) {
-      Store.completeLesson(currentLesson.id, _lessonLanguage());
+      Store.completeFullTrailLesson(currentLesson.id, _lessonLanguage());
       if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
       Store.activateStreak();
     } else {
-      Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());  // calls completeLesson on mini 4
-      // also save 'j' format so sidebar stays green
-      if (isLastMini && _lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
+      lessonFinished = Store.completeMini(currentLesson.id, miniNum, _lessonLanguage());
     }
-    if ((isFullMode && fullXP >= 40) || (isLastMini && xpReward >= 15)) {
+    if ((isFullMode && fullXP >= 40) || (!isFullMode && lessonFinished && xpReward >= 15)) {
       Store.unlockBadge('lesson_hero');
     }
   }
@@ -1497,7 +1569,7 @@ function guidedLessonComplete() {
   // Update overlay texts
   const completionTitle = isFullMode
     ? '🎉 Lesson Complete!'
-    : isLastMini
+    : lessonFinished
       ? '🏆 Lesson Complete!'
       : `✅ Day ${miniNum} Complete!`;
 
@@ -1521,9 +1593,11 @@ function guidedLessonComplete() {
     } else {
       nextBtn.style.display = 'none';
     }
-  } else if (!isLastMini) {
-    // Mini 1–3: advance to next mini day
-    const nextMini  = miniNum + 1;
+  } else if (!lessonFinished) {
+    // The trail allows free navigation, so the next unfinished day can be earlier.
+    const nextMini = window.Store
+      ? [1, 2, 3, 4].find(day => !Store.isMiniDone(currentLesson.id, day, _lessonLanguage()))
+      : miniNum + 1;
     const nextLabel = DAY_LABELS[nextMini];
     nextBtn.textContent = 'Day ' + nextMini + ': ' + nextLabel + ' →';
     nextBtn.onclick = () => {
@@ -1531,7 +1605,7 @@ function guidedLessonComplete() {
     };
     nextBtn.style.display = '';
   } else {
-    // Mini 4 (last): go to next lesson's Day 1
+    // All days are complete: go to the next lesson's Day 1.
     const nextLesson = _nextLessonInCurrentLanguage();
     if (nextLesson) {
       nextBtn.textContent = nextLesson.title + ' — Day 1 →';

@@ -118,6 +118,10 @@
       padding:7px 10px;border-radius:9px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
     #yw-board:hover .yw-board-tip{opacity:1;transform:translateY(-50%) scale(1);}
     @media (max-width:640px){#yw-board .yw-board-tip{display:none}}
+    @media (max-width:640px){
+      .yw-guided-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:16px 24px 32px;}
+      .yw-guided-actions #yw-fab,.yw-guided-actions #yw-board{position:relative;inset:auto!important;}
+    }
 
     #yw-panel{position:fixed;bottom:96px;right:24px;z-index:9998;width:340px;max-height:520px;
       background:#fff;border-radius:24px;box-shadow:0 8px 40px rgba(0,0,0,.18);
@@ -196,6 +200,9 @@
   const ICONE_TELEFONE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>';
 
   const container = document.createElement('div');
+  if (location.pathname.endsWith('/lessons.html') && new URLSearchParams(location.search).get('guided') === '1') {
+    container.classList.add('yw-guided-actions');
+  }
   container.innerHTML = `
     <button id="yw-fab" type="button" title="Falar com a Yara" aria-label="Falar com a Yara">
       <img src="${avatarSrc}" alt=""/>
