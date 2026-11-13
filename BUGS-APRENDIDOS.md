@@ -1,5 +1,25 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Desafio da Yara colava como HTML o que o aluno e a IA escreviam
+
+**Sintoma:** no Desafio da Yara (o chefe no fim de cada capítulo da Trilha, `lessons.html?boss=…`), uma mensagem
+com `<img src=x onerror=…>` virava uma imagem de verdade e o código rodava. O mesmo valia para a resposta da IA
+e para o texto final de avaliação ("Capítulo dominado!" / "Quase lá!").
+
+**Causa raiz:** o `appendBossMsg` montava o balão com `innerHTML` e `${text}` cru, e o `finishBossChallenge`
+fazia o mesmo com o `feedback` da IA. O chat do Dia 4 (`appendChatMsg`) já usava `textContent`; o do chefe ficou
+de fora.
+
+**Correção:** os balões e o texto da avaliação entram por `textContent`. O HTML fixo (ícone, classes) continua igual.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (manda `<img onerror>` como aluno e como IA, até a
+avaliação final, e confere que nada vira HTML).
+
+**Por que aconteceu:** cada chat da página tinha a sua função de balão, e a regra "texto do usuário ou da IA
+nunca vai cru para `innerHTML`" foi aplicada em uma e esquecida na outra.
+
+---
+
 ## 2026-11-13 — Trilhas de curso ignoravam a regra dos 4 dias
 
 **Sintoma:** nas trilhas de curso (Agro, GPS Tronic, Intermediário, Entrevista e Medicina), quem tinha feito só

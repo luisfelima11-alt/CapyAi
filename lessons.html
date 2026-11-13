@@ -784,11 +784,13 @@ function appendBossMsg(who, text) {
   if (who === 'yara') {
     div.className = 'flex gap-2 items-start';
     div.innerHTML = `<span class="text-xl mt-0.5 flex-shrink-0">🐾</span>
-      <div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]">${text}</div>`;
+      <div class="bg-fuchsia-50 border border-fuchsia-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-800 max-w-[80%]"></div>`;
   } else {
     div.className = 'flex gap-2 items-start justify-end';
-    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]">${text}</div>`;
+    div.innerHTML = `<div class="bg-navy text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm max-w-[80%]"></div>`;
   }
+  // Fala do aluno e resposta da IA são texto: entram por textContent, nunca HTML.
+  div.querySelector('div').textContent = text;
   el.appendChild(div);
   el.scrollTop = el.scrollHeight;
 }
@@ -882,7 +884,7 @@ function finishBossChallenge(rawReply) {
       <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
         <div class="text-7xl mb-3">👑</div>
         <h2 class="text-2xl font-black text-navy mb-2">Capítulo dominado!</h2>
-        <p class="text-slate-500 text-sm mb-5">${feedback}</p>
+        <p id="boss-feedback" class="text-slate-500 text-sm mb-5"></p>
         <div class="bg-yellow-50 border border-yellow-200 rounded-2xl px-6 py-3 mb-6 inline-block">
           <p class="font-black text-yellow-700">+50 XP</p>
         </div>
@@ -893,11 +895,14 @@ function finishBossChallenge(rawReply) {
       <div class="bg-white rounded-3xl shadow-sm p-8 text-center">
         <div class="text-6xl mb-3">💪</div>
         <h2 class="text-xl font-black text-navy mb-2">Quase lá!</h2>
-        <p class="text-slate-500 text-sm mb-6">${feedback}</p>
+        <p id="boss-feedback" class="text-slate-500 text-sm mb-6"></p>
         <button onclick="initBossMode(bossChapterId, lastBossLessons)" class="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px] mb-2">🔁 Tentar de novo</button>
         <button onclick="window.location.href='learn.html'" class="w-full bg-slate-100 hover:bg-slate-200 text-navy font-black py-4 rounded-2xl text-base transition-all active:scale-95 min-h-[44px]">🗺️ Voltar à trilha</button>
       </div>`;
   }
+  // O retorno vem da IA: texto, nunca HTML.
+  const feedbackEl = document.getElementById('boss-feedback');
+  if (feedbackEl) feedbackEl.textContent = feedback;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

@@ -87,3 +87,70 @@ for (const [pagina, prefixo, id] of [
     await expect(page.locator(`#${prefixo}-cont-sub`)).toHaveText(/^Day 1/);
   });
 }
+
+// Desafio da Yara (o chefe no fim de cada capítulo da trilha): o que o aluno
+// digita e o que a IA responde é texto, nunca HTML.
+test('Desafio da Yara mostra a fala do aluno e a da IA como texto', async ({ page }) => {
+  await preparar(page);
+  const ataque = '<img src=x onerror="window.__xss=(window.__xss||0)+1">';
+  await page.route('**/api/chat', route => {
+    const fim = String(route.request().postDataJSON().message).includes('conversation over');
+    const text = fim ? JSON.stringify({ passed: false, feedback: 'Quase! ' + ataque }) : 'Nice! ' + ataque;
+    return route.fulfill({ status: 200, json: { candidates: [{ content: { parts: [{ text }] } }] } });
+  });
+  await page.goto('/lessons.html?boss=1&lessons=1,2');
+  await expect(page.locator('#boss-input')).toBeVisible();
+  await page.fill('#boss-input', ataque);
+  await page.locator('#boss-input').press('Enter');
+  await expect(page.locator('#boss-messages')).toContainText('Nice! <img');
+  await expect(page.locator('#boss-messages')).toContainText(ataque);
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+  expect(await page.locator('#boss-messages img').count()).toBe(0);
+
+  // Até a 6ª fala; a avaliação final (da IA) também é texto.
+  for (let i = 2; i <= 6; i++) {
+    await expect(page.locator('#boss-input')).toBeEnabled();
+    await page.fill('#boss-input', 'I like to have a dog ' + i);
+    await page.locator('#boss-input').press('Enter');
+  }
+  await expect(page.locator('#boss-feedback')).toHaveText('Quase! ' + ataque);
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+});
+
+// Conclui o Dia 4 (conversa com a Yara) pela prática escrita, que é o caminho
+// quando a IA não responde.
+async function fazerDia4PelaPraticaEscrita(page) {
+  await expect(page.locator('#aichat-input')).toBeVisible();
+  await page.fill('#aichat-input', 'Merhaba!');
+  await page.locator('#aichat-input').press('Enter');
+  await page.getByRole('button', { name: 'Fazer prática escrita' }).click();
+  for (const campo of await page.locator('#aichat-writing-form textarea').all()) await campo.fill('Merhaba, ben Ana.');
+  await page.getByRole('button', { name: 'Concluir prática escrita' }).click();
+  await expect(page.locator('#guided-complete-overlay')).toBeVisible();
+}
+
+test('Dia 4 antes, em turco: a trilha turca retoma no Dia 1 e não mistura com o inglês', async ({ page }) => {
+  await preparar(page);
+  await page.goto('/lessons.html?lesson=301&mini=4&guided=1');
+  await fazerDia4PelaPraticaEscrita(page);
+  await expect(page.locator('#guided-complete-overlay h2')).toHaveText(/Day 4 Complete/);
+  await expect(page.locator('#gco-next-btn')).toHaveText(/Day 1/);
+
+  const s = await estado(page);
+  expect(s.completedMinis).toEqual(['tr:301_4']);
+  expect(s.completedLessons || []).toEqual([]);
+
+  await page.goto('/learn.html?lang=tr');
+  await expect(page.locator('#mini-node-301-4')).toContainText('Done');
+  for (const dia of [1, 2, 3]) await expect(page.locator(`#mini-node-301-${dia}`)).not.toContainText('Done');
+  await expect(page.locator('#continue-step')).toHaveText(/Day 1/);
+
+  // Troca para o inglês: nada feito, começa do Dia 1 da lição 1.
+  await page.locator('#trail-lang-toggle [data-lang="en"]').click();
+  await expect(page).toHaveURL(/lang=en/);
+  await expect(page.locator('#mini-node-1-4')).not.toContainText('Done');
+  await expect(page.locator('#continue-step')).toHaveText(/Day 1/);
+  await expect(page.locator('#trail-progress-label')).toHaveText(/^0 \/ /);
+});
