@@ -6,8 +6,8 @@
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Looking Ahead em inglês — Aula 20 Intermediário</title>
-<meta name="description" content="Aprenda Looking Ahead em inglês com vocabulário, exemplos, diálogo e exercícios interativos. Aula 20 do curso Intermediário da Capy English, com a Yara."/>
+<title>Looking Ahead — passado, desejos e futuro em inglês — Aula 20 Intermediate</title>
+<meta name="description" content="Used to, wish e as condicionais (If I knew…, If you had told me…) numa entrevista sobre carreira e futuro. A aula de fechamento do curso Intermediate da Capy English, com diálogo em áudio."/>
 <link rel="canonical" href="https://www.capyenglish.com.br/intermediate_aula_20.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -17,15 +17,29 @@
 *{font-family:'Plus Jakarta Sans',sans-serif}
 @keyframes floatEmoji{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(5deg)}}
 .float-emoji{animation:floatEmoji 3s ease-in-out infinite}
-.tab-btn{position:relative;transition:color .2s}
-.tab-btn::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:9999px;background:linear-gradient(90deg,#e11d48,#f97316);transform:scaleX(0);transition:transform .2s}
-.tab-btn.active{color:#e11d48;font-weight:800}
-.tab-btn.active::after{transform:scaleX(1)}
+.flip-card{perspective:800px;min-height:120px;cursor:pointer}
+.flip-card-inner{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.flip-card.flipped .flip-card-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1rem}
+.flip-back{transform:rotateY(180deg)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeIn .35s ease both}
 .prog-dot{width:10px;height:10px;border-radius:50%;transition:all .3s}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-.shake{animation:shake .4s ease}
+.chip-starter{transition:all .15s}
+.chip-starter:hover{transform:scale(1.04)}
+/* Percurso linear: a barra de abas com rolagem horizontal saiu daqui. */
+.rota-trilho{height:4px;background:#e2e8f0}
+.rota-preenche{height:100%;background:linear-gradient(90deg,#e11d48,#ea580c);transition:width .4s cubic-bezier(.4,0,.2,1)}
+.rota-item{display:flex;align-items:center;gap:.75rem;width:100%;padding:.7rem .9rem;border-radius:.85rem;text-align:left;transition:background .15s}
+.rota-item:hover{background:#fff7ed}
+.rota-item[aria-current="true"]{background:#fff1f2;box-shadow:inset 0 0 0 2px #fda4af}
+.rota-num{width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.7rem;flex-shrink:0}
+/* Diálogo */
+.dlg-linha[hidden]{display:none}
+.dlg-bolha{max-width:85%;border-radius:1rem;padding:.75rem 1rem;transition:box-shadow .2s,transform .2s}
+.dlg-linha.tocando .dlg-bolha{box-shadow:0 0 0 3px #fb7185;transform:scale(1.015)}
+.dlg-acao{font-size:.68rem;font-weight:800;opacity:.65;padding:.15rem .5rem;border-radius:999px;background:rgba(0,0,0,.06)}
+.dlg-acao:hover{opacity:1}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -35,15 +49,15 @@
 <meta property="og:site_name" content="Capy Yara English"/>
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/intermediate_aula_20.html"/>
-<meta property="og:title" content="Looking Ahead em inglês — Aula 20 Intermediário"/>
-<meta property="og:description" content="Aprenda Looking Ahead em inglês com vocabulário, exemplos, diálogo e exercícios interativos. Aula 20 do curso Intermediário da Capy English, com a Yara."/>
+<meta property="og:title" content="Looking Ahead — passado, desejos e futuro em inglês — Aula 20 Intermediate"/>
+<meta property="og:description" content="Used to, wish e as condicionais (If I knew…, If you had told me…) numa entrevista sobre carreira e futuro. A aula de fechamento do curso Intermediate da Capy English, com diálogo em áudio."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Looking Ahead em inglês — Aula 20 Intermediário"/>
-<meta name="twitter:description" content="Aprenda Looking Ahead em inglês com vocabulário, exemplos, diálogo e exercícios interativos. Aula 20 do curso Intermediário da Capy English, com a Yara."/>
+<meta name="twitter:title" content="Looking Ahead — passado, desejos e futuro em inglês — Aula 20 Intermediate"/>
+<meta name="twitter:description" content="Used to, wish e as condicionais (If I knew…, If you had told me…) numa entrevista sobre carreira e futuro. A aula de fechamento do curso Intermediate da Capy English, com diálogo em áudio."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
@@ -57,268 +71,575 @@
   <div class="absolute inset-0 pointer-events-none select-none">
     <span class="absolute text-5xl float-emoji opacity-20" style="top:10%;left:3%;animation-delay:0s">🎓</span>
     <span class="absolute text-4xl float-emoji opacity-20" style="top:60%;left:7%;animation-delay:.7s">🚀</span>
-    <span class="absolute text-5xl float-emoji opacity-20" style="top:20%;left:15%;animation-delay:1.3s">🌅</span>
-    <span class="absolute text-4xl float-emoji opacity-15" style="top:70%;left:22%;animation-delay:.4s">🎯</span>
-    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">💫</span>
-    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:15%;animation-delay:1.6s">🌟</span>
-    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:5%;animation-delay:.2s">🏆</span>
-    <span class="absolute text-4xl float-emoji opacity-15" style="top:75%;right:28%;animation-delay:1s">✨</span>
+    <span class="absolute text-5xl float-emoji opacity-15" style="top:20%;left:15%;animation-delay:1.3s">🌅</span>
+    <span class="absolute text-4xl float-emoji opacity-20" style="top:70%;left:22%;animation-delay:.4s">🏆</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:5%;right:22%;animation-delay:.9s">🎓</span>
+    <span class="absolute text-4xl float-emoji opacity-15" style="top:55%;right:15%;animation-delay:1.6s">🚀</span>
+    <span class="absolute text-5xl float-emoji opacity-20" style="top:30%;right:5%;animation-delay:.2s">🌅</span>
+    <span class="absolute text-4xl float-emoji opacity-20" style="top:75%;right:28%;animation-delay:1s">🏆</span>
   </div>
   <div class="relative max-w-5xl mx-auto px-6 py-12">
     <div class="flex items-center gap-3 flex-wrap mb-5">
-      <a href="classes_intermediate.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Intermediate English</a>
-      <a href="intermediate_aula_19.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
-      <a href="intermediate_revisao.html" class="inline-flex items-center gap-1 bg-rose-500/30 hover:bg-rose-500/40 border border-rose-300/40 text-rose-100 text-sm font-black px-3.5 py-1.5 rounded-full transition-all">🔥 Aula de Revisão →</a>
-      <a href="intermediate_prova.html" class="inline-flex items-center gap-1 bg-amber-400/20 hover:bg-amber-400/30 border border-amber-300/40 text-amber-200 text-sm font-black px-3.5 py-1.5 rounded-full transition-all">🏆 Prova Final →</a>
+      <a href="classes_intermediate.html" class="inline-flex items-center gap-1 text-white/60 hover:text-white text-sm font-bold transition-colors">← Intermediate Course</a>
     </div>
-    <div class="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-400/30 rounded-full px-4 py-1 text-sm font-black text-rose-300 mb-3">Lesson 20</div>
+    <div class="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-400/30 rounded-full px-4 py-1 text-sm font-black text-rose-300 mb-3">Lesson 20 · Intermediate</div>
     <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">🎓 Looking<br><span class="text-rose-300">Ahead</span></h1>
-    <p class="text-white/60 text-base mb-1 max-w-lg">The final conversation — reflect on how far you've come, talk about your future, and celebrate completing the entire Intermediate journey.</p>
-    <p class="text-white/40 text-sm mb-5 max-w-lg">The grand finale of the entire 20-lesson course — reading, listening, discussion and reflection.</p>
+    <p class="text-white/60 text-base mb-5 max-w-lg">A conversa final do curso: olhar para trás, dizer o que você queria ter feito diferente e falar do futuro sem medo. Tudo o que você viu no Intermediate, numa entrevista só.</p>
     <div class="flex flex-wrap gap-2 mb-6">
       <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Conversation</span>
-      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Listening</span>
+      <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">Revisão do curso</span>
       <span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">B2</span>
     </div>
     <div class="flex items-center gap-3">
-      <div class="flex gap-1.5" id="section-dots"></div>
-      <span class="text-white/40 text-xs" id="section-label">0 / 6 sections done</span>
+      <div class="flex gap-1.5 w-40" id="section-dots"></div>
+      <span class="text-white/40 text-xs" id="section-label">0 / 8 sections done</span>
     </div>
   </div>
 </div>
 
-<!-- STICKY TABS -->
+<!-- BARRA DO PERCURSO (substitui a barra de abas) -->
 <div class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100 shadow-sm">
-  <div class="max-w-5xl mx-auto px-4 overflow-x-auto">
-    <div class="flex gap-0 min-w-max">
-      <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="reading">📖 Reading</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="listening">🎧 Listening</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="questions">❓ Questions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="conversation">🗨️ Conversation</button>
-<button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speaking">🗣️ Speaking</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="writing">✏️ Writing</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="homework">📝 Homework</button>
+  <div class="rota-trilho"><div class="rota-preenche" id="rota-preenche" style="width:0%"></div></div>
+  <div class="max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-3">
+    <button id="rota-indice-btn" type="button" onclick="toggleIndice()" class="flex items-center gap-1.5 text-slate-500 hover:text-rose-600 font-black text-xs px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-colors" aria-expanded="false" aria-controls="rota-indice">
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">menu</span> Índice
+    </button>
+    <div class="flex-1 min-w-0">
+      <p class="font-black text-navy text-sm truncate" id="rota-titulo">🎭 Diálogo</p>
+      <p class="text-[11px] text-slate-400 font-bold" id="rota-passo">Passo 1 de 8</p>
     </div>
+    <button type="button" onclick="passoAnterior()" id="rota-voltar" class="w-9 h-9 rounded-xl border-2 border-slate-200 text-slate-400 hover:border-rose-300 hover:text-rose-600 flex items-center justify-center transition-colors disabled:opacity-30" aria-label="Seção anterior">
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">chevron_left</span>
+    </button>
+    <button type="button" onclick="proximoPasso()" id="rota-avancar" class="w-9 h-9 rounded-xl bg-gradient-to-r from-rose-500 to-orange-600 text-white flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-30" aria-label="Próxima seção">
+      <span class="material-symbols-outlined text-lg" style="display:inline-block;width:1em;overflow:hidden;white-space:nowrap;flex-shrink:0">chevron_right</span>
+    </button>
+  </div>
+  <div id="rota-indice" class="hidden border-t border-slate-100 bg-white">
+    <div class="max-w-5xl mx-auto px-3 py-2 grid sm:grid-cols-2 gap-1" id="rota-indice-lista"></div>
   </div>
 </div>
 
 <div class="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
-<!-- READING TAB -->
-<div id="tab-reading" class="tab-content fade-in">
-  <h2 class="text-2xl font-black text-navy mb-2">📖 Reading</h2>
-  <p class="text-slate-500 text-sm mb-6">Read the story carefully. Pay attention to the conditionals, "wish", "used to" and future forms.</p>
+<!-- DIALOGUE — primeira seção da aula -->
+<div id="tab-prepare" class="tab-content fade-in hidden"><div id="prep-raiz"></div></div>
 
-  <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 mb-5">
-    <h3 class="text-xl font-black text-navy mb-4">Where Do You See Yourself?</h3>
-    <div class="text-sm text-navy leading-relaxed space-y-4">
-      <p>It's the question every interviewer loves to ask: "Where do you see yourself in five years?" Most people hate it. They <strong class="text-orange-500">mumble</strong> something safe about "growth" and "opportunities." But Sofia had learned to love that question — because she finally had a real answer.</p>
-      <p>Five years ago, Sofia couldn't have answered it honestly. Back then, she was working as a translator, spending her days converting other people's words from one language to another. She was good at it. The pay was decent. But she <strong class="text-rose-600">used to feel</strong> <strong class="text-orange-500">invisible</strong>, like a bridge that everyone walked across without ever noticing.</p>
-      <p><strong class="text-rose-600">If you had told her then that she would one day run her own language school, she would have laughed.</strong> She didn't think she was the "<strong class="text-orange-500">entrepreneur</strong> type." She <strong class="text-rose-600">wished she were braver</strong>, but every time an idea appeared, a louder voice would remind her of all the reasons it might fail.</p>
-      <p>The change began quietly. She started teaching one evening class, just for extra income. Then two. Then a <strong class="text-orange-500">waiting list</strong> appeared. By the end of the first year, she <strong class="text-rose-600">had quit</strong> translation entirely. By the end of the second, she <strong class="text-rose-600">had hired</strong> her first teacher.</p>
-      <p>It wasn't easy. There were months when she wondered if she had made a terrible mistake. She had to learn things nobody had taught her — accounting, marketing, leadership. She often <strong class="text-rose-600">wished she had studied</strong> business. But she kept going, because for the first time, the work felt like hers.</p>
-      <p>Now, when interviewers ask candidates "Where do you see yourself in five years?", Sofia is the one sitting on the other side of the desk. And she always <strong class="text-orange-500">follows up</strong> with her favourite question: "Forget what's realistic. <strong class="text-rose-600">What would you do if you knew you couldn't fail?</strong>"</p>
-      <p>Because that, she believes, is where every real future begins — not with a safe answer, but with an honest one.</p>
-      <p class="font-black text-navy">So let us ask you, now that you've come this far: Where do you see yourself? And more importantly — <strong class="text-rose-600">what are you going to do</strong> about it?</p>
-    </div>
-  </div>
+<div id="tab-dialogue" class="tab-content fade-in">
+  <h2 class="text-2xl font-black text-navy mb-2">🎭 Looking Ahead</h2>
+  <p class="text-slate-500 text-sm mb-5">🎙️ Num podcast sobre carreira, o Daniel entrevista a Sofia. Há cinco anos ela era tradutora e se sentia invisível; hoje tem a própria escola de idiomas. Ouça antes de ler a tradução.</p>
 
-  <div class="bg-orange-50 border-2 border-orange-200 rounded-2xl p-5 mb-5">
-    <h4 class="font-black text-orange-800 text-sm mb-3">📚 Key Vocabulary</h4>
-    <div class="space-y-2">
-      <div class="flex gap-3 text-sm"><span class="font-black text-orange-700 w-28 flex-shrink-0">mumble (v)</span><span class="text-slate-600">to speak quietly and unclearly</span></div>
-      <div class="flex gap-3 text-sm"><span class="font-black text-orange-700 w-28 flex-shrink-0">invisible (adj)</span><span class="text-slate-600">unable to be seen; unnoticed</span></div>
-      <div class="flex gap-3 text-sm"><span class="font-black text-orange-700 w-28 flex-shrink-0">entrepreneur (n)</span><span class="text-slate-600">a person who starts and runs their own business</span></div>
-      <div class="flex gap-3 text-sm"><span class="font-black text-orange-700 w-28 flex-shrink-0">waiting list (n)</span><span class="text-slate-600">a list of people waiting for something not yet available</span></div>
-      <div class="flex gap-3 text-sm"><span class="font-black text-orange-700 w-28 flex-shrink-0">follow up (phr v)</span><span class="text-slate-600">to pursue or add something after an initial action</span></div>
-    </div>
-  </div>
+  <figure class="mb-5">
+    <img src="/assets/img/intermediate20-dialogue.jpg" width="1200" height="800" loading="eager"
+         alt="Uma mulher sorridente é entrevistada por um homem num pequeno estúdio de podcast, com microfones na mesa; ao fundo, uma sala de aula iluminada."
+         class="w-full rounded-2xl border-2 border-rose-200 shadow-sm"/>
+  </figure>
 
-  <button onclick="markSectionBtn(this,'reading')" class="bg-rose-500 hover:bg-rose-600 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Mark as Read (+20 XP)
-  </button>
-</div>
-
-<!-- LISTENING TAB -->
-<div id="tab-listening" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">🎧 Listening Challenge</h2>
-  <p class="text-slate-500 text-sm mb-6">Press play and listen carefully — <strong>no text shown</strong>. Write what you understand!</p>
-
-  <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-6 mb-6">
-    <div class="flex items-center gap-4 mb-4">
-      <button onclick="playListening()" class="w-14 h-14 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-lg shadow-rose-200">
-        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">play_arrow</span>
-      </button>
-      <div>
-        <p class="font-black text-navy">Play the audio</p>
-        <p class="text-slate-500 text-sm">Listen as many times as you need — focus on understanding!</p>
-      </div>
-    </div>
-    <p class="text-xs text-rose-600 font-bold bg-rose-100 rounded-xl px-3 py-2">🚫 No transcript shown — this is a real listening challenge!</p>
-  </div>
-
-  <div id="listen-field" class="hidden">
-    <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 mb-4">
-      <label class="block font-black text-navy text-sm mb-2">What did you hear? Write what you understood:</label>
-      <textarea id="listen-textarea" rows="5" oninput="checkReveal()" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="Write what you heard... It doesn't need to be perfect!"></textarea>
-      <div class="flex items-center justify-between mt-2">
-        <span id="word-count" class="text-xs text-slate-400 font-bold">0 words</span>
-        <span class="text-xs text-slate-400">Write at least 20 words to reveal the transcript</span>
-      </div>
-    </div>
-    <button id="reveal-btn" onclick="revealTranscript()" class="hidden w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all mb-4">
-      🔍 Reveal Transcript (+20 XP)
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <button type="button" id="dlg-play" onclick="dlgTocarTudo()" class="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-orange-600 text-white font-black px-5 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-transform">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1" id="dlg-play-icone">headphones</span>
+      <span id="dlg-play-txt">Ouvir o diálogo</span>
     </button>
-    <div id="transcript" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5">
-      <p class="font-black text-emerald-800 text-sm mb-3">📄 Full Transcript:</p>
-      <p class="text-sm text-navy leading-relaxed">Hi, I'm Sofia. Five years ago, if you had asked me where I saw myself, I wouldn't have known what to say. I was a translator — good at my job, but I felt invisible. I used to wish I were braver. I had so many ideas, but I was too scared to try any of them. Then one day, I started teaching an evening class, just for extra money. I loved it. Within two years, I had quit my old job and opened my own language school. It wasn't easy. There were days I wanted to give up. But now I wake up excited. So here's my question for you: forget what's realistic. What would you do if you knew you couldn't fail? Because that's where your real future begins.</p>
+    <button type="button" id="dlg-modo" onclick="dlgTrocarModo()" class="border-2 border-slate-200 text-slate-600 font-black text-xs px-4 py-2.5 rounded-2xl hover:border-rose-300 hover:text-rose-600 transition-colors">
+      ➕ Versão longa
+    </button>
+    <button type="button" id="dlg-pt" onclick="dlgTrocarTraducao()" class="border-2 border-slate-200 text-slate-600 font-black text-xs px-4 py-2.5 rounded-2xl hover:border-rose-300 hover:text-rose-600 transition-colors">
+      🇧🇷 Mostrar tradução
+    </button>
+  </div>
+
+  <div class="space-y-3 mb-6" id="dialogue-lines"></div>
+
+  <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-4">
+    <p class="font-black text-rose-800 text-sm mb-2">🎯 Encontre no diálogo:</p>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <div class="bg-white rounded-xl p-2 border border-rose-200">✅ <strong>I used to feel invisible</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-rose-200">✅ <strong>I would have laughed</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-rose-200">✅ <strong>I wish I had studied…</strong></div>
+      <div class="bg-white rounded-xl p-2 border border-rose-200">✅ <strong>If you knew you couldn't fail…</strong></div>
     </div>
   </div>
-</div>
-
-<!-- QUESTIONS TAB -->
-<div id="tab-questions" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">❓ Questions</h2>
-  <p class="text-slate-500 text-sm mb-6">Answer these questions based on the reading. Some are comprehension, some are your opinion!</p>
-  <div class="space-y-4" id="questions-list"></div>
-  <button onclick="markSectionBtn(this,'questions')" class="mt-6 bg-rose-500 hover:bg-rose-600 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Questions Done! (+20 XP)
+  <button onclick="markSectionBtn(this,'dialogue')" class="mt-4 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-600 hover:to-orange-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+    ✓ Li e ouvi o diálogo! (+20 XP)
   </button>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
 
-<!-- CONVERSATION TAB -->
+<!-- VOCAB (+ VERBOS, fundidos) -->
+<div id="tab-vocab" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-4">
+    <div><h2 class="text-2xl font-black text-navy">Vocabulary</h2><p class="text-slate-500 text-sm mt-1">As palavras que você acabou de ouvir. Toque para virar a carta.</p></div>
+    <div class="text-right"><div class="text-2xl font-black text-rose-600" id="vocab-count">0</div><div class="text-xs text-slate-400 font-bold">learned</div></div>
+  </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-4 overflow-hidden"><div id="vocab-bar" class="h-full bg-gradient-to-r from-rose-500 to-orange-600 rounded-full transition-all duration-500" style="width:0%"></div></div>
+  <div class="flex flex-wrap gap-3 mb-5 text-[11px] font-bold text-slate-500">
+    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2 border-amber-300 bg-amber-50"></span> borda laranja = verbo (o verso mostra as formas)</span>
+    <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2 border-rose-200 bg-rose-50"></span> palavra nova</span>
+    <span class="inline-flex items-center gap-1.5">🔁 = revisão de aulas anteriores</span>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="vocab-grid"></div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+</div>
+
+<!-- EXPRESSIONS -->
+<div id="tab-expressions" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">Key Expressions</h2>
+  <p class="text-slate-500 text-sm mb-6">Frases prontas para contar a sua história e falar do futuro. Uma por slide.</p>
+  <div class="grid gap-4" id="expr-grid"></div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+</div>
+
+<!-- GRAMMAR -->
+<div id="tab-grammar" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-1">Passado, desejos e futuro</h2>
+  <p class="text-slate-500 text-sm mb-5">6 slides com 28 exemplos. Toque no slide para ver em tela cheia; passe com as setas, deslizando ou pelos botões.</p>
+  <div id="gs-deck" role="region" aria-roledescription="carrossel" aria-label="Slides dos padrões">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <span id="gs-pos" class="text-xs font-black text-slate-400" style="font-variant-numeric:tabular-nums" aria-live="polite">Slide 1 de 6</span>
+      <div class="flex flex-wrap gap-1.5"><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-rose-500" aria-label="Ir para o slide 1" aria-current="true"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 2" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 3" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 4" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 5" aria-current="false"></button><button type="button" class="gs-dot w-2.5 h-2.5 rounded-full bg-slate-200" aria-label="Ir para o slide 6" aria-current="false"></button></div>
+    </div>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="0" aria-label="Slide 1 de 6">
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Nesta aula</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Passado, desejos e futuro</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 1 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-0.webp?v=e5476c4112" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ol class="gs-lista space-y-2">
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">1</span><span class="gs-en font-black text-navy">I <strong class="text-rose-600">used to</strong> feel invisible</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">2</span><span class="gs-en font-black text-navy">I wish I <strong class="text-rose-600">were</strong> braver · I wish I <strong class="text-rose-600">had</strong> studied</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">3</span><span class="gs-en font-black text-navy">If I <strong class="text-rose-600">knew</strong>…, I <strong class="text-rose-600">would</strong>…</span></li>
+            <li class="flex items-center gap-3"><span class="flex-shrink-0 w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">4</span><span class="gs-en font-black text-navy">If you <strong class="text-rose-600">had told</strong> me…, I <strong class="text-rose-600">would have</strong> laughed</span></li>
+          </ol>
+          <p class="gs-nota mt-4 text-slate-500 text-sm">28 exemplos. Ouça cada frase e repare na parte em destaque.</p>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="1" aria-label="Slide 2 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Padrão 1 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">I <strong class="text-rose-300">used to</strong> feel invisible</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 2 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-1.webp?v=ef22b43c56" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I used to feel invisible at work." aria-label="Ouvir: I used to feel invisible at work."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I <strong class="text-rose-600">used to feel</strong> invisible at work.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu me sentia invisível no trabalho.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="She used to work as a translator." aria-label="Ouvir: She used to work as a translator."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">She <strong class="text-rose-600">used to work</strong> as a translator.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Ela trabalhava como tradutora.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="We used to live in a small apartment." aria-label="Ouvir: We used to live in a small apartment."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">We <strong class="text-rose-600">used to live</strong> in a small apartment.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A gente morava num apartamento pequeno.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I didn't use to speak English at work." aria-label="Ouvir: I didn't use to speak English at work."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I <strong class="text-rose-600">didn't use to speak</strong> English at work.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu não falava inglês no trabalho.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="Did you use to play any sports?" aria-label="Ouvir: Did you use to play any sports?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug"><strong class="text-rose-600">Did</strong> you <strong class="text-rose-600">use to</strong> play any sports?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Você praticava algum esporte?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="He used to be very shy." aria-label="Ouvir: He used to be very shy."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">He <strong class="text-rose-600">used to be</strong> very shy.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Ele era muito tímido.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="2" aria-label="Slide 3 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Padrão 2 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">I wish I <strong class="text-rose-300">were</strong> braver · I wish I <strong class="text-rose-300">had</strong> studied</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 3 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-2.webp?v=ac3adee531" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I were braver." aria-label="Ouvir: I wish I were braver."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">were</strong> braver.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria ser mais corajosa.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I had more free time." aria-label="Ouvir: I wish I had more free time."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">had</strong> more free time.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria ter mais tempo livre.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I could speak French too." aria-label="Ouvir: I wish I could speak French too."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">could</strong> speak French too.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria saber falar francês também.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I had studied business." aria-label="Ouvir: I wish I had studied business."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">had studied</strong> business.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria ter estudado administração.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="She wishes she had started earlier." aria-label="Ouvir: She wishes she had started earlier."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">She wishes she <strong class="text-rose-600">had started</strong> earlier.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Ela queria ter começado antes.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I hadn't been so afraid." aria-label="Ouvir: I wish I hadn't been so afraid."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">hadn't been</strong> so afraid.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria não ter tido tanto medo.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="3" aria-label="Slide 4 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Padrão 3 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">If I <strong class="text-rose-300">knew</strong>…, I <strong class="text-rose-300">would</strong>…</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 4 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-3.webp?v=f74441770c" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I knew I couldn't fail, I would open a second school." aria-label="Ouvir: If I knew I couldn't fail, I would open a second school."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">knew</strong> I couldn't fail, I <strong class="text-rose-600">would open</strong> a second school.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu soubesse que não poderia falhar, eu abriria uma segunda escola.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I had more time, I would travel more." aria-label="Ouvir: If I had more time, I would travel more."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">had</strong> more time, I <strong class="text-rose-600">would travel</strong> more.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu tivesse mais tempo, eu viajaria mais.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If she lived abroad, she would speak English every day." aria-label="Ouvir: If she lived abroad, she would speak English every day."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If she <strong class="text-rose-600">lived</strong> abroad, she <strong class="text-rose-600">would speak</strong> English every day.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se ela morasse fora, ela falaria inglês todo dia.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="What would you do if you won the lottery?" aria-label="Ouvir: What would you do if you won the lottery?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">What <strong class="text-rose-600">would</strong> you <strong class="text-rose-600">do</strong> if you <strong class="text-rose-600">won</strong> the lottery?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O que você faria se ganhasse na loteria?</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I were you, I would accept the job." aria-label="Ouvir: If I were you, I would accept the job."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">were</strong> you, I <strong class="text-rose-600">would accept</strong> the job.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu fosse você, eu aceitaria o emprego.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wouldn't worry if I were you." aria-label="Ouvir: I wouldn't worry if I were you."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I <strong class="text-rose-600">wouldn't worry</strong> if I <strong class="text-rose-600">were</strong> you.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu não me preocuparia se fosse você.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="4" aria-label="Slide 5 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Padrão 4 de 4</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">If you <strong class="text-rose-300">had told</strong> me…, I <strong class="text-rose-300">would have</strong> laughed</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 5 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-4.webp?v=9bde779fea" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If you had told me then, I would have laughed." aria-label="Ouvir: If you had told me then, I would have laughed."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If you <strong class="text-rose-600">had told</strong> me then, I <strong class="text-rose-600">would have laughed</strong>.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se você tivesse me dito naquela época, eu teria rido.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I had studied business, it would have been easier." aria-label="Ouvir: If I had studied business, it would have been easier."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">had studied</strong> business, it <strong class="text-rose-600">would have been</strong> easier.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu tivesse estudado administração, teria sido mais fácil.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If she hadn't started that class, she wouldn't have found her passion." aria-label="Ouvir: If she hadn't started that class, she wouldn't have found her passion."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If she <strong class="text-rose-600">hadn't started</strong> that class, she <strong class="text-rose-600">wouldn't have found</strong> her passion.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se ela não tivesse começado aquela turma, não teria encontrado a paixão dela.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="We would have arrived on time if we had left earlier." aria-label="Ouvir: We would have arrived on time if we had left earlier."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">We <strong class="text-rose-600">would have arrived</strong> on time if we <strong class="text-rose-600">had left</strong> earlier.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">A gente teria chegado a tempo se tivesse saído mais cedo.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I had known, I would have helped you." aria-label="Ouvir: If I had known, I would have helped you."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">had known</strong>, I <strong class="text-rose-600">would have helped</strong> you.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu soubesse, eu teria te ajudado.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="What would you have done in my place?" aria-label="Ouvir: What would you have done in my place?"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0">
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">What <strong class="text-rose-600">would</strong> you <strong class="text-rose-600">have done</strong> in my place?</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">O que você teria feito no meu lugar?</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="gs-slide rounded-3xl bg-white border-2 border-rose-100 overflow-hidden cursor-zoom-in" data-i="5" aria-label="Slide 6 de 6" hidden>
+      <div class="gs-cab bg-navy text-white px-5 py-4 sm:px-6 flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="gs-rotulo text-[11px] font-black uppercase tracking-widest text-rose-300">Revisão</p>
+          <h3 class="gs-titulo text-xl sm:text-2xl font-black leading-snug">Uma frase nova de cada padrão</h3>
+        </div>
+        <button type="button" class="gs-expandir flex-shrink-0 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all active:scale-95" aria-label="Ver o slide 6 em tela cheia" title="Tela cheia"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zM4 14h2v4h4v2H4v-6zm14 0h2v6h-6v-2h4v-4z"/></svg></button>
+      </div>
+      <div class="gs-corpo p-3 sm:p-4 sm:grid sm:grid-cols-5 sm:gap-4 sm:items-start">
+        <img class="gs-img block w-full h-auto rounded-2xl bg-rose-50 sm:col-span-2" src="assets/img/gramatica/intermediate20-5.webp?v=19f529063b" alt="" width="1024" height="768" loading="lazy" decoding="async">
+        <div class="gs-texto mt-3 sm:mt-0 sm:col-span-3">
+          <ul class="gs-lista space-y-2">
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I used to hate speaking in public." aria-label="Ouvir: I used to hate speaking in public."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 rounded-full px-2 py-0.5">Padrão 1</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I <strong class="text-rose-600">used to hate</strong> speaking in public.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu odiava falar em público.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="I wish I had learned English as a child." aria-label="Ouvir: I wish I had learned English as a child."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 rounded-full px-2 py-0.5">Padrão 2</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">I wish I <strong class="text-rose-600">had learned</strong> English as a child.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Eu queria ter aprendido inglês quando criança.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If I spoke better, I would apply for that job." aria-label="Ouvir: If I spoke better, I would apply for that job."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 rounded-full px-2 py-0.5">Padrão 3</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If I <strong class="text-rose-600">spoke</strong> better, I <strong class="text-rose-600">would apply</strong> for that job.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se eu falasse melhor, eu me candidataria àquela vaga.</p>
+              </div>
+            </li>
+            <li class="gs-item flex items-start gap-3 rounded-2xl bg-slate-50 px-3 py-3 sm:px-4">
+              <button type="button" class="gs-ouvir flex-shrink-0 w-10 h-10 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-all active:scale-95" data-say="If she had quit earlier, she would have saved time." aria-label="Ouvir: If she had quit earlier, she would have saved time."><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></svg></button>
+              <div class="min-w-0"><span class="gs-selo inline-block mb-1 text-[11px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 rounded-full px-2 py-0.5">Padrão 4</span>
+                <p class="gs-en text-navy font-bold text-base sm:text-lg leading-snug">If she <strong class="text-rose-600">had quit</strong> earlier, she <strong class="text-rose-600">would have saved</strong> time.</p>
+                <p class="gs-pt text-slate-500 text-sm mt-0.5">Se ela tivesse largado antes, teria economizado tempo.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" id="gs-ant" class="flex-shrink-0 inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-navy font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Anterior</button>
+      <button type="button" id="gs-prox" class="flex-1 inline-flex items-center justify-center gap-1 bg-navy hover:opacity-90 text-white font-black px-5 py-3 rounded-2xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">Próximo →</button>
+    </div>
+  </div>
+  <button type="button" id="gs-xp" onclick="markSectionBtn(this,'grammar')" class="mt-5 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-600 hover:to-orange-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" disabled>
+    Veja os 6 slides para ganhar +20 XP
+  </button>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+<script src="gramatica-slides.js?v=gs2"></script>
+</div>
+
+<!-- HOW DO YOU SAY IT IN ENGLISH? (padrão de 12/nov/2026, montado pelo aula-molde.js) -->
+<div id="tab-traducao" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🇧🇷 How do you say it in English?</h2>
+  <p class="text-slate-500 text-sm mb-5">Leia a frase em português e escreva em inglês, com as palavras e os padrões da aula. Depois de conferir, a resposta certa aparece escrita.</p>
+  <div id="trad-area"></div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+</div>
+
+<!-- CONVERSATION -->
 <div id="tab-conversation" class="tab-content fade-in hidden">
   <h2 class="text-2xl font-black text-navy mb-2">🗨️ Let's Talk!</h2>
   <p class="text-slate-500 text-sm mb-6">Responda com suas próprias palavras. Clique num "starter" pra começar a frase, use as palavras sugeridas e treine em voz alta. 🎤</p>
   <div class="space-y-5" id="conv-grid"></div>
-  <button onclick="markSectionBtn(this,'conversation')" class="mt-6 bg-rose-500 hover:bg-rose-600 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+  <button onclick="markSectionBtn(this,'conversation')" class="mt-6 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-600 hover:to-orange-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
     ✓ Pratiquei a conversação! (+20 XP)
   </button>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
 
-<!-- SPEAKING TAB -->
-<div id="tab-speaking" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">🗣️ Speaking Practice</h2>
-  <p class="text-slate-500 text-sm mb-6">Read each prompt aloud. Press ▶️ to hear the model answer, then give YOUR own response.</p>
-  <div class="space-y-4" id="speaking-prompts"></div>
-  <button onclick="markSectionBtn(this,'speaking')" class="mt-6 bg-rose-500 hover:bg-rose-600 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
-    ✓ Speaking Done! (+20 XP)
-  </button>
-</div>
-
-<!-- WRITING TAB -->
-<div id="tab-writing" class="tab-content fade-in hidden">
-  <h2 class="text-2xl font-black text-navy mb-2">✏️ Writing Challenge</h2>
-  <p class="text-slate-500 text-sm mb-6">Write a paragraph (5–8 sentences) answering "Where do you see yourself in five years, and how has learning English changed your path?" Use as many grammar structures from the whole course as you can!</p>
-
-  <div class="grid grid-cols-2 gap-2 mb-5">
-    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs"><strong class="text-rose-700">🚀 Future Forms</strong><p class="text-slate-500 mt-0.5">I'm going to... / By 2030 I will have...</p></div>
-    <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs"><strong class="text-orange-700">💭 Conditionals &amp; Wish</strong><p class="text-slate-500 mt-0.5">If I could... / I wish I had...</p></div>
-    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs"><strong class="text-rose-700">⏪ Used to / Present Perfect</strong><p class="text-slate-500 mt-0.5">I used to... / I have learned...</p></div>
-    <div class="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs"><strong class="text-orange-700">🔗 Relative Clauses</strong><p class="text-slate-500 mt-0.5">a future where... / someone who...</p></div>
-  </div>
-
-  <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 mb-4">
-    <label class="block font-black text-navy text-sm mb-2">Your paragraph:</label>
-    <textarea id="writing-text" rows="6" oninput="checkWriting()" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="Start with: 'In five years, I see myself...' or 'Learning English has changed...'"></textarea>
-    <div class="flex items-center justify-between mt-2">
-      <span id="writing-count" class="text-xs text-slate-400 font-bold">0 words</span>
-      <span class="text-xs text-slate-400">Aim for 5–8 sentences</span>
+<!-- PRACTICE (quiz + o antigo mini-quiz de verbos) -->
+<div id="tab-practice" class="tab-content fade-in hidden">
+  <div class="flex items-center justify-between mb-6">
+    <div><h2 class="text-2xl font-black text-navy">Practice</h2><p class="text-slate-500 text-sm mt-1" id="prac-subtitle">Parte 1 de 2 — 8 perguntas. O que você diria nessa situação?</p></div>
+    <div class="flex items-center gap-3">
+      <div class="text-center"><div class="text-2xl font-black text-rose-600" id="prac-score">0<span class="text-sm text-slate-400">/8</span></div><div class="text-[10px] text-slate-400 font-bold">score</div></div>
+      <div class="text-center"><div class="text-2xl font-black text-orange-500" id="prac-streak">🔥 0</div><div class="text-[10px] text-slate-400 font-bold">streak</div></div>
     </div>
   </div>
+  <div class="h-2 bg-slate-100 rounded-full mb-6 overflow-hidden"><div id="prac-bar" class="h-full bg-gradient-to-r from-rose-500 to-orange-600 rounded-full transition-all duration-500" style="width:0%"></div></div>
+  <div id="practice-area"></div>
 
-  <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
-    <p class="font-black text-slate-700 text-xs mb-2">Grammar used (mark all that apply):</p>
-    <div class="flex flex-wrap gap-2" id="tense-checklist">
-      <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="tc-ff" class="accent-rose-500"/> <span class="text-xs font-bold text-slate-600">Future Forms</span></label>
-      <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="tc-cw" class="accent-orange-500"/> <span class="text-xs font-bold text-slate-600">Conditionals &amp; Wish</span></label>
-      <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="tc-up" class="accent-rose-500"/> <span class="text-xs font-bold text-slate-600">Used to / Present Perfect</span></label>
-      <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" id="tc-rc" class="accent-orange-500"/> <span class="text-xs font-bold text-slate-600">Relative Clauses</span></label>
-    </div>
+  <div class="mt-8 bg-white border-2 border-rose-200 rounded-2xl p-6">
+    <h3 class="font-black text-navy text-lg mb-1">✏️ Parte 2 — Complete a frase</h3>
+    <p class="text-slate-500 text-xs mb-4">Escreva a palavra que falta, como você viu na aula.</p>
+    <div class="space-y-4" id="verbs-quiz"></div>
+    <button onclick="checkVerbsQuiz()" class="mt-5 bg-gradient-to-r from-rose-500 to-orange-600 hover:from-rose-600 hover:to-orange-700 text-white font-black px-6 py-3 rounded-2xl transition-all hover:scale-105 active:scale-95">
+      Check Answers
+    </button>
+    <div id="verbs-quiz-result" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div>
   </div>
 
-  <button id="writing-done-btn" onclick="submitWriting()" class="w-full bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all opacity-50 cursor-not-allowed" disabled>
-    ✓ Submit Writing (+20 XP)
-  </button>
+  <div id="result-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden')}">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-6xl mb-3" id="result-emoji">🎉</div>
+      <h2 class="text-2xl font-black text-navy mb-1" id="result-title">Great job!</h2>
+      <p class="text-slate-500 text-sm mb-4" id="result-msg"></p>
+      <div class="inline-flex items-center gap-2 bg-rose-100 text-rose-700 font-black px-6 py-3 rounded-full text-lg mb-6">+50 XP 🌟</div>
+      <div class="flex gap-3">
+        <button onclick="restartPractice()" class="flex-1 border-2 border-slate-200 text-slate-600 font-black py-3 rounded-2xl hover:bg-slate-50 transition-all">Try Again</button>
+        <button onclick="document.getElementById('result-overlay').classList.add('hidden');proximoPasso()" class="flex-1 bg-gradient-to-r from-rose-500 to-orange-600 text-white font-black py-3 rounded-2xl hover:scale-105 transition-all">Continuar</button>
+      </div>
+    </div>
+  </div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
 
-<!-- HOMEWORK TAB -->
+<!-- COMPLETE THE TEXT (padrão de 12/nov/2026, montado pelo aula-molde.js) -->
+<div id="tab-lacunas" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔤 Complete the text</h2>
+  <p class="text-slate-500 text-sm mb-5">Um texto com partes faltando. Os pedaços estão na caixa: escolha cada um e encaixe no lugar certo.</p>
+  <div id="lacunas-area"></div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+</div>
+
+<!-- SPEAK -->
+<div id="tab-speak" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">Speak &amp; Practise</h2>
+  <p class="text-slate-500 text-sm mb-6">Pressione ▶️ para ouvir e repita em voz alta.</p>
+  <div class="space-y-3" id="speak-grid"></div>
+  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
+</div>
+
+<!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
-  <div class="bg-gradient-to-br from-rose-500 to-orange-600 rounded-3xl p-6 mb-6 text-white">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
+  <div class="bg-gradient-to-br from-rose-500 to-orange-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
-      <span class="text-4xl">🏆</span>
+      <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 20 — Looking Ahead</p></div>
     </div>
-    <p class="text-white/80 text-sm font-bold">🏆 THE FINAL LESSON! You're about to complete the entire Intermediate Course — 20 lessons!</p>
+    <p class="text-white/70 text-sm">São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
-  <!-- Task 1: Word Order -->
   <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">1</span>
-      <div><p class="font-black text-navy text-sm">Word Order</p><p class="text-slate-500 text-xs">Monte a frase na ordem correta!</p></div>
+      <div><p class="font-black text-navy text-sm">Word Order</p><p class="text-slate-500 text-xs">Monte a instrução na ordem correta.</p></div>
     </div>
-    <div id="wo-i20-wrap"></div>
+    <div id="wo-int20-wrap"></div>
   </div>
 
-  <!-- Task 2: Error Correction -->
   <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">2</span>
-      <div><p class="font-black text-navy text-sm">Error Correction</p><p class="text-slate-500 text-xs">Reescreva a frase corrigindo o erro.</p></div>
+      <div><p class="font-black text-navy text-sm">Match the Vocabulary</p><p class="text-slate-500 text-xs">Conecte a palavra ao seu significado.</p></div>
     </div>
-    <div class="bg-red-50 border border-red-200 rounded-xl p-3">
-      <p class="text-xs font-black text-red-700 mb-1">❌ Frase com erro:</p>
-      <p class="text-sm font-bold text-navy mb-2">"If you had told me five years ago, I would laughed at the idea."</p>
-      <input id="err-i20" type="text" placeholder="Escreva a frase correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none" oninput="checkErrI20()"/>
-      <p id="err-i20-fb" class="text-xs font-black mt-1 hidden"></p>
-    </div>
+    <div id="mp-int20-wrap"></div>
   </div>
 
-  <!-- Task 3: Gap Fill -->
   <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-4">
     <div class="flex items-center gap-2 mb-3">
       <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">3</span>
-      <div><p class="font-black text-navy text-sm">Mixed Grammar Gap Fill — Whole Course Review</p><p class="text-slate-500 text-xs">Fill in the blank with the correct form (≥3/5 to complete)</p></div>
+      <div><p class="font-black text-navy text-sm">Error Correction</p><p class="text-slate-500 text-xs">Reescreva a frase corrigindo o erro.</p></div>
     </div>
-    <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-5">
-      <div class="space-y-3" id="hw-quiz-i20"></div>
-      <div class="flex items-center gap-3 mt-4">
-        <button onclick="checkHWQuiz()" class="bg-rose-500 hover:bg-rose-600 text-white font-black px-5 py-2.5 rounded-xl transition-all hover:scale-105 active:scale-95 text-sm">Check Answers</button>
-        <span id="hw-quiz-result" class="text-sm font-black"></span>
-      </div>
+    <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+      <p class="text-xs font-black text-red-700 mb-1">❌ Corrija:</p>
+      <p class="text-sm font-bold text-navy mb-2">Corrija a frase: <em>"If you had told me, I would laughed."</em></p>
+      <input id="err-int20" type="text" placeholder="Escreva a instrução correta..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none" oninput="checkErrorInt20()"/>
+      <p id="err-int20-fb" class="text-xs font-black mt-1 hidden"></p>
     </div>
   </div>
 
-  <!-- Task 4: Final Reflection -->
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-rose-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Final Reflection — Course Completion</p><p class="text-slate-500 text-xs">Answer Sofia's question in your own words.</p></div>
+      <span class="w-7 h-7 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center">8</span>
+      <div><p class="font-black text-navy text-sm">Onde você se vê daqui a cinco anos?</p><p class="text-slate-500 text-xs">Escreva 4 ou 5 frases: como você era antes (used to), o que gostaria de ter feito diferente (I wish I had), o que faria sem medo de falhar (If I knew…, I would) e o seu plano (going to).</p></div>
     </div>
-    <p class="text-sm text-navy leading-relaxed mb-3 bg-rose-50 border border-rose-200 rounded-xl p-3">🎓 You've reached the end of the Intermediate course — 20 lessons complete! Answer Sofia's question in your own words: "Where do you see yourself, and what are you going to do about it?" Write 3-4 sentences. Be bold and honest. You've earned it! 🎉</p>
-    <textarea rows="5" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="In five years, I see myself...&#10;And here's what I'm going to do about it..."></textarea>
-    <button onclick="submitHomeworkI20()" class="mt-3 bg-gradient-to-r from-rose-500 to-orange-600 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
-      🚀 Submit Homework (+75 XP)
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="Five years ago, I used to avoid speaking English.&#10;I wish I had started practising earlier.&#10;If I knew I couldn't fail, I would work abroad.&#10;Next year, I'm going to apply for an international job."></textarea>
+    <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
+    <button onclick="submitHomeworkInt20()" class="mt-3 bg-gradient-to-r from-rose-500 to-orange-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
+      🚀 Entregar Homework (+75 XP)
     </button>
+    <div id="hw-card"></div>
   </div>
-
-  <!-- Final Exam CTA -->
-  <div class="bg-gradient-to-br from-navy via-rose-950 to-orange-900 text-white border-2 border-amber-300 rounded-3xl p-6 shadow-xl">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <span class="inline-block bg-amber-400/20 border border-amber-300/40 text-amber-200 text-[11px] font-black uppercase tracking-widest px-3 py-0.5 rounded-full mb-2">🏆 Próximos Passos · Revisão + Prova Final</span>
-        <h3 class="text-xl font-black mb-1">Revise tudo ou vá direto para a Prova Final!</h3>
-        <p class="text-white/75 text-xs md:text-sm">Faça a Aula de Revisão Geral antes da prova ou inicie direto o exame de 30 minutos (40 questões).</p>
-      </div>
-      <div class="flex flex-wrap gap-2.5 w-full sm:w-auto">
-        <a href="intermediate_revisao.html" class="flex-1 sm:flex-initial text-center bg-white/15 hover:bg-white/25 border border-white/30 text-white font-black text-sm px-5 py-3.5 rounded-2xl transition-all">
-          🔥 Aula de Revisão →
-        </a>
-        <a href="intermediate_prova.html" class="flex-1 sm:flex-initial text-center bg-gradient-to-r from-amber-400 to-orange-500 text-navy font-black text-sm px-6 py-3.5 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg">
-          🎓 Prova Final →
-        </a>
-      </div>
+  <div class="mt-6 bg-gradient-to-br from-rose-500 to-orange-500 rounded-3xl p-6 text-white">
+    <p class="text-3xl mb-1">🎓</p>
+    <h3 class="font-black text-xl mb-1">Você chegou ao fim do Intermediate!</h3>
+    <p class="text-white/85 text-sm mb-4">Antes da prova final, faça a aula de revisão: ela junta tudo o que você viu nas 20 aulas.</p>
+    <div class="flex flex-wrap gap-2">
+      <a href="intermediate_revisao.html" class="bg-white text-rose-600 font-black px-5 py-3 rounded-2xl hover:scale-105 transition-transform">🔥 Aula de revisão</a>
+      <a href="intermediate_prova.html" class="bg-white/20 border border-white/40 text-white font-black px-5 py-3 rounded-2xl hover:bg-white/30 transition-colors">🏆 Prova final</a>
     </div>
   </div>
 </div>
@@ -337,338 +658,325 @@ Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-const TOTAL_SECTIONS = 7;
-let sectionsDone = 0;
-function buildSectionDots() {
-  const c = document.getElementById('section-dots');
-  const lb = document.getElementById('section-label');
-  if (!c) return;
-  c.innerHTML = Array.from({length: TOTAL_SECTIONS}, (_,i) =>
-    `<div class="prog-dot ${i < sectionsDone ? 'bg-gradient-to-r from-rose-400 to-orange-400' : 'bg-white/20'}"></div>`).join('');
-  if (lb) lb.textContent = `${sectionsDone} / ${TOTAL_SECTIONS} sections done`;
-}
-buildSectionDots();
-function markSection(name) {
-  if (sectionsDone < TOTAL_SECTIONS) { sectionsDone++; buildSectionDots(); }
-  if (typeof Store !== 'undefined') Store.addXP(20);
-}
-
-const SECTIONS = ['reading','listening','questions','conversation','speaking','writing','homework'];
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    SECTIONS.forEach(t => {
-      const el = document.getElementById('tab-'+t);
-      if (el) el.classList.toggle('hidden', t !== tab);
-    });
-  });
-});
-
-function markSectionBtn(btn, section) {
-  btn.disabled = true;
-  btn.textContent = '✓ Done! +20 XP';
-  btn.classList.add('opacity-75');
-  markSection(section);
-}
-
-// ===== LISTENING =====
-const LISTEN_TEXT = `Hi, I'm Sofia. Five years ago, if you had asked me where I saw myself, I wouldn't have known what to say. I was a translator — good at my job, but I felt invisible. I used to wish I were braver. I had so many ideas, but I was too scared to try any of them. Then one day, I started teaching an evening class, just for extra money. I loved it. Within two years, I had quit my old job and opened my own language school. It wasn't easy. There were days I wanted to give up. But now I wake up excited. So here's my question for you: forget what's realistic. What would you do if you knew you couldn't fail? Because that's where your real future begins.`;
-
-function playListening() {
-  const u = new SpeechSynthesisUtterance(LISTEN_TEXT);
-  u.lang = 'en-US'; u.rate = 0.85;
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
-  document.getElementById('listen-field').classList.remove('hidden');
-}
-
-function checkReveal() {
-  const words = document.getElementById('listen-textarea').value.trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('word-count').textContent = `${words} words`;
-  if (words >= 20) document.getElementById('reveal-btn').classList.remove('hidden');
-}
-
-function revealTranscript() {
-  document.getElementById('transcript').classList.remove('hidden');
-  const btn = document.getElementById('reveal-btn');
-  btn.disabled = true;
-  btn.classList.add('opacity-75');
-  btn.textContent = '✓ Transcript revealed!';
-  markSection('listening');
-  if(typeof Store !== 'undefined') Store.addXP(20);
-}
-
-// ===== QUESTIONS =====
-const QUESTIONS = [
-  {type:'comprehension', q:'What job did Sofia have five years ago, and how did she feel about it?'},
-  {type:'comprehension', q:'Why does the text compare Sofia to "a bridge"?'},
-  {type:'comprehension', q:'How did Sofia\'s language school actually begin?'},
-  {type:'comprehension', q:'What new skills did Sofia have to learn that nobody had taught her?'},
-  {type:'comprehension', q:'What is Sofia\'s favourite question to ask job candidates?'},
-  {type:'opinion', q:'How would YOU answer: "Where do you see yourself in five years?"'},
-  {type:'opinion', q:'What would you do if you knew you couldn\'t fail? Be honest!'},
-  {type:'opinion', q:'Do you think it\'s better to have a "safe" answer or an "honest" one? Why?'},
-  {type:'opinion', q:'Have you ever felt "invisible" in a job, school, or situation? Describe it.'},
-  {type:'opinion', q:'Now that you\'ve completed this course — how do you feel about your English journey?'},
+// ── PERCURSO LINEAR ────────────────────────────────────────────────────────
+// A barra de abas com rolagem horizontal saiu. A aula tem ordem — o diálogo
+// abre e tudo depois se apoia nele — e aba convida a pular.
+// TOTAL_SECTIONS é DERIVADO: o listening-lab.js injeta uma seção depois do
+// boot, e o percurso a adota (ver adotarListening).
+const ROTA=[
+  {id:'prepare',     rotulo:'🎯 Prepare'},
+  {id:'dialogue',    rotulo:'🎭 Diálogo'},
+  {id:'vocab',       rotulo:'📚 Vocab + Verbos'},
+  {id:'expressions', rotulo:'💬 Expressions'},
+  {id:'grammar',     rotulo:'🧩 Patterns'},
+  {id:'traducao',    rotulo:'🇧🇷 How do you say it?'},
+  {id:'conversation',rotulo:'🗨️ Conversation'},
+  {id:'practice',    rotulo:'✏️ Practice'},
+  {id:'lacunas',     rotulo:'🔤 Complete the text'},
+  {id:'speak',       rotulo:'🗣️ Speak'},
+  {id:'homework',    rotulo:'📝 Homework'},
 ];
+let passo=0;
+// Idempotência do XP: sem isto, toggleExpr credita +20 a CADA clique depois do
+// sexto, e "Try Again" no quiz paga de novo. O índice também precisa saber o
+// que já foi creditado para desenhar os ✓.
+const creditadas=new Set();
+let sectionsDone=0;
 
-function buildQuestions() {
-  const list = document.getElementById('questions-list');
-  QUESTIONS.forEach((item, i) => {
-    const isComp = item.type === 'comprehension';
-    const div = document.createElement('div');
-    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5';
-    div.innerHTML = `
-      <div class="flex items-start gap-3 mb-3">
-        <span class="text-xs font-black px-2 py-1 rounded-full flex-shrink-0 mt-0.5 ${isComp ? 'bg-navy text-white' : 'bg-rose-100 text-rose-700'}">
-          ${isComp ? 'Comprehension' : 'Your Opinion'}
-        </span>
-        <p class="text-sm font-bold text-navy">${i+1}. ${item.q}</p>
-      </div>
-      <textarea rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none" placeholder="${isComp ? 'Write your answer...' : 'Share your thoughts...'}" aria-label="Answer to question ${i+1}"></textarea>`;
-    list.appendChild(div);
-  });
-}
-buildQuestions();
+try{
+  const s=JSON.parse(localStorage.getItem('capyIntermediate20Done')||'[]');
+  if(Array.isArray(s))s.forEach(n=>creditadas.add(n));
+  sectionsDone=creditadas.size;
+}catch(e){}
 
-// ===== SPEAKING =====
-const SPEAKING_PROMPTS = [
-  {
-    prompt: "Where do you see yourself in five years? Give an honest answer.",
-    modelAnswer: "In five years, I see myself working in a role where I use English every day — maybe in international business or remote work. I'd love to have travelled to at least five new countries by then. Honestly, I just want to keep growing and never feel stuck again.",
-    tense: "Future Forms + Future Perfect + Conditional"
-  },
-  {
-    prompt: "Think back five years. How has your life changed since then?",
-    modelAnswer: "Five years ago, I used to be much more shy and unsure of myself. I would avoid speaking English because I was afraid of making mistakes. Since then, I've grown so much. I've learned that mistakes are just part of the process.",
-    tense: "Used to + Would + Present Perfect"
-  },
-  {
-    prompt: "What's one thing you wish you had done differently in your learning journey?",
-    modelAnswer: "I wish I had started speaking earlier instead of just studying rules silently. If I had practised conversation from the beginning, I would have built confidence much faster. But hindsight is 20/20 — at least I know better now!",
-    tense: "Wish + Past Perfect + Third Conditional"
-  },
-  {
-    prompt: "If you knew you couldn't fail, what would you do with your life?",
-    modelAnswer: "If I knew I couldn't fail, I would start my own business doing something creative. I'd probably combine my love of languages with technology — maybe build an app or a platform. I wouldn't worry about money or other people's opinions at all.",
-    tense: "Second Conditional"
-  },
-  {
-    prompt: "What are your goals for continuing to improve your English after this course?",
-    modelAnswer: "I'm going to keep practising every single day, even if it's just for ten minutes. I'm planning to watch series without subtitles and join an online conversation group. By this time next year, I want to be having full conversations without translating in my head.",
-    tense: "Future Forms (going to / present continuous) + Future Continuous"
-  },
-];
-
-function buildSpeaking() {
-  const container = document.getElementById('speaking-prompts');
-  SPEAKING_PROMPTS.forEach((item, i) => {
-    const div = document.createElement('div');
-    div.className = 'bg-white border-2 border-slate-200 rounded-2xl p-5';
-    div.innerHTML = `
-      <div class="flex items-start gap-3 mb-3">
-        <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center flex-shrink-0">${i+1}</span>
-        <p class="font-black text-navy text-sm pt-1">${item.prompt}</p>
-      </div>
-      <div class="flex items-center gap-3 mb-3">
-        <button onclick="speakModelAnswer(${i})" class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95">
-          <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1">play_arrow</span>
-        </button>
-        <span class="text-xs text-slate-400 font-bold">Play model answer</span>
-        <button onclick="toggleModelAnswer(${i})" id="toggle-ma-${i}" class="ml-auto text-xs font-black text-rose-600 hover:text-rose-700 border border-rose-200 rounded-lg px-3 py-1.5 hover:bg-rose-50 transition-all">
-          Show Answer
-        </button>
-      </div>
-      <div id="model-answer-${i}" class="hidden bg-rose-50 border border-rose-200 rounded-xl p-3 mb-2">
-        <p class="text-sm text-navy leading-relaxed"><em>"${item.modelAnswer}"</em></p>
-        <span class="inline-block mt-2 text-xs font-black bg-orange-100 text-orange-700 px-2 py-1 rounded-full">${item.tense}</span>
-      </div>`;
-    container.appendChild(div);
-  });
+function paintProgress(){
+  const total=ROTA.length;
+  const pct=Math.round(((passo+1)/total)*100);
+  const f=document.getElementById('rota-preenche'); if(f)f.style.width=pct+'%';
+  const t=document.getElementById('rota-titulo');   if(t)t.textContent=ROTA[passo].rotulo;
+  const p=document.getElementById('rota-passo');    if(p)p.textContent=`Passo ${passo+1} de ${total} · ${sectionsDone} concluídas`;
+  const v=document.getElementById('rota-voltar');   if(v)v.disabled=(passo===0);
+  const a=document.getElementById('rota-avancar');  if(a)a.disabled=(passo===total-1);
+  // O hero mantém os ids da convenção do curso, mas vira barra, não bolinhas.
+  const dots=document.getElementById('section-dots');
+  if(dots)dots.innerHTML=`<div class="w-full h-2.5 rounded-full bg-white/15 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-rose-400 to-orange-400 transition-all duration-500" style="width:${Math.round(sectionsDone/total*100)}%"></div></div>`;
+  const lb=document.getElementById('section-label');
+  if(lb)lb.textContent=`${sectionsDone} / ${total} sections done`;
+  pintarIndice();
 }
 
-function speakModelAnswer(i) {
-  if(!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(SPEAKING_PROMPTS[i].modelAnswer);
-  u.lang = 'en-US'; u.rate = 0.88;
-  speechSynthesis.cancel(); speechSynthesis.speak(u);
-}
-
-function toggleModelAnswer(i) {
-  const el = document.getElementById('model-answer-'+i);
-  const btn = document.getElementById('toggle-ma-'+i);
-  const hidden = el.classList.toggle('hidden');
-  btn.textContent = hidden ? 'Show Answer' : 'Hide Answer';
-}
-buildSpeaking();
-
-// ===== WRITING =====
-function checkWriting() {
-  const words = document.getElementById('writing-text').value.trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('writing-count').textContent = `${words} words`;
-  const tenseChecked = ['tc-ff','tc-cw','tc-up','tc-rc'].filter(id => document.getElementById(id)?.checked).length;
-  const btn = document.getElementById('writing-done-btn');
-  if (words >= 30 && tenseChecked >= 2) {
-    btn.disabled = false;
-    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-  } else {
-    btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
+function irParaPasso(i,{rolar=true}={}){
+  if(i<0||i>=ROTA.length)return;
+  passo=i;
+  // Esconde TODO painel de seção, inclusive o #tab-listening que o
+  // listening-lab.js injeta e que não nasce na ROTA.
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.classList.add('hidden'));
+  const alvo=document.getElementById('tab-'+ROTA[i].id);
+  if(alvo)alvo.classList.remove('hidden');
+  try{localStorage.setItem('capyIntermediate20Passo',String(i));}catch(e){}
+  paintProgress();
+  fecharIndice();
+  if(rolar&&alvo){
+    // 76px: altura da barra do percurso, mais o menu fixo do topo (a barra gruda embaixo dele).
+    const y=alvo.getBoundingClientRect().top+window.scrollY-76-((document.getElementById('top-nav-bar')||{}).offsetHeight||0);
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
   }
 }
+function proximoPasso(){irParaPasso(passo+1);}
+function passoAnterior(){irParaPasso(passo-1);}
 
-function submitWriting() {
-  markSection('writing');
-  if(typeof Store !== 'undefined') Store.addXP(20);
-  const btn = document.getElementById('writing-done-btn');
-  btn.textContent = '✓ Writing submitted! +20 XP';
-  btn.disabled = true;
-  btn.classList.add('opacity-75');
-}
-
-document.querySelectorAll('#tense-checklist input').forEach(cb => cb.addEventListener('change', checkWriting));
-
-// ===== HOMEWORK =====
-
-// Word Order
-function hwShuffle(a){return[...a].sort(()=>Math.random()-.5)}
-const WO_I20_DATA=[{s:'Forget what is realistic and ask what you would do if you couldn\'t fail',w:['Forget','what','is','realistic','and','ask','what','you','would','do','if','you','couldn\'t','fail']}];
-const woI20=WO_I20_DATA.map(d=>({ans:[],bank:hwShuffle(d.w)}));
-
-function woI20Render(){
-  const c=document.getElementById('wo-i20-wrap');if(!c)return;
-  c.innerHTML=WO_I20_DATA.map((d,i)=>{
-    const st=woI20[i];
-    return`<div class="bg-slate-50 border border-slate-100 rounded-xl p-4">
-      <div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">
-        ${st.ans.length?st.ans.map((w,j)=>`<span onclick="woI20Move(1,${i},${j})" class="cursor-pointer select-none bg-rose-100 text-rose-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-rose-200 active:scale-95 transition-all">${w}</span>`).join(''):'<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}
-      </div>
-      <div class="flex flex-wrap gap-2 min-h-10">
-        ${st.bank.map((w,j)=>`<span onclick="woI20Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-rose-400 hover:bg-rose-50 active:scale-95 transition-all">${w}</span>`).join('')}
-      </div>
-      <div class="flex items-center gap-2 mt-3">
-        <button onclick="woI20Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80">Verificar ✓</button>
-        <button onclick="woI20Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300">↺ Reset</button>
-        <span id="woI20fb${i}" class="text-xs font-black"></span>
-      </div></div>`;
+function pintarIndice(){
+  const c=document.getElementById('rota-indice-lista'); if(!c)return;
+  c.innerHTML=ROTA.map((s,i)=>{
+    const feita=creditadas.has(s.id);
+    const atual=i===passo;
+    return `<button type="button" class="rota-item" aria-current="${atual}" onclick="irParaPasso(${i})">
+      <span class="rota-num ${feita?'bg-rose-500 text-white':atual?'bg-rose-100 text-rose-700':'bg-slate-100 text-slate-400'}">${feita?'✓':i+1}</span>
+      <span class="text-sm font-bold ${atual?'text-rose-700':'text-navy'}">${s.rotulo}</span>
+    </button>`;
   }).join('');
 }
-function woI20Move(fromBank,si,wi){
-  if(fromBank) woI20[si].bank.push(woI20[si].ans.splice(wi,1)[0]);
-  else woI20[si].ans.push(woI20[si].bank.splice(wi,1)[0]);
-  woI20Render();
+function toggleIndice(){
+  const el=document.getElementById('rota-indice');
+  const btn=document.getElementById('rota-indice-btn');
+  const abrindo=el.classList.contains('hidden');
+  el.classList.toggle('hidden',!abrindo);
+  btn.setAttribute('aria-expanded',String(abrindo));
 }
-function woI20Check(i){
-  const fb=document.getElementById('woI20fb'+i);if(!fb)return;
-  if(woI20[i].ans.join(' ').toLowerCase()===WO_I20_DATA[i].s.toLowerCase()){
-    fb.textContent='✅ Correto!';fb.className='text-xs font-black text-rose-600';
-  }else{fb.textContent='❌ Tente novamente!';fb.className='text-xs font-black text-red-500';}
+function fecharIndice(){
+  const el=document.getElementById('rota-indice');
+  if(el)el.classList.add('hidden');
+  const btn=document.getElementById('rota-indice-btn');
+  if(btn)btn.setAttribute('aria-expanded','false');
 }
-function woI20Reset(i){
-  woI20[i]={ans:[],bank:hwShuffle(WO_I20_DATA[i].w)};
-  const fb=document.getElementById('woI20fb'+i);if(fb)fb.textContent='';
-  woI20Render();
-}
-woI20Render();
 
-// Error Correction
-function checkErrI20(){
-  const inp=document.getElementById('err-i20'),fb=document.getElementById('err-i20-fb');
-  if(!inp||!fb)return;
-  const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').trim();
-  if(!v){fb.classList.add('hidden');return;}
-  fb.classList.remove('hidden');
-  if(v.includes('would have laughed')){
-    fb.textContent='✅ Correto! Third conditional: would HAVE + past participle.';
-    fb.className='text-xs font-black text-rose-600 mt-1';
-  }else{
-    fb.textContent='❌ Dica: Third conditional — If + Past Perfect, would HAVE + past participle.';
-    fb.className='text-xs font-black text-red-500 mt-1';
+function markSection(name){
+  if(creditadas.has(name))return;      // a correção do XP repetido, inteira
+  creditadas.add(name);
+  sectionsDone=creditadas.size;
+  try{localStorage.setItem('capyIntermediate20Done',JSON.stringify([...creditadas]));}catch(e){}
+  paintProgress();
+  if(typeof Store!=='undefined')Store.addXP(20);
+  if(name==='homework'){
+    try{const KEY='capyIntermediateCompleted';const arr=JSON.parse(localStorage.getItem(KEY)||'[]');if(!arr.includes(20)){arr.push(20);localStorage.setItem(KEY,JSON.stringify(arr));}}catch(e){}
   }
 }
+function markSectionBtn(btn,name){btn.disabled=true;btn.textContent='✓ Feito! +20 XP';btn.classList.add('opacity-75');markSection(name);}
+function toggleAccordion(id){const el=document.getElementById(id);const arrow=document.getElementById(id+'-arrow');el.classList.toggle('hidden');if(arrow)arrow.style.transform=el.classList.contains('hidden')?'':'rotate(180deg)';}
 
-// Gap Fill Quiz — Whole Course Review
-const HW_QUIZ_DATA = [
-  {q:'Five years ago, she ___ (use to) feel invisible at her old job.', ans:'used to', hint:'used to — past habit/state'},
-  {q:'I wish I ___ (start) speaking English earlier — huge regret!', ans:'had started', hint:'wish + Past Perfect for past regret'},
-  {q:'By this time next year, I ___ (finish) all my goals. (future perfect)', ans:'will have finished', hint:'Future Perfect — will have + past participle'},
-  {q:'If I knew I couldn\'t fail, I ___ (start) my own business.', ans:'would start', hint:'Second conditional — would + base form'},
-  {q:'She runs a school ___ teaches five languages. (relative clause)', ans:'that', hint:'Relative pronoun for a thing: that / which'},
+// O listening-lab.js monta #tab-listening e SÓ DEPOIS tenta se pendurar numa
+// .tab-btn — que aqui não existe mais. Sem esta adoção o painel fica criado,
+// escondido e inalcançável para sempre.
+function adotarListening(){
+  if(!document.getElementById('tab-listening'))return;
+  if(ROTA.some(s=>s.id==='listening'))return;
+  ROTA.splice(ROTA.length-1,0,{id:'listening',rotulo:'🎧 Listening'});
+  paintProgress();
+}
+setTimeout(adotarListening,1800);
+setTimeout(adotarListening,3200);
+
+// ── DIÁLOGO ────────────────────────────────────────────────────────────────
+// Fonte única: scripts/aula09-dialogo.json. O mesmo arquivo gerou os mp3.
+const DIALOGO=/*DIALOGO_JSON*/[
+  {"who":"client","en":"Sofia, thanks for coming. What was your life like five years ago?","pt":"Sofia, obrigado por vir. Como era a sua vida cinco anos atrás?","extra":false,"mp3":"/assets/audio/intermediate20/s01.mp3"},
+  {"who":"yara","en":"I was a translator. I used to feel invisible at work.","pt":"Eu era tradutora. Eu me sentia invisível no trabalho.","extra":false,"mp3":"/assets/audio/intermediate20/s02.mp3"},
+  {"who":"client","en":"Invisible? But you were good at your job.","pt":"Invisível? Mas você era boa no seu trabalho.","extra":false,"mp3":"/assets/audio/intermediate20/s03.mp3"},
+  {"who":"yara","en":"I was. But I used to think the work wasn't really mine.","pt":"Eu era. Mas eu achava que aquele trabalho não era de verdade meu.","extra":false,"mp3":"/assets/audio/intermediate20/s04.mp3"},
+  {"who":"client","en":"Did you ever dream of having your own school?","pt":"Você já sonhava em ter a sua própria escola?","extra":true,"mp3":"/assets/audio/intermediate20/s05.mp3"},
+  {"who":"yara","en":"Never! If you had told me then, I would have laughed.","pt":"Nunca! Se você tivesse me dito naquela época, eu teria rido.","extra":true,"mp3":"/assets/audio/intermediate20/s06.mp3"},
+  {"who":"client","en":"So how did the change begin?","pt":"Então como a mudança começou?","extra":false,"mp3":"/assets/audio/intermediate20/s07.mp3"},
+  {"who":"yara","en":"Quietly. I started teaching one evening class, just for extra money.","pt":"Em silêncio. Comecei a dar uma aula à noite, só por um dinheiro extra.","extra":false,"mp3":"/assets/audio/intermediate20/s08.mp3"},
+  {"who":"client","en":"And then?","pt":"E depois?","extra":false,"mp3":"/assets/audio/intermediate20/s09.mp3"},
+  {"who":"yara","en":"Then two classes. Soon there was a waiting list.","pt":"Depois, duas turmas. Logo apareceu uma lista de espera.","extra":false,"mp3":"/assets/audio/intermediate20/s10.mp3"},
+  {"who":"client","en":"When did you quit translation?","pt":"Quando você largou a tradução?","extra":true,"mp3":"/assets/audio/intermediate20/s11.mp3"},
+  {"who":"yara","en":"By the end of the first year, I had quit completely.","pt":"No fim do primeiro ano, eu já tinha largado de vez.","extra":true,"mp3":"/assets/audio/intermediate20/s12.mp3"},
+  {"who":"client","en":"Was it easy to run a business?","pt":"Foi fácil tocar um negócio?","extra":false,"mp3":"/assets/audio/intermediate20/s13.mp3"},
+  {"who":"yara","en":"Not at all. I often wished I had studied business.","pt":"De jeito nenhum. Muitas vezes eu queria ter estudado administração.","extra":false,"mp3":"/assets/audio/intermediate20/s14.mp3"},
+  {"who":"client","en":"What do you wish you were better at now?","pt":"Em que você queria ser melhor hoje?","extra":true,"mp3":"/assets/audio/intermediate20/s15.mp3"},
+  {"who":"yara","en":"I wish I were more patient with myself.","pt":"Eu queria ser mais paciente comigo mesma.","extra":true,"mp3":"/assets/audio/intermediate20/s16.mp3"},
+  {"who":"client","en":"What's your favorite question for job candidates?","pt":"Qual é a sua pergunta favorita para os candidatos?","extra":false,"mp3":"/assets/audio/intermediate20/s17.mp3"},
+  {"who":"yara","en":"What would you do if you knew you couldn't fail?","pt":"O que você faria se soubesse que não poderia falhar?","extra":false,"mp3":"/assets/audio/intermediate20/s18.mp3"},
+  {"who":"client","en":"And what's your own answer to that question?","pt":"E qual é a sua resposta para essa pergunta?","extra":true,"mp3":"/assets/audio/intermediate20/s19.mp3"},
+  {"who":"yara","en":"If I knew I couldn't fail, I would open a second school.","pt":"Se eu soubesse que não poderia falhar, eu abriria uma segunda escola.","extra":true,"mp3":"/assets/audio/intermediate20/s20.mp3"}
+]/*FIM_DIALOGO*/;
+let dlgLongo=false, dlgComPt=false, dlgAudio=null, dlgTocando=false;
+
+function buildDialogue(){
+  const c=document.getElementById('dialogue-lines'); if(!c)return;
+  c.innerHTML='';
+  DIALOGO.forEach((l,i)=>{
+    const daYara=l.who==='yara';
+    const div=document.createElement('div');
+    // As falas extras nascem no HTML e ficam escondidas — trocar o array e
+    // re-renderizar mataria os botões "Por que é assim?" do self-study.js,
+    // que exporta ligarTraducao mas NÃO ligarExplicacao.
+    div.className=`dlg-linha flex ${daYara?'justify-start':'justify-end'} fade-in`;
+    div.dataset.i=i;
+    if(l.extra)div.hidden=true;
+    // REGRA DE OURO: um <p> por fala, e ele é o inglês. A tradução vai em
+    // <div>. Como <p>, o self-study.js pegaria p:nth-of-type(2) e a Yara
+    // explicaria a frase em português; e o listening-lab ditaria português.
+    div.innerHTML=`<div class="dlg-bolha text-sm leading-relaxed ${daYara?'bg-rose-50 border-2 border-rose-200 text-navy':'bg-navy text-white'}">
+      <div class="text-[11px] font-black opacity-60 mb-0.5">${daYara?"🌟 Sofia":"🎙️ Daniel"}</div>
+      <p>${l.en}</p>
+      <div class="dlg-pt hidden text-xs italic opacity-70 mt-1">${l.pt}</div>
+      <button type="button" class="dlg-acao mt-1.5" onclick="dlgTocarUma(${i})">🔊 ouvir</button>
+    </div>`;
+    c.appendChild(div);
+  });
+}
+
+function dlgVisiveis(){
+  return DIALOGO.map((l,i)=>({l,i})).filter(x=>dlgLongo||!x.l.extra);
+}
+function dlgDestacar(i){
+  document.querySelectorAll('.dlg-linha').forEach(el=>el.classList.remove('tocando'));
+  const el=document.querySelector(`.dlg-linha[data-i="${i}"]`);
+  if(el){el.classList.add('tocando');el.scrollIntoView({block:'center',behavior:'smooth'});}
+}
+function dlgParar(){
+  if(dlgAudio){dlgAudio.onended=null;dlgAudio.pause();dlgAudio=null;}
+  dlgTocando=false;
+  document.querySelectorAll('.dlg-linha').forEach(el=>el.classList.remove('tocando'));
+  const t=document.getElementById('dlg-play-txt'),ic=document.getElementById('dlg-play-icone');
+  if(t)t.textContent='Ouvir o diálogo'; if(ic)ic.textContent='headphones';
+}
+function dlgTocarUma(i){
+  dlgParar();
+  dlgDestacar(i);
+  const a=new Audio(DIALOGO[i].mp3);
+  a.onended=()=>{document.querySelectorAll('.dlg-linha').forEach(el=>el.classList.remove('tocando'));};
+  a.onerror=()=>{if(window.speak)speak(DIALOGO[i].en);};
+  a.play().catch(()=>{if(window.speak)speak(DIALOGO[i].en);});
+}
+function dlgTocarTudo(){
+  if(dlgTocando){dlgParar();return;}
+  const fila=dlgVisiveis();
+  if(!fila.length)return;
+  dlgTocando=true;
+  const t=document.getElementById('dlg-play-txt'),ic=document.getElementById('dlg-play-icone');
+  if(t)t.textContent='Parar'; if(ic)ic.textContent='stop_circle';
+  (function tocarDe(k){
+    if(!dlgTocando)return;
+    if(k>=fila.length){dlgParar();return;}
+    const {l,i}=fila[k];
+    dlgDestacar(i);
+    const a=new Audio(l.mp3);
+    dlgAudio=a;
+    a.onended=()=>tocarDe(k+1);
+    // Se o mp3 não existir, cai na voz do navegador e segue a fila — o aluno
+    // não fica olhando para um botão parado.
+    a.onerror=()=>{if(window.speak)speak(l.en);setTimeout(()=>tocarDe(k+1),2600);};
+    if(fila[k+1])new Audio(fila[k+1].l.mp3).load();
+    a.play().catch(()=>{if(window.speak)speak(l.en);setTimeout(()=>tocarDe(k+1),2600);});
+  })(0);
+}
+function dlgTrocarModo(){
+  dlgParar();
+  dlgLongo=!dlgLongo;
+  document.querySelectorAll('.dlg-linha').forEach(el=>{
+    const l=DIALOGO[Number(el.dataset.i)];
+    if(l&&l.extra)el.hidden=!dlgLongo;
+  });
+  const b=document.getElementById('dlg-modo');
+  if(b)b.textContent=dlgLongo?'➖ Versão curta':'➕ Versão longa';
+}
+function dlgTrocarTraducao(){
+  dlgComPt=!dlgComPt;
+  document.querySelectorAll('.dlg-pt').forEach(el=>el.classList.toggle('hidden',!dlgComPt));
+  const b=document.getElementById('dlg-pt');
+  if(b)b.textContent=dlgComPt?'🇧🇷 Esconder tradução':'🇧🇷 Mostrar tradução';
+}
+buildDialogue();
+// Aluno mais avançado começa na versão longa. O campo existe desde sempre no
+// Store e nenhuma aula lia — esta é a primeira.
+try{
+  const nivel=(typeof Store!=='undefined'&&Store.state&&Store.state.englishLevel)||'';
+  if(['intermediate','advanced','B1','B2','C1'].includes(nivel))dlgTrocarModo();
+}catch(e){}
+
+// ── VOCAB (verbos fundidos) ────────────────────────────────────────────────
+const VOCAB_DATA=[
+  {"en":"translator","pt":"tradutor(a)","ex":"Five years ago, I was a translator.","emoji":"🌐"},
+  {"en":"invisible","pt":"invisível","ex":"I used to feel invisible at work.","emoji":"👻"},
+  {"en":"entrepreneur","pt":"empreendedor(a)","ex":"She never thought she was an entrepreneur.","emoji":"💡"},
+  {"en":"waiting list","pt":"lista de espera","ex":"Soon there was a waiting list.","emoji":"📋"},
+  {"en":"candidate","pt":"candidato(a)","ex":"She interviews every candidate herself.","emoji":"🧑‍💼"},
+  {"en":"brave","pt":"corajoso(a)","ex":"She wished she were braver.","emoji":"🦁"},
+  {"en":"patient","pt":"paciente","ex":"I wish I were more patient with myself.","emoji":"🧘"},
+  {"en":"honest","pt":"sincero(a) / honesto(a)","ex":"Give me an honest answer, not a safe one.","emoji":"🤝"},
+  {"en":"to mumble","pt":"murmurar / falar enrolado","ex":"Most people mumble something safe.","emoji":"🤐","verb":true,"forms":"mumble · mumbled · has mumbled"},
+  {"en":"to quit","pt":"largar / pedir demissão","ex":"By the end of the first year, she had quit translation.","emoji":"🚪","verb":true,"forms":"quit · quit · has quit"},
+  {"en":"to hire","pt":"contratar","ex":"In the second year, she hired her first teacher.","emoji":"🤝","verb":true,"forms":"hire · hired · has hired"},
+  {"en":"to run (a business)","pt":"tocar / administrar (um negócio)","ex":"Running a school wasn't easy.","emoji":"🏫","verb":true,"forms":"run · ran · has run"},
+  {"en":"to wonder","pt":"se perguntar","ex":"Some months, she wondered if she had made a mistake.","emoji":"🤔","verb":true,"forms":"wonder · wondered · has wondered"},
+  {"en":"to follow up","pt":"continuar / dar sequência","ex":"She always follows up with her favorite question.","emoji":"➡️","verb":true,"forms":"follow up · followed up · has followed up"}
 ];
-let hwQuizDone = false;
-
-function buildHWQuiz(){
-  const qc = document.getElementById('hw-quiz-i20');
-  HW_QUIZ_DATA.forEach((q,i)=>{
-    const div = document.createElement('div');
-    div.className = 'bg-white border-2 border-slate-200 rounded-xl p-3 flex flex-wrap items-center gap-2';
-    div.innerHTML = `<span class="text-sm text-navy font-semibold flex-1">${q.q}</span>
-      <input id="hwq-i20-${i}" type="text" data-ans="${q.ans}" placeholder="type here…" class="border-2 border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:border-rose-400 focus:outline-none w-48"/>
-      <span id="hwq-i20-fb-${i}" class="text-sm font-black"></span>`;
-    qc.appendChild(div);
+let vocabDone=new Set();
+function buildVocab(){
+  const grid=document.getElementById('vocab-grid'); if(!grid)return;
+  VOCAB_DATA.forEach((v,i)=>{
+    const card=document.createElement('div');
+    card.className='flip-card h-24';
+    // Verbo é marcado por COR, nunca por texto: o vocab-focus.js só descarta
+    // button/input/select/textarea antes de ler a frente, então um badge em
+    // <span> viraria "to press VERBO" na tela cheia e no TTS.
+    const bg=v.verb?'bg-amber-50 border-amber-300':(v.bg||'bg-rose-50 border-rose-200');
+    const dot=v.verb?'bg-amber-400':(v.dot||'bg-rose-400');
+    const verso=[v.pt,v.forms?`<span class="text-[10px] font-bold opacity-90">${v.forms}</span>`:null,`<em class="text-[10px] italic font-medium opacity-90 leading-tight">"${v.ex}"</em>`]
+      .filter(Boolean).join('<br>');
+    card.innerHTML=`<div class="flip-card-inner h-full">
+      <div class="flip-front h-full border-2 ${bg} rounded-2xl flex flex-col items-center justify-center p-2 gap-1 relative">
+        ${v.revisao?'<span class="absolute top-1 right-1.5 text-[10px] material-symbols-outlined" style="font-size:13px" title="revisão de '+v.revisao+'">history</span>':''}
+        <span class="text-2xl">${v.emoji}</span>
+        <span class="font-black text-navy text-sm text-center leading-tight">${v.en}</span>
+        <span class="w-2 h-2 rounded-full ${dot}"></span>
+      </div>
+      <div class="flip-back h-full bg-gradient-to-br from-rose-500 to-orange-600 rounded-2xl flex items-center justify-center p-2">
+        <span class="font-black text-white text-sm text-center leading-snug">${verso}</span>
+      </div></div>`;
+    card.addEventListener('click',()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped')){
+        vocabDone.add(i);
+        document.getElementById('vocab-count').textContent=vocabDone.size;
+        document.getElementById('vocab-bar').style.width=(vocabDone.size/VOCAB_DATA.length*100)+'%';
+        if(vocabDone.size===VOCAB_DATA.length)markSection('vocab');
+      }
+    });
+    grid.appendChild(card);
   });
 }
-buildHWQuiz();
+buildVocab();
 
-function checkHWQuiz(){
-  let correct = 0;
-  HW_QUIZ_DATA.forEach((q,i)=>{
-    const inp = document.getElementById(`hwq-i20-${i}`);
-    const fb = document.getElementById(`hwq-i20-fb-${i}`);
-    const val = inp.value.trim().toLowerCase();
-    let acceptable = [q.ans.toLowerCase()];
-    if(i===4) acceptable = ['that','which']; // accept "which" for relative clause
-    if(acceptable.includes(val)){
-      correct++;
-      fb.textContent='✅';
-      fb.className='text-sm font-black text-rose-600';
-    }else{
-      fb.textContent='❌';
-      fb.className='text-sm font-black text-red-500';
-      fb.title = q.hint;
-    }
-  });
-  const res = document.getElementById('hw-quiz-result');
-  res.textContent = `${correct}/5 correct`;
-  res.className = correct>=3 ? 'text-sm font-black text-rose-600' : 'text-sm font-black text-slate-500';
-  if(correct>=3 && !hwQuizDone){ hwQuizDone=true; }
-}
+// ── EXPRESSIONS ────────────────────────────────────────────────────────────
+const EXPR_DATA=[
+  {"expr":"Where do you see yourself in five years?","pt":"Onde você se vê daqui a cinco anos?","emoji":"🔭","usage":"a pergunta clássica de entrevista. Responda com going to, will e I hope","example":"In five years, I see myself running my own business."},
+  {"expr":"Back then, …","pt":"Naquela época, …","emoji":"⏪","usage":"para voltar ao passado na sua história. Combina com used to","example":"Back then, I used to work as a translator."},
+  {"expr":"Looking back, …","pt":"Olhando para trás, …","emoji":"🪞","usage":"para avaliar o que passou. Combina com I wish e would have","example":"Looking back, I wish I had started earlier."},
+  {"expr":"It wasn't easy.","pt":"Não foi fácil.","emoji":"⛰️","usage":"para admitir a dificuldade antes de contar como você seguiu em frente","example":"It wasn't easy, but I kept going."},
+  {"expr":"I kept going.","pt":"Eu continuei.","emoji":"🏃","usage":"keep + -ing: continuar fazendo, mesmo com dificuldade","example":"There were hard months, but I kept going."},
+  {"expr":"To be honest, …","pt":"Para ser sincero(a), …","emoji":"💬","usage":"para abrir uma resposta sincera, sem a resposta pronta","example":"To be honest, I was afraid of failing."}
+];
+let exprDone=new Set();
+function buildExpressions(){const grid=document.getElementById('expr-grid');if(!grid)return;EXPR_DATA.forEach((e,i)=>{const div=document.createElement('div');div.className='border-2 border-rose-200 bg-white rounded-2xl overflow-hidden cursor-pointer';div.innerHTML=`<div class="p-4 flex items-center gap-4" onclick="toggleExpr(${i})"><span class="text-3xl">${e.emoji}</span><div class="flex-1"><div class="font-black text-navy">"${e.expr}"</div><div class="text-rose-600 text-sm font-semibold">${e.pt}</div></div><span class="material-symbols-outlined text-rose-400 transition-transform" id="expr-arrow-${i}">expand_more</span></div><div id="expr-body-${i}" class="hidden px-4 pb-4"><div class="bg-rose-50 rounded-xl p-3 text-sm space-y-2"><p><strong class="text-navy">Uso:</strong> ${e.usage}</p><p><strong class="text-navy">Exemplo:</strong> <em>"${e.example}"</em></p></div></div>`;grid.appendChild(div);});}
+function toggleExpr(i){const body=document.getElementById('expr-body-'+i);const arrow=document.getElementById('expr-arrow-'+i);body.classList.toggle('hidden');arrow.style.transform=body.classList.contains('hidden')?'':'rotate(180deg)';exprDone.add(i);if(exprDone.size===EXPR_DATA.length)markSection('expressions');}
+buildExpressions();
 
-function submitHomeworkI20() {
-  markSection('homework');
-  if(typeof Store !== 'undefined') Store.addXP(75);
-  try {
-    const done = JSON.parse(localStorage.getItem('capyIntermediateCompleted') || '[]');
-    if(!done.includes(20)) { done.push(20); localStorage.setItem('capyIntermediateCompleted', JSON.stringify(done)); }
-  } catch(e){}
-  const btn = document.querySelector('[onclick="submitHomeworkI20()"]');
-  if(btn){
-    btn.textContent = '🎓🏆 ENTIRE INTERMEDIATE COURSE COMPLETE! Incredible work! 🏆🎓';
-    btn.disabled = true;
-    btn.classList.add('opacity-75');
-  }
-}
-</script>
-<script src="tts-en.js?v=som1"></script>
-<script>window.YARA_WIDGET = {lang:'en', lessonTitle:'Conversation: Looking Ahead', lessonNum:20, course:'intermediate'};
-// ── Conversação: o aluno responde com as próprias palavras ──────────────────
+// ── CONVERSATION ───────────────────────────────────────────────────────────
 const CONV_DATA=[
-  {q:"What are your three biggest goals right now?",starters:["My first goal is to...","I also want to...","And finally I hope to..."],words:["goal","want to","hope"]},
-  {q:"Where do you want to be in five years?",starters:["In five years I want to be...","I hope I will have...","My plan is to..."],words:["want to be","will have","plan"]},
-  {q:"What will you need to change to get there?",starters:["I will need to...","I would have to...","The first change is..."],words:["will need","would have to","change"]},
-  {q:"What are you going to do differently this year?",starters:["This year I am going to...","I will try to...","I want to stop..."],words:["going to","will try","stop"]},
-  {q:"How will English help you reach your goals?",starters:["English will help me to...","With English I could...","I need it to..."],words:["will help","could","need"]},
-  {q:"What habit do you want to build?",starters:["I want to start...","I am going to try to... every day","My new habit will be..."],words:["want to start","every day","habit"]},
-  {q:"Who will support you along the way?",starters:["My family will...","I can count on...","My friends always..."],words:["will support","count on","always"]},
-  {q:"What might get in the way?",starters:["The main obstacle might be...","I might struggle with...","It could be difficult because..."],words:["might","struggle","could"]},
-  {q:"What is the first step you will take this week?",starters:["This week I will...","The first step is to...","I am going to start by..."],words:["will","first step","start by"]},
-  {q:"How will you know you have succeeded?",starters:["I will know when...","Success for me would be...","If I can..., that is enough"],words:["will know","would be","enough"]},
-  {q:"What have you learned in this course that you will use?",starters:["I have learned to...","I will use... a lot","The most useful thing was..."],words:["have learned","will use","useful"]},
-  {q:"Say one sentence about the future you, in English.",starters:["In the future I will...","One day I am going to...","I see myself..."],words:["will","going to","see myself"]},
+  {"q":"Onde você se vê daqui a cinco anos? Dê uma resposta sincera.","starters":["In five years, I see myself...","I hope I'll be...","To be honest, I'd love to..."],"words":["see myself","hope","to be honest"]},
+  {"q":"Como a sua vida mudou nos últimos cinco anos?","starters":["Five years ago, I used to...","Back then, I...","Since then, I've..."],"words":["used to","back then","since then"]},
+  {"q":"O que você costumava fazer e não faz mais?","starters":["I used to... but now I...","When I was younger, I used to...","I didn't use to..."],"words":["used to","now","younger"]},
+  {"q":"O que você queria ter feito diferente nos estudos?","starters":["I wish I had...","Looking back, I wish...","If I had..., I would have..."],"words":["wish","had","would have"]},
+  {"q":"Se você soubesse que não poderia falhar, o que faria?","starters":["If I knew I couldn't fail, I would...","I'd probably...","I would start..."],"words":["if I knew","would","start"]},
+  {"q":"Quais são os seus três maiores objetivos agora?","starters":["My first goal is to...","I also want to...","And finally, I hope to..."],"words":["goal","want to","hope"]},
+  {"q":"Que hábito você quer criar?","starters":["I want to start...","I'm going to try to... every day","My new habit will be..."],"words":["start","every day","habit"]},
+  {"q":"Qual é o primeiro passo que você vai dar esta semana?","starters":["This week I'm going to...","The first step is to...","I'll start by..."],"words":["first step","going to","start by"]}
 ];
 let convMicActive=null;
-function buildConversation(){const grid=document.getElementById('conv-grid');if(!grid)return;CONV_DATA.forEach((c,i)=>{const div=document.createElement('div');div.className='bg-white border-2 border-rose-200 rounded-2xl p-5';div.innerHTML=`<p class="font-black text-navy text-base mb-3">${i+1}. ${c.q}</p><div class="flex flex-wrap gap-2 mb-3">${c.starters.map(s=>`<button onclick="convUseStarter(${i},this)" data-starter="${s.replace(/"/g,'&quot;')}" class="chip-starter bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs px-3 py-1.5 rounded-full hover:bg-rose-100">${s}</button>`).join('')}</div><div class="flex flex-wrap gap-2 mb-3">${c.words.map(w=>`<span class="bg-slate-100 text-slate-500 text-[11px] font-bold px-2.5 py-1 rounded-full">💡 ${w}</span>`).join('')}</div><textarea id="conv-ta-${i}" rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none mb-2" placeholder="Escreva sua resposta em inglês..." oninput="convCheckDone()"></textarea><button id="conv-mic-${i}" onclick="convMicToggle(${i},this)" class="text-xs bg-navy text-white px-3 py-1.5 rounded-lg font-black hover:opacity-80">🎤 Falar resposta</button>`;grid.appendChild(div);});}
+function buildConversation(){const grid=document.getElementById('conv-grid');if(!grid)return;CONV_DATA.forEach((c,i)=>{const div=document.createElement('div');div.className='bg-white border-2 border-rose-200 rounded-2xl p-5';div.innerHTML=`<p class="font-black text-navy text-base mb-3">${i+1}. ${c.q}</p><div class="flex flex-wrap gap-2 mb-3">${c.starters.map(s=>`<button onclick="convUseStarter(${i},this)" data-starter="${s}" class="chip-starter bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs px-3 py-1.5 rounded-full hover:bg-rose-100">${s}</button>`).join('')}</div><div class="flex flex-wrap gap-2 mb-3">${c.words.map(w=>`<span class="bg-slate-100 text-slate-500 text-[11px] font-bold px-2.5 py-1 rounded-full">💡 ${w}</span>`).join('')}</div><textarea id="conv-ta-${i}" rows="2" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-rose-400 focus:outline-none resize-none mb-2" placeholder="Escreva sua resposta em inglês..." oninput="convCheckDone()"></textarea><button id="conv-mic-${i}" onclick="convMicToggle(${i},this)" class="text-xs bg-navy text-white px-3 py-1.5 rounded-lg font-black hover:opacity-80">🎤 Falar resposta</button>`;grid.appendChild(div);});}
 function convUseStarter(i,btn){const ta=document.getElementById('conv-ta-'+i);if(!ta)return;const s=btn.dataset.starter;if(!ta.value.trim())ta.value=s+' ';else ta.focus();convCheckDone();}
 let convDone=new Set();
 function convCheckDone(){CONV_DATA.forEach((c,i)=>{const ta=document.getElementById('conv-ta-'+i);if(ta&&ta.value.trim().length>3)convDone.add(i);});}
@@ -679,11 +987,108 @@ async function convMicToggle(i,btn){if(!window.CapyMic){btn.textContent='🎤 In
   if(started){convMicActive=i;btn.textContent='⏹ Parar e enviar';}
 }
 buildConversation();
+
+// ── PRACTICE ───────────────────────────────────────────────────────────────
+const QUIZ=[
+  {"q":"\"Eu me sentia invisível no trabalho.\" (era um hábito)","opts":["I used to feel invisible at work.","I use to feel invisible at work.","I used to feeling invisible at work.","I was used feel invisible at work."],"a":"I used to feel invisible at work.","rule":"Hábito ou estado do passado: used to + verbo puro."},
+  {"q":"\"Eu queria ser mais corajosa.\"","opts":["I wish I were braver.","I wish I am braver.","I wish I will be braver.","I wish being braver."],"a":"I wish I were braver.","rule":"Desejo sobre o presente: wish + passado (were)."},
+  {"q":"\"Eu queria ter estudado administração.\"","opts":["I wish I had studied business.","I wish I studied business yesterday.","I wish I have studied business.","I wish I would study business before."],"a":"I wish I had studied business.","rule":"Arrependimento sobre o passado: wish + had + particípio."},
+  {"q":"\"Se eu soubesse, eu abriria uma escola.\"","opts":["If I knew, I would open a school.","If I know, I would open a school.","If I knew, I will open a school.","If I would know, I would open a school."],"a":"If I knew, I would open a school.","rule":"Situação imaginada: If + passado, would + verbo."},
+  {"q":"\"Se você tivesse me dito, eu teria rido.\"","opts":["If you had told me, I would have laughed.","If you told me, I would laughed.","If you had told me, I would laugh yesterday.","If you have told me, I would have laughed."],"a":"If you had told me, I would have laughed.","rule":"Passado que não aconteceu: If + had + particípio, would have + particípio."},
+  {"q":"\"Se eu fosse você, eu aceitaria.\"","opts":["If I were you, I would accept.","If I am you, I would accept.","If I was you, I will accept.","If I were you, I accept."],"a":"If I were you, I would accept.","rule":"Conselho clássico: If I were you, I would…"},
+  {"q":"Daniel pergunta: \"What was your life like five years ago?\" Qual resposta combina?","opts":["I was a translator. I used to feel invisible.","I'm a translator. I feel invisible.","I will be a translator.","I would be a translator."],"a":"I was a translator. I used to feel invisible.","rule":"Pergunta sobre o passado, resposta no passado e com used to."},
+  {"q":"\"Ela continuou, mesmo assim.\"","opts":["She kept going.","She kept go.","She keeps to go.","She kept to going."],"a":"She kept going.","rule":"keep + -ing: continuar fazendo."}
+];
+let pracIdx=0,pracScore=0,pracStreak=0,pracAnswered=false,pracFim=false,verbosFim=false;
+function buildPractice(){if(pracIdx>=QUIZ.length){showResult();return;}const q=QUIZ[pracIdx];document.getElementById('prac-bar').style.width=(pracIdx/QUIZ.length*100)+'%';document.getElementById('practice-area').innerHTML=`<div class="bg-white border-2 border-slate-200 rounded-2xl p-6 fade-in"><div class="text-xs font-black text-slate-400 mb-3">Question ${pracIdx+1} of ${QUIZ.length}</div><p class="font-black text-navy text-base mb-5 leading-relaxed">${q.q}</p><div class="grid grid-cols-1 gap-3" id="opts"></div><div id="prac-feedback" class="hidden mt-4 p-3 rounded-xl text-sm font-bold"></div></div>`;const opts=document.getElementById('opts');[...q.opts].sort(()=>Math.random()-.5).forEach(o=>{const btn=document.createElement('button');btn.className='w-full text-left border-2 border-slate-200 bg-white rounded-2xl px-4 py-3 text-sm font-semibold text-navy hover:border-rose-400 hover:bg-rose-50 transition-all';btn.textContent=o;btn.onclick=()=>answerQ(o,btn,q);opts.appendChild(btn);});pracAnswered=false;}
+function answerQ(ans,btn,q){if(pracAnswered)return;pracAnswered=true;const correct=ans===q.a;document.querySelectorAll('#opts button').forEach(b=>{b.disabled=true;if(b.textContent===q.a)b.className='w-full text-left border-2 border-rose-400 bg-rose-50 rounded-2xl px-4 py-3 text-sm font-black text-rose-700';});if(!correct)btn.className='w-full text-left border-2 border-red-400 bg-red-50 rounded-2xl px-4 py-3 text-sm font-black text-red-700';if(correct){pracScore++;pracStreak++;}else{pracStreak=0;}document.getElementById('prac-score').innerHTML=`${pracScore}<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;document.getElementById('prac-streak').textContent='🔥 '+pracStreak;const fb=document.getElementById('prac-feedback');fb.classList.remove('hidden');fb.className=`mt-4 p-3 rounded-xl text-sm font-bold ${correct?'bg-rose-50 text-rose-700 border border-rose-200':'bg-red-50 text-red-700 border border-red-200'}`;fb.innerHTML=`${correct?'✅ Correct!':'❌ Not quite.'} <span class="font-normal">${q.rule}</span>`;pracIdx++;setTimeout(buildPractice,1400);}
+// A seção só é creditada quando as DUAS partes foram feitas — o quiz de verbos
+// virou a parte 2 daqui, já que a aba Verbs deixou de existir.
+function finishPractice(){if(pracFim&&verbosFim)markSection('practice');}
+function showResult(){const goodThresh=Math.ceil(QUIZ.length*0.75),okThresh=Math.ceil(QUIZ.length*0.5);document.getElementById('result-msg').textContent=`You scored ${pracScore} out of ${QUIZ.length}.${pracScore>=goodThresh?' Outstanding! 🌟':pracScore>=okThresh?' Keep it up!':' Keep practising!'}`;document.getElementById('result-emoji').textContent=pracScore>=goodThresh?'🏆':pracScore>=okThresh?'🎉':'💪';document.getElementById('result-title').textContent=pracScore>=goodThresh?'Excellent!':pracScore>=okThresh?'Well done!':'Keep going!';document.getElementById('prac-subtitle').textContent='Parte 1 concluída — agora a parte 2, logo abaixo.';document.getElementById('result-overlay').classList.remove('hidden');
+  // O +50 também fica atrás do controle: sem isso, "Try Again" paga de novo.
+  if(!pracFim){pracFim=true;if(typeof Store!=='undefined')Store.addXP(50);}
+  finishPractice();}
+function restartPractice(){pracIdx=0;pracScore=0;pracStreak=0;document.getElementById('prac-score').innerHTML=`0<span class="text-sm text-slate-400">/${QUIZ.length}</span>`;document.getElementById('prac-streak').textContent='🔥 0';document.getElementById('result-overlay').classList.add('hidden');buildPractice();}
+buildPractice();
+
+const VERBS_QUIZ_DATA=[
+  {"q":"Five years ago, I ___ to feel invisible at work.","ans":"used"},
+  {"q":"I wish I ___ studied business. (passado)","ans":"had"},
+  {"q":"If I knew I couldn't fail, I ___ open a second school.","ans":"would"}
+];
+function buildVerbsQuiz(){const qWrap=document.getElementById('verbs-quiz');if(!qWrap)return;VERBS_QUIZ_DATA.forEach((q,i)=>{const div=document.createElement('div');div.innerHTML=`<div class="bg-slate-50 rounded-xl p-3"><p class="text-sm font-semibold text-navy mb-2">${i+1}. ${q.q}</p><input id="vq-int20-${i}" data-ans="${q.ans}" type="text" placeholder="Type your answer..." class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm focus:border-rose-400 focus:outline-none"/><p id="vq-int20-fb${i}" class="text-xs font-black mt-1 hidden"></p></div>`;qWrap.appendChild(div);});}
+buildVerbsQuiz();
+function checkVerbsQuiz(){let correct=0;VERBS_QUIZ_DATA.forEach((q,i)=>{const inp=document.getElementById('vq-int20-'+i);const fb=document.getElementById('vq-int20-fb'+i);if(!inp||!fb)return;const val=inp.value.trim().toLowerCase().replace(/[.!]/g,'').replace(/’/g,"'");const ans=q.ans.toLowerCase();fb.classList.remove('hidden');if(val===ans){correct++;fb.textContent='✅ Correct!';fb.className='text-xs font-black mt-1 text-rose-600';}else{fb.textContent=`❌ Answer: ${q.ans}`;fb.className='text-xs font-black mt-1 text-red-500';}});const res=document.getElementById('verbs-quiz-result');res.classList.remove('hidden');if(correct>=2){res.className='mt-4 p-3 rounded-xl text-sm font-bold bg-rose-50 text-rose-700 border border-rose-200';res.textContent=`🎉 ${correct}/3 correct! Excellent work!`;verbosFim=true;finishPractice();}else{res.className='mt-4 p-3 rounded-xl text-sm font-bold bg-orange-50 text-orange-700 border border-orange-200';res.textContent=`${correct}/3 correct. Keep practising!`;}}
+
+// ── SPEAK ──────────────────────────────────────────────────────────────────
+const SPEAK_DATA=[
+  {"text":"I <strong class='text-rose-600'>used to</strong> feel invisible at work."},
+  {"text":"<strong class='text-rose-600'>Back then</strong>, I was a translator."},
+  {"text":"If you had told me, <strong class='text-rose-600'>I'd have laughed</strong>."},
+  {"text":"I <strong class='text-rose-600'>wish I had studied</strong> business."},
+  {"text":"I <strong class='text-rose-600'>wish I were</strong> more patient."},
+  {"text":"If I knew I couldn't fail, <strong class='text-rose-600'>I would</strong> try."},
+  {"text":"<strong class='text-rose-600'>It wasn't easy</strong>, but I kept going."},
+  {"text":"Where do you <strong class='text-rose-600'>see yourself</strong> in five years?"}
+];
+let speakDone=new Set();
+function buildSpeak(){const grid=document.getElementById('speak-grid');if(!grid)return;SPEAK_DATA.forEach((s,i)=>{const div=document.createElement('div');div.className='bg-white border-2 border-slate-200 rounded-2xl p-5 flex items-center gap-4 hover:border-rose-300 transition-colors';div.innerHTML=`<button onclick="speakRaw(${i})" class="flex-shrink-0 w-12 h-12 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center transition-all hover:scale-105 active:scale-95"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">play_arrow</span></button><p class="flex-1 text-navy font-semibold text-sm leading-relaxed">${s.text}</p><label class="flex-shrink-0 flex flex-col items-center gap-1 cursor-pointer"><input type="checkbox" class="w-5 h-5 accent-rose-500" onchange="markSpeak(${i},this)"/><span class="text-[10px] text-slate-400 font-bold">Done</span></label>`;grid.appendChild(div);});}
+buildSpeak();
+function speakRaw(i){const plain=SPEAK_DATA[i].text.replace(/<[^>]+>/g,'');speak(plain);}
+function markSpeak(i,chk){if(chk.checked)speakDone.add(i);else speakDone.delete(i);if(speakDone.size>=4)markSection('speak');}
+function speak(text){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=0.9;speechSynthesis.cancel();speechSynthesis.speak(u);}
+
+// ── HOMEWORK ───────────────────────────────────────────────────────────────
+function hwShuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r}
+const WO_INT20_DATA=[
+  {"s":"if i knew i couldn't fail i would start my own business","w":["if","i","knew","i","couldn't","fail","i","would","start","my","own","business"]}
+];
+const wo_int20=WO_INT20_DATA.map(d=>({ans:[],bank:hwShuffle(d.w)}));
+function woInt20Render(){const c=document.getElementById('wo-int20-wrap');if(!c)return;c.innerHTML=WO_INT20_DATA.map((d,i)=>{const st=wo_int20[i];return`<div class="bg-slate-50 border border-slate-100 rounded-xl p-4"><div class="min-h-12 border-2 border-dashed border-slate-300 bg-white rounded-xl p-2.5 flex flex-wrap gap-2 mb-3">${st.ans.length?st.ans.map((w,j)=>`<span onclick="woInt20Move(1,${i},${j})" class="cursor-pointer select-none bg-rose-100 text-rose-800 font-black px-3 py-1.5 rounded-lg text-sm hover:bg-rose-200 active:scale-95 transition-all">${w}</span>`).join(''):'<span class="text-slate-300 text-sm self-center pl-1">Toque nas palavras abaixo…</span>'}</div><div class="flex flex-wrap gap-2 min-h-10">${st.bank.map((w,j)=>`<span onclick="woInt20Move(0,${i},${j})" class="cursor-pointer select-none bg-white border-2 border-slate-200 text-navy font-black px-3 py-1.5 rounded-lg text-sm hover:border-rose-400 hover:bg-rose-50 active:scale-95 transition-all">${w}</span>`).join('')}</div><div class="flex items-center gap-2 mt-3"><button onclick="woInt20Check(${i})" class="text-xs bg-navy text-white px-4 py-2 rounded-lg font-black hover:opacity-80">Verificar ✓</button><button onclick="woInt20Reset(${i})" class="text-xs bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-black hover:bg-slate-300">↺ Reset</button><span id="wo-int20-fb${i}" class="text-xs font-black"></span></div></div>`;}).join('');}
+function woInt20Move(fromBank,si,wi){if(fromBank)wo_int20[si].bank.push(wo_int20[si].ans.splice(wi,1)[0]);else wo_int20[si].ans.push(wo_int20[si].bank.splice(wi,1)[0]);woInt20Render();}
+function woInt20Check(i){const fb=document.getElementById('wo-int20-fb'+i);if(!fb)return;if(wo_int20[i].ans.join(' ').toLowerCase()===WO_INT20_DATA[i].s.toLowerCase()){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-rose-600';}else{fb.textContent='❌ Tente novamente!';fb.className='text-xs font-black text-red-500';}}
+function woInt20Reset(i){wo_int20[i]={ans:[],bank:hwShuffle(WO_INT20_DATA[i].w)};const fb=document.getElementById('wo-int20-fb'+i);if(fb)fb.textContent='';woInt20Render();}
+woInt20Render();
+
+const MP_INT20=[
+  {"l":"entrepreneur","r":"empreendedor"},
+  {"l":"waiting list","r":"lista de espera"},
+  {"l":"invisible","r":"invisível"},
+  {"l":"to hire","r":"contratar"},
+  {"l":"brave","r":"corajoso"}
+];
+const mp_int20_R=hwShuffle(MP_INT20.map((p,i)=>({label:p.r,pid:i})));
+let mp_int20_SelL=null;const mp_int20_Done=new Set();
+function mpInt20Render(){const c=document.getElementById('mp-int20-wrap');if(!c)return;c.innerHTML=`<div class="grid grid-cols-2 gap-2"><div class="space-y-2">${MP_INT20.map((p,i)=>`<div id="mp-int20-L${i}" onclick="mpInt20ClickL(${i})" class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all ${mp_int20_Done.has(i)?'border-rose-400 bg-rose-50 text-rose-700 pointer-events-none':mp_int20_SelL===i?'border-rose-500 bg-rose-100 text-rose-800':'border-slate-200 bg-white text-navy hover:border-rose-300 hover:bg-rose-50'}">${p.l}</div>`).join('')}</div><div class="space-y-2">${mp_int20_R.map((r,i)=>`<div id="mp-int20-R${i}" onclick="mpInt20ClickR(${i})" class="cursor-pointer border-2 rounded-xl px-3 py-3 text-xs font-bold text-center leading-snug transition-all ${mp_int20_Done.has(r.pid)?'border-rose-400 bg-rose-50 text-rose-700 pointer-events-none':'border-slate-200 bg-white text-navy hover:border-rose-300 hover:bg-rose-50'}">${r.label}</div>`).join('')}</div></div>${mp_int20_Done.size===MP_INT20.length?'<p class="mt-3 text-center text-rose-600 font-black text-sm">🎉 Todos combinados! Perfeito!</p>':''}`;}
+function mpInt20ClickL(i){if(mp_int20_Done.has(i))return;mp_int20_SelL=(mp_int20_SelL===i)?null:i;mpInt20Render();}
+function mpInt20ClickR(i){if(mp_int20_SelL===null)return;const r=mp_int20_R[i];if(mp_int20_Done.has(r.pid))return;if(r.pid===mp_int20_SelL){mp_int20_Done.add(mp_int20_SelL);mp_int20_SelL=null;mpInt20Render();}else{const lEl=document.getElementById('mp-int20-L'+mp_int20_SelL),rEl=document.getElementById('mp-int20-R'+i);[lEl,rEl].forEach(el=>el&&el.classList.add('!border-red-400','!bg-red-50','!text-red-700'));setTimeout(()=>{mp_int20_SelL=null;mpInt20Render();},700);}}
+mpInt20Render();
+
+function checkErrorInt20(){const inp=document.getElementById('err-int20'),fb=document.getElementById('err-int20-fb');if(!inp||!fb)return;const v=inp.value.toLowerCase().replace(/[?.!,]/g,'').replace(/’/g,"'").trim();if(!v){fb.classList.add('hidden');return;}fb.classList.remove('hidden');if(["if you had told me i would have laughed","if you had told me i'd have laughed"].includes(v)){fb.textContent='✅ Correto!';fb.className='text-xs font-black text-rose-600 mt-1';}else{fb.textContent="❌ Quase. Passado que não aconteceu: would have + particípio.";fb.className='text-xs font-black text-red-500 mt-1';}}
+
+let hwEntregue=false;
+function submitHomeworkInt20(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick="submitHomeworkInt20()"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}
+
+// Retoma onde o aluno parou. Sem isto o percurso volta ao diálogo toda vez.
+(function retomar(){
+  let i=0;
+  try{const s=Number(localStorage.getItem('capyIntermediate20Passo'));if(Number.isInteger(s)&&s>=0&&s<ROTA.length)i=s;}catch(e){}
+  irParaPasso(i,{rolar:false});
+})();
 </script>
+<script src="tts-en.js?v=som1"></script>
+<script>window.YARA_WIDGET={lang:'en',lessonTitle:"Looking Ahead",lessonNum:20,course:'intermediate'};</script>
 <script src="yara-widget.js?v=yw8"></script>
 <script src="vocab-focus.js?v=vf2"></script>
-<script src="listening-lab.js?v=som1"></script>
+<script src="listening-lab.js?v=som2"></script>
 <script src="self-study.js?v=ss4"></script>
+<script>const TRAD_DATA=[{"pt":"Eu trabalhava como tradutora. (era um hábito)","en":"I used to work as a translator.","dica":"used to + verbo."},{"pt":"Eu queria ser mais paciente.","en":"I wish I were more patient.","aceitas":["I wish I was more patient."]},{"pt":"Se eu soubesse, eu teria ajudado.","en":"If I had known, I would have helped.","aceitas":["If I had known, I'd have helped."],"dica":"If + had + particípio, would have + particípio."},{"pt":"Ela contratou a primeira professora no segundo ano.","en":"She hired her first teacher in the second year."},{"pt":"Se eu soubesse que não poderia falhar, eu abriria uma escola.","en":"If I knew I couldn't fail, I would open a school.","aceitas":["If I knew I couldn't fail, I'd open a school."]},{"pt":"Não foi fácil, mas eu continuei.","en":"It wasn't easy, but I kept going.","aceitas":["It was not easy, but I kept going."]}];const LACUNAS_DATA={"titulo":"Sofia's story","texto":"Five years ago, Sofia [[used to]] feel invisible. She was a [[translator]], and she never thought she was the entrepreneur type. If someone had told her about her future, she [[would have]] laughed. Then she started teaching one evening class, and soon there was a [[waiting list]]. By the end of the first year, she [[had quit]] translation. Running a school wasn't easy, and she often wished she [[had studied]] business. But she kept going. Today she interviews candidates, and she always asks them: \"What [[would]] you do if you [[knew]] you couldn't fail?\"","extras":["would be","has quit"]};</script>
+<script src="aula-molde.js?v=am1"></script>
+<script>window.HW_PLUS={"aula":20,"titulo":"Looking Ahead","curso":"Intermediate","cor":"#e11d48","completar":[{"f":"Five years ago, I ___ to work as a translator.","r":["used"],"dica":"used to"},{"f":"I wish I ___ braver.","r":["were","was"],"dica":"wish + passado"},{"f":"If I knew I couldn't fail, I ___ open a school.","r":["would","'d"],"dica":"would"},{"f":"If you had told me, I would ___ laughed.","r":["have"],"dica":"would have"}],"compreensao":[{"q":"O que a Sofia fazia cinco anos atrás?","opts":["She was a translator.","She was a teacher.","She was a business student."],"a":"She was a translator."},{"q":"O que ela faria se soubesse que não poderia falhar?","opts":["Open a second school.","Go back to translation.","Study business."],"a":"Open a second school."}],"voz":["Five years ago, I used to feel invisible at work.","If I knew I couldn't fail, I would start a business."],"livre":{"pedido":"Escreva 2 frases: uma coisa que você costumava fazer (used to) e uma que você queria ter feito diferente (I wish I had…).","exemplo":"I used to be very shy in English. I wish I had started speaking earlier."}};window.HW_ESTADO=function(){const er=document.getElementById('err-int20-fb');return{ordem:WO_INT20_DATA.map((x,i)=>wo_int20[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_int20_Done.size,MP_INT20.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/intermediate_aula_20-folha.pdf"></script>
+<script>window.PREP={"aquecimento":"O que mudou na sua vida nos últimos cinco anos?","exemplo":"Five years ago, I used to live with my parents."};</script>
+<script src="preparacao.js?v=prep1"></script>
 </body>
 </html>

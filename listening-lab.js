@@ -71,12 +71,22 @@
         return true;
     }
 
+    // Teto do Listening (regra do Luis, 12/nov/2026): com o Speak e as 20 falas do
+    // diálogo, a seção passava de 25 frases e cansava. A ordem decide quem fica:
+    // primeiro as frases do Speak, depois as falas principais do diálogo e, só se
+    // faltar, as falas extras (as da versão longa, escondidas com hidden).
+    const MAX_ITENS = 15;
+
     function coletar() {
         const brutos = [];
         const speak = document.querySelector('#speak-grid, #speak-list');
         if (speak) Array.from(speak.children).forEach(f => brutos.push(semRotulo(textoDe(f))));
         const dlg = document.getElementById('dialogue-lines');
-        if (dlg) Array.from(dlg.children).forEach(f => brutos.push(semRotulo(textoDe(f))));
+        if (dlg) {
+            const falas = Array.from(dlg.children);
+            falas.filter(f => !f.hidden).forEach(f => brutos.push(semRotulo(textoDe(f))));
+            falas.filter(f => f.hidden).forEach(f => brutos.push(semRotulo(textoDe(f))));
+        }
 
         const vistos = new Set();
         const saida = [];
@@ -87,6 +97,7 @@
             if (vistos.has(chave)) continue;
             vistos.add(chave);
             saida.push(limpo);
+            if (saida.length >= MAX_ITENS) break;
         }
         return saida;
     }
