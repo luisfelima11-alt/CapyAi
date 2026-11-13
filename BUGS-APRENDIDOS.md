@@ -1,5 +1,28 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Provas finais do GPS e do Agro abriam sem estilo nenhum
+
+**Sintoma:** `gpstronic_prova.html` e `agro_prova.html` abriam como texto cru, sem cores, sem layout e com
+quadradinhos no lugar dos ícones. Na mesma varredura: a foto da Yara na barra lateral do `lessons.html` dava 404.
+
+**Causa raiz:** as duas provas pediam `assets/css/tailwind.css`, arquivo que nunca existiu (entrou assim
+em 3d71819), e o Font Awesome do cdnjs, que a CSP bloqueia (`style-src` só aceita o próprio site e o Google
+Fonts). O `lessons.html` apontava para `capy Yara teacher generated pic.png`, que saiu do repositório na
+sincronização com a produção (565f43a). Nada no build nem nos testes conferia se o arquivo pedido existe.
+
+**Correção:** Tailwind do CDN, como as outras páginas; Font Awesome 6.4.0 servido pelo próprio site em
+`assets/vendor/` (CSS + as duas fontes usadas); `assets/**/*.woff2` no `builds` do `vercel.json`, senão as
+fontes não subiriam (mesma armadilha do favicon); a foto virou `yara-quadrado-v1.jpg`.
+
+**Como pegar isso de novo:** `tests/arquivos-do-deploy.test.js` (no `npm run test:security`, roda no CI)
+confere que todo `src`/`href` local das páginas e todo `url()` dos CSS existe **e** entra na lista branca
+do `vercel.json`.
+
+**Por que aconteceu:** um arquivo que falta não quebra nada na hora; a página só fica feia. E a varredura da
+produção (`page.on('requestfailed')` + respostas 4xx) só roda quando alguém lembra.
+
+---
+
 ## 2026-11-07 — Toda aula gerada do GPS e do Agro pedia a escrita da aula 09
 
 **Sintoma:** no homework da Agro 13 (comparativos), a última tarefa pedia "Escreva 5 passos para o
