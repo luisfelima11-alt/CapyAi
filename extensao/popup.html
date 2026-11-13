@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<title>Capy no YouTube</title>
+<link rel="stylesheet" href="popup.css"/>
+</head>
+<body>
+  <header>
+    <img src="icones/capy-48.png" alt="" width="40" height="40"/>
+    <div>
+      <h1>Capy no YouTube</h1>
+      <p id="quem" class="sub">Carregando…</p>
+    </div>
+  </header>
+
+  <section id="sem-conta" class="cartao" hidden>
+    <p>A legenda dupla e o frase a frase já funcionam. Para <strong>traduzir a palavra clicada</strong> e <strong>salvar na sua revisão</strong>, conecte sua conta Capy.</p>
+    <button id="conectar" class="cta" type="button">Conectar minha conta</button>
+  </section>
+
+  <section class="cartao">
+    <label class="linha">
+      <span>Ligar a Capy nos vídeos</span>
+      <input id="aj-ligado" type="checkbox"/>
+    </label>
+    <label class="linha">
+      <span>Mostrar a tradução em português</span>
+      <input id="aj-pt" type="checkbox"/>
+    </label>
+    <label class="linha">
+      <span>Pausar no fim de cada frase <kbd>Q</kbd></span>
+      <input id="aj-pausar" type="checkbox"/>
+    </label>
+    <p class="atalhos"><kbd>A</kbd> frase anterior · <kbd>S</kbd> repetir · <kbd>D</kbd> próxima</p>
+  </section>
+
+  <section id="com-conta" class="cartao" hidden>
+    <h2>Palavras salvas do YouTube <span id="contagem" class="selo">0</span></h2>
+    <ul id="lista"></ul>
+    <p id="vazio" class="sub" hidden>Clique numa palavra da legenda e toque em “Salvar na revisão”.</p>
+    <button id="revisar" class="cta" type="button">Revisar minhas palavras</button>
+    <button id="sair" class="discreto" type="button">Sair neste navegador</button>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -113,7 +113,7 @@ function updateStrength() {
 // `next`: quem entrava pelo admin caía na home, e quem já estava logado era
 // jogado para a home sem poder trocar de conta.
 // Lista FECHADA: aceitar qualquer `next` da URL viraria redirecionamento aberto.
-const DESTINOS_DEPOIS_DO_LOGIN = ['admin.html'];
+const DESTINOS_DEPOIS_DO_LOGIN = ['admin.html', 'extensao.html'];
 
 function destinoDepoisDoLogin() {
   let pedido = '';

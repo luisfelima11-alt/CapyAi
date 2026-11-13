@@ -2,7 +2,7 @@ const { defineConfig } = require('playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests',
-  testMatch: ['security.spec.js', 'turkish.spec.js', 'gramatica-slides.spec.js', 'analytics.spec.js', 'licao-de-casa.spec.js', 'homework-plus.spec.js', 'preparacao.spec.js', 'typing.spec.js', 'trilha-teste-de-nivel.spec.js', 'quadro-chat.spec.js', 'preparacao-pagina.spec.js'],
+  testMatch: ['security.spec.js', 'turkish.spec.js', 'gramatica-slides.spec.js', 'analytics.spec.js', 'licao-de-casa.spec.js', 'homework-plus.spec.js', 'preparacao.spec.js', 'typing.spec.js', 'trilha-teste-de-nivel.spec.js', 'quadro-chat.spec.js', 'preparacao-pagina.spec.js', 'extensao.spec.js'],
   timeout: 30_000,
   // Na CI, a falha também vira anotação no PR (o log bruto nem sempre é acessível).
   reporter: process.env.CI ? [['list'], ['github']] : 'list',

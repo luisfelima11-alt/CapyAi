@@ -6,7 +6,7 @@
     "audit": "node scripts/audit-lessons.js",
     "audit:local": "node scripts/audit-lessons.js --base=http://localhost:8765",
     "audit:debug": "node scripts/audit-lessons.js --headless=false",
-    "test:security": "node --test tests/security.test.js tests/professor.test.js tests/plano-hoje.test.js tests/home-nova.test.js tests/arquivos-do-deploy.test.js tests/quadro-ai.test.js",
+    "test:security": "node --test tests/security.test.js tests/professor.test.js tests/plano-hoje.test.js tests/home-nova.test.js tests/arquivos-do-deploy.test.js tests/quadro-ai.test.js tests/extensao-api.test.js tests/extensao-background.test.js",
     "test:turkish": "node --test tests/turkish-course.test.js",
     "test:e2e:security": "playwright test --config=playwright.config.js",
     "security:check": "node scripts/audit.js && npm run test:security",
@@ -19,7 +19,9 @@
     "test:music": "node --test tests/music-lab.test.js",
     "aulas:contexto": "node scripts/gera-contexto-aulas.js",
     "test:aulas": "node --test tests/aula-contexto.test.js tests/tela-cheia.test.js tests/mini-prova.test.js tests/barra-sticky.test.js tests/migracoes.test.js",
-    "headers": "node scripts/cabecalhos-para-routes.js"
+    "headers": "node scripts/cabecalhos-para-routes.js",
+    "test:extensao": "node --test tests/extensao-api.test.js tests/extensao-background.test.js tests/extensao-legendas.test.js",
+    "extensao:zip": "node scripts/empacotar-extensao.js"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
