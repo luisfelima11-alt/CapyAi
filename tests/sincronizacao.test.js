@@ -175,3 +175,29 @@ test('servidor: lista de progresso com mais de 100 itens chega inteira', async (
   assert.equal(salvo().completedLessons.length, 120);
   assert.equal(salvo().completedMinis.at(-1), '40_4');
 });
+
+test('servidor: um aparelho atrasado não apaga o progresso salvo', async () => {
+  banco.user_state.clear();
+  await chamar('POST', '/api/db', { type: 'state', payload: { xp: 900, completedLessons: [1, 2, 3], completedMinis: ['1_1', '1_2'], badges: ['first'], starBerries: 120 } });
+  // A aba velha (ou o aparelho que não leu o servidor) manda o estado dela.
+  const r = await chamar('POST', '/api/db', { type: 'state', payload: { xp: 40, completedLessons: [1], completedMinis: [], badges: [], starBerries: 70 } });
+  assert.equal(r.status, 200);
+  assert.equal(salvo().xp, 900, 'XP não volta atrás');
+  assert.deepEqual([...salvo().completedLessons].sort(), [1, 2, 3]);
+  assert.deepEqual([...salvo().completedMinis].sort(), ['1_1', '1_2']);
+  assert.deepEqual(salvo().badges, ['first']);
+  assert.equal(salvo().starBerries, 70, 'frutinhas são saldo: o último gasto vale');
+});
+
+test('servidor: um estado zerado não apaga o progresso, mas "zerar progresso" explícito zera', async () => {
+  banco.user_state.clear();
+  await chamar('POST', '/api/db', { type: 'state', payload: { xp: 900, completedLessons: [1, 2, 3] } });
+  await chamar('POST', '/api/db', { type: 'state', payload: { xp: 0, completedLessons: [] } });
+  assert.equal(salvo().xp, 900);
+  assert.equal(salvo().completedLessons.length, 3);
+
+  const r = await chamar('POST', '/api/db', { type: 'state', reset: true, payload: { xp: 0, completedLessons: [] } });
+  assert.equal(r.status, 200);
+  assert.equal(salvo().xp, 0);
+  assert.deepEqual(salvo().completedLessons, []);
+});

@@ -1,5 +1,28 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Uma aba velha ou um aparelho atrasado apagava aulas e XP no servidor
+
+**Sintoma:** o aluno estudava no celular e, depois de abrir o computador (ou uma aba esquecida aberta havia
+dias), as aulas feitas no celular sumiam e o XP voltava atrás. Às vezes voltavam sozinhas no aparelho certo,
+às vezes não voltavam mais.
+
+**Causa raiz:** o `POST /api/db` grava o estado **inteiro** que o navegador manda, sem conferir versão. Quem
+postasse por último ganhava: uma aba aberta com o estado de ontem, um aparelho que ainda não tinha lido o
+servidor, ou dois POSTs que chegavam fora de ordem.
+
+**Correção:** o servidor junta o que chega com o que já estava (`progressoQueSoSobe`): XP fica com o maior; as
+aulas, mini-aulas, medalhas, chefes vencidos, baús e itens comprados ficam com a união. O resto continua "o
+último vale" (frutinhas são saldo; a sequência pode zerar). Zerar o progresso de propósito manda `reset: true`.
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("aparelho atrasado não apaga", "estado
+zerado não apaga"), no `npm run test:security`.
+
+**Por que aconteceu:** "o último vale" só é seguro com um aparelho e uma aba. O merge do navegador protegia a
+leitura, mas a escrita continuava trocando tudo. Junção sem trava ainda pode perder um item se dois POSTs
+chegarem no mesmo instante (ler e gravar não é atômico); para fechar isso de vez é preciso uma função no banco.
+
+---
+
 ## 2026-11-13 — Da aula 26 em diante, o progresso da trilha não chegava ao servidor
 
 **Sintoma:** quem fez mais de 25 aulas da trilha (100 mini-aulas) continuava vendo tudo no próprio aparelho,

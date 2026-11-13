@@ -658,6 +658,27 @@ function deltaAtividade(antes, depois) {
     return { minis: Math.min(novos, 50), xp: Math.min(xp, 5000) };
 }
 
+// O POST /api/db troca o estado INTEIRO. Uma aba velha, um aparelho que ainda
+// não leu o servidor ou dois POSTs que chegam fora de ordem gravavam por cima,
+// e o aluno perdia aulas e XP. O que só cresce (XP e listas de conquista) fica
+// com o MAIOR e com a UNIÃO; o resto continua "o último vale" (frutinhas são
+// saldo, a sequência pode zerar). Zerar de verdade só com `reset: true`.
+const LISTAS_QUE_SO_CRESCEM = ['completedLessons', 'completedMinis', 'badges', 'bossesBeaten', 'chestsOpened', 'purchasedItems'];
+function progressoQueSoSobe(antes, depois) {
+    if (!antes || typeof antes !== 'object') return depois;
+    const saida = { ...depois };
+    const xpAntes = Number(antes.xp) || 0;
+    if (xpAntes > (Number(saida.xp) || 0)) saida.xp = xpAntes;
+    for (const k of LISTAS_QUE_SO_CRESCEM) {
+        if (!Array.isArray(antes[k]) || !antes[k].length) continue;
+        const atual = Array.isArray(saida[k]) ? saida[k] : [];
+        const tem = new Set(atual.map(v => JSON.stringify(v)));
+        const faltam = antes[k].filter(v => !tem.has(JSON.stringify(v)));
+        if (faltam.length) saida[k] = [...atual, ...faltam].slice(0, 5000);
+    }
+    return saida;
+}
+
 // Resumo de um aluno para o painel: só números e datas, nada do que ele escreveu
 // fora da lição de casa.
 function resumoAluno({ state, atualizadoEm, atividade = [], licoes = [], hoje = diaBrasil() }) {
@@ -4399,7 +4420,7 @@ Respond ONLY with valid JSON, no markdown:
     if (req.method === 'POST' && url === '/api/db') {
         assertCsrf(req);
         const identity = await requireAppUser(req, res);
-        const { type, payload } = await readBody(req);
+        const { type, payload, reset } = await readBody(req);
         if (payload && typeof payload === 'object' && !Array.isArray(payload) && type === 'state') {
             // 319 aulas na trilha x 4 mini-aulas: 5000 cobre tudo, e o corpo já
             // é limitado a 256 KB pelo readBody.
@@ -4412,18 +4433,19 @@ Respond ONLY with valid JSON, no markdown:
             let anterior = null;
             try { anterior = (await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`))?.[0]?.data || null; }
             catch (e) { anterior = null; }
+            const estado = reset === true ? safePayload : progressoQueSoSobe(anterior, safePayload);
             await sbUser(identity, '/user_state', {
                 method: 'POST',
                 headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
                 body: JSON.stringify({
                     user_id:    identity.appUserId,
-                    data:       safePayload,
+                    data:       estado,
                     updated_at: new Date().toISOString(),
                 }),
             });
-            try { await trackCampaignProgress(identity, safePayload); }
+            try { await trackCampaignProgress(identity, estado); }
             catch (e) { console.error('[campaign-tracker]', e?.message || e); }
-            const delta = anterior ? deltaAtividade(anterior, safePayload) : { minis: 0, xp: 0 };
+            const delta = anterior ? deltaAtividade(anterior, estado) : { minis: 0, xp: 0 };
             if (delta.minis || delta.xp) {
                 try {
                     await sb('/rpc/somar_atividade', { method: 'POST', body: JSON.stringify({
