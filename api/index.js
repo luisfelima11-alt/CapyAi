@@ -655,6 +655,13 @@ async function requireProfessor(req, res) {
 
 const diaBrasil = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
+// Teto do XP que um POST /api/db pode somar (ranking público). Uma aula inteira
+// dá ~300 XP e o maior prêmio único é 250: os tetos são folgados de propósito.
+// Quem passa deles (visitante que estudou muito e criou a conta) não perde
+// nada no aparelho: o navegador manda o total de novo e o servidor alcança.
+const XP_MAX_POR_SALVAR = 2000;
+const XP_MAX_POR_DIA = 20000;
+
 // Quanto o aluno avançou entre dois estados salvos: mini-lições novas e XP ganho.
 // Um aparelho atrasado que salva menos não gera número negativo.
 function deltaAtividade(antes, depois) {
@@ -4418,8 +4425,29 @@ Respond ONLY with valid JSON, no markdown:
             if ('xp' in safePayload) safePayload.xp = Math.max(0, Math.min(10000000, Number(safePayload.xp) || 0));
             // O estado anterior, para a atividade do dia (painel do professor).
             let anterior = null;
-            try { anterior = (await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`))?.[0]?.data || null; }
-            catch (e) { anterior = null; }
+            let lido = false;
+            try {
+                const linhas = await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`);
+                lido = Array.isArray(linhas);
+                anterior = lido ? (linhas[0]?.data || null) : null;
+            } catch (e) { anterior = null; }
+            // O XP vem do navegador e vai para o ranking público: sem teto, um
+            // POST com 10 milhões punha qualquer um no topo (13/nov). Cada salvar
+            // sobe no máximo XP_MAX_POR_SALVAR, e o dia (atividade_diaria) no
+            // máximo XP_MAX_POR_DIA. Descer sempre pode (recomeçar o progresso).
+            // Se o estado anterior não pôde ser lido, não corta nada.
+            if ('xp' in safePayload && lido) {
+                const antes = Math.max(0, Number(anterior?.xp) || 0);
+                if (safePayload.xp > antes) {
+                    let hoje = 0;
+                    try {
+                        const dia = await sb(`/atividade_diaria?user_id=eq.${encodeURIComponent(identity.appUserId)}&dia=eq.${diaBrasil()}&select=xp`);
+                        hoje = Array.isArray(dia) ? Math.max(0, Number(dia[0]?.xp) || 0) : 0;
+                    } catch (e) { hoje = 0; }
+                    const folga = Math.max(0, Math.min(XP_MAX_POR_SALVAR, XP_MAX_POR_DIA - hoje));
+                    safePayload.xp = Math.min(safePayload.xp, antes + folga);
+                }
+            }
             await sbUser(identity, '/user_state', {
                 method: 'POST',
                 headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },

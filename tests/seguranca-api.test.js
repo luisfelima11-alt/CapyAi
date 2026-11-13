@@ -277,3 +277,18 @@ test('homework list: a teacher sees only the students of their own class; admin 
   assert.equal(aluno.status, 403);
 });
 
+// ── 4. Ranking: XP do navegador entrava inteiro ────────────────────────────
+test('ranking: a forged XP total cannot jump to the top in one save, nor climb without end in a day', async () => {
+  const salvar = xp => chamar('POST', '/api/db', comSessao('tk-ana'), { type: 'state', payload: { xp, completedMinis: [] } });
+  const xpGuardado = () => banco.user_state.get('acc-ana')?.data?.xp;
+  await salvar(120);
+  assert.equal(xpGuardado(), 120, 'a normal save keeps the XP');
+  await salvar(10_000_000);
+  assert.ok(xpGuardado() <= 120 + 2000, `one save took the XP to ${xpGuardado()}`);
+  for (let i = 0; i < 40; i++) await salvar(10_000_000);
+  assert.ok(xpGuardado() <= 120 + 20000, `40 saves in one day took the XP to ${xpGuardado()}`);
+  // Perder XP (recomeçar o progresso) continua valendo.
+  await salvar(0);
+  assert.equal(xpGuardado(), 0);
+});
+

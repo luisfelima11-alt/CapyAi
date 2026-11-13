@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Um POST com XP inventado punha qualquer aluno no topo do ranking
+
+**Sintoma:** um aluno logado mandava `POST /api/db` com `xp: 10000000` e aparecia em 1º no ranking público
+(`leaderboard.html`) na hora. Nada limitava quantas vezes por dia.
+
+**Causa raiz:** o estado do aluno inteiro vem do navegador. O servidor só cortava o XP em 10 milhões, e o
+`public_leaderboard` lê esse número direto do `user_state`.
+
+**Correção:** cada salvar sobe o XP no máximo 2.000 acima do que estava guardado (`XP_MAX_POR_SALVAR`), e o dia
+inteiro no máximo 20.000 (`XP_MAX_POR_DIA`, somado na `atividade_diaria`). Descer continua livre (recomeçar o
+progresso). Uma aula inteira dá ~300 XP. Quem passa do teto não perde nada no aparelho: o `store.js` mescla pelo
+MAIOR e manda o total de novo; o servidor alcança aos poucos. Se o estado anterior não pôde ser lido, nada é
+cortado. O cálculo do XP continua no navegador (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (um salvar com 10 milhões e 40
+salvares seguidos no mesmo dia).
+
+**Por que aconteceu:** número que o aluno controla e que todo mundo vê (ranking) precisa de teto no servidor.
+
+---
+
 ## 2026-11-13 — Qualquer professor lia a lição de casa de todos os alunos do site
 
 **Sintoma:** uma conta com papel `teacher` abria `teacher_homework.html` (ou chamava `GET /api/homework`) e
