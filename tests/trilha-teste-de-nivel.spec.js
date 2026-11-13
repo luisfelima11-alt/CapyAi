@@ -28,7 +28,7 @@ test('aluna com conta e onboarding feito, num aparelho novo, fica na trilha', as
   await abrir(page, { sessao: ALUNA, perfil: { onboarding_complete: true, english_level: 'elementary' } });
   await expect.poll(() => page.evaluate(() => localStorage.getItem('capyPlacementDone'))).toBe('1');
   await page.waitForTimeout(500);
-  await expect(page).toHaveURL(/\/learn\.html$/);
+  await expect(page).toHaveURL(/\/learn\.html(\?.*)?$/);   // a trilha pode guardar ?lang= no endereço
   // O nível do perfil vira o selo da trilha.
   expect(await page.evaluate(() => localStorage.getItem('capyPlayerLevel'))).toBe('elementary');
   await expect(page.locator('#level-name')).toHaveText('Elementary Level');
@@ -42,7 +42,7 @@ test('o nível que o aparelho já tem (do teste) não é trocado pelo do perfil'
   });
   await expect(page.locator('#level-name')).toHaveText('Intermediate Level');
   await page.waitForTimeout(500);
-  await expect(page).toHaveURL(/\/learn\.html$/);
+  await expect(page).toHaveURL(/\/learn\.html(\?.*)?$/);   // a trilha pode guardar ?lang= no endereço
   expect(await page.evaluate(() => localStorage.getItem('capyPlayerLevel'))).toBe('intermediate');
 });
 
