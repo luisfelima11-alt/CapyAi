@@ -212,6 +212,10 @@ const RATE_LIMITS = {
     translate:    { free:  10, pro: 200, super: 500 },
     story:        { free:   3, pro:  30, super: 100 },
     transcribe:   { free:   3, pro:  50, super: 150 },
+    // Voz da página de Preparação (repetir 3 frases + responder a pergunta da
+    // aula, com novas tentativas): só o preparacao.html pede este balde
+    // (`uso: 'preparacao'`). Áudios de ~5 s: cerca de R$ 0,02 por preparação.
+    'transcribe-prep': { free: 40, pro: 120, super: 200 },
     homework:     { free:  20, pro: 100, super: 200 },
     'auth-login': { free:  20, pro:  20, super:  20 },
     'auth-signup':{ free:   5, pro:   5, super:   5 },
@@ -4842,8 +4846,8 @@ Rules:
     // ── Whisper: transcrição de áudio (Speak step + AI Chat por voz) ─────────
     // POST /api/transcribe { audioBase64, mimeType?, lang? } → { text }
     if (req.method === 'POST' && url === '/api/transcribe') {
-        const { audioBase64, mimeType, lang } = await readBody(req, Math.ceil(MAX_AUDIO_BODY * 4 / 3) + 4096);
-        const _rl = await checkRateLimit(req, 'transcribe', null);
+        const { audioBase64, mimeType, lang, uso } = await readBody(req, Math.ceil(MAX_AUDIO_BODY * 4 / 3) + 4096);
+        const _rl = await checkRateLimit(req, uso === 'preparacao' ? 'transcribe-prep' : 'transcribe', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         if (typeof audioBase64 !== 'string' || !audioBase64 || !/^[A-Za-z0-9+/]*={0,2}$/.test(audioBase64)) {

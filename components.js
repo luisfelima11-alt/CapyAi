@@ -1366,7 +1366,9 @@ window.CapyMic = {
 
     // Para a gravação e devolve { text, empty, error }. Cada gravação é transcrita
     // (e cobrada) uma vez só: uma 2ª chamada devolve { empty:true }.
-    async stopAndTranscribe({ lang } = {}) {
+    // `uso: 'preparacao'` (só a página de Preparação) usa o balde próprio de voz
+    // da preparação no servidor, em vez do de transcrição geral.
+    async stopAndTranscribe({ lang, uso } = {}) {
         const rec = this._rec;
         if (!rec) return { text: '', empty: true };
         rec.claimed = true;
@@ -1376,7 +1378,7 @@ window.CapyMic = {
         const mimeType = rec.recorder.mimeType || 'audio/webm';
         const blob = new Blob(rec.chunks, { type: mimeType });
         try {
-            const text = await this._sendToWhisper(blob, mimeType, lang);
+            const text = await this._sendToWhisper(blob, mimeType, lang, uso);
             return { text, empty: false };
         } catch (e) {
             return { text: '', empty: false, error: e.message || 'Erro na transcrição.' };
@@ -1391,7 +1393,7 @@ window.CapyMic = {
         this._stop(rec);
     },
 
-    async _sendToWhisper(blob, mimeType, lang) {
+    async _sendToWhisper(blob, mimeType, lang, uso) {
         const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(String(reader.result).split(',')[1] || '');
@@ -1401,7 +1403,7 @@ window.CapyMic = {
         const r = await fetch('/api/transcribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audioBase64: base64, mimeType, lang })
+            body: JSON.stringify(uso ? { audioBase64: base64, mimeType, lang, uso } : { audioBase64: base64, mimeType, lang })
         });
         const data = await r.json();
         // O servidor manda {error:'rate_limited', message:'Limite diário...'} — o

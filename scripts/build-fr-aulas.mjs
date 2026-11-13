@@ -170,6 +170,7 @@ function buildLessonHtml(l) {
 <meta name="twitter:title" content="${escAttr(pageTitle)}"/>
 <meta name="twitter:description" content="${escAttr(metaDesc)}"/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
+<script src="analytics.js?v=ga1" defer></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
 <div id="top-nav-placeholder"></div>
@@ -193,6 +194,7 @@ ${heroFloating}
     <div class="flex flex-wrap gap-2 mb-6">
       ${l.tags.map(t => `<span class="bg-white/10 border border-white/20 rounded-full px-3 py-1 text-sm font-bold">${escHtml(t)}</span>`).join('\n      ')}
     </div>
+    <a href="preparacao.html?aula=${l.slug}" class="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-400 text-white font-black text-sm px-5 py-2.5 rounded-full shadow-lg mb-5 transition-all">🎯 Preparar esta aula · 12 min</a>
     <div class="flex items-center gap-3">
       <div class="flex gap-1.5" id="section-dots"></div>
       <span class="text-white/60 text-xs font-bold" id="section-label">0 / 8 etapas concluídas</span>

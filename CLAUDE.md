@@ -198,6 +198,41 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
   - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
 - **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
 
+## Página de Preparação de aula (piloto: francês, 09/nov/2026)
+
+`preparacao.html` é o lugar próprio da preparação para a aula ao vivo. Ela segue o método do Luis
+(o da Influx): ouvir antes de ler, palavras com repetição, noticing e falar.
+
+- **Sessão** (`preparacao.html?aula=fr_aula_03`, 10 a 15 min, uma tela por vez):
+  1. 🎧 Ouvir: o diálogo na voz, **sem texto**, e 3 perguntas;
+  2. 🔤 Palavras: 8 cartões "ainda não sei / já sabia"; as difíceis voltam na sessão e na revisão;
+  3. 📖 Ler: o texto, com as palavras do passo 2 sublinhadas;
+  4. 👀 Reparar: 2 trechos do diálogo para o aluno notar como se diz algo (noticing);
+  5. 🗣️ Falar: repetir 3 frases no microfone (`CapyMic`, `uso: 'preparacao'`, balde `transcribe-prep`)
+     e responder em voz a pergunta da aula;
+  6. ✅ Pronto: placar, +30 XP na primeira vez e `POST /api/homework` com `lessonId: "<aula>-prep"`.
+     O professor recebe o placar, a resposta transcrita e as palavras difíceis.
+- **Lista** (`preparacao.html`):
+  - a próxima aula é a primeira que o aluno não terminou (`capyFrCompleted`);
+  - se ele já se preparou, a página oferece adiantar a seguinte;
+  - "Palavras para revisar" usa repetição espaçada no aparelho (`capyPrepPalavras_fr`: amanhã,
+    depois 3, 7 e 14 dias).
+- **Atalhos:**
+  - o botão "🎯 Preparar esta aula" em cada `fr_aula_XX` (vem do gerador `build-fr-aulas.mjs`);
+  - o card no `classes_fr.html`;
+  - o card na home, só para quem já estuda francês (`preparacao-atalho.js`).
+  - Ainda sem item no menu: ele aparece quando a página tiver mais cursos.
+- **Conteúdo:**
+  - o diálogo, as palavras e as frases saem da própria aula;
+  - o que a aula não tem (compreensão, "repare" e a pergunta) fica em `scripts/fr-preparacao.mjs`;
+  - depois de editar, rode `node scripts/build-preparacao.mjs`, que gera `data/preparacao/*.json`
+    e confere: sem pronúncia escrita, sem "gramática", o trecho existe no diálogo e a resposta está
+    entre as opções;
+  - mudou algum dado? Troque `VERSAO_DADOS` em `preparacao-core.js`.
+- **Curso novo na preparação:** um arquivo de conteúdo como o `fr-preparacao.mjs`, uma entrada em
+  `cursos.json` (o build) e o atalho na página do curso.
+- **Testes:** `tests/preparacao-pagina.{test,spec}.js`.
+
 ## Jogo novo? Registre no game-celebra.js
 
 O fim de partida dos jogos dispara a comemoração da Yara por meio do `game-celebra.js`,
