@@ -2518,30 +2518,40 @@ function scrollToNextMini() {
 }
 
 // ── Level badge ───────────────────────────────────────────────────────────────
-function setLevelBadge() {
+function setLevelBadge(nivel) {
   const map = {
     'starter': { name:'Starter', emoji:'🌱', iconKey:'sprout' },
     'elementary': { name:'Elementary', emoji:'🌿', iconKey:'seedling' },
     'pre-intermediate': { name:'Pre-Intermediate', emoji:'🌳', iconKey:'sapling' },
     'intermediate': { name:'Intermediate', emoji:'🌲', iconKey:'tree' },
   };
-  const l = map[playerLevel] || map['starter'];
+  const l = map[nivel || playerLevel] || map['starter'];
   document.getElementById('level-emoji').innerHTML = Components.icon(l.iconKey, 'w-5 h-5') || l.emoji;
   document.getElementById('level-name').textContent  = l.name + ' Level';
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-// Check onboarding (async — redirects to onboarding.html if profile not set)
-(async function() {
-  if (typeof Auth !== 'undefined') {
-    await Auth.checkOnboarding();
+// Onboarding e teste de nível. O "já fiz o teste" fica só no aparelho
+// (localStorage). Quem tem conta e terminou o onboarding (perfil no servidor)
+// não volta para o teste ao abrir a trilha noutro aparelho: o perfil vale pelo
+// teste e o nível dele vira o selo. Visitante sem o teste vai para lá na hora.
+const NIVEL_DA_TRILHA = { beginner: 'starter', elementary: 'elementary', intermediate: 'pre-intermediate', advanced: 'intermediate' };
+(async function conferirOnboardingETeste() {
+  const testeFeito = localStorage.getItem('capyPlacementDone');
+  const cache = typeof Auth !== 'undefined' ? Auth.getSession() : null;
+  const ehVisitante = s => !s || s.id === 'guest' || s.role === 'guest';
+  if (!testeFeito && ehVisitante(cache)) { window.location.href = 'placement_test.html'; return; }
+  if (typeof Auth === 'undefined') return;
+  const onboardingOk = await Auth.checkOnboarding();   // sem onboarding: já foi para onboarding.html
+  if (!onboardingOk || testeFeito) return;
+  if (ehVisitante(await Auth.ready())) { window.location.href = 'placement_test.html'; return; }
+  localStorage.setItem('capyPlacementDone', '1');
+  const nivel = NIVEL_DA_TRILHA[window.Store && Store.state && Store.state.englishLevel];
+  if (nivel && !localStorage.getItem('capyPlayerLevel')) {
+    localStorage.setItem('capyPlayerLevel', nivel);
+    setLevelBadge(nivel);
   }
 })();
-
-// If placement not done, redirect
-if (!localStorage.getItem('capyPlacementDone')) {
-  window.location.href = 'placement_test.html';
-}
 
 Components.mount('top-nav-placeholder',    Components.renderTopNav('lessons'));
 Components.mount('side-nav-placeholder',   Components.renderSideNav('lessons'));

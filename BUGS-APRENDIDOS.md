@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — A trilha mandava quem tem conta de volta para o teste de nível em outro aparelho
+
+**Sintoma:** o aluno se cadastrava e fazia o onboarding no computador; ao abrir a Trilha (`learn.html`) no
+celular, caía no teste de nível, toda vez, até refazer ou pular o teste (e aí o selo virava "Starter").
+Quem acabava de criar a conta e ainda não tinha feito o onboarding também caía no teste, e não no onboarding.
+
+**Causa raiz:** o `learn.html` decidia "já fez o teste?" só pelo `localStorage.capyPlacementDone`, que é do
+aparelho, e decidia na hora, antes de o `Auth.checkOnboarding()` (assíncrono) responder. O perfil no
+servidor (`onboarding_complete`, `english_level`) nunca entrava na conta.
+
+**Correção:** visitante sem o teste continua indo direto para o teste. Quem tem conta espera o
+`checkOnboarding()`: sem onboarding, vai para o onboarding; com onboarding, o perfil vale pelo teste. A
+página marca o `capyPlacementDone` e, se o aparelho não tiver nível, usa o `english_level` do perfil para o selo.
+
+**Como pegar isso de novo:** `tests/trilha-teste-de-nivel.spec.js` (aparelho novo com conta, nível já
+salvo no aparelho, visitante, convidado antigo, conta sem onboarding).
+
+**Por que aconteceu:** marca de "já fiz" guardada no `localStorage` vale por aparelho, não por pessoa. Toda
+marca dessas que bloqueia uma página precisa olhar também o que o servidor sabe do aluno.
+
+---
+
 ## 2026-11-13 — Provas finais do GPS e do Agro abriam sem estilo nenhum
 
 **Sintoma:** `gpstronic_prova.html` e `agro_prova.html` abriam como texto cru, sem cores, sem layout e com
