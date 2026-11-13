@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Da aula 26 em diante, o progresso da trilha não chegava ao servidor
+
+**Sintoma:** quem fez mais de 25 aulas da trilha (100 mini-aulas) continuava vendo tudo no próprio aparelho,
+mas noutro aparelho, ou depois de entrar de novo, as aulas novas tinham sumido. O painel do professor também
+parava de mostrar a atividade desse aluno.
+
+**Causa raiz:** o `POST /api/db` passa o estado pelo `sanitizeStoredJson`, que cortava **toda** lista em 100
+itens e todo objeto em 100 chaves. As mini-aulas novas entram no fim do `completedMinis`, então eram justamente
+elas que caíam. O aparelho não percebia: o merge junta o que o servidor tem com o que ele já tinha.
+
+**Correção:** o `sanitizeStoredJson` ganhou um limite (`maxItens`, padrão 100 para formulários); o estado do
+aluno usa 5000 (a trilha tem 319 aulas × 4 mini-aulas; o corpo já é limitado a 256 KB).
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("lista de progresso com mais de 100
+itens"), no `npm run test:security`.
+
+**Por que aconteceu:** o limite foi pensado para texto de formulário e aplicado ao estado inteiro. Corte
+silencioso de dado do aluno precisa de teste com um aluno avançado, não só com um aluno novo.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas

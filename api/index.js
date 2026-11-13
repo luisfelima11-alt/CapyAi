@@ -2354,17 +2354,20 @@ function instrucoesDaAula(c, aula, canal) {
     ];
 }
 
-function sanitizeStoredJson(value, depth = 0) {
+// `maxItens` limita listas e chaves. O padrão (100) serve a formulários; o
+// estado do aluno (POST /api/db) passa um limite maior: lá a lista de
+// mini-aulas feitas passa de 100 na aula 26 da trilha, e o corte era silencioso.
+function sanitizeStoredJson(value, depth = 0, maxItens = 100) {
     if (depth > 6) return null;
     if (typeof value === 'string') return value.slice(0, 2000).replace(/[<>\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
     if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
     if (typeof value === 'boolean' || value === null) return value;
-    if (Array.isArray(value)) return value.slice(0, 100).map(item => sanitizeStoredJson(item, depth + 1));
+    if (Array.isArray(value)) return value.slice(0, maxItens).map(item => sanitizeStoredJson(item, depth + 1, maxItens));
     if (value && typeof value === 'object') {
         const output = {};
-        for (const [key, item] of Object.entries(value).slice(0, 100)) {
+        for (const [key, item] of Object.entries(value).slice(0, maxItens)) {
             if (['__proto__', 'constructor', 'prototype'].includes(key)) continue;
-            output[String(key).slice(0, 100)] = sanitizeStoredJson(item, depth + 1);
+            output[String(key).slice(0, 100)] = sanitizeStoredJson(item, depth + 1, maxItens);
         }
         return output;
     }
@@ -4398,7 +4401,9 @@ Respond ONLY with valid JSON, no markdown:
         const identity = await requireAppUser(req, res);
         const { type, payload } = await readBody(req);
         if (payload && typeof payload === 'object' && !Array.isArray(payload) && type === 'state') {
-            const safePayload = sanitizeStoredJson(payload);
+            // 319 aulas na trilha x 4 mini-aulas: 5000 cobre tudo, e o corpo já
+            // é limitado a 256 KB pelo readBody.
+            const safePayload = sanitizeStoredJson(payload, 0, 5000);
             delete safePayload.plan;
             delete safePayload.planType;
             delete safePayload.subscription;
