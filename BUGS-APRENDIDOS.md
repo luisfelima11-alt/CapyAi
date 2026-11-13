@@ -1,5 +1,25 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — O envio de lição de casa não tinha limite nenhum
+
+**Sintoma:** um aluno logado (ou um script com a sessão dele) podia mandar `POST /api/homework` sem parar:
+cada envio grava até 20 KB na `homework_submissions` e aparece na lista do professor, que só mostra as 500
+mais recentes.
+
+**Causa raiz:** o balde `homework` existia em `RATE_LIMITS` (20 por dia no grátis, 100 no Pro, 200 no Super),
+mas a rota nunca chamava o `checkRateLimit`.
+
+**Correção:** a rota consulta o balde `homework` (por aluno, depois de validar o pedido) e responde 429 quando
+estoura. Na aula, o `components.js` já mostra "Tentar de novo" para qualquer erro que não seja de login.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (balde estourado: 429 e nada gravado;
+balde livre: 200, contado por aluno).
+
+**Por que aconteceu:** criar o limite e ligar o limite na rota eram dois passos, e só o primeiro foi feito.
+Balde em `RATE_LIMITS` que nenhuma rota usa é sinal de rota sem limite.
+
+---
+
 ## 2026-11-13 — Um POST com XP inventado punha qualquer aluno no topo do ranking
 
 **Sintoma:** um aluno logado mandava `POST /api/db` com `xp: 10000000` e aparecia em 1º no ranking público

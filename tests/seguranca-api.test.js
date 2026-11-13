@@ -292,3 +292,15 @@ test('ranking: a forged XP total cannot jump to the top in one save, nor climb w
   assert.equal(xpGuardado(), 0);
 });
 
+// ── 5. Lição de casa: o balde `homework` existia e ninguém usava ───────────
+test('homework submit uses its own rate limit', async () => {
+  banco.negarLimites = true;
+  const r = await chamar('POST', '/api/homework', comSessao('tk-ana'), { lessonId: 'aula_01', lessonTitle: 'x', answers: { a: 'b' }, xp: 75 });
+  assert.equal(r.status, 429, JSON.stringify(r.json));
+  assert.equal(banco.homework_submissions.length, 0, 'the submission was stored past the limit');
+  banco.negarLimites = false;
+  const ok = await chamar('POST', '/api/homework', comSessao('tk-ana'), { lessonId: 'aula_01', lessonTitle: 'x', answers: { a: 'b' }, xp: 75 });
+  assert.equal(ok.status, 200, JSON.stringify(ok.json));
+  assert.ok([...banco.limites.keys()].some(b => b.startsWith('u:auth-ana|homework|')), 'counted per student, not per IP');
+});
+

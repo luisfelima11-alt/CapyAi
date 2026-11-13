@@ -6494,6 +6494,10 @@ Rules:
         if (!/^[a-z0-9_-]{1,64}$/.test(licao)) { res.status(400).json({ error: 'lessonId_invalid' }); return; }
         const respostas = answers && typeof answers === 'object' && !Array.isArray(answers) ? sanitizeStoredJson(answers) : {};
         if (JSON.stringify(respostas).length > 20000) { res.status(413).json({ error: 'answers_too_large' }); return; }
+        // The `homework` bucket existed in RATE_LIMITS and nothing used it: a
+        // script could fill the table (20 KB a row) and bury the teacher's list.
+        const limite = await checkRateLimit(req, 'homework', null);
+        if (!limite.ok) { rateLimitedResponse(res, limite); return; }
         const result = await sbUser(identity, '/homework_submissions', {
             method: 'POST',
             headers: { 'Prefer': 'return=representation' },
