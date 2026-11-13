@@ -68,3 +68,22 @@ test('fazer só o Dia 1 não fecha a lição: os Dias 2 a 4 continuam pendentes'
   await expect(page.locator('#continue-step')).toHaveText(/Day 2/);
   await expect(page.locator('#trail-progress-label')).toHaveText(/^0 \/ /);
 });
+
+// Trilhas de curso (Agro, GPS Tronic, Intermediário, Entrevista, Medicina): a
+// regra dos 4 dias é a mesma. Até 12/nov o Dia 4 sozinho gravava a lição como
+// concluída; esse registro antigo não pode fazer os 4 dias aparecerem feitos.
+for (const [pagina, prefixo, id] of [
+  ['learn_agro.html', 'agro', 701],
+  ['learn_gpstronic.html', 'gps', 501],
+  ['learn_intermediate.html', 'int', 401],
+  ['learn_interview.html', 'iv', 601],
+  ['learn_med.html', 'med', 801],
+]) {
+  test(`${pagina}: só o Dia 4 feito (registro antigo) não conta a lição inteira`, async ({ page }) => {
+    const antigo = { completedMinis: [`${id}_4`], completedLessons: [id] };
+    await preparar(page, { local: { capyYaraState: JSON.stringify(antigo) } });
+    await page.goto('/' + pagina);
+    await expect(page.locator(`#${prefixo}-progress-label`)).toHaveText(/^1 \/ /);
+    await expect(page.locator(`#${prefixo}-cont-sub`)).toHaveText(/^Day 1/);
+  });
+}

@@ -1,5 +1,25 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Trilhas de curso ignoravam a regra dos 4 dias
+
+**Sintoma:** nas trilhas de curso (Agro, GPS Tronic, Intermediário, Entrevista e Medicina), quem tinha feito só
+o Dia 4 de uma lição antes de 12/nov via os 4 dias com ✓, a barra contava 4 dias e o "Começar" pulava para a
+lição seguinte. Na trilha de inglês (`learn.html`) e na de francês, a mesma lição aparecia com só o Dia 4 feito.
+
+**Causa raiz:** o `miniDone` dessas 5 páginas olhava a lista crua `completedLessons` antes dos dias. Até 12/nov,
+o Dia 4 sozinho gravava a lição nessa lista. A regra dos 4 dias entrou no `store.js` (`isTrailLessonDone`)
+e no `learn.html`/`learn_fr.html`, mas as páginas de curso ficaram com a lógica antiga.
+
+**Correção:** o `miniDone` das 5 páginas usa `Store.isTrailLessonDone(id) || Store.isMiniDone(id, dia)`, igual
+ao `learn_fr.html`. Quem terminou a lição no formato antigo (sem nenhum dia gravado) continua com os 4 dias feitos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (abre as 5 trilhas com o registro antigo do Dia 4).
+
+**Por que aconteceu:** a mesma regra estava copiada em 7 páginas. Regra de progresso mora num lugar só
+(`store.js`) e as páginas só perguntam a ele.
+
+---
+
 ## 2026-11-13 — Fazer só o Dia 1 da trilha fechava a lição inteira
 
 **Sintoma:** o aluno fazia o Dia 1 (Listen & Quiz) de uma lição da Trilha, acertava 60% ou mais do quiz e via
