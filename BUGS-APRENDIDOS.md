@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — O lembrete diário prometia salvar uma sequência que já tinha acabado
+
+**Sintoma:** aluna que parou de estudar há duas semanas com 12 dias seguidos recebia todo dia, às 19h, o
+e-mail "🔥 Sua streak está em perigo! (streak de 12 dias!) … Sua streak de 12 dias expira à meia-noite!".
+Quando voltava ao app, a sequência estava em 0.
+
+**Causa raiz:** a sequência só é recalculada no navegador (`resolverStreak` no `store.js`). O banco guarda o
+`streakDays` do último dia em que o aluno abriu o app. O `/api/send-reminders` lia esse número cru, sem olhar
+a data da última prática, e ainda sorteava mensagens que falam de streak para quem não tem mais nenhuma.
+
+**Correção:** `sequenciaParaSalvarHoje(d, hoje)` aplica no servidor as regras do `resolverStreak` (última
+prática ou dia coberto ontem; com um dia de falta, só com 🧊). O assunto e a frase "expira à meia-noite" usam
+esse número. Quem já perdeu a sequência recebe só a mensagem que não fala de streak.
+
+**Como pegar isso de novo:** `tests/lembrete-streak.test.js` roda o cron com relógio falso e quatro alunas
+(sumida, praticou ontem, faltou com 🧊, faltou sem 🧊), em várias rodadas por causa do sorteio.
+
+**Por que aconteceu:** número derivado (a sequência) salvo como se fosse fato. Quem lê o `streakDays` do banco
+precisa reavaliá-lo contra a data, do mesmo jeito que o navegador faz ao abrir.
+
+---
+
 ## 2026-11-13 — Quem usava a IA à noite ficava bloqueado na manhã seguinte
 
 **Sintoma:** o visitante usava os 3 usos de IA às 22h. Na manhã seguinte o app mostrava "3 chats left today",

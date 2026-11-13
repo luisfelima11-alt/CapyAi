@@ -908,6 +908,24 @@ function resumoDoAluno(a, st, prof, today) {
     };
 }
 
+// A sequência que ainda dá para salvar HOJE, pelas regras do store.js
+// (resolverStreak): viva se a última prática (ou o dia coberto por freeze) foi
+// ontem; com um dia de falta, só se houver 🧊 para cobri-lo. O servidor não
+// recalcula a sequência: o streakDays salvo é o do último dia em que o aluno
+// abriu o app. Devolve 0 quando ela já acabou.
+function sequenciaParaSalvarHoje(d, hoje) {
+    const dias = Number(d && d.streakDays) || 0;
+    if (dias < 1) return 0;
+    const iso = /^\d{4}-\d{2}-\d{2}$/;
+    const praticou = d.lastPracticeDate || (d.streakActive ? d.lastQuestDate : '');
+    const ancora = [praticou, d.streakCoveredThrough].filter(v => typeof v === 'string' && iso.test(v)).sort().pop();
+    if (!ancora) return 0;
+    const gap = Math.round((Date.parse(hoje + 'T12:00:00Z') - Date.parse(ancora + 'T12:00:00Z')) / 86400000);
+    if (gap <= 1) return dias;
+    if (gap === 2 && (Number(d.streakFreezes) || 0) > 0) return dias;
+    return 0;
+}
+
 async function buildStudentRoster() {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
     const [accounts, states, profiles] = await Promise.all([
@@ -6036,10 +6054,13 @@ Rules:
             if (neverStarted) nudgedNewcomers++;
 
             const acc = accById[row.user_id];
-            const msg = neverStarted
-                ? NEVER_STARTED_MESSAGES[Math.floor(Math.random() * NEVER_STARTED_MESSAGES.length)]
-                : MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
-            const streakNote = d.streakDays > 1 ? ` Sua streak de ${d.streakDays} dias expira à meia-noite!` : '';
+            // O streakDays do banco é o que o aluno deixou ao sair: quem parou há
+            // semanas ainda tem 12 lá. Falar de streak só para quem ainda a tem.
+            const sequencia = sequenciaParaSalvarHoje(d, today);
+            const semFalarDeStreak = MESSAGES.filter(m => !/streak/i.test(m.title + m.body));
+            const opcoes = neverStarted ? NEVER_STARTED_MESSAGES : sequencia > 0 ? MESSAGES : semFalarDeStreak;
+            const msg = opcoes[Math.floor(Math.random() * opcoes.length)];
+            const streakNote = sequencia > 1 ? ` Sua streak de ${sequencia} dias expira à meia-noite!` : '';
 
             // 1) Web Push (se inscrito)
             let pushOk = false;
@@ -6073,7 +6094,7 @@ Rules:
                         body: JSON.stringify({
                             from: process.env.EMAIL_FROM || 'Capy English <contato@capyenglish.com.br>',
                             to: acc.email,
-                            subject: msg.title + (d.streakDays > 1 ? ` (streak de ${d.streakDays} dias!)` : ''),
+                            subject: msg.title + (sequencia > 1 ? ` (streak de ${sequencia} dias!)` : ''),
                             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#001f3f;border-radius:24px;padding:32px;text-align:center;color:#fff">
                                 <img src="https://www.capyenglish.com.br/icon-192.png" width="96" height="96" style="border-radius:50%;border:4px solid rgba(236,72,153,.5)"/>
                                 <h1 style="font-size:22px;margin:16px 0 8px">${msg.title}</h1>
