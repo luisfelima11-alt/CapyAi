@@ -83,6 +83,28 @@ test('English, French and Turkish completion keys remain isolated', () => {
   assert.equal(Store.isLessonDone(301, 'en'), false);
 });
 
+test('a trail lesson needs all four days, including when Day 4 is done first', () => {
+  for (const [id, lang] of [[1, 'en'], [201, 'fr'], [301, 'tr']]) {
+    const Store = loadStore();
+    assert.equal(Store.completeMini(id, 4, lang), false);
+    assert.equal(Store.isLessonDone(id, lang), false);
+    Store.completeLesson(id, lang); // marker written by the old Day 4 flow
+    assert.equal(Store.isTrailLessonDone(id, lang), false);
+    assert.equal(Store.completeMini(id, 1, lang), false);
+    assert.equal(Store.completeMini(id, 2, lang), false);
+    assert.equal(Store.completeMini(id, 3, lang), true);
+    assert.equal(Store.isTrailLessonDone(id, lang), true);
+  }
+  const Store = loadStore();
+  Store.completeLesson(301, 'tr');
+  assert.equal(Store.isTrailLessonDone(301, 'tr'), true);
+  Store.completeMini(301, 2, 'tr');
+  assert.equal(Store.isTrailLessonDone(301, 'tr'), true);
+  Store.completeMini(201, 1, 'fr');
+  Store.completeFullTrailLesson(201, 'fr');
+  assert.equal(Store.isTrailLessonDone(201, 'fr'), true);
+});
+
 test('trail and runner expose Turkish without replacing English or French', () => {
   const trail = read('learn.html');
   const runner = read('lessons.html');

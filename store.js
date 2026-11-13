@@ -502,6 +502,11 @@ const Store = {
     },
 
     completeMini(lessonId, miniNum, language = 'en') {
+        const wasComplete = this.isTrailLessonDone(lessonId, language);
+        if (wasComplete && !this.isMiniDone(lessonId, miniNum, language)) {
+            this.completeFullTrailLesson(lessonId, language);
+            return true;
+        }
         const key = this._miniKey(lessonId, miniNum, language);
         if (!this.state.completedMinis) this.state.completedMinis = [];
         if (!this.state.completedMinis.includes(key)) {
@@ -509,9 +514,10 @@ const Store = {
             this.save();
             this.questProgress('complete_minis', 1);
         }
-        // When last mini done → also mark the full lesson complete + streak
-        if (miniNum === 4) {
+        const allMinisDone = [1, 2, 3, 4].every(day => this.isMiniDone(lessonId, day, language));
+        if (!wasComplete && allMinisDone) {
             this.completeLesson(lessonId, language);
+            if (language === 'en') this.completeLesson('j' + lessonId);
             this.activateStreak();
             // O pico de satisfação do aluno no site inteiro — e até aqui era o
             // único grande momento que ninguém escutava. Quem quiser reagir a
@@ -519,6 +525,25 @@ const Store = {
             // em vez de editar as 124 páginas de aula.
             document.dispatchEvent(new CustomEvent('lessonComplete', { detail: { lessonId, language } }));
         }
+        return allMinisDone;
+    },
+
+    isTrailLessonDone(lessonId, language = 'en') {
+        // Older records can mark the lesson done after Day 4 alone.
+        const days = [1, 2, 3, 4].map(day => this.isMiniDone(lessonId, day, language));
+        if (days.some(Boolean)) return days.every(Boolean);
+        return this.isLessonDone(lessonId, language);
+    },
+
+    completeFullTrailLesson(lessonId, language = 'en') {
+        this.state.completedMinis ||= [];
+        for (const day of [1, 2, 3, 4]) {
+            if (!this.isMiniDone(lessonId, day, language)) {
+                this.state.completedMinis.push(this._miniKey(lessonId, day, language));
+            }
+        }
+        this.completeLesson(lessonId, language);
+        this.save();
     },
 
     isMiniDone(lessonId, miniNum, language = 'en') {

@@ -82,6 +82,37 @@ Só nas aulas do **GPS Tronic** e do **Agro English**:
   - a tag uma vez em cada aula desses dois cursos;
   - nenhuma outra página com o botão.
 
+## Padrão das aulas de 12/nov/2026: Listening curto, Expressions em slides e 2 exercícios novos
+
+Vale para toda aula do molde novo (o desenho da `gpstronic_aula_09.html`):
+
+- **Listening com no máximo 15 áudios.** Quem decide é o `listening-lab.js` (`MAX_ITENS`):
+  1. primeiro as frases do Speak;
+  2. depois as falas principais do diálogo;
+  3. as falas extras só entram se faltar.
+- **Key Expressions em slides, no visual do Patterns.** É uma expressão por slide, com 🔊, tradução,
+  "quando usar" e exemplo, com tela cheia.
+  - O `aula-molde.js` monta o deck a partir do `EXPR_DATA` da aula. As aulas do molde ganham os slides
+    só por carregar o script (`node scripts/aplica-padrao-novo.mjs`).
+  - O comportamento vem do mesmo motor do Patterns: `gramatica-slides.js`, `CapySlides.montar`.
+  - **O que não pode mudar:**
+    - o contêiner continua `#expr-grid` (o `self-study.js` usa);
+    - o array continua `EXPR_DATA`, com `expr`/`pt` (a folha em PDF lê esses campos);
+    - nada de classe `flip-card`.
+- **"How do you say it in English?"** (`#tab-traducao`, logo depois do Patterns): 6 frases em PT com
+  o vocabulário da aula, que o aluno escreve em inglês.
+  - A conferência é tolerante (`CapyFala`) e aceita as variações em `aceitas`.
+  - A resposta certa aparece escrita sempre, no acerto e no erro.
+- **Texto com lacunas** (`#tab-lacunas`, logo depois do Practice): um texto de 60 palavras ou mais,
+  com 6 a 8 `[[pedaços]]`.
+  - Os pedaços ficam numa caixa, junto com 2 de distração. O aluno toca para encaixar.
+  - "Conferir" revela a palavra certa de cada lacuna errada.
+- **Dados das seções novas:** vêm do conteudo.json (`traducao`, `lacunas`). O construtor grava
+  `const TRAD_DATA` e `const LACUNAS_DATA`, e o `aula-molde.js` monta as duas seções.
+- **Construtor de referência:** `scripts/build-intermediate-aula.mjs`. É o primeiro com as duas
+  seções novas e foi feito para as aulas 19 e 20 do Intermediate. Os construtores do GPS, do Agro,
+  da Entrevista e do Medical ganham as seções quando cada curso for refeito.
+
 ## Proibido: "gramática" e "grammar" (regra do Luis, 12/out/2026)
 
 O foco do site não é gramática, é **aprender com exemplos**. Por isso, as palavras
