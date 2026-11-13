@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Trocar de aba na lição pagava o XP do Quiz e do Listen de novo
+
+**Sintoma:** no `lessons.html`, depois de terminar o Quiz (ou o Listen), bastava clicar em outra aba e
+voltar: a tela "Quiz Concluído!" aparecia de novo e o XP da rodada era somado outra vez, a cada clique.
+Três idas e voltas transformavam 20 XP em 80. Dava para subir de nível sem responder nada.
+
+**Causa raiz:** quem pagava o XP era a função que DESENHA a tela de fim (`renderQuizFinish`,
+`renderListenFinish`). Trocar de aba chama `renderQuiz()`/`renderListen()`, que, com a rodada já
+terminada, redesenham a tela de fim, e com ela o pagamento.
+
+**Correção:** as duas telas de fim recebem `concluiuAgora`. Só o momento em que a última resposta é dada
+passa `true` e paga (XP, `markToolDone`, streak, lição concluída, comemoração). Redesenhar só mostra.
+O "🔄 Refazer" continua pagando a nova rodada, porque é prática de verdade.
+
+**Como pegar isso de novo:** `tests/xp-uma-vez.spec.js` termina o Quiz e o Listen e troca de aba três
+vezes, conferindo que o XP não muda.
+
+**Por que aconteceu:** função de desenhar com efeito colateral. Tela que pode ser redesenhada (troca de
+aba, voltar, atualizar) não pode pagar nada; o pagamento fica no evento que só acontece uma vez.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas
