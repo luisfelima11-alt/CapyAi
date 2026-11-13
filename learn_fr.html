@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Prática Diária de Francês | Capy English</title>
-<meta name="description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
+<meta name="description" content="Pratique francês em mini-lições diárias: escute, jogue, monte frases e converse com a Yara."/>
 <link rel="canonical" href="https://www.capyenglish.com.br/learn_fr.html"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -28,14 +28,14 @@
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/learn_fr.html"/>
 <meta property="og:title" content="Prática Diária de Francês | Capy English"/>
-<meta property="og:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
+<meta property="og:description" content="Pratique francês em mini-lições diárias: escute, jogue, monte frases e converse com a Yara."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda francês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Prática Diária de Francês | Capy English"/>
-<meta name="twitter:description" content="Uma lição de francês por dia: escute, jogue, monte frases e converse com a Yara. 12 unidades (48 mini-lições) do zero ao Passé Composé."/>
+<meta name="twitter:description" content="Pratique francês em mini-lições diárias: escute, jogue, monte frases e converse com a Yara."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
@@ -54,14 +54,14 @@
         <span class="text-4xl">🇫🇷</span>
         <div>
           <h1 class="text-2xl font-black">Prática Diária de Francês</h1>
-          <p class="text-blue-200/85 text-sm font-bold">Un peu chaque jour — 12 unidades · 48 mini-lições de 5 minutos</p>
+          <p id="fr-trail-summary" class="text-blue-200/85 text-sm font-bold">Un peu chaque jour — mini-lições de 5 minutos</p>
         </div>
       </div>
       <div class="flex items-center gap-3 mt-4">
         <div class="flex-1 bg-white/10 rounded-full h-3 overflow-hidden">
           <div id="fr-progress-bar" class="h-full bg-gradient-to-r from-blue-400 to-indigo-300 rounded-full transition-all" style="width:0%"></div>
         </div>
-        <span id="fr-progress-label" class="text-xs font-black text-blue-200">0 / 48</span>
+        <span id="fr-progress-label" class="text-xs font-black text-blue-200"></span>
       </div>
     </div>
 
@@ -88,7 +88,7 @@
     <div id="fr-done" class="hidden card-in bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-3xl p-8 text-center mt-6">
       <div class="text-5xl mb-3">🏆</div>
       <p class="font-black text-xl mb-1">Félicitations ! Prática completa!</p>
-      <p class="text-blue-100 text-sm">Você completou todas as 48 mini-lições de francês! Revisite sempre para manter a pronúncia e o vocabulário afiados.</p>
+      <p class="text-blue-100 text-sm">Você completou todas as mini-lições de francês! Revisite sempre para manter a pronúncia e o vocabulário afiados.</p>
     </div>
 
   </div>
@@ -98,7 +98,7 @@
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
-<script src="store.js?v=xpfix"></script>
+<script src="store.js?v=trail-progress"></script>
 <script src="streak-overlay.js?v=land1"></script>
 <script src="components.js?v=seg1"></script>
 <script>window.YARA_WIDGET={lang:'fr',lessonTitle:'Prática Diária de Francês'};</script>
@@ -108,7 +108,7 @@ Components.mount('top-nav-placeholder', Components.renderTopNav('classes'));
 Components.mount('side-nav-placeholder', Components.renderSideNav('classes'));
 Components.mount('mobile-nav-placeholder', Components.renderMobileNav('classes'));
 
-// ── Trilha de Francês: 42 unidades × 4 mini-lições (168 etapas) ─────────────
+// ── Trilha de Francês: quatro mini-lições por unidade ─────────────
 const BLOCKS = [
   { id: 'all', label: 'Todas (42)' },
   { id: 'b1',  label: 'Bloco 1 · Primeiros Passos (1–4)' },
@@ -165,6 +165,8 @@ const TRAIL_FR = [
 ];
 
 const TOTAL_NODES = TRAIL_FR.length * 4;
+document.getElementById('fr-trail-summary').textContent =
+  `Un peu chaque jour — ${TRAIL_FR.length} unidades · ${TOTAL_NODES} mini-lições de 5 minutos`;
 const DAY_SUBS = [
   'Escuta, Vocabulário & Quiz',
   'Jogo de Pares & Lacunas',
@@ -176,12 +178,23 @@ let activeBlock = 'all';
 
 function miniDone(lessonId, miniNum) {
   if (!window.Store) return false;
-  if (Store.isLessonDone && (Store.isLessonDone(lessonId, 'fr') || Store.isLessonDone(lessonId))) return true;
-  if (Store.isMiniDone && (Store.isMiniDone(lessonId, miniNum, 'fr') || Store.isMiniDone(lessonId, miniNum))) return true;
-  return false;
+  return Store.isTrailLessonDone(lessonId, 'fr') || Store.isMiniDone(lessonId, miniNum, 'fr');
 }
 
 function nextMini() {
+  try {
+    const last = JSON.parse(localStorage.getItem('capyLastMini_fr') || 'null');
+    const lesson = TRAIL_FR.find(unit => unit.id === last?.lessonId);
+    if (lesson && [1, 2, 3, 4].includes(last.miniNum) && !miniDone(lesson.id, last.miniNum)) {
+      return { lesson, mini: last.miniNum, resumed: true };
+    }
+  } catch { /* Ignore invalid resume data. */ }
+
+  for (const lesson of TRAIL_FR) for (let mini = 1; mini <= 4; mini++) {
+    if (!miniDone(lesson.id, mini) && Number(localStorage.getItem(`capyGuidedStep_${lesson.id}_fr_m${mini}`)) > 0) {
+      return { lesson, mini, resumed: true };
+    }
+  }
   for (const l of TRAIL_FR) for (let m = 1; m <= 4; m++)
     if (!miniDone(l.id, m)) return { lesson: l, mini: m };
   return null;
@@ -261,16 +274,14 @@ function render() {
   document.getElementById('fr-progress-bar').style.width = Math.round(doneTotal / TOTAL_NODES * 100) + '%';
   document.getElementById('fr-progress-label').textContent = doneTotal + ' / ' + TOTAL_NODES;
 
+  document.getElementById('fr-continue').classList.toggle('hidden', !next);
+  document.getElementById('fr-done').classList.toggle('hidden', !!next);
   if (next) {
-    const c = document.getElementById('fr-continue');
-    c.classList.remove('hidden');
     document.getElementById('fr-cont-emoji').textContent = next.lesson.emoji;
     document.getElementById('fr-cont-title').textContent = `Unidade ${String(next.lesson.num).padStart(2,'0')} · ${next.lesson.title}`;
     document.getElementById('fr-cont-sub').textContent = `Jour ${next.mini} — ${DAY_SUBS[next.mini-1]}`;
     document.getElementById('fr-cont-btn').onclick = () => openMini(next.lesson.id, next.mini);
-    document.getElementById('fr-cont-kicker').textContent = doneTotal === 0 ? 'Comece por aqui' : 'Continuar de onde parou';
-  } else {
-    document.getElementById('fr-done').classList.remove('hidden');
+    document.getElementById('fr-cont-kicker').textContent = next.resumed ? 'Continuar de onde parou' : doneTotal === 0 ? 'Comece por aqui' : 'Próxima mini-lição';
   }
 }
 

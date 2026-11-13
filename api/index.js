@@ -214,6 +214,10 @@ const RATE_LIMITS = {
     translate:    { free:  10, pro: 200, super: 500 },
     story:        { free:   3, pro:  30, super: 100 },
     transcribe:   { free:   3, pro:  50, super: 150 },
+    // Voz da página de Preparação (repetir 3 frases + responder a pergunta da
+    // aula, com novas tentativas): só o preparacao.html pede este balde
+    // (`uso: 'preparacao'`). Áudios de ~5 s: cerca de R$ 0,02 por preparação.
+    'transcribe-prep': { free: 40, pro: 120, super: 200 },
     homework:     { free:  20, pro: 100, super: 200 },
     'auth-login': { free:  20, pro:  20, super:  20 },
     'auth-signup':{ free:   5, pro:   5, super:   5 },
@@ -752,6 +756,20 @@ function chatHeaders(contentLength) {
         h['X-Title']      = 'Capy Yara English';
     }
     return h;
+}
+
+// O que a IA devolve para a lousa vira { reply, cards } conferido: no máximo
+// 12 cartões, só texto (sem < >), com tamanho limitado. Os cartões vão para o
+// quadro de todos da sala, então nada passa do jeito que o modelo escreveu.
+function cartoesDaLousa(saida) {
+    const limpar = (v, max) => String(v == null ? '' : v).replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
+    const lista = saida && Array.isArray(saida.cards) ? saida.cards : [];
+    const cards = lista.slice(0, 40).map(c => ({
+        badge: limpar(c && c.badge, 30),
+        en: limpar(c && (c.en ?? c.texto), 220),
+        pt: limpar(c && (c.pt ?? c.subtexto), 220),
+    })).filter(c => c.en).slice(0, 12).map((c, i) => ({ ...c, badge: c.badge || `Frase ${i + 1}` }));
+    return { reply: limpar(saida && saida.reply, 400), cards };
 }
 
 function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
@@ -4272,8 +4290,13 @@ Respond ONLY with valid JSON, no markdown:
         callOpenAI(messages, 150, 0.85, res, req); return;
     }
 
+    // Chat da lousa (quadro.html). Responde { reply, cards } já conferidos: até
+    // 07/nov/2026 respondia pelo callOpenAI, no envelope antigo `candidates`, que
+    // a lousa não lê — e ela mostrava sempre as frases prontas do fallback.
     if (req.method === 'POST' && url === '/api/quadro-ai') {
         const { history, message, sala = 'geral' } = await readBody(req);
+        const pedido = String(message == null ? '' : message).slice(0, 2000).trim();
+        if (!pedido) throw new HttpError(400, 'mensagem_obrigatoria', 'Escreva o que você quer na lousa.');
         const _rl = await checkRateLimit(req, 'chat', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
@@ -4309,8 +4332,23 @@ Respond ONLY with valid JSON, no markdown:
             const texto = String(m?.content ?? m?.text ?? '').slice(0, 600);
             if (texto) messages.push({ role: (m?.role === 'model' || m?.role === 'assistant') ? 'assistant' : 'user', content: texto });
         });
-        messages.push({ role: 'user', content: String(message == null ? '' : message).slice(0, 2000) });
-        callOpenAI(messages, 1000, 0.75, res, req); return;
+        messages.push({ role: 'user', content: pedido });
+        if (!CHAT_KEY) { res.status(503).json({ error: 'ia_indisponivel', message: 'A Yara está desligada agora.' }); return; }
+
+        let saida = null;
+        try {
+            const r = await chatComplete(messages, { maxTokens: 1000, temperature: 0.75, json: true, rota: '/api/quadro-ai', timeout: 30000 });
+            saida = JSON.parse(String(r.text || '').replace(/^```(?:json)?\s*|\s*```$/g, ''));
+        } catch (e) {
+            console.error('[quadro-ai]', e.message);
+        }
+        const resposta = cartoesDaLousa(saida);
+        if (!resposta.cards.length && !resposta.reply) {
+            res.status(502).json({ error: 'ia_falhou', message: 'A Yara não respondeu agora. Tente de novo.' });
+            return;
+        }
+        res.status(200).json(resposta);
+        return;
     }
 
     // ── DB endpoints (Supabase) ───────────────────────────────────────────────
@@ -4973,8 +5011,8 @@ Rules:
     // ── Whisper: transcrição de áudio (Speak step + AI Chat por voz) ─────────
     // POST /api/transcribe { audioBase64, mimeType?, lang? } → { text }
     if (req.method === 'POST' && url === '/api/transcribe') {
-        const { audioBase64, mimeType, lang } = await readBody(req, Math.ceil(MAX_AUDIO_BODY * 4 / 3) + 4096);
-        const _rl = await checkRateLimit(req, 'transcribe', null);
+        const { audioBase64, mimeType, lang, uso } = await readBody(req, Math.ceil(MAX_AUDIO_BODY * 4 / 3) + 4096);
+        const _rl = await checkRateLimit(req, uso === 'preparacao' ? 'transcribe-prep' : 'transcribe', null);
         if (!_rl.ok) { rateLimitedResponse(res, _rl); return; }
 
         if (typeof audioBase64 !== 'string' || !audioBase64 || !/^[A-Za-z0-9+/]*={0,2}$/.test(audioBase64)) {

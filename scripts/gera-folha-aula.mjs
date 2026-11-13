@@ -23,7 +23,7 @@ const CURSOS = {
     med_aula: { nome: 'Medical English', cor: '#0e7490' },
     business_aula: { nome: 'Business English', cor: '#1d4ed8' },
     travel_aula: { nome: 'Travel English', cor: '#0369a1' },
-    intermediate_aula: { nome: 'Intermediate', cor: '#6d28d9' },
+    intermediate_aula: { nome: 'Intermediate', cor: '#be123c' },
     advanced_aula: { nome: 'Advanced', cor: '#9f1239' },
     interview_aula: { nome: 'Entrevista em inglês', cor: '#334155' },
     fr_aula: { nome: 'Français', cor: '#1e3a8a' },

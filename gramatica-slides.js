@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   gramatica-slides.js — os slides da aba Grammar das aulas dos cursos.
+   gramatica-slides.js — os slides das aulas dos cursos (Patterns e Key Expressions).
 
-   O HTML do deck sai pronto do gerador (scripts/lib/gramatica-slides.mjs):
+   O HTML do deck de Patterns sai pronto do gerador (scripts/lib/gramatica-slides.mjs):
    um <section class="gs-slide"> por slide, com imagem, padrão e frases.
    Aqui fica o comportamento:
    - na página: setas, bolinhas, deslizar, teclado ← →, o 🔊 de cada frase e
@@ -15,72 +15,86 @@
    Navegar na tela cheia move o deck da página junto, então quem chega ao
    último slide lá também libera o XP. A tela cheia é um clone do slide, para
    o HTML ter uma fonte só.
+
+   Desde 12/nov/2026 o mesmo motor serve mais de um deck por página: as Key
+   Expressions viraram slides (aula-molde.js monta o deck e chama
+   CapySlides.montar). O deck de Patterns continua sendo o #gs-deck, com os
+   botões #gs-pos/#gs-ant/#gs-prox/#gs-xp; os outros decks usam as mesmas
+   peças com classe (.gs-pos, .gs-ant, .gs-prox) dentro do próprio deck.
    ══════════════════════════════════════════════════════════════════════════ */
 (function () {
     'use strict';
 
-    const deck = document.getElementById('gs-deck');
-    if (!deck || deck.dataset.gsPronto) return;
-    deck.dataset.gsPronto = '1';
-
-    const slides = Array.from(deck.querySelectorAll('.gs-slide'));
-    if (!slides.length) return;
-    const dots = Array.from(deck.querySelectorAll('.gs-dot'));
-    const pos = document.getElementById('gs-pos');
-    const ant = document.getElementById('gs-ant');
-    const prox = document.getElementById('gs-prox');
-    const xp = document.getElementById('gs-xp');
-    const ultimo = slides.length - 1;
-    let atual = 0;
-
-    // tela cheia
-    let overlay = null, palco = null, revelar = null, contador = null, voltar = null, avancar = null;
-    let abertoEm = 0;        // para ignorar o clique fantasma do celular
-    let revelado = false;
-    let origem = null;       // quem abriu, para devolver o foco
+    let cssPosto = false;
 
     function falar(texto) {
         if (texto && typeof window.speak === 'function') window.speak(texto);
     }
 
-    // A imagem é lazy e o slide escondido não carrega: puxamos a do próximo
-    // antes, para ela já estar lá quando a pessoa avançar.
-    function preCarregar(i) {
-        const img = slides[i] && slides[i].querySelector('img.gs-img');
-        if (img && !img.complete) { const p = new Image(); p.src = img.src; }
-    }
+    // opts: { pos, ant, prox, xp, aba (id da aba), focoId, aoUltimo() }
+    function montar(deck, opts) {
+        opts = opts || {};
+        if (!deck || deck.dataset.gsPronto) return null;
+        const slides = Array.from(deck.querySelectorAll('.gs-slide'));
+        if (!slides.length) return null;
+        deck.dataset.gsPronto = '1';
+        const dots = Array.from(deck.querySelectorAll('.gs-dot'));
+        const pos = opts.pos || deck.querySelector('.gs-pos');
+        const ant = opts.ant || deck.querySelector('.gs-ant');
+        const prox = opts.prox || deck.querySelector('.gs-prox');
+        const xp = opts.xp || null;
+        const ultimo = slides.length - 1;
+        let atual = 0;
+        let chegouNoFim = false;
 
-    function aberto() { return !!overlay && overlay.classList.contains('gs-aberto'); }
+        // tela cheia
+        let overlay = null, palco = null, revelar = null, contador = null, voltar = null, avancar = null;
+        let abertoEm = 0;        // para ignorar o clique fantasma do celular
+        let revelado = false;
+        let origem = null;       // quem abriu, para devolver o foco
 
-    function ir(i) {
-        i = Math.max(0, Math.min(ultimo, i));
-        atual = i;
-        slides.forEach((s, k) => { s.hidden = k !== i; });
-        dots.forEach((d, k) => {
-            d.setAttribute('aria-current', k === i ? 'true' : 'false');
-            d.className = 'gs-dot w-2.5 h-2.5 rounded-full ' + (k === i ? 'bg-emerald-500' : 'bg-slate-200');
-        });
-        if (pos) pos.textContent = 'Slide ' + (i + 1) + ' de ' + slides.length;
-        if (ant) ant.disabled = i === 0;
-        if (prox) prox.disabled = i === ultimo;
-        if (i === ultimo && xp && xp.disabled && !xp.dataset.liberado) {
-            xp.dataset.liberado = '1';
-            xp.disabled = false;
-            xp.textContent = '✓ Vi todos os exemplos! (+20 XP)';
+        // A imagem é lazy e o slide escondido não carrega: puxamos a do próximo
+        // antes, para ela já estar lá quando a pessoa avançar.
+        function preCarregar(i) {
+            const img = slides[i] && slides[i].querySelector('img.gs-img');
+            if (img && !img.complete) { const p = new Image(); p.src = img.src; }
         }
-        preCarregar(i + 1);
-        if (aberto()) pintar();
-    }
 
-    // ── Tela cheia ────────────────────────────────────────────────────────
-    function criarOverlay() {
-        const el = document.createElement('div');
-        el.id = 'gs-foco';
-        el.className = 'gs-foco';
-        el.setAttribute('role', 'dialog');
-        el.setAttribute('aria-modal', 'true');
-        el.tabIndex = -1;
-        el.innerHTML = `
+        function aberto() { return !!overlay && overlay.classList.contains('gs-aberto'); }
+
+        function ir(i) {
+            i = Math.max(0, Math.min(ultimo, i));
+            atual = i;
+            slides.forEach((s, k) => { s.hidden = k !== i; });
+            dots.forEach((d, k) => {
+                d.setAttribute('aria-current', k === i ? 'true' : 'false');
+                d.className = 'gs-dot w-2.5 h-2.5 rounded-full ' + (k === i ? 'bg-emerald-500' : 'bg-slate-200');
+            });
+            if (pos) pos.textContent = 'Slide ' + (i + 1) + ' de ' + slides.length;
+            if (ant) ant.disabled = i === 0;
+            if (prox) prox.disabled = i === ultimo;
+            if (i === ultimo && xp && xp.disabled && !xp.dataset.liberado) {
+                xp.dataset.liberado = '1';
+                xp.disabled = false;
+                xp.textContent = '✓ Vi todos os exemplos! (+20 XP)';
+            }
+            if (i === ultimo && !chegouNoFim) {
+                chegouNoFim = true;
+                if (typeof opts.aoUltimo === 'function') { try { opts.aoUltimo(); } catch (e) { /* o XP nunca derruba o deck */ } }
+            }
+            preCarregar(i + 1);
+            if (aberto()) pintar();
+        }
+
+        // ── Tela cheia ────────────────────────────────────────────────────
+        function criarOverlay() {
+            const el = document.createElement('div');
+            if (opts.focoId) el.id = opts.focoId;
+            el.className = 'gs-foco';
+            el.setAttribute('role', 'dialog');
+            el.setAttribute('aria-modal', 'true');
+            el.tabIndex = -1;
+            el.innerHTML = `
       <button class="gs-foco-fechar" type="button" aria-label="Fechar a tela cheia">✕</button>
       <button class="gs-foco-nav gs-foco-prev" type="button" aria-label="Slide anterior">‹</button>
       <button class="gs-foco-nav gs-foco-next" type="button" aria-label="Próximo slide">›</button>
@@ -89,163 +103,172 @@
         <button class="gs-foco-revelar" type="button">👁️ Ver tradução</button>
         <span class="gs-foco-contador"></span>
       </div>`;
-        document.body.appendChild(el);
-        palco = el.querySelector('.gs-foco-palco');
-        revelar = el.querySelector('.gs-foco-revelar');
-        contador = el.querySelector('.gs-foco-contador');
-        voltar = el.querySelector('.gs-foco-prev');
-        avancar = el.querySelector('.gs-foco-next');
+            document.body.appendChild(el);
+            palco = el.querySelector('.gs-foco-palco');
+            revelar = el.querySelector('.gs-foco-revelar');
+            contador = el.querySelector('.gs-foco-contador');
+            voltar = el.querySelector('.gs-foco-prev');
+            avancar = el.querySelector('.gs-foco-next');
 
-        el.querySelector('.gs-foco-fechar').addEventListener('click', fechar);
-        voltar.addEventListener('click', e => { e.stopPropagation(); mover(-1); });
-        avancar.addEventListener('click', e => { e.stopPropagation(); mover(1); });
-        revelar.addEventListener('click', e => { e.stopPropagation(); alternarRevelar(); });
-        // Fundo fecha, com carência: o overlay nasce embaixo do dedo e o mesmo
-        // toque vira um clique ~300 ms depois no celular.
-        el.addEventListener('click', ev => {
-            if (ev.target !== el) return;
-            if (Date.now() - abertoEm < 400) return;
-            fechar();
-        });
-        // No slide: 🔊 fala; tocar no resto mostra/esconde a tradução.
-        palco.addEventListener('click', ev => {
+            el.querySelector('.gs-foco-fechar').addEventListener('click', fechar);
+            voltar.addEventListener('click', e => { e.stopPropagation(); mover(-1); });
+            avancar.addEventListener('click', e => { e.stopPropagation(); mover(1); });
+            revelar.addEventListener('click', e => { e.stopPropagation(); alternarRevelar(); });
+            // Fundo fecha, com carência: o overlay nasce embaixo do dedo e o mesmo
+            // toque vira um clique ~300 ms depois no celular.
+            el.addEventListener('click', ev => {
+                if (ev.target !== el) return;
+                if (Date.now() - abertoEm < 400) return;
+                fechar();
+            });
+            // No slide: 🔊 fala; tocar no resto mostra/esconde a tradução.
+            palco.addEventListener('click', ev => {
+                const b = ev.target.closest('[data-say]');
+                if (b) { ev.stopPropagation(); falar(b.getAttribute('data-say')); return; }
+                if (ev.target.closest('button, a')) return;
+                alternarRevelar();
+            });
+            let x0 = null, y0 = null;
+            el.addEventListener('touchstart', e => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+            el.addEventListener('touchend', e => {
+                if (x0 === null) return;
+                const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+                x0 = null;
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) mover(dx < 0 ? 1 : -1);
+            }, { passive: true });
+            return el;
+        }
+
+        function pintar() {
+            const c = slides[atual].cloneNode(true);
+            c.hidden = false;
+            c.removeAttribute('data-i');
+            c.querySelectorAll('.gs-expandir').forEach(n => n.remove());
+            c.querySelectorAll('img').forEach(img => { img.loading = 'eager'; if (!img.complete) img.addEventListener('load', ajustar, { once: true }); });
+            palco.replaceChildren(c);
+            const temTraducao = !!c.querySelector('.gs-pt');
+            overlay.classList.toggle('gs-revelado', revelado);
+            revelar.hidden = !temTraducao;
+            revelar.textContent = revelado ? '🙈 Esconder tradução' : '👁️ Ver tradução';
+            revelar.setAttribute('aria-pressed', revelado ? 'true' : 'false');
+            contador.textContent = (atual + 1) + ' / ' + slides.length;
+            voltar.style.visibility = atual === 0 ? 'hidden' : '';
+            avancar.style.visibility = atual === ultimo ? 'hidden' : '';
+            overlay.setAttribute('aria-label', 'Slide ' + (atual + 1) + ' de ' + slides.length + ' em tela cheia');
+            palco.scrollTop = 0;
+            ajustar();
+        }
+
+        // Projetado, o slide tem que caber inteiro: se as frases passam da tela,
+        // a letra encolhe um pouco por vez (até 72%). No celular ela encolhe pouco
+        // (até 90%, para continuar legível) e o que sobrar rola.
+        function ajustar() {
+            if (!aberto()) return;
+            const piso = window.matchMedia('(max-width:760px),(orientation:portrait)').matches ? 0.9 : 0.72;
+            let e = 1;
+            palco.style.setProperty('--gs-e', '1');
+            while (palco.scrollHeight > palco.clientHeight + 1 && e > piso) {
+                e = Math.round((e - 0.04) * 100) / 100;
+                palco.style.setProperty('--gs-e', String(e));
+            }
+        }
+        window.addEventListener('resize', () => { if (aberto()) ajustar(); });
+
+        function abrir(i, quem) {
+            if (!overlay) overlay = criarOverlay();
+            origem = quem || null;
+            revelado = false;
+            ir(i);
+            pintar();
+            abertoEm = Date.now();
+            document.body.classList.add('gs-travado');
+            overlay.classList.add('gs-aberto');
+            // Foco no próprio diálogo (e não no ✕): assim espaço/Enter revelam a
+            // tradução logo de cara; o Tab leva aos botões.
+            overlay.focus({ preventScroll: true });
+        }
+
+        function fechar() {
+            if (!aberto()) return;
+            overlay.classList.remove('gs-aberto');
+            document.body.classList.remove('gs-travado');
+            palco.replaceChildren();
+            const volta = slides[atual].querySelector('.gs-expandir') || origem;
+            if (volta && typeof volta.focus === 'function') volta.focus({ preventScroll: true });
+        }
+
+        function mover(passo) {
+            const destino = Math.max(0, Math.min(ultimo, atual + passo));
+            if (destino === atual) return;
+            revelado = false;
+            ir(destino);
+        }
+
+        function alternarRevelar() {
+            if (revelar.hidden) return;
+            revelado = !revelado;
+            pintar();
+        }
+
+        // ── Deck da página ────────────────────────────────────────────────
+        if (ant) ant.addEventListener('click', () => ir(atual - 1));
+        if (prox) prox.addEventListener('click', () => ir(atual + 1));
+        dots.forEach((d, k) => d.addEventListener('click', () => ir(k)));
+
+        deck.addEventListener('click', ev => {
             const b = ev.target.closest('[data-say]');
-            if (b) { ev.stopPropagation(); falar(b.getAttribute('data-say')); return; }
-            if (ev.target.closest('button, a')) return;
-            alternarRevelar();
+            if (b) { falar(b.getAttribute('data-say')); return; }
+            const s = ev.target.closest('.gs-slide');
+            if (!s) return;
+            const expandir = ev.target.closest('.gs-expandir');
+            if (!expandir && ev.target.closest('button, a')) return;
+            // Quem arrasta para selecionar um trecho não quer abrir a tela cheia.
+            const sel = window.getSelection && window.getSelection();
+            if (!expandir && sel && String(sel).trim()) return;
+            abrir(slides.indexOf(s), expandir || s.querySelector('.gs-expandir'));
         });
+
         let x0 = null, y0 = null;
-        el.addEventListener('touchstart', e => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-        el.addEventListener('touchend', e => {
+        deck.addEventListener('touchstart', e => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+        deck.addEventListener('touchend', e => {
             if (x0 === null) return;
             const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
             x0 = null;
-            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) mover(dx < 0 ? 1 : -1);
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) ir(atual + (dx < 0 ? 1 : -1));
         }, { passive: true });
-        return el;
+
+        // Um handler por deck: com a tela cheia aberta, ela tem prioridade; sem
+        // ela, as setas só valem quando a aba do deck está à vista.
+        document.addEventListener('keydown', ev => {
+            if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+            if (aberto()) {
+                const emBotao = ev.target && ev.target.closest && ev.target.closest('button');
+                if (ev.key === 'Escape') { ev.preventDefault(); fechar(); }
+                else if (ev.key === 'ArrowRight') { ev.preventDefault(); mover(1); }
+                else if (ev.key === 'ArrowLeft') { ev.preventDefault(); mover(-1); }
+                else if ((ev.key === ' ' || ev.key === 'Enter') && !emBotao) { ev.preventDefault(); alternarRevelar(); }
+                return;
+            }
+            const aba = document.getElementById(opts.aba || 'tab-grammar');
+            if (!aba || aba.classList.contains('hidden')) return;
+            const alvo = ev.target;
+            if (alvo && (/^(INPUT|TEXTAREA|SELECT)$/.test(alvo.tagName) || alvo.isContentEditable)) return;
+            if (ev.key === 'ArrowRight') { ev.preventDefault(); ir(atual + 1); }
+            else if (ev.key === 'ArrowLeft') { ev.preventDefault(); ir(atual - 1); }
+        });
+
+        porCss();
+        ir(0);
+        return { abrir: i => abrir(i), fechar, ir, atual: () => atual };
     }
-
-    function pintar() {
-        const c = slides[atual].cloneNode(true);
-        c.hidden = false;
-        c.removeAttribute('data-i');
-        c.querySelectorAll('.gs-expandir').forEach(n => n.remove());
-        c.querySelectorAll('img').forEach(img => { img.loading = 'eager'; if (!img.complete) img.addEventListener('load', ajustar, { once: true }); });
-        palco.replaceChildren(c);
-        const temTraducao = !!c.querySelector('.gs-pt');
-        overlay.classList.toggle('gs-revelado', revelado);
-        revelar.hidden = !temTraducao;
-        revelar.textContent = revelado ? '🙈 Esconder tradução' : '👁️ Ver tradução';
-        revelar.setAttribute('aria-pressed', revelado ? 'true' : 'false');
-        contador.textContent = (atual + 1) + ' / ' + slides.length;
-        voltar.style.visibility = atual === 0 ? 'hidden' : '';
-        avancar.style.visibility = atual === ultimo ? 'hidden' : '';
-        overlay.setAttribute('aria-label', 'Slide ' + (atual + 1) + ' de ' + slides.length + ' em tela cheia');
-        palco.scrollTop = 0;
-        ajustar();
-    }
-
-    // Projetado, o slide tem que caber inteiro: se as frases passam da tela,
-    // a letra encolhe um pouco por vez (até 72%). No celular ela encolhe pouco
-    // (até 90%, para continuar legível) e o que sobrar rola.
-    function ajustar() {
-        if (!aberto()) return;
-        const piso = window.matchMedia('(max-width:760px),(orientation:portrait)').matches ? 0.9 : 0.72;
-        let e = 1;
-        palco.style.setProperty('--gs-e', '1');
-        while (palco.scrollHeight > palco.clientHeight + 1 && e > piso) {
-            e = Math.round((e - 0.04) * 100) / 100;
-            palco.style.setProperty('--gs-e', String(e));
-        }
-    }
-    window.addEventListener('resize', () => { if (aberto()) ajustar(); });
-
-    function abrir(i, quem) {
-        if (!overlay) overlay = criarOverlay();
-        origem = quem || null;
-        revelado = false;
-        ir(i);
-        pintar();
-        abertoEm = Date.now();
-        document.body.classList.add('gs-travado');
-        overlay.classList.add('gs-aberto');
-        // Foco no próprio diálogo (e não no ✕): assim espaço/Enter revelam a
-        // tradução logo de cara; o Tab leva aos botões.
-        overlay.focus({ preventScroll: true });
-    }
-
-    function fechar() {
-        if (!aberto()) return;
-        overlay.classList.remove('gs-aberto');
-        document.body.classList.remove('gs-travado');
-        palco.replaceChildren();
-        const volta = slides[atual].querySelector('.gs-expandir') || origem;
-        if (volta && typeof volta.focus === 'function') volta.focus({ preventScroll: true });
-    }
-
-    function mover(passo) {
-        const destino = Math.max(0, Math.min(ultimo, atual + passo));
-        if (destino === atual) return;
-        revelado = false;
-        ir(destino);
-    }
-
-    function alternarRevelar() {
-        if (revelar.hidden) return;
-        revelado = !revelado;
-        pintar();
-    }
-
-    // ── Deck da página ────────────────────────────────────────────────────
-    if (ant) ant.addEventListener('click', () => ir(atual - 1));
-    if (prox) prox.addEventListener('click', () => ir(atual + 1));
-    dots.forEach((d, k) => d.addEventListener('click', () => ir(k)));
-
-    deck.addEventListener('click', ev => {
-        const b = ev.target.closest('[data-say]');
-        if (b) { falar(b.getAttribute('data-say')); return; }
-        const s = ev.target.closest('.gs-slide');
-        if (!s) return;
-        const expandir = ev.target.closest('.gs-expandir');
-        if (!expandir && ev.target.closest('button, a')) return;
-        // Quem arrasta para selecionar um trecho não quer abrir a tela cheia.
-        const sel = window.getSelection && window.getSelection();
-        if (!expandir && sel && String(sel).trim()) return;
-        abrir(slides.indexOf(s), expandir || s.querySelector('.gs-expandir'));
-    });
-
-    let x0 = null, y0 = null;
-    deck.addEventListener('touchstart', e => { const t = e.changedTouches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-    deck.addEventListener('touchend', e => {
-        if (x0 === null) return;
-        const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
-        x0 = null;
-        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) ir(atual + (dx < 0 ? 1 : -1));
-    }, { passive: true });
-
-    // Um handler só: com a tela cheia aberta, ela tem prioridade.
-    document.addEventListener('keydown', ev => {
-        if (ev.defaultPrevented || ev.altKey || ev.ctrlKey || ev.metaKey) return;
-        if (aberto()) {
-            const emBotao = ev.target && ev.target.closest && ev.target.closest('button');
-            if (ev.key === 'Escape') { ev.preventDefault(); fechar(); }
-            else if (ev.key === 'ArrowRight') { ev.preventDefault(); mover(1); }
-            else if (ev.key === 'ArrowLeft') { ev.preventDefault(); mover(-1); }
-            else if ((ev.key === ' ' || ev.key === 'Enter') && !emBotao) { ev.preventDefault(); alternarRevelar(); }
-            return;
-        }
-        const aba = document.getElementById('tab-grammar');
-        if (!aba || aba.classList.contains('hidden')) return;
-        const alvo = ev.target;
-        if (alvo && (/^(INPUT|TEXTAREA|SELECT)$/.test(alvo.tagName) || alvo.isContentEditable)) return;
-        if (ev.key === 'ArrowRight') { ev.preventDefault(); ir(atual + 1); }
-        else if (ev.key === 'ArrowLeft') { ev.preventDefault(); ir(atual - 1); }
-    });
 
     // ── Estilo da tela cheia ──────────────────────────────────────────────
     // Fica no próprio arquivo, como no vocab-focus.js. O z-index passa o da
     // Yara flutuante (10000) para o slide ocupar a tela inteira.
-    const css = `
+    function porCss() {
+        if (cssPosto) return;
+        cssPosto = true;
+        const css = `
 .gs-foco{position:fixed;inset:0;z-index:10001;display:none;align-items:center;justify-content:center;
   background:rgba(0,31,63,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:2vh 2vw}
 .gs-foco.gs-aberto{display:flex;animation:gsIn .18s ease both}
@@ -260,6 +283,7 @@ body.gs-travado{overflow:hidden}
 .gs-foco-palco .gs-titulo{font-size:calc(var(--gs-e) * clamp(1.4rem,3vw,3.2rem));line-height:1.15}
 .gs-foco-palco .gs-corpo{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(14px,2.2vw,40px);
   align-items:center;padding:calc(var(--gs-e) * clamp(12px,2.2vh,28px)) clamp(18px,2.8vw,40px)}
+.gs-foco-palco .gs-sem-img .gs-corpo{grid-template-columns:minmax(0,1fr)}
 .gs-foco-palco .gs-img,.gs-foco-palco .gs-texto{grid-column:auto;margin:0}
 .gs-foco-palco .gs-img{width:100%;height:auto;aspect-ratio:4/3;max-height:calc(100vh - 290px);object-fit:contain;background:none}
 .gs-foco-palco .gs-lista>li+li{margin-top:calc(var(--gs-e) * clamp(5px,.9vh,12px))}
@@ -292,10 +316,21 @@ body.gs-travado{overflow:hidden}
   .gs-foco-palco .gs-img{max-height:32vh}
   .gs-foco-nav{top:auto;bottom:max(12px,2vh);transform:none;width:48px;height:48px;font-size:1.9rem}
 }`;
-    const tag = document.createElement('style');
-    tag.textContent = css;
-    document.head.appendChild(tag);
+        const tag = document.createElement('style');
+        tag.textContent = css;
+        document.head.appendChild(tag);
+    }
 
-    ir(0);
-    window.CapyGramaticaSlides = { abrir: i => abrir(i), fechar, ir, atual: () => atual };
+    window.CapySlides = { montar };
+
+    // O deck de Patterns da aula, com os botões de id fixo que o gerador escreve.
+    const api = montar(document.getElementById('gs-deck'), {
+        pos: document.getElementById('gs-pos'),
+        ant: document.getElementById('gs-ant'),
+        prox: document.getElementById('gs-prox'),
+        xp: document.getElementById('gs-xp'),
+        aba: 'tab-grammar',
+        focoId: 'gs-foco',
+    });
+    if (api) window.CapyGramaticaSlides = api;
 })();

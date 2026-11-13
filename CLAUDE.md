@@ -82,6 +82,37 @@ Só nas aulas do **GPS Tronic** e do **Agro English**:
   - a tag uma vez em cada aula desses dois cursos;
   - nenhuma outra página com o botão.
 
+## Padrão das aulas de 12/nov/2026: Listening curto, Expressions em slides e 2 exercícios novos
+
+Vale para toda aula do molde novo (o desenho da `gpstronic_aula_09.html`):
+
+- **Listening com no máximo 15 áudios.** Quem decide é o `listening-lab.js` (`MAX_ITENS`):
+  1. primeiro as frases do Speak;
+  2. depois as falas principais do diálogo;
+  3. as falas extras só entram se faltar.
+- **Key Expressions em slides, no visual do Patterns.** É uma expressão por slide, com 🔊, tradução,
+  "quando usar" e exemplo, com tela cheia.
+  - O `aula-molde.js` monta o deck a partir do `EXPR_DATA` da aula. As aulas do molde ganham os slides
+    só por carregar o script (`node scripts/aplica-padrao-novo.mjs`).
+  - O comportamento vem do mesmo motor do Patterns: `gramatica-slides.js`, `CapySlides.montar`.
+  - **O que não pode mudar:**
+    - o contêiner continua `#expr-grid` (o `self-study.js` usa);
+    - o array continua `EXPR_DATA`, com `expr`/`pt` (a folha em PDF lê esses campos);
+    - nada de classe `flip-card`.
+- **"How do you say it in English?"** (`#tab-traducao`, logo depois do Patterns): 6 frases em PT com
+  o vocabulário da aula, que o aluno escreve em inglês.
+  - A conferência é tolerante (`CapyFala`) e aceita as variações em `aceitas`.
+  - A resposta certa aparece escrita sempre, no acerto e no erro.
+- **Texto com lacunas** (`#tab-lacunas`, logo depois do Practice): um texto de 60 palavras ou mais,
+  com 6 a 8 `[[pedaços]]`.
+  - Os pedaços ficam numa caixa, junto com 2 de distração. O aluno toca para encaixar.
+  - "Conferir" revela a palavra certa de cada lacuna errada.
+- **Dados das seções novas:** vêm do conteudo.json (`traducao`, `lacunas`). O construtor grava
+  `const TRAD_DATA` e `const LACUNAS_DATA`, e o `aula-molde.js` monta as duas seções.
+- **Construtor de referência:** `scripts/build-intermediate-aula.mjs`. É o primeiro com as duas
+  seções novas e foi feito para as aulas 19 e 20 do Intermediate. Os construtores do GPS, do Agro,
+  da Entrevista e do Medical ganham as seções quando cada curso for refeito.
+
 ## Proibido: "gramática" e "grammar" (regra do Luis, 12/out/2026)
 
 O foco do site não é gramática, é **aprender com exemplos**. Por isso, as palavras
@@ -166,6 +197,41 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
   - o `professor.js` mostra "🎯 preparou a aula N" à parte das lições de casa;
   - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
 - **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
+
+## Página de Preparação de aula (piloto: francês, 09/nov/2026)
+
+`preparacao.html` é o lugar próprio da preparação para a aula ao vivo. Ela segue o método do Luis
+(o da Influx): ouvir antes de ler, palavras com repetição, noticing e falar.
+
+- **Sessão** (`preparacao.html?aula=fr_aula_03`, 10 a 15 min, uma tela por vez):
+  1. 🎧 Ouvir: o diálogo na voz, **sem texto**, e 3 perguntas;
+  2. 🔤 Palavras: 8 cartões "ainda não sei / já sabia"; as difíceis voltam na sessão e na revisão;
+  3. 📖 Ler: o texto, com as palavras do passo 2 sublinhadas;
+  4. 👀 Reparar: 2 trechos do diálogo para o aluno notar como se diz algo (noticing);
+  5. 🗣️ Falar: repetir 3 frases no microfone (`CapyMic`, `uso: 'preparacao'`, balde `transcribe-prep`)
+     e responder em voz a pergunta da aula;
+  6. ✅ Pronto: placar, +30 XP na primeira vez e `POST /api/homework` com `lessonId: "<aula>-prep"`.
+     O professor recebe o placar, a resposta transcrita e as palavras difíceis.
+- **Lista** (`preparacao.html`):
+  - a próxima aula é a primeira que o aluno não terminou (`capyFrCompleted`);
+  - se ele já se preparou, a página oferece adiantar a seguinte;
+  - "Palavras para revisar" usa repetição espaçada no aparelho (`capyPrepPalavras_fr`: amanhã,
+    depois 3, 7 e 14 dias).
+- **Atalhos:**
+  - o botão "🎯 Preparar esta aula" em cada `fr_aula_XX` (vem do gerador `build-fr-aulas.mjs`);
+  - o card no `classes_fr.html`;
+  - o card na home, só para quem já estuda francês (`preparacao-atalho.js`).
+  - Ainda sem item no menu: ele aparece quando a página tiver mais cursos.
+- **Conteúdo:**
+  - o diálogo, as palavras e as frases saem da própria aula;
+  - o que a aula não tem (compreensão, "repare" e a pergunta) fica em `scripts/fr-preparacao.mjs`;
+  - depois de editar, rode `node scripts/build-preparacao.mjs`, que gera `data/preparacao/*.json`
+    e confere: sem pronúncia escrita, sem "gramática", o trecho existe no diálogo e a resposta está
+    entre as opções;
+  - mudou algum dado? Troque `VERSAO_DADOS` em `preparacao-core.js`.
+- **Curso novo na preparação:** um arquivo de conteúdo como o `fr-preparacao.mjs`, uma entrada em
+  `cursos.json` (o build) e o atalho na página do curso.
+- **Testes:** `tests/preparacao-pagina.{test,spec}.js`.
 
 ## Extensão "Capy no YouTube" (Fase 1, 07/nov/2026)
 

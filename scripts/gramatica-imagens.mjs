@@ -29,8 +29,8 @@ const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([
 const LARGURA = 1024, ALTURA = 768;
 
 function conteudoDe(slug) {
-    const m = /^(gps|agro|med|interview)(\d{2})$/.exec(slug);
-    if (!m) throw new Error(`slug inválido: ${slug} (ex.: gps14, agro01, med05, interview03)`);
+    const m = /^(gps|agro|med|interview|intermediate)(\d{2})$/.exec(slug);
+    if (!m) throw new Error(`slug inválido: ${slug} (ex.: gps14, agro01, med05, interview03, intermediate19)`);
     const base = path.join(RAIZ, 'scripts', `${m[1] === 'gps' ? 'aula' : m[1]}${m[2]}`);
     // As aulas antigas feitas à mão (GPS 01–09) não têm conteudo.json: o deck fica em -gramatica.json (aplicar-slides.mjs).
     const arquivo = fs.existsSync(`${base}-conteudo.json`) ? `${base}-conteudo.json` : `${base}-gramatica.json`;

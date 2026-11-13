@@ -34,7 +34,7 @@ import path from 'node:path';
 export const MIN_FRASES = 5;
 
 /** A versão do gramatica-slides.js na tag <script>. Mudou o arquivo, muda aqui e regera as aulas. */
-export const VERSAO_JS = 'gs1';
+export const VERSAO_JS = 'gs2';
 
 // ── Imagens dos slides ────────────────────────────────────────────────────
 // Uma imagem por slide (pedido do Luis, 05/out/2026), gerada na Higgsfield com o
