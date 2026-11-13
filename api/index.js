@@ -3785,9 +3785,11 @@ module.exports = async (req, res) => {
             }
         } catch (e) { /* guardar é bônus: nunca pode derrubar a devolutiva */ }
 
-        // O custo tambem vira linha propria, append-only. O sendBeacon do cliente
-        // ja costuma ter gravado — mas se o aluno ficou na pagina, esta e a via.
-        if (custoVoz.segundos > 0) await gravarUsoVoz(req, res, body, custoVoz);
+        // O custo NAO e gravado aqui. A entrevista.html manda o /api/conversa-uso
+        // em TODO desligamento, antes de pedir esta devolutiva, e aquele relato
+        // liquida a reserva da ligacao. Gravar de novo aqui contava a mesma
+        // entrevista duas vezes na cota do aluno e no freio do site (13/nov), e
+        // gravava custo de quem nem tinha ligado.
 
         res.status(200).json({ ok: true, feedback, custo: custoVoz });
         return;

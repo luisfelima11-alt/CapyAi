@@ -235,3 +235,27 @@ test('voice: a forged usage report cannot trip the site-wide monthly brake', asy
   assert.equal(bia.status, 200, JSON.stringify(bia.json));
 });
 
+test('voice: the interview feedback does not count the same call a second time', async () => {
+  // A Bia (Super) liga: o token reserva os minutos.
+  const token = await chamar('POST', '/api/realtime-token', comSessao('tk-bia'), { cenario: 'entrevista' });
+  assert.equal(token.status, 200, JSON.stringify(token.json));
+  // Desliga depois de 2 minutos: entrevista.html manda o relato (sendBeacon)...
+  const uso = { cenario: 'entrevista', duracaoMs: 120_000, uso: { audioIn: 2000, audioOut: 4000, cache: 0, textoIn: 500, textoOut: 300 } };
+  for (const l of banco.user_state.values()) if (l.data?.reserva) l.data.emitidoEm = Date.now() - 125_000;
+  await chamar('POST', '/api/conversa-uso', comSessao('tk-bia'), uso);
+  // ...e pede a devolutiva com o mesmo uso.
+  const fb = await chamar('POST', '/api/conversa-feedback', comSessao('tk-bia'), {
+    ...uso, cargo: 'dev', transcricao: [{ quem: 'eu', texto: 'Hi, I am Bia' }, { quem: 'ia', texto: 'Tell me' }, { quem: 'eu', texto: 'I code' }],
+  });
+  assert.equal(fb.status, 200, JSON.stringify(fb.json));
+  const minutos = minutosVoz('acc-bia');
+  assert.ok(minutos > 1.9 && minutos < 2.5, `a 2-minute interview counted ${minutos.toFixed(2)} minutes of the monthly quota`);
+  // A devolutiva também gravava o custo que o navegador mandasse, sem ligação nenhuma.
+  const antes = somaVoz();
+  await chamar('POST', '/api/conversa-feedback', comSessao('tk-ana'), {
+    cenario: 'entrevista', duracaoMs: 7_200_000, uso: { audioIn: 5e6, audioOut: 5e6, cache: 5e6, textoIn: 5e6, textoOut: 5e6 },
+    transcricao: [{ quem: 'eu', texto: 'a' }, { quem: 'eu', texto: 'b' }],
+  });
+  assert.equal(somaVoz(), antes, 'the feedback route stored a cost for a call that never happened');
+});
+

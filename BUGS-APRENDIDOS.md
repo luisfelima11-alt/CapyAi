@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — A entrevista por voz gastava o dobro dos minutos do aluno
+
+**Sintoma:** um aluno Super que fazia uma simulação de entrevista de 2 minutos (`entrevista.html`) perdia 4
+minutos da cota do mês. O freio de gasto do site também via o dobro.
+
+**Causa raiz:** ao desligar, a página manda o `/api/conversa-uso` (que liquida a reserva da ligação) e logo
+depois pede a devolutiva em `/api/conversa-feedback` com o mesmo uso. A rota da devolutiva gravava o custo de
+novo, numa linha nova (`gravarUsoVoz`). O comentário dizia "se o aluno ficou na página, esta é a via", mas a
+página manda o relato em todo desligamento. De quebra, a devolutiva gravava o custo que o navegador mandasse,
+mesmo sem ligação nenhuma.
+
+**Correção:** a devolutiva não grava mais custo. Quem mede a ligação é só o `/api/conversa-uso`.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (token, relato de 2 minutos e
+devolutiva: a cota conta 2 minutos; devolutiva com custo inventado não grava nada).
+
+**Por que aconteceu:** duas rotas gravando a mesma medição. Cada número precisa de um único caminho até o
+banco.
+
+---
+
 ## 2026-11-13 — Um relato de voz inventado desligava a voz do site inteiro
 
 **Sintoma:** qualquer aluno logado (até do plano grátis, que nunca ligou) mandava um `POST /api/conversa-uso`
