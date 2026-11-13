@@ -2675,8 +2675,15 @@ function renderListenFinish() {
 // ══════════════════════════════════════════════════════════════════════════════
 // TOOL 8: TYPING PRACTICE
 // ══════════════════════════════════════════════════════════════════════════════
+// O Typing mostra os cartões embaralhados (shuffledVocab, até 15). Conferir,
+// dar dica e saber quando acabou têm que olhar a MESMA lista: antes o
+// checkTyping e o useTypeHint liam currentLesson.vocab na ordem original e
+// cobravam outra palavra ("Informação" na tela, "water" como resposta).
+function typingVocab() {
+  return shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+}
 function renderTyping() {
-  const vocab = shuffledVocab.length ? shuffledVocab : currentLesson.vocab;
+  const vocab = typingVocab();
   if (typeDone) { renderTypingFinish(); return; }
   const card = vocab[typeIdx];
   const isEnToPt = typeMode === 'en-to-pt';
@@ -2729,7 +2736,7 @@ function checkTyping() {
   const input = document.getElementById('type-input');
   if (!input) return;
   const typed  = _lessonLower(input.value.trim());
-  const vocab  = currentLesson.vocab;
+  const vocab  = typingVocab();
   const card   = vocab[typeIdx];
   const isEnToPt = typeMode === 'en-to-pt';
   const correct  = _lessonLower(isEnToPt ? card.pt : card.en);
@@ -2763,7 +2770,7 @@ function checkTyping() {
 }
 function useTypeHint() {
   typeHints++;
-  const vocab  = currentLesson.vocab;
+  const vocab  = typingVocab();
   const card   = vocab[typeIdx];
   const isEnToPt = typeMode === 'en-to-pt';
   const correct  = isEnToPt ? card.pt : card.en;
@@ -2774,7 +2781,7 @@ function useTypeHint() {
   input.focus();
 }
 function renderTypingFinish() {
-  const total = shuffledVocab.length || currentLesson.vocab.length;
+  const total = typingVocab().length;
   const pct   = Math.round((typeScore / total) * 100);
   const stars  = pct === 100 ? 3 : pct >= 70 ? 2 : 1;
   markToolDone(currentLesson.id, 'typing', stars);
