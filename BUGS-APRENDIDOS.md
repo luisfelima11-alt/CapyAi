@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Quem usava a IA à noite ficava bloqueado na manhã seguinte
+
+**Sintoma:** o visitante usava os 3 usos de IA às 22h. Na manhã seguinte o app mostrava "3 chats left today",
+mas toda mensagem para a Yara falhava ("A conversa está indisponível") até as 21h.
+
+**Causa raiz:** dois relógios para o mesmo limite. O navegador zera o contador (`aiUsageToday`) à meia-noite
+de Brasília (`capyHojeBR`). O servidor (`checkRateLimit` no `api/index.js`) montava o balde com o dia UTC,
+que vira às 21h de Brasília: os usos das 21h às 24h caíam no balde do dia seguinte.
+
+**Correção:** o balde do servidor usa `diaBrasil()`, o mesmo dia do navegador. O tempo de espera do contador
+em memória (`retryAfter`) passou a contar até a meia-noite de Brasília. **Mudança de regra:** o limite do
+servidor renova à meia-noite de Brasília, não mais às 21h.
+
+**Como pegar isso de novo:** `tests/limite-ia-dia-br.test.js` (relógio falso: uso às 22h e volta de manhã;
+21h30 ainda é o mesmo dia; tempo de espera até a meia-noite).
+
+**Por que aconteceu:** `toISOString().slice(0, 10)` é o dia de Greenwich. Todo "dia" que o aluno sente
+(limite, sequência, desafio do dia) tem que ser o dia de Brasília, nos dois lados.
+
+---
+
 ## 2026-11-13 — Com a página aberta na virada do dia, o freeze não protegia a sequência
 
 **Sintoma:** aluno com 🧊 Streak Freeze (80 🫐) faltou um dia, deixou a página aberta desde a noite anterior e

@@ -282,7 +282,10 @@ function assertLeituraDoProprioSite(req) {
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
-    const today = new Date().toISOString().slice(0, 10);
+    // Dia de Brasília, o mesmo do contador do navegador (store.js). O dia UTC
+    // virava às 21h: quem usava a IA às 22h gastava a cota do dia seguinte e
+    // ficava bloqueado na manhã seguinte, com o app mostrando usos sobrando.
+    const today = diaBrasil();
     const trusted = req._securityIdentity || null;
     const isGuest = trusted?.kind === 'guest';
     const appUserId = trusted?.appUserId || null;
@@ -348,9 +351,10 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         const entry = _rateLimitMemory[bucket];
         if (entry.day !== today) { entry.count = 0; entry.day = today; }
         if (entry.count >= limit) {
-            const now = new Date();
-            const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan, guest: isGuest };
+            // Meia-noite de Brasília (UTC−3; sem horário de verão desde 2019).
+            const amanha = new Date(Date.parse(today + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
+            const virada = Date.parse(amanha + 'T00:00:00-03:00');
+            const info = { ok: false, retryAfter: Math.max(1, Math.ceil((virada - Date.now()) / 1000)), limit, used: entry.count, plan, guest: isGuest };
             req._rateLimitResults[key] = info;
             return info;
         }
