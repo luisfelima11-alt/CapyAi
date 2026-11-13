@@ -6337,7 +6337,10 @@ Rules:
     // call has a deadline, the answer is checked, and a failure is a JSON error
     // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
+    // Exact path, never startsWith: the rate limit (AI_ROUTE_KEYS) looks the
+    // path up exactly, so `/api/lyrics-search/` or `/api/lyricsX` reached
+    // lyrics.ovh with no limit at all (13/nov).
+    if (req.method === 'GET' && url === '/api/lyrics-search') {
         const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
         try {
@@ -6352,7 +6355,7 @@ Rules:
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
+    if (req.method === 'GET' && url === '/api/lyrics') {
         const p = new URL(`https://x.com${req.url}`).searchParams;
         const artist = String(p.get('artist') || '').trim().slice(0, 100);
         const title  = String(p.get('title')  || '').trim().slice(0, 150);

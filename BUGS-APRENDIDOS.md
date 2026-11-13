@@ -1,5 +1,25 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — As letras de música pulavam o limite com uma barra no fim do endereço
+
+**Sintoma:** `GET /api/lyrics-search/?q=…` (com barra) ou `/api/lyricsX?…` respondia 200 e chamava o
+lyrics.ovh quantas vezes alguém quisesse, mesmo com o limite do dia estourado.
+
+**Causa raiz:** o portão de limite procura a rota pelo endereço EXATO (`AI_ROUTE_KEYS.get(url)`), mas as
+duas rotas de letra casavam com `url.startsWith('/api/lyrics-search')` e `url.startsWith('/api/lyrics')`.
+Qualquer endereço que só começasse igual passava pelo handler sem passar pelo portão.
+
+**Correção:** as duas rotas comparam o endereço exato (`url === '/api/lyrics-search'`, `url === '/api/lyrics'`).
+O Music Lab já chamava exatamente esses endereços.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (com todo balde estourado, nenhuma
+variante do endereço chega ao lyrics.ovh).
+
+**Por que aconteceu:** rota com limite e o portão de limite precisam casar o endereço do mesmo jeito. Rota que
+custa (IA ou serviço de fora) nunca usa `startsWith`.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas
