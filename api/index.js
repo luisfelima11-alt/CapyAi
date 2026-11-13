@@ -6587,14 +6587,27 @@ Rules:
     }
 
     // GET /api/homework — list submissions (teacher/admin session only).
+    // The admin sees every student. A teacher sees only the students of their
+    // own class (turma_alunos), the same rule as /api/professor/*: this route
+    // used to hand any teacher every student's homework, names and answers (13/nov).
     if (req.method === 'GET' && url.startsWith('/api/homework')) {
-        await requireRole(req, res, ['admin', 'teacher']);
+        const quem = await requireRole(req, res, ['admin', 'teacher']);
         const p = new URL(`https://x.com${req.url}`).searchParams;
         const lessonId = p.get('lessonId');
         const userId   = p.get('userId');
         let filter = '';
         if (lessonId) filter += `&lesson_id=eq.${encodeURIComponent(lessonId)}`;
-        if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
+        if (quem.role !== 'admin') {
+            const professor = await resolveSecurityIdentity(req, res, { allowGuest: false });
+            const membros = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(professor.appUserId)}&select=aluno_id&limit=500`);
+            const daTurma = (Array.isArray(membros) ? membros : []).map(m => String(m.aluno_id));
+            const alvo = userId ? daTurma.filter(id => id === userId) : daTurma;
+            if (!alvo.length) { res.status(200).json([]); return; }
+            const lista = alvo.map(i => `"${i.replace(/["\\]/g, '')}"`).join(',');
+            filter += `&user_id=in.(${encodeURIComponent(lista)})`;
+        } else if (userId) {
+            filter += `&user_id=eq.${encodeURIComponent(userId)}`;
+        }
         const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc&limit=500${filter}`);
         // On a GET, sb() returns Supabase's error object (a missing table, for
         // one) instead of throwing: that is not a list of submissions.

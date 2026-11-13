@@ -259,3 +259,21 @@ test('voice: the interview feedback does not count the same call a second time',
   assert.equal(somaVoz(), antes, 'the feedback route stored a cost for a call that never happened');
 });
 
+// ── 3. Lição de casa: o professor via a de todos os alunos ─────────────────
+test('homework list: a teacher sees only the students of their own class; admin sees all', async () => {
+  banco.turma_alunos.push({ professor_id: 'acc-prof', aluno_id: 'acc-ana' });
+  banco.homework_submissions.push(
+    { id: 'h1', user_id: 'acc-ana', student_name: 'Ana', lesson_id: 'aula_01', answers: { a: 'minha' }, submitted_at: '2026-11-10T10:00:00Z' },
+    { id: 'h2', user_id: 'acc-bia', student_name: 'Bia', lesson_id: 'aula_01', answers: { a: 'segredo da Bia' }, submitted_at: '2026-11-11T10:00:00Z' },
+  );
+  const prof = await chamar('GET', '/api/homework', comSessao('tk-prof'));
+  assert.equal(prof.status, 200, JSON.stringify(prof.json));
+  assert.deepEqual(prof.json.map(h => h.user_id), ['acc-ana'], 'the teacher read homework of a student outside the class');
+  const pedindoOutro = await chamar('GET', '/api/homework?userId=acc-bia', comSessao('tk-prof'));
+  assert.deepEqual(pedindoOutro.json, [], 'asking by userId opened another student');
+  const admin = await chamar('GET', '/api/homework', comSessao('tk-admin'));
+  assert.equal(admin.json.length, 2);
+  const aluno = await chamar('GET', '/api/homework', comSessao('tk-ana'));
+  assert.equal(aluno.status, 403);
+});
+

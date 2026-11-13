@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Qualquer professor lia a lição de casa de todos os alunos do site
+
+**Sintoma:** uma conta com papel `teacher` abria `teacher_homework.html` (ou chamava `GET /api/homework`) e
+recebia as últimas 500 lições de casa do site inteiro: nome, id e respostas de alunos que nunca entraram na
+turma dele. Com `?userId=<id>` lia qualquer aluno.
+
+**Causa raiz:** a rota só conferia o papel (`requireRole(['admin','teacher'])`) e consultava a tabela com a
+chave de serviço, sem filtro. O painel novo do professor (`/api/professor/*`, 19/out) recorta tudo pela
+`turma_alunos`; esta rota mais antiga ficou de fora.
+
+**Correção:** o admin continua vendo tudo. O professor vê só quem está na turma dele (`turma_alunos` com o
+`professor_id` da sessão); pedir um `userId` de fora da turma devolve lista vazia.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (professor com uma aluna na turma não
+vê a outra, nem pedindo pelo id; admin vê as duas; aluno recebe 403).
+
+**Por que aconteceu:** quando uma regra de acesso nova entra ("o servidor filtra sempre pela turma"), toda
+rota que lê a mesma tabela precisa ser revista, não só as rotas novas.
+
+---
+
 ## 2026-11-13 — A entrevista por voz gastava o dobro dos minutos do aluno
 
 **Sintoma:** um aluno Super que fazia uma simulação de entrevista de 2 minutos (`entrevista.html`) perdia 4
