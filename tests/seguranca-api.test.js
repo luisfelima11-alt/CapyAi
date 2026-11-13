@@ -213,3 +213,25 @@ test('lyrics: no path variant reaches lyrics.ovh without passing the rate limit'
   assert.deepEqual(chamadasLetras, [], 'lyrics.ovh was called past the rate limit');
 });
 
+// ── 2. Voz: custo informado pelo navegador sem teto ────────────────────────
+test('voice: a forged usage report cannot trip the site-wide monthly brake', async () => {
+  const forjado = { cenario: 'conversa', duracaoMs: 7_200_000, uso: { audioIn: 5e6, audioOut: 5e6, cache: 5e6, textoIn: 5e6, textoOut: 5e6 } };
+  // Ana (grátis, nunca ligou) manda o relato inventado, com e sem reserva aberta.
+  const r = await chamar('POST', '/api/conversa-uso', comSessao('tk-ana'), forjado);
+  assert.equal(r.status, 204);
+  assert.ok(somaVoz() < 5, `one report without any call booked US$ ${somaVoz().toFixed(2)}`);
+  // Com uma reserva de 3 minutos (a ligação de teste), o relato não passa do que cabe nela.
+  const agora = new Date().toISOString();
+  banco.user_state.set(`__voz_acc-ana_${agora}_reserva`, {
+    user_id: `__voz_acc-ana_${agora}_reserva`, updated_at: agora,
+    data: { cenario: 'conversa', reserva: true, emitidoEm: Date.now() - 60_000, em: agora, custo: { segundos: 180, usd: 0.06 } },
+  });
+  await chamar('POST', '/api/conversa-uso', comSessao('tk-ana'), forjado);
+  assert.ok(somaVoz() < 5, `a 3-minute reservation was settled at US$ ${somaVoz().toFixed(2)}`);
+  assert.ok(minutosVoz('acc-ana') <= 3, `a 3-minute reservation was settled as ${minutosVoz('acc-ana')} minutes`);
+  // E a Bia, que paga o Super, continua ligando.
+  const bia = await chamar('POST', '/api/realtime-token', comSessao('tk-bia'), { cenario: 'conversa' });
+  assert.notEqual(bia.json?.error, 'teto_de_gasto', 'one student switched voice off for the whole site');
+  assert.equal(bia.status, 200, JSON.stringify(bia.json));
+});
+

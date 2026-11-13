@@ -137,6 +137,12 @@ const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 // "0" meant unlimited voice.
 const VOZ_SESSAO_MAX_SEG = Math.max(60, Number(process.env.VOZ_SESSAO_MAX_MIN || 30) * 60);
 const VOZ_USD_POR_MIN_PISO = Number(process.env.VOZ_USD_POR_MIN_PISO || 0.02);
+// And the ceiling: the browser's report counts up to this much per minute of
+// the booked call. Without it one forged report (5 million tokens of each kind
+// = US$ 166) tripped VOZ_TETO_USD_MES and switched voice off for every Super
+// student until the next month (13/nov). Generous on purpose: a long call whose
+// cache misses every turn costs well under US$ 1 a minute on the mini model.
+const VOZ_USD_POR_MIN_TETO = Math.max(VOZ_USD_POR_MIN_PISO, Number(process.env.VOZ_USD_POR_MIN_TETO || 1));
 
 // Ligacao de teste (28/out/2026, decisao do Luis): quem nao e Super liga UMA vez,
 // com 3 minutos gratis. E o que vende o Super, entao so conta conta com e-mail
@@ -3648,8 +3654,11 @@ module.exports = async (req, res) => {
             if (!alvo || !alvo.data) return false;
             const reservados = Number(alvo.data.custo && alvo.data.custo.segundos) || 0;
             const decorridos = Math.max(0, Math.round((Date.now() - (Number(alvo.data.emitidoEm) || Date.now())) / 1000));
-            const segundos = Math.max(custo.segundos, Math.min(decorridos, reservados));
-            const usd = Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO);
+            // Never more than was booked: the browser's own seconds (up to 2 h)
+            // used to pass straight through.
+            const segundos = Math.min(reservados, Math.max(custo.segundos, Math.min(decorridos, reservados)));
+            const usd = Math.min(segundos / 60 * VOZ_USD_POR_MIN_TETO,
+                Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO));
             const agora = new Date().toISOString();
             await sb(`/user_state?user_id=eq.${encodeURIComponent(alvo.user_id)}`, {
                 method: 'PATCH',
@@ -3701,10 +3710,12 @@ module.exports = async (req, res) => {
         const corpo = await readBody(req);
         const custo = calcularCustoVoz(corpo);
         // With a reservation from /api/realtime-token, settle it (the server's
-        // clock is the floor). Without one, record the report as before; a
-        // 0-second call is not recorded — the student gave up before connecting.
+        // clock is the floor, the booked time the ceiling). Every student's
+        // token books one, so a report with nothing open to settle is a repeat
+        // or made up: only the admin, who is never booked, is recorded as
+        // reported. A 0-second call is not recorded — nobody connected.
         const liquidou = await liquidarReservaVoz(req, res, corpo, custo);
-        if (!liquidou && custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
+        if (!liquidou && custo.segundos > 0 && await isAdminReq(req, res)) await gravarUsoVoz(req, res, corpo, custo);
         res.status(204).end();
         return;
     }

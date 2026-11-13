@@ -1,5 +1,31 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Um relato de voz inventado desligava a voz do site inteiro
+
+**Sintoma:** qualquer aluno logado (até do plano grátis, que nunca ligou) mandava um `POST /api/conversa-uso`
+dizendo ter gasto 5 milhões de tokens de cada tipo. O servidor gravava US$ 166 de custo, o freio mensal do
+site (`VOZ_TETO_USD_MES`, US$ 50) disparava e todo aluno Super recebia "A voz está temporariamente
+indisponível" até o mês seguinte.
+
+**Causa raiz:** os tokens e a duração da ligação vêm do navegador. O `liquidarReservaVoz` usava
+`Math.max(custo do navegador, piso)` sem teto, e os segundos do navegador (até 2 h) passavam por cima da
+reserva. Sem reserva aberta, o relato era gravado do jeito que veio (`gravarUsoVoz`), mesmo que nenhum token
+tivesse sido emitido.
+
+**Correção:** a liquidação nunca passa do tempo reservado, e o custo do navegador conta até
+`VOZ_USD_POR_MIN_TETO` (padrão US$ 1 por minuto reservado, 50 vezes o piso). Relato sem reserva aberta só é
+gravado para o admin (o único que liga sem reserva). Assim, a ligação de teste de 3 minutos vale no máximo
+US$ 3.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (relato forjado sem ligação e com
+reserva de 3 minutos; depois a aluna Super ainda consegue o token).
+
+**Por que aconteceu:** número que vem do navegador e entra numa conta que trava o site inteiro precisa de
+teto no servidor, não só de piso. O piso protegia contra quem informa pouco; ninguém pensou em quem informa
+demais.
+
+---
+
 ## 2026-11-13 — As letras de música pulavam o limite com uma barra no fim do endereço
 
 **Sintoma:** `GET /api/lyrics-search/?q=…` (com barra) ou `/api/lyricsX?…` respondia 200 e chamava o
