@@ -101,7 +101,7 @@ test('a versão do gramatica-slides.js é a mesma em todas as páginas', () => {
     }
 });
 
-for (const nn of ['19', '20']) {
+for (const nn of ['19', '20', '21', '22', '23', '24', '25', '26', '27', '28']) {
     test(`intermediate_aula_${nn}: molde novo com as seções de 12/nov`, () => {
         const html = ler(`intermediate_aula_${nn}.html`);
         assert.equal((html.match(/id="tab-/g) || []).length, 11);
@@ -118,8 +118,17 @@ for (const nn of ['19', '20']) {
     });
 }
 
-test('a aula 20 mantém a frase da Sofia que a revisão usa e o cartão da revisão e da prova', () => {
+test('a aula 20 mantém a frase da Sofia que a revisão usa e leva para a 21', () => {
     const html = ler('intermediate_aula_20.html');
     assert.ok(html.includes('Five years ago, Sofia [[used to]] feel invisible'));
+    assert.ok(html.includes('href="intermediate_aula_21.html"'));
+});
+
+test('o curso fecha na aula 28: cartão da revisão e da prova, e a página do curso com as 28', () => {
+    const html = ler('intermediate_aula_28.html');
     assert.ok(html.includes('href="intermediate_revisao.html"') && html.includes('href="intermediate_prova.html"'));
+    const hub = ler('classes_intermediate.html');
+    for (let n = 1; n <= 28; n++) assert.ok(hub.includes(`href:'intermediate_aula_${String(n).padStart(2, '0')}.html'`) || hub.includes(`href:'intermediate_aula_${n}.html'`), `aula ${n} na lista`);
+    assert.ok(!/\b20 aulas\b|All 20 Lessons/.test(hub));
+    for (const f of ['intermediate_revisao.html', 'intermediate_prova.html']) assert.ok(ler(f).includes('href="intermediate_aula_28.html"'), f);
 });
