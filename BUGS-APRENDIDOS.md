@@ -1,5 +1,52 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Story Time: palavra digitada com apóstrofo ou HTML quebrava a tela
+
+**Sintoma:** no Story Time, o aluno digitava "don't" em "Add your own word": a palavra aparecia, mas o ✕
+não a tirava mais (erro de JavaScript no clique). Digitando `<b>oi</b>` ou uma tag de imagem, o HTML
+entrava na página, na lista escolhida e na linha "palavras usadas" da história.
+
+**Causa raiz:** `updateSelectedDisplay()` e `showStory()` montavam o `innerHTML` com a palavra crua, e o
+✕ era `onclick="toggleWord('${w}')"`: o apóstrofo fechava a string do onclick.
+
+**Correção:** a palavra passa por `escStory()` antes do `innerHTML`, e o ✕ remove pela posição
+(`toggleWord(selectedWords[i])`), sem colocar o texto do aluno dentro do atributo.
+
+**Como pegar isso de novo:** `tests/story-time.spec.js` adiciona "don't" e tira pelo ✕, e adiciona HTML
+e confere que nenhuma tag nasce na escolha nem na história.
+
+**Por que aconteceu:** o padrão `onclick="fn('${texto}')"` foi copiado de onde o texto era fixo (as
+palavras sugeridas) para onde o texto vem do aluno. Texto do aluno ou da IA nunca vai cru para
+`innerHTML` nem para dentro de um atributo `onclick`: use o índice ou `data-*` escapado.
+
+---
+
+## 2026-11-13 — A Preparação só deixava gravar 3 vezes por dia no plano grátis
+
+**Sintoma:** na página de Preparação, o aluno do plano grátis gravava 3 frases e, na 4ª gravação do
+dia, recebia "Muitas mensagens seguidas" / "Limite diário do plano grátis atingido". O PR #41 prometia
+40 gravações por dia. Quem paga gastava duas cotas por gravação.
+
+**Causa raiz:** o portão de IA (o bloco do `api/index.js` que conta o uso antes de toda rota de IA)
+contava o `/api/transcribe` no balde `transcribe` (grátis: 3/dia), sem ler o corpo. Depois o handler lia
+`uso: 'preparacao'` e contava de novo, no balde `transcribe-prep` (grátis: 40). O `checkRateLimit` só
+evita contar duas vezes quando o nome do balde é o mesmo; aqui eram dois nomes. O teste do PR #41
+só conferia o texto do código com regex, então não viu o portão.
+
+**Correção:** o portão continua conferindo CSRF e identidade no `/api/transcribe`, mas não conta: quem
+conta é o handler, que já sabe o `uso`. A Preparação gasta só o `transcribe-prep`; as outras gravações,
+só o `transcribe`.
+
+**Como pegar isso de novo:** `tests/cota-da-ia.test.js` roda o `api/index.js` com um Supabase falso que
+conta os baldes de verdade: 4 gravações da Preparação passam e só o `transcribe-prep` é gasto; quem paga
+gasta uma cota; a 4ª gravação comum ainda recebe 429.
+
+**Por que aconteceu:** o portão foi posto depois dos handlers e supõe que cada rota usa o mesmo balde
+que ele. Toda rota cujo handler escolhe outro balde (pelo corpo ou por conta própria) gasta em dobro.
+Rota nova com balde próprio: confira o `AI_ROUTE_KEYS` e teste com contagem de verdade, não com regex.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas

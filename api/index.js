@@ -3132,8 +3132,13 @@ module.exports = async (req, res) => {
         if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.refresh] || sessionCookies[COOKIE_NAMES.guest]) {
             try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { req._securityIdentity = null; }
         }
-        const limited = await checkRateLimit(req, aiKey, null);
-        if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        // O /api/transcribe só sabe o balde depois de ler o corpo (`uso:
+        // 'preparacao'` → transcribe-prep): o handler conta. Contar aqui gastava
+        // o `transcribe` (grátis: 3/dia) também em toda gravação da Preparação.
+        if (url !== '/api/transcribe') {
+            const limited = await checkRateLimit(req, aiKey, null);
+            if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        }
     }
 
     // /api/admin/* routes call isAdminReq() inside each handler: an admin
