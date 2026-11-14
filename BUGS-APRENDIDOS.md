@@ -1,5 +1,156 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Quando a IA falhava, a resposta era "200 OK" e sem prazo
+
+**Sintoma:** com a OpenAI fora do ar (ou sem crédito), as rotas de IA de texto (`/api/chat`, quiz, tradução,
+história…) respondiam **200** com `{error:{…}}`. O widget da Yara guarda na conversa toda resposta 200: a
+mensagem "A IA não respondeu agora" voltava para a IA no próximo pedido como se a Yara tivesse dito aquilo. E
+com a OpenAI travada, sem responder, a função ficava pendurada até a Vercel matar.
+
+**Causa raiz:** o `callOpenAI` respondia `res.status(200)` no erro do provedor e não passava `timeout` ao
+`https.request` (o `chatComplete` sempre teve 45 s).
+
+**Correção:** erro do provedor responde **502** (mesmo corpo, mesma mensagem genérica), e o pedido à IA tem
+prazo de 45 s; vencido, o pedido é desfeito e o aluno recebe 502. As páginas já liam a mensagem do corpo em
+qualquer status. A cota do dia continua gasta quando a IA falha (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (IA com 500 → resposta não é 200 e não
+vaza o texto do provedor; IA travada → 502 quando o prazo vence).
+
+**Por que aconteceu:** "não quebrar a tela" virou "dizer que deu certo". Erro precisa de status de erro: é
+o que o navegador usa para decidir o que guardar.
+
+---
+
+## 2026-11-13 — O envio de lição de casa não tinha limite nenhum
+
+**Sintoma:** um aluno logado (ou um script com a sessão dele) podia mandar `POST /api/homework` sem parar:
+cada envio grava até 20 KB na `homework_submissions` e aparece na lista do professor, que só mostra as 500
+mais recentes.
+
+**Causa raiz:** o balde `homework` existia em `RATE_LIMITS` (20 por dia no grátis, 100 no Pro, 200 no Super),
+mas a rota nunca chamava o `checkRateLimit`.
+
+**Correção:** a rota consulta o balde `homework` (por aluno, depois de validar o pedido) e responde 429 quando
+estoura. Na aula, o `components.js` já mostra "Tentar de novo" para qualquer erro que não seja de login.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (balde estourado: 429 e nada gravado;
+balde livre: 200, contado por aluno).
+
+**Por que aconteceu:** criar o limite e ligar o limite na rota eram dois passos, e só o primeiro foi feito.
+Balde em `RATE_LIMITS` que nenhuma rota usa é sinal de rota sem limite.
+
+---
+
+## 2026-11-13 — Um POST com XP inventado punha qualquer aluno no topo do ranking
+
+**Sintoma:** um aluno logado mandava `POST /api/db` com `xp: 10000000` e aparecia em 1º no ranking público
+(`leaderboard.html`) na hora. Nada limitava quantas vezes por dia.
+
+**Causa raiz:** o estado do aluno inteiro vem do navegador. O servidor só cortava o XP em 10 milhões, e o
+`public_leaderboard` lê esse número direto do `user_state`.
+
+**Correção:** cada salvar sobe o XP no máximo 2.000 acima do que estava guardado (`XP_MAX_POR_SALVAR`), e o dia
+inteiro no máximo 20.000 (`XP_MAX_POR_DIA`, somado na `atividade_diaria`). Descer continua livre (recomeçar o
+progresso). Uma aula inteira dá ~300 XP. Quem passa do teto não perde nada no aparelho: o `store.js` mescla pelo
+MAIOR e manda o total de novo; o servidor alcança aos poucos. Se o estado anterior não pôde ser lido, nada é
+cortado. O cálculo do XP continua no navegador (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (um salvar com 10 milhões e 40
+salvares seguidos no mesmo dia).
+
+**Por que aconteceu:** número que o aluno controla e que todo mundo vê (ranking) precisa de teto no servidor.
+
+---
+
+## 2026-11-13 — Qualquer professor lia a lição de casa de todos os alunos do site
+
+**Sintoma:** uma conta com papel `teacher` abria `teacher_homework.html` (ou chamava `GET /api/homework`) e
+recebia as últimas 500 lições de casa do site inteiro: nome, id e respostas de alunos que nunca entraram na
+turma dele. Com `?userId=<id>` lia qualquer aluno.
+
+**Causa raiz:** a rota só conferia o papel (`requireRole(['admin','teacher'])`) e consultava a tabela com a
+chave de serviço, sem filtro. O painel novo do professor (`/api/professor/*`, 19/out) recorta tudo pela
+`turma_alunos`; esta rota mais antiga ficou de fora.
+
+**Correção:** o admin continua vendo tudo. O professor vê só quem está na turma dele (`turma_alunos` com o
+`professor_id` da sessão); pedir um `userId` de fora da turma devolve lista vazia.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (professor com uma aluna na turma não
+vê a outra, nem pedindo pelo id; admin vê as duas; aluno recebe 403).
+
+**Por que aconteceu:** quando uma regra de acesso nova entra ("o servidor filtra sempre pela turma"), toda
+rota que lê a mesma tabela precisa ser revista, não só as rotas novas.
+
+---
+
+## 2026-11-13 — A entrevista por voz gastava o dobro dos minutos do aluno
+
+**Sintoma:** um aluno Super que fazia uma simulação de entrevista de 2 minutos (`entrevista.html`) perdia 4
+minutos da cota do mês. O freio de gasto do site também via o dobro.
+
+**Causa raiz:** ao desligar, a página manda o `/api/conversa-uso` (que liquida a reserva da ligação) e logo
+depois pede a devolutiva em `/api/conversa-feedback` com o mesmo uso. A rota da devolutiva gravava o custo de
+novo, numa linha nova (`gravarUsoVoz`). O comentário dizia "se o aluno ficou na página, esta é a via", mas a
+página manda o relato em todo desligamento. De quebra, a devolutiva gravava o custo que o navegador mandasse,
+mesmo sem ligação nenhuma.
+
+**Correção:** a devolutiva não grava mais custo. Quem mede a ligação é só o `/api/conversa-uso`.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (token, relato de 2 minutos e
+devolutiva: a cota conta 2 minutos; devolutiva com custo inventado não grava nada).
+
+**Por que aconteceu:** duas rotas gravando a mesma medição. Cada número precisa de um único caminho até o
+banco.
+
+---
+
+## 2026-11-13 — Um relato de voz inventado desligava a voz do site inteiro
+
+**Sintoma:** qualquer aluno logado (até do plano grátis, que nunca ligou) mandava um `POST /api/conversa-uso`
+dizendo ter gasto 5 milhões de tokens de cada tipo. O servidor gravava US$ 166 de custo, o freio mensal do
+site (`VOZ_TETO_USD_MES`, US$ 50) disparava e todo aluno Super recebia "A voz está temporariamente
+indisponível" até o mês seguinte.
+
+**Causa raiz:** os tokens e a duração da ligação vêm do navegador. O `liquidarReservaVoz` usava
+`Math.max(custo do navegador, piso)` sem teto, e os segundos do navegador (até 2 h) passavam por cima da
+reserva. Sem reserva aberta, o relato era gravado do jeito que veio (`gravarUsoVoz`), mesmo que nenhum token
+tivesse sido emitido.
+
+**Correção:** a liquidação nunca passa do tempo reservado, e o custo do navegador conta até
+`VOZ_USD_POR_MIN_TETO` (padrão US$ 1 por minuto reservado, 50 vezes o piso). Relato sem reserva aberta só é
+gravado para o admin (o único que liga sem reserva). Assim, a ligação de teste de 3 minutos vale no máximo
+US$ 3.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (relato forjado sem ligação e com
+reserva de 3 minutos; depois a aluna Super ainda consegue o token).
+
+**Por que aconteceu:** número que vem do navegador e entra numa conta que trava o site inteiro precisa de
+teto no servidor, não só de piso. O piso protegia contra quem informa pouco; ninguém pensou em quem informa
+demais.
+
+---
+
+## 2026-11-13 — As letras de música pulavam o limite com uma barra no fim do endereço
+
+**Sintoma:** `GET /api/lyrics-search/?q=…` (com barra) ou `/api/lyricsX?…` respondia 200 e chamava o
+lyrics.ovh quantas vezes alguém quisesse, mesmo com o limite do dia estourado.
+
+**Causa raiz:** o portão de limite procura a rota pelo endereço EXATO (`AI_ROUTE_KEYS.get(url)`), mas as
+duas rotas de letra casavam com `url.startsWith('/api/lyrics-search')` e `url.startsWith('/api/lyrics')`.
+Qualquer endereço que só começasse igual passava pelo handler sem passar pelo portão.
+
+**Correção:** as duas rotas comparam o endereço exato (`url === '/api/lyrics-search'`, `url === '/api/lyrics'`).
+O Music Lab já chamava exatamente esses endereços.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (com todo balde estourado, nenhuma
+variante do endereço chega ao lyrics.ovh).
+
+**Por que aconteceu:** rota com limite e o portão de limite precisam casar o endereço do mesmo jeito. Rota que
+custa (IA ou serviço de fora) nunca usa `startsWith`.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas
