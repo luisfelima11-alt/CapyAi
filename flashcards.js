@@ -259,11 +259,24 @@ const DECKS = {
 };
 
 // ── Web Speech ────────────────────────────────────────────────────────────────
+const FLASHCARD_LANGUAGES = { en: 'Inglês', fr: 'Francês', tr: 'Turco' };
+const FLASHCARD_LOCALES = { en: 'en-US', fr: 'fr-FR', tr: 'tr-TR' };
+const FLASHCARD_SESSION_DECKS = ['quick', 'review', 'favorites', 'resume'];
+
+for (const [id, label, emoji, lang, lessonId, terms] of COURSE_FLASHCARD_DECKS) {
+    DECKS[id] = {
+        id, label, emoji, lang, lessonId,
+        cards: terms.map(([word, translation]) => ({
+            id: `${id}:${word}`, word, translation, lang, aiEmoji: emoji
+        }))
+    };
+}
+
 function speakWord(word) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utt = new SpeechSynthesisUtterance(word);
-    utt.lang  = 'en-US';
+    utt.lang  = FLASHCARD_LOCALES[getActiveDeck().cards[currentCardIndex].lang || 'en'];
     utt.rate  = 0.85;
     utt.pitch = 1.1;
     window.speechSynthesis.speak(utt);
@@ -271,7 +284,58 @@ function speakWord(word) {
 
 // ── Active deck state ─────────────────────────────────────────────────────────
 let activeDeckId    = 'forest';
+let deckLanguage = 'en';
 let currentCardIndex = 0;
+let sessionRatings = new Set();
+let sessionFinished = false;
+const SESSION_KEY = 'capyFlashcardSession_v1';
+const REVIEW_DAY_MS = 86400000;
+const cardCatalog = new Map();
+
+function indexFlashcardDeck(deck) {
+    for (const card of deck.cards) {
+        card.id ||= `${deck.id}:${card.word}`;
+        cardCatalog.set(card.id, card);
+    }
+}
+
+Object.values(DECKS).forEach(indexFlashcardDeck);
+
+function readFlashcardData(key) {
+    try {
+        const data = JSON.parse(localStorage.getItem(key) || '{}');
+        return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+    } catch { return {}; }
+}
+
+function saveFlashcardSession() {
+    const deck = getActiveDeck();
+    if (sessionFinished || deck.cards.some(card => card.id.startsWith('ai_'))) {
+        localStorage.removeItem(SESSION_KEY);
+        return;
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+        id: deck.id,
+        cards: deck.cards.map(flashcardKey), index: currentCardIndex, rated: [...sessionRatings]
+    }));
+}
+
+function restoreFlashcardSession() {
+    const saved = readFlashcardData(SESSION_KEY);
+    if (!Array.isArray(saved.cards) || !saved.cards.length || !Number.isInteger(saved.index) ||
+        saved.index < 0 || saved.index >= saved.cards.length) return;
+    const cards = saved.cards.map(id => cardCatalog.get(id));
+    if (cards.some(card => !card)) return;
+    if (Object.hasOwn(DECKS, saved.id)) {
+        activeDeckId = saved.id;
+        DECKS[activeDeckId].cards = cards;
+    } else {
+        DECKS.resume = { id: 'resume', label: 'Sessão retomada', emoji: '🃏', cards };
+        activeDeckId = 'resume';
+    }
+    currentCardIndex = saved.index;
+    sessionRatings = new Set(Array.isArray(saved.rated) ? saved.rated.filter(id => saved.cards.includes(id)) : []);
+}
 
 function getActiveDeck() {
     return DECKS[activeDeckId];
@@ -279,10 +343,30 @@ function getActiveDeck() {
 
 // ── Switch deck ───────────────────────────────────────────────────────────────
 function switchDeck(deckId) {
+    if (!Object.hasOwn(DECKS, deckId) || !DECKS[deckId].cards.length) return;
     activeDeckId     = deckId;
-    currentCardIndex = 0;
-    updateFlashcard();
+    resetFlashcardSession();
     updateDeckPicker();
+}
+
+function filterFlashcardDecks(language) {
+    if (!Object.hasOwn(FLASHCARD_LANGUAGES, language)) return;
+    deckLanguage = language;
+    const deck = getActiveDeck();
+    if ((deck.lang || 'en') !== language || FLASHCARD_SESSION_DECKS.includes(deck.id)) {
+        const first = Object.values(DECKS).find(item => !FLASHCARD_SESSION_DECKS.includes(item.id) && (item.lang || 'en') === language);
+        if (first) switchDeck(first.id);
+        return;
+    }
+    updateDeckPicker();
+}
+
+function resetFlashcardSession() {
+    currentCardIndex = 0;
+    sessionRatings = new Set();
+    sessionFinished = false;
+    updateFlashcard();
+    updateMasterySummary();
 }
 
 // ── Card display ──────────────────────────────────────────────────────────────
@@ -296,7 +380,7 @@ function updateFlashcard() {
             imgEl.src = card.image;
             imgEl.style.display = '';
         } else {
-            imgEl.src = '';
+            imgEl.removeAttribute('src');
             imgEl.style.display = 'none';
         }
     }
@@ -309,8 +393,11 @@ function updateFlashcard() {
     }
 
     document.getElementById('card-icon').innerText  = card.icon  || 'style';
+    document.getElementById('card-icon').style.display = card.image || card.aiEmoji ? 'none' : '';
     document.getElementById('card-word').innerText  = card.word;
-    document.getElementById('card-pron').innerText  = card.pronunciation;
+    document.getElementById('card-word').lang = card.lang || 'en';
+    document.getElementById('card-pron').innerText = card.pronunciation || '';
+    document.getElementById('flashcard-language').textContent = FLASHCARD_LANGUAGES[card.lang || 'en'];
 
     // Deck label
     const deckLabelEl = document.getElementById('deck-label');
@@ -318,17 +405,20 @@ function updateFlashcard() {
 
     // Progress
     document.getElementById('progress-text').innerText =
-        `${currentCardIndex + 1} / ${deck.cards.length} Cards`;
+        `${currentCardIndex + 1} / ${deck.cards.length} cartões`;
     const progressPercent = ((currentCardIndex + 1) / deck.cards.length) * 100;
     document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
 
     // Reset flip
     const container = document.getElementById('card-container');
     if (container) container.classList.remove('flipped');
+    document.getElementById('translate-bubble')?.classList.add('hidden');
     updateFavoriteButton();
+    saveFlashcardSession();
 }
 
 function nextCard() {
+    if (sessionFinished) return;
     const deck = getActiveDeck();
     if (currentCardIndex < deck.cards.length - 1) {
         currentCardIndex++;
@@ -339,24 +429,64 @@ function nextCard() {
 }
 
 function flashcardKey(card) {
-    return `${activeDeckId}:${card.word}`;
+    return card.id;
 }
 
 function getFlashcardRatings() {
-    try { return JSON.parse(localStorage.getItem('capyFlashcardRatings') || '{}'); }
-    catch (e) { return {}; }
+    return readFlashcardData('capyFlashcardRatings');
 }
 
 function getFavoriteCards() {
-    try { return JSON.parse(localStorage.getItem('capyFlashcardFavorites') || '{}'); }
-    catch (e) { return {}; }
+    return readFlashcardData('capyFlashcardFavorites');
+}
+
+function migrateFlashcardData() {
+    for (const key of ['capyFlashcardRatings', 'capyFlashcardFavorites']) {
+        const records = readFlashcardData(key);
+        let changed = false;
+        // Prefer the original baralho entry when both versions have a record.
+        for (const [oldId, value] of Object.entries(records)) {
+            let id = oldId.replace(/^(?:(?:quick|review)_)+/, '');
+            if (id.startsWith('favorites:')) {
+                const word = id.slice('favorites:'.length);
+                const matches = [...cardCatalog.values()].filter(card => card.word === word);
+                if (matches.length === 1) id = matches[0].id;
+            }
+            if (id === oldId || !cardCatalog.has(id)) continue;
+            if (!Object.hasOwn(records, id)) records[id] = value;
+            delete records[oldId];
+            changed = true;
+        }
+        if (key === 'capyFlashcardRatings') {
+            for (const [id, value] of Object.entries(records)) {
+                if (!cardCatalog.has(id) || value !== 'known') continue;
+                records[id] = { status: 'known', repetitions: 1, dueAt: Date.now() + 3 * REVIEW_DAY_MS };
+                changed = true;
+            }
+        }
+        if (changed) localStorage.setItem(key, JSON.stringify(records));
+    }
+}
+
+function ratingStatus(entry) {
+    return typeof entry === 'string' ? entry : entry?.status;
+}
+
+function dueFlashcards(now = Date.now()) {
+    const ratings = getFlashcardRatings();
+    return [...cardCatalog.values()].filter(card => {
+        const entry = ratings[flashcardKey(card)];
+        const status = ratingStatus(entry);
+        return (status === 'learning' || status === 'known') &&
+            (Number.isFinite(entry?.dueAt) ? entry.dueAt <= now : status === 'learning');
+    }).sort((a, b) => (ratings[a.id]?.dueAt || 0) - (ratings[b.id]?.dueAt || 0));
 }
 
 function toggleFavoriteCard() {
     const card = getActiveDeck().cards[currentCardIndex];
     const favorites = getFavoriteCards();
     const key = flashcardKey(card);
-    if (favorites[key]) delete favorites[key]; else favorites[key] = { deckId:activeDeckId, word:card.word };
+    if (favorites[key]) delete favorites[key]; else favorites[key] = { word:card.word };
     localStorage.setItem('capyFlashcardFavorites', JSON.stringify(favorites));
     updateFavoriteButton();
     updateMasterySummary();
@@ -374,45 +504,47 @@ function updateFavoriteButton() {
 function shuffleActiveDeck() {
     const deck = getActiveDeck();
     deck.cards = [...deck.cards].sort(() => Math.random() - .5);
-    currentCardIndex = 0;
-    updateFlashcard();
+    resetFlashcardSession();
 }
 
 function startQuickSession() {
     const source = getActiveDeck();
     const cards = [...source.cards].sort(() => Math.random() - .5).slice(0, 5);
-    const id = `quick_${source.id}`;
-    DECKS[id] = { id, label:'Quick 5', emoji:'⚡', badgeId:'explorer', cards };
-    switchDeck(id);
+    DECKS.quick = { id:'quick', label:'Sessão de 5 cartões', emoji:'⚡', badgeId:'explorer', cards };
+    switchDeck('quick');
 }
 
 function reviewFavoriteCards() {
     const favorites = getFavoriteCards();
-    const cards = [];
-    Object.values(DECKS).forEach(deck => deck.cards.forEach(card => {
-        if (favorites[`${deck.id}:${card.word}`] && !cards.some(item => item.word === card.word)) cards.push(card);
-    }));
+    const cards = [...cardCatalog.values()].filter(card => favorites[card.id]);
     if (!cards.length) return;
     DECKS.favorites = { id:'favorites', label:'Favorites', emoji:'⭐', badgeId:'explorer', cards };
     switchDeck('favorites');
 }
 
 function rateCard(status) {
+    if (sessionFinished || !['learning', 'known'].includes(status)) return;
     const card = getActiveDeck().cards[currentCardIndex];
     const ratings = getFlashcardRatings();
-    ratings[flashcardKey(card)] = status;
+    const id = flashcardKey(card);
+    const previous = ratings[id];
+    const lastCount = Number.isInteger(previous?.repetitions) ? Math.max(0, previous.repetitions) : 0;
+    const now = Date.now();
+    const alreadyScheduled = status === 'known' && previous?.status === 'known' && previous.dueAt > now;
+    const repetitions = status === 'known' ? Math.min(4, lastCount + 1) : 0;
+    const interval = status === 'learning' ? 1 : [3, 7, 14, 30][repetitions - 1];
+    if (!alreadyScheduled) ratings[id] = { status, repetitions, dueAt: now + interval * REVIEW_DAY_MS };
+    sessionRatings.add(id);
     localStorage.setItem('capyFlashcardRatings', JSON.stringify(ratings));
     updateMasterySummary();
     nextCard();
 }
 
 function reviewLearningCards() {
-    const ratings = getFlashcardRatings();
-    const cards = getActiveDeck().cards.filter(card => ratings[flashcardKey(card)] === 'learning');
+    const cards = dueFlashcards().slice(0, 5);
     if (!cards.length) return;
-    const reviewId = `review_${activeDeckId}`;
-    DECKS[reviewId] = { id:reviewId, label:'Review Queue', emoji:'🧠', badgeId:'explorer', cards };
-    switchDeck(reviewId);
+    DECKS.review = { id:'review', label:'Revisão de hoje', emoji:'🧠', badgeId:'explorer', cards };
+    switchDeck('review');
 }
 
 function updateMasterySummary() {
@@ -420,35 +552,40 @@ function updateMasterySummary() {
     if (!el) return;
     const ratings = getFlashcardRatings();
     const deck = getActiveDeck();
-    const known = deck.cards.filter(card => ratings[flashcardKey(card)] === 'known').length;
-    const learning = deck.cards.filter(card => ratings[flashcardKey(card)] === 'learning').length;
-    const favoriteCount = Object.keys(getFavoriteCards()).length;
+    const known = deck.cards.filter(card => ratingStatus(ratings[flashcardKey(card)]) === 'known').length;
+    const learning = deck.cards.filter(card => ratingStatus(ratings[flashcardKey(card)]) === 'learning').length;
+    const favoriteCount = Object.keys(getFavoriteCards()).filter(id => cardCatalog.has(id)).length;
+    const due = dueFlashcards().length;
     el.innerHTML = `<span class="text-emerald-300">✓ ${known} já sei</span><span class="text-amber-300">↻ ${learning} revisando</span><span class="text-pink-300">★ ${favoriteCount} favoritos</span>`;
     const reviewBtn = document.getElementById('review-learning-btn');
-    if (reviewBtn) reviewBtn.disabled = learning === 0;
+    if (reviewBtn) {
+        reviewBtn.disabled = due === 0;
+        reviewBtn.textContent = due ? `Revisar agora (${due})` : 'Revisão em dia';
+    }
     const favoriteBtn = document.getElementById('review-favorites-btn');
     if (favoriteBtn) favoriteBtn.disabled = favoriteCount === 0;
 }
 
 function finishDeck() {
+    if (sessionFinished) return;
+    sessionFinished = true;
     const deck = getActiveDeck();
-    if (window.Store) {
-        Store.addXP(50);
+    const goal = 5;
+    const todayKey = 'capyFlashXpDone_' + capyHojeBR();
+    let xp = 0;
+    if (window.Store && sessionRatings.size >= goal && !localStorage.getItem(todayKey)) {
+        xp = goal * 2;
+        localStorage.setItem(todayKey, '1');
+        Store.addXP(xp);
         Store.activateStreak();
         Store.unlockBadge(deck.badgeId || 'explorer');
         Store.completeActivity('flashcards');
     }
-    // Per-day flag read by the "Flashcards do Dia" node on the daily trail
-    // (learn.html) to show its done state — same convention as newsline,
-    // historyline and music_lab.
-    try {
-        const today = capyHojeBR();
-        localStorage.setItem('capyFlashXpDone_' + today, '1');
-    } catch (e) { /* storage unavailable — the deck still counts, just no badge on the trail */ }
-    showDeckComplete();
+    saveFlashcardSession();
+    showDeckComplete(xp);
 }
 
-function showDeckComplete() {
+function showDeckComplete(xp) {
     const deck = getActiveDeck();
     const overlay = document.createElement('div');
     overlay.id = 'deck-complete-overlay';
@@ -463,9 +600,9 @@ function showDeckComplete() {
                       style="font-variation-settings: 'FILL' 1;">check_circle</span>
             </div>
             <div>
-                <p class="font-label text-emerald-400 font-bold text-sm uppercase tracking-widest mb-1">Deck Complete!</p>
-                <h2 class="font-headline text-5xl font-black text-white mb-2">+50 XP</h2>
-                <p class="font-body text-slate-300">${deck.emoji} <strong>${deck.label}</strong><br/>All ${deck.cards.length} words learned!</p>
+                <h2 class="font-headline text-3xl font-black text-white mb-2">Sessão concluída</h2>
+                <p class="font-body text-slate-300">${sessionRatings.size} de ${deck.cards.length} cartões avaliados</p>
+                ${xp ? `<p class="font-bold text-emerald-300">+${xp} XP de revisão diária</p>` : ''}
             </div>
             <div class="flex gap-1 mt-1">
                 <span class="material-symbols-outlined text-yellow-400 text-3xl" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -473,17 +610,17 @@ function showDeckComplete() {
                 <span class="material-symbols-outlined text-yellow-400 text-3xl" style="font-variation-settings: 'FILL' 1;">star</span>
             </div>
             <div class="flex gap-3 flex-wrap justify-center">
-                <button onclick="document.getElementById('deck-complete-overlay').remove(); currentCardIndex=0; updateFlashcard();"
+                <button onclick="document.getElementById('deck-complete-overlay').remove(); resetFlashcardSession();"
                         class="bg-white/10 hover:bg-white/20 text-white font-label font-bold
                                px-8 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
-                    Replay
+                    Refazer sessão
                 </button>
-                <button onclick="launchAIQuiz()"
+                ${deck.cards.every(card => (card.lang || 'en') === 'en') ? `<button onclick="launchAIQuiz()"
                         class="bg-pink-500 hover:bg-pink-600 text-white font-label font-bold
                                px-8 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-pink-500/30 flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">auto_awesome</span>
                     AI Quiz!
-                </button>
+                </button>` : ''}
                 <button onclick="window.location.href='6_Home_Forest_Expedition.html'"
                         class="bg-emerald-500 hover:bg-emerald-600 text-white font-label font-bold
                                px-8 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-emerald-500/30">
@@ -503,6 +640,7 @@ function showDeckComplete() {
 // ── Launch AI Quiz ────────────────────────────────────────────────────────────
 function launchAIQuiz() {
     const deck  = getActiveDeck();
+    if (deck.cards.some(card => (card.lang || 'en') !== 'en')) return;
     const words = deck.cards.map(c => c.word).join(',');
     const url   = `ai_quiz.html?deck=${deck.id}&label=${encodeURIComponent(deck.label)}&words=${encodeURIComponent(words)}`;
     window.location.href = url;
@@ -512,19 +650,40 @@ function launchAIQuiz() {
 function updateDeckPicker() {
     const picker = document.getElementById('deck-picker');
     if (!picker) return;
-    picker.innerHTML = Object.values(DECKS).map(d => {
-        const active = d.id === activeDeckId;
-        return `<button onclick="switchDeck('${d.id}')"
-                        class="flex items-center gap-2 px-5 py-3 rounded-full font-label font-bold text-sm
-                               transition-all active:scale-95 whitespace-nowrap
-                               ${active
-                                   ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30'
-                                   : 'bg-white/10 text-white/70 hover:bg-white/20 border border-white/20'}">
-                    <span>${d.emoji}</span>
-                    <span>${d.label}</span>
-                    ${active ? '<span class="material-symbols-outlined text-sm" style="font-variation-settings:\'FILL\' 1;">check_circle</span>' : ''}
-                </button>`;
-    }).join('');
+    document.querySelectorAll('[data-flashcard-language]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.flashcardLanguage === deckLanguage));
+    });
+    const normalize = value => value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+    const query = normalize(document.getElementById('flashcard-search')?.value || '');
+    const decks = Object.values(DECKS).filter(d => FLASHCARD_SESSION_DECKS.includes(d.id)
+        ? d.id === activeDeckId && !query
+        : (d.lang || 'en') === deckLanguage && normalize(d.label).includes(query));
+    const fixed = Object.values(DECKS).filter(d => !FLASHCARD_SESSION_DECKS.includes(d.id) && !d.id.startsWith('ai_'));
+    document.getElementById('flashcard-library-total').textContent = `${fixed.reduce((sum, deck) => sum + deck.cards.length, 0)} cartões em ${fixed.length} baralhos · Inglês, francês e turco`;
+    document.getElementById('flashcard-results').textContent = decks.length
+        ? `${decks.length} ${decks.length === 1 ? 'baralho' : 'baralhos'}`
+        : 'Nenhum baralho encontrado. Tente outro tema ou idioma.';
+    picker.replaceChildren(...decks.map(d => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'fc-deck';
+        button.setAttribute('aria-pressed', String(d.id === activeDeckId));
+        const emoji = document.createElement('span');
+        emoji.textContent = d.emoji;
+        emoji.setAttribute('aria-hidden', 'true');
+        const info = document.createElement('span');
+        const name = document.createElement('strong');
+        name.textContent = d.label;
+        const count = document.createElement('small');
+        count.textContent = `${d.cards.length} cartões`;
+        info.append(name, count);
+        button.append(emoji, info);
+        button.addEventListener('click', () => {
+            if (d.id !== activeDeckId) switchDeck(d.id);
+            document.getElementById('flashcard-study').focus();
+        });
+        return button;
+    }));
     updateMasterySummary();
 }
 
@@ -658,12 +817,17 @@ function applyAIDeck(topic, cards) {
             aiEmoji:       c.emoji || topic.emoji,
         }))
     };
+    indexFlashcardDeck(DECKS[deckId]);
+    deckLanguage = 'en';
     switchDeck(deckId);
     updateDeckPicker();
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    migrateFlashcardData();
+    restoreFlashcardSession();
+    deckLanguage = getActiveDeck().cards[currentCardIndex].lang || 'en';
     updateDeckPicker();
     updateFlashcard();
     renderAITopics();
