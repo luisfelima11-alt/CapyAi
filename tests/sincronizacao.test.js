@@ -201,3 +201,17 @@ test('servidor: um estado zerado não apaga o progresso, mas "zerar progresso" e
   assert.equal(salvo().xp, 0);
   assert.deepEqual(salvo().completedLessons, []);
 });
+
+test('store: aparelho sem estado salvo não manda um estado zerado antes de ler o servidor', async () => {
+  const loja = new Map([['capySession', JSON.stringify(ANA)]]);
+  const servidor = { estado: { xp: 900, completedLessons: [1, 2, 3], starBerries: 400, customLessons: [{ id: 100, title: 'Minha aula' }] }, posts: [] };
+  const Store = abrirPagina({ loja, servidor, auth: { usuario: ANA } });
+  Store.init();
+  await esperar();
+  for (const p of servidor.posts) {
+    assert.ok(p.payload.xp >= 900, `um POST mandou xp=${p.payload.xp} e apagou o progresso do servidor`);
+  }
+  assert.equal(Store.state.xp, 900);
+  assert.equal(servidor.estado.starBerries, 400, 'as frutinhas do servidor continuam');
+  assert.equal(servidor.estado.customLessons.length, 1, 'as aulas criadas pelo aluno continuam');
+});

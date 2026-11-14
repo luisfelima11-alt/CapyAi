@@ -1,5 +1,29 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Abrir o app num aparelho novo podia zerar o progresso salvo na conta
+
+**Sintoma:** o aluno com conta abria o site num aparelho novo (ou depois de limpar o navegador) e o XP, as
+frutinhas, os freezes e as aulas criadas por ele voltavam ao começo, inclusive nos outros aparelhos.
+
+**Causa raiz:** o `store.js` postava o estado inteiro antes de ler o servidor. Sem estado salvo, o `init()`
+chamava `save()` com envio ligado e mandava o estado zerado; o `syncPlanFromServer()` também chamava `save()`
+assim que o `/api/me` respondia, muitas vezes antes do `GET /api/db` do merge. O merge depois só recuperava o
+que entra por MAIOR/UNIÃO; frutinhas gastas, freezes, aulas criadas e metas ficavam zerados. Só escapava
+quando o CSRF da aba ainda não tinha carregado (o POST levava 403).
+
+**Correção:** até o merge terminar, o `save()` grava só no aparelho e marca `_postPendente`; o merge espera o
+`Auth.ready()` (sessão verificada e CSRF da aba), lê o servidor e só então posta. Aparelho sem estado próprio
+usa o estado do servidor como base (o plano continua vindo do `/api/me`). Se o merge falhar, o próximo
+`save()` tenta de novo (no máximo a cada 15 s). Visitante não posta mais (o servidor respondia 401).
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("aparelho sem estado salvo não manda
+um estado zerado"), no `npm run test:security`.
+
+**Por que aconteceu:** o `postar:false` foi colocado no reset diário e na migração, mas o `init()` e o
+`syncPlanFromServer()` continuaram postando. Regra: com estado inteiro, ninguém escreve antes de ler.
+
+---
+
 ## 2026-11-13 — Uma aba velha ou um aparelho atrasado apagava aulas e XP no servidor
 
 **Sintoma:** o aluno estudava no celular e, depois de abrir o computador (ou uma aba esquecida aberta havia
