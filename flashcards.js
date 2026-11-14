@@ -263,7 +263,7 @@ const FLASHCARD_LANGUAGES = { en: 'Inglês', fr: 'Francês', tr: 'Turco' };
 const FLASHCARD_LOCALES = { en: 'en-US', fr: 'fr-FR', tr: 'tr-TR' };
 const FLASHCARD_SESSION_DECKS = ['quick', 'review', 'favorites', 'resume'];
 
-for (const [id, label, emoji, lang, lessonId, terms] of COURSE_FLASHCARD_DECKS) {
+for (const [id, label, emoji, lang, lessonId, terms] of [...COURSE_FLASHCARD_DECKS, ...ENGLISH_FLASHCARD_DECKS]) {
     DECKS[id] = {
         id, label, emoji, lang, lessonId,
         cards: terms.map(([word, translation]) => ({
@@ -659,7 +659,9 @@ function updateDeckPicker() {
         ? d.id === activeDeckId && !query
         : (d.lang || 'en') === deckLanguage && normalize(d.label).includes(query));
     const fixed = Object.values(DECKS).filter(d => !FLASHCARD_SESSION_DECKS.includes(d.id) && !d.id.startsWith('ai_'));
-    document.getElementById('flashcard-library-total').textContent = `${fixed.reduce((sum, deck) => sum + deck.cards.length, 0)} cartões em ${fixed.length} baralhos · Inglês, francês e turco`;
+    const languageDecks = fixed.filter(deck => (deck.lang || 'en') === deckLanguage);
+    const languageCount = languageDecks.reduce((sum, deck) => sum + deck.cards.length, 0);
+    document.getElementById('flashcard-library-total').textContent = `${languageCount.toLocaleString('pt-BR')} cartões de ${FLASHCARD_LANGUAGES[deckLanguage].toLowerCase()} em ${languageDecks.length} baralhos`;
     document.getElementById('flashcard-results').textContent = decks.length
         ? `${decks.length} ${decks.length === 1 ? 'baralho' : 'baralhos'}`
         : 'Nenhum baralho encontrado. Tente outro tema ou idioma.';
