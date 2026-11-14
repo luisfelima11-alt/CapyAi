@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Story Time: palavra digitada com apóstrofo ou HTML quebrava a tela
+
+**Sintoma:** no Story Time, o aluno digitava "don't" em "Add your own word": a palavra aparecia, mas o ✕
+não a tirava mais (erro de JavaScript no clique). Digitando `<b>oi</b>` ou uma tag de imagem, o HTML
+entrava na página, na lista escolhida e na linha "palavras usadas" da história.
+
+**Causa raiz:** `updateSelectedDisplay()` e `showStory()` montavam o `innerHTML` com a palavra crua, e o
+✕ era `onclick="toggleWord('${w}')"`: o apóstrofo fechava a string do onclick.
+
+**Correção:** a palavra passa por `escStory()` antes do `innerHTML`, e o ✕ remove pela posição
+(`toggleWord(selectedWords[i])`), sem colocar o texto do aluno dentro do atributo.
+
+**Como pegar isso de novo:** `tests/story-time.spec.js` adiciona "don't" e tira pelo ✕, e adiciona HTML
+e confere que nenhuma tag nasce na escolha nem na história.
+
+**Por que aconteceu:** o padrão `onclick="fn('${texto}')"` foi copiado de onde o texto era fixo (as
+palavras sugeridas) para onde o texto vem do aluno. Texto do aluno ou da IA nunca vai cru para
+`innerHTML` nem para dentro de um atributo `onclick`: use o índice ou `data-*` escapado.
+
+---
+
 ## 2026-11-13 — A Preparação só deixava gravar 3 vezes por dia no plano grátis
 
 **Sintoma:** na página de Preparação, o aluno do plano grátis gravava 3 frases e, na 4ª gravação do

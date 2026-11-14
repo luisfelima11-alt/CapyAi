@@ -215,6 +215,10 @@ const SUGGESTED = [
 let selectedWords = [];
 let storyData     = null;
 
+function escStory(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   renderChips();
@@ -261,11 +265,13 @@ function updateSelectedDisplay() {
     return;
   }
   if (ph) ph.remove();
-  display.innerHTML = selectedWords.map(w =>
+  // A palavra pode ter sido digitada pelo aluno: vai escapada, e o ✕ remove
+  // pela posição (um apóstrofo em "don't" quebrava o onclick com a palavra).
+  display.innerHTML = selectedWords.map((w, i) =>
     `<span class="flex items-center gap-1.5 bg-yellow-500/20 border border-yellow-500/40 text-yellow-300
                   font-label font-bold text-sm px-4 py-2 rounded-full">
-       ${w}
-       <button onclick="toggleWord('${w}')" class="text-yellow-400/60 hover:text-yellow-300 ml-1 leading-none">✕</button>
+       ${escStory(w)}
+       <button onclick="toggleWord(selectedWords[${i}])" class="text-yellow-400/60 hover:text-yellow-300 ml-1 leading-none">✕</button>
      </span>`
   ).join('');
 }
@@ -323,7 +329,7 @@ function showStory(data) {
 
   // Words used row
   document.getElementById('used-words-row').innerHTML = selectedWords.map(w =>
-    `<span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-label font-bold text-sm px-4 py-1.5 rounded-full">${w}</span>`
+    `<span class="bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 font-label font-bold text-sm px-4 py-1.5 rounded-full">${escStory(w)}</span>`
   ).join('');
 }
 
