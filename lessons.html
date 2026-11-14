@@ -415,7 +415,15 @@ function markToolDone(id, toolKey, stars) {
   renderProgressDashboard();
 
   // ── Guided mode: show Continue banner when current step finishes ─────────
-  if (GUIDED_MODE && activeSteps[guidedStep] === toolKey) {
+  // O passo "game" é jogado num dos jogos da lição (showGameStep: speed,
+  // scramble ou typing). Sem isto, terminar o jogo não liberava o "Continue" e
+  // o Dia 2 nunca fechava — e sem o Dia 2 a lição nunca conta (regra dos 4 dias).
+  const jogoDoPasso = activeSteps[guidedStep] === 'game' && ['speed', 'scramble', 'typing'].includes(toolKey);
+  if (GUIDED_MODE && jogoDoPasso) {
+    p.tools['game'] = true;
+    saveLessonProgress(id, p);
+  }
+  if (GUIDED_MODE && (activeSteps[guidedStep] === toolKey || jogoDoPasso)) {
     const banner = document.getElementById('guided-continue-banner');
     if (banner) { banner.style.display = 'block'; window.scrollTo({top:0,behavior:'smooth'}); }
   }

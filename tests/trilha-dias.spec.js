@@ -88,6 +88,24 @@ for (const [pagina, prefixo, id] of [
   });
 }
 
+// Dia 2 (Game) em inglês: o jogo é montado com o vocabulário da lição (speed,
+// scramble ou typing, pelo id). Ao terminar o jogo, o aluno precisa conseguir
+// seguir e fechar o dia.
+test('Dia 2 em inglês: terminar o jogo da lição fecha o dia', async ({ page }) => {
+  await preparar(page);
+  await page.goto('/lessons.html?lesson=3&mini=2&guided=1');   // 3 % 3 = 0 → speed
+  await expect(page.locator('#speed-opts')).toBeVisible();
+  while (!(await page.evaluate(() => speedDone))) {
+    const i = await page.evaluate(() => speedIdx);
+    await page.locator('#speed-opts .choice-btn[data-correct="true"]').click();
+    await page.waitForFunction(n => speedDone || speedIdx > n, i, { timeout: 8000 });
+  }
+  await expect(page.locator('#panel-speed')).toContainText('Speed Round!');
+  await page.locator('#guided-continue-banner button').click({ timeout: 5000 });
+  await expect(page.locator('#guided-complete-overlay h2')).toHaveText(/Day 2 Complete/);
+  expect((await estado(page)).completedMinis).toEqual(['3_2']);
+});
+
 // Desafio da Yara (o chefe no fim de cada capítulo da trilha): o que o aluno
 // digita e o que a IA responde é texto, nunca HTML.
 test('Desafio da Yara mostra a fala do aluno e a da IA como texto', async ({ page }) => {

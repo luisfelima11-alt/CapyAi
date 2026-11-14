@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — O Dia 2 da trilha (Game) não fechava em inglês, francês e nos cursos
+
+**Sintoma:** no Dia 2 de uma lição da Trilha (fora do turco), o aluno jogava o jogo da lição (Speed, Scramble ou
+Typing) até o fim e ficava preso na tela de resultado: só havia "Refazer", o botão para outro jogo e "Learning
+Path". O "✅ Continue to Next Step" nunca aparecia, o Dia 2 nunca era gravado e, com a regra dos 4 dias, nenhuma
+lição de inglês, francês ou dos cursos podia ser concluída pela trilha.
+
+**Causa raiz:** desde que o Game passou a usar o vocabulário da lição (`showGameStep`), o passo do dia se chama
+`game`, mas o jogo avisa o fim com o nome dele (`markToolDone(id, 'speed')`). O `markToolDone` só mostrava o
+"Continue" quando os dois nomes eram iguais. O turco não tinha o problema porque o jogo dele chama
+`guidedGameDone()`. Antes de 12/nov o Dia 4 sozinho fechava a lição, e isso escondia o buraco.
+
+**Correção:** no modo guiado, quando o passo é `game` e termina um dos jogos da lição (speed, scramble, typing), o
+`markToolDone` marca o game como feito e mostra o "Continue", como nos outros passos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (joga o Speed do Dia 2 da lição 3 até o fim e fecha o dia).
+
+**Por que aconteceu:** o passo e a ferramenta que o executa deixaram de ter o mesmo nome, e não havia teste que
+fizesse um dia da trilha do começo ao fim.
+
+---
+
 ## 2026-11-13 — O "Plano de hoje" mandava refazer lições que a Trilha já dava como feitas
 
 **Sintoma:** quem terminou lições no formato antigo (a lição inteira de uma vez, antes das minilições) via na home
