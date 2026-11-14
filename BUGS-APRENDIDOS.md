@@ -1,5 +1,96 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-14 — "Zerar progresso" não zerava (e, para quem tem conta, voltava)
+
+**Sintoma:** em Configurações, o pai respondia a conta, confirmava "All XP, badges, and streaks will be lost",
+via "Progress reset!" e o XP continuava lá. Na página de Progresso, quem tem conta zerava e, ao recarregar,
+tudo voltava (às vezes sim, às vezes não).
+
+**Causa raiz:** as duas páginas só apagavam `capyYaraState` do aparelho. O `settings.html` chamava
+`Store.init()` em seguida, e o `init()` sem estado salvo regravava o estado que ainda estava na memória: não
+zerava nada. No `progress.html`, o recarregar postava um estado zerado ao mesmo tempo em que o merge lia o
+servidor; se a leitura chegasse antes, o merge trazia tudo de volta. Com o servidor agora recusando baixar o
+progresso sem pedido explícito, nem essa corrida sobraria.
+
+**Correção:** `Store.resetProgress()` zera a memória e o aparelho e manda `reset: true` ao servidor (o único
+jeito de baixar o progresso salvo); as duas páginas usam ela e avisam o aluno se o servidor não confirmar.
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("zerar progresso de quem tem conta"),
+no `npm run test:security`.
+
+**Por que aconteceu:** "zerar" foi escrito como "apagar a chave do localStorage", que só funcionava quando o
+progresso morava apenas no aparelho. Com servidor no meio, zerar é uma operação do servidor.
+
+---
+
+## 2026-11-13 — Abrir o app num aparelho novo podia zerar o progresso salvo na conta
+
+**Sintoma:** o aluno com conta abria o site num aparelho novo (ou depois de limpar o navegador) e o XP, as
+frutinhas, os freezes e as aulas criadas por ele voltavam ao começo, inclusive nos outros aparelhos.
+
+**Causa raiz:** o `store.js` postava o estado inteiro antes de ler o servidor. Sem estado salvo, o `init()`
+chamava `save()` com envio ligado e mandava o estado zerado; o `syncPlanFromServer()` também chamava `save()`
+assim que o `/api/me` respondia, muitas vezes antes do `GET /api/db` do merge. O merge depois só recuperava o
+que entra por MAIOR/UNIÃO; frutinhas gastas, freezes, aulas criadas e metas ficavam zerados. Só escapava
+quando o CSRF da aba ainda não tinha carregado (o POST levava 403).
+
+**Correção:** até o merge terminar, o `save()` grava só no aparelho e marca `_postPendente`; o merge espera o
+`Auth.ready()` (sessão verificada e CSRF da aba), lê o servidor e só então posta. Aparelho sem estado próprio
+usa o estado do servidor como base (o plano continua vindo do `/api/me`). Se o merge falhar, o próximo
+`save()` tenta de novo (no máximo a cada 15 s). Visitante não posta mais (o servidor respondia 401).
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("aparelho sem estado salvo não manda
+um estado zerado"), no `npm run test:security`.
+
+**Por que aconteceu:** o `postar:false` foi colocado no reset diário e na migração, mas o `init()` e o
+`syncPlanFromServer()` continuaram postando. Regra: com estado inteiro, ninguém escreve antes de ler.
+
+---
+
+## 2026-11-13 — Uma aba velha ou um aparelho atrasado apagava aulas e XP no servidor
+
+**Sintoma:** o aluno estudava no celular e, depois de abrir o computador (ou uma aba esquecida aberta havia
+dias), as aulas feitas no celular sumiam e o XP voltava atrás. Às vezes voltavam sozinhas no aparelho certo,
+às vezes não voltavam mais.
+
+**Causa raiz:** o `POST /api/db` grava o estado **inteiro** que o navegador manda, sem conferir versão. Quem
+postasse por último ganhava: uma aba aberta com o estado de ontem, um aparelho que ainda não tinha lido o
+servidor, ou dois POSTs que chegavam fora de ordem.
+
+**Correção:** o servidor junta o que chega com o que já estava (`progressoQueSoSobe`): XP fica com o maior; as
+aulas, mini-aulas, medalhas, chefes vencidos, baús e itens comprados ficam com a união. O resto continua "o
+último vale" (frutinhas são saldo; a sequência pode zerar). Zerar o progresso de propósito manda `reset: true`.
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("aparelho atrasado não apaga", "estado
+zerado não apaga"), no `npm run test:security`.
+
+**Por que aconteceu:** "o último vale" só é seguro com um aparelho e uma aba. O merge do navegador protegia a
+leitura, mas a escrita continuava trocando tudo. Junção sem trava ainda pode perder um item se dois POSTs
+chegarem no mesmo instante (ler e gravar não é atômico); para fechar isso de vez é preciso uma função no banco.
+
+---
+
+## 2026-11-13 — Da aula 26 em diante, o progresso da trilha não chegava ao servidor
+
+**Sintoma:** quem fez mais de 25 aulas da trilha (100 mini-aulas) continuava vendo tudo no próprio aparelho,
+mas noutro aparelho, ou depois de entrar de novo, as aulas novas tinham sumido. O painel do professor também
+parava de mostrar a atividade desse aluno.
+
+**Causa raiz:** o `POST /api/db` passa o estado pelo `sanitizeStoredJson`, que cortava **toda** lista em 100
+itens e todo objeto em 100 chaves. As mini-aulas novas entram no fim do `completedMinis`, então eram justamente
+elas que caíam. O aparelho não percebia: o merge junta o que o servidor tem com o que ele já tinha.
+
+**Correção:** o `sanitizeStoredJson` ganhou um limite (`maxItens`, padrão 100 para formulários); o estado do
+aluno usa 5000 (a trilha tem 319 aulas × 4 mini-aulas; o corpo já é limitado a 256 KB).
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("lista de progresso com mais de 100
+itens"), no `npm run test:security`.
+
+**Por que aconteceu:** o limite foi pensado para texto de formulário e aplicado ao estado inteiro. Corte
+silencioso de dado do aluno precisa de teste com um aluno avançado, não só com um aluno novo.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas

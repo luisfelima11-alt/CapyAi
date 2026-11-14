@@ -66,10 +66,15 @@ const Store = {
     
     init() {
         const saved = localStorage.getItem('capyYaraState');
+        // Aparelho sem estado próprio: no merge, o do servidor vale inteiro.
+        this._estadoNovo = !saved;
         if (saved) {
             this.state = { ...this.state, ...JSON.parse(saved) };
         } else {
-            this.save();
+            this.state = JSON.parse(this._inicial);
+            // postar:false — este estado zerado não pode chegar ao servidor
+            // antes do merge (apagava XP, frutinhas e aulas de quem tem conta).
+            this.save({ postar: false });
         }
         this.migrarStreakBR();   // backfill de lastPracticeDate, antes do reset
         this.checkDailyReset();
@@ -89,76 +94,153 @@ const Store = {
     // Aqui nada é sobrescrito: número que só cresce entra pelo MAIOR, lista de
     // conquista entra por UNIÃO. Assim mesclar duas vezes, ou nas duas ordens,
     // dá sempre o mesmo resultado — e ninguém volta no tempo.
-    async mergeFromServer() {
+    //
+    // Só posta depois de ler o servidor: o save() manda o estado INTEIRO, e
+    // antes do merge o que está na memória pode ser um estado zerado (aparelho
+    // novo) ou velho (aparelho parado há dias). Até o merge terminar, o save()
+    // grava só no aparelho e marca `_postPendente`.
+    _remoteReady: false,
+    _postPendente: false,
+    _mergeEmCurso: null,
+    _ultimoMerge: 0,
+
+    mergeFromServer() {
+        if (this._mergeEmCurso) return this._mergeEmCurso;
+        this._ultimoMerge = Date.now();
+        this._mergeEmCurso = this._mesclarComServidor()
+            .finally(() => { this._mergeEmCurso = null; });
+        return this._mergeEmCurso;
+    },
+
+    // A conta logada segundo o cache de exibição (capySession). Visitante (id
+    // 'guest' ou 'guest_…', papel 'guest') não tem progresso no servidor.
+    _contaDoCache() {
         try {
-            const bruto = localStorage.getItem('capySession');
-            if (!bruto) return;
-            const sessao = JSON.parse(bruto);
-            if (!sessao || !sessao.id || sessao.id === 'guest') return;
+            const s = JSON.parse(localStorage.getItem('capySession') || 'null');
+            if (!s || !s.id || s.role === 'guest') return null;
+            const id = String(s.id);
+            return (id === 'guest' || id.startsWith('guest_')) ? null : s;
+        } catch (e) { return null; }
+    },
+
+    async _mesclarComServidor() {
+        try {
+            // A sessão VERIFICADA (e o CSRF desta aba) antes de qualquer coisa.
+            if (window.Auth && typeof window.Auth.ready === 'function') {
+                try { await window.Auth.ready(); } catch (e) { /* segue com o cache */ }
+            }
+            const conta = this._contaDoCache();
+            if (!conta) return;
 
             const r = await fetch('/api/db?type=state');
             if (!r.ok) return;
             const remoto = await r.json();
-            if (!remoto || typeof remoto !== 'object') return;
-
-            const maior = ['xp', 'streakDays', 'starBerries'];
-            const uniao = ['badges', 'completedLessons', 'completedMinis',
-                           'purchasedItems', 'bossesBeaten', 'chestsOpened'];
             let mudou = false;
-
-            for (const k of maior) {
-                const v = Number(remoto[k]);
-                if (Number.isFinite(v) && v > (Number(this.state[k]) || 0)) {
-                    this.state[k] = v; mudou = true;
+            if (remoto && typeof remoto === 'object') {
+                if (this._estadoNovo) {
+                    // Nada de próprio neste aparelho: o servidor é a base, e o
+                    // que já foi feito nesta página entra por cima. Campo a campo
+                    // aqui postaria zerado tudo o que o merge não cobre
+                    // (frutinhas, freezes, aulas criadas, metas...).
+                    const local = this.state;
+                    const base = { ...local, ...remoto };
+                    // O plano é do /api/me, nunca de uma cópia salva.
+                    for (const k of ['planType', 'planExpiresAt', 'kiwifySubscriptionId', 'aiUsageLimit']) base[k] = local[k];
+                    this.state = base;
+                    this._mesclar(local);
+                    this.checkDailyReset();   // a cópia do servidor pode ser de ontem
+                    mudou = true;
+                } else {
+                    mudou = this._mesclar(remoto);
                 }
             }
-            for (const k of uniao) {
-                if (!Array.isArray(remoto[k])) continue;
-                const atual = Array.isArray(this.state[k]) ? this.state[k] : [];
-                const juntos = [...new Set([...atual, ...remoto[k]])];
-                if (juntos.length !== atual.length) { this.state[k] = juntos; mudou = true; }
-            }
-            // completedActivities é objeto de contadores: fica o maior de cada
-            if (remoto.completedActivities && typeof remoto.completedActivities === 'object') {
-                const alvo = this.state.completedActivities || (this.state.completedActivities = {});
-                for (const [k, v] of Object.entries(remoto.completedActivities)) {
-                    if (Number(v) > (Number(alvo[k]) || 0)) { alvo[k] = v; mudou = true; }
-                }
-            }
-            // Perfil: o servidor só preenche o que aqui está vazio.
-            // aiNivel/aiEstilo: dificuldade e estilo da conversa com a Yara (28/set).
-            for (const k of ['englishLevel', 'playerName', 'aiPersona', 'aiNivel', 'aiEstilo']) {
-                if (!this.state[k] && remoto[k]) { this.state[k] = remoto[k]; mudou = true; }
-            }
-            for (const k of ['goals', 'interests']) {
-                if (Array.isArray(remoto[k]) && remoto[k].length &&
-                    !(this.state[k] || []).length) { this.state[k] = remoto[k]; mudou = true; }
-            }
-            // Datas de prática entram por MAIS RECENTE. "Praticou no dia X" é
-            // fato positivo, igual a badge: nunca some, e as duas ordens de
-            // sincronização dão o mesmo resultado.
-            const dataISO = /^\d{4}-\d{2}-\d{2}$/;
-            for (const k of ['lastPracticeDate', 'streakCoveredThrough']) {
-                const v = typeof remoto[k] === 'string' ? remoto[k] : '';
-                if (dataISO.test(v) && v > (this.state[k] || '')) { this.state[k] = v; mudou = true; }
-            }
-            // streakFreezes fica FORA do merge de propósito: é saldo gastável,
-            // e entrar por MAIOR reembolsaria o freeze a cada sincronização.
+            this._estadoNovo = false;
 
-            // planType NÃO entra aqui: quem manda nele é o /api/me.
-
-            // streakDays entrou por MAIOR lá em cima. Sozinho, isso
-            // ressuscitaria a streak de um aparelho parado há uma semana.
-            // Reavaliar contra a data mesclada é o que impede: o número só
-            // sobrevive se a data justificar.
+            // streakDays entrou por MAIOR. Sozinho, isso ressuscitaria a streak
+            // de um aparelho parado há uma semana. Reavaliar contra a data
+            // mesclada é o que impede: o número só sobrevive se a data justificar.
             const antes = JSON.stringify([this.state.streakDays, this.state.streakActive,
                                           this.state.streakFreezes, this.state.streakCoveredThrough]);
             this.resolverStreak();
             const depois = JSON.stringify([this.state.streakDays, this.state.streakActive,
                                            this.state.streakFreezes, this.state.streakCoveredThrough]);
 
-            if (mudou || antes !== depois) this.save();
+            this._remoteReady = true;
+            if (mudou || antes !== depois || this._postPendente) this.save();
         } catch (e) { /* offline ou sem sessão: segue com o que tem local */ }
+    },
+
+    // As regras do merge, campo a campo. Devolve true se algo mudou.
+    _mesclar(remoto) {
+        const maior = ['xp', 'streakDays', 'starBerries'];
+        const uniao = ['badges', 'completedLessons', 'completedMinis',
+                       'purchasedItems', 'bossesBeaten', 'chestsOpened'];
+        let mudou = false;
+
+        for (const k of maior) {
+            const v = Number(remoto[k]);
+            if (Number.isFinite(v) && v > (Number(this.state[k]) || 0)) {
+                this.state[k] = v; mudou = true;
+            }
+        }
+        for (const k of uniao) {
+            if (!Array.isArray(remoto[k])) continue;
+            const atual = Array.isArray(this.state[k]) ? this.state[k] : [];
+            const juntos = [...new Set([...atual, ...remoto[k]])];
+            if (juntos.length !== atual.length) { this.state[k] = juntos; mudou = true; }
+        }
+        // completedActivities é objeto de contadores: fica o maior de cada
+        if (remoto.completedActivities && typeof remoto.completedActivities === 'object') {
+            const alvo = this.state.completedActivities || (this.state.completedActivities = {});
+            for (const [k, v] of Object.entries(remoto.completedActivities)) {
+                if (Number(v) > (Number(alvo[k]) || 0)) { alvo[k] = v; mudou = true; }
+            }
+        }
+        // Perfil: o servidor só preenche o que aqui está vazio.
+        // aiNivel/aiEstilo: dificuldade e estilo da conversa com a Yara (28/set).
+        for (const k of ['englishLevel', 'playerName', 'aiPersona', 'aiNivel', 'aiEstilo']) {
+            if (!this.state[k] && remoto[k]) { this.state[k] = remoto[k]; mudou = true; }
+        }
+        for (const k of ['goals', 'interests']) {
+            if (Array.isArray(remoto[k]) && remoto[k].length &&
+                !(this.state[k] || []).length) { this.state[k] = remoto[k]; mudou = true; }
+        }
+        // Datas de prática entram por MAIS RECENTE. "Praticou no dia X" é
+        // fato positivo, igual a badge: nunca some, e as duas ordens de
+        // sincronização dão o mesmo resultado.
+        const dataISO = /^\d{4}-\d{2}-\d{2}$/;
+        for (const k of ['lastPracticeDate', 'streakCoveredThrough']) {
+            const v = typeof remoto[k] === 'string' ? remoto[k] : '';
+            if (dataISO.test(v) && v > (this.state[k] || '')) { this.state[k] = v; mudou = true; }
+        }
+        // streakFreezes fica FORA do merge de propósito: é saldo gastável,
+        // e entrar por MAIOR reembolsaria o freeze a cada sincronização.
+
+        // planType NÃO entra aqui: quem manda nele é o /api/me.
+        return mudou;
+    },
+
+    // ── Zerar o progresso de propósito (progress.html, settings.html) ────────
+    // Apagar a chave do localStorage não zera: o merge traz tudo de volta do
+    // servidor, que só aceita baixar o progresso com `reset: true`. Devolve
+    // false se o servidor não confirmou (a página avisa o aluno).
+    async resetProgress() {
+        if (this._mergeEmCurso) { try { await this._mergeEmCurso; } catch (e) { /* segue */ } }
+        this.state = JSON.parse(this._inicial);
+        this._estadoNovo = false;
+        this.checkDailyReset();               // grava só no aparelho
+        const conta = this._contaDoCache();
+        if (!conta) return true;
+        localStorage.setItem('capyYaraState_' + conta.id, JSON.stringify(this.state));
+        try {
+            const r = await fetch('/api/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'state', reset: true, payload: this.state })
+            });
+            if (r.ok) { this._remoteReady = true; this._postPendente = false; }
+            return r.ok;
+        } catch (e) { return false; }
     },
 
     // ── Plan helpers ───────────────────────────────────────────────────────────
@@ -382,18 +464,22 @@ const Store = {
         if (!postar) return;
 
         try {
-            const b = localStorage.getItem('capySession');
-            if (b) {
-                const session = JSON.parse(b);
-                if (session && session.id && session.id !== 'guest') {
-                    localStorage.setItem('capyYaraState_' + session.id, JSON.stringify(this.state));
-                    fetch('/api/db', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'state', userId: session.id, payload: this.state })
-                    }).catch(e => {});
-                }
+            const session = this._contaDoCache();
+            if (!session) return;
+            localStorage.setItem('capyYaraState_' + session.id, JSON.stringify(this.state));
+            if (!this._remoteReady) {
+                // Ainda não leu o servidor: posta quando o merge terminar. Se o
+                // merge falhou (rede), tenta de novo, no máximo a cada 15 s.
+                this._postPendente = true;
+                if (!this._mergeEmCurso && Date.now() - this._ultimoMerge > 15000) this.mergeFromServer();
+                return;
             }
+            this._postPendente = false;
+            fetch('/api/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'state', userId: session.id, payload: this.state })
+            }).catch(e => {});
         } catch(e) {}
     },
 
@@ -650,6 +736,9 @@ const Store = {
 // e uma página esquecida volta a falhar em silêncio. A exposição aqui conserta
 // todos de uma vez e mantém os dois nomes válidos.
 window.Store = Store;
+
+// O estado de quem nunca usou o app, para começar do zero sem herdar a memória.
+Store._inicial = JSON.stringify(Store.state);
 
 // Immediately initialize
 Store.init();
