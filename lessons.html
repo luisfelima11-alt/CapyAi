@@ -2032,29 +2032,34 @@ function answerQuiz(btn, chosen, correct) {
       quizDone = true;
       // Analytics: quiz finished (fires once per completion)
       if (window.capyTrack) capyTrack('quiz_finish', { lessonId: String(currentLesson.id) });
-      renderQuizFinish();
+      renderQuizFinish(true);
     }
     else renderQuiz();
   }, isCorrect ? 1100 : 2600);   // tempo de ler a confirmação, sobretudo no erro
 }
-function renderQuizFinish() {
+// `concluiuAgora` só é true quando a última resposta acabou de ser dada. Trocar
+// de aba chama renderQuiz() de novo, que redesenha esta tela: antes ela pagava
+// o XP outra vez a cada clique (Quiz → Flashcards → Quiz = XP infinito).
+function renderQuizFinish(concluiuAgora = false) {
   const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
     ? aiQuizQuestions.length
     : (shuffledQuiz.length || currentLesson.quiz.length);
   const pct = Math.round((quizScore / qLen) * 100);
   const stars = pct === 100 ? 3 : pct >= 60 ? 2 : 1;
-  markToolDone(currentLesson.id, 'quiz', stars);
-  addXPToProgress(currentLesson.id, quizScore * 5);
-  if (window.Store) {
-    Store.activateStreak();
-    Store.completeActivity('lessons');
-    if (pct >= 60) {
-      Store.completeLesson(currentLesson.id, _lessonLanguage());
-      if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
-    }
-    if (pct >= 60 && window.CapyCelebra) {
-      CapyCelebra.mostrar({ tipo: 'licao', titulo: 'Lição concluída!',
-                            subtitulo: currentLesson.emoji + ' ' + currentLesson.title });
+  if (concluiuAgora) {
+    markToolDone(currentLesson.id, 'quiz', stars);
+    addXPToProgress(currentLesson.id, quizScore * 5);
+    if (window.Store) {
+      Store.activateStreak();
+      Store.completeActivity('lessons');
+      if (pct >= 60) {
+        Store.completeLesson(currentLesson.id, _lessonLanguage());
+        if (_lessonLanguage() === 'en') Store.completeLesson('j' + currentLesson.id);
+      }
+      if (pct >= 60 && window.CapyCelebra) {
+        CapyCelebra.mostrar({ tipo: 'licao', titulo: 'Lição concluída!',
+                              subtitulo: currentLesson.emoji + ' ' + currentLesson.title });
+      }
     }
   }
   document.getElementById('panel-quiz').innerHTML = `
@@ -2655,16 +2660,20 @@ function answerListen(btn, isCorrect) {
   }
   setTimeout(() => {
     listenIdx++;
-    if (listenIdx >= vocab.length) { listenDone = true; renderListenFinish(); }
+    if (listenIdx >= vocab.length) { listenDone = true; renderListenFinish(true); }
     else renderListen();
   }, isCorrect ? 1600 : 2400);   // tempo de ler a palavra revelada, não só de ouvir o som
 }
-function renderListenFinish() {
+// Mesma regra do renderQuizFinish: paga só quando acabou de terminar, não a
+// cada vez que o aluno volta para a aba.
+function renderListenFinish(concluiuAgora = false) {
   const total = shuffledVocab.length || currentLesson.vocab.length;
   const pct   = Math.round((listenScore / total) * 100);
   const stars  = pct === 100 ? 3 : pct >= 70 ? 2 : 1;
-  markToolDone(currentLesson.id, 'listen', stars);
-  addXPToProgress(currentLesson.id, listenScore * 5);
+  if (concluiuAgora) {
+    markToolDone(currentLesson.id, 'listen', stars);
+    addXPToProgress(currentLesson.id, listenScore * 5);
+  }
   document.getElementById('panel-listen').innerHTML = `
     <div class="text-center bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
       <div class="text-5xl mb-3">${pct===100?'🎉':pct>=70?'👂':'💪'}</div>

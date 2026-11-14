@@ -1,5 +1,112 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — O lembrete diário prometia salvar uma sequência que já tinha acabado
+
+**Sintoma:** aluna que parou de estudar há duas semanas com 12 dias seguidos recebia todo dia, às 19h, o
+e-mail "🔥 Sua streak está em perigo! (streak de 12 dias!) … Sua streak de 12 dias expira à meia-noite!".
+Quando voltava ao app, a sequência estava em 0.
+
+**Causa raiz:** a sequência só é recalculada no navegador (`resolverStreak` no `store.js`). O banco guarda o
+`streakDays` do último dia em que o aluno abriu o app. O `/api/send-reminders` lia esse número cru, sem olhar
+a data da última prática, e ainda sorteava mensagens que falam de streak para quem não tem mais nenhuma.
+
+**Correção:** `sequenciaParaSalvarHoje(d, hoje)` aplica no servidor as regras do `resolverStreak` (última
+prática ou dia coberto ontem; com um dia de falta, só com 🧊). O assunto e a frase "expira à meia-noite" usam
+esse número. Quem já perdeu a sequência recebe só a mensagem que não fala de streak.
+
+**Como pegar isso de novo:** `tests/lembrete-streak.test.js` roda o cron com relógio falso e quatro alunas
+(sumida, praticou ontem, faltou com 🧊, faltou sem 🧊), em várias rodadas por causa do sorteio.
+
+**Por que aconteceu:** número derivado (a sequência) salvo como se fosse fato. Quem lê o `streakDays` do banco
+precisa reavaliá-lo contra a data, do mesmo jeito que o navegador faz ao abrir.
+
+---
+
+## 2026-11-13 — Quem usava a IA à noite ficava bloqueado na manhã seguinte
+
+**Sintoma:** o visitante usava os 3 usos de IA às 22h. Na manhã seguinte o app mostrava "3 chats left today",
+mas toda mensagem para a Yara falhava ("A conversa está indisponível") até as 21h.
+
+**Causa raiz:** dois relógios para o mesmo limite. O navegador zera o contador (`aiUsageToday`) à meia-noite
+de Brasília (`capyHojeBR`). O servidor (`checkRateLimit` no `api/index.js`) montava o balde com o dia UTC,
+que vira às 21h de Brasília: os usos das 21h às 24h caíam no balde do dia seguinte.
+
+**Correção:** o balde do servidor usa `diaBrasil()`, o mesmo dia do navegador. O tempo de espera do contador
+em memória (`retryAfter`) passou a contar até a meia-noite de Brasília. **Mudança de regra:** o limite do
+servidor renova à meia-noite de Brasília, não mais às 21h.
+
+**Como pegar isso de novo:** `tests/limite-ia-dia-br.test.js` (relógio falso: uso às 22h e volta de manhã;
+21h30 ainda é o mesmo dia; tempo de espera até a meia-noite).
+
+**Por que aconteceu:** `toISOString().slice(0, 10)` é o dia de Greenwich. Todo "dia" que o aluno sente
+(limite, sequência, desafio do dia) tem que ser o dia de Brasília, nos dois lados.
+
+---
+
+## 2026-11-13 — Com a página aberta na virada do dia, o freeze não protegia a sequência
+
+**Sintoma:** aluno com 🧊 Streak Freeze (80 🫐) faltou um dia, deixou a página aberta desde a noite anterior e
+estudou depois da meia-noite: a sequência recomeçou em 1 e o freeze continuou no bolso, sem uso.
+
+**Causa raiz:** o freeze só é conferido no `resolverStreak`, que roda ao ABRIR o app (`checkDailyReset`). O
+`activateStreak` olhava o buraco entre a última prática e hoje e, com dois dias de distância, recomeçava em 1
+sem passar pelo freeze.
+
+**Correção:** o `activateStreak` chama o `resolverStreak` (que é idempotente) antes de contar o dia. Com
+freeze, a sequência continua; sem freeze, recomeça em 1 como antes.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` ("página aberta na virada do dia"), com o relógio
+falso avançando no meio do teste.
+
+**Por que aconteceu:** regra de "virada do dia" amarrada ao carregamento da página. Quem estuda à noite deixa
+a aba aberta; toda regra que depende do dia tem que valer também no momento da ação.
+
+---
+
+## 2026-11-13 — Relógio adiantado zerava a sequência de quem estudou
+
+**Sintoma:** aluno com o celular alguns minutos adiantado estudava às 23h55. O celular gravava a prática
+como "amanhã". Quando o relógio voltava ao certo, ou quando o estado chegava ao computador (que está com a
+hora certa), a sequência de dias ia a zero, e praticar de novo recomeçava em 1.
+
+**Causa raiz:** `resolverStreak` tratava data de prática no futuro (`gap < 0`) como dado inválido e zerava
+`streakDays`. O `activateStreak` também recomeçava em 1 nesse caso. O merge entre aparelhos leva a data mais
+recente, então a data do futuro se espalhava para os outros aparelhos do aluno.
+
+**Correção:** `trazerDatasParaHoje(hoje)`, chamado no `resolverStreak` e no `activateStreak`: data de prática
+(ou de freeze) depois de hoje vira hoje. A prática aconteceu de verdade, no máximo agora, então conta como
+"praticou hoje". A migração antiga já fazia o mesmo com o rótulo UTC.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` (3 testes de relógio adiantado, com o `store.js`
+real e relógio falso).
+
+**Por que aconteceu:** data que vem do relógio do aparelho não é confiável. Toda conta de "quantos dias
+desde" precisa decidir o que fazer com uma data no futuro em vez de tratá-la como erro e apagar progresso.
+
+---
+
+## 2026-11-13 — Trocar de aba na lição pagava o XP do Quiz e do Listen de novo
+
+**Sintoma:** no `lessons.html`, depois de terminar o Quiz (ou o Listen), bastava clicar em outra aba e
+voltar: a tela "Quiz Concluído!" aparecia de novo e o XP da rodada era somado outra vez, a cada clique.
+Três idas e voltas transformavam 20 XP em 80. Dava para subir de nível sem responder nada.
+
+**Causa raiz:** quem pagava o XP era a função que DESENHA a tela de fim (`renderQuizFinish`,
+`renderListenFinish`). Trocar de aba chama `renderQuiz()`/`renderListen()`, que, com a rodada já
+terminada, redesenham a tela de fim, e com ela o pagamento.
+
+**Correção:** as duas telas de fim recebem `concluiuAgora`. Só o momento em que a última resposta é dada
+passa `true` e paga (XP, `markToolDone`, streak, lição concluída, comemoração). Redesenhar só mostra.
+O "🔄 Refazer" continua pagando a nova rodada, porque é prática de verdade.
+
+**Como pegar isso de novo:** `tests/xp-uma-vez.spec.js` termina o Quiz e o Listen e troca de aba três
+vezes, conferindo que o XP não muda.
+
+**Por que aconteceu:** função de desenhar com efeito colateral. Tela que pode ser redesenhada (troca de
+aba, voltar, atualizar) não pode pagar nada; o pagamento fica no evento que só acontece uma vez.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas
