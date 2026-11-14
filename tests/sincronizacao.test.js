@@ -215,3 +215,24 @@ test('store: aparelho sem estado salvo não manda um estado zerado antes de ler 
   assert.equal(servidor.estado.starBerries, 400, 'as frutinhas do servidor continuam');
   assert.equal(servidor.estado.customLessons.length, 1, 'as aulas criadas pelo aluno continuam');
 });
+
+test('store: "zerar progresso" de quem tem conta zera no servidor e não volta com o merge', async () => {
+  const loja = aparelhoDaAna();
+  const servidor = { estado: { xp: 700, completedLessons: ['a1', 'a2'], badges: ['week_warrior'] }, posts: [] };
+  const pagina = abrirPagina({ loja, servidor, auth: { usuario: ANA } });
+  pagina.init();
+  await esperar();
+  assert.equal(pagina.state.xp, 700);
+
+  // O que progress.html e settings.html fazem agora.
+  assert.equal(await pagina.resetProgress(), true);
+  assert.equal(servidor.posts.at(-1).reset, true, 'o servidor só aceita baixar o progresso com reset: true');
+
+  // Recarregou a página: o merge não traz nada de volta.
+  const depois = abrirPagina({ loja, servidor, auth: { usuario: ANA } });
+  depois.init();
+  await esperar();
+  assert.equal(depois.state.xp, 0);
+  assert.deepEqual([...depois.state.completedLessons], []);
+  assert.deepEqual([...depois.state.badges], []);
+});

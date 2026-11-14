@@ -220,6 +220,29 @@ const Store = {
         return mudou;
     },
 
+    // ── Zerar o progresso de propósito (progress.html, settings.html) ────────
+    // Apagar a chave do localStorage não zera: o merge traz tudo de volta do
+    // servidor, que só aceita baixar o progresso com `reset: true`. Devolve
+    // false se o servidor não confirmou (a página avisa o aluno).
+    async resetProgress() {
+        if (this._mergeEmCurso) { try { await this._mergeEmCurso; } catch (e) { /* segue */ } }
+        this.state = JSON.parse(this._inicial);
+        this._estadoNovo = false;
+        this.checkDailyReset();               // grava só no aparelho
+        const conta = this._contaDoCache();
+        if (!conta) return true;
+        localStorage.setItem('capyYaraState_' + conta.id, JSON.stringify(this.state));
+        try {
+            const r = await fetch('/api/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'state', reset: true, payload: this.state })
+            });
+            if (r.ok) { this._remoteReady = true; this._postPendente = false; }
+            return r.ok;
+        } catch (e) { return false; }
+    },
+
     // ── Plan helpers ───────────────────────────────────────────────────────────
     isPro()   { return this.state.planType === 'pro' || this.state.planType === 'super'; },
     isSuper() { return this.state.planType === 'super'; },

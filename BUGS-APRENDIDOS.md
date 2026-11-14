@@ -1,5 +1,28 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-14 — "Zerar progresso" não zerava (e, para quem tem conta, voltava)
+
+**Sintoma:** em Configurações, o pai respondia a conta, confirmava "All XP, badges, and streaks will be lost",
+via "Progress reset!" e o XP continuava lá. Na página de Progresso, quem tem conta zerava e, ao recarregar,
+tudo voltava (às vezes sim, às vezes não).
+
+**Causa raiz:** as duas páginas só apagavam `capyYaraState` do aparelho. O `settings.html` chamava
+`Store.init()` em seguida, e o `init()` sem estado salvo regravava o estado que ainda estava na memória: não
+zerava nada. No `progress.html`, o recarregar postava um estado zerado ao mesmo tempo em que o merge lia o
+servidor; se a leitura chegasse antes, o merge trazia tudo de volta. Com o servidor agora recusando baixar o
+progresso sem pedido explícito, nem essa corrida sobraria.
+
+**Correção:** `Store.resetProgress()` zera a memória e o aparelho e manda `reset: true` ao servidor (o único
+jeito de baixar o progresso salvo); as duas páginas usam ela e avisam o aluno se o servidor não confirmar.
+
+**Como pegar isso de novo:** `node --test tests/sincronizacao.test.js` ("zerar progresso de quem tem conta"),
+no `npm run test:security`.
+
+**Por que aconteceu:** "zerar" foi escrito como "apagar a chave do localStorage", que só funcionava quando o
+progresso morava apenas no aparelho. Com servidor no meio, zerar é uma operação do servidor.
+
+---
+
 ## 2026-11-13 — Abrir o app num aparelho novo podia zerar o progresso salvo na conta
 
 **Sintoma:** o aluno com conta abria o site num aparelho novo (ou depois de limpar o navegador) e o XP, as

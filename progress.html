@@ -242,9 +242,12 @@
     }).join('');
   }
 
-  function resetProgress() {
+  async function resetProgress() {
     if (!confirm('Reset all your progress? This cannot be undone.')) return;
-    localStorage.removeItem('capyYaraState');
+    // Store.resetProgress zera também no servidor; só apagar o localStorage
+    // deixava o merge trazer tudo de volta para quem tem conta.
+    const ok = await Store.resetProgress();
+    if (!ok) { alert('Não foi possível zerar agora. Confira a internet e tente de novo.'); return; }
     location.reload();
   }
 
