@@ -1,5 +1,5 @@
-// Página de Preparação de aula (piloto: francês), 09/nov/2026.
-// A voz (tts-fr.js) e o microfone (CapyMic) são trocados por dublês: o teste
+// Página de Preparação de aula: francês (09/nov/2026) e Agro English 11–15 (14/nov).
+// A voz (tts-fr.js, tts-en.js) e o microfone (CapyMic) são trocados por dublês: o teste
 // confere o caminho do aluno, não a OpenAI.
 const { test, expect } = require('playwright/test');
 const fs = require('fs');
@@ -7,6 +7,8 @@ const path = require('path');
 
 const ALUNA = { id: 'aluna-teste', name: 'Ana Souza', email: 'ana@example.test', role: 'student' };
 const AULA3 = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'preparacao', 'fr_aula_03.json'), 'utf8'));
+const AGRO15 = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'preparacao', 'agro_aula_15.json'), 'utf8'));
+const DUBLE_VOZ_EN = 'window.__falasEn = []; window.speakEnEnd = (t, o) => { window.__falasEn.push({ t: String(t), voice: o && o.voice, mp3: o && o.mp3 }); return Promise.resolve(true); }; window.speakEnStop = () => {};';
 const DUBLE_VOZ = 'window.__falas = []; window.speakFrEnd = t => { window.__falas.push(String(t)); return Promise.resolve(true); }; window.speakFrStop = () => {};';
 
 async function abrir(page, url, { concluidas = [], extra = {} } = {}) {
@@ -17,6 +19,7 @@ async function abrir(page, url, { concluidas = [], extra = {} } = {}) {
     for (const [k, v] of Object.entries(ex)) localStorage.setItem(k, JSON.stringify(v));
   }, [ALUNA, concluidas, extra]);
   await page.route('**/tts-fr.js*', route => route.fulfill({ contentType: 'text/javascript', body: DUBLE_VOZ }));
+  await page.route('**/tts-en.js*', route => route.fulfill({ contentType: 'text/javascript', body: DUBLE_VOZ_EN }));
   await page.route('**/api/**', async route => {
     const req = route.request();
     const caminho = new URL(req.url()).pathname;
@@ -56,7 +59,7 @@ test('a sessão inteira: ouvir, palavras, ler, reparar, falar — e o teacher re
 
   // 1. Ouvir: o diálogo inteiro na voz, sem o texto na tela.
   await expect(page.getByText('Ouça a conversa, sem ler')).toBeVisible();
-  await expect(page.locator('#passo')).not.toContainText(AULA3.dialogo.linhas[0].fr);
+  await expect(page.locator('#passo')).not.toContainText(AULA3.dialogo.linhas[0].txt);
   await page.getByRole('button', { name: '▶ Ouvir a conversa' }).click();
   await expect(page.locator('#tocando')).toContainText('Ouviu tudo');
   expect(await page.evaluate(() => window.__falas.length)).toBe(AULA3.dialogo.linhas.length);
@@ -80,7 +83,7 @@ test('a sessão inteira: ouvir, palavras, ler, reparar, falar — e o teacher re
   await page.click('#seguir');
 
   // 3. Ler: o texto aparece; tocar numa palavra sublinhada mostra a tradução.
-  await expect(page.locator('#passo')).toContainText(AULA3.dialogo.linhas[0].fr.slice(0, 20));
+  await expect(page.locator('#passo')).toContainText(AULA3.dialogo.linhas[0].txt.slice(0, 20));
   await page.locator('.palavra-lida').first().click();
   await expect(page.locator('[data-glossa]:visible').first()).toContainText('=');
   await page.click('#seguir');
@@ -94,13 +97,13 @@ test('a sessão inteira: ouvir, palavras, ler, reparar, falar — e o teacher re
   // 5. Falar: 3 frases no microfone (com o balde de voz da preparação) e a pergunta.
   await micDeMentira(page);
   for (const [i, f] of AULA3.repetir.entries()) {
-    await page.evaluate(t => { window.__fala = t; }, i === 1 ? 'je ne sais pas' : f.fr);
+    await page.evaluate(t => { window.__fala = t; }, i === 1 ? 'je ne sais pas' : f.txt);
     const gravar = page.locator(`[data-frase="${i}"] [data-gravar]`);
     await gravar.click();
     await gravar.click();
     if (i === 1) {
       await expect(page.locator('[data-frase="1"] [data-fb]')).toContainText('Quase');
-      await page.evaluate(t => { window.__fala = t; }, f.fr);
+      await page.evaluate(t => { window.__fala = t; }, f.txt);
       await gravar.click();
       await gravar.click();
     }
@@ -175,7 +178,7 @@ test('sem microfone: o aluno fala em voz alta e digita', async ({ page }) => {
   await expect(page.locator('#sem-mic')).toContainText('O microfone está bloqueado');
   for (const [i, f] of A1.repetir.entries()) {
     const inp = page.locator(`[data-frase="${i}"] [data-digitar]`);
-    await inp.fill(f.fr);
+    await inp.fill(f.txt);
     await inp.press('Tab');
     await expect(page.locator(`[data-frase="${i}"] [data-fb]`)).toContainText('Muito bem');
   }
@@ -202,4 +205,128 @@ test('home de quem já estuda francês: o card leva à próxima aula a preparar'
   await expect(page.locator('#prep-atalho')).toBeVisible();
   await expect(page.locator('#prep-atalho')).toContainText('Aula 4');
   await expect(page.locator('#prep-atalho')).toHaveAttribute('href', 'preparacao.html?aula=fr_aula_04');
+});
+
+// ── Agro English, aulas 11 a 15 ─────────────────────────────────────────────
+
+test('Agro: a lista do curso, o seletor de curso e a volta ao último curso aberto', async ({ page }) => {
+  await abrir(page, '/preparacao.html?curso=agro', { extra: { capyAgroCompleted: [9, 10, 11] } });
+  await expect(page.locator('#proxima')).toContainText('Aula 12 · Yesterday We Harvested');
+  await expect(page.locator('#comecar')).toHaveAttribute('href', 'preparacao.html?aula=agro_aula_12');
+  await expect(page.locator('ul > li')).toHaveCount(5);
+  await expect(page.locator('#cursos [aria-current="true"]')).toContainText('Agro English');
+  // Sem curso na URL, volta para o último aberto (Agro); o seletor leva ao francês.
+  await page.goto('/preparacao.html');
+  await expect(page.locator('#cursos [aria-current="true"]')).toContainText('Agro English');
+  await page.locator('#cursos a', { hasText: 'Francês' }).click();
+  await expect(page.locator('ul > li')).toHaveCount(12);
+  await expect(page.locator('#cursos [aria-current="true"]')).toContainText('Francês');
+});
+
+test('Agro 15: a sessão inteira em inglês, com as duas vozes, e a aula abre com o Prepare feito', async ({ page }) => {
+  const enviadas = await abrir(page, '/preparacao.html?aula=agro_aula_15', { extra: { capyAgroCompleted: [11, 12, 13, 14] } });
+
+  // 1. Ouvir: as 12 falas principais, cada uma na voz do personagem, sem texto na tela.
+  await expect(page.locator('#passo')).not.toContainText(AGRO15.dialogo.linhas[0].txt);
+  await page.getByRole('button', { name: '▶ Ouvir a conversa' }).click();
+  await expect(page.locator('#tocando')).toContainText('Ouviu tudo');
+  const falas = await page.evaluate(() => window.__falasEn);
+  expect(falas.map(f => f.t)).toEqual(AGRO15.dialogo.linhas.map(l => l.txt));
+  expect(falas.map(f => f.voice)).toEqual(AGRO15.dialogo.linhas.map(l => l.voz));
+  expect(new Set(falas.map(f => f.voice)).size).toBe(2);
+  expect(await page.evaluate(() => window.__falas.length)).toBe(0);      // nada pela voz do francês
+  for (const [i, c] of AGRO15.compreensao.entries()) await page.locator(`[data-pergunta="${i}"] [data-opcao="${c.a}"]`).click();
+  await page.click('#seguir');
+
+  // 2. Palavras: a 1ª "ainda não", as outras "já sabia".
+  let vistas = 0;
+  while (await page.locator('[data-virar]').count()) {
+    await page.click('[data-virar]');
+    const repetindo = await page.getByText('De novo: esta você ainda não sabia').count();
+    await page.click(!repetindo && vistas < 1 ? '[data-sabia="0"]' : '[data-sabia="1"]');
+    if (!repetindo) vistas++;
+  }
+  await page.click('#seguir');
+
+  // 3. Ler: "to plant" fica sublinhado em "plant"/"planting"; "seed" em "seeds".
+  const sublinhadas = (await page.locator('.palavra-lida').allTextContents()).map(t => t.toLowerCase());
+  expect(sublinhadas).toEqual(expect.arrayContaining(['plant', 'planting', 'seeds']));
+  await page.locator('.palavra-lida', { hasText: 'seeds' }).click();
+  await expect(page.locator('[data-glossa]:visible').first()).toContainText('seed = semente');
+  await page.click('#seguir');
+
+  // 4. Reparar: fala do curso, sem "franceses".
+  await expect(page.locator('#passo')).toContainText('Repare em como se fala em inglês');
+  await expect(page.locator('mark.repare').first()).toHaveText(AGRO15.perceber[0].trecho);
+  for (const [i, p] of AGRO15.perceber.entries()) await page.locator(`[data-repare="${i}"] [data-opcao="${p.a}"]`).click();
+  await page.click('#seguir');
+
+  // 5. Falar: o Whisper escreve "I will" onde a frase tem "I'll"; conta como certo.
+  await micDeMentira(page);
+  await expect(page.locator('#pergunta')).toContainText('Responda em voz alta, em inglês');
+  for (const [i, f] of AGRO15.repetir.entries()) {
+    await page.evaluate(t => { window.__fala = t; }, f.txt.replace("I'll", 'I will').replace(/[.,!?]/g, ''));
+    const gravar = page.locator(`[data-frase="${i}"] [data-gravar]`);
+    await gravar.click();
+    await gravar.click();
+    await expect(page.locator(`[data-frase="${i}"] [data-fb]`)).toContainText('Muito bem');
+  }
+  await page.evaluate(() => { window.__fala = "Next season I'm going to plant corn."; });
+  await page.click('#responder');
+  await page.click('#responder');
+  expect(await page.evaluate(() => window.__usos.every(u => u.lang === 'en' && u.uso === 'preparacao'))).toBe(true);
+  await page.click('#seguir');
+
+  // 6. Pronto: o teacher recebe, e o passo "prepare" fica feito na aula.
+  await expect(page.locator('#passo')).toContainText('Pronto para a aula 15!');
+  await expect(page.locator('#envio')).toContainText('O seu teacher já sabe');
+  expect(enviadas).toHaveLength(1);
+  expect(enviadas[0].lessonId).toBe('agro_aula_15-prep');
+  expect(enviadas[0].lessonTitle).toContain('Agro English — Aula 15');
+  expect(enviadas[0].answers.placar).toBe('Ouvir 3/3 · Palavras 7/8 · Reparar 2/2 · Falar 3/3 · Total 94%');
+  expect(enviadas[0].answers.resposta).toBe("Next season I'm going to plant corn.");
+  const guardado = await page.evaluate(() => ({
+    passos: JSON.parse(localStorage.getItem('capyAgro15Done')),
+    palavras: Object.keys(JSON.parse(localStorage.getItem('capyPrepPalavras_en'))),
+    fr: localStorage.getItem('capyPrepPalavras_fr'),
+  }));
+  expect(guardado.passos).toEqual(['prepare']);
+  expect(guardado.palavras).toHaveLength(1);
+  expect(guardado.fr).toBeNull();
+
+  // Na aula: o Prepare mostra "já se preparou", o passo está creditado e nada é enviado de novo.
+  const xpAntes = await page.evaluate(() => window.Store.state.xp);
+  await page.getByRole('link', { name: 'Abrir a aula 15' }).click();
+  await expect(page.locator('#prep-feita')).toContainText('Você já se preparou para esta aula (94%)');
+  await expect(page.locator('#prep-abrir')).toHaveText('Refazer a preparação');
+  expect(await page.evaluate(() => creditadas.has('prepare'))).toBe(true);
+  expect(await page.evaluate(() => window.Store.state.xp)).toBe(xpAntes);
+  expect(enviadas).toHaveLength(1);
+});
+
+test('Agro: o cartão na aula leva à página; a aula 10 segue com o Prepare antigo', async ({ page }) => {
+  await abrir(page, '/agro_aula_13.html');
+  const prep = page.locator('#tab-prepare');
+  await expect(prep).toBeVisible();
+  await expect(page.locator('#prep-abrir')).toHaveAttribute('href', 'preparacao.html?aula=agro_aula_13');
+  await expect(page.locator('#prep-abrir')).toContainText('Preparar esta aula');
+  await expect(page.locator('#prep-pronto')).toHaveCount(0);            // sem o mini-Prepare: um aviso só ao teacher
+  await page.goto('/agro_aula_10.html');
+  await expect(page.locator('#prep-pronto')).toBeVisible();
+  await expect(page.locator('#prep-abrir')).toHaveCount(0);
+});
+
+test('Agro: o card do curso leva à lista de quem ainda não chegou na aula 11, e à próxima aula de quem chegou', async ({ page }) => {
+  await abrir(page, '/classes_agro.html');
+  await expect(page.locator('#prep-atalho')).toBeVisible();
+  await expect(page.locator('#prep-atalho')).toContainText('Preparação das aulas 11 a 15');
+  await expect(page.locator('#prep-atalho')).toHaveAttribute('href', 'preparacao.html?curso=agro');
+  await page.evaluate(() => localStorage.setItem('capyAgroCompleted', '[10,11,12]'));
+  await page.reload();
+  await expect(page.locator('#prep-atalho')).toContainText('Prepare a próxima aula do Agro English');
+  await expect(page.locator('#prep-atalho')).toHaveAttribute('href', 'preparacao.html?aula=agro_aula_13');
+  // Home: quem estuda só Agro vê o card do Agro.
+  await page.goto('/6_Home_Forest_Expedition.html');
+  await expect(page.locator('#prep-atalho')).toBeVisible();
+  await expect(page.locator('#prep-atalho')).toHaveAttribute('href', 'preparacao.html?aula=agro_aula_13');
 });

@@ -2,8 +2,9 @@
 // Preparação de aula — a tela (preparacao.html)
 // ══════════════════════════════════════════════════════════════════════════════
 //   preparacao.html                 → a próxima aula, palavras para revisar e a lista
+//   preparacao.html?curso=agro      → o mesmo, no curso pedido (francais, agro)
 //   preparacao.html?aula=fr_aula_03 → a sessão: Ouvir → Palavras → Ler → Reparar → Falar → Pronto
-//   preparacao.html?revisar=fr      → revisão das palavras que o aluno não sabia
+//   preparacao.html?revisar=fr      → revisão das palavras que o aluno não sabia (por idioma)
 // Os dados vêm de data/preparacao/*.json (scripts/build-preparacao.mjs). Toda
 // a lógica sem tela (próxima aula, nota da fala, placar) está em preparacao-core.js.
 // ══════════════════════════════════════════════════════════════════════════════
@@ -27,13 +28,17 @@
   ];
 
   // ── Voz ──────────────────────────────────────────────────────────────────
-  // Francês: a voz da OpenAI do tts-fr.js (regra do curso). Sem ela, o navegador.
-  function falar(texto, idioma) {
+  // Francês: a voz da OpenAI do tts-fr.js (regra do curso). Inglês: tts-en.js,
+  // com a voz do personagem e o áudio gravado da fala, quando a aula tem
+  // (`fala` é a linha do diálogo: { voz, mp3 }). Sem elas, a voz do navegador.
+  function falar(texto, idioma, fala) {
     if (idioma === 'fr' && typeof window.speakFrEnd === 'function') return window.speakFrEnd(texto);
+    const limpo = String(texto || '').replace(/\s*\/\s*/g, ', ');      // "leaf / leaves": a barra não é lida
+    if (idioma === 'en' && typeof window.speakEnEnd === 'function') return window.speakEnEnd(limpo, { voice: fala && fala.voz, mp3: fala && fala.mp3 });
     return new Promise(resolve => {
       try {
         speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(String(texto || '').replace(/\s*\([^)]*\)/g, ''));
+        const u = new SpeechSynthesisUtterance(limpo.replace(/\s*\([^)]*\)/g, ''));
         u.lang = idioma === 'fr' ? 'fr-FR' : 'en-US';
         u.rate = 0.9;
         u.onend = () => resolve(true);
@@ -44,6 +49,7 @@
   }
   function pararFala() {
     try { if (typeof window.speakFrStop === 'function') window.speakFrStop(); } catch (_) {}
+    try { if (typeof window.speakEnStop === 'function') window.speakEnStop(); } catch (_) {}
     try { speechSynthesis.cancel(); } catch (_) {}
   }
 
@@ -72,7 +78,7 @@
   // ════════════════════════════════════════════════════════════════════════
   // HUB
   // ════════════════════════════════════════════════════════════════════════
-  function hub(curso) {
+  function hub(curso, cursos) {
     const nums = P.concluidas(curso), prep = P.feitas(), prox = P.proxima(curso, nums, prep);
     const revisar = P.palavrasParaRevisar(curso.idioma);
     const link = a => `preparacao.html?aula=${encodeURIComponent(a.aula)}`;
@@ -117,7 +123,9 @@
         <p class="text-white/80 mt-2">10 a 15 minutos antes da aula ao vivo: você ouve a conversa, aprende as palavras, lê, repara no jeito de falar e fala em voz alta.</p>
         <div class="flex flex-wrap gap-2 mt-4 text-xs font-extrabold">${PASSOS.slice(0, 5).map(p => `<span class="bg-white/15 rounded-full px-3 py-1">${p.icone} ${p.nome}</span>`).join('')}</div>
       </section>
-      <div class="flex gap-2 mt-4"><span class="botao bg-navy text-white font-extrabold text-sm px-4 py-2">${esc(curso.bandeira)} ${esc(curso.nome)}</span></div>
+      <div id="cursos" class="flex flex-wrap gap-2 mt-4">${cursos.map(c => c.id === curso.id
+        ? `<span class="botao bg-navy text-white font-extrabold text-sm px-4 py-2" aria-current="true">${esc(c.bandeira)} ${esc(c.nome)}</span>`
+        : `<a href="preparacao.html?curso=${encodeURIComponent(c.id)}" class="botao bg-white text-navy font-extrabold text-sm px-4 py-2 shadow-sm">${esc(c.bandeira)} ${esc(c.nome)}</a>`).join('')}</div>
       <section id="proxima" class="bg-white rounded-[2rem] p-5 md:p-6 shadow-sm mt-4 entrar">${cartao}</section>
       ${revisar.length ? `<a id="revisar" href="preparacao.html?revisar=${encodeURIComponent(curso.idioma)}" class="mt-4 flex items-center gap-3 bg-violet-50 rounded-[1.5rem] px-5 py-4 hover:bg-violet-100">
         <span class="text-2xl" aria-hidden="true">🔁</span><span class="flex-1"><b class="block font-extrabold">Palavras para revisar: ${revisar.length}</b>
@@ -142,7 +150,7 @@
       alvo.innerHTML = `<section class="bg-white rounded-[2rem] p-6 shadow-sm text-center entrar">
         <p class="text-xs font-extrabold text-slate-400">${repetindo ? '🔁 De novo: esta você ainda não sabia' : `Palavra ${vistas.size + 1} de ${total}`}</p>
         <div class="text-5xl mt-3" aria-hidden="true">${esc(p.emoji)}</div>
-        <p class="text-3xl font-black mt-2" lang="${esc(idioma)}">${esc(p.fr)}</p>
+        <p class="text-3xl font-black mt-2" lang="${esc(idioma)}">${esc(p.txt)}</p>
         <button type="button" data-ouvir-palavra class="botao mt-3 bg-slate-100 font-extrabold px-4 py-2 text-sm">🔊 Ouvir</button>
         <div data-verso hidden class="mt-4">
           <p class="text-lg font-extrabold text-emerald-700">${esc(p.pt)}</p>
@@ -155,7 +163,7 @@
           <button type="button" data-sabia="1" class="botao bg-emerald-100 text-emerald-800 font-black py-3">✅ Já sabia</button>
         </div>
       </section>`;
-      alvo.querySelector('[data-ouvir-palavra]').addEventListener('click', () => falar(p.fr, idioma));
+      alvo.querySelector('[data-ouvir-palavra]').addEventListener('click', () => falar(p.txt, idioma));
       const ex = alvo.querySelector('[data-ouvir-exemplo]');
       if (ex) ex.addEventListener('click', () => falar(p.ex, idioma));
       alvo.querySelector('[data-virar]').addEventListener('click', ev => {
@@ -171,11 +179,11 @@
         fila.shift();
         if (!sabia && ++p.vezes < 3) fila.push(p);
         mostrar();
-        if (fila.length) falar(fila[0].fr, idioma);
+        if (fila.length) falar(fila[0].txt, idioma);
       }));
     }
     mostrar();
-    if (fila.length) falar(fila[0].fr, idioma);
+    if (fila.length) falar(fila[0].txt, idioma);
   }
 
   // ════════════════════════════════════════════════════════════════════════
@@ -185,6 +193,7 @@
     let A;
     try { A = await P.carregarAula(aulaId); } catch (_) { erro('Não consegui abrir esta preparação. Tente de novo.'); return; }
     const idioma = A.idioma;
+    const nomeDoIdioma = A.idiomaNome || curso.idiomaNome || 'francês';
     const R = {
       ouvir: A.compreensao.map(() => null),
       palavras: { sabia: 0, total: A.palavras.length },
@@ -255,7 +264,7 @@
         let falhou = false;
         for (let i = 0; i < linhas.length && tocandoAgora; i++) {
           status.textContent = `🔊 ${linhas[i].quem} (${i + 1} de ${linhas.length})`;
-          const ok = await falar(linhas[i].fr, idioma);
+          const ok = await falar(linhas[i].txt, idioma, linhas[i]);
           if (!ok && tocandoAgora) { falhou = true; break; }
         }
         status.textContent = falhou ? 'Não consegui tocar o áudio agora. Toque de novo; se não der, responda e siga.' : tocandoAgora ? '✓ Ouviu tudo. Quer ouvir de novo?' : '';
@@ -301,17 +310,27 @@
     // As palavras do passo 2 ficam sublinhadas no texto: tocar mostra a tradução.
     function destacar(texto) {
       const termos = [];
-      A.palavras.forEach(p => String(p.fr).split('/').forEach(t => {
-        const limpo = t.replace(/\([^)]*\)/g, '').trim();
-        if (limpo.length >= 2) termos.push({ t: limpo.toLowerCase(), g: `${p.fr} = ${p.pt}` });
+      // Inglês: "to check" casa com "checking" e "seed" com "seeds".
+      const ingles = idioma === 'en';
+      A.palavras.forEach(p => String(p.txt).split('/').forEach(t => {
+        let limpo = t.replace(/\([^)]*\)/g, '').trim();
+        const verbo = ingles && /^to\s+/i.test(limpo);
+        if (verbo) limpo = limpo.replace(/^to\s+/i, '');
+        if (limpo.length >= 2) termos.push({ t: limpo.toLowerCase(), g: `${p.txt} = ${p.pt}`, verbo });
       }));
       termos.sort((a, b) => b.t.length - a.t.length);
       const baixo = texto.toLowerCase(), usados = [];
       const letra = c => /[\p{L}]/u.test(c || '');
-      for (const { t, g } of termos) {
+      for (const { t, g, verbo } of termos) {
         let i = baixo.indexOf(t);
         while (i >= 0) {
-          const fim = i + t.length;
+          let fim = i + t.length;
+          if (ingles && letra(baixo[fim])) {
+            let resto = fim;
+            while (letra(baixo[resto])) resto++;
+            const sobra = baixo.slice(fim, resto);
+            if ((verbo && sobra.length <= 4) || /^(s|es)$/.test(sobra)) fim = resto;
+          }
           const livre = !usados.some(u => i < u.fim && fim > u.ini);
           if (livre && !letra(baixo[i - 1]) && !letra(baixo[fim])) { usados.push({ ini: i, fim, g }); break; }
           i = baixo.indexOf(t, i + 1);
@@ -339,7 +358,7 @@
           return `<div class="flex ${esquerda ? 'justify-start' : 'justify-end'}">
             <div data-linha="${i}" class="max-w-[88%] ${esquerda ? 'bg-white' : 'bg-sky-50'} rounded-[1.5rem] p-4 shadow-sm transition">
               <p class="text-xs font-extrabold text-pink-600">${esc(l.quem)}</p>
-              <p class="font-bold leading-relaxed mt-0.5" lang="${esc(idioma)}">${destacar(l.fr)}</p>
+              <p class="font-bold leading-relaxed mt-0.5" lang="${esc(idioma)}">${destacar(l.txt)}</p>
               <p data-glossa hidden class="text-xs font-extrabold text-emerald-700 mt-1"></p>
               <p data-trad hidden class="text-sm text-slate-500 mt-1">${esc(l.pt)}</p>
               <div class="flex gap-2 mt-2">
@@ -351,7 +370,7 @@
 
       alvo.querySelectorAll('[data-linha]').forEach(caixa => {
         const i = Number(caixa.dataset.linha);
-        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.dialogo.linhas[i].fr, idioma));
+        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.dialogo.linhas[i].txt, idioma, A.dialogo.linhas[i]));
         caixa.querySelector('[data-ver]').addEventListener('click', ev => {
           const t = caixa.querySelector('[data-trad]');
           t.hidden = !t.hidden;
@@ -375,7 +394,7 @@
           caixas.forEach(c => c.classList.remove('ring-2', 'ring-pink-400'));
           caixas[i].classList.add('ring-2', 'ring-pink-400');
           caixas[i].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-          if (!(await falar(A.dialogo.linhas[i].fr, idioma))) break;
+          if (!(await falar(A.dialogo.linhas[i].txt, idioma, A.dialogo.linhas[i]))) break;
         }
         caixas.forEach(c => c.classList.remove('ring-2', 'ring-pink-400'));
         lendo = false;
@@ -386,11 +405,11 @@
 
     // ── 4. Reparar (noticing) ──────────────────────────────────────────────
     function passoReparar(alvo) {
-      alvo.innerHTML = `<p class="text-sm text-slate-600 mb-3">Repare em como os franceses falam. São detalhes que aparecem na aula.</p>
+      alvo.innerHTML = `<p class="text-sm text-slate-600 mb-3">${idioma === 'fr' ? 'Repare em como os franceses falam.' : `Repare em como se fala em ${esc(nomeDoIdioma)}.`} São detalhes que aparecem na aula.</p>
         <div class="space-y-4">${A.perceber.map((p, i) => {
           const l = A.dialogo.linhas[p.linha];
-          const k = l.fr.indexOf(p.trecho);
-          const frase = esc(l.fr.slice(0, k)) + `<mark class="repare">${esc(p.trecho)}</mark>` + esc(l.fr.slice(k + p.trecho.length));
+          const k = l.txt.indexOf(p.trecho);
+          const frase = esc(l.txt.slice(0, k)) + `<mark class="repare">${esc(p.trecho)}</mark>` + esc(l.txt.slice(k + p.trecho.length));
           return `<section class="bg-white rounded-[2rem] p-5 shadow-sm entrar" data-repare="${i}">
             <p class="text-xs font-extrabold text-pink-600">👀 Repare · ${esc(l.quem)}</p>
             <p class="text-lg font-bold mt-1 leading-relaxed" lang="${esc(idioma)}">${frase}</p>
@@ -402,7 +421,7 @@
         }).join('')}</div>`;
       alvo.querySelectorAll('[data-repare]').forEach(caixa => {
         const i = Number(caixa.dataset.repare), p = A.perceber[i];
-        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.dialogo.linhas[p.linha].fr, idioma));
+        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.dialogo.linhas[p.linha].txt, idioma, A.dialogo.linhas[p.linha]));
         caixa.querySelectorAll('[data-opcao]').forEach(b => b.addEventListener('click', () => {
           const ok = responder(caixa, b, p.a);
           R.perceber[i] = ok;
@@ -427,7 +446,7 @@
         <div class="space-y-4">${A.repetir.map((f, i) => `
           <section class="bg-white rounded-[2rem] p-5 shadow-sm" data-frase="${i}">
             <p class="text-xs font-extrabold text-slate-400">Frase ${i + 1} de ${A.repetir.length}</p>
-            <p class="text-lg font-black mt-1" lang="${esc(idioma)}">${esc(f.fr)}</p>
+            <p class="text-lg font-black mt-1" lang="${esc(idioma)}">${esc(f.txt)}</p>
             <p class="text-sm text-slate-500">${esc(f.pt)}</p>
             <div class="flex flex-wrap gap-2 mt-3">
               <button type="button" data-ouvir class="botao bg-slate-100 font-extrabold px-4 py-2 text-sm">🔊 Ouvir</button>
@@ -439,10 +458,10 @@
           </section>`).join('')}
           <section class="bg-gradient-to-br from-violet-50 to-pink-50 rounded-[2rem] p-5" id="pergunta">
             <p class="text-xs font-extrabold uppercase tracking-widest text-violet-700">❓ A pergunta da aula</p>
-            <p class="text-xl font-black mt-1" lang="${esc(idioma)}">${esc(A.pergunta.fr)}</p>
+            <p class="text-xl font-black mt-1" lang="${esc(idioma)}">${esc(A.pergunta.txt)}</p>
             <p class="text-sm text-slate-600">${esc(A.pergunta.pt)}</p>
             <button type="button" data-ouvir-pergunta class="text-xs font-extrabold bg-white rounded-full px-3 py-1 mt-2">🔊 Ouvir a pergunta</button>
-            <p class="text-sm text-slate-600 mt-3">Responda em voz alta, em francês. O seu teacher lê a sua resposta antes da aula.</p>
+            <p class="text-sm text-slate-600 mt-3">Responda em voz alta, em ${esc(nomeDoIdioma)}. O seu teacher lê a sua resposta antes da aula.</p>
             <button type="button" id="responder" class="botao mt-3 bg-violet-600 text-white font-black px-5 py-3"${temMic ? '' : ' hidden'}>🎤 Responder em voz</button>
             <textarea id="resposta" rows="3" class="w-full mt-3 rounded-2xl bg-white px-4 py-3 text-sm font-bold" lang="${esc(idioma)}" placeholder="A sua resposta aparece aqui. Você pode corrigir ou digitar."></textarea>
             <p id="resposta-fb" class="text-xs font-bold text-slate-500 mt-1"></p>
@@ -463,7 +482,7 @@
 
       function notaFrase(i, falado, veioDoMic) {
         const caixa = alvo.querySelector(`[data-frase="${i}"]`), fb = caixa.querySelector('[data-fb]');
-        const ok = P.falouBem(A.repetir[i].fr, falado);
+        const ok = P.falouBem(A.repetir[i].txt, falado, idioma);
         R.falar[i] = R.falar[i] === true ? true : ok;
         tentativas[i]++;
         fb.innerHTML = ok ? `✅ Muito bem!${veioDoMic ? ` <span class="font-semibold text-slate-500">Você disse: «${esc(falado)}»</span>` : ''}`
@@ -529,7 +548,7 @@
 
       alvo.querySelectorAll('[data-frase]').forEach(caixa => {
         const i = Number(caixa.dataset.frase);
-        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.repetir[i].fr, idioma));
+        caixa.querySelector('[data-ouvir]').addEventListener('click', () => falar(A.repetir[i].txt, idioma));
         const g = caixa.querySelector('[data-gravar]');
         g.addEventListener('click', () => gravar(i, g, { de_novo: '🎤 Gravar de novo' }));
         caixa.querySelector('[data-pular]').addEventListener('click', ev => {
@@ -545,7 +564,7 @@
       });
       const responderBtn = alvo.querySelector('#responder');
       responderBtn.addEventListener('click', () => gravar('resposta', responderBtn, { de_novo: '🎤 Gravar mais' }));
-      alvo.querySelector('[data-ouvir-pergunta]').addEventListener('click', () => falar(A.pergunta.fr, idioma));
+      alvo.querySelector('[data-ouvir-pergunta]').addEventListener('click', () => falar(A.pergunta.txt, idioma));
       alvo.querySelector('[data-ouvir-exemplo]').addEventListener('click', () => falar(A.pergunta.exemplo, idioma));
       resposta.addEventListener('input', () => { R.pulouPergunta = false; conferir(); });
       alvo.querySelector('#pular-pergunta').addEventListener('click', ev => {
@@ -561,8 +580,10 @@
       const pl = P.placar({ ouvir: R.ouvir, palavras: R.palavras, perceber: R.perceber, falar: R.falar.map(Boolean) });
       const primeira = P.marcarFeita(A.aula, pl.pct);
       if (primeira && window.Store && typeof Store.addXP === 'function') Store.addXP(XP_PREPARACAO);
+      // Aula com o passo "🎯 Prepare" (Agro): fica feito lá, sem XP repetido.
+      if (A.aulaFeito) P.marcarPassoDaAula(A.aulaFeito);
       if (window.capyTrack) window.capyTrack('preparacao_concluida', { aula: A.aula, pct: pl.pct });
-      const dificeis = R.dificeis.map(p => p.fr);
+      const dificeis = R.dificeis.map(p => p.txt);
 
       alvo.innerHTML = `
         <section class="rounded-[2rem] bg-gradient-to-br from-emerald-600 to-teal-600 text-white p-6 text-center entrar">
@@ -641,12 +662,20 @@
   async function iniciar() {
     let cursos;
     try { cursos = (await P.carregarCursos()).cursos || []; } catch (_) { erro('Não consegui carregar a preparação agora. Confira a internet e tente de novo.'); return; }
-    const curso = cursos[0];
-    if (!curso) { erro('Ainda não há preparação disponível.'); return; }
+    if (!cursos.length) { erro('Ainda não há preparação disponível.'); return; }
+    // O curso: o da aula pedida, o de ?curso=, o do idioma de ?revisar=, ou o preferido do aluno.
     const aula = params.get('aula');
-    if (aula && curso.aulas.some(a => a.aula === aula)) { sessao(curso, aula); return; }
-    if (params.get('revisar') === curso.idioma) { revisao(curso); return; }
-    hub(curso);
+    const daAula = aula ? cursos.find(c => c.aulas.some(a => a.aula === aula)) : null;
+    const preferido = P.cursoPreferido(cursos);
+    const revisar = params.get('revisar');
+    const curso = daAula
+      || cursos.find(c => c.id === params.get('curso'))
+      || (revisar ? (preferido.idioma === revisar ? preferido : cursos.find(c => c.idioma === revisar)) : null)
+      || preferido;
+    P.lembrarCurso(curso.id);
+    if (daAula) { sessao(curso, aula); return; }
+    if (revisar === curso.idioma) { revisao(curso); return; }
+    hub(curso, cursos);
   }
 
   iniciar();

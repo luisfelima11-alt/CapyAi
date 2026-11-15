@@ -198,7 +198,7 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
   - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
 - **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
 
-## Página de Preparação de aula (piloto: francês, 09/nov/2026)
+## Página de Preparação de aula (francês, 09/nov/2026; Agro English 11–15, 14/nov/2026)
 
 `preparacao.html` é o lugar próprio da preparação para a aula ao vivo. Ela segue o método do Luis
 (o da Influx): ouvir antes de ler, palavras com repetição, noticing e falar.
@@ -229,8 +229,21 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
     e confere: sem pronúncia escrita, sem "gramática", o trecho existe no diálogo e a resposta está
     entre as opções;
   - mudou algum dado? Troque `VERSAO_DADOS` em `preparacao-core.js`.
-- **Curso novo na preparação:** um arquivo de conteúdo como o `fr-preparacao.mjs`, uma entrada em
-  `cursos.json` (o build) e o atalho na página do curso.
+- **Curso novo na preparação:** um arquivo de conteúdo como o `agro-preparacao.mjs`, uma fonte como
+  `aulasAgro()` e uma entrada em `CURSOS` no `build-preparacao.mjs`, e o atalho na página do curso
+  (`<a id="prep-atalho" data-curso="<id>" data-sempre>`).
+- **Agro English (aulas 11 a 15):**
+  - os dados saem de `scripts/agroNN-dialogo.json` e `agroNN-conteudo.json`: só as 12 falas principais
+    (sem as `extra`), cada uma com a voz do personagem (`onyx`/`echo`). O mp3 gravado entra sozinho se
+    `assets/audio/agroNN/` existir quando o build roda (hoje as aulas 11 a 15 não têm);
+  - `txt` é o texto no idioma do curso, nos dois cursos (era `fr`);
+  - a voz em inglês é o `speakEnEnd(texto, { voice, mp3 })` do `tts-en.js`; a nota da fala em inglês
+    (`notaFala(..., 'en')`) aceita contração e número por extenso;
+  - o passo "🎯 Prepare" dessas aulas vira um cartão que abre a página (`window.PREP.paginaNova`,
+    ligado pelo `build-agro-aula.mjs` para as aulas que estão no `agro-preparacao.mjs`). Ao terminar,
+    a página grava o passo em `capyAgroNNDone`: a aula abre com ele feito, sem XP repetido e com um
+    aviso só ao teacher;
+  - sem curso na URL, a página abre o último curso usado (`capyPrepCurso`); `?curso=agro` escolhe.
 - **Testes:** `tests/preparacao-pagina.{test,spec}.js`.
 
 ## Extensão "Capy no YouTube" (Fase 1, 07/nov/2026)
