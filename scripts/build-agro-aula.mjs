@@ -22,6 +22,7 @@ import path from 'node:path';
 import { blocoGramaticaSlides, checarSlides } from './lib/gramatica-slides.mjs';
 import { aplicarHomework, checarHomework } from './lib/homework-plus.mjs';
 import { aplicarPreparacao, checarPreparacao } from './lib/preparacao.mjs';
+import { AGRO_PREPARACAO } from './agro-preparacao.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
@@ -212,7 +213,8 @@ function construir(n) {
     //     novo, as 8 tarefas e o card para o teacher (scripts/lib/homework-plus.mjs).
     t = aplicarHomework(t, { c, d, n, pagina: `agro_aula_${nn}`, raiz: RAIZ, curso: 'Agro English', cor: '#15803d' });
     // 6c. 🎯 Prepare: a preparação antes da aula, no começo da rota (scripts/lib/preparacao.mjs).
-    t = aplicarPreparacao(t, { c });
+    // Aula com Preparação nova (scripts/agro-preparacao.mjs): o passo abre a página.
+    t = aplicarPreparacao(t, { c, paginaNova: !!AGRO_PREPARACAO[n] });
 
     // 7. Curso Agro: hub, chave de conclusão e rótulo próprios.
     //    Sem isso a aula do Luan marcaria progresso na trilha do GPS Tronic.
@@ -298,7 +300,7 @@ function validar({ t, d, c, n, nn }) {
     // Gramática em slides de exemplos (regra do Luis, 05/out/2026): scripts/lib/gramatica-slides.mjs.
     checarSlides(c, ok, { teto: c.tetoPalavras || 14, slug: `agro${nn}`, raiz: RAIZ });
     checarHomework(c, t, ok);
-    checarPreparacao(c, t, ok);
+    checarPreparacao(c, t, ok, { paginaNova: !!AGRO_PREPARACAO[c.aula] });
 
     let scripts = 0, quebrados = 0;
     for (const m of t.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)) {
