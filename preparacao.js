@@ -9,6 +9,10 @@
 // para o professor pelo mesmo caminho da lição de casa (POST /api/homework,
 // lessonId "<aula>-prep"), e aparece no painel dele como "🎯 Preparação".
 // O texto do aluno só vai em value de campo e no corpo do POST: nunca innerHTML.
+//
+// Modo página (window.PREP.paginaNova, 14/nov/2026): a aula tem a Preparação
+// nova (preparacao.html). Aqui fica só o cartão que leva até lá; o XP e o aviso
+// ao teacher saem da página, e ela marca este passo como feito na aula.
 (function () {
   'use strict';
   const raiz = document.getElementById('prep-raiz');
@@ -19,6 +23,27 @@
   const W = window.YARA_WIDGET || {};
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const pagina = (location.pathname.split('/').pop() || '').replace(/\.html$/i, '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 58);
+
+  if (P.paginaNova) {
+    let feita = null;
+    try { feita = (JSON.parse(localStorage.getItem('capyPrepFeitas')) || {})[pagina] || null; } catch (e) { feita = null; }
+    const pct = feita ? Math.max(0, Math.min(100, Math.round(Number(feita.pct) || 0))) : 0;
+    raiz.innerHTML = `
+    <div class="bg-gradient-to-br from-pink-500 to-violet-700 rounded-3xl p-6 mb-4 text-white">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-4xl" aria-hidden="true">🎯</span>
+        <div><h2 class="text-2xl font-black">Prepare-se para a aula</h2><p class="text-white/80 text-sm">${esc(W.lessonNum ? `Lesson ${W.lessonNum} — ` : '')}${esc(W.lessonTitle || '')}</p></div>
+      </div>
+      <p class="text-white/80 text-sm">10 a 15 minutos, antes do encontro com o seu teacher. Você ouve a conversa sem ler, aprende as palavras, lê, repara no jeito de falar e fala no microfone.</p>
+      <div class="flex flex-wrap gap-2 mt-4 text-xs font-extrabold">${['🎧 Ouvir', '🔤 Palavras', '📖 Ler', '👀 Reparar', '🗣️ Falar'].map(x => `<span class="bg-white/15 rounded-full px-3 py-1">${x}</span>`).join('')}</div>
+    </div>
+    ${feita ? `<div id="prep-feita" class="bg-emerald-50 rounded-2xl p-5 mb-4 text-center">
+      <p class="font-black text-emerald-700">✓ Você já se preparou para esta aula (${pct}%)</p>
+      <p class="text-sm text-slate-600 mt-1">O seu teacher já recebeu. Agora é seguir a aula.</p>
+    </div>` : ''}
+    <a id="prep-abrir" href="preparacao.html?aula=${encodeURIComponent(pagina)}" class="block text-center w-full ${feita ? 'bg-slate-100 text-navy' : 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'} font-black px-6 py-3 rounded-2xl">${feita ? 'Refazer a preparação' : '🎯 Preparar esta aula · 10 a 15 min'}</a>`;
+    return;
+  }
 
   const palavras = VOC.slice(0, 6);
   const trecho = DLG.filter(l => !l.extra).slice(0, 4);

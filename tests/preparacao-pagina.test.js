@@ -1,4 +1,4 @@
-// Página de Preparação (piloto: francês): dados gerados e a lógica sem tela.
+// Página de Preparação (francês e Agro English 11–15): dados gerados e a lógica sem tela.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -23,7 +23,83 @@ test('data/preparacao está em dia com as aulas e com fr-preparacao.mjs, e passa
     assert.equal(fs.readFileSync(path.join(RAIZ, 'data', 'preparacao', nome), 'utf8'), conteudo, `${nome} desatualizado: rode node scripts/build-preparacao.mjs`);
   }
   const cursos = JSON.parse(arquivos['cursos.json']).cursos;
-  assert.equal(cursos[0].aulas.length, 12);
+  assert.deepEqual(cursos.map(c => [c.id, c.idioma, c.aulas.length]), [['francais', 'fr', 12], ['agro', 'en', 5]]);
+  assert.deepEqual(cursos[1].aulas.map(a => a.num), [11, 12, 13, 14, 15]);
+});
+
+test('Agro: só as falas principais, cada uma com a voz do personagem, e o passo da aula para marcar', async () => {
+  const { gerar, conferirAula } = await import('../scripts/build-preparacao.mjs');
+  const { arquivos } = gerar();
+  for (let n = 11; n <= 15; n++) {
+    const a = JSON.parse(arquivos[`agro_aula_${n}.json`]);
+    const d = JSON.parse(fs.readFileSync(path.join(RAIZ, 'scripts', `agro${n}-dialogo.json`), 'utf8'));
+    assert.deepEqual(a.dialogo.linhas.map(l => l.txt), d.linhas.filter(l => !l.extra).map(l => l.en), `aula ${n}: falas principais`);
+    assert.ok(a.dialogo.linhas.every(l => ['onyx', 'echo'].includes(l.voz)), `aula ${n}: vozes`);
+    // O mp3 só entra se o arquivo existir (hoje as aulas 11 a 15 não têm áudio gravado).
+    for (const l of a.dialogo.linhas) if (l.mp3) assert.ok(fs.existsSync(path.join(RAIZ, l.mp3)), l.mp3);
+    assert.deepEqual(a.aulaFeito, { chave: `capyAgro${n}Done`, secao: 'prepare' });
+    assert.equal(a.idioma, 'en');
+    assert.deepEqual(conferirAula(a), []);
+    // As frases para repetir são falas do aluno (Luan).
+    const doAluno = d.linhas.filter(l => l.who === 'yara').map(l => l.en);
+    assert.ok(a.repetir.every(r => doAluno.includes(r.txt)), `aula ${n}: repetir`);
+  }
+  const ruim = JSON.parse(arquivos['agro_aula_15.json']);
+  ruim.perceber[0].explica = 'Uma regra de grammar';
+  ruim.perceber[1].trecho = 'não existe';
+  assert.match(conferirAula(ruim).join('\n'), /gramática[\s\S]*não está na linha/);
+});
+
+test('o passo Prepare das aulas 11 a 15 do Agro abre a página; as 1 a 10 e o GPS seguem com o Prepare da aula', () => {
+  const temModoPagina = f => /window\.PREP=\{[^<]*"paginaNova":true/.test(fs.readFileSync(path.join(RAIZ, f), 'utf8'));
+  for (let n = 1; n <= 15; n++) assert.equal(temModoPagina(`agro_aula_${String(n).padStart(2, '0')}.html`), n >= 11, `agro ${n}`);
+  assert.equal(temModoPagina('gpstronic_aula_25.html'), false);
+  const curso = fs.readFileSync(path.join(RAIZ, 'classes_agro.html'), 'utf8');
+  assert.match(curso, /id="prep-atalho" data-curso="agro"/);
+  assert.match(fs.readFileSync(path.join(RAIZ, 'classes_fr.html'), 'utf8'), /id="prep-atalho" data-curso="francais"/);
+});
+
+test('nota da fala em inglês: contração, número e "okay" contam como a mesma coisa', () => {
+  assert.ok(P.falouBem("Hi, Jack! I'm checking the soybean field.", 'Hi Jack, I am checking the soybean field', 'en'));
+  assert.ok(P.falouBem("OK, Jack. We're waiting for you!", 'okay jack we are waiting for you', 'en'));
+  assert.ok(P.falouBem('We loaded six trucks yesterday.', 'we loaded 6 trucks yesterday', 'en'));
+  assert.ok(P.falouBem("Sure, I'll send it by email today.", 'sure i will send it by e-mail today', 'en'));
+  assert.ok(!P.falouBem("Tiago is driving it. He's preparing the soil.", 'Tiago is driving', 'en'));
+  assert.equal(P.notaFala('Call the vet', '', 'en'), 0);
+  // O francês não muda de régua.
+  assert.ok(P.falouBem("J'ai dix-neuf ans.", 'jai 19 ans', 'fr'));
+});
+
+test('curso preferido: o último aberto; senão o da preparação mais recente; senão o que o aluno estuda', () => {
+  const cursos = [
+    { id: 'francais', concluidas: 'capyFrCompleted', aulas: [{ num: 1, aula: 'fr_aula_01' }] },
+    { id: 'agro', concluidas: 'capyAgroCompleted', aulas: [{ num: 11, aula: 'agro_aula_11' }, { num: 12, aula: 'agro_aula_12' }] },
+  ];
+  for (const k of ['capyPrepCurso', 'capyPrepFeitas', 'capyFrCompleted', 'capyAgroCompleted']) guardado.delete(k);
+  assert.equal(P.cursoPreferido(cursos).id, 'francais');           // nada: o primeiro
+  assert.equal(P.sabeAProxima(cursos[0]), true);
+  assert.equal(P.sabeAProxima(cursos[1]), false);                  // ainda não chegou na aula 11
+  guardado.set('capyAgroCompleted', '[9,10]');
+  assert.equal(P.cursoPreferido(cursos).id, 'agro');
+  assert.equal(P.estuda(cursos[1]), true);
+  assert.equal(P.estuda(cursos[0]), false);
+  assert.equal(P.sabeAProxima(cursos[1]), true);                   // terminou a 10
+  guardado.set('capyPrepFeitas', JSON.stringify({ fr_aula_01: { em: '2026-11-14T10:00:00.000Z', pct: 80 } }));
+  assert.equal(P.cursoPreferido(cursos).id, 'francais');
+  P.lembrarCurso('agro');
+  assert.equal(P.cursoPreferido(cursos).id, 'agro');
+});
+
+test('terminar a Preparação marca o passo na aula uma vez, e só em chave de aula', () => {
+  guardado.delete('capyAgro15Done');
+  assert.equal(P.marcarPassoDaAula({ chave: 'capyAgro15Done', secao: 'prepare' }), true);
+  assert.equal(P.marcarPassoDaAula({ chave: 'capyAgro15Done', secao: 'prepare' }), false);
+  assert.deepEqual(JSON.parse(guardado.get('capyAgro15Done')), ['prepare']);
+  guardado.set('capyAgro14Done', '["dialogue"]');
+  P.marcarPassoDaAula({ chave: 'capyAgro14Done', secao: 'prepare' });
+  assert.deepEqual(JSON.parse(guardado.get('capyAgro14Done')), ['dialogue', 'prepare']);
+  assert.equal(P.marcarPassoDaAula({ chave: 'capyYaraState', secao: 'prepare' }), false);
+  assert.equal(P.marcarPassoDaAula(null), false);
 });
 
 test('a conferência pega pronúncia escrita, "gramática", trecho fora do diálogo e resposta fora das opções', async () => {
@@ -86,8 +162,8 @@ test('marcarFeita diz se é a primeira vez (o XP sai uma vez só)', () => {
 test('palavras para revisar: errou volta amanhã; acertou sobe para 3, 7, 14 dias e depois sai', () => {
   guardado.delete('capyPrepPalavras_fr');
   const agora = 1_000_000_000_000, DIA = 86400000;
-  const p = { fr: 'Rouge', pt: 'Vermelho(a)', ex: '', emoji: '🔴' };
-  P.anotarPalavra('fr', { fr: 'Bleu', pt: 'Azul' }, true, agora);       // sabia de primeira: nada
+  const p = { txt: 'Rouge', pt: 'Vermelho(a)', ex: '', emoji: '🔴' };
+  P.anotarPalavra('fr', { txt: 'Bleu', pt: 'Azul' }, true, agora);       // sabia de primeira: nada
   P.anotarPalavra('fr', p, false, agora);
   assert.deepEqual(P.palavrasParaRevisar('fr', agora), []);
   assert.equal(P.palavrasParaRevisar('fr', agora + DIA).length, 1);
