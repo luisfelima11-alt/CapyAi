@@ -137,8 +137,10 @@ const TOTAL_NODES = TRAIL_GPS.length * 4;
 const DAY_SUBS = ['Listen & Quiz','Game','Build & Speak','Chat with Yara'];
 
 function miniDone(lessonId, miniNum) {
-  if (window.Store && Store.state.completedLessons && Store.state.completedLessons.includes(lessonId)) return true;
-  return window.Store ? Store.isMiniDone(lessonId, miniNum) : false;
+  // A lição só conta com os 4 dias (store.js: isTrailLessonDone). Olhar o
+  // completedLessons cru fazia o Dia 4 antigo sozinho marcar os 4 dias.
+  if (!window.Store) return false;
+  return Store.isTrailLessonDone(lessonId) || Store.isMiniDone(lessonId, miniNum);
 }
 
 function nextMini() {

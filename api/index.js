@@ -137,6 +137,12 @@ const VOZ_TETO_USD_MES = Number(process.env.VOZ_TETO_USD_MES || 50);
 // "0" meant unlimited voice.
 const VOZ_SESSAO_MAX_SEG = Math.max(60, Number(process.env.VOZ_SESSAO_MAX_MIN || 30) * 60);
 const VOZ_USD_POR_MIN_PISO = Number(process.env.VOZ_USD_POR_MIN_PISO || 0.02);
+// And the ceiling: the browser's report counts up to this much per minute of
+// the booked call. Without it one forged report (5 million tokens of each kind
+// = US$ 166) tripped VOZ_TETO_USD_MES and switched voice off for every Super
+// student until the next month (13/nov). Generous on purpose: a long call whose
+// cache misses every turn costs well under US$ 1 a minute on the mini model.
+const VOZ_USD_POR_MIN_TETO = Math.max(VOZ_USD_POR_MIN_PISO, Number(process.env.VOZ_USD_POR_MIN_TETO || 1));
 
 // Ligacao de teste (28/out/2026, decisao do Luis): quem nao e Super liga UMA vez,
 // com 3 minutos gratis. E o que vende o Super, entao so conta conta com e-mail
@@ -282,7 +288,10 @@ function assertLeituraDoProprioSite(req) {
 async function checkRateLimit(req, key, _untrustedUserId) {
     req._rateLimitResults = req._rateLimitResults || {};
     if (req._rateLimitResults[key]) return req._rateLimitResults[key];
-    const today = new Date().toISOString().slice(0, 10);
+    // Dia de Brasília, o mesmo do contador do navegador (store.js). O dia UTC
+    // virava às 21h: quem usava a IA às 22h gastava a cota do dia seguinte e
+    // ficava bloqueado na manhã seguinte, com o app mostrando usos sobrando.
+    const today = diaBrasil();
     const trusted = req._securityIdentity || null;
     const isGuest = trusted?.kind === 'guest';
     const appUserId = trusted?.appUserId || null;
@@ -348,9 +357,10 @@ async function checkRateLimit(req, key, _untrustedUserId) {
         const entry = _rateLimitMemory[bucket];
         if (entry.day !== today) { entry.count = 0; entry.day = today; }
         if (entry.count >= limit) {
-            const now = new Date();
-            const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-            const info = { ok: false, retryAfter: Math.ceil((tomorrow - now) / 1000), limit, used: entry.count, plan, guest: isGuest };
+            // Meia-noite de Brasília (UTC−3; sem horário de verão desde 2019).
+            const amanha = new Date(Date.parse(today + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10);
+            const virada = Date.parse(amanha + 'T00:00:00-03:00');
+            const info = { ok: false, retryAfter: Math.max(1, Math.ceil((virada - Date.now()) / 1000)), limit, used: entry.count, plan, guest: isGuest };
             req._rateLimitResults[key] = info;
             return info;
         }
@@ -649,6 +659,13 @@ async function requireProfessor(req, res) {
 
 const diaBrasil = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
+// Teto do XP que um POST /api/db pode somar (ranking público). Uma aula inteira
+// dá ~300 XP e o maior prêmio único é 250: os tetos são folgados de propósito.
+// Quem passa deles (visitante que estudou muito e criou a conta) não perde
+// nada no aparelho: o navegador manda o total de novo e o servidor alcança.
+const XP_MAX_POR_SALVAR = 2000;
+const XP_MAX_POR_DIA = 20000;
+
 // Quanto o aluno avançou entre dois estados salvos: mini-lições novas e XP ganho.
 // Um aparelho atrasado que salva menos não gera número negativo.
 function deltaAtividade(antes, depois) {
@@ -804,21 +821,28 @@ function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
     // an array (quiz, flashcard-deck, lesson-quiz) can't use it.
     if (opts.json) corpo.response_format = { type: 'json_object' };
     const postData = JSON.stringify(corpo);
+    // Deadline like chatComplete's: without it a stalled provider held the
+    // function (and the student's "digitando…") until Vercel killed it.
     const options = {
         hostname: CHAT_HOST,
         path:     CHAT_PATH,
         method:   'POST',
-        headers:  chatHeaders(Buffer.byteLength(postData))
+        headers:  chatHeaders(Buffer.byteLength(postData)),
+        timeout:  45000,
     };
     const apiReq = https.request(options, apiRes => {
         let data = '';
         apiRes.on('data', chunk => data += chunk);
         apiRes.on('end', () => {
+            if (res.headersSent) return;
             res.setHeader('Content-Type', 'application/json');
             if (apiRes.statusCode !== 200) {
                 // The provider's message can name the org, key or model: log it, answer generically.
+                // 502, not 200: the Yara widget keeps every 200 reply in the
+                // conversation, so the error text came back to the AI as if
+                // Yara had said it.
                 console.error('[ai] upstream', apiRes.statusCode, String(data).slice(0, 300));
-                res.status(200).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
+                res.status(502).end(JSON.stringify({ error: { code: apiRes.statusCode, message: 'A IA não respondeu agora. Tente de novo em instantes.' } }));
                 return;
             }
             try {
@@ -831,7 +855,13 @@ function callOpenAI(messages, maxTokens, temperature, res, req, opts = {}) {
             }
         });
     });
-    apiReq.on('error', err => { console.error('[ai] request', err.message); res.status(500).end(JSON.stringify({ error: { code: 500, message: 'Erro de conexão com a IA.' } })); });
+    apiReq.on('timeout', () => apiReq.destroy(new Error('timeout')));
+    apiReq.on('error', err => {
+        console.error('[ai] request', err.message);
+        if (res.headersSent) return;
+        res.setHeader('Content-Type', 'application/json');
+        res.status(502).end(JSON.stringify({ error: { code: 502, message: 'Erro de conexão com a IA.' } }));
+    });
     apiReq.write(postData);
     apiReq.end();
 }
@@ -923,6 +953,24 @@ function resumoDoAluno(a, st, prof, today) {
         neverStarted,
         status: neverStarted ? 'never_started' : praticou === today ? 'active_today' : 'idle',
     };
+}
+
+// A sequência que ainda dá para salvar HOJE, pelas regras do store.js
+// (resolverStreak): viva se a última prática (ou o dia coberto por freeze) foi
+// ontem; com um dia de falta, só se houver 🧊 para cobri-lo. O servidor não
+// recalcula a sequência: o streakDays salvo é o do último dia em que o aluno
+// abriu o app. Devolve 0 quando ela já acabou.
+function sequenciaParaSalvarHoje(d, hoje) {
+    const dias = Number(d && d.streakDays) || 0;
+    if (dias < 1) return 0;
+    const iso = /^\d{4}-\d{2}-\d{2}$/;
+    const praticou = d.lastPracticeDate || (d.streakActive ? d.lastQuestDate : '');
+    const ancora = [praticou, d.streakCoveredThrough].filter(v => typeof v === 'string' && iso.test(v)).sort().pop();
+    if (!ancora) return 0;
+    const gap = Math.round((Date.parse(hoje + 'T12:00:00Z') - Date.parse(ancora + 'T12:00:00Z')) / 86400000);
+    if (gap <= 1) return dias;
+    if (gap === 2 && (Number(d.streakFreezes) || 0) > 0) return dias;
+    return 0;
 }
 
 async function buildStudentRoster() {
@@ -3156,8 +3204,13 @@ module.exports = async (req, res) => {
         if (sessionCookies[COOKIE_NAMES.access] || sessionCookies[COOKIE_NAMES.refresh] || sessionCookies[COOKIE_NAMES.guest]) {
             try { await resolveSecurityIdentity(req, res, { allowGuest: true }); } catch (e) { req._securityIdentity = null; }
         }
-        const limited = await checkRateLimit(req, aiKey, null);
-        if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        // O /api/transcribe só sabe o balde depois de ler o corpo (`uso:
+        // 'preparacao'` → transcribe-prep): o handler conta. Contar aqui gastava
+        // o `transcribe` (grátis: 3/dia) também em toda gravação da Preparação.
+        if (url !== '/api/transcribe') {
+            const limited = await checkRateLimit(req, aiKey, null);
+            if (!limited.ok) { rateLimitedResponse(res, limited); return; }
+        }
     }
 
     // /api/admin/* routes call isAdminReq() inside each handler: an admin
@@ -3672,8 +3725,11 @@ module.exports = async (req, res) => {
             if (!alvo || !alvo.data) return false;
             const reservados = Number(alvo.data.custo && alvo.data.custo.segundos) || 0;
             const decorridos = Math.max(0, Math.round((Date.now() - (Number(alvo.data.emitidoEm) || Date.now())) / 1000));
-            const segundos = Math.max(custo.segundos, Math.min(decorridos, reservados));
-            const usd = Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO);
+            // Never more than was booked: the browser's own seconds (up to 2 h)
+            // used to pass straight through.
+            const segundos = Math.min(reservados, Math.max(custo.segundos, Math.min(decorridos, reservados)));
+            const usd = Math.min(segundos / 60 * VOZ_USD_POR_MIN_TETO,
+                Math.max(Number(custo.usd) || 0, segundos / 60 * VOZ_USD_POR_MIN_PISO));
             const agora = new Date().toISOString();
             await sb(`/user_state?user_id=eq.${encodeURIComponent(alvo.user_id)}`, {
                 method: 'PATCH',
@@ -3725,10 +3781,12 @@ module.exports = async (req, res) => {
         const corpo = await readBody(req);
         const custo = calcularCustoVoz(corpo);
         // With a reservation from /api/realtime-token, settle it (the server's
-        // clock is the floor). Without one, record the report as before; a
-        // 0-second call is not recorded — the student gave up before connecting.
+        // clock is the floor, the booked time the ceiling). Every student's
+        // token books one, so a report with nothing open to settle is a repeat
+        // or made up: only the admin, who is never booked, is recorded as
+        // reported. A 0-second call is not recorded — nobody connected.
         const liquidou = await liquidarReservaVoz(req, res, corpo, custo);
-        if (!liquidou && custo.segundos > 0) await gravarUsoVoz(req, res, corpo, custo);
+        if (!liquidou && custo.segundos > 0 && await isAdminReq(req, res)) await gravarUsoVoz(req, res, corpo, custo);
         res.status(204).end();
         return;
     }
@@ -3798,9 +3856,11 @@ module.exports = async (req, res) => {
             }
         } catch (e) { /* guardar é bônus: nunca pode derrubar a devolutiva */ }
 
-        // O custo tambem vira linha propria, append-only. O sendBeacon do cliente
-        // ja costuma ter gravado — mas se o aluno ficou na pagina, esta e a via.
-        if (custoVoz.segundos > 0) await gravarUsoVoz(req, res, body, custoVoz);
+        // O custo NAO e gravado aqui. A entrevista.html manda o /api/conversa-uso
+        // em TODO desligamento, antes de pedir esta devolutiva, e aquele relato
+        // liquida a reserva da ligacao. Gravar de novo aqui contava a mesma
+        // entrevista duas vezes na cota do aluno e no freio do site (13/nov), e
+        // gravava custo de quem nem tinha ligado.
 
         res.status(200).json({ ok: true, feedback, custo: custoVoz });
         return;
@@ -4431,8 +4491,31 @@ Respond ONLY with valid JSON, no markdown:
             if ('xp' in safePayload) safePayload.xp = Math.max(0, Math.min(10000000, Number(safePayload.xp) || 0));
             // O estado anterior, para a atividade do dia (painel do professor).
             let anterior = null;
-            try { anterior = (await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`))?.[0]?.data || null; }
-            catch (e) { anterior = null; }
+            let lido = false;
+            try {
+                const linhas = await sb(`/user_state?user_id=eq.${encodeURIComponent(identity.appUserId)}&select=data`);
+                lido = Array.isArray(linhas);
+                anterior = lido ? (linhas[0]?.data || null) : null;
+            } catch (e) { anterior = null; }
+            // O XP vem do navegador e vai para o ranking público: sem teto, um
+            // POST com 10 milhões punha qualquer um no topo (13/nov). Cada salvar
+            // sobe no máximo XP_MAX_POR_SALVAR, e o dia (atividade_diaria) no
+            // máximo XP_MAX_POR_DIA. Descer sempre pode (recomeçar o progresso).
+            // Se o estado anterior não pôde ser lido, não corta nada.
+            if ('xp' in safePayload && lido) {
+                const antes = Math.max(0, Number(anterior?.xp) || 0);
+                if (safePayload.xp > antes) {
+                    let hoje = 0;
+                    try {
+                        const dia = await sb(`/atividade_diaria?user_id=eq.${encodeURIComponent(identity.appUserId)}&dia=eq.${diaBrasil()}&select=xp`);
+                        hoje = Array.isArray(dia) ? Math.max(0, Number(dia[0]?.xp) || 0) : 0;
+                    } catch (e) { hoje = 0; }
+                    const folga = Math.max(0, Math.min(XP_MAX_POR_SALVAR, XP_MAX_POR_DIA - hoje));
+                    safePayload.xp = Math.min(safePayload.xp, antes + folga);
+                }
+            }
+            // Depois do teto de XP: o que só cresce (XP e listas de conquista) nunca
+            // desce por causa de um envio velho. Zerar de propósito exige reset: true.
             const estado = reset === true ? safePayload : progressoQueSoSobe(anterior, safePayload);
             await sbUser(identity, '/user_state', {
                 method: 'POST',
@@ -6059,10 +6142,13 @@ Rules:
             if (neverStarted) nudgedNewcomers++;
 
             const acc = accById[row.user_id];
-            const msg = neverStarted
-                ? NEVER_STARTED_MESSAGES[Math.floor(Math.random() * NEVER_STARTED_MESSAGES.length)]
-                : MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
-            const streakNote = d.streakDays > 1 ? ` Sua streak de ${d.streakDays} dias expira à meia-noite!` : '';
+            // O streakDays do banco é o que o aluno deixou ao sair: quem parou há
+            // semanas ainda tem 12 lá. Falar de streak só para quem ainda a tem.
+            const sequencia = sequenciaParaSalvarHoje(d, today);
+            const semFalarDeStreak = MESSAGES.filter(m => !/streak/i.test(m.title + m.body));
+            const opcoes = neverStarted ? NEVER_STARTED_MESSAGES : sequencia > 0 ? MESSAGES : semFalarDeStreak;
+            const msg = opcoes[Math.floor(Math.random() * opcoes.length)];
+            const streakNote = sequencia > 1 ? ` Sua streak de ${sequencia} dias expira à meia-noite!` : '';
 
             // 1) Web Push (se inscrito)
             let pushOk = false;
@@ -6096,7 +6182,7 @@ Rules:
                         body: JSON.stringify({
                             from: process.env.EMAIL_FROM || 'Capy English <contato@capyenglish.com.br>',
                             to: acc.email,
-                            subject: msg.title + (d.streakDays > 1 ? ` (streak de ${d.streakDays} dias!)` : ''),
+                            subject: msg.title + (sequencia > 1 ? ` (streak de ${sequencia} dias!)` : ''),
                             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#001f3f;border-radius:24px;padding:32px;text-align:center;color:#fff">
                                 <img src="https://www.capyenglish.com.br/icon-192.png" width="96" height="96" style="border-radius:50%;border:4px solid rgba(236,72,153,.5)"/>
                                 <h1 style="font-size:22px;margin:16px 0 8px">${msg.title}</h1>
@@ -6364,7 +6450,10 @@ Rules:
     // call has a deadline, the answer is checked, and a failure is a JSON error
     // the Music Lab can tell apart from "no songs found".
     // GET /api/lyrics-search?q=query  → suggest songs via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics-search')) {
+    // Exact path, never startsWith: the rate limit (AI_ROUTE_KEYS) looks the
+    // path up exactly, so `/api/lyrics-search/` or `/api/lyricsX` reached
+    // lyrics.ovh with no limit at all (13/nov).
+    if (req.method === 'GET' && url === '/api/lyrics-search') {
         const q = String(new URL(`https://x.com${req.url}`).searchParams.get('q') || '').trim().slice(0, 100);
         if (!q) { res.status(400).json({ error: 'q required' }); return; }
         try {
@@ -6379,7 +6468,7 @@ Rules:
     }
 
     // GET /api/lyrics?artist=...&title=...  → fetch full lyrics via lyrics.ovh
-    if (req.method === 'GET' && url.startsWith('/api/lyrics')) {
+    if (req.method === 'GET' && url === '/api/lyrics') {
         const p = new URL(`https://x.com${req.url}`).searchParams;
         const artist = String(p.get('artist') || '').trim().slice(0, 100);
         const title  = String(p.get('title')  || '').trim().slice(0, 150);
@@ -6477,6 +6566,10 @@ Rules:
         if (!/^[a-z0-9_-]{1,64}$/.test(licao)) { res.status(400).json({ error: 'lessonId_invalid' }); return; }
         const respostas = answers && typeof answers === 'object' && !Array.isArray(answers) ? sanitizeStoredJson(answers) : {};
         if (JSON.stringify(respostas).length > 20000) { res.status(413).json({ error: 'answers_too_large' }); return; }
+        // The `homework` bucket existed in RATE_LIMITS and nothing used it: a
+        // script could fill the table (20 KB a row) and bury the teacher's list.
+        const limite = await checkRateLimit(req, 'homework', null);
+        if (!limite.ok) { rateLimitedResponse(res, limite); return; }
         const result = await sbUser(identity, '/homework_submissions', {
             method: 'POST',
             headers: { 'Prefer': 'return=representation' },
@@ -6598,14 +6691,27 @@ Rules:
     }
 
     // GET /api/homework — list submissions (teacher/admin session only).
+    // The admin sees every student. A teacher sees only the students of their
+    // own class (turma_alunos), the same rule as /api/professor/*: this route
+    // used to hand any teacher every student's homework, names and answers (13/nov).
     if (req.method === 'GET' && url.startsWith('/api/homework')) {
-        await requireRole(req, res, ['admin', 'teacher']);
+        const quem = await requireRole(req, res, ['admin', 'teacher']);
         const p = new URL(`https://x.com${req.url}`).searchParams;
         const lessonId = p.get('lessonId');
         const userId   = p.get('userId');
         let filter = '';
         if (lessonId) filter += `&lesson_id=eq.${encodeURIComponent(lessonId)}`;
-        if (userId)   filter += `&user_id=eq.${encodeURIComponent(userId)}`;
+        if (quem.role !== 'admin') {
+            const professor = await resolveSecurityIdentity(req, res, { allowGuest: false });
+            const membros = await sb(`/turma_alunos?professor_id=eq.${encodeURIComponent(professor.appUserId)}&select=aluno_id&limit=500`);
+            const daTurma = (Array.isArray(membros) ? membros : []).map(m => String(m.aluno_id));
+            const alvo = userId ? daTurma.filter(id => id === userId) : daTurma;
+            if (!alvo.length) { res.status(200).json([]); return; }
+            const lista = alvo.map(i => `"${i.replace(/["\\]/g, '')}"`).join(',');
+            filter += `&user_id=in.(${encodeURIComponent(lista)})`;
+        } else if (userId) {
+            filter += `&user_id=eq.${encodeURIComponent(userId)}`;
+        }
         const rows = await sb(`/homework_submissions?select=*&order=submitted_at.desc&limit=500${filter}`);
         // On a GET, sb() returns Supabase's error object (a missing table, for
         // one) instead of throwing: that is not a list of submissions.

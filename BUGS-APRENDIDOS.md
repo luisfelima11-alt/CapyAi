@@ -1,5 +1,415 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-13 — Quando a IA falhava, a resposta era "200 OK" e sem prazo
+
+**Sintoma:** com a OpenAI fora do ar (ou sem crédito), as rotas de IA de texto (`/api/chat`, quiz, tradução,
+história…) respondiam **200** com `{error:{…}}`. O widget da Yara guarda na conversa toda resposta 200: a
+mensagem "A IA não respondeu agora" voltava para a IA no próximo pedido como se a Yara tivesse dito aquilo. E
+com a OpenAI travada, sem responder, a função ficava pendurada até a Vercel matar.
+
+**Causa raiz:** o `callOpenAI` respondia `res.status(200)` no erro do provedor e não passava `timeout` ao
+`https.request` (o `chatComplete` sempre teve 45 s).
+
+**Correção:** erro do provedor responde **502** (mesmo corpo, mesma mensagem genérica), e o pedido à IA tem
+prazo de 45 s; vencido, o pedido é desfeito e o aluno recebe 502. As páginas já liam a mensagem do corpo em
+qualquer status. A cota do dia continua gasta quando a IA falha (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (IA com 500 → resposta não é 200 e não
+vaza o texto do provedor; IA travada → 502 quando o prazo vence).
+
+**Por que aconteceu:** "não quebrar a tela" virou "dizer que deu certo". Erro precisa de status de erro: é
+o que o navegador usa para decidir o que guardar.
+
+---
+
+## 2026-11-13 — O envio de lição de casa não tinha limite nenhum
+
+**Sintoma:** um aluno logado (ou um script com a sessão dele) podia mandar `POST /api/homework` sem parar:
+cada envio grava até 20 KB na `homework_submissions` e aparece na lista do professor, que só mostra as 500
+mais recentes.
+
+**Causa raiz:** o balde `homework` existia em `RATE_LIMITS` (20 por dia no grátis, 100 no Pro, 200 no Super),
+mas a rota nunca chamava o `checkRateLimit`.
+
+**Correção:** a rota consulta o balde `homework` (por aluno, depois de validar o pedido) e responde 429 quando
+estoura. Na aula, o `components.js` já mostra "Tentar de novo" para qualquer erro que não seja de login.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (balde estourado: 429 e nada gravado;
+balde livre: 200, contado por aluno).
+
+**Por que aconteceu:** criar o limite e ligar o limite na rota eram dois passos, e só o primeiro foi feito.
+Balde em `RATE_LIMITS` que nenhuma rota usa é sinal de rota sem limite.
+
+---
+
+## 2026-11-13 — Um POST com XP inventado punha qualquer aluno no topo do ranking
+
+**Sintoma:** um aluno logado mandava `POST /api/db` com `xp: 10000000` e aparecia em 1º no ranking público
+(`leaderboard.html`) na hora. Nada limitava quantas vezes por dia.
+
+**Causa raiz:** o estado do aluno inteiro vem do navegador. O servidor só cortava o XP em 10 milhões, e o
+`public_leaderboard` lê esse número direto do `user_state`.
+
+**Correção:** cada salvar sobe o XP no máximo 2.000 acima do que estava guardado (`XP_MAX_POR_SALVAR`), e o dia
+inteiro no máximo 20.000 (`XP_MAX_POR_DIA`, somado na `atividade_diaria`). Descer continua livre (recomeçar o
+progresso). Uma aula inteira dá ~300 XP. Quem passa do teto não perde nada no aparelho: o `store.js` mescla pelo
+MAIOR e manda o total de novo; o servidor alcança aos poucos. Se o estado anterior não pôde ser lido, nada é
+cortado. O cálculo do XP continua no navegador (ver relatório da caça).
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (um salvar com 10 milhões e 40
+salvares seguidos no mesmo dia).
+
+**Por que aconteceu:** número que o aluno controla e que todo mundo vê (ranking) precisa de teto no servidor.
+
+---
+
+## 2026-11-13 — Qualquer professor lia a lição de casa de todos os alunos do site
+
+**Sintoma:** uma conta com papel `teacher` abria `teacher_homework.html` (ou chamava `GET /api/homework`) e
+recebia as últimas 500 lições de casa do site inteiro: nome, id e respostas de alunos que nunca entraram na
+turma dele. Com `?userId=<id>` lia qualquer aluno.
+
+**Causa raiz:** a rota só conferia o papel (`requireRole(['admin','teacher'])`) e consultava a tabela com a
+chave de serviço, sem filtro. O painel novo do professor (`/api/professor/*`, 19/out) recorta tudo pela
+`turma_alunos`; esta rota mais antiga ficou de fora.
+
+**Correção:** o admin continua vendo tudo. O professor vê só quem está na turma dele (`turma_alunos` com o
+`professor_id` da sessão); pedir um `userId` de fora da turma devolve lista vazia.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (professor com uma aluna na turma não
+vê a outra, nem pedindo pelo id; admin vê as duas; aluno recebe 403).
+
+**Por que aconteceu:** quando uma regra de acesso nova entra ("o servidor filtra sempre pela turma"), toda
+rota que lê a mesma tabela precisa ser revista, não só as rotas novas.
+
+---
+
+## 2026-11-13 — A entrevista por voz gastava o dobro dos minutos do aluno
+
+**Sintoma:** um aluno Super que fazia uma simulação de entrevista de 2 minutos (`entrevista.html`) perdia 4
+minutos da cota do mês. O freio de gasto do site também via o dobro.
+
+**Causa raiz:** ao desligar, a página manda o `/api/conversa-uso` (que liquida a reserva da ligação) e logo
+depois pede a devolutiva em `/api/conversa-feedback` com o mesmo uso. A rota da devolutiva gravava o custo de
+novo, numa linha nova (`gravarUsoVoz`). O comentário dizia "se o aluno ficou na página, esta é a via", mas a
+página manda o relato em todo desligamento. De quebra, a devolutiva gravava o custo que o navegador mandasse,
+mesmo sem ligação nenhuma.
+
+**Correção:** a devolutiva não grava mais custo. Quem mede a ligação é só o `/api/conversa-uso`.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (token, relato de 2 minutos e
+devolutiva: a cota conta 2 minutos; devolutiva com custo inventado não grava nada).
+
+**Por que aconteceu:** duas rotas gravando a mesma medição. Cada número precisa de um único caminho até o
+banco.
+
+---
+
+## 2026-11-13 — Um relato de voz inventado desligava a voz do site inteiro
+
+**Sintoma:** qualquer aluno logado (até do plano grátis, que nunca ligou) mandava um `POST /api/conversa-uso`
+dizendo ter gasto 5 milhões de tokens de cada tipo. O servidor gravava US$ 166 de custo, o freio mensal do
+site (`VOZ_TETO_USD_MES`, US$ 50) disparava e todo aluno Super recebia "A voz está temporariamente
+indisponível" até o mês seguinte.
+
+**Causa raiz:** os tokens e a duração da ligação vêm do navegador. O `liquidarReservaVoz` usava
+`Math.max(custo do navegador, piso)` sem teto, e os segundos do navegador (até 2 h) passavam por cima da
+reserva. Sem reserva aberta, o relato era gravado do jeito que veio (`gravarUsoVoz`), mesmo que nenhum token
+tivesse sido emitido.
+
+**Correção:** a liquidação nunca passa do tempo reservado, e o custo do navegador conta até
+`VOZ_USD_POR_MIN_TETO` (padrão US$ 1 por minuto reservado, 50 vezes o piso). Relato sem reserva aberta só é
+gravado para o admin (o único que liga sem reserva). Assim, a ligação de teste de 3 minutos vale no máximo
+US$ 3.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (relato forjado sem ligação e com
+reserva de 3 minutos; depois a aluna Super ainda consegue o token).
+
+**Por que aconteceu:** número que vem do navegador e entra numa conta que trava o site inteiro precisa de
+teto no servidor, não só de piso. O piso protegia contra quem informa pouco; ninguém pensou em quem informa
+demais.
+
+---
+
+## 2026-11-13 — As letras de música pulavam o limite com uma barra no fim do endereço
+
+**Sintoma:** `GET /api/lyrics-search/?q=…` (com barra) ou `/api/lyricsX?…` respondia 200 e chamava o
+lyrics.ovh quantas vezes alguém quisesse, mesmo com o limite do dia estourado.
+
+**Causa raiz:** o portão de limite procura a rota pelo endereço EXATO (`AI_ROUTE_KEYS.get(url)`), mas as
+duas rotas de letra casavam com `url.startsWith('/api/lyrics-search')` e `url.startsWith('/api/lyrics')`.
+Qualquer endereço que só começasse igual passava pelo handler sem passar pelo portão.
+
+**Correção:** as duas rotas comparam o endereço exato (`url === '/api/lyrics-search'`, `url === '/api/lyrics'`).
+O Music Lab já chamava exatamente esses endereços.
+
+**Como pegar isso de novo:** `node --test tests/seguranca-api.test.js` (com todo balde estourado, nenhuma
+variante do endereço chega ao lyrics.ovh).
+
+**Por que aconteceu:** rota com limite e o portão de limite precisam casar o endereço do mesmo jeito. Rota que
+custa (IA ou serviço de fora) nunca usa `startsWith`.
+
+---
+
+## 2026-11-13 — Story Time: palavra digitada com apóstrofo ou HTML quebrava a tela
+
+**Sintoma:** no Story Time, o aluno digitava "don't" em "Add your own word": a palavra aparecia, mas o ✕
+não a tirava mais (erro de JavaScript no clique). Digitando `<b>oi</b>` ou uma tag de imagem, o HTML
+entrava na página, na lista escolhida e na linha "palavras usadas" da história.
+
+**Causa raiz:** `updateSelectedDisplay()` e `showStory()` montavam o `innerHTML` com a palavra crua, e o
+✕ era `onclick="toggleWord('${w}')"`: o apóstrofo fechava a string do onclick.
+
+**Correção:** a palavra passa por `escStory()` antes do `innerHTML`, e o ✕ remove pela posição
+(`toggleWord(selectedWords[i])`), sem colocar o texto do aluno dentro do atributo.
+
+**Como pegar isso de novo:** `tests/story-time.spec.js` adiciona "don't" e tira pelo ✕, e adiciona HTML
+e confere que nenhuma tag nasce na escolha nem na história.
+
+**Por que aconteceu:** o padrão `onclick="fn('${texto}')"` foi copiado de onde o texto era fixo (as
+palavras sugeridas) para onde o texto vem do aluno. Texto do aluno ou da IA nunca vai cru para
+`innerHTML` nem para dentro de um atributo `onclick`: use o índice ou `data-*` escapado.
+
+---
+
+## 2026-11-13 — A Preparação só deixava gravar 3 vezes por dia no plano grátis
+
+**Sintoma:** na página de Preparação, o aluno do plano grátis gravava 3 frases e, na 4ª gravação do
+dia, recebia "Muitas mensagens seguidas" / "Limite diário do plano grátis atingido". O PR #41 prometia
+40 gravações por dia. Quem paga gastava duas cotas por gravação.
+
+**Causa raiz:** o portão de IA (o bloco do `api/index.js` que conta o uso antes de toda rota de IA)
+contava o `/api/transcribe` no balde `transcribe` (grátis: 3/dia), sem ler o corpo. Depois o handler lia
+`uso: 'preparacao'` e contava de novo, no balde `transcribe-prep` (grátis: 40). O `checkRateLimit` só
+evita contar duas vezes quando o nome do balde é o mesmo; aqui eram dois nomes. O teste do PR #41
+só conferia o texto do código com regex, então não viu o portão.
+
+**Correção:** o portão continua conferindo CSRF e identidade no `/api/transcribe`, mas não conta: quem
+conta é o handler, que já sabe o `uso`. A Preparação gasta só o `transcribe-prep`; as outras gravações,
+só o `transcribe`.
+
+**Como pegar isso de novo:** `tests/cota-da-ia.test.js` roda o `api/index.js` com um Supabase falso que
+conta os baldes de verdade: 4 gravações da Preparação passam e só o `transcribe-prep` é gasto; quem paga
+gasta uma cota; a 4ª gravação comum ainda recebe 429.
+
+**Por que aconteceu:** o portão foi posto depois dos handlers e supõe que cada rota usa o mesmo balde
+que ele. Toda rota cujo handler escolhe outro balde (pelo corpo ou por conta própria) gasta em dobro.
+Rota nova com balde próprio: confira o `AI_ROUTE_KEYS` e teste com contagem de verdade, não com regex.
+
+---
+
+## 2026-11-13 — O Dia 2 da trilha (Game) não fechava em inglês, francês e nos cursos
+
+**Sintoma:** no Dia 2 de uma lição da Trilha (fora do turco), o aluno jogava o jogo da lição (Speed, Scramble ou
+Typing) até o fim e ficava preso na tela de resultado: só havia "Refazer", o botão para outro jogo e "Learning
+Path". O "✅ Continue to Next Step" nunca aparecia, o Dia 2 nunca era gravado e, com a regra dos 4 dias, nenhuma
+lição de inglês, francês ou dos cursos podia ser concluída pela trilha.
+
+**Causa raiz:** desde que o Game passou a usar o vocabulário da lição (`showGameStep`), o passo do dia se chama
+`game`, mas o jogo avisa o fim com o nome dele (`markToolDone(id, 'speed')`). O `markToolDone` só mostrava o
+"Continue" quando os dois nomes eram iguais. O turco não tinha o problema porque o jogo dele chama
+`guidedGameDone()`. Antes de 12/nov o Dia 4 sozinho fechava a lição, e isso escondia o buraco.
+
+**Correção:** no modo guiado, quando o passo é `game` e termina um dos jogos da lição (speed, scramble, typing), o
+`markToolDone` marca o game como feito e mostra o "Continue", como nos outros passos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (joga o Speed do Dia 2 da lição 3 até o fim e fecha o dia).
+
+**Por que aconteceu:** o passo e a ferramenta que o executa deixaram de ter o mesmo nome, e não havia teste que
+fizesse um dia da trilha do começo ao fim.
+
+---
+
+## 2026-11-13 — O "Plano de hoje" mandava refazer lições que a Trilha já dava como feitas
+
+**Sintoma:** quem terminou lições no formato antigo (a lição inteira de uma vez, antes das minilições) via na home
+e no `study_plan.html` "Trilha: mini-lição 1 · Aula 1", enquanto a Trilha (`learn.html`) mostrava essas lições
+concluídas e retomava na primeira pendente.
+
+**Causa raiz:** o `proximaMini` do `plano-hoje.js` só olhava a lista `completedMinis`. Lição terminada no formato
+antigo não tem os dias gravados, só o `completedLessons`, e a regra da trilha (`Store.isTrailLessonDone`) conta
+essas lições como feitas.
+
+**Correção:** o `proximaMini` recebe a regra da trilha (`Store.isTrailLessonDone(id, 'en')`) e pula a lição que a
+trilha dá como concluída. Sem o `Store` na página, continua como era.
+
+**Como pegar isso de novo:** `tests/plano-hoje.test.js` (roda o `store.js` e o `plano-hoje.js` de verdade com um
+aluno do formato antigo; está no `npm run test:security`).
+
+**Por que aconteceu:** a "próxima lição" é calculada em três lugares (trilha, cartão "Continue" e plano da home), e
+só a trilha foi atualizada quando a regra dos 4 dias entrou. Quem calcula progresso pergunta ao `store.js`.
+
+---
+
+## 2026-11-13 — Desafio da Yara colava como HTML o que o aluno e a IA escreviam
+
+**Sintoma:** no Desafio da Yara (o chefe no fim de cada capítulo da Trilha, `lessons.html?boss=…`), uma mensagem
+com `<img src=x onerror=…>` virava uma imagem de verdade e o código rodava. O mesmo valia para a resposta da IA
+e para o texto final de avaliação ("Capítulo dominado!" / "Quase lá!").
+
+**Causa raiz:** o `appendBossMsg` montava o balão com `innerHTML` e `${text}` cru, e o `finishBossChallenge`
+fazia o mesmo com o `feedback` da IA. O chat do Dia 4 (`appendChatMsg`) já usava `textContent`; o do chefe ficou
+de fora.
+
+**Correção:** os balões e o texto da avaliação entram por `textContent`. O HTML fixo (ícone, classes) continua igual.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (manda `<img onerror>` como aluno e como IA, até a
+avaliação final, e confere que nada vira HTML).
+
+**Por que aconteceu:** cada chat da página tinha a sua função de balão, e a regra "texto do usuário ou da IA
+nunca vai cru para `innerHTML`" foi aplicada em uma e esquecida na outra.
+
+---
+
+## 2026-11-13 — Trilhas de curso ignoravam a regra dos 4 dias
+
+**Sintoma:** nas trilhas de curso (Agro, GPS Tronic, Intermediário, Entrevista e Medicina), quem tinha feito só
+o Dia 4 de uma lição antes de 12/nov via os 4 dias com ✓, a barra contava 4 dias e o "Começar" pulava para a
+lição seguinte. Na trilha de inglês (`learn.html`) e na de francês, a mesma lição aparecia com só o Dia 4 feito.
+
+**Causa raiz:** o `miniDone` dessas 5 páginas olhava a lista crua `completedLessons` antes dos dias. Até 12/nov,
+o Dia 4 sozinho gravava a lição nessa lista. A regra dos 4 dias entrou no `store.js` (`isTrailLessonDone`)
+e no `learn.html`/`learn_fr.html`, mas as páginas de curso ficaram com a lógica antiga.
+
+**Correção:** o `miniDone` das 5 páginas usa `Store.isTrailLessonDone(id) || Store.isMiniDone(id, dia)`, igual
+ao `learn_fr.html`. Quem terminou a lição no formato antigo (sem nenhum dia gravado) continua com os 4 dias feitos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (abre as 5 trilhas com o registro antigo do Dia 4).
+
+**Por que aconteceu:** a mesma regra estava copiada em 7 páginas. Regra de progresso mora num lugar só
+(`store.js`) e as páginas só perguntam a ele.
+
+---
+
+## 2026-11-13 — Fazer só o Dia 1 da trilha fechava a lição inteira
+
+**Sintoma:** o aluno fazia o Dia 1 (Listen & Quiz) de uma lição da Trilha, acertava 60% ou mais do quiz e via
+"🏆 Lesson Complete!" no lugar de "Day 1 Complete". De volta à trilha, os Dias 2, 3 e 4 apareciam feitos, a
+lição contava como concluída e a retomada pulava para a lição seguinte.
+
+**Causa raiz:** o `renderQuizFinish` do `lessons.html` chamava `Store.completeLesson` sempre que o quiz passava
+de 60%, também no modo guiado. Logo depois, o `guidedLessonComplete` chamava `Store.completeMini(id, 1)`. Como
+ainda não havia nenhum dia gravado, o `isTrailLessonDone` caía no marcador antigo (`completedLessons`), achava
+que era uma lição terminada no formato antigo e o `completeMini` gravava os 4 dias de uma vez.
+
+**Correção:** no modo guiado o quiz não marca mais a lição (nem mostra "Lição concluída!"): quem fecha a lição
+é o `guidedLessonComplete`, com os 4 dias. O modo livre (sem `guided=1`) continua como era.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (faz o Dia 1 no modo guiado e volta para a trilha).
+
+**Por que aconteceu:** a regra dos 4 dias entrou no `store.js` com uma ponte para o progresso antigo
+("sem nenhum dia gravado, vale o `completedLessons`"), mas o quiz continuava escrevendo esse mesmo marcador.
+Marcador de compatibilidade não pode continuar sendo escrito pelo fluxo novo.
+
+---
+
+## 2026-11-13 — O lembrete diário prometia salvar uma sequência que já tinha acabado
+
+**Sintoma:** aluna que parou de estudar há duas semanas com 12 dias seguidos recebia todo dia, às 19h, o
+e-mail "🔥 Sua streak está em perigo! (streak de 12 dias!) … Sua streak de 12 dias expira à meia-noite!".
+Quando voltava ao app, a sequência estava em 0.
+
+**Causa raiz:** a sequência só é recalculada no navegador (`resolverStreak` no `store.js`). O banco guarda o
+`streakDays` do último dia em que o aluno abriu o app. O `/api/send-reminders` lia esse número cru, sem olhar
+a data da última prática, e ainda sorteava mensagens que falam de streak para quem não tem mais nenhuma.
+
+**Correção:** `sequenciaParaSalvarHoje(d, hoje)` aplica no servidor as regras do `resolverStreak` (última
+prática ou dia coberto ontem; com um dia de falta, só com 🧊). O assunto e a frase "expira à meia-noite" usam
+esse número. Quem já perdeu a sequência recebe só a mensagem que não fala de streak.
+
+**Como pegar isso de novo:** `tests/lembrete-streak.test.js` roda o cron com relógio falso e quatro alunas
+(sumida, praticou ontem, faltou com 🧊, faltou sem 🧊), em várias rodadas por causa do sorteio.
+
+**Por que aconteceu:** número derivado (a sequência) salvo como se fosse fato. Quem lê o `streakDays` do banco
+precisa reavaliá-lo contra a data, do mesmo jeito que o navegador faz ao abrir.
+
+---
+
+## 2026-11-13 — Quem usava a IA à noite ficava bloqueado na manhã seguinte
+
+**Sintoma:** o visitante usava os 3 usos de IA às 22h. Na manhã seguinte o app mostrava "3 chats left today",
+mas toda mensagem para a Yara falhava ("A conversa está indisponível") até as 21h.
+
+**Causa raiz:** dois relógios para o mesmo limite. O navegador zera o contador (`aiUsageToday`) à meia-noite
+de Brasília (`capyHojeBR`). O servidor (`checkRateLimit` no `api/index.js`) montava o balde com o dia UTC,
+que vira às 21h de Brasília: os usos das 21h às 24h caíam no balde do dia seguinte.
+
+**Correção:** o balde do servidor usa `diaBrasil()`, o mesmo dia do navegador. O tempo de espera do contador
+em memória (`retryAfter`) passou a contar até a meia-noite de Brasília. **Mudança de regra:** o limite do
+servidor renova à meia-noite de Brasília, não mais às 21h.
+
+**Como pegar isso de novo:** `tests/limite-ia-dia-br.test.js` (relógio falso: uso às 22h e volta de manhã;
+21h30 ainda é o mesmo dia; tempo de espera até a meia-noite).
+
+**Por que aconteceu:** `toISOString().slice(0, 10)` é o dia de Greenwich. Todo "dia" que o aluno sente
+(limite, sequência, desafio do dia) tem que ser o dia de Brasília, nos dois lados.
+
+---
+
+## 2026-11-13 — Com a página aberta na virada do dia, o freeze não protegia a sequência
+
+**Sintoma:** aluno com 🧊 Streak Freeze (80 🫐) faltou um dia, deixou a página aberta desde a noite anterior e
+estudou depois da meia-noite: a sequência recomeçou em 1 e o freeze continuou no bolso, sem uso.
+
+**Causa raiz:** o freeze só é conferido no `resolverStreak`, que roda ao ABRIR o app (`checkDailyReset`). O
+`activateStreak` olhava o buraco entre a última prática e hoje e, com dois dias de distância, recomeçava em 1
+sem passar pelo freeze.
+
+**Correção:** o `activateStreak` chama o `resolverStreak` (que é idempotente) antes de contar o dia. Com
+freeze, a sequência continua; sem freeze, recomeça em 1 como antes.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` ("página aberta na virada do dia"), com o relógio
+falso avançando no meio do teste.
+
+**Por que aconteceu:** regra de "virada do dia" amarrada ao carregamento da página. Quem estuda à noite deixa
+a aba aberta; toda regra que depende do dia tem que valer também no momento da ação.
+
+---
+
+## 2026-11-13 — Relógio adiantado zerava a sequência de quem estudou
+
+**Sintoma:** aluno com o celular alguns minutos adiantado estudava às 23h55. O celular gravava a prática
+como "amanhã". Quando o relógio voltava ao certo, ou quando o estado chegava ao computador (que está com a
+hora certa), a sequência de dias ia a zero, e praticar de novo recomeçava em 1.
+
+**Causa raiz:** `resolverStreak` tratava data de prática no futuro (`gap < 0`) como dado inválido e zerava
+`streakDays`. O `activateStreak` também recomeçava em 1 nesse caso. O merge entre aparelhos leva a data mais
+recente, então a data do futuro se espalhava para os outros aparelhos do aluno.
+
+**Correção:** `trazerDatasParaHoje(hoje)`, chamado no `resolverStreak` e no `activateStreak`: data de prática
+(ou de freeze) depois de hoje vira hoje. A prática aconteceu de verdade, no máximo agora, então conta como
+"praticou hoje". A migração antiga já fazia o mesmo com o rótulo UTC.
+
+**Como pegar isso de novo:** `tests/sequencia-xp.test.js` (3 testes de relógio adiantado, com o `store.js`
+real e relógio falso).
+
+**Por que aconteceu:** data que vem do relógio do aparelho não é confiável. Toda conta de "quantos dias
+desde" precisa decidir o que fazer com uma data no futuro em vez de tratá-la como erro e apagar progresso.
+
+---
+
+## 2026-11-13 — Trocar de aba na lição pagava o XP do Quiz e do Listen de novo
+
+**Sintoma:** no `lessons.html`, depois de terminar o Quiz (ou o Listen), bastava clicar em outra aba e
+voltar: a tela "Quiz Concluído!" aparecia de novo e o XP da rodada era somado outra vez, a cada clique.
+Três idas e voltas transformavam 20 XP em 80. Dava para subir de nível sem responder nada.
+
+**Causa raiz:** quem pagava o XP era a função que DESENHA a tela de fim (`renderQuizFinish`,
+`renderListenFinish`). Trocar de aba chama `renderQuiz()`/`renderListen()`, que, com a rodada já
+terminada, redesenham a tela de fim, e com ela o pagamento.
+
+**Correção:** as duas telas de fim recebem `concluiuAgora`. Só o momento em que a última resposta é dada
+passa `true` e paga (XP, `markToolDone`, streak, lição concluída, comemoração). Redesenhar só mostra.
+O "🔄 Refazer" continua pagando a nova rodada, porque é prática de verdade.
+
+**Como pegar isso de novo:** `tests/xp-uma-vez.spec.js` termina o Quiz e o Listen e troca de aba três
+vezes, conferindo que o XP não muda.
+
+**Por que aconteceu:** função de desenhar com efeito colateral. Tela que pode ser redesenhada (troca de
+aba, voltar, atualizar) não pode pagar nada; o pagamento fica no evento que só acontece uma vez.
+
+---
+
 ## 2026-11-14 — "Zerar progresso" não zerava (e, para quem tem conta, voltava)
 
 **Sintoma:** em Configurações, o pai respondia a conta, confirmava "All XP, badges, and streaks will be lost",
