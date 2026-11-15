@@ -287,8 +287,12 @@ test('ranking: a forged XP total cannot jump to the top in one save, nor climb w
   assert.ok(xpGuardado() <= 120 + 2000, `one save took the XP to ${xpGuardado()}`);
   for (let i = 0; i < 40; i++) await salvar(10_000_000);
   assert.ok(xpGuardado() <= 120 + 20000, `40 saves in one day took the XP to ${xpGuardado()}`);
-  // Perder XP (recomeçar o progresso) continua valendo.
+  // Um envio velho (XP menor) não desce o XP guardado: o progresso só sobe.
+  const antes = xpGuardado();
   await salvar(0);
+  assert.equal(xpGuardado(), antes, 'a stale save must not lower the XP');
+  // Recomeçar o progresso de propósito (reset: true) continua valendo.
+  await chamar('POST', '/api/db', comSessao('tk-ana'), { type: 'state', reset: true, payload: { xp: 0, completedMinis: [] } });
   assert.equal(xpGuardado(), 0);
 });
 

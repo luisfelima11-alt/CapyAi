@@ -557,15 +557,13 @@ function verifyParentSubmit() {
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
 function resetProgress() {
-  openParentGate(() => {
+  openParentGate(async () => {
     if (!confirm('Are you sure? All XP, badges, and streaks will be lost! 😢')) return;
-    const sess = Auth.getSession();
-    localStorage.removeItem('capyYaraState');
-    if (sess && sess.id !== 'guest') {
-      localStorage.removeItem('capyYaraState_' + sess.id);
-    }
+    // O Store.init() de antes regravava o estado que estava na memória: o
+    // "reset" não zerava nada. Store.resetProgress zera aqui e no servidor.
+    const ok = await Store.resetProgress();
+    if (!ok) { alert('Não foi possível zerar agora. Confira a internet e tente de novo.'); return; }
     localStorage.removeItem('capyWotd');
-    Store.init();
     alert('Progress reset! Starting fresh 🌿');
     window.location.href = '6_Home_Forest_Expedition.html';
   });
