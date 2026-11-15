@@ -565,12 +565,13 @@
 
 <!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
   <div class="bg-gradient-to-br from-emerald-500 to-green-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 20 — Welcome to Our Booth!</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas abaixo.</p>
+    <p class="text-white/70 text-sm">São 12 tarefas, uns 30 a 40 minutos, para fixar o que você viu na aula. Pode fazer em duas partes. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -602,12 +603,14 @@
     </div>
   </div>
 
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 4 frases sobre o seu dia a dia usando o que você aprendeu nesta aula.</p><p class="text-slate-500 text-xs">Use os padrões da aula: WE OFFER + serviço · FASTER THAN · CHEAPER THAN · WOULD YOU LIKE…?.</p></div>
+      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">12</span>
+      <div><p class="font-black text-navy text-sm">Apresente a sua empresa por mensagem</p><p class="text-slate-500 text-xs">Uma cliente nova perguntou o que a sua empresa faz. Escreva 4 frases: dê as boas-vindas, diga o que vocês oferecem, compare com a concorrência e ofereça uma demonstração.</p></div>
     </div>
-    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Good afternoon! Welcome to the GPS Tronic booth.&#10;Congratulations! How big is the farm?&#10;We offer GPS repair, installation and operator training."></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Welcome to GPS Tronic!&#10;We offer GPS repair and operator training.&#10;Our repairs are faster than the dealers'.&#10;Would you like to see a demo?"></textarea>
     <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps20()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
@@ -1055,6 +1058,8 @@ function submitHomeworkGps20(){if(hwEntregue)return;if(window.HomeworkPlus&&!Hom
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
 <script src="aula-molde.js?v=am1"></script>
+<script>window.HW_PLUS={"aula":20,"titulo":"Welcome to Our Booth!","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"___ to the GPS Tronic booth.","r":["welcome"],"dica":"bem-vindo(a)"},{"f":"We ___ GPS repair, installation and operator training.","r":["offer"],"dica":"oferecer"},{"f":"Our repairs are faster ___ the dealers'.","r":["than"],"dica":"do que (comparação)"},{"f":"___ you like to see a demo?","r":["would"],"dica":"você gostaria…?"}],"compreensao":[{"q":"Why should Lúcia choose GPS Tronic?","opts":["The repairs are faster and cheaper.","It is the biggest dealer in Brazil.","It sells new tractors."],"a":"The repairs are faster and cheaper."},{"q":"What does Lúcia ask for at the end?","opts":["A price list.","A new receiver.","A job at the company."],"a":"A price list."}],"voz":["We offer GPS repair, installation and operator training.","Would you like to see a demo of our video support?"],"livre":{"pedido":"Write 1 sentence about what your company offers, using We offer… or We also offer….","exemplo":"We offer GPS repair and training."},"ditado":["Welcome to the GPS Tronic booth.","How big is the farm?","We're cheaper than buying a new receiver.","Here's our brochure, and here are the prices."],"traduzir":[{"pt":"O que a sua empresa faz?","en":["What does your company do?"]},{"pt":"A gente oferece suporte sete dias por semana.","en":["We offer support seven days a week.","We offer support 7 days a week."]},{"pt":"Parece bom.","en":["That sounds good.","It sounds good.","Sounds good."]},{"pt":"Eu gostaria de uma tabela de preços, por favor.","en":["I'd like a price list, please.","I would like a price list, please."]},{"pt":"Meu gerente vai te ligar semana que vem.","en":["My manager will call you next week.","My manager is going to call you next week."]}],"memoria":[{"quem":"Dona Lúcia","f":"I'm starting a new ___ in Goiás.","r":["farm"]},{"quem":"Yara","f":"We also offer support by video call, seven days a ___.","r":["week"]},{"quem":"Dona Lúcia","f":"Why should I ___ you and not the big dealers?","r":["choose"]},{"quem":"Yara","f":"Usually two days, not two ___.","r":["weeks"]}],"revisao":[{"en":"step","a":"passo, etapa","opts":["passo, etapa","aviso, alerta","nervoso"]},{"en":"steering wheel","a":"volante","opts":["nervoso","imediatamente","volante"]},{"en":"safety","a":"segurança","opts":["ensinar","segurança","imediatamente"]},{"en":"slowly","a":"devagar","opts":["devagar","ensinar","dirigir, virar o volante"]},{"en":"by itself","a":"sozinho (a máquina)","opts":["dirigir, virar o volante","piloto automático","sozinho (a máquina)"]},{"en":"to hold","a":"segurar","opts":["botão","segurar","piloto automático"]}]};window.HW_ESTADO=function(){const er=document.getElementById('err-gps20-fb');return{ordem:WO_GPS20_DATA.map((x,i)=>wo_gps20[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps20_Done.size,MP_GPS20.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_20-folha.pdf"></script>
 <script>window.PREP={};</script>
 <script src="preparacao.js?v=prep1"></script>

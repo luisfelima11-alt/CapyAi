@@ -196,6 +196,11 @@ Tudo sai dos geradores (`build-gpstronic-aula.mjs` e `build-agro-aula.mjs`). Dep
 - **No painel:**
   - o `professor.js` mostra "🎯 preparou a aula N" à parte das lições de casa;
   - o `resumoAluno` não conta a preparação no alerta de lição atrasada.
+- **Homework de 12 tarefas (protótipo, 15/nov/2026: GPS 20 a 24):** a aula que tem `homework.ditado` no
+  `conteudo.json` ganha 4 tarefas de fixação antes da escrita: 8. ditado (`ditado`: 4 frases), 9. traduzir
+  para o inglês (`traduzir`: 5 × `{pt, en:[aceitas]}`), 10. diálogo de memória (`memoria`: 4 falas com
+  `___`) e 11. revisão da aula anterior (sai sozinha do `vocab` da aula N−1, `montarRevisao`). A escrita
+  vira a 12 e o placar ao teacher inclui as 4. As outras aulas seguem com 8.
 - **Testes:** `tests/homework-plus.{test,spec}.js`, `tests/preparacao.{test,spec}.js`.
 
 ## Página de Preparação de aula (piloto: francês, 09/nov/2026)
