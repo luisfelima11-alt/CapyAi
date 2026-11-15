@@ -4,6 +4,15 @@
 // e HTML digitado entrava na página.
 const { test, expect } = require('playwright/test');
 
+// Trocas de página depois de aberta: o teste não espera nenhuma. Se uma
+// acontecer, a falha mostra para onde foi (na CI, "Execution context was
+// destroyed" sozinho não dizia).
+function vigiarNavegacao(page) {
+  const idas = [];
+  page.on('framenavigated', f => { if (f === page.mainFrame()) idas.push(f.url()); });
+  return idas;
+}
+
 async function abrir(page) {
   await page.route('**/api/**', route => {
     const caminho = new URL(route.request().url()).pathname;
@@ -15,6 +24,8 @@ async function abrir(page) {
   });
   await page.goto('/story_time.html');
   await page.waitForFunction(() => typeof addCustomWord === 'function');
+  // A conferência da sessão termina antes de o teste mexer na página.
+  await page.waitForFunction(() => window.Auth && Auth.ready().then(() => true));
 }
 
 async function adicionar(page, palavra) {
@@ -37,6 +48,7 @@ test('palavra com apóstrofo aparece e sai pelo ✕', async ({ page }) => {
 
 test('HTML digitado vira texto, na escolha e na história', async ({ page }) => {
   await abrir(page);
+  const idas = vigiarNavegacao(page);
   await adicionar(page, '<img src=x onerror="window.__xss=1">');
   await adicionar(page, '<b>negrito</b>');
   const display = page.locator('#selected-display');
@@ -47,9 +59,11 @@ test('HTML digitado vira texto, na escolha e na história', async ({ page }) => 
   await display.locator('button').first().click();
   expect(await page.evaluate(() => selectedWords)).toEqual(['<b>negrito</b>']);
 
-  await page.evaluate(() => generateStory());
+  // Pelo botão, como o aluno: sem ficar preso à promessa do generateStory().
+  await page.click('#gen-btn');
   const usadas = page.locator('#used-words-row');
   await expect(usadas).toContainText('<b>negrito</b>');
   await expect(usadas.locator('img, b')).toHaveCount(0);
+  expect(idas).toEqual([]);
   expect(await page.evaluate(() => window.__xss)).toBeUndefined();
 });
