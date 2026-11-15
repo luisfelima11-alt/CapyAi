@@ -259,6 +259,7 @@ const Store = {
     // chegado uma prática mais recente feita em outro aparelho.
     resolverStreak() {
         const hoje = capyHojeBR();
+        this.trazerDatasParaHoje(hoje);
         const ancora = [this.state.lastPracticeDate || '',
                         this.state.streakCoveredThrough || ''].sort().pop();
         const gap = ancora ? capyDiasEntre(ancora, hoje) : null;   // 0 = hoje, 1 = ontem
@@ -284,6 +285,19 @@ const Store = {
         this.state.streakDays = 0;
         this.state.streakCoveredThrough = '';
         this.state.lastFreezeUsed = '';
+    },
+
+    // Data de prática no FUTURO vem de relógio adiantado: o celular 10 min à
+    // frente grava a prática das 23h55 como "amanhã", e o merge leva essa data
+    // para os outros aparelhos (entra por MAIS RECENTE). A prática aconteceu
+    // de verdade, no máximo agora, então conta como hoje. Antes o gap negativo
+    // zerava a streak inteira de quem estudou.
+    trazerDatasParaHoje(hoje) {
+        const data = /^\d{4}-\d{2}-\d{2}$/;   // lixo não vira "praticou hoje"
+        for (const k of ['lastPracticeDate', 'streakCoveredThrough']) {
+            const v = this.state[k];
+            if (typeof v === 'string' && data.test(v) && v > hoje) this.state[k] = hoje;
+        }
     },
 
     // ── Daily Quests ─────────────────────────────────────────────
@@ -426,7 +440,11 @@ const Store = {
     // então o incremento dependia da ordem de execução da página.
     activateStreak() {
         const hoje = capyHojeBR();
+        this.trazerDatasParaHoje(hoje);
         if (this.state.lastPracticeDate === hoje) return;    // já contou hoje
+        // Página aberta desde antes da meia-noite: o checkDailyReset não rodou
+        // hoje, então o freeze tem que ser conferido aqui também.
+        this.resolverStreak();
 
         const ancora = [this.state.lastPracticeDate || '',
                         this.state.streakCoveredThrough || ''].sort().pop();
