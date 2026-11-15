@@ -198,6 +198,111 @@ Rota nova com balde próprio: confira o `AI_ROUTE_KEYS` e teste com contagem de 
 
 ---
 
+## 2026-11-13 — O Dia 2 da trilha (Game) não fechava em inglês, francês e nos cursos
+
+**Sintoma:** no Dia 2 de uma lição da Trilha (fora do turco), o aluno jogava o jogo da lição (Speed, Scramble ou
+Typing) até o fim e ficava preso na tela de resultado: só havia "Refazer", o botão para outro jogo e "Learning
+Path". O "✅ Continue to Next Step" nunca aparecia, o Dia 2 nunca era gravado e, com a regra dos 4 dias, nenhuma
+lição de inglês, francês ou dos cursos podia ser concluída pela trilha.
+
+**Causa raiz:** desde que o Game passou a usar o vocabulário da lição (`showGameStep`), o passo do dia se chama
+`game`, mas o jogo avisa o fim com o nome dele (`markToolDone(id, 'speed')`). O `markToolDone` só mostrava o
+"Continue" quando os dois nomes eram iguais. O turco não tinha o problema porque o jogo dele chama
+`guidedGameDone()`. Antes de 12/nov o Dia 4 sozinho fechava a lição, e isso escondia o buraco.
+
+**Correção:** no modo guiado, quando o passo é `game` e termina um dos jogos da lição (speed, scramble, typing), o
+`markToolDone` marca o game como feito e mostra o "Continue", como nos outros passos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (joga o Speed do Dia 2 da lição 3 até o fim e fecha o dia).
+
+**Por que aconteceu:** o passo e a ferramenta que o executa deixaram de ter o mesmo nome, e não havia teste que
+fizesse um dia da trilha do começo ao fim.
+
+---
+
+## 2026-11-13 — O "Plano de hoje" mandava refazer lições que a Trilha já dava como feitas
+
+**Sintoma:** quem terminou lições no formato antigo (a lição inteira de uma vez, antes das minilições) via na home
+e no `study_plan.html` "Trilha: mini-lição 1 · Aula 1", enquanto a Trilha (`learn.html`) mostrava essas lições
+concluídas e retomava na primeira pendente.
+
+**Causa raiz:** o `proximaMini` do `plano-hoje.js` só olhava a lista `completedMinis`. Lição terminada no formato
+antigo não tem os dias gravados, só o `completedLessons`, e a regra da trilha (`Store.isTrailLessonDone`) conta
+essas lições como feitas.
+
+**Correção:** o `proximaMini` recebe a regra da trilha (`Store.isTrailLessonDone(id, 'en')`) e pula a lição que a
+trilha dá como concluída. Sem o `Store` na página, continua como era.
+
+**Como pegar isso de novo:** `tests/plano-hoje.test.js` (roda o `store.js` e o `plano-hoje.js` de verdade com um
+aluno do formato antigo; está no `npm run test:security`).
+
+**Por que aconteceu:** a "próxima lição" é calculada em três lugares (trilha, cartão "Continue" e plano da home), e
+só a trilha foi atualizada quando a regra dos 4 dias entrou. Quem calcula progresso pergunta ao `store.js`.
+
+---
+
+## 2026-11-13 — Desafio da Yara colava como HTML o que o aluno e a IA escreviam
+
+**Sintoma:** no Desafio da Yara (o chefe no fim de cada capítulo da Trilha, `lessons.html?boss=…`), uma mensagem
+com `<img src=x onerror=…>` virava uma imagem de verdade e o código rodava. O mesmo valia para a resposta da IA
+e para o texto final de avaliação ("Capítulo dominado!" / "Quase lá!").
+
+**Causa raiz:** o `appendBossMsg` montava o balão com `innerHTML` e `${text}` cru, e o `finishBossChallenge`
+fazia o mesmo com o `feedback` da IA. O chat do Dia 4 (`appendChatMsg`) já usava `textContent`; o do chefe ficou
+de fora.
+
+**Correção:** os balões e o texto da avaliação entram por `textContent`. O HTML fixo (ícone, classes) continua igual.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (manda `<img onerror>` como aluno e como IA, até a
+avaliação final, e confere que nada vira HTML).
+
+**Por que aconteceu:** cada chat da página tinha a sua função de balão, e a regra "texto do usuário ou da IA
+nunca vai cru para `innerHTML`" foi aplicada em uma e esquecida na outra.
+
+---
+
+## 2026-11-13 — Trilhas de curso ignoravam a regra dos 4 dias
+
+**Sintoma:** nas trilhas de curso (Agro, GPS Tronic, Intermediário, Entrevista e Medicina), quem tinha feito só
+o Dia 4 de uma lição antes de 12/nov via os 4 dias com ✓, a barra contava 4 dias e o "Começar" pulava para a
+lição seguinte. Na trilha de inglês (`learn.html`) e na de francês, a mesma lição aparecia com só o Dia 4 feito.
+
+**Causa raiz:** o `miniDone` dessas 5 páginas olhava a lista crua `completedLessons` antes dos dias. Até 12/nov,
+o Dia 4 sozinho gravava a lição nessa lista. A regra dos 4 dias entrou no `store.js` (`isTrailLessonDone`)
+e no `learn.html`/`learn_fr.html`, mas as páginas de curso ficaram com a lógica antiga.
+
+**Correção:** o `miniDone` das 5 páginas usa `Store.isTrailLessonDone(id) || Store.isMiniDone(id, dia)`, igual
+ao `learn_fr.html`. Quem terminou a lição no formato antigo (sem nenhum dia gravado) continua com os 4 dias feitos.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (abre as 5 trilhas com o registro antigo do Dia 4).
+
+**Por que aconteceu:** a mesma regra estava copiada em 7 páginas. Regra de progresso mora num lugar só
+(`store.js`) e as páginas só perguntam a ele.
+
+---
+
+## 2026-11-13 — Fazer só o Dia 1 da trilha fechava a lição inteira
+
+**Sintoma:** o aluno fazia o Dia 1 (Listen & Quiz) de uma lição da Trilha, acertava 60% ou mais do quiz e via
+"🏆 Lesson Complete!" no lugar de "Day 1 Complete". De volta à trilha, os Dias 2, 3 e 4 apareciam feitos, a
+lição contava como concluída e a retomada pulava para a lição seguinte.
+
+**Causa raiz:** o `renderQuizFinish` do `lessons.html` chamava `Store.completeLesson` sempre que o quiz passava
+de 60%, também no modo guiado. Logo depois, o `guidedLessonComplete` chamava `Store.completeMini(id, 1)`. Como
+ainda não havia nenhum dia gravado, o `isTrailLessonDone` caía no marcador antigo (`completedLessons`), achava
+que era uma lição terminada no formato antigo e o `completeMini` gravava os 4 dias de uma vez.
+
+**Correção:** no modo guiado o quiz não marca mais a lição (nem mostra "Lição concluída!"): quem fecha a lição
+é o `guidedLessonComplete`, com os 4 dias. O modo livre (sem `guided=1`) continua como era.
+
+**Como pegar isso de novo:** `tests/trilha-dias.spec.js` (faz o Dia 1 no modo guiado e volta para a trilha).
+
+**Por que aconteceu:** a regra dos 4 dias entrou no `store.js` com uma ponte para o progresso antigo
+("sem nenhum dia gravado, vale o `completedLessons`"), mas o quiz continuava escrevendo esse mesmo marcador.
+Marcador de compatibilidade não pode continuar sendo escrito pelo fluxo novo.
+
+---
+
 ## 2026-11-07 — O chat da lousa nunca usou a resposta da IA
 
 **Sintoma:** no `quadro.html`, o professor pedia "5 frases sobre viagem" e recebia sempre as mesmas

@@ -32,6 +32,32 @@ test('proximaMini continues where the student stopped, else the first unfinished
   assert.equal(P._proximaMini([{ id: 1 }], ['1_1', '1_2', '1_3', '1_4'], null), null);
 });
 
+// A home e a Trilha precisam apontar a mesma "próxima lição". Quem terminou lições
+// no formato antigo (lição inteira, sem dias gravados) tem só o completedLessons; a
+// trilha (store.js: isTrailLessonDone) conta essas lições como feitas.
+test('plano de hoje: lição terminada no formato antigo não volta como a próxima da trilha', async () => {
+  const valores = new Map([['capyYaraState', JSON.stringify({ completedLessons: [1, 2], completedMinis: ['3_4'] })]]);
+  const indice = [1, 2, 3, 4].map(id => ({ id, lang: 'en', title: 'Lesson ' + id }));
+  const ctx = {
+    localStorage: { getItem: k => valores.get(k) ?? null, setItem: (k, v) => valores.set(k, String(v)), removeItem: k => valores.delete(k) },
+    document: { dispatchEvent() {}, addEventListener() {} },
+    Event: function Event(type) { this.type = type; },
+    CustomEvent: function CustomEvent(type, o) { this.type = type; this.detail = o && o.detail; },
+    fetch: async url => String(url).startsWith('data/lessons-index.json')
+      ? { ok: true, json: async () => indice } : { ok: false, json: async () => null },
+    URLSearchParams, Date, Set, Map, JSON, Number, String, Math, Promise, Object, Array, console,
+  };
+  ctx.window = ctx;
+  ctx.location = { search: '' };
+  vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'store.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'plano-hoje.js'), 'utf8'), ctx);
+  const plano = await ctx.CapyPlano.hoje();
+  const trilha = plano.itens.find(i => i.id === 'trilha');
+  // 1 e 2 estão feitas (formato antigo); a 3 tem só o Dia 4: a próxima é o Dia 1 da 3.
+  assert.equal(trilha.href, 'lessons.html?lesson=3&guided=1&mini=1');
+});
+
 test('Google Calendar link: daily, in Brazil time, 15 minutes at the chosen hour', () => {
   const P = carregarPlano();
   const u = new URL(P.linkGoogle('19:00', '2026-10-29'));
