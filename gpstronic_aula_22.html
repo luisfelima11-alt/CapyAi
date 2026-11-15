@@ -565,12 +565,13 @@
 
 <!-- HOMEWORK -->
 <div id="tab-homework" class="tab-content fade-in hidden">
+  <input type="text" id="placar" hidden readonly tabindex="-1" aria-hidden="true"/>
   <div class="bg-gradient-to-br from-emerald-500 to-green-700 rounded-3xl p-6 mb-6 text-white">
     <div class="flex items-center gap-3 mb-2">
       <span class="text-4xl">📝</span>
       <div><h2 class="text-2xl font-black">Homework</h2><p class="text-white/80 text-sm">Lesson 22 — Harvest Emergency!</p></div>
     </div>
-    <p class="text-white/70 text-sm">Complete as 4 tarefas abaixo.</p>
+    <p class="text-white/70 text-sm">São 12 tarefas, uns 30 a 40 minutos, para fixar o que você viu na aula. Pode fazer em duas partes. No fim, você ganha um card para mandar para o seu teacher.</p>
   </div>
 
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -602,12 +603,14 @@
     </div>
   </div>
 
+  <div id="hw-plus"></div>
+
   <div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">4</span>
-      <div><p class="font-black text-navy text-sm">Escreva 4 frases sobre o seu dia a dia usando o que você aprendeu nesta aula.</p><p class="text-slate-500 text-xs">Use os padrões da aula: RIGHT NOW · TONIGHT · TOMORROW · I'll be there IN + tempo · UNTIL + momento.</p></div>
+      <span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-black text-sm flex items-center justify-center">12</span>
+      <div><p class="font-black text-navy text-sm">Mensagem numa emergência</p><p class="text-slate-500 text-xs">Um cliente está parado no meio da colheita. Escreva 4 frases para ele: acalme, diga quando você chega, diga o que ele faz até lá e peça uma foto.</p></div>
     </div>
-    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Calm down. What happened?&#10;I need to finish tonight. Rain is coming tomorrow.&#10;What does the display say right now?"></textarea>
+    <textarea id="texto-guiado" rows="6" class="w-full border-2 border-slate-200 rounded-xl p-3 text-sm text-navy focus:border-emerald-400 focus:outline-none resize-none" placeholder="Don't worry, Marcos.&#10;I'm leaving now. I'll be there in forty minutes.&#10;Drive the combine manually until I arrive.&#10;Send me a photo of the display as soon as you can."></textarea>
     <p id="texto-guiado-aviso" class="hidden text-xs font-black text-red-600 mt-1"></p>
     <button onclick="submitHomeworkGps22()" class="mt-3 bg-gradient-to-r from-emerald-500 to-green-700 text-white font-black px-6 py-3 rounded-2xl hover:scale-105 transition-all w-full">
       🚀 Entregar Homework (+75 XP)
@@ -1055,6 +1058,8 @@ function submitHomeworkGps22(){if(hwEntregue)return;if(window.HomeworkPlus&&!Hom
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
 <script src="aula-molde.js?v=am1"></script>
+<script>window.HW_PLUS={"aula":22,"titulo":"Harvest Emergency!","curso":"GPS Tronic","cor":"#0f766e","completar":[{"f":"Calm ___. What happened?","r":["down"],"dica":"fica calmo"},{"f":"I'm ___ the shop now.","r":["leaving"],"dica":"saindo (agora)"},{"f":"Drive the combine manually ___ I arrive.","r":["until"],"dica":"até (eu chegar)"},{"f":"Call me as ___ as you see my car.","r":["soon"],"dica":"assim que"}],"compreensao":[{"q":"Why does Marcos need to finish tonight?","opts":["Rain is coming tomorrow.","The combine is rented.","He is traveling tomorrow."],"a":"Rain is coming tomorrow."},{"q":"What should Marcos do until Yara arrives?","opts":["Drive the combine manually.","Stop the harvest.","Buy a new receiver."],"a":"Drive the combine manually."}],"voz":["I'm leaving the shop now. I'll be there in forty minutes.","Send me a photo of the display as soon as you can."],"livre":{"pedido":"Write 1 sentence to calm a client down and say when you arrive, using I'll be there in….","exemplo":"Don't worry. I'll be there in one hour."},"ditado":["What happened?","I need to finish tonight.","I'll be there in forty minutes.","Call me as soon as you see my car."],"traduzir":[{"pt":"Desculpa ligar tão tarde.","en":["Sorry to call so late.","I'm sorry to call so late.","I am sorry to call so late."]},{"pt":"O que o monitor está mostrando agora?","en":["What does the display say right now?","What does the display say now?","What is the display showing now?","What is the display showing right now?"]},{"pt":"Estou saindo da oficina agora.","en":["I'm leaving the shop now.","I am leaving the shop now."]},{"pt":"Vai devagar.","en":["Go slowly.","Drive slowly."]},{"pt":"Você termina antes da chuva.","en":["You'll finish before the rain.","You will finish before the rain."]}],"memoria":[{"quem":"Marcos","f":"The autosteer on my combine stopped in the ___ of the field.","r":["middle"]},{"quem":"Marcos","f":"And ___ is coming tomorrow.","r":["rain"]},{"quem":"Yara","f":"Drive the combine ___ until I arrive.","r":["manually"]},{"quem":"Yara","f":"At the ___. Call me as soon as you see my car.","r":["gate"]}],"revisao":[{"en":"report","a":"relatório","opts":["relatório","placa (eletrônica)","queimado"]},{"en":"power connector","a":"conector de energia","opts":["queimado","de graça","conector de energia"]},{"en":"certificate","a":"certificado","opts":["trocar, substituir","certificado","de graça"]},{"en":"tight","a":"firme, bem preso","opts":["firme, bem preso","trocar, substituir","imprimir"]},{"en":"probably","a":"provavelmente","opts":["imprimir","nota fiscal, fatura","provavelmente"]},{"en":"to receive","a":"receber","opts":["anexo","receber","nota fiscal, fatura"]}]};window.HW_ESTADO=function(){const er=document.getElementById('err-gps22-fb');return{ordem:WO_GPS22_DATA.map((x,i)=>wo_gps22[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps22_Done.size,MP_GPS22.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
+<script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/gpstronic_aula_22-folha.pdf"></script>
 <script>window.PREP={};</script>
 <script src="preparacao.js?v=prep1"></script>

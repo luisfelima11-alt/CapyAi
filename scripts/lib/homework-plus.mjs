@@ -14,6 +14,11 @@
 //     homework-plus.js, e a escrita guiada no fim. Ao entregar, o placar de
 //     cada tarefa vai junto para o professor (campo "placar") e o aluno ganha
 //     um card para compartilhar.
+//  3. Nas aulas com o homework maior (15/nov/2026, protótipo no GPS 20–24:
+//     conteudo.json → homework.ditado), são 12 tarefas, uns 30 a 40 minutos. As
+//     4 novas são de fixação: ditado, traduzir para o inglês, completar o
+//     diálogo de memória e a revisão das palavras da aula anterior (essa sai
+//     sozinha do vocabulário da aula N−1, que o gerador passa em vocabAnterior).
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -35,6 +40,24 @@ export const SUBMIT_MOLDE = "function submitHomeworkGps9(){if(hwEntregue)return;
 const SUBMIT_NOVO = "function submitHomeworkGps9(){if(hwEntregue)return;if(window.HomeworkPlus&&!HomeworkPlus.podeEntregar())return;hwEntregue=true;markSection('homework');if(typeof Store!=='undefined')Store.addXP(55);const btn=document.querySelector('[onclick=\"submitHomeworkGps9()\"]');btn.textContent='🎉 Homework submitted! +75 XP';btn.disabled=true;if(window.HomeworkPlus)HomeworkPlus.entregue();}";
 
 export const temHomeworkNovo = c => !!(c.homework && Array.isArray(c.homework.completar));
+export const temHomeworkMaior = c => temHomeworkNovo(c) && Array.isArray(c.homework.ditado);
+
+// Revisão da aula anterior: 6 palavras espalhadas pelo vocabulário dela, cada
+// uma com 3 significados (o certo e dois de outras palavras da mesma aula).
+// Sem sorteio: gerar de novo dá a mesma página.
+export function montarRevisao(vocabAnterior) {
+    const v = (vocabAnterior || []).filter(x => x && x.en && x.pt);
+    if (v.length < 8) return [];
+    const passo = Math.max(1, Math.floor(v.length / 6));
+    return Array.from({ length: 6 }, (_, k) => {
+        const i = (k * passo) % v.length;
+        const certa = v[i].pt;
+        const outras = [v[(i + 3) % v.length].pt, v[(i + 5) % v.length].pt].filter(o => o !== certa);
+        const opts = [certa, ...outras];
+        const giro = k % opts.length;                      // a certa não fica sempre em primeiro
+        return { en: v[i].en, a: certa, opts: [...opts.slice(giro), ...opts.slice(0, giro)] };
+    });
+}
 
 // A escrita das aulas que ainda não têm o homework novo: um pedido que serve
 // para qualquer tema, com os padrões e as frases da própria aula como exemplo.
@@ -66,25 +89,28 @@ function cartaoEscrita(numero, e) {
 
 /**
  * @param {string} t   HTML da aula, ainda com os nomes do molde (gps9)
- * @param {object} o   { c, d, n, pagina, raiz, curso, cor }
+ * @param {object} o   { c, d, n, pagina, raiz, curso, cor, vocabAnterior }
  */
-export function aplicarHomework(t, { c, d, n, pagina, raiz, curso, cor }) {
+export function aplicarHomework(t, { c, d, n, pagina, raiz, curso, cor, vocabAnterior }) {
     // A Parte 2 do treino ("Complete a instrução" / "imperativo") era da aula 09.
     t = trocar(t, '✏️ Parte 2 — Complete a instrução', c.verbsQuizTitulo || '✏️ Parte 2 — Complete a frase', 'título da Parte 2');
     t = trocar(t, 'Escreva o verbo na forma certa do imperativo.', c.verbsQuizDica || 'Escreva a palavra que falta, como você viu na aula.', 'dica da Parte 2');
 
     const novo = temHomeworkNovo(c);
+    const maior = temHomeworkMaior(c);
     const h = c.homework;
+    const revisao = maior ? montarRevisao(vocabAnterior) : [];
     const escrita = novo ? h.escrita : escritaPadrao(c);
 
     // O cartão de escrita (e o botão de entrega) com o pedido desta aula.
     const i = t.indexOf(INICIO_ESCRITA), f = t.indexOf(FIM_ESCRITA, i);
     if (i < 0 || f < 0) throw new Error('homework-plus: não achei o cartão de escrita no molde');
     const antes = novo ? '  <div id="hw-plus"></div>\n\n' : '';
-    t = t.slice(0, i) + antes + cartaoEscrita(novo ? 8 : 4, escrita) + t.slice(f + FIM_ESCRITA.length);
+    t = t.slice(0, i) + antes + cartaoEscrita(maior ? (revisao.length ? 12 : 11) : novo ? 8 : 4, escrita) + t.slice(f + FIM_ESCRITA.length);
 
     t = trocar(t, 'Complete as 4 tarefas interativas abaixo.',
-        novo ? 'São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.' : 'Complete as 4 tarefas abaixo.',
+        maior ? `São ${revisao.length ? 12 : 11} tarefas, uns 30 a 40 minutos, para fixar o que você viu na aula. Pode fazer em duas partes. No fim, você ganha um card para mandar para o seu teacher.`
+            : novo ? 'São 8 tarefas, uns 20 minutos. No fim, você ganha um card para mandar para o seu teacher.' : 'Complete as 4 tarefas abaixo.',
         'texto do topo do homework');
 
     // A entrega: confere a escrita e, depois de entregue, mostra o card.
@@ -99,6 +125,12 @@ export function aplicarHomework(t, { c, d, n, pagina, raiz, curso, cor }) {
             aula: n, titulo: d.titulo, curso, cor,
             completar: h.completar, compreensao: h.compreensao, voz: h.voz, livre: h.livre,
         };
+        if (maior) {
+            dados.ditado = h.ditado;
+            dados.traduzir = h.traduzir;
+            dados.memoria = h.memoria;
+            if (revisao.length) dados.revisao = revisao;
+        }
         // O estado das 3 primeiras tarefas fica em variáveis do molde: aqui elas
         // viram uma função que o homework-plus.js chama na hora da entrega.
         const estado = "window.HW_ESTADO=function(){const er=document.getElementById('err-gps9-fb');return{ordem:WO_GPS9_DATA.map((x,i)=>wo_gps9[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_gps9_Done.size,MP_GPS9.length],erro:!!(er&&/✅/.test(er.textContent))};};";
@@ -129,4 +161,12 @@ export function checarHomework(c, t, ok) {
     ok(h.livre && h.livre.pedido && h.livre.exemplo, 'frase livre com pedido e exemplo');
     ok(h.escrita && h.escrita.titulo && h.escrita.dica && h.escrita.exemplo, 'escrita guiada com título, dica e exemplo');
     ok(t.includes('homework-plus.js?v=') && t.includes('id="hw-plus"') && t.includes('id="placar"'), 'homework novo ligado (homework-plus.js, #hw-plus, placar)');
+    if (!temHomeworkMaior(c)) return;
+    const textos = JSON.stringify([h.ditado, h.traduzir, h.memoria]);
+    ok(!/gram[aá]tic|grammar/i.test(textos), 'homework maior sem "gramática"');
+    ok(h.ditado.length === 4 && h.ditado.every(x => typeof x === 'string' && x.split(/\s+/).length <= 10), '4 frases de ditado, até 10 palavras');
+    ok(Array.isArray(h.traduzir) && h.traduzir.length === 5 && h.traduzir.every(x => x.pt && Array.isArray(x.en) && x.en.length), '5 frases para traduzir, cada uma com as respostas aceitas');
+    ok(Array.isArray(h.memoria) && h.memoria.length === 4 && h.memoria.every(x => x.quem && (x.f.match(/___/g) || []).length === 1 && Array.isArray(x.r) && x.r.length), '4 falas de memória, cada uma com um ___ e a resposta');
+    ok(/"ditado":\[/.test(t) && /"traduzir":\[/.test(t) && /"memoria":\[/.test(t), 'homework maior nos dados da página (ditado, traduzir, memoria)');
+    ok(/São 1[12] tarefas/.test(t), 'o topo do homework anuncia as 11 ou 12 tarefas');
 }

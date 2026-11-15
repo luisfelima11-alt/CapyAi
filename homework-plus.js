@@ -6,6 +6,11 @@
 //   4. Completar frases   5. Compreensão do diálogo   6. Gravação de voz   7. Frase livre
 // (a 8, escrita guiada, já vem no HTML da aula, com o botão de entrega).
 //
+// Homework maior (15/nov/2026, protótipo no GPS 20–24): quando a aula traz
+// HW_PLUS.ditado, entram mais 4 tarefas de fixação antes da escrita, que vira a 12:
+//   8. Ditado   9. Traduzir para o inglês   10. Diálogo de memória   11. Revisão da aula anterior
+// As aulas sem esses dados continuam com as 8 tarefas, sem mudança.
+//
 // Na entrega: podeEntregar() confere a escrita e escreve o placar no campo
 // #placar, que o components.js manda ao professor junto com as respostas
 // (primeiro campo da entrega); entregue() desenha o card e oferece compartilhar.
@@ -21,11 +26,32 @@
   const norm = s => String(s || '').toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
   const palavras = s => norm(s).split(' ').filter(Boolean);
 
+  const MAIOR = Array.isArray(D.ditado);
+  const DITADO = MAIOR ? D.ditado : [], TRADUZIR = MAIOR ? (D.traduzir || []) : [];
+  const MEMORIA = MAIOR ? (D.memoria || []) : [], REVISAO = MAIOR ? (D.revisao || []) : [];
+
   const estado = {
     completar: D.completar.map(() => null),     // true / false / null (não respondida)
     compreensao: D.compreensao.map(() => null), // índice escolhido
     voz: D.voz.map(() => null),                 // true / false / null
+    ditado: DITADO.map(() => null),
+    traduzir: TRADUZIR.map(() => null),
+    memoria: MEMORIA.map(() => null),
+    revisao: REVISAO.map(() => null),           // índice escolhido
   };
+
+  // Frase digitada contra a esperada: contração e número contam como a mesma
+  // coisa ("I'll" = "I will", "40" = "forty"), pela régua do CapyFala.
+  const paraComparar = s => (window.CapyFala && typeof CapyFala.normalizar === 'function' ? CapyFala.normalizar(s, 'en') : norm(s)).replace(/\s+/g, ' ').trim();
+  // Quanto da frase esperada o aluno escreveu (palavras certas, na conta da esperada).
+  function acertoFrase(esperada, escrita) {
+    const alvo = paraComparar(esperada).split(' ').filter(Boolean), dito = paraComparar(escrita).split(' ').filter(Boolean);
+    if (!alvo.length || !dito.length) return 0;
+    const resto = dito.slice();
+    let iguais = 0;
+    for (const w of alvo) { const k = resto.indexOf(w); if (k >= 0) { iguais++; resto.splice(k, 1); } }
+    return iguais / Math.max(alvo.length, dito.length);
+  }
 
   function cartao(num, titulo, sub, corpo) {
     return `<div class="bg-white border-2 border-emerald-200 rounded-2xl p-5 mb-4">
@@ -79,7 +105,81 @@
     cartao(6, 'Grave a sua voz', 'Ouça, toque em Gravar, fale a frase e toque de novo para parar. Seu teacher vê o que você falou.',
       `<div class="grid gap-2">${htmlVoz}</div><p id="voz-aviso" class="hidden text-xs font-bold text-slate-500 mt-2"></p>`) +
     cartao(7, D.livre.pedido, 'Escreva com as suas palavras. Pode ser simples!',
-      `<input id="frase-livre" type="text" class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm text-navy focus:border-emerald-400 focus:outline-none" placeholder="${esc(D.livre.exemplo)}"/>`);
+      `<input id="frase-livre" type="text" class="w-full border-2 border-slate-200 rounded-xl px-3 py-2 text-sm text-navy focus:border-emerald-400 focus:outline-none" placeholder="${esc(D.livre.exemplo)}"/>`) +
+    (MAIOR ? htmlMaior() : '');
+
+  // ── Homework maior: 8 a 11 ───────────────────────────────────────────────
+  function htmlMaior() {
+    const campo = (id, extra) => `<input id="${id}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" ${extra}
+      class="mt-2 w-full border-2 border-slate-200 rounded-lg px-2 py-1.5 text-sm text-navy focus:border-emerald-400 focus:outline-none"/>`;
+    const fb = id => `<p class="text-xs font-black mt-1 hidden" id="${id}"></p>`;
+    const ditado = DITADO.map((_, i) => `<div class="bg-slate-50 rounded-xl p-3">
+        <div class="flex items-center gap-2"><span class="text-sm font-bold text-navy">Frase ${i + 1}</span>
+          <button type="button" class="text-xs font-black bg-white border-2 border-slate-200 rounded-full px-3 py-1.5" data-hw-ditado="${i}">🔊 Ouvir</button></div>
+        ${campo(`ditado-${i + 1}`, 'placeholder="Escreva o que você ouviu"')}${fb(`ditado-fb-${i}`)}
+      </div>`).join('');
+    const traduzir = TRADUZIR.map((x, i) => `<div class="bg-slate-50 rounded-xl p-3">
+        <label class="text-sm font-bold text-navy" for="traduzir-${i + 1}">${i + 1}. ${esc(x.pt)}</label>
+        ${campo(`traduzir-${i + 1}`, 'placeholder="In English…"')}${fb(`traduzir-fb-${i}`)}
+      </div>`).join('');
+    const memoria = MEMORIA.map((x, i) => {
+      const [antes, depois] = String(x.f).split('___');
+      return `<div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-[11px] font-black text-emerald-700">${esc(x.quem)}</p>
+        <label class="text-sm text-navy font-semibold leading-relaxed flex flex-wrap items-center gap-1" for="memoria-${i + 1}">
+          <span>${esc(antes)}</span>
+          <input id="memoria-${i + 1}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+            class="w-28 border-2 border-slate-200 rounded-lg px-2 py-1 text-sm focus:border-emerald-400 focus:outline-none"/>
+          <span>${esc(depois || '')}</span>
+        </label>${fb(`memoria-fb-${i}`)}
+      </div>`;
+    }).join('');
+    const revisao = REVISAO.map((q, i) => `<div class="bg-slate-50 rounded-xl p-3">
+        <p class="text-sm font-bold text-navy mb-2">${i + 1}. ${esc(q.en)}</p>
+        <div class="grid gap-2" role="group" aria-label="${esc(q.en)}">${q.opts.map((o, k) =>
+          `<button type="button" class="text-left text-sm font-semibold border-2 border-slate-200 bg-white rounded-xl px-3 py-2 transition-colors" data-hw-rev="${i}" data-hw-rev-op="${k}">${esc(o)}</button>`).join('')}</div>
+      </div>`).join('');
+    const conferir = (id, total) => `<button type="button" id="${id}" class="mt-3 text-sm font-black bg-navy text-white rounded-full px-5 py-2">Conferir</button>
+       <p id="${total}" class="text-xs font-black text-slate-500 mt-2"></p>`;
+    return cartao(8, 'Ditado', 'Ouça cada frase (quantas vezes quiser) e escreva em inglês o que você ouviu.',
+        `<div class="grid gap-2">${ditado}</div>${conferir('ditado-conferir', 'ditado-total')}`) +
+      cartao(9, 'Como se diz em inglês?', 'Escreva em inglês, de memória, as frases que você viu na aula.',
+        `<div class="grid gap-2">${traduzir}</div>${conferir('traduzir-conferir', 'traduzir-total')}`) +
+      cartao(10, 'O diálogo, de memória', 'Complete as falas do diálogo sem olhar a aula.',
+        `<div class="grid gap-2">${memoria}</div>${conferir('memoria-conferir', 'memoria-total')}`) +
+      (REVISAO.length ? cartao(11, 'Revisão da aula anterior', 'O que significam estas palavras da última aula? Uma tentativa por palavra.',
+        `<div class="grid gap-2">${revisao}</div>`) : '');
+  }
+
+  function marcarCampo(inp, fb, ok, certo) {
+    fb.classList.remove('hidden');
+    fb.textContent = ok ? '✅ Correto!' : `❌ Quase. O certo: ${certo}`;
+    fb.className = `text-xs font-black mt-1 ${ok ? 'text-emerald-600' : 'text-red-500'}`;
+    inp.classList.toggle('border-emerald-400', ok);
+    inp.classList.toggle('border-red-300', !ok);
+  }
+  // Confere uma lista de campos; `julgar(i, valor)` devolve { ok, certo }.
+  function conferirLista(nome, lista, julgar, mostrar) {
+    let certas = 0;
+    lista.forEach((_, i) => {
+      const inp = $(`${nome}-${i + 1}`), fb = $(`${nome}-fb-${i}`);
+      if (!inp.value.trim()) { estado[nome][i] = null; if (mostrar) fb.classList.add('hidden'); return; }
+      const r = julgar(i, inp.value);
+      estado[nome][i] = r.ok;
+      if (r.ok) certas++;
+      if (mostrar) marcarCampo(inp, fb, r.ok, r.certo);
+    });
+    if (mostrar) $(`${nome}-total`).textContent = `${certas} de ${lista.length} certas`;
+    return certas;
+  }
+  const conferirDitado = m => conferirLista('ditado', DITADO, (i, v) => ({ ok: acertoFrase(DITADO[i], v) >= 0.85, certo: DITADO[i] }), m);
+  const conferirTraduzir = m => conferirLista('traduzir', TRADUZIR, (i, v) => ({ ok: TRADUZIR[i].en.some(e => acertoFrase(e, v) >= 0.85), certo: TRADUZIR[i].en[0] }), m);
+  const conferirMemoria = m => conferirLista('memoria', MEMORIA, (i, v) => ({ ok: MEMORIA[i].r.map(norm).includes(norm(v)), certo: MEMORIA[i].r[0] }), m);
+  if (MAIOR) {
+    $('ditado-conferir').addEventListener('click', () => conferirDitado(true));
+    $('traduzir-conferir').addEventListener('click', () => conferirTraduzir(true));
+    $('memoria-conferir').addEventListener('click', () => conferirMemoria(true));
+  }
 
   // ── Correções ────────────────────────────────────────────────────────────
   function conferirCompletar(mostrar) {
@@ -115,6 +215,22 @@
         b.disabled = true;
         if (certo) b.classList.add('border-emerald-400', 'bg-emerald-50');
         else if (b === op) b.classList.add('border-red-300', 'bg-red-50');
+        b.classList.remove('border-slate-200', 'bg-white');
+      });
+      return;
+    }
+    const dit = e.target.closest('[data-hw-ditado]');
+    if (dit) { falar(DITADO[Number(dit.dataset.hwDitado)]); return; }
+    const rev = e.target.closest('[data-hw-rev-op]');
+    if (rev) {
+      const i = Number(rev.dataset.hwRev), k = Number(rev.dataset.hwRevOp);
+      if (estado.revisao[i] !== null) return;        // uma tentativa: vale o placar
+      estado.revisao[i] = k;
+      document.querySelectorAll(`[data-hw-rev="${i}"]`).forEach(b => {
+        const certo = REVISAO[i].opts[Number(b.dataset.hwRevOp)] === REVISAO[i].a;
+        b.disabled = true;
+        if (certo) b.classList.add('border-emerald-400', 'bg-emerald-50');
+        else if (b === rev) b.classList.add('border-red-300', 'bg-red-50');
         b.classList.remove('border-slate-200', 'bg-white');
       });
       return;
@@ -208,6 +324,12 @@
     somar('Compreensão', estado.compreensao.filter((k, i) => k !== null && D.compreensao[i].opts[k] === D.compreensao[i].a).length, D.compreensao.length);
     somar('Voz', estado.voz.filter(Boolean).length, D.voz.length);
     somar('Frase livre', palavras($('frase-livre').value).length >= 3 ? 1 : 0, 1);
+    if (MAIOR) {
+      somar('Ditado', conferirDitado(false), DITADO.length);
+      somar('Traduzir', conferirTraduzir(false), TRADUZIR.length);
+      somar('De memória', conferirMemoria(false), MEMORIA.length);
+      if (REVISAO.length) somar('Revisão', estado.revisao.filter((k, i) => k !== null && REVISAO[i].opts[k] === REVISAO[i].a).length, REVISAO.length);
+    }
     return { certas, total, texto: `${linhas.join(' · ')} · Total ${certas}/${total}` };
   }
 

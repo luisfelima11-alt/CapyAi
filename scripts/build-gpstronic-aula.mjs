@@ -206,7 +206,10 @@ function construir(n) {
 
     // 6b. Homework: escrita desta aula (não a da aula 09) e, nas aulas com o homework
     //     novo, as 8 tarefas e o card para o teacher (scripts/lib/homework-plus.mjs).
-    t = aplicarHomework(t, { c, d, n, pagina: `gpstronic_aula_${nn}`, raiz: RAIZ, curso: 'GPS Tronic', cor: '#0f766e' });
+    // O homework maior revisa as palavras da aula anterior.
+    const anterior = path.join(RAIZ, `scripts/aula${String(n - 1).padStart(2, '0')}-conteudo.json`);
+    const vocabAnterior = fs.existsSync(anterior) ? JSON.parse(fs.readFileSync(anterior, 'utf8')).vocab : [];
+    t = aplicarHomework(t, { c, d, n, pagina: `gpstronic_aula_${nn}`, raiz: RAIZ, curso: 'GPS Tronic', cor: '#0f766e', vocabAnterior });
     // 6c. 🎯 Prepare: a preparação antes da aula, no começo da rota (scripts/lib/preparacao.mjs).
     t = aplicarPreparacao(t, { c });
 

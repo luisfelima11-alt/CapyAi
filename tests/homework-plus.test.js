@@ -40,8 +40,35 @@ test('as aulas com o homework novo têm as 8 tarefas ligadas e o placar como pri
     assert.equal(dados.completar.length, 4);
     assert.deepEqual(dados.voz, c.homework.voz);
     assert.ok(!/<\/script/i.test(t.match(/window\.HW_PLUS=.*?<\/script>/)[0].slice(0, -9)), `${pagina}: JSON sem </script>`);
-    assert.match(t, /São 8 tarefas, uns 20 minutos/);
+    const maior = Array.isArray(c.homework.ditado);
+    assert.match(t, maior ? /São 12 tarefas, uns 30 a 40 minutos/ : /São 8 tarefas, uns 20 minutos/);
+    assert.equal('ditado' in dados, maior, `${pagina}: ditado só no homework maior`);
   }
+});
+
+test('homework de 12 tarefas: só no GPS 20 a 24, com ditado, tradução, memória e a revisão da aula anterior', async () => {
+  const maiores = geradas.filter(g => Array.isArray(JSON.parse(ler(g.json)).homework.ditado)).map(g => g.pagina).sort();
+  assert.deepEqual(maiores, [20, 21, 22, 23, 24].map(n => `gpstronic_aula_${n}.html`));
+  const { montarRevisao } = await import('../scripts/lib/homework-plus.mjs');
+  for (const n of [20, 21, 22, 23, 24]) {
+    const t = ler(`gpstronic_aula_${n}.html`);
+    const dados = JSON.parse(t.match(/window\.HW_PLUS=(\{.*?\});window\.HW_ESTADO/)[1]);
+    const anterior = JSON.parse(ler(`scripts/aula${n - 1}-conteudo.json`)).vocab;
+    assert.deepEqual([dados.ditado.length, dados.traduzir.length, dados.memoria.length, dados.revisao.length], [4, 5, 4, 6], `aula ${n}`);
+    // A revisão sai do vocabulário da aula anterior, com a resposta entre 3 opções diferentes.
+    assert.deepEqual(dados.revisao, montarRevisao(anterior));
+    for (const q of dados.revisao) {
+      assert.ok(anterior.some(v => v.en === q.en && v.pt === q.a), `aula ${n}: ${q.en}`);
+      assert.ok(q.opts.includes(q.a) && new Set(q.opts).size === 3, `aula ${n}: opções de ${q.en}`);
+    }
+    assert.ok(new Set(dados.revisao.map(q => q.opts.indexOf(q.a))).size > 1, `aula ${n}: a certa não fica sempre na mesma posição`);
+    // Cada fala de memória existe no diálogo, com a resposta no lugar do ___.
+    const falas = JSON.parse(ler(`scripts/aula${n}-dialogo.json`)).linhas.map(l => l.en);
+    for (const m of dados.memoria) assert.ok(falas.some(f => f.includes(m.f.replace('___', m.r[0]))), `aula ${n}: "${m.f}" não bate com o diálogo`);
+    // As frases do ditado e as traduções aceitas não trazem a palavra proibida.
+    assert.doesNotMatch(JSON.stringify(dados), /gram[aá]tic|grammar/i);
+  }
+  assert.deepEqual(montarRevisao([{ en: 'a', pt: 'b' }]), []);       // aula anterior sem vocabulário: sem a tarefa
 });
 
 test('homework-plus.js compila e não põe texto do aluno em innerHTML', () => {
