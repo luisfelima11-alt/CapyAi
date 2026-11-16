@@ -157,15 +157,21 @@
           if (meu !== turno) return fim(false);
           const url = URL.createObjectURL(blob);
           const solta = () => { try { URL.revokeObjectURL(url); } catch (e) {} };
-          await toca(url, () => { solta(); fim(true); },
-            () => { solta(); if (meu === turno) vozDoNavegador(clean, fim); else fim(false); });
+          // Um áudio que falha dispara o onerror e também rejeita o play(): cai uma vez só.
+          let caiu = false;
+          const peloNavegador = () => {
+            if (caiu) return; caiu = true; solta();
+            if (meu === turno) vozDoNavegador(clean, fim); else fim(false);
+          };
+          try { await toca(url, () => { solta(); fim(true); }, peloNavegador); } catch (e) { peloNavegador(); }
         } catch (e) {
           if (meu === turno) vozDoNavegador(clean, fim); else fim(false);
         }
       };
       (async () => {
         if (!mp3) return pelaIA();
-        const seFalhar = () => { if (meu === turno) pelaIA(); else fim(false); };
+        let falhou = false;   // onerror + play() rejeitado: pede a voz da IA uma vez só
+        const seFalhar = () => { if (falhou) return; falhou = true; if (meu === turno) pelaIA(); else fim(false); };
         try { await toca(mp3, () => fim(true), seFalhar); } catch (e) { seFalhar(); }
       })();
     });
