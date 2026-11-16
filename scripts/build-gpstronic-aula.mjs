@@ -21,6 +21,8 @@ import { aplicarPreparacao, checarPreparacao } from './lib/preparacao.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const MOLDE = path.join(RAIZ, 'gpstronic_aula_09.html');
+const caminhoAudio = (pasta, i) => `/assets/audio/${pasta}/s${String(i + 1).padStart(2, '0')}.mp3`;
+const temAudio = (pasta, i) => fs.existsSync(path.join(RAIZ, caminhoAudio(pasta, i).slice(1)));
 
 function entre(t, abre, fecha, novo) {
     const i = t.indexOf(abre);
@@ -182,7 +184,10 @@ function construir(n) {
     // 5. Arrays
     t = trocarArray(t, 'DIALOGO', d.linhas.map((l, i) => '  ' + j({
         who: l.who, en: l.en, pt: l.pt, extra: !!l.extra,
-        mp3: `/assets/audio/${pastaAudio}/s${String(i + 1).padStart(2, '0')}.mp3`,
+        // A voz do personagem (para a voz da IA) e o arquivo gravado, só se ele existir:
+        // apontar para um mp3 que não foi gravado dava 404 e quebrava o "Ouvir o diálogo".
+        ...((d.vozes || {})[l.who] ? { voz: d.vozes[l.who] } : {}),
+        ...(temAudio(pastaAudio, i) ? { mp3: caminhoAudio(pastaAudio, i) } : {}),
     })).join(',\n'));
     t = trocarArray(t, 'VOCAB_DATA', c.vocab.map(v => {
         const o = { en: v.en, pt: v.pt, ex: v.ex, emoji: v.emoji };
@@ -256,7 +261,10 @@ function validar({ t, d, c, n, nn }) {
     ok(t.includes(`arr.push(${n})`), `push(${n}) na chave do curso`);
     ok(!/Ã[©¡ªµ§]|â€/.test(t), 'zero mojibake');
     ok((t.match(/id="tab-/g) || []).length === 9, '9 seções tab-* (com o 🎯 Prepare)');
-    ok(t.includes(`/assets/audio/gps${nn}/s20.mp3`), 'áudio da 20ª fala apontado');
+    // Com arquivo gravado, a aula aponta para ele; sem arquivo, cada fala leva a voz do personagem
+    // (a voz da IA) e nenhum caminho de mp3 que daria 404.
+    if (temAudio(`gps${nn}`, 19)) ok(t.includes(`/assets/audio/gps${nn}/s20.mp3`), 'áudio da 20ª fala apontado');
+    else ok(!t.includes(`/assets/audio/gps${nn}/`) && d.linhas.every(l => (d.vozes || {})[l.who]), 'sem mp3 gravado: nenhuma fala aponta para arquivo, e todas têm a voz do personagem');
     ok(fs.existsSync(path.join(RAIZ, d.imagem.arquivo)), 'imagem existe em disco');
     ok(c.vocab.length === 14, '14 palavras de vocabulário');
     ok(c.vocab.every(v => v.ex), 'toda palavra tem exemplo');

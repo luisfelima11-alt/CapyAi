@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
+
+**Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
+
+**Causa raiz:** o gerador apontava cada fala para um mp3 gravado (`/assets/audio/<aula>/sNN.mp3`), mas esses arquivos só existem para Agro 1 a 10 e GPS 9 a 14. O 404 caía num plano B do tocador (na aula-molde, `gpstronic_aula_09.html`) que disparava duas vezes (`onerror` e `play().catch`) e andava a fila por um tempo fixo de 2,6 s.
+
+**Correção:** o tocador usa o `speakEnEnd` (`tts-en.js`), que avisa quando a fala termina: arquivo gravado, depois a voz da IA na voz do personagem, depois a do navegador. O gerador só escreve `mp3` na fala se o arquivo existir e sempre escreve a voz do personagem. O `speakEnEnd` também ganhou guarda contra a falha em dobro. Etiqueta do `tts-en.js` trocada para `som2`.
+
+**Como pegar isso de novo:** `tests/dialogo-audio.spec.js` (cada fala uma vez, em ordem, sem pedir mp3 que não existe). A validação dos geradores recusa aula sem áudio gravado que aponte para arquivo.
+
+**Por que aconteceu:** as aulas novas foram geradas sem a chave da OpenAI para gravar o áudio, e o plano B nunca tinha sido testado com o arquivo faltando.
+
+---
+
 ## 2026-11-13 — Quando a IA falhava, a resposta era "200 OK" e sem prazo
 
 **Sintoma:** com a OpenAI fora do ar (ou sem crédito), as rotas de IA de texto (`/api/chat`, quiz, tradução,
