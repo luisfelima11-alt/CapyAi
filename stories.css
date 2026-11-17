@@ -27,7 +27,16 @@ select { min-height: 44px; padding: 8px 14px; border-radius: 12px; border: 1px s
 .spread img { display: block; width: 100%; height: auto; aspect-ratio: 3/2; object-fit: cover; background: var(--deep); }
 .page-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(18px, 4vw, 40px); min-width: 0; }
 #page-number { font-weight: 800; font-size: .8rem; color: #822344; margin: 0; }
+#word-help { color: #664153; font-size: .8rem; line-height: 1.4; margin: 7px 0 0; }
 #page-text { font: 400 clamp(1.17rem, 2.2vw, 1.57rem)/1.55 'Literata', Georgia, serif; overflow-wrap: anywhere; }
+#page-text p { margin: 1em 0; }
+.spread--long .page-copy { justify-content: start; }
+.spread--long #page-text { font-size: clamp(1.1rem, 1.65vw, 1.33rem); line-height: 1.7; }
+#page-text .capy-t-word:focus-visible { outline-offset: 1px; }
+#page-text .capy-t-word:hover, #page-text .capy-t-word:focus-visible { background: #ffd2e4; }
+#capy-translate-tooltip { position: fixed; z-index: 999; max-width: min(240px, calc(100vw - 16px)); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--navy); color: var(--paper); box-shadow: 0 5px 22px #00112666; font-size: .85rem; overflow-wrap: anywhere; }
+#capy-translate-tooltip p { margin: 0; }
+#capy-translate-tooltip p + p { margin-top: 4px; color: var(--rose); }
 details { border-top: 1px solid #d4b3c0; padding-top: 12px; }
 summary { cursor: pointer; font-size: .89rem; font-weight: 800; }
 details p { line-height: 1.55; margin-bottom: 0; }
@@ -35,3 +44,7 @@ details p { line-height: 1.55; margin-bottom: 0; }
 .pager a { min-height: 44px; padding: 10px 16px; border-radius: 999px; display: inline-flex; align-items: center; text-decoration: none; font-weight: 800; background: var(--deep); border: 1px solid var(--line); }
 .pager a:last-child { color: var(--navy); background: var(--rose); border-color: var(--rose); margin-left: auto; }
 @media (min-width: 760px) { .spread { grid-template-columns: minmax(0, 1.26fr) minmax(0, 1fr); } .spread img { height: 100%; min-height: 350px; } }
+@media (min-width: 760px) {
+  .spread--long { grid-template-columns: minmax(0, 1fr) minmax(0, 1.16fr); }
+  .spread--long img { align-self: start; height: auto; min-height: 0; aspect-ratio: auto; object-fit: contain; }
+}

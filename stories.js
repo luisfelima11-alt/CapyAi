@@ -6,6 +6,15 @@ const language = storyLanguages.includes(requestedLanguage) ? requestedLanguage 
 const requestedPage = Number(params.get('pagina'));
 const byId = id => document.getElementById(id);
 const artPath = (story, page) => `assets/stories/${story.art}-${page}.webp`;
+function renderParagraphs(container, text, lookupLanguage) {
+  for (const section of text.split(/\n\n+/)) {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = section;
+    container.append(paragraph);
+    if (lookupLanguage) window.CapyTranslate?.enable(paragraph, { sourceLanguage: lookupLanguage, keyboard: true });
+  }
+}
+
 function readerLink(story, lang, page) {
   return `historias.html?${new URLSearchParams({ historia: story.id, idioma: lang, pagina: String(page) })}`;
 }
@@ -43,9 +52,13 @@ if (!currentStory) {
   byId('page-number').textContent = `Página ${page} de ${currentStory.pages.length}`;
   const copy = byId('page-text');
   copy.lang = language;
-  copy.textContent = storyPage[langIndex];
+  if (currentStory.longRead) copy.closest('.spread').classList.add('spread--long');
+  const lookup = language !== 'pt' && Boolean(window.CapyTranslate);
+  byId('word-help').hidden = !lookup;
+  if (lookup) copy.setAttribute('aria-describedby', 'word-help');
+  renderParagraphs(copy, storyPage[langIndex], lookup ? language : null);
   byId('translation').hidden = language === 'pt';
-  byId('translation-text').textContent = storyPage[0];
+  if (language !== 'pt') renderParagraphs(byId('translation-text'), storyPage[0]);
   const select = byId('story-language');
   select.value = language;
   select.addEventListener('change', () => location.assign(readerLink(currentStory, select.value, page)));

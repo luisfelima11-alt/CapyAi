@@ -1770,6 +1770,7 @@ window.CapyTranslate = (function () {
     const TARGET_LANG  = 'Portuguese (Brazil)';
     const STYLE_ID     = 'capy-translate-styles';
     const TOOLTIP_ID   = 'capy-translate-tooltip';
+    let activeWord = null;
 
     function escapeHtml(str) {
         return String(str == null ? '' : str).replace(/[&<>"']/g, c => ({
@@ -1804,18 +1805,24 @@ window.CapyTranslate = (function () {
         if (tip) return tip;
         tip = document.createElement('div');
         tip.id = TOOLTIP_ID;
+        tip.setAttribute('role', 'status');
         tip.className = 'fixed z-[999] bg-navy text-white text-xs font-bold rounded-2xl px-4 py-3 shadow-2xl max-w-[240px]';
         document.body.appendChild(tip);
+        const close = () => { activeWord = null; tip.style.display = 'none'; };
 
         // Close on outside click / tap, or Esc — shared across every enabled element.
         document.addEventListener('click', e => {
             if (!e.target.closest('.capy-t-word') && !e.target.closest('#' + TOOLTIP_ID)) {
-                tip.style.display = 'none';
+                close();
             }
         });
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') tip.style.display = 'none';
+            if (e.key === 'Escape') close();
         });
+        window.addEventListener('resize', close);
+        window.addEventListener('scroll', () => {
+            if (activeWord?.span?.isConnected && tip.style.display !== 'none') positionTooltip(tip, activeWord.span);
+        }, { passive: true });
         return tip;
     }
 
@@ -1823,10 +1830,11 @@ window.CapyTranslate = (function () {
         try {
             const rect = span.getBoundingClientRect();
             tip.style.display = 'block';
-            const left = Math.max(8, Math.min(window.innerWidth - 248, rect.left));
-            const top  = Math.max(8, rect.top - 8 - tip.offsetHeight);
+            const left = Math.max(8, Math.min(window.innerWidth - tip.offsetWidth - 8, rect.left));
+            const above = rect.top - 8 - tip.offsetHeight;
+            const top = above >= 8 ? above : Math.max(8, Math.min(rect.bottom + 8, window.innerHeight - tip.offsetHeight - 8));
             tip.style.left = left + 'px';
-            tip.style.top  = (top > 0 ? top : rect.bottom + 8) + 'px';
+            tip.style.top  = top + 'px';
         } catch (e) {}
     }
 
@@ -1854,11 +1862,14 @@ window.CapyTranslate = (function () {
         try {
             const word    = span.dataset.word || '';
             const context = span.dataset.context || '';
+            const cacheKey = span.dataset.language ? JSON.stringify([span.dataset.language, word, context]) : word;
+            const request = { span };
+            activeWord = request;
             const tip = ensureTooltip();
             tip.innerHTML = '<span class="opacity-70">…</span>';
             positionTooltip(tip, span);
 
-            const cached = getCachedTranslation(word);
+            const cached = getCachedTranslation(cacheKey);
             if (cached) {
                 tip.innerHTML = `<p class="text-sm">${escapeHtml(word)}</p><p class="text-pink-300">${escapeHtml(cached)}</p>`;
                 positionTooltip(tip, span);
@@ -1867,21 +1878,27 @@ window.CapyTranslate = (function () {
             }
 
             try {
+                if (window.Auth?.ready) await window.Auth.ready();
+                if (activeWord !== request) return;
                 const res = await fetch('/api/translate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ word, targetLang: TARGET_LANG, context })
                 });
+                if (!res.ok) throw new Error('Translation unavailable');
                 const data = await res.json();
                 const raw   = data?.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
                 const clean = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();
                 const obj = JSON.parse(clean);
-                const translation = obj.translation || '—';
-                setCachedTranslation(word, translation);
+                const translation = typeof obj.translation === 'string' ? obj.translation.trim() : '';
+                if (!translation) throw new Error('Translation unavailable');
+                setCachedTranslation(cacheKey, translation);
+                if (activeWord !== request) return;
                 tip.innerHTML = `<p class="text-sm">${escapeHtml(word)}</p><p class="text-pink-300">${escapeHtml(translation)}</p>`;
                 positionTooltip(tip, span);
                 span.classList.add('capy-t-learned');
             } catch (e) {
+                if (activeWord !== request) return;
                 tip.innerHTML = '<span>⚠️ Tradução indisponível</span>';
                 positionTooltip(tip, span);
             }
@@ -1890,14 +1907,19 @@ window.CapyTranslate = (function () {
         }
     }
 
-    function renderClickable(text) {
+    function renderClickable(text, sourceLanguage) {
         const tokens = tokenize(text);
-        const ctx = String(text || '').slice(0, 300).replace(/"/g, '&quot;');
+        const sourceNames = { en: 'English', fr: 'French', tr: 'Turkish' };
+        const prefix = Object.hasOwn(sourceNames, sourceLanguage) ? sourceNames[sourceLanguage] + ': ' : '';
+        let offset = 0;
         return tokens.map(tok => {
+            const start = offset;
+            offset += tok.length;
             try {
                 if (/\p{L}/u.test(tok)) {
                     const w = tok.toLowerCase();
-                    return `<span class="capy-t-word" data-word="${escapeHtml(w)}" data-context="${escapeHtml(ctx)}">${escapeHtml(tok)}</span>`;
+                    const ctx = prefix ? prefix + text.slice(Math.max(0, start - 112), offset + 112).trim() : text.slice(0, 300);
+                    return `<span class="capy-t-word" data-word="${escapeHtml(w)}" data-context="${escapeHtml(ctx)}" data-language="${prefix ? escapeHtml(sourceLanguage) : ''}">${escapeHtml(tok)}</span>`;
                 }
             } catch (e) {}
             return escapeHtml(tok);
@@ -1907,7 +1929,7 @@ window.CapyTranslate = (function () {
     // Turn every word inside `target` (an Element or a CSS selector) into a
     // clickable, translatable span. Idempotent: calling twice on the same
     // element is a no-op the second time.
-    function enable(target) {
+    function enable(target, options = {}) {
         try {
             const el = (typeof target === 'string') ? document.querySelector(target) : target;
             if (!el || !el.nodeType) return;
@@ -1918,11 +1940,31 @@ window.CapyTranslate = (function () {
 
             const text = el.textContent;
             if (!text || !text.trim()) return;
-            el.innerHTML = renderClickable(text);
+            el.innerHTML = renderClickable(text, options.sourceLanguage);
             if (el.dataset) el.dataset.capyTranslateEnabled = '1';
 
-            el.querySelectorAll('.capy-t-word').forEach(span => {
+            const words = [...el.querySelectorAll('.capy-t-word')];
+            words.forEach((span, index) => {
                 span.addEventListener('click', e => { e.stopPropagation(); onWordClick(span); });
+                if (!options.keyboard) return;
+                span.setAttribute('role', 'button');
+                span.tabIndex = index === 0 ? 0 : -1;
+                span.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        span.click();
+                        return;
+                    }
+                    const step = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : 0;
+                    if (!step || !words[index + step]) return;
+                    e.preventDefault();
+                    activeWord = null;
+                    const tip = document.getElementById(TOOLTIP_ID);
+                    if (tip) tip.style.display = 'none';
+                    span.tabIndex = -1;
+                    words[index + step].tabIndex = 0;
+                    words[index + step].focus();
+                });
             });
         } catch (e) {
             // Never let the translate component break the page it's mounted on.
@@ -2107,8 +2149,11 @@ window.CapyFala = (function () {
     return { normalizar, palavras, acerto, passou, distancia, numerosEmAlgarismo };
 })();
 
+// Standalone readers can reuse vocabulary lookup without enabling lesson/PWA hooks.
+const capyTranslateOnly = document.currentScript?.hasAttribute('data-translate-only');
 // Auto-inject personalized tab on aula pages (runs after all inline scripts)
 document.addEventListener('DOMContentLoaded', () => {
+    if (capyTranslateOnly) return;
     Components.autoInjectPersonalizedTab();
     Components.autoInjectWritingCoach();
     Components.autoEnviarLicaoDeCasa();
