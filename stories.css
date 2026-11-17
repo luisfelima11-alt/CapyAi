@@ -40,11 +40,20 @@ select { min-height: 44px; padding: 8px 14px; border-radius: 12px; border: 1px s
 details { border-top: 1px solid #d4b3c0; padding-top: 12px; }
 summary { cursor: pointer; font-size: .89rem; font-weight: 800; }
 details p { line-height: 1.55; margin-bottom: 0; }
+#story-vocabulary { margin-top: 18px; }
+#vocabulary-heading { color: #822344; }
+#vocabulary-list { margin: 14px 0 0; }
+#vocabulary-list > div { border-bottom: 1px solid #ead6df; padding: 13px 0; }
+#vocabulary-list dt { font-size: 1rem; font-weight: 800; line-height: 1.45; }
+#vocabulary-list dd { margin: 4px 0 0; }
+#vocabulary-list p { margin: 0; font-size: .91rem; overflow-wrap: anywhere; }
+#vocabulary-list .vocabulary-example { margin-top: 7px; color: #664153; font-family: 'Literata', Georgia, serif; font-style: italic; }
+.vocabulary-note { color: #664153; font-size: .76rem; }
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 30px; }
 .pager a { min-height: 44px; padding: 10px 16px; border-radius: 999px; display: inline-flex; align-items: center; text-decoration: none; font-weight: 800; background: var(--deep); border: 1px solid var(--line); }
 .pager a:last-child { color: var(--navy); background: var(--rose); border-color: var(--rose); margin-left: auto; }
 @media (min-width: 760px) { .spread { grid-template-columns: minmax(0, 1.26fr) minmax(0, 1fr); } .spread img { height: 100%; min-height: 350px; } }
 @media (min-width: 760px) {
-  .spread--long { grid-template-columns: minmax(0, 1fr) minmax(0, 1.16fr); }
-  .spread--long img { align-self: start; height: auto; min-height: 0; aspect-ratio: auto; object-fit: contain; }
+  .spread--long { grid-template-columns: minmax(0, 1fr) minmax(0, 1.16fr); overflow: clip; }
+  .spread--long img { position: sticky; top: 16px; align-self: start; height: auto; min-height: 0; aspect-ratio: auto; object-fit: contain; }
 }

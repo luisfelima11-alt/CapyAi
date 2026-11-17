@@ -59,6 +59,29 @@ if (!currentStory) {
   renderParagraphs(copy, storyPage[langIndex], lookup ? language : null);
   byId('translation').hidden = language === 'pt';
   if (language !== 'pt') renderParagraphs(byId('translation-text'), storyPage[0]);
+  const vocabulary = currentStory.vocabulary?.[page - 1];
+  if (language === 'en' && vocabulary?.length) {
+    byId('story-vocabulary').hidden = false;
+    byId('vocabulary-heading').textContent = `${currentStory.vocabularyTitle || 'Vocabulário da história'} · ${vocabulary.length} termos e expressões`;
+    for (const [term, meaning, example] of vocabulary) {
+      const entry = document.createElement('div');
+      const name = document.createElement('dt');
+      name.lang = 'en';
+      name.textContent = term;
+      const description = document.createElement('dd');
+      description.lang = 'pt-BR';
+      const definition = document.createElement('p');
+      definition.textContent = meaning;
+      const usage = document.createElement('p');
+      usage.className = 'vocabulary-example';
+      usage.lang = 'en';
+      usage.textContent = example;
+      description.append(definition, usage);
+      entry.append(name, description);
+      byId('vocabulary-list').append(entry);
+      window.CapyTranslate?.enable(usage, { sourceLanguage: 'en', keyboard: true });
+    }
+  }
   const select = byId('story-language');
   select.value = language;
   select.addEventListener('change', () => location.assign(readerLink(currentStory, select.value, page)));
