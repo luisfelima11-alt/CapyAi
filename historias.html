@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Leia histórias ilustradas em inglês, francês, turco e português na Capy English.">
+  <title>Histórias ilustradas | Capy English</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Literata:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stories.css?v=1">
+  <script src="stories-data.js?v=1" defer></script>
+  <script src="stories.js?v=1" defer></script>
+</head>
+<body>
+  <header class="top"><a href="/">Capy English</a><a href="learn.html">Trilha diária</a></header>
+  <main>
+    <section id="library" aria-labelledby="library-title">
+      <header class="intro"><h1 id="library-title" tabindex="-1">Histórias ilustradas</h1><p>Escolha uma história e leia no idioma que você está aprendendo.</p></header>
+      <div id="story-list" class="shelf"></div>
+    </section>
+    <section id="reader" hidden aria-labelledby="story-title">
+      <a class="back" href="historias.html">← Todas as histórias</a>
+      <div class="reader-heading">
+        <h1 id="story-title" tabindex="-1"></h1>
+        <label>Idioma da leitura <select id="story-language"><option value="en">Inglês</option><option value="fr">Francês</option><option value="tr">Turco</option><option value="pt">Português</option></select></label>
+      </div>
+      <article class="spread">
+        <img id="story-image" width="900" height="600" alt="">
+        <div class="page-copy">
+          <p id="page-number" aria-live="polite"></p>
+          <p id="page-text"></p>
+          <details id="translation"><summary>Ver em português</summary><p id="translation-text"></p></details>
+        </div>
+      </article>
+      <nav class="pager" aria-label="Páginas da história"><a id="previous-page">← Anterior</a><a id="next-page">Próxima →</a></nav>
+    </section>
+  </main>
+</body>
+</html>
