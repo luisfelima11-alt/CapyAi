@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — "Foco gramatical" na revisão final do GPS Tronic (lessons.html)
+
+**Sintoma:** na lição "GPS Tronic Master Review" (id 524) do `lessons.html`, a tabela da seção de padrões tinha a coluna "Foco gramatical".
+
+**Causa raiz:** o texto vem do `lessons_gps_data.js` (cabeçalho da tabela) e nenhum teste olhava os arquivos de dados das lições.
+
+**Correção:** a coluna se chama "Padrão".
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` também lê os `lessons_*data.js` (tirando as chaves internas `grammar:`).
+
+**Por que aconteceu:** a troca de 12/out procurou nas páginas HTML, não nos dados que o JS transforma em tela.
+
+---
+
 ## 2026-11-20 — Erro de CSP no console da página Minha conta
 
 **Sintoma:** na produção, abrir `account.html` mostrava no console "Applying inline style violates the following Content Security Policy directive 'style-src-elem …'", e o "+XP"/confete dessa página ficava sem estilo.

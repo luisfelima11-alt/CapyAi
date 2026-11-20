@@ -34,6 +34,19 @@ test('as aulas feitas à mão não mostram "gramática"/"grammar" ao aluno', () 
   assert.deepStrictEqual(achados.slice(0, 15), [], `${achados.length} ocorrências`);
 });
 
+// Os dados das lições do lessons.html (lessons_*data.js) viram texto na tela:
+// o "GPS Tronic Master Review" (id 524) mostrava a coluna "Foco gramatical".
+test('os dados das lições (lessons_*data.js) não mostram a palavra', () => {
+  const dados = fs.readdirSync(ROOT).filter(f => /^lessons_\w*data\.js$/.test(f));
+  assert.ok(dados.length >= 3, 'achou os arquivos de dados');
+  const achados = [];
+  for (const f of dados) {
+    const v = visivel(fs.readFileSync(path.join(ROOT, f), 'utf8'));
+    for (const m of v.matchAll(/.{0,40}(gramm?[aá]tic\w*|grammar)\b.{0,30}/gi)) achados.push(`${f}: ${m[0].trim()}`);
+  }
+  assert.deepStrictEqual(achados, []);
+});
+
 // As bolinhas de progresso usavam o id da seção como dica (title="${s}"): passar o
 // mouse na bolinha da seção de padrões mostrava "grammar".
 test('a dica das bolinhas de progresso não é o id interno da seção', () => {
