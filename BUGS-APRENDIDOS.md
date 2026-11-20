@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Grammar Lab: nenhuma alternativa respondia
+
+**Sintoma:** no Grammar Lab (`grammar_lab.html`, aberto pelo pavilhão de jogos), o aluno tocava em
+"Praticar Agora!", via a primeira pergunta e nenhuma alternativa fazia nada. O jogo inteiro (6 lições,
+30 perguntas) ficava travado na pergunta 1, sem XP e sem missão do dia.
+
+**Causa raiz:** cada botão levava a resposta e a explicação como texto dentro de
+`onclick="answerQ(this,'…','…','…')"`. O código escapava o apóstrofo, mas não as aspas duplas, e todas
+as 30 explicações têm aspas (`so we use "an".`). A primeira aspa fechava o atributo `onclick` no meio, o
+JavaScript ficava cortado e o clique dava erro de sintaxe.
+
+**Correção:** o botão passa só o número da alternativa (`answerQ(this, j)`); a resposta certa e a
+explicação são lidas da pergunta atual no próprio script.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Grammar Lab) clica numa alternativa e confere que a
+explicação aparece inteira, com as aspas, sem erro na página.
+
+**Por que aconteceu:** texto de conteúdo colado dentro de um atributo HTML com JavaScript. Escapar à mão
+um caractere (o `'`) esquece o outro (o `"`). Passe um índice e leia o dado no script.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
