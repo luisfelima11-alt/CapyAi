@@ -1,0 +1,60 @@
+// O site no celular (iPhone 13, 390 px, toque). Cada teste mede com
+// getBoundingClientRect o que o aluno não consegue tocar.
+const { test, expect, devices } = require('playwright/test');
+
+// defaultBrowserType não pode ir no test.use (o Chromium da CI faz o papel).
+const { defaultBrowserType, ...IPHONE } = devices['iPhone 13'];
+test.use({ ...IPHONE, deviceScaleFactor: 1 });
+
+const ALUNA = { id: 'aluna-teste', name: 'Ana Souza', email: 'ana@example.test', role: 'student' };
+
+async function entrar(page, url) {
+  await page.addInitScript(aluna => {
+    localStorage.setItem('capySession', JSON.stringify(aluna));
+    localStorage.setItem('capyConsent', 'no');
+  }, ALUNA);
+  await page.route('**/api/**', route => {
+    const caminho = new URL(route.request().url()).pathname;
+    if (caminho === '/api/auth/session') return route.fulfill({ status: 200, json: { ok: true, user: ALUNA, csrfToken: 'csrf-teste' } });
+    if (caminho === '/api/profile') return route.fulfill({ status: 200, json: { onboarding_complete: true } });
+    return route.fulfill({ status: 200, json: {} });
+  });
+  await page.goto(url);
+}
+
+// Quanto do elemento fica embaixo dos botões flutuantes (Yara e lousa), com a
+// página rolada até o fim: é ali que o último botão para.
+const cobertoPelosFlutuantes = (page, seletor) => page.evaluate(async seletor => {
+  window.scrollTo(0, document.documentElement.scrollHeight);
+  await new Promise(r => setTimeout(r, 300));
+  const alvo = document.querySelector(seletor).getBoundingClientRect();
+  let coberto = 0;
+  for (const id of ['yw-fab', 'yw-board']) {
+    const el = document.getElementById(id);
+    if (!el || getComputedStyle(el).pointerEvents === 'none') continue;
+    const r = el.getBoundingClientRect();
+    const w = Math.max(0, Math.min(alvo.right, r.right) - Math.max(alvo.left, r.left));
+    const h = Math.max(0, Math.min(alvo.bottom, r.bottom) - Math.max(alvo.top, r.top));
+    coberto += w * h;
+  }
+  return coberto / (alvo.width * alvo.height);
+}, seletor);
+
+test('lessons.html: o "Verificar" do Build não fica embaixo da Yara', async ({ page }) => {
+  await entrar(page, '/lessons.html?lesson=1');
+  await page.waitForSelector('#yw-fab');
+  await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson && currentLesson.vocab);
+  await page.evaluate(() => switchTool('build', true));
+  const verificar = '#panel-build button[onclick^="buildCheck"]';
+  await page.waitForSelector(verificar);
+  expect(await cobertoPelosFlutuantes(page, verificar)).toBe(0);
+});
+
+test('lessons.html: a última opção do Quiz não fica embaixo da Yara', async ({ page }) => {
+  await entrar(page, '/lessons.html?lesson=1');
+  await page.waitForSelector('#yw-fab');
+  await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson && currentLesson.vocab);
+  await page.evaluate(() => switchTool('quiz', true));
+  await page.waitForSelector('#qopt-3');
+  expect(await cobertoPelosFlutuantes(page, '#qopt-3')).toBe(0);
+});

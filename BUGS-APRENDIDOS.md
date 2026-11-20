@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — No celular, a Yara cobria o "Verificar" das lições
+
+**Sintoma:** no celular, em `lessons.html` (Build, Quiz, Scramble, Speed), o último botão de cada ferramenta ficava metade embaixo dos botões flutuantes da Yara e da lousa, mesmo com a página rolada até o fim. O toque no "✓ Verificar" abria a Yara.
+
+**Causa raiz:** é a única página com o widget da Yara que não tem o menu de baixo. Sem o menu, os botões flutuantes ficam a 16 px do fundo (~74 px de altura), e o `<main>` só tinha `py-8` (32 px) de folga embaixo.
+
+**Correção:** `pb-28 md:pb-8` no `<main>` de `lessons.html`: no celular sobra espaço para rolar o último botão para cima dos flutuantes.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` (iPhone 13) mede, com a página rolada até o fim, quanto do botão fica embaixo de `#yw-fab`/`#yw-board`.
+
+**Por que aconteceu:** as outras páginas com a Yara têm o menu de baixo e `pb-32`; a folga foi pensada para o menu, não para os flutuantes.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
