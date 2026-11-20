@@ -39,7 +39,7 @@ test('youtube_lab: as setas do menu lateral funcionam', async ({ page }) => {
 // selo "Grammar Star", "grammar adventure" no diálogo, "Domine a gramática" no
 // curso Advanced, "Expedição de gramática" no Verb Voyage, "Grammar Notes" no
 // criador de aulas.
-const PROIBIDA = /gram[aá]tic|grammar/i;
+const PROIBIDA = /gramm?[aá]tic|grammar/i;
 const textoVisivel = page => page.evaluate(() => {
   const c = document.body.cloneNode(true);
   c.querySelectorAll('script,style,noscript,template').forEach(x => x.remove());

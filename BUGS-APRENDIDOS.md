@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Aba "📐 Grammar" em ~100 aulas feitas à mão
+
+**Sintoma:** nas aulas 01–44, Advanced, Business, Travel e Intermediate 01–18 o aluno via a aba "📐 Grammar", o botão "✓ Grammar understood!", títulos "Grammar: …", "Corrija o erro gramatical", a dica "grammar" ao passar o mouse na bolinha de progresso e até frases de diálogo e um cartão de vocabulário com a palavra.
+
+**Causa raiz:** a troca para "🧩 Patterns" (regra de 12/out) entrou nos geradores (Agro, GPS, Intermediate 19+, francês) e no `aplicar-slides.mjs`, mas as aulas antigas feitas à mão nunca passaram por ela. Nenhum teste olhava essas páginas.
+
+**Correção:** troca só do texto visível ("🧩 Patterns", "Entendi o padrão!", "Patterns: …", "Corrija a frase"; frases de diálogo reescritas sem a palavra). Os ids internos (`tab-grammar`, `'grammar'` nas listas de seções) ficaram. A bolinha de progresso mostra "patterns" na dica.
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` (no `npm run test:security`) lê todas as aulas feitas à mão, tira os nomes internos e procura "gramática/gramatical/grammar/grammatical".
+
+**Por que aconteceu:** a troca foi feita curso a curso, junto com o molde novo; as aulas que não mudaram de molde ficaram para trás. Ainda faltam `med_aula_*` e `interview_aula_*`: o gerador deles escreve "Entendi a gramática!" e não passa na própria validação de slides, então regerar hoje mudaria muito mais que o texto.
+
+---
+
 ## 2026-11-20 — "Gramática"/"grammar" ainda na tela em páginas do site
 
 **Sintoma:** fora das aulas, o aluno ainda via a palavra proibida: selo "Grammar Star" (pavilhões de jogos, progresso e aviso de selo), "grammar adventure" no Dialogue Expedition, "Domine a gramática avançada" e etiquetas "Grammar" no curso Advanced, "Expedição de gramática" no Verb Voyage e "Grammar Notes" no criador de aulas.
