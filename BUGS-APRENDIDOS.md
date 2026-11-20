@@ -1,5 +1,21 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Forest Puzzle: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Forest Puzzle, ao montar a palavra e tocar em "Check", o aluno ganhava +15 duas vezes e a
+palavra seguinte era pulada. Na última, a tela de fim abria duas vezes e o XP do jogo era pago em dobro.
+
+**Causa raiz:** igual ao Word Scramble: a última peça já dispara o `submitAnswer()` sozinho, e o botão
+"Check" conferia a mesma resposta de novo. Cada conferência fazia `round++` e marcava um `renderRound`.
+
+**Correção:** `wordLocked`, destravado no `renderRound`; peças e Check não contam com a palavra resolvida.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Forest Puzzle).
+
+**Por que aconteceu:** jogo copiado do mesmo molde do Word Scramble, com a mesma falta de trava.
+
+---
+
 ## 2026-11-20 — Phrase Path: dois toques em "Conferir frase" pagavam em dobro e pulavam frase
 
 **Sintoma:** no Phrase Path, com a frase montada certa, um toque duplo (ou um segundo toque impaciente)
