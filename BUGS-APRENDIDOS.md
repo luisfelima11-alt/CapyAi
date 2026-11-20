@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — No celular, a página "Minha conta" não tinha caminho
+
+**Sintoma:** no celular não havia como chegar a "Minha conta" (plano atual, "Atualizar status da assinatura", o que a Yara sabe do aluno). O link só existia no menu do avatar.
+
+**Causa raiz:** o menu do avatar abre com `group-hover` (passar o mouse). No toque, o avatar é um link e leva direto para os Ajustes; o menu "Mais" do celular só tinha Progresso e Ajustes, e os Ajustes não apontam para a conta.
+
+**Correção:** "Minha conta" entrou nos links de baixo do menu "Mais" (`components.js`, etiqueta `?v=` mantida). A fileira quebra linha em 320 px.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` abre o "Mais" no iPhone 13 e toca em "Minha conta".
+
+**Por que aconteceu:** menu que depende de hover não existe no celular; ninguém conferiu se cada item dele tinha outro caminho no toque.
+
+---
+
 ## 2026-11-20 — No celular, o Índice das aulas do molde escondia o "Homework"
 
 **Sintoma:** nas aulas do molde novo (Agro, GPS 09+, Intermediate 19+, Entrevista, Medical), tocar em "Índice" no celular abria a lista dos 10 passos, mas o fim dela ficava embaixo do menu de baixo. Não dava para rolar até lá: o "Homework" (e às vezes o "Listening") não podia ser tocado.

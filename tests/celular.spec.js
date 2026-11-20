@@ -59,6 +59,24 @@ test('lessons.html: a última opção do Quiz não fica embaixo da Yara', async 
   expect(await cobertoPelosFlutuantes(page, '#qopt-3')).toBe(0);
 });
 
+// "Minha conta" (plano e "Atualizar status da assinatura") só existia no menu
+// do avatar, que abre ao passar o mouse. No celular o toque no avatar leva
+// direto para os Ajustes: a página da conta não tinha caminho nenhum.
+test('celular: o menu "Mais" leva à Minha conta', async ({ page }) => {
+  await entrar(page, '/classes.html');
+  await page.tap('nav.md\\:hidden >> text=Mais');
+  const link = page.locator('#more-sheet a[href="account.html"]');
+  await expect(link).toBeVisible();
+  await page.waitForTimeout(400);   // a folha sobe com animação
+  const tocavel = await link.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return r.bottom <= innerHeight && el.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2));
+  });
+  expect(tocavel).toBe(true);
+  await link.tap();
+  await expect(page).toHaveURL(/account\.html/);
+});
+
 // Aulas do molde (Agro, GPS 09+, Intermediate 19+, Entrevista, Medical): o
 // Índice abre dentro da barra grudada no topo. Com 10 passos ele passava da
 // tela e o fim ficava embaixo do menu de baixo, sem rolagem: o "Homework"

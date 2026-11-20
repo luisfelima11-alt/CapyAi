@@ -316,12 +316,16 @@ const Components = {
                 </div>
 
                 <!-- Utility links -->
-                <div class="border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center justify-around">
-                    <a href="progress.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-4 flex flex-wrap items-center justify-around gap-x-3 gap-y-3">
+                    <a href="progress.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
                         <span class="material-symbols-outlined text-emerald-500 text-lg" style="${ico}${cheio(true)}">military_tech</span> Progresso
                     </a>
-                    <a href="settings.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
+                    <a href="settings.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
                         <span class="material-symbols-outlined text-slate-400 text-lg" style="${ico}">settings</span> Ajustes
+                    </a>
+                    <!-- O menu do avatar (onde fica "Minha conta") só abre com o mouse: no celular, este é o caminho. -->
+                    <a href="account.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
+                        <span class="material-symbols-outlined text-orange-500 text-lg" style="${ico}${cheio(true)}">workspace_premium</span> Minha conta
                     </a>
                 </div>
             </div>
