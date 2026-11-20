@@ -1,5 +1,27 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Word Scramble: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Word Scramble do pavilhão, o aluno montava a palavra e tocava em "Check ✓" (o gesto
+natural). A palavra rendia pontos duas vezes e a seguinte era pulada sem aparecer. Na última palavra, a
+tela de fim abria duas vezes, uma por cima da outra, e o XP do jogo era pago duas vezes. Dois toques em
+"Skip →" também pulavam duas palavras.
+
+**Causa raiz:** ao encher a última casa, o jogo já confere sozinho (300 ms depois). O botão "Check"
+conferia de novo a mesma resposta, e cada conferência certa marcava um `nextWord()` para dali a 1,4 s.
+Nada dizia "esta palavra já foi resolvida"; o `skipWord` tinha o mesmo problema.
+
+**Correção:** `wordLocked`: depois de um acerto, dos corações acabarem ou de um Skip, peças, Check e Skip
+não fazem nada até a próxima palavra carregar (`loadWord` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Word Scramble): acerto + Check, acerto + Check na
+última palavra (uma tela de fim, XP uma vez) e Skip duplo.
+
+**Por que aconteceu:** resposta com espera (`setTimeout`) antes de avançar, sem trava. Todo jogo que mostra
+o resultado por um tempo antes de seguir precisa ignorar novos toques nesse intervalo.
+
+---
+
 ## 2026-11-20 — Grammar Lab: nenhuma alternativa respondia
 
 **Sintoma:** no Grammar Lab (`grammar_lab.html`, aberto pelo pavilhão de jogos), o aluno tocava em

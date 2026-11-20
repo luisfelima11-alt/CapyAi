@@ -39,3 +39,51 @@ test.describe('Grammar Lab (grammar_lab.html)', () => {
     await expect(page.locator('#fb-text')).toHaveText(exp);
   });
 });
+
+test.describe('Word Scramble (word_scramble_game.html)', () => {
+  // Monta a palavra certa tocando nas peças, como o aluno faz.
+  async function montarPalavra(page) {
+    await page.evaluate(() => {
+      const palavra = shuffledWords[wordIdx].word;
+      const usadas = new Set();
+      for (const letra of palavra) {
+        const peca = [...document.querySelectorAll('#tiles-row .tile')]
+          .find(t => t.textContent === letra && !usadas.has(t.id));
+        usadas.add(peca.id);
+        peca.click();
+      }
+    });
+  }
+
+  test('acertar e tocar em "Check" paga a palavra uma vez e não pula a próxima', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/word_scramble_game.html');
+    await montarPalavra(page);
+    await page.click('button:has-text("Check")');
+    await page.waitForTimeout(2200);
+    expect(await page.evaluate(() => wordIdx)).toBe(1);
+    expect(await page.evaluate(() => score)).toBe(25);
+  });
+
+  test('na última palavra, "Check" depois do acerto termina o jogo uma vez só (XP uma vez)', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/word_scramble_game.html');
+    await page.evaluate(() => { wordIdx = shuffledWords.length - 1; loadWord(); });
+    const antes = await xpDaAluna(page);
+    await montarPalavra(page);
+    await page.click('button:has-text("Check")');
+    await expect(page.locator('#fin')).toHaveCount(1);
+    await page.waitForTimeout(2000);
+    await expect(page.locator('#fin')).toHaveCount(1);
+    expect(await xpDaAluna(page) - antes).toBe(10);
+  });
+
+  test('"Skip" tocado duas vezes pula uma palavra só', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/word_scramble_game.html');
+    await page.click('button:has-text("Skip")');
+    await page.click('button:has-text("Skip")');
+    await page.waitForTimeout(2000);
+    expect(await page.evaluate(() => wordIdx)).toBe(1);
+  });
+});
