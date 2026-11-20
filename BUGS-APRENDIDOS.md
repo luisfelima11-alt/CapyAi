@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Setas do menu lateral sem efeito no YouTube Lab
+
+**Sintoma:** no computador, no `youtube_lab.html`, as setas ▲ ▼ do menu lateral não faziam nada; o console mostrava `ReferenceError: sideNavScroll is not defined`.
+
+**Causa raiz:** a página montava o menu com `innerHTML = Components.renderSideNav(...)` em vez de `Components.mount('side-nav-placeholder', ...)`. Só o `mount` chama o `initSideNavScroll()`, que cria a função `sideNavScroll` usada pelos botões.
+
+**Correção:** a página usa `Components.mount` com os ids padrão (`top-nav-placeholder`, `side-nav-placeholder`), como as outras.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` (as setas existem e clicar não dá erro). Varredura: procurar `innerHTML = Components.render` nas páginas.
+
+**Por que aconteceu:** a página é mais antiga que o `initSideNavScroll` e nunca foi migrada para o `mount`.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
