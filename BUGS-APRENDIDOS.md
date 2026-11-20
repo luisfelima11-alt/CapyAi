@@ -1,5 +1,26 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Hangman: digitar no teclado depois do fim da palavra contava erros e repetia o fim do jogo
+
+**Sintoma:** no Hangman, quem joga pelo teclado do computador e continuava digitando depois de a palavra
+acabar via erros sendo somados por trás do aviso, um "Oops!" abrindo por cima do "Correct!" e, na última
+palavra, a tela de fim abrindo duas ou três vezes, com o XP do jogo pago a cada uma.
+
+**Causa raiz:** o aviso de fim de palavra é uma camada sobre a tela, que bloqueia o mouse mas não o
+teclado. O `keydown` só olhava se a tecla estava desabilitada; nada dizia que a palavra já tinha acabado.
+Cada erro além do 6º disparava de novo o `roundResult`.
+
+**Correção:** `roundOver`, ligado ao ganhar ou perder e desligado no `startRound`; `guess()` não aceita
+letra com a palavra encerrada.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Hangman): 8 letras erradas no teclado na última
+palavra (uma tela de fim, XP uma vez) e letras depois de acertar (nenhum erro somado).
+
+**Por que aconteceu:** camada por cima da tela foi tratada como trava, mas teclado não respeita camada.
+Trava de jogo é estado no script, não um elemento na frente.
+
+---
+
 ## 2026-11-20 — Lição: trocar de aba logo depois de responder repetia a pergunta e pagava 2x
 
 **Sintoma:** no `lessons.html`, quem respondia no Quiz, Listen, Speed ou Scramble e trocava de aba antes

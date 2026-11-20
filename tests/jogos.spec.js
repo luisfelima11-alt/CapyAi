@@ -158,6 +158,40 @@ test.describe('Forest Puzzle (forest_puzzle_game.html)', () => {
   });
 });
 
+test.describe('Hangman (hangman_game.html)', () => {
+  // Letras que NÃO estão na palavra atual, para errar de propósito pelo teclado.
+  const letrasErradas = page => page.evaluate(() => {
+    const palavra = shuffled[roundIdx].word;
+    return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(l => !palavra.includes(l));
+  });
+
+  test('pelo teclado, continuar digitando depois da 6ª letra errada não termina o jogo 2x', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/hangman_game.html');
+    await page.evaluate(() => { roundIdx = shuffled.length - 1; startRound(); });
+    const antes = await xpDaAluna(page);
+    const erradas = await letrasErradas(page);
+    for (const l of erradas.slice(0, 8)) await page.keyboard.press(l);
+    await expect(page.locator('#fin')).toHaveCount(1);
+    await page.waitForTimeout(800);
+    await expect(page.locator('#fin')).toHaveCount(1);
+    expect(await xpDaAluna(page) - antes).toBe(10);
+  });
+
+  test('pelo teclado, digitar depois de acertar a palavra não conta como erro', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/hangman_game.html');
+    const palavra = await page.evaluate(() => shuffled[roundIdx].word);
+    for (const l of new Set(palavra)) await page.keyboard.press(l);
+    const erradas = await letrasErradas(page);
+    for (const l of erradas.slice(0, 6)) await page.keyboard.press(l);
+    await page.waitForTimeout(800);
+    expect(await page.evaluate(() => wrongCount)).toBe(0);
+    await expect(page.getByText('Oops!')).toHaveCount(0);
+    await expect(page.getByText('Correct!')).toHaveCount(1);
+  });
+});
+
 test.describe('Word Scramble (word_scramble_game.html)', () => {
   // Monta a palavra certa tocando nas peças, como o aluno faz.
   async function montarPalavra(page) {
