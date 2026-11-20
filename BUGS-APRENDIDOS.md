@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Erro de CSP no console da página Minha conta
+
+**Sintoma:** na produção, abrir `account.html` mostrava no console "Applying inline style violates the following Content Security Policy directive 'style-src-elem …'", e o "+XP"/confete dessa página ficava sem estilo.
+
+**Causa raiz:** `account.html` tem CSP estrita no `vercel.json` (sem `'unsafe-inline'` em `style-src-elem`). O `CapyJuice.init()` (`components.js`) roda em toda página e criava um `<style>` com as animações; a CSP bloqueava. O dev-server não manda CSP, por isso só aparecia no ar.
+
+**Correção:** as regras entram por uma folha construída pelo CSSOM (`new CSSStyleSheet()` + `document.adoptedStyleSheets`), que a CSP não bloqueia; navegador sem isso cai no `<style>` antigo. Etiqueta do `components.js` mantida (`seg1`).
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre `account.html` com a CSP tirada do `vercel.json` e falha em qualquer erro de CSP no console. Código novo que injeta `<style>` precisa passar por esse teste.
+
+**Por que aconteceu:** a CSP estrita de account/login é posterior ao CapyJuice, e a varredura local não reproduz cabeçalhos da Vercel.
+
+---
+
 ## 2026-11-20 — Aba "📐 Grammar" em ~100 aulas feitas à mão
 
 **Sintoma:** nas aulas 01–44, Advanced, Business, Travel e Intermediate 01–18 o aluno via a aba "📐 Grammar", o botão "✓ Grammar understood!", títulos "Grammar: …", "Corrija o erro gramatical", a dica "grammar" ao passar o mouse na bolinha de progresso e até frases de diálogo e um cartão de vocabulário com a palavra.

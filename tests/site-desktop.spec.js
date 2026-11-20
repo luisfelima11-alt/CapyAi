@@ -64,3 +64,25 @@ test('selo "Grammar Star" e o fim do diálogo também não dizem a palavra', asy
   expect(ler('badge-toast.js')).not.toMatch(/label:\s*'[^']*Grammar/);
   expect(ler('3_Dialogue_Expedition_Yara_Turn.html')).not.toMatch(/grammar explorer/i);
 });
+
+// account.html tem CSP estrita na Vercel (style-src-elem sem 'unsafe-inline').
+// O CapyJuice.init (components.js) criava um <style> para o "+XP" e o confete:
+// a CSP bloqueava, o console da produção mostrava erro e o "+XP" ficava sem estilo.
+test('account.html com a CSP da produção: sem erro de CSP e o "+XP" tem estilo', async ({ page }) => {
+  const csp = require('../vercel.json').routes.find(r => r.src.includes('account')).headers['Content-Security-Policy'];
+  const errosCsp = [];
+  page.on('console', m => { if (m.type() === 'error' && /Content Security Policy/.test(m.text())) errosCsp.push(m.text().slice(0, 160)); });
+  await page.route(/\/account\.html$/, async route => {
+    const r = await route.fetch();
+    await route.fulfill({ response: r, headers: { ...r.headers(), 'content-security-policy': csp } });
+  });
+  await abrirLogada(page, '/account.html');
+  await page.waitForFunction(() => typeof window.CapyJuice !== 'undefined');
+  await page.waitForTimeout(500);
+  const posicao = await page.evaluate(() => {
+    const el = document.createElement('div'); el.className = 'capy-xp-pop'; document.body.appendChild(el);
+    const p = getComputedStyle(el).position; el.remove(); return p;
+  });
+  expect(errosCsp).toEqual([]);
+  expect(posicao).toBe('fixed');
+});
