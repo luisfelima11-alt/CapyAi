@@ -3055,6 +3055,7 @@ function renderScrambleBoxes(len) {
   });
 }
 function scramblePressLetter(idx, letter) {
+  if (scrambleAnswered) return;   // palavra já certa: o índice já aponta para a próxima
   const tile = document.getElementById(`stile-${idx}`);
   if (!tile || tile.classList.contains('used')) return;
   tile.classList.add('used');
@@ -3075,6 +3076,7 @@ function scrambleClear() {
   if (fb) { fb.classList.add('hidden'); }
 }
 function scrambleHintFn() {
+  if (scrambleAnswered) return;
   const words = getScrambleWords();
   const card  = words[scrambleIdx];
   const nextPos = scrambleInput.length;
