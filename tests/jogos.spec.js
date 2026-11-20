@@ -40,6 +40,58 @@ test.describe('Grammar Lab (grammar_lab.html)', () => {
   });
 });
 
+test.describe('Phrase Path (phrase_path_game.html)', () => {
+  async function montarFrase(page) {
+    await page.evaluate(() => {
+      const palavras = PHRASES[order[step]];
+      palavras.forEach((_, i) => document.querySelector(`#bank button[data-i="${i}"]`).click());
+    });
+  }
+
+  test('dois toques em "Conferir frase" pagam a frase uma vez e não pulam a próxima', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/phrase_path_game.html');
+    await montarFrase(page);
+    await page.dblclick('#check');
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => step)).toBe(1);
+    expect(await page.evaluate(() => points)).toBe(12);
+    await expect(page.locator('#round')).toHaveText('2 / 7');
+  });
+
+  test('na última frase, dois toques terminam a trilha com o XP uma vez', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/phrase_path_game.html');
+    await page.evaluate(() => { step = 6; points = 72; render(); });
+    const antes = await xpDaAluna(page);
+    await montarFrase(page);
+    await page.dblclick('#check');
+    await expect(page.getByText('Trilha completa!')).toBeVisible();
+    await page.waitForTimeout(1500);
+    expect(await xpDaAluna(page) - antes).toBe(84);
+  });
+});
+
+test.describe('Forest Puzzle (forest_puzzle_game.html)', () => {
+  test('acertar e tocar em "Check" paga a palavra uma vez e não pula a próxima', async ({ page }) => {
+    await entrarComoAluna(page);
+    await page.goto('/forest_puzzle_game.html');
+    await page.evaluate(() => {
+      const usadas = new Set();
+      for (const letra of currentWord) {
+        const i = currentScramble.findIndex((l, k) => l === letra && !usadas.has(k));
+        usadas.add(i);
+        pickLetter(document.getElementById(`tile-${i}`));
+      }
+    });
+    await page.click('button:has-text("Check")');
+    await page.waitForTimeout(2500);
+    expect(await page.evaluate(() => round)).toBe(1);
+    expect(await page.evaluate(() => score)).toBe(15);
+    await expect(page.locator('#round-display')).toContainText('Word 2 /');
+  });
+});
+
 test.describe('Word Scramble (word_scramble_game.html)', () => {
   // Monta a palavra certa tocando nas peças, como o aluno faz.
   async function montarPalavra(page) {

@@ -1,5 +1,24 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Phrase Path: dois toques em "Conferir frase" pagavam em dobro e pulavam frase
+
+**Sintoma:** no Phrase Path, com a frase montada certa, um toque duplo (ou um segundo toque impaciente)
+em "Conferir frase" somava +12 XP duas vezes e a frase seguinte sumia sem ser jogada. Na última frase, o
+fim da trilha pagava o XP do jogo duas vezes.
+
+**Causa raiz:** o acerto espera 0,9 s antes de avançar (`setTimeout(() => { step++; render() })`) e o
+botão continuava valendo nesse intervalo. Cada toque somava pontos e marcava mais um `step++`.
+
+**Correção:** `locked`: depois do acerto, conferir, escolher e tirar peças não fazem nada até a próxima
+frase aparecer (`render` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Phrase Path): toque duplo numa frase do meio e na
+última (XP do fim uma vez).
+
+**Por que aconteceu:** o mesmo do Word Scramble e do Forest Puzzle: espera antes de avançar sem trava.
+
+---
+
 ## 2026-11-20 — Word Scramble: "Check" depois do acerto pagava em dobro e pulava palavra
 
 **Sintoma:** no Word Scramble do pavilhão, o aluno montava a palavra e tocava em "Check ✓" (o gesto
