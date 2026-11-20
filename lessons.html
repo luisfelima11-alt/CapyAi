@@ -940,6 +940,21 @@ let speedIdx=0, speedScore=0, speedDone=false, speedStreak=0;
 let speedTimer=null, speedSecsLeft=6, speedAnswered=false, speedMultiplier=1;
 // Scramble
 let scrambleIdx=0, scrambleInput=[], scrambleHints=0, scrambleDone=false, scrambleAnswered=false;
+// Avançar depois de mostrar a resposta (Quiz, Listen, Speed, Scramble). O índice
+// anda NA HORA da resposta; só o redesenho espera o tempo de leitura, e só
+// acontece se o aluno continua na aba e ninguém redesenhou o painel. Antes o
+// índice andava dentro do setTimeout: trocar de aba e voltar nesse intervalo
+// mostrava a mesma pergunta de novo (paga duas vezes, a próxima era pulada) e o
+// Speed seguia com o relógio correndo escondido em outra aba.
+// O fim da rodada (que paga) roda uma vez, esteja o aluno em que aba estiver.
+const _avancoDaFerramenta = {};
+function avancarDepois(tool, ms, fimDaRodada, desenhar) {
+  const vez = _avancoDaFerramenta[tool] = (_avancoDaFerramenta[tool] || 0) + 1;
+  setTimeout(() => {
+    if (fimDaRodada) { fimDaRodada(); return; }
+    if (_avancoDaFerramenta[tool] === vez && currentTool === tool) desenhar();
+  }, ms);
+}
 // Shuffled arrays — refreshed on every loadLesson()
 let shuffledVocab     = [];
 let shuffledQuiz      = [];
@@ -1860,6 +1875,8 @@ function switchTool(tool, force = false) {
   if (panel) panel.classList.add('active');
   // Stop speed timer when leaving speed tab
   if (tool !== 'speed' && speedTimer) { clearInterval(speedTimer); speedTimer = null; }
+  // Voltou para a aba: o painel é redesenhado agora; um avanço pendente não redesenha de novo.
+  _avancoDaFerramenta[tool] = (_avancoDaFerramenta[tool] || 0) + 1;
   // Render
   if (tool === 'vocab')    renderVocab();
   if (tool === 'quiz')     renderQuiz();
@@ -2039,19 +2056,19 @@ function answerQuiz(btn, chosen, correct) {
       fb.appendChild(linha2);
     }
   })();
-  setTimeout(() => {
-    quizIdx++;
-    const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
-      ? aiQuizQuestions.length
-      : (shuffledQuiz.length || currentLesson.quiz.length);
-    if (quizIdx >= qLen) {
-      quizDone = true;
+  quizIdx++;
+  const qLen = (GUIDED_MODE && aiQuizQuestions.length > 0)
+    ? aiQuizQuestions.length
+    : (shuffledQuiz.length || currentLesson.quiz.length);
+  const acabou = quizIdx >= qLen;
+  if (acabou) quizDone = true;
+  avancarDepois('quiz', isCorrect ? 1100 : 2600,   // tempo de ler a confirmação, sobretudo no erro
+    acabou && (() => {
       // Analytics: quiz finished (fires once per completion)
       if (window.capyTrack) capyTrack('quiz_finish', { lessonId: String(currentLesson.id) });
       renderQuizFinish(true);
-    }
-    else renderQuiz();
-  }, isCorrect ? 1100 : 2600);   // tempo de ler a confirmação, sobretudo no erro
+    }),
+    renderQuiz);
 }
 // `concluiuAgora` só é true quando a última resposta acabou de ser dada. Trocar
 // de aba chama renderQuiz() de novo, que redesenha esta tela: antes ela pagava
@@ -2677,11 +2694,11 @@ function answerListen(btn, isCorrect) {
     listenStreak = 0;
     recordWeakWord(currentLesson.id, vocab[listenIdx], 'listen');
   }
-  setTimeout(() => {
-    listenIdx++;
-    if (listenIdx >= vocab.length) { listenDone = true; renderListenFinish(true); }
-    else renderListen();
-  }, isCorrect ? 1600 : 2400);   // tempo de ler a palavra revelada, não só de ouvir o som
+  listenIdx++;
+  const acabou = listenIdx >= vocab.length;
+  if (acabou) listenDone = true;
+  avancarDepois('listen', isCorrect ? 1600 : 2400,   // tempo de ler a palavra revelada, não só de ouvir o som
+    acabou && (() => renderListenFinish(true)), renderListen);
 }
 // Mesma regra do renderQuizFinish: paga só quando acabou de terminar, não a
 // cada vez que o aluno volta para a aba.
@@ -2918,11 +2935,7 @@ function answerSpeed(btn, isCorrect, en, pt) {
     speedMultiplier = speedStreak >= 5 ? 3 : speedStreak >= 3 ? 2 : 1;
     addXPToProgress(currentLesson.id, 10 * speedMultiplier);
     removeWeakWord(currentLesson.id, en);
-    setTimeout(() => {
-      speedIdx++;
-      if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
-      else renderSpeed();
-    }, 900);
+    proximoSpeed(900);
   } else {
     btn.classList.add('wrong');
     speedStreak = 0; speedMultiplier = 1;
@@ -2930,11 +2943,7 @@ function answerSpeed(btn, isCorrect, en, pt) {
     document.querySelectorAll('#speed-opts .choice-btn').forEach(b => {
       if (b.dataset.correct === 'true') b.classList.add('correct');
     });
-    setTimeout(() => {
-      speedIdx++;
-      if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
-      else renderSpeed();
-    }, 1200);
+    proximoSpeed(1200);
   }
 }
 function handleSpeedTimeout(en, pt) {
@@ -2946,11 +2955,13 @@ function handleSpeedTimeout(en, pt) {
     b.setAttribute('disabled','');
     if (b.dataset.correct === 'true') b.classList.add('correct');
   });
-  setTimeout(() => {
-    speedIdx++;
-    if (speedIdx >= (shuffledVocab.length || currentLesson.vocab.length)) { speedDone=true; renderSpeedFinish(); }
-    else renderSpeed();
-  }, 1200);
+  proximoSpeed(1200);
+}
+function proximoSpeed(ms) {
+  speedIdx++;
+  const acabou = speedIdx >= (shuffledVocab.length || currentLesson.vocab.length);
+  if (acabou) speedDone = true;
+  avancarDepois('speed', ms, acabou && renderSpeedFinish, renderSpeed);
 }
 function renderSpeedFinish() {
   const total = shuffledVocab.length || currentLesson.vocab.length;
@@ -3047,6 +3058,7 @@ function renderScrambleBoxes(len) {
   });
 }
 function scramblePressLetter(idx, letter) {
+  if (scrambleAnswered) return;   // palavra já certa: o índice já aponta para a próxima
   const tile = document.getElementById(`stile-${idx}`);
   if (!tile || tile.classList.contains('used')) return;
   tile.classList.add('used');
@@ -3067,6 +3079,7 @@ function scrambleClear() {
   if (fb) { fb.classList.add('hidden'); }
 }
 function scrambleHintFn() {
+  if (scrambleAnswered) return;
   const words = getScrambleWords();
   const card  = words[scrambleIdx];
   const nextPos = scrambleInput.length;
@@ -3099,12 +3112,11 @@ function scrambleCheckNow() {
       fb.textContent = `✨ Correto! +${xpEarned} XP`;
       fb.classList.remove('hidden');
     }
-    setTimeout(() => {
-      scrambleIdx++;
-      scrambleHints = 0;
-      if (scrambleIdx >= words.length) { scrambleDone=true; renderScrambleFinish(); }
-      else renderScramble();
-    }, 1200);
+    scrambleIdx++;
+    scrambleHints = 0;
+    const acabou = scrambleIdx >= words.length;
+    if (acabou) scrambleDone = true;
+    avancarDepois('scramble', 1200, acabou && renderScrambleFinish, renderScramble);
   } else {
     recordWeakWord(currentLesson.id, card, 'scramble');
     if (fb) {

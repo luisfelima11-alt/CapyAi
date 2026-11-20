@@ -1,5 +1,201 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Hangman: digitar no teclado depois do fim da palavra contava erros e repetia o fim do jogo
+
+**Sintoma:** no Hangman, quem joga pelo teclado do computador e continuava digitando depois de a palavra
+acabar via erros sendo somados por trás do aviso, um "Oops!" abrindo por cima do "Correct!" e, na última
+palavra, a tela de fim abrindo duas ou três vezes, com o XP do jogo pago a cada uma.
+
+**Causa raiz:** o aviso de fim de palavra é uma camada sobre a tela, que bloqueia o mouse mas não o
+teclado. O `keydown` só olhava se a tecla estava desabilitada; nada dizia que a palavra já tinha acabado.
+Cada erro além do 6º disparava de novo o `roundResult`.
+
+**Correção:** `roundOver`, ligado ao ganhar ou perder e desligado no `startRound`; `guess()` não aceita
+letra com a palavra encerrada.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Hangman): 8 letras erradas no teclado na última
+palavra (uma tela de fim, XP uma vez) e letras depois de acertar (nenhum erro somado).
+
+**Por que aconteceu:** camada por cima da tela foi tratada como trava, mas teclado não respeita camada.
+Trava de jogo é estado no script, não um elemento na frente.
+
+---
+
+## 2026-11-20 — Lição: trocar de aba logo depois de responder repetia a pergunta e pagava 2x
+
+**Sintoma:** no `lessons.html`, quem respondia no Quiz, Listen, Speed ou Scramble e trocava de aba antes
+de a próxima pergunta aparecer (1 a 2,6 s), ao voltar via a MESMA pergunta liberada. Respondendo de novo,
+ganhava o acerto duas vezes e a pergunta seguinte era pulada. Na última pergunta do Quiz, o XP da rodada
+era pago duas vezes (15 XP viravam 40). No Speed era pior: o jogo continuava sozinho na aba escondida,
+com o relógio correndo, e contava como erro cada palavra que o aluno nem viu.
+
+**Causa raiz:** o índice da pergunta só andava dentro do `setTimeout` que mostra a próxima. Trocar de
+aba e voltar redesenhava o painel com o índice velho (e o `renderScramble`/`startSpeedTimer` destravavam
+a resposta). E o `setTimeout` redesenhava o painel mesmo com o aluno em outra aba, o que no Speed ligava
+um relógio novo que ninguém desligava.
+
+**Correção:** `avancarDepois()`: o índice anda na hora da resposta; o redesenho espera o tempo de leitura e
+só acontece se o aluno continua na aba e nada redesenhou o painel (o `switchTool` invalida o avanço
+pendente). O fim da rodada, que paga, roda uma vez em qualquer caso.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Jogos da lição): Quiz (errar a última, sair e voltar),
+Speed (responder e sair: o relógio não pode seguir) e Scramble (acertar, sair e voltar).
+
+**Por que aconteceu:** o conserto de 13/nov (XP do Quiz/Listen) tirou o pagamento da tela de fim, mas o
+estado "já respondi esta" continuava morando dentro de um `setTimeout`. Estado de jogo muda na hora do
+evento; o tempo de espera é só para a tela.
+
+---
+
+## 2026-11-20 — Forest Puzzle: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Forest Puzzle, ao montar a palavra e tocar em "Check", o aluno ganhava +15 duas vezes e a
+palavra seguinte era pulada. Na última, a tela de fim abria duas vezes e o XP do jogo era pago em dobro.
+
+**Causa raiz:** igual ao Word Scramble: a última peça já dispara o `submitAnswer()` sozinho, e o botão
+"Check" conferia a mesma resposta de novo. Cada conferência fazia `round++` e marcava um `renderRound`.
+
+**Correção:** `wordLocked`, destravado no `renderRound`; peças e Check não contam com a palavra resolvida.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Forest Puzzle).
+
+**Por que aconteceu:** jogo copiado do mesmo molde do Word Scramble, com a mesma falta de trava.
+
+---
+
+## 2026-11-20 — Phrase Path: dois toques em "Conferir frase" pagavam em dobro e pulavam frase
+
+**Sintoma:** no Phrase Path, com a frase montada certa, um toque duplo (ou um segundo toque impaciente)
+em "Conferir frase" somava +12 XP duas vezes e a frase seguinte sumia sem ser jogada. Na última frase, o
+fim da trilha pagava o XP do jogo duas vezes.
+
+**Causa raiz:** o acerto espera 0,9 s antes de avançar (`setTimeout(() => { step++; render() })`) e o
+botão continuava valendo nesse intervalo. Cada toque somava pontos e marcava mais um `step++`.
+
+**Correção:** `locked`: depois do acerto, conferir, escolher e tirar peças não fazem nada até a próxima
+frase aparecer (`render` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Phrase Path): toque duplo numa frase do meio e na
+última (XP do fim uma vez).
+
+**Por que aconteceu:** o mesmo do Word Scramble e do Forest Puzzle: espera antes de avançar sem trava.
+
+---
+
+## 2026-11-20 — Word Scramble: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Word Scramble do pavilhão, o aluno montava a palavra e tocava em "Check ✓" (o gesto
+natural). A palavra rendia pontos duas vezes e a seguinte era pulada sem aparecer. Na última palavra, a
+tela de fim abria duas vezes, uma por cima da outra, e o XP do jogo era pago duas vezes. Dois toques em
+"Skip →" também pulavam duas palavras.
+
+**Causa raiz:** ao encher a última casa, o jogo já confere sozinho (300 ms depois). O botão "Check"
+conferia de novo a mesma resposta, e cada conferência certa marcava um `nextWord()` para dali a 1,4 s.
+Nada dizia "esta palavra já foi resolvida"; o `skipWord` tinha o mesmo problema.
+
+**Correção:** `wordLocked`: depois de um acerto, dos corações acabarem ou de um Skip, peças, Check e Skip
+não fazem nada até a próxima palavra carregar (`loadWord` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Word Scramble): acerto + Check, acerto + Check na
+última palavra (uma tela de fim, XP uma vez) e Skip duplo.
+
+**Por que aconteceu:** resposta com espera (`setTimeout`) antes de avançar, sem trava. Todo jogo que mostra
+o resultado por um tempo antes de seguir precisa ignorar novos toques nesse intervalo.
+
+---
+
+## 2026-11-20 — Grammar Lab: nenhuma alternativa respondia
+
+**Sintoma:** no Grammar Lab (`grammar_lab.html`, aberto pelo pavilhão de jogos), o aluno tocava em
+"Praticar Agora!", via a primeira pergunta e nenhuma alternativa fazia nada. O jogo inteiro (6 lições,
+30 perguntas) ficava travado na pergunta 1, sem XP e sem missão do dia.
+
+**Causa raiz:** cada botão levava a resposta e a explicação como texto dentro de
+`onclick="answerQ(this,'…','…','…')"`. O código escapava o apóstrofo, mas não as aspas duplas, e todas
+as 30 explicações têm aspas (`so we use "an".`). A primeira aspa fechava o atributo `onclick` no meio, o
+JavaScript ficava cortado e o clique dava erro de sintaxe.
+
+**Correção:** o botão passa só o número da alternativa (`answerQ(this, j)`); a resposta certa e a
+explicação são lidas da pergunta atual no próprio script.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Grammar Lab) clica numa alternativa e confere que a
+explicação aparece inteira, com as aspas, sem erro na página.
+
+**Por que aconteceu:** texto de conteúdo colado dentro de um atributo HTML com JavaScript. Escapar à mão
+um caractere (o `'`) esquece o outro (o `"`). Passe um índice e leia o dado no script.
+
+---
+
+## 2026-11-20 — "Foco gramatical" na revisão final do GPS Tronic (lessons.html)
+
+**Sintoma:** na lição "GPS Tronic Master Review" (id 524) do `lessons.html`, a tabela da seção de padrões tinha a coluna "Foco gramatical".
+
+**Causa raiz:** o texto vem do `lessons_gps_data.js` (cabeçalho da tabela) e nenhum teste olhava os arquivos de dados das lições.
+
+**Correção:** a coluna se chama "Padrão".
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` também lê os `lessons_*data.js` (tirando as chaves internas `grammar:`).
+
+**Por que aconteceu:** a troca de 12/out procurou nas páginas HTML, não nos dados que o JS transforma em tela.
+
+---
+
+## 2026-11-20 — Erro de CSP no console da página Minha conta
+
+**Sintoma:** na produção, abrir `account.html` mostrava no console "Applying inline style violates the following Content Security Policy directive 'style-src-elem …'", e o "+XP"/confete dessa página ficava sem estilo.
+
+**Causa raiz:** `account.html` tem CSP estrita no `vercel.json` (sem `'unsafe-inline'` em `style-src-elem`). O `CapyJuice.init()` (`components.js`) roda em toda página e criava um `<style>` com as animações; a CSP bloqueava. O dev-server não manda CSP, por isso só aparecia no ar.
+
+**Correção:** as regras entram por uma folha construída pelo CSSOM (`new CSSStyleSheet()` + `document.adoptedStyleSheets`), que a CSP não bloqueia; navegador sem isso cai no `<style>` antigo. Etiqueta do `components.js` mantida (`seg1`).
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre `account.html` com a CSP tirada do `vercel.json` e falha em qualquer erro de CSP no console. Código novo que injeta `<style>` precisa passar por esse teste.
+
+**Por que aconteceu:** a CSP estrita de account/login é posterior ao CapyJuice, e a varredura local não reproduz cabeçalhos da Vercel.
+
+---
+
+## 2026-11-20 — Aba "📐 Grammar" em ~100 aulas feitas à mão
+
+**Sintoma:** nas aulas 01–44, Advanced, Business, Travel e Intermediate 01–18 o aluno via a aba "📐 Grammar", o botão "✓ Grammar understood!", títulos "Grammar: …", "Corrija o erro gramatical", a dica "grammar" ao passar o mouse na bolinha de progresso e até frases de diálogo e um cartão de vocabulário com a palavra.
+
+**Causa raiz:** a troca para "🧩 Patterns" (regra de 12/out) entrou nos geradores (Agro, GPS, Intermediate 19+, francês) e no `aplicar-slides.mjs`, mas as aulas antigas feitas à mão nunca passaram por ela. Nenhum teste olhava essas páginas.
+
+**Correção:** troca só do texto visível ("🧩 Patterns", "Entendi o padrão!", "Patterns: …", "Corrija a frase"; frases de diálogo reescritas sem a palavra). Os ids internos (`tab-grammar`, `'grammar'` nas listas de seções) ficaram. A bolinha de progresso mostra "patterns" na dica.
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` (no `npm run test:security`) lê todas as aulas feitas à mão, tira os nomes internos e procura "gramática/gramatical/grammar/grammatical".
+
+**Por que aconteceu:** a troca foi feita curso a curso, junto com o molde novo; as aulas que não mudaram de molde ficaram para trás. Ainda faltam `med_aula_*` e `interview_aula_*`: o gerador deles escreve "Entendi a gramática!" e não passa na própria validação de slides, então regerar hoje mudaria muito mais que o texto.
+
+---
+
+## 2026-11-20 — "Gramática"/"grammar" ainda na tela em páginas do site
+
+**Sintoma:** fora das aulas, o aluno ainda via a palavra proibida: selo "Grammar Star" (pavilhões de jogos, progresso e aviso de selo), "grammar adventure" no Dialogue Expedition, "Domine a gramática avançada" e etiquetas "Grammar" no curso Advanced, "Expedição de gramática" no Verb Voyage e "Grammar Notes" no criador de aulas.
+
+**Causa raiz:** a troca de 12/out (regra do Luis) foi feita página por página e os testes só olhavam a descrição SEO, o Laboratório de Padrões e as aulas no molde novo; textos montados em JS (selos, cartões) e páginas menos visitadas ficaram de fora.
+
+**Correção:** "Grammar Star" vira "Pattern Star" (o id `grammar_star` fica), "dialogue adventure", "estruturas avançadas", etiqueta "Patterns", "Expedição dos verbos" e "🧩 Patterns" no criador.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre cada página e procura a palavra no texto visível (inclusive o que o JS montou), no título e em title/placeholder/alt/aria-label.
+
+**Por que aconteceu:** a busca da troca original olhou o HTML, não o texto que o JS escreve na tela.
+
+---
+
+## 2026-11-20 — Setas do menu lateral sem efeito no YouTube Lab
+
+**Sintoma:** no computador, no `youtube_lab.html`, as setas ▲ ▼ do menu lateral não faziam nada; o console mostrava `ReferenceError: sideNavScroll is not defined`.
+
+**Causa raiz:** a página montava o menu com `innerHTML = Components.renderSideNav(...)` em vez de `Components.mount('side-nav-placeholder', ...)`. Só o `mount` chama o `initSideNavScroll()`, que cria a função `sideNavScroll` usada pelos botões.
+
+**Correção:** a página usa `Components.mount` com os ids padrão (`top-nav-placeholder`, `side-nav-placeholder`), como as outras.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` (as setas existem e clicar não dá erro). Varredura: procurar `innerHTML = Components.render` nas páginas.
+
+**Por que aconteceu:** a página é mais antiga que o `initSideNavScroll` e nunca foi migrada para o `mount`.
+
+---
+
 ## 2026-11-20 — Aulas 43 e 44: o 🔊 ficava mudo no iPhone
 
 **Sintoma:** nas aulas 43 ("Let's Make Plans!") e 44 ("Tell Me About Yourself"), os 🔊 do diálogo, das frases-chave e dos exemplos de resposta não faziam som no iPhone com a chave de silencioso ligada (e tinham a voz robótica nos outros aparelhos).

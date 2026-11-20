@@ -184,6 +184,10 @@ let wordIdx       = 0;
 let wrongCount    = 0;
 let score         = 0;
 let answer        = [];   // array of {letter, tileIdx}
+// Palavra já resolvida (acerto, corações acabaram ou Skip): até a próxima
+// carregar, nada mais conta. Sem isso, "Check" depois do auto-check ou dois
+// toques no Skip pagavam de novo e pulavam palavras (e o fim de jogo vinha 2x).
+let wordLocked    = false;
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 buildPips();
@@ -207,6 +211,7 @@ function updatePips() {
 function loadWord() {
   answer     = [];
   wrongCount = 0;
+  wordLocked = false;
   const entry = shuffledWords[wordIdx];
 
   document.getElementById('word-emoji').textContent    = entry.emoji;
@@ -260,6 +265,7 @@ function renderTiles(letters) {
 
 // ── Interaction ────────────────────────────────────────────────────────────────
 function placeLetter(letter, tileIdx) {
+  if (wordLocked) return;
   const nextSlotIdx = answer.length;
   const word = shuffledWords[wordIdx].word;
   if (nextSlotIdx >= word.length) return;
@@ -311,6 +317,7 @@ function clearAnswer() {
 
 // ── Check ──────────────────────────────────────────────────────────────────────
 function checkAnswer() {
+  if (wordLocked) return;
   if (answer.length < shuffledWords[wordIdx].word.length) {
     showFeedback('⚠️', 'Fill all the letters first!');
     return;
@@ -321,6 +328,7 @@ function checkAnswer() {
 
   if (attempt === word) {
     // Correct
+    wordLocked = true;
     document.querySelectorAll('.slot').forEach(s => { s.classList.remove('filled'); s.classList.add('correct'); });
     const pts = 10 + (MAX_WRONG - wrongCount) * 5;
     score += pts;
@@ -336,6 +344,7 @@ function checkAnswer() {
     clearAnswer();
 
     if (wrongCount >= MAX_WRONG) {
+      wordLocked = true;
       showFeedback('💡', `The word was: ${word}`);
       setTimeout(nextWord, 1800);
     } else {
@@ -345,6 +354,8 @@ function checkAnswer() {
 }
 
 function skipWord() {
+  if (wordLocked) return;
+  wordLocked = true;
   showFeedback('💡', `The word was: ${shuffledWords[wordIdx].word}`);
   setTimeout(nextWord, 1500);
 }
