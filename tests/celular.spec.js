@@ -105,3 +105,21 @@ for (const aula of ['agro_aula_12.html', 'gpstronic_aula_20.html']) {
     }
   });
 }
+
+// Pavilhão de Jogos: o botão "voltar ao topo" (fixo, 64 px, canto de baixo)
+// ficava em cima do "Mais" do menu de baixo: o toque no "Mais" subia a página
+// em vez de abrir o menu.
+test('Pavilhão de Jogos: o "Mais" do menu de baixo abre no toque', async ({ page }) => {
+  await entrar(page, '/5_Game_Pavilion_Forest_Edition.html');
+  const mais = page.locator('nav.md\\:hidden button', { hasText: 'Mais' });
+  await expect(mais).toBeVisible();
+  const centro = await mais.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+  await page.touchscreen.tap(centro.x, centro.y);   // o dedo cai no meio do botão
+  await expect.poll(() => page.evaluate(() => {
+    const r = document.getElementById('more-sheet').getBoundingClientRect();
+    return r.top < innerHeight - 100;
+  })).toBe(true);
+});

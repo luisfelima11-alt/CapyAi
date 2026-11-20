@@ -305,7 +305,8 @@
 <div id="mobile-nav-placeholder"></div>
 </main>
 <!-- FAB: Return to Top -->
-<button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-8 right-8 bg-pink-brand text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-pink-500/40">
+<!-- No celular sobe acima do menu de baixo (82 px): em bottom-8 ele cobria o "Mais". -->
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Voltar ao topo" class="fixed bottom-24 right-4 md:bottom-8 md:right-8 bg-pink-brand text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-pink-500/40">
 <span class="material-symbols-outlined text-3xl" data-icon="expand_less">expand_less</span>
 </button>
 

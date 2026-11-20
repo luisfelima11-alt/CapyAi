@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — No celular, o Pavilhão de Jogos não abria o "Mais"
+
+**Sintoma:** no Pavilhão de Jogos, no celular, tocar em "Mais" no menu de baixo subia a página até o topo em vez de abrir o menu.
+
+**Causa raiz:** o botão rosa "voltar ao topo" é fixo em `bottom-8 right-8` (64 px). No celular ele ficava bem em cima do "Mais" do menu de baixo (82 px de altura), e por estar na frente recebia o toque.
+
+**Correção:** no celular o botão fica acima do menu (`bottom-24 right-4`, 56 px); no computador continua onde estava.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` toca no meio do "Mais" no iPhone 13 e espera a folha subir.
+
+**Por que aconteceu:** o botão foi posto antes do menu de baixo existir e nunca foi revisto no celular.
+
+---
+
 ## 2026-11-20 — No celular, a página "Minha conta" não tinha caminho
 
 **Sintoma:** no celular não havia como chegar a "Minha conta" (plano atual, "Atualizar status da assinatura", o que a Yara sabe do aluno). O link só existia no menu do avatar.
