@@ -33,3 +33,34 @@ test('youtube_lab: as setas do menu lateral funcionam', async ({ page }) => {
   await page.evaluate(() => document.getElementById('sidenav-up').click());
   expect(erros).toEqual([]);
 });
+
+// Regra do Luis (12/out/2026): "gramática"/"grammar" não aparecem em nada que
+// o aluno vê. Estas páginas do site (fora das aulas) ainda mostravam a palavra:
+// selo "Grammar Star", "grammar adventure" no diálogo, "Domine a gramática" no
+// curso Advanced, "Expedição de gramática" no Verb Voyage, "Grammar Notes" no
+// criador de aulas.
+const PROIBIDA = /gram[aá]tic|grammar/i;
+const textoVisivel = page => page.evaluate(() => {
+  const c = document.body.cloneNode(true);
+  c.querySelectorAll('script,style,noscript,template').forEach(x => x.remove());
+  const attrs = [...c.querySelectorAll('[title],[placeholder],[aria-label],[alt]')]
+    .flatMap(el => ['title', 'placeholder', 'aria-label', 'alt'].map(a => el.getAttribute(a) || ''));
+  return [document.title, c.textContent, ...attrs].join('\n');
+});
+for (const pagina of ['3_Dialogue_Expedition_Yara_Turn.html', '5_Game_Pavilion_Forest_Edition.html',
+  '9_Game_Pavilion_Yaras_Expedition.html', 'progress.html', 'classes_advanced.html',
+  'verb_voyage_game.html', 'lesson_creator.html']) {
+  test(`${pagina}: sem "gramática"/"grammar" na tela`, async ({ page }) => {
+    await abrirLogada(page, '/' + pagina);
+    await page.waitForLoadState('load');
+    const texto = await textoVisivel(page);
+    expect(texto.match(new RegExp('.{0,40}(' + PROIBIDA.source + ').{0,40}', 'gi')) || []).toEqual([]);
+  });
+}
+
+test('selo "Grammar Star" e o fim do diálogo também não dizem a palavra', async () => {
+  const fs = require('fs'), path = require('path');
+  const ler = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
+  expect(ler('badge-toast.js')).not.toMatch(/label:\s*'[^']*Grammar/);
+  expect(ler('3_Dialogue_Expedition_Yara_Turn.html')).not.toMatch(/grammar explorer/i);
+});

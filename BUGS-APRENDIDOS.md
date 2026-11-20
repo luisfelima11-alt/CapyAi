@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — "Gramática"/"grammar" ainda na tela em páginas do site
+
+**Sintoma:** fora das aulas, o aluno ainda via a palavra proibida: selo "Grammar Star" (pavilhões de jogos, progresso e aviso de selo), "grammar adventure" no Dialogue Expedition, "Domine a gramática avançada" e etiquetas "Grammar" no curso Advanced, "Expedição de gramática" no Verb Voyage e "Grammar Notes" no criador de aulas.
+
+**Causa raiz:** a troca de 12/out (regra do Luis) foi feita página por página e os testes só olhavam a descrição SEO, o Laboratório de Padrões e as aulas no molde novo; textos montados em JS (selos, cartões) e páginas menos visitadas ficaram de fora.
+
+**Correção:** "Grammar Star" vira "Pattern Star" (o id `grammar_star` fica), "dialogue adventure", "estruturas avançadas", etiqueta "Patterns", "Expedição dos verbos" e "🧩 Patterns" no criador.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre cada página e procura a palavra no texto visível (inclusive o que o JS montou), no título e em title/placeholder/alt/aria-label.
+
+**Por que aconteceu:** a busca da troca original olhou o HTML, não o texto que o JS escreve na tela.
+
+---
+
 ## 2026-11-20 — Setas do menu lateral sem efeito no YouTube Lab
 
 **Sintoma:** no computador, no `youtube_lab.html`, as setas ▲ ▼ do menu lateral não faziam nada; o console mostrava `ReferenceError: sideNavScroll is not defined`.
