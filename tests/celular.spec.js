@@ -106,6 +106,39 @@ for (const aula of ['agro_aula_12.html', 'gpstronic_aula_20.html']) {
   });
 }
 
+// Aulas 43 e 44: o 🔊 do diálogo, das frases-chave e dos exemplos chamava a voz
+// do navegador direto (speechSynthesis), que o iPhone cala com a chave de
+// silencioso. As outras aulas passam pelo tts-en.js (voz da IA no elemento de
+// áudio que o primeiro toque liberou, CapyAudio). O teste confere que o toque
+// pede a voz da IA e não fala pelo navegador antes dela.
+for (const [aula, aba, botao, abrir] of [
+  ['aula_43.html', 'dialogue', 'button[onclick^="speakLine43"]'],
+  ['aula_43.html', 'chunks', 'button[onclick^="speakChunk43"]'],
+  ['aula_44.html', 'dialogue', 'button[onclick^="speakLine44"]'],
+  ['aula_44.html', 'chunks', 'button[onclick^="speakChunk44"]', '.chunk-card > button'],
+  ['aula_44.html', 'speak', 'button[onclick^="speakEx44"]', 'button[onclick^="toggleSpeak44"]'],
+]) {
+  test(`${aula} (${aba}): o 🔊 usa a voz que toca no iPhone`, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__falasDoNavegador = 0;
+      const original = speechSynthesis.speak.bind(speechSynthesis);
+      speechSynthesis.speak = u => { if (u.text.trim()) window.__falasDoNavegador++; return original(u); };
+    });
+    await entrar(page, '/' + aula);
+    // A voz da IA responde com um clipe mudo de verdade (sem cair no plano B).
+    const MUDO = Buffer.from('UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=', 'base64');
+    await page.route('**/api/tts**', route => route.fulfill({ status: 200, contentType: 'audio/wav', body: MUDO }));
+    await page.tap(`.tab-btn[data-tab="${aba}"]`);
+    if (abrir) await page.locator(abrir).first().tap();   // o cartão abre antes
+    const alvo = page.locator(botao).first();
+    await alvo.scrollIntoViewIfNeeded();
+    const pedido = page.waitForRequest(r => new URL(r.url()).pathname === '/api/tts', { timeout: 5000 });
+    await alvo.tap();
+    await pedido;
+    expect(await page.evaluate(() => window.__falasDoNavegador)).toBe(0);
+  });
+}
+
 // Pavilhão de Jogos: o botão "voltar ao topo" (fixo, 64 px, canto de baixo)
 // ficava em cima do "Mais" do menu de baixo: o toque no "Mais" subia a página
 // em vez de abrir o menu.

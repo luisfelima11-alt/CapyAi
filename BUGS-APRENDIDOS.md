@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Aulas 43 e 44: o 🔊 ficava mudo no iPhone
+
+**Sintoma:** nas aulas 43 ("Let's Make Plans!") e 44 ("Tell Me About Yourself"), os 🔊 do diálogo, das frases-chave e dos exemplos de resposta não faziam som no iPhone com a chave de silencioso ligada (e tinham a voz robótica nos outros aparelhos).
+
+**Causa raiz:** `speakLine43/44`, `speakChunk43/44` e `speakEx44` chamavam `speechSynthesis` direto. As outras aulas passam pelo `tts-en.js`, que toca a voz da IA no elemento de áudio liberado pelo primeiro toque (`CapyAudio`, entrada de 18/out); estas cinco funções foram escritas à mão no modelo comunicativo e nunca foram ligadas a ele.
+
+**Correção:** as cinco funções chamam `falar43/falar44`, que usa `window.speakEn` (tts-en.js, já carregado nas duas páginas) e só cai na voz do navegador se o tts-en.js não existir.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` toca em cada 🔊 no iPhone 13 e exige o pedido a `/api/tts`, sem fala do navegador antes. Para achar outras: procure `new SpeechSynthesisUtterance` fora de `speak()` em página que carrega `tts-en.js`.
+
+**Por que aconteceu:** o `tts-en.js` só substitui `speak`/`speakRaw`; função com outro nome passa por fora sem ninguém notar no computador.
+
+---
+
 ## 2026-11-20 — No celular, o Pavilhão de Jogos não abria o "Mais"
 
 **Sintoma:** no Pavilhão de Jogos, no celular, tocar em "Mais" no menu de baixo subia a página até o topo em vez de abrir o menu.
