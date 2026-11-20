@@ -1,5 +1,19 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — No celular, o Índice das aulas do molde escondia o "Homework"
+
+**Sintoma:** nas aulas do molde novo (Agro, GPS 09+, Intermediate 19+, Entrevista, Medical), tocar em "Índice" no celular abria a lista dos 10 passos, mas o fim dela ficava embaixo do menu de baixo. Não dava para rolar até lá: o "Homework" (e às vezes o "Listening") não podia ser tocado.
+
+**Causa raiz:** o Índice fica dentro da barra grudada no topo (`sticky top-0`). Uma área grudada não rola com a página, e a lista (~536 px) somada ao cabeçalho, à barra e ao menu de baixo passa dos 664 px do iPhone 13.
+
+**Correção:** `aula-molde.js` (que todas essas aulas carregam) limita o `#rota-indice` à altura da tela menos 15rem e deixa a lista rolar por dentro. Corrige as 63 páginas sem gerar de novo.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` abre o Índice com a barra grudada e confere, passo a passo, que o dedo alcança cada item (`elementFromPoint`).
+
+**Por que aconteceu:** o Índice foi desenhado no computador, onde a tela é alta e não há menu de baixo.
+
+---
+
 ## 2026-11-20 — No celular, a Yara cobria o "Verificar" das lições
 
 **Sintoma:** no celular, em `lessons.html` (Build, Quiz, Scramble, Speed), o último botão de cada ferramenta ficava metade embaixo dos botões flutuantes da Yara e da lousa, mesmo com a página rolada até o fim. O toque no "✓ Verificar" abria a Yara.

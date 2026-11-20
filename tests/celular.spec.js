@@ -58,3 +58,32 @@ test('lessons.html: a última opção do Quiz não fica embaixo da Yara', async 
   await page.waitForSelector('#qopt-3');
   expect(await cobertoPelosFlutuantes(page, '#qopt-3')).toBe(0);
 });
+
+// Aulas do molde (Agro, GPS 09+, Intermediate 19+, Entrevista, Medical): o
+// Índice abre dentro da barra grudada no topo. Com 10 passos ele passava da
+// tela e o fim ficava embaixo do menu de baixo, sem rolagem: o "Homework"
+// não tinha como ser tocado.
+for (const aula of ['agro_aula_12.html', 'gpstronic_aula_20.html']) {
+  test(`${aula}: todo passo do Índice pode ser tocado`, async ({ page }) => {
+    await entrar(page, '/' + aula);
+    // O passo "Prepare" entra depois que a página monta: são 10 passos.
+    await page.waitForFunction(() => document.querySelectorAll('#rota-indice-lista .rota-item').length >= 10);
+    await page.evaluate(() => window.scrollTo(0, 800));   // a barra gruda no topo
+    await page.tap('#rota-indice-btn');
+    const itens = page.locator('#rota-indice-lista .rota-item');
+    const n = await itens.count();
+    expect(n).toBeGreaterThanOrEqual(10);
+    for (let i = 0; i < n; i++) {
+      const item = itens.nth(i);
+      const tocavel = await item.evaluate(async el => {
+        el.scrollIntoView({ block: 'center' });   // o que o dedo faria: rolar até ele
+        await new Promise(r => setTimeout(r, 100));
+        const r = el.getBoundingClientRect();
+        const cy = r.top + r.height / 2;
+        if (cy <= 0 || cy >= innerHeight) return false;
+        return el.contains(document.elementFromPoint(r.left + 40, cy));
+      });
+      expect(tocavel, `passo ${i + 1} do Índice`).toBe(true);
+    }
+  });
+}
