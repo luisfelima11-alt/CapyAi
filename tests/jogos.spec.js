@@ -40,6 +40,72 @@ test.describe('Grammar Lab (grammar_lab.html)', () => {
   });
 });
 
+test.describe('Jogos da lição (lessons.html): trocar de aba logo depois de responder', () => {
+  async function abrirLicao(page) {
+    await entrarComoAluna(page);
+    await page.goto('/lessons.html?lesson=1');
+    await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson
+      && currentLesson.quiz && currentLesson.quiz.length > 1 && currentLesson.vocab && currentLesson.vocab.length > 3
+      && window.Store);
+  }
+
+  test('Quiz: errar a última, ir aos Flashcards e voltar não deixa responder de novo nem paga 2x', async ({ page }) => {
+    await abrirLicao(page);
+    await page.click('.tool-tab[data-tool="quiz"]');
+    await page.evaluate(() => {
+      const qs = shuffledQuiz.length ? shuffledQuiz : currentLesson.quiz;
+      quizIdx = qs.length - 1; quizScore = 3; quizDone = false;
+      renderQuiz();
+    });
+    const certa = await page.evaluate(() => (shuffledQuiz.length ? shuffledQuiz : currentLesson.quiz)[quizIdx].a);
+    const antes = await xpDaAluna(page);
+    const exato = new RegExp('^\\s*' + certa.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$');
+    await page.locator('#quiz-opts button').filter({ hasNotText: exato }).first().click();
+    await page.click('.tool-tab[data-tool="vocab"]');
+    await page.click('.tool-tab[data-tool="quiz"]');
+    const abertas = page.locator('#quiz-opts button:not([disabled])');
+    if (await abertas.count()) await abertas.filter({ hasText: exato }).click();
+    await page.waitForTimeout(3500);
+    await expect(page.locator('#panel-quiz')).toContainText('Quiz Concluído!');
+    expect(await xpDaAluna(page) - antes).toBe(3 * 5);
+  });
+
+  test('Speed: responder e trocar de aba não deixa o relógio correndo escondido', async ({ page }) => {
+    await abrirLicao(page);
+    await page.click('.tool-tab[data-tool="speed"]');
+    await page.locator('#speed-opts button[data-correct="true"]').click();
+    await page.click('.tool-tab[data-tool="vocab"]');
+    await page.waitForTimeout(9000);
+    expect(await page.evaluate(() => ({ idx: speedIdx, relogio: !!speedTimer })))
+      .toEqual({ idx: 1, relogio: false });
+  });
+
+  test('Scramble: acertar, trocar de aba e voltar não paga a mesma palavra de novo', async ({ page }) => {
+    await abrirLicao(page);
+    await page.click('.tool-tab[data-tool="scramble"]');
+    const montar = () => page.evaluate(() => {
+      const palavra = getScrambleWords()[scrambleIdx].en;
+      const usadas = new Set();
+      for (const letra of palavra) {
+        const t = [...document.querySelectorAll('.scramble-tile')].find(b => b.dataset.letter === letra && !usadas.has(b.id));
+        usadas.add(t.id);
+        t.click();
+      }
+    });
+    const primeira = await page.evaluate(() => getScrambleWords()[0].en);
+    await montar();
+    await page.waitForTimeout(600);   // o auto-check confere e paga
+    const pago = await page.evaluate(() => getLessonProgress(currentLesson.id).xpEarned);
+    await page.click('.tool-tab[data-tool="vocab"]');
+    await page.click('.tool-tab[data-tool="scramble"]');
+    const naTela = await page.evaluate(() => getScrambleWords()[scrambleIdx].en);
+    if (naTela === primeira) { await montar(); await page.waitForTimeout(600); }
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => scrambleIdx)).toBe(1);
+    expect(await page.evaluate(() => getLessonProgress(currentLesson.id).xpEarned)).toBe(pago);
+  });
+});
+
 test.describe('Phrase Path (phrase_path_game.html)', () => {
   async function montarFrase(page) {
     await page.evaluate(() => {

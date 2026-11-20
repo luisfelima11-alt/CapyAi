@@ -1,5 +1,31 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Lição: trocar de aba logo depois de responder repetia a pergunta e pagava 2x
+
+**Sintoma:** no `lessons.html`, quem respondia no Quiz, Listen, Speed ou Scramble e trocava de aba antes
+de a próxima pergunta aparecer (1 a 2,6 s), ao voltar via a MESMA pergunta liberada. Respondendo de novo,
+ganhava o acerto duas vezes e a pergunta seguinte era pulada. Na última pergunta do Quiz, o XP da rodada
+era pago duas vezes (15 XP viravam 40). No Speed era pior: o jogo continuava sozinho na aba escondida,
+com o relógio correndo, e contava como erro cada palavra que o aluno nem viu.
+
+**Causa raiz:** o índice da pergunta só andava dentro do `setTimeout` que mostra a próxima. Trocar de
+aba e voltar redesenhava o painel com o índice velho (e o `renderScramble`/`startSpeedTimer` destravavam
+a resposta). E o `setTimeout` redesenhava o painel mesmo com o aluno em outra aba, o que no Speed ligava
+um relógio novo que ninguém desligava.
+
+**Correção:** `avancarDepois()`: o índice anda na hora da resposta; o redesenho espera o tempo de leitura e
+só acontece se o aluno continua na aba e nada redesenhou o painel (o `switchTool` invalida o avanço
+pendente). O fim da rodada, que paga, roda uma vez em qualquer caso.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Jogos da lição): Quiz (errar a última, sair e voltar),
+Speed (responder e sair: o relógio não pode seguir) e Scramble (acertar, sair e voltar).
+
+**Por que aconteceu:** o conserto de 13/nov (XP do Quiz/Listen) tirou o pagamento da tela de fim, mas o
+estado "já respondi esta" continuava morando dentro de um `setTimeout`. Estado de jogo muda na hora do
+evento; o tempo de espera é só para a tela.
+
+---
+
 ## 2026-11-20 — Forest Puzzle: "Check" depois do acerto pagava em dobro e pulava palavra
 
 **Sintoma:** no Forest Puzzle, ao montar a palavra e tocar em "Check", o aluno ganhava +15 duas vezes e a
