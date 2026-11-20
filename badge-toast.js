@@ -17,7 +17,7 @@
         chat_master:    { icon: 'chat_bubble',              color: '#10b981', label: 'Chat Master',     msg: 'Amazing dialogue skills! 💬' },
         game_hero:      { icon: 'sports_esports',           color: '#f59e0b', label: 'Game Hero',       msg: 'Word Match champion! 🎮' },
         forest_sage:    { icon: 'auto_awesome',             color: '#a855f7', label: 'Forest Sage',     msg: 'Puzzle master of the forest! 🧩' },
-        grammar_star:   { icon: 'school',                   color: '#06b6d4', label: 'Grammar Star',    msg: 'Sentence builder genius! 🏫' },
+        grammar_star:   { icon: 'school',                   color: '#06b6d4', label: 'Pattern Star',    msg: 'Sentence builder genius! 🏫' },
         word_wizard:    { icon: 'spellcheck',               color: '#8b5cf6', label: 'Word Wizard',     msg: 'You spelled every word right! ✏️' },
         number_wizard:  { icon: '123',                      color: '#3b82f6', label: 'Number Wizard',   msg: 'You know your numbers! 🔢' },
         story_teller:   { icon: 'menu_book',                color: '#f43f5e', label: 'Story Teller',    msg: 'Yara loved your story adventure! 📖' },

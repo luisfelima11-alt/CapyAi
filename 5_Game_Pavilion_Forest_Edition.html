@@ -305,7 +305,8 @@
 <div id="mobile-nav-placeholder"></div>
 </main>
 <!-- FAB: Return to Top -->
-<button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-8 right-8 bg-pink-brand text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-pink-500/40">
+<!-- No celular sobe acima do menu de baixo (82 px): em bottom-8 ele cobria o "Mais". -->
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Voltar ao topo" class="fixed bottom-24 right-4 md:bottom-8 md:right-8 bg-pink-brand text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 shadow-pink-500/40">
 <span class="material-symbols-outlined text-3xl" data-icon="expand_less">expand_less</span>
 </button>
 
@@ -329,7 +330,7 @@
         { id: 'chat_master',    icon: 'chat_bubble',                 color: 'bg-emerald-500',  shadow: 'shadow-emerald-500/30', label: 'Chat Master'   },
         { id: 'game_hero',      icon: 'sports_esports',              color: 'bg-pink-500',     shadow: 'shadow-pink-500/30',    label: 'Game Hero'     },
         { id: 'forest_sage',    icon: 'auto_awesome',                color: 'bg-emerald-500',  shadow: 'shadow-emerald-500/30', label: 'Forest Sage'   },
-        { id: 'grammar_star',   icon: 'school',                      color: 'bg-cyan-500',     shadow: 'shadow-cyan-500/30',    label: 'Grammar Star'  },
+        { id: 'grammar_star',   icon: 'school',                      color: 'bg-cyan-500',     shadow: 'shadow-cyan-500/30',    label: 'Pattern Star'  },
         { id: 'word_wizard',    icon: 'spellcheck',                  color: 'bg-violet-500',   shadow: 'shadow-violet-500/30',  label: 'Word Wizard'   },
         { id: 'number_wizard',  icon: '123',                         color: 'bg-amber-500',    shadow: 'shadow-amber-500/30',   label: 'Number Wizard' },
         { id: 'story_teller',   icon: 'menu_book',                   color: 'bg-rose-500',     shadow: 'shadow-rose-500/30',    label: 'Story Teller'  },

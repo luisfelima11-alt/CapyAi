@@ -56,8 +56,9 @@
 <script src="components.js?v=seg1"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('top-nav').innerHTML = Components.renderTopNav('youtube');
-    document.getElementById('side-nav').innerHTML = Components.renderSideNav('youtube');
+    // mount (e não innerHTML) liga as setas do menu lateral e os números do topo.
+    Components.mount('top-nav-placeholder', Components.renderTopNav('youtube'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('youtube'));
     Components.applyDarkMode();
     if (!Auth.isLoggedIn()) window.location.href = '4_Login_Capy_Yara_Welcomes_You.html';
     updateNavState();
@@ -75,8 +76,8 @@
   }
 </script>
 
-<div id="top-nav"></div>
-<div id="side-nav"></div>
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
 
 <!-- Main content with side nav offset -->
 <div class="md:pl-28 pt-20 min-h-screen">

@@ -1379,7 +1379,7 @@ const LESSONS_GPS = [
         'Feiras e Parcerias (Aula 14): "I\'m interested in becoming a dealer" + "We\'re looking for a partner" + "Let\'s keep in touch."',
       ],
       table: {
-        headers: ['Cenário','Frase-chave','Foco gramatical','Aula'],
+        headers: ['Cenário','Frase-chave','Padrão','Aula'],
         rows: [
           ['Suporte remoto','Hold it for three seconds.','Imperativo + for','Aula 9'],
           ['Imprevisto',"I'm sorry about the delay.",'Empatia + solução','Aula 10'],

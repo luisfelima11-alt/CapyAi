@@ -316,12 +316,16 @@ const Components = {
                 </div>
 
                 <!-- Utility links -->
-                <div class="border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center justify-around">
-                    <a href="progress.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-4 flex flex-wrap items-center justify-around gap-x-3 gap-y-3">
+                    <a href="progress.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
                         <span class="material-symbols-outlined text-emerald-500 text-lg" style="${ico}${cheio(true)}">military_tech</span> Progresso
                     </a>
-                    <a href="settings.html" class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-bold text-sm">
+                    <a href="settings.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
                         <span class="material-symbols-outlined text-slate-400 text-lg" style="${ico}">settings</span> Ajustes
+                    </a>
+                    <!-- O menu do avatar (onde fica "Minha conta") só abre com o mouse: no celular, este é o caminho. -->
+                    <a href="account.html" class="flex items-center gap-2 whitespace-nowrap text-slate-500 dark:text-slate-400 font-bold text-sm">
+                        <span class="material-symbols-outlined text-orange-500 text-lg" style="${ico}${cheio(true)}">workspace_premium</span> Minha conta
                     </a>
                 </div>
             </div>
@@ -1431,7 +1435,15 @@ window.CapyJuice = {
           @keyframes capyConfettiFall{0%{transform:translateY(-10vh) rotate(0deg)}100%{transform:translateY(110vh) rotate(var(--rz,720deg))}}
           .capy-confetti{position:fixed;top:0;width:10px;height:14px;border-radius:2px;pointer-events:none;animation:capyConfettiFall var(--dur,2.2s) ease-in var(--delay,0s) forwards;z-index:94}
         `;
-        document.head.appendChild(st);
+        // Folha construída pelo CSSOM: a CSP estrita de account/login bloqueia um
+        // <style> novo (erro no console e "+XP" sem estilo), mas não o CSSOM.
+        try {
+            const folha = new CSSStyleSheet();
+            folha.replaceSync(st.textContent);
+            document.adoptedStyleSheets = [...document.adoptedStyleSheets, folha];
+        } catch (e) {
+            document.head.appendChild(st);
+        }
 
         // XP pop: envolve Store.addXP mantendo o comportamento original
         if (typeof Store !== 'undefined' && typeof Store.addXP === 'function' && !Store.__capyJuiced) {

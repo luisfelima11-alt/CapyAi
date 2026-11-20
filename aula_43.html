@@ -123,7 +123,7 @@
 
       <!-- Grammar focus -->
       <div class="bg-navy rounded-2xl p-5 text-white mb-6">
-        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Grammar in this dialogue</p>
+        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Patterns in this dialogue</p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="bg-white/10 rounded-xl p-3 text-center">
             <div class="font-black text-sm mb-1">WILL</div>
@@ -147,7 +147,7 @@
     <div id="tab-dialogue" class="fade-in hidden">
       <div class="mb-6">
         <h2 class="text-2xl font-black text-navy mb-1">💬 The Dialogue</h2>
-        <p class="text-slate-500 text-sm mb-1">Read the conversation. Colours show the grammar: <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-teal-600 font-bold">invitations</span></p>
+        <p class="text-slate-500 text-sm mb-1">Read the conversation. Colours show the patterns: <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-teal-600 font-bold">invitations</span></p>
       </div>
       <div class="bg-slate-50 rounded-2xl p-5 mb-6" id="dialogue43-grid"></div>
       <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the dialogue! +20 XP</button>
@@ -373,12 +373,20 @@ function buildDialogue() {
   }).join('');
 }
 
-function speakLine43(i) {
+// Voz das falas: a do tts-en.js (voz da IA no elemento de áudio que o primeiro
+// toque liberou), que soa no iPhone mesmo com a chave de silencioso. A voz do
+// navegador fica só de reserva, para quando o tts-en.js não carregou.
+function falar43(texto, rate) {
+  if (typeof window.speakEn === 'function') { window.speakEn(texto); return; }
   if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(DIALOGUE43[i].plain);
-  u.lang = 'en-US'; u.rate = 0.88;
+  const u = new SpeechSynthesisUtterance(texto);
+  u.lang = 'en-US'; u.rate = rate;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
+}
+
+function speakLine43(i) {
+  falar43(DIALOGUE43[i].plain, 0.88);
 }
 
 // ─── CHUNKS ───────────────────────────────────────────────────────────────────
@@ -413,11 +421,7 @@ function buildChunks43() {
 }
 
 function speakChunk43(i) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(CHUNKS43[i].expr.replace(/\?|\./g, ''));
-  u.lang = 'en-US'; u.rate = 0.85;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+  falar43(CHUNKS43[i].expr.replace(/\?|\./g, ''), 0.85);
   _chunks43Spoken.add(i);
   if (_chunks43Spoken.size >= 4) {
     const markEl = document.getElementById('chunks43-mark');

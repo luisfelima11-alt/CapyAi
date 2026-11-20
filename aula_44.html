@@ -122,7 +122,7 @@
       </div>
 
       <div class="bg-navy rounded-2xl p-5 text-white mb-6">
-        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Grammar in this dialogue</p>
+        <p class="text-emerald-300 text-xs font-black uppercase tracking-widest mb-3">Patterns in this dialogue</p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="bg-white/10 rounded-xl p-3 text-center">
             <div class="font-black text-sm mb-1">PRESENT PERFECT</div>
@@ -146,7 +146,7 @@
     <div id="tab-dialogue" class="fade-in hidden">
       <div class="mb-6">
         <h2 class="text-2xl font-black text-navy mb-1">💬 The Dialogue</h2>
-        <p class="text-slate-500 text-sm mb-1">Read the interview. Cores mostram a gramática: <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-teal-600 font-bold">expressões formais</span></p>
+        <p class="text-slate-500 text-sm mb-1">Read the interview. Cores mostram os padrões: <span class="text-blue-600 font-bold">present perfect</span> · <span class="text-emerald-600 font-bold">will / going to</span> · <span class="text-teal-600 font-bold">expressões formais</span></p>
       </div>
       <div class="bg-slate-50 rounded-2xl p-5 mb-6" id="dialogue44-grid"></div>
       <button onclick="markSection('dialogue')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ I read the interview! +20 XP</button>
@@ -225,7 +225,7 @@
         <!-- Task 3: Error Correction -->
         <div class="bg-white rounded-2xl border-2 border-slate-100 p-6">
           <h3 class="font-black text-navy mb-1">3. Error Correction</h3>
-          <p class="text-slate-500 text-xs mb-4">Find and fix the grammar mistake in each sentence.</p>
+          <p class="text-slate-500 text-xs mb-4">Find and fix the mistake in each sentence.</p>
           <div class="space-y-5">
             <div>
               <p class="text-sm font-bold text-red-500 bg-red-50 rounded-xl px-4 py-2 mb-2">❌ "I have worked there since three years."</p>
@@ -361,12 +361,20 @@ function buildDialogue44() {
   }).join('');
 }
 
-function speakLine44(i) {
+// Voz das falas: a do tts-en.js (voz da IA no elemento de áudio que o primeiro
+// toque liberou), que soa no iPhone mesmo com a chave de silencioso. A voz do
+// navegador fica só de reserva, para quando o tts-en.js não carregou.
+function falar44(texto, rate) {
+  if (typeof window.speakEn === 'function') { window.speakEn(texto); return; }
   if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(DIALOGUE44[i].plain);
-  u.lang = 'en-US'; u.rate = 0.88;
+  const u = new SpeechSynthesisUtterance(texto);
+  u.lang = 'en-US'; u.rate = rate;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
+}
+
+function speakLine44(i) {
+  falar44(DIALOGUE44[i].plain, 0.88);
 }
 
 // ── Chunks ────────────────────────────────────────────────────────
@@ -405,11 +413,7 @@ function buildChunks44() {
 }
 
 function speakChunk44(i) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(CHUNKS44[i].ex);
-  u.lang = 'en-US'; u.rate = 0.88;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+  falar44(CHUNKS44[i].ex, 0.88);
   _chunks44Spoken.add(i);
   if (_chunks44Spoken.size >= 4) {
     const wrap = document.getElementById('chunks44-mark-wrap');
@@ -519,11 +523,7 @@ function toggleSpeak44(i) {
 }
 
 function speakEx44(i) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(SPEAK44[i].example);
-  u.lang = 'en-US'; u.rate = 0.88;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+  falar44(SPEAK44[i].example, 0.88);
 }
 
 // ── Homework: Word Order ──────────────────────────────────────────

@@ -285,6 +285,10 @@ let guessed      = new Set();
 let wrongLetters = [];
 let score        = 0;
 let wins         = 0;   // rounds actually won (for accurate final stars)
+// Palavra ganha ou perdida: até a próxima, nenhuma letra conta. O teclado físico
+// passa por cima do aviso na tela; sem isto, continuar digitando somava erros,
+// abria "Oops!" por cima de "Correct!" e terminava o jogo (e pagava o XP) 2-3 vezes.
+let roundOver    = false;
 
 document.getElementById('total-rounds').textContent = shuffled.length;
 
@@ -297,6 +301,7 @@ function startRound() {
   wrongCount   = 0;
   guessed      = new Set();
   wrongLetters = [];
+  roundOver    = false;
 
   document.getElementById('round-disp').textContent     = roundIdx + 1;
   document.getElementById('category-label').textContent = entry.cat;
@@ -345,7 +350,7 @@ function resetKeyboard() {
 
 // ── Guess ──────────────────────────────────────────────────────────────────────
 function guess(letter) {
-  if (guessed.has(letter)) return;
+  if (roundOver || guessed.has(letter)) return;
   guessed.add(letter);
 
   const btn = document.getElementById(`key-${letter}`);
@@ -367,6 +372,7 @@ function guess(letter) {
 
     // Check win
     if (word.split('').every(ch => guessed.has(ch))) {
+      roundOver = true;
       const pts = 20 + (MAX_WRONG - wrongCount) * 5;
       score += pts;
       wins++;
@@ -389,6 +395,7 @@ function guess(letter) {
     setTimeout(() => blanksRow.classList.remove('shake'), 400);
 
     if (wrongCount >= MAX_WRONG) {
+      roundOver = true;
       setTimeout(() => roundResult(false, 0), 400);
     }
   }
