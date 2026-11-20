@@ -52,12 +52,19 @@ test('aula sem arquivo gravado: cada fala uma vez, em ordem, na voz do personage
 
 test('"Parar" interrompe a fila', async ({ page }) => {
   await abrir(page, 'gpstronic_aula_20.html');
+  // Falas lentas aqui (1 s): com 40 ms a fila podia acabar antes de o teste ver a
+  // 2ª fala numa máquina carregada (a CI pulava o "=== 2" e esperava para sempre).
+  await page.evaluate(() => {
+    window.speakEnEnd = (t, o) => new Promise(fim => { window.__falas.push({ t: String(t) }); setTimeout(() => fim(true), 1000); });
+  });
   await page.evaluate(() => { dlgTocarTudo(); });
-  await page.waitForFunction(() => window.__falas.length === 2);
+  await page.waitForFunction(() => window.__falas.length >= 1);
   await page.evaluate(() => { dlgTocarTudo(); });      // o mesmo botão para
-  await page.waitForTimeout(300);
-  expect(await page.evaluate(() => window.__falas.length)).toBeLessThanOrEqual(3);
+  const naHora = await page.evaluate(() => window.__falas.length);
+  await page.waitForTimeout(2500);
+  expect(await page.evaluate(() => window.__falas.length)).toBe(naHora);   // nenhuma fala nova depois do Parar
   expect(await page.evaluate(() => window.__parou)).toBeGreaterThan(0);
+  await expect(page.locator('#dlg-play-txt')).toHaveText('Ouvir o diálogo');
 });
 
 test('tocar uma fala só: uma chamada, na voz de quem fala', async ({ page }) => {

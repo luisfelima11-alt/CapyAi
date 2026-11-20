@@ -119,6 +119,9 @@
 
   const TOTAL_ROUNDS = WORDS.length, MAX_LIVES = 3;
   let lives=MAX_LIVES, score=0, round=0, wordOrder=[], currentWord='', currentScramble=[], playerInput=[];
+  // Palavra já resolvida: até a próxima carregar, peças e Check não contam.
+  // Sem isso, Check depois do auto-envio pagava de novo e pulava uma palavra.
+  let wordLocked=false;
 
   function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   function scramble(word){const w=[...word];let s;do{s=shuffle(w);}while(s.join('')===w.join('')&&w.length>2);return s;}
@@ -133,7 +136,7 @@
 
   function renderRound(){
     if(round>=TOTAL_ROUNDS){finishGame();return;}
-    playerInput=[];hideFeedback();
+    playerInput=[];hideFeedback();wordLocked=false;
     const entry=WORDS[wordOrder[round]];
     currentWord=entry.word; currentScramble=scramble([...currentWord]);
     const hintImg = document.getElementById('hint-image');
@@ -165,6 +168,7 @@
   }
 
   function pickLetter(btn){
+    if(wordLocked)return;
     if(playerInput.length>=currentWord.length)return;
     const idx=parseInt(btn.dataset.idx,10);
     playerInput.push({letter:currentScramble[idx],tileIdx:idx});
@@ -183,9 +187,11 @@
   }
 
   function submitAnswer(){
+    if(wordLocked)return;
     if(playerInput.length<currentWord.length){showFeedback(false,'Fill in all the letters first!');return;}
     const attempt=playerInput.map(p=>p.letter).join('');
     if(attempt===currentWord){
+      wordLocked=true;
       score+=15;
       document.getElementById('score-display').textContent=score;
       for(let i=0;i<currentWord.length;i++){
@@ -202,6 +208,7 @@
       slotsEl.classList.add('shake-answer');
       setTimeout(()=>slotsEl.classList.remove('shake-answer'),500);
       if(lives<=0){
+        wordLocked=true;
         showFeedback(false,`The word was "${currentWord}". Moving on…`);
         round++; setTimeout(renderRound,1800);
       } else {

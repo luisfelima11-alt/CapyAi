@@ -1,5 +1,131 @@
 # Bugs aprendidos — Capy Yara English
 
+## 2026-11-20 — Hangman: digitar no teclado depois do fim da palavra contava erros e repetia o fim do jogo
+
+**Sintoma:** no Hangman, quem joga pelo teclado do computador e continuava digitando depois de a palavra
+acabar via erros sendo somados por trás do aviso, um "Oops!" abrindo por cima do "Correct!" e, na última
+palavra, a tela de fim abrindo duas ou três vezes, com o XP do jogo pago a cada uma.
+
+**Causa raiz:** o aviso de fim de palavra é uma camada sobre a tela, que bloqueia o mouse mas não o
+teclado. O `keydown` só olhava se a tecla estava desabilitada; nada dizia que a palavra já tinha acabado.
+Cada erro além do 6º disparava de novo o `roundResult`.
+
+**Correção:** `roundOver`, ligado ao ganhar ou perder e desligado no `startRound`; `guess()` não aceita
+letra com a palavra encerrada.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Hangman): 8 letras erradas no teclado na última
+palavra (uma tela de fim, XP uma vez) e letras depois de acertar (nenhum erro somado).
+
+**Por que aconteceu:** camada por cima da tela foi tratada como trava, mas teclado não respeita camada.
+Trava de jogo é estado no script, não um elemento na frente.
+
+---
+
+## 2026-11-20 — Lição: trocar de aba logo depois de responder repetia a pergunta e pagava 2x
+
+**Sintoma:** no `lessons.html`, quem respondia no Quiz, Listen, Speed ou Scramble e trocava de aba antes
+de a próxima pergunta aparecer (1 a 2,6 s), ao voltar via a MESMA pergunta liberada. Respondendo de novo,
+ganhava o acerto duas vezes e a pergunta seguinte era pulada. Na última pergunta do Quiz, o XP da rodada
+era pago duas vezes (15 XP viravam 40). No Speed era pior: o jogo continuava sozinho na aba escondida,
+com o relógio correndo, e contava como erro cada palavra que o aluno nem viu.
+
+**Causa raiz:** o índice da pergunta só andava dentro do `setTimeout` que mostra a próxima. Trocar de
+aba e voltar redesenhava o painel com o índice velho (e o `renderScramble`/`startSpeedTimer` destravavam
+a resposta). E o `setTimeout` redesenhava o painel mesmo com o aluno em outra aba, o que no Speed ligava
+um relógio novo que ninguém desligava.
+
+**Correção:** `avancarDepois()`: o índice anda na hora da resposta; o redesenho espera o tempo de leitura e
+só acontece se o aluno continua na aba e nada redesenhou o painel (o `switchTool` invalida o avanço
+pendente). O fim da rodada, que paga, roda uma vez em qualquer caso.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Jogos da lição): Quiz (errar a última, sair e voltar),
+Speed (responder e sair: o relógio não pode seguir) e Scramble (acertar, sair e voltar).
+
+**Por que aconteceu:** o conserto de 13/nov (XP do Quiz/Listen) tirou o pagamento da tela de fim, mas o
+estado "já respondi esta" continuava morando dentro de um `setTimeout`. Estado de jogo muda na hora do
+evento; o tempo de espera é só para a tela.
+
+---
+
+## 2026-11-20 — Forest Puzzle: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Forest Puzzle, ao montar a palavra e tocar em "Check", o aluno ganhava +15 duas vezes e a
+palavra seguinte era pulada. Na última, a tela de fim abria duas vezes e o XP do jogo era pago em dobro.
+
+**Causa raiz:** igual ao Word Scramble: a última peça já dispara o `submitAnswer()` sozinho, e o botão
+"Check" conferia a mesma resposta de novo. Cada conferência fazia `round++` e marcava um `renderRound`.
+
+**Correção:** `wordLocked`, destravado no `renderRound`; peças e Check não contam com a palavra resolvida.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Forest Puzzle).
+
+**Por que aconteceu:** jogo copiado do mesmo molde do Word Scramble, com a mesma falta de trava.
+
+---
+
+## 2026-11-20 — Phrase Path: dois toques em "Conferir frase" pagavam em dobro e pulavam frase
+
+**Sintoma:** no Phrase Path, com a frase montada certa, um toque duplo (ou um segundo toque impaciente)
+em "Conferir frase" somava +12 XP duas vezes e a frase seguinte sumia sem ser jogada. Na última frase, o
+fim da trilha pagava o XP do jogo duas vezes.
+
+**Causa raiz:** o acerto espera 0,9 s antes de avançar (`setTimeout(() => { step++; render() })`) e o
+botão continuava valendo nesse intervalo. Cada toque somava pontos e marcava mais um `step++`.
+
+**Correção:** `locked`: depois do acerto, conferir, escolher e tirar peças não fazem nada até a próxima
+frase aparecer (`render` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Phrase Path): toque duplo numa frase do meio e na
+última (XP do fim uma vez).
+
+**Por que aconteceu:** o mesmo do Word Scramble e do Forest Puzzle: espera antes de avançar sem trava.
+
+---
+
+## 2026-11-20 — Word Scramble: "Check" depois do acerto pagava em dobro e pulava palavra
+
+**Sintoma:** no Word Scramble do pavilhão, o aluno montava a palavra e tocava em "Check ✓" (o gesto
+natural). A palavra rendia pontos duas vezes e a seguinte era pulada sem aparecer. Na última palavra, a
+tela de fim abria duas vezes, uma por cima da outra, e o XP do jogo era pago duas vezes. Dois toques em
+"Skip →" também pulavam duas palavras.
+
+**Causa raiz:** ao encher a última casa, o jogo já confere sozinho (300 ms depois). O botão "Check"
+conferia de novo a mesma resposta, e cada conferência certa marcava um `nextWord()` para dali a 1,4 s.
+Nada dizia "esta palavra já foi resolvida"; o `skipWord` tinha o mesmo problema.
+
+**Correção:** `wordLocked`: depois de um acerto, dos corações acabarem ou de um Skip, peças, Check e Skip
+não fazem nada até a próxima palavra carregar (`loadWord` destrava).
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Word Scramble): acerto + Check, acerto + Check na
+última palavra (uma tela de fim, XP uma vez) e Skip duplo.
+
+**Por que aconteceu:** resposta com espera (`setTimeout`) antes de avançar, sem trava. Todo jogo que mostra
+o resultado por um tempo antes de seguir precisa ignorar novos toques nesse intervalo.
+
+---
+
+## 2026-11-20 — Grammar Lab: nenhuma alternativa respondia
+
+**Sintoma:** no Grammar Lab (`grammar_lab.html`, aberto pelo pavilhão de jogos), o aluno tocava em
+"Praticar Agora!", via a primeira pergunta e nenhuma alternativa fazia nada. O jogo inteiro (6 lições,
+30 perguntas) ficava travado na pergunta 1, sem XP e sem missão do dia.
+
+**Causa raiz:** cada botão levava a resposta e a explicação como texto dentro de
+`onclick="answerQ(this,'…','…','…')"`. O código escapava o apóstrofo, mas não as aspas duplas, e todas
+as 30 explicações têm aspas (`so we use "an".`). A primeira aspa fechava o atributo `onclick` no meio, o
+JavaScript ficava cortado e o clique dava erro de sintaxe.
+
+**Correção:** o botão passa só o número da alternativa (`answerQ(this, j)`); a resposta certa e a
+explicação são lidas da pergunta atual no próprio script.
+
+**Como pegar isso de novo:** `tests/jogos.spec.js` (Grammar Lab) clica numa alternativa e confere que a
+explicação aparece inteira, com as aspas, sem erro na página.
+
+**Por que aconteceu:** texto de conteúdo colado dentro de um atributo HTML com JavaScript. Escapar à mão
+um caractere (o `'`) esquece o outro (o `"`). Passe um índice e leia o dado no script.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
