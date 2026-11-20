@@ -69,7 +69,7 @@
         <a href="aula_41.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">← Prev</a>
         <a href="aula_43.html" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold px-3 py-1.5 rounded-full transition-all">Next →</a>
       </div>
-      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🧩 Aula 42 · Advanced Grammar</div>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-black mb-4 uppercase tracking-widest">🧩 Aula 42 · Advanced Patterns</div>
       <h1 class="text-4xl md:text-5xl font-black mb-2 leading-tight">Linking<br><span class="text-emerald-300">Words</span></h1>
       <p class="text-white/70 mb-6 max-w-lg">However, although, therefore, furthermore — aprenda a conectar ideias e escrever com fluidez como um falante nativo!</p>
       <div class="flex items-center gap-2 flex-wrap"><div id="hero-dots" class="flex gap-2"></div><span id="hero-label" class="text-white/50 text-xs font-bold ml-2">0 / 7 sections done</span></div>
@@ -79,7 +79,7 @@
     <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
       <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
@@ -104,7 +104,7 @@
 
     <!-- GRAMMAR -->
     <div id="tab-grammar" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Categorias de linking words e como posicioná-las na frase.</p></div>
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🧩 Patterns</h2><p class="text-slate-500 text-sm">Categorias de linking words e como posicioná-las na frase.</p></div>
       <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
         <p class="text-xs font-black uppercase tracking-widest mb-3 text-emerald-100">The 4 Main Categories</p>
         <div class="grid grid-cols-2 gap-3">
@@ -115,7 +115,7 @@
         </div>
       </div>
       <div class="space-y-3 mb-6" id="acc-grammar"></div>
-      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Entendi o padrão! +20 XP</button>
     </div>
 
     <!-- DIALOGUE -->
@@ -357,7 +357,7 @@ const DIALOGUE = [
   {sp:'🐾 Yara', msg:'Capy, you could say: "The market opens early. Consequently, locals arrive before 7am."'},
   {sp:'🐾 Capy', msg:'I love it! Moreover, I could add: "Although the weather is hot, the festival never stops."'},
   {sp:'📰 Editor 🦁 Leo', msg:'Now THAT is good writing. The contrast makes it vivid. In addition, the rhythm is great.'},
-  {sp:'🐾 Yara', msg:'See? You\'re a natural writer, Capy. That said, we still need to check the grammar!'},
+  {sp:'🐾 Yara', msg:'See? You\'re a natural writer, Capy. That said, we still need to check the spelling!'},
   {sp:'🐾 Capy', msg:'Ha! Nevertheless, I am very proud of this article. Yara Forest deserves to be famous!'},
 ];
 const dlEl = document.getElementById('dialogue-lines');
@@ -398,7 +398,7 @@ function showQuizResult(){
   const r = document.getElementById('quiz-result');
   const pct = Math.round(quizScore/QUIZ.length*100);
   r.className = 'bg-white rounded-2xl border-2 border-emerald-100 p-6 shadow-sm text-center';
-  r.innerHTML = `<p class="text-4xl font-black text-navy mb-1">${quizScore}/${QUIZ.length}</p><p class="text-slate-500 mb-3">${pct >= 80 ? '🎉 Excellent! You mastered linking words!' : pct >= 50 ? '👍 Good effort! Review the grammar tab.' : '💪 Keep practising! Check the Grammar tab again.'}</p><button onclick="markSection('practice',50)" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">Claim +50 XP</button>`;
+  r.innerHTML = `<p class="text-4xl font-black text-navy mb-1">${quizScore}/${QUIZ.length}</p><p class="text-slate-500 mb-3">${pct >= 80 ? '🎉 Excellent! You mastered linking words!' : pct >= 50 ? '👍 Good effort! Review the Patterns tab.' : '💪 Keep practising! Check the Patterns tab again.'}</p><button onclick="markSection('practice',50)" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 transition-all shadow-sm">Claim +50 XP</button>`;
   r.classList.remove('hidden');
 }
 
