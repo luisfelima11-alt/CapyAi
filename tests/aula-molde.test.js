@@ -108,6 +108,17 @@ test('toda aula do molde carrega o aula-molde.js uma vez, antes do cartão da fo
     }
 });
 
+test('o subtítulo das Key Expressions da GPS 09 ("quem atende no telefone") não vaza para outras aulas', () => {
+    // O molde é a GPS 09, uma aula de suporte por telefone. Os construtores copiavam o
+    // subtítulo dela para Agro, GPS 10+, Entrevista e Medical (corrigido em 21/nov/2026).
+    for (const arq of aulasDoMolde.filter(n => n !== 'gpstronic_aula_09.html')) {
+        assert.ok(!ler(arq).includes('quem atende no telefone'), arq);
+    }
+    for (const b of ['build-gpstronic-aula', 'build-interview-aula', 'build-med-aula', 'build-agro-aula', 'build-intermediate-aula']) {
+        assert.ok(ler(`scripts/${b}.mjs`).includes('Frases prontas de quem atende no telefone'), `${b} troca o subtítulo do molde`);
+    }
+});
+
 test('a versão do gramatica-slides.js é a mesma em todas as páginas', () => {
     for (const arq of fs.readdirSync(RAIZ).filter(n => n.endsWith('.html'))) {
         const vs = [...ler(arq).matchAll(/gramatica-slides\.js\?v=(\w+)/g)].map(m => m[1]);
