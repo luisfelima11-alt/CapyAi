@@ -111,7 +111,7 @@ html,body{height:100%;overscroll-behavior:none}
   <textarea id="text-input" rows="2" class="hidden absolute z-30 bg-white/95 border-2 border-emerald-400 rounded-xl px-3 py-2 font-bold shadow-xl focus:outline-none resize-none leading-snug" placeholder="Digite (Enter confirma, Shift+Enter pula linha)…" autocomplete="off"></textarea>
 
   <!-- Barra Flutuante de Personalização de Cartão / Texto Selecionado na Lousa -->
-  <div id="card-customizer" class="hidden absolute z-30 bg-white/95 backdrop-blur-md border-2 border-indigo-200 rounded-2xl shadow-2xl p-2 flex flex-wrap items-center gap-1.5 max-w-[94vw] transition-all">
+  <div id="card-customizer" class="hidden absolute z-30 bg-white/95 backdrop-blur-md border-2 border-indigo-200 rounded-2xl shadow-2xl p-2 flex flex-wrap items-center gap-1.5 max-w-[96vw] transition-all">
     <button id="cc-btn-edit" type="button" class="px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1 shadow-sm transition" title="Editar texto deste cartão (ou dê duplo-clique no cartão)">
       ✏️ <span>Editar</span>
     </button>
@@ -135,14 +135,26 @@ html,body{height:100%;overscroll-behavior:none}
       <button id="cc-font-inc" type="button" class="px-2 py-1 rounded-lg hover:bg-white text-navy text-xs font-black transition" title="Aumentar letra">A+</button>
     </div>
 
-    <!-- Cores do cartão -->
-    <div id="cc-color-swatches" class="flex items-center gap-1 px-1"></div>
+    <!-- Cores da Fonte (Letra) -->
+    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1" title="Mudar cor da fonte (letra)">
+      <span class="text-[10px] font-black text-slate-500 uppercase mr-0.5">🔤 Letra:</span>
+      <div id="cc-font-swatches" class="flex items-center gap-1"></div>
+      <label class="relative w-5 h-5 rounded-full border-2 border-white shadow-sm cursor-pointer hover:scale-125 transition-transform flex-shrink-0" style="background:conic-gradient(#ef4444,#f59e0b,#10b981,#3b82f6,#8b5cf6,#ec4899,#ef4444)" title="Escolher qualquer cor personalizada para a fonte">
+        <input id="cc-custom-font-color" type="color" class="sr-only" value="#0f172a" />
+      </label>
+    </div>
+
+    <!-- Cores do Cartão (Fundo e Borda) -->
+    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-1" title="Mudar cor do cartão / post-it">
+      <span class="text-[10px] font-black text-slate-500 uppercase mr-0.5">🎨 Cartão:</span>
+      <div id="cc-color-swatches" class="flex items-center gap-1"></div>
+    </div>
 
     <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
 
     <!-- Organizar cartões em grade -->
-    <button id="cc-layout-1col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 1 coluna">1 Col</button>
-    <button id="cc-layout-2col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 2 colunas">2 Col</button>
+    <button id="cc-layout-1col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 1 coluna sem sobrepor">1 Col</button>
+    <button id="cc-layout-2col" type="button" class="px-2 py-1 rounded-lg bg-slate-50 hover:bg-indigo-50 text-slate-700 border border-slate-200 text-[11px] font-extrabold transition" title="Organizar cartões em 2 colunas sem sobrepor">2 Col</button>
 
     <button id="cc-btn-dup" type="button" class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition" title="Duplicar cartão">📑</button>
     <button id="cc-btn-del" type="button" class="px-2 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition" title="Apagar este cartão">🗑️</button>
@@ -150,14 +162,14 @@ html,body{height:100%;overscroll-behavior:none}
   </div>
 
   <!-- Modal / Popover de Edição Rica do Cartão -->
-  <div id="card-editor-popover" class="hidden absolute z-40 bg-white border-2 border-indigo-400 rounded-3xl shadow-2xl p-4 w-[340px] max-w-[92vw] space-y-3">
+  <div id="card-editor-popover" class="hidden absolute z-40 bg-white border-2 border-indigo-400 rounded-3xl shadow-2xl p-4 w-[365px] max-w-[94vw] space-y-2.5">
     <div class="flex items-center justify-between">
-      <span class="text-xs font-black uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">✏️ Editar Texto na Lousa</span>
+      <span class="text-xs font-black uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">✏️ Editar e Colorir Texto na Lousa</span>
       <button id="ce-close" type="button" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-black">✕</button>
     </div>
     <div>
       <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Etiqueta / Título (Opcional)</label>
-      <input id="ce-badge" type="text" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs font-bold text-navy focus:outline-none" placeholder="Ex: Frase 1 · Present Perfect" />
+      <input id="ce-badge" type="text" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs font-bold text-navy focus:outline-none" placeholder="Ex: Frase 1 · Passado" />
     </div>
     <div>
       <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Frase Principal / Texto em Inglês</label>
@@ -166,6 +178,15 @@ html,body{height:100%;overscroll-behavior:none}
     <div>
       <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Tradução / Explicação Abaixo (Opcional)</label>
       <input id="ce-sub" type="text" class="w-full border-2 border-slate-200 focus:border-indigo-500 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-600 focus:outline-none" placeholder="Ex: Tradução ou dica de uso…" />
+    </div>
+    <div>
+      <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">🔤 Cor da Fonte (Letra)</label>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <div id="ce-font-swatches" class="flex flex-wrap items-center gap-1.5"></div>
+        <label class="relative w-6 h-6 rounded-full border-2 border-slate-200 shadow-sm cursor-pointer hover:scale-110 transition-transform flex items-center justify-center" style="background:conic-gradient(#ef4444,#f59e0b,#10b981,#3b82f6,#8b5cf6,#ec4899,#ef4444)" title="Cor personalizada da fonte">
+          <input id="ce-custom-font-color" type="color" class="sr-only" value="#0f172a" />
+        </label>
+      </div>
     </div>
     <div class="flex items-center justify-end gap-2 pt-1">
       <button id="ce-cancel" type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold">Cancelar</button>
@@ -372,7 +393,7 @@ html,body{height:100%;overscroll-behavior:none}
   </button>
 </div>
 
-<section id="yw-panel" class="hidden fixed right-4 bottom-[140px] z-40 w-[395px] max-w-[calc(100vw-24px)] h-[545px] max-h-[calc(100vh-165px)] bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 flex flex-col overflow-hidden" role="dialog" aria-label="Chat com a Yara IA na Lousa">
+<section id="yw-panel" class="hidden fixed right-4 bottom-20 z-40 w-[410px] max-w-[calc(100vw-24px)] h-[565px] max-h-[calc(100vh-110px)] bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 flex flex-col overflow-hidden" role="dialog" aria-label="Chat com a Yara IA na Lousa">
   <!-- Header -->
   <div class="bg-gradient-to-r from-navy via-emerald-900 to-teal-800 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
     <div class="flex items-center gap-2.5 min-w-0">
@@ -382,21 +403,41 @@ html,body{height:100%;overscroll-behavior:none}
         <div class="text-[11px] text-emerald-200 truncate">Peça frases, vocabulário ou exercícios p/ colar no quadro</div>
       </div>
     </div>
-    <button id="yw-close" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-black transition-colors flex-shrink-0" title="Fechar chat">✕</button>
+    <div class="flex items-center gap-1 flex-shrink-0">
+      <button id="yw-clear-chat" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center text-xs font-black transition-colors" title="Limpar histórico desta conversa">🗑️</button>
+      <button id="yw-close" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm font-black transition-colors" title="Minimizar chat (Esc)">✕</button>
+    </div>
   </div>
 
   <!-- Barra de Configuração de Colagem na Lousa -->
-  <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px] flex-shrink-0">
+  <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex flex-wrap items-center justify-between gap-1.5 text-[11px] flex-shrink-0">
     <label class="flex items-center gap-1.5 font-extrabold text-navy cursor-pointer select-none" title="Quando ativado, as frases pedidas já entram direto na lousa">
       <input id="yw-auto-paste" type="checkbox" checked class="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer" />
-      <span>📌 Colar na lousa automaticamente</span>
+      <span>📌 Colar automático</span>
     </label>
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1 flex-wrap">
       <select id="yw-card-style" class="bg-white border border-slate-200 text-navy font-bold rounded-lg px-1.5 py-1 text-[10px] focus:outline-none cursor-pointer" title="Estilo visual dos cartões criados">
         <option value="modern">✨ Moderno</option>
         <option value="sticky">🟨 Post-it</option>
         <option value="minimal">🪟 Minimal</option>
         <option value="plain">🔤 Só Texto</option>
+      </select>
+      <select id="yw-font-color" class="bg-white border border-slate-200 text-navy font-bold rounded-lg px-1.5 py-1 text-[10px] focus:outline-none cursor-pointer" title="Cor da fonte (letra) das frases geradas">
+        <option value="">🔤 Letra: Padrão</option>
+        <option value="#0f172a">⚫ Marinho Escuro</option>
+        <option value="#1e3a8a">🔵 Azul Profundo</option>
+        <option value="#2563eb">💙 Azul Royal</option>
+        <option value="#0284c7">🩵 Azul Céu</option>
+        <option value="#0d9488">🦚 Turquesa</option>
+        <option value="#059669">💚 Verde Esmeralda</option>
+        <option value="#15803d">🌿 Verde Floresta</option>
+        <option value="#b45309">琥 Âmbar / Dourado</option>
+        <option value="#ea580c">🧡 Laranja</option>
+        <option value="#dc2626">❤️ Vermelho</option>
+        <option value="#e11d48">🌹 Rosa Carmim</option>
+        <option value="#9333ea">💜 Roxo</option>
+        <option value="#4f46e5">🔮 Índigo</option>
+        <option value="#78350f">🤎 Marrom</option>
       </select>
       <select id="yw-card-layout" class="bg-white border border-slate-200 text-navy font-bold rounded-lg px-1.5 py-1 text-[10px] focus:outline-none cursor-pointer" title="Disposição das frases na lousa">
         <option value="1col">1 Coluna</option>
@@ -408,24 +449,26 @@ html,body{height:100%;overscroll-behavior:none}
   <!-- Sugestões Rápidas -->
   <div id="yw-chips" class="px-3 py-2 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-1.5 overflow-x-auto flex-shrink-0">
     <button type="button" data-prompt="Me dê 5 frases práticas em inglês com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">✨ 5 Frases em Inglês</button>
+    <button type="button" data-prompt="Me dê 5 frases em inglês no passado com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">⏳ 5 Frases no Passado</button>
     <button type="button" data-prompt="Me dê 6 palavras essenciais deste curso com exemplo e tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">🟨 6 Palavras do Curso</button>
     <button type="button" data-prompt="Crie 4 falas de um diálogo curto em inglês com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">🗣️ Diálogo Curto</button>
     <button type="button" data-prompt="Crie 4 frases em inglês com lacuna (___) para o aluno completar na lousa" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">❓ 4 Frases p/ Completar</button>
+    <button type="button" data-prompt="Crie 5 perguntas interessantes em inglês para conversação em aula com tradução" class="yw-chip flex-shrink-0 px-2.5 py-1 rounded-full bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 text-[11px] font-extrabold transition shadow-sm whitespace-nowrap">💬 5 Perguntas</button>
   </div>
 
   <!-- Mensagens -->
   <div id="yw-messages" class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-gradient-to-b from-slate-50/60 to-white text-xs">
     <div class="bg-white border border-emerald-200 rounded-2xl rounded-tl-sm p-3 shadow-sm text-slate-700 leading-relaxed">
       <div class="font-black text-emerald-800 text-[11px] uppercase tracking-wider mb-1">🦫 Yara IA · Assistente da Lousa</div>
-      Oi! Peça qualquer lista de frases, exemplos, vocabulário ou exercícios — por exemplo: <strong class="text-navy">"Me dê 5 frases em inglês sobre rotina"</strong>.<br><br>
-      Eu coloco tudo na lousa em <strong>cartões bonitos, personalizáveis e editáveis</strong> (basta clicar no cartão na lousa para arrastar, trocar cores, fonte ou dar duplo-clique para editar!).
+      Oi! Peça qualquer lista de frases, exemplos, vocabulário ou exercícios — por exemplo: <strong class="text-navy">"Me dê 5 frases em inglês sobre viagem"</strong>.<br><br>
+      Eu coloco tudo na lousa em <strong>cartões bonitos, personalizáveis e editáveis</strong> (clique no cartão na lousa para arrastar, mudar a <strong>cor da letra</strong>, cor do fundo, tamanho da fonte ou dar duplo-clique para editar!).
     </div>
   </div>
 
   <!-- Input -->
   <div class="p-2.5 bg-white border-t border-slate-200 flex items-end gap-2 flex-shrink-0">
     <textarea id="yw-input" rows="1" class="flex-1 bg-slate-50 border-2 border-slate-200 focus:border-emerald-500 focus:bg-white rounded-2xl px-3.5 py-2 text-xs font-bold text-navy focus:outline-none resize-none max-h-24 leading-snug" placeholder="Peça ex: 5 frases em inglês sobre viagem…"></textarea>
-    <button id="yw-send" type="button" class="px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition flex items-center gap-1 flex-shrink-0" style="min-height:38px">
+    <button id="yw-send" type="button" class="px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs shadow-md transition flex items-center gap-1 flex-shrink-0" style="min-height:38px">
       <span>Enviar</span> 🚀
     </button>
   </div>
@@ -468,14 +511,26 @@ const STORAGE_KEY = 'capyQuadroState_v2_' + SALA;
 })();
 
 const COLORS = [
-  '#059669', // emerald
-  '#dc2626', // red
-  '#2563eb', // blue
-  '#f59e0b', // amber
-  '#9333ea', // purple
-  '#ec4899', // pink
-  '#111827', // near-black
-  '#ffffff', // white (great for dark board)
+  '#111827', // preto / grafite
+  '#1e3a8a', // azul marinho profundo
+  '#2563eb', // azul royal
+  '#0284c7', // azul céu
+  '#0891b2', // ciano
+  '#0d9488', // turquesa / teal
+  '#059669', // verde esmeralda
+  '#16a34a', // verde folha
+  '#65a30d', // verde lima
+  '#d97706', // âmbar / dourado
+  '#f59e0b', // amarelo ouro
+  '#ea580c', // laranja vibrante
+  '#dc2626', // vermelho
+  '#e11d48', // rosa carmim
+  '#db2777', // pink vibrante
+  '#9333ea', // roxo
+  '#4f46e5', // índigo
+  '#78350f', // marrom
+  '#475569', // cinza ardósia
+  '#ffffff', // branco (ótimo p/ quadro escuro)
 ];
 const BG_MODES = ['plain', 'ruled', 'grid', 'dots', 'dark'];
 const MAX_HISTORY = 2500;
@@ -610,6 +665,7 @@ function updatePageUI() {
 
 function switchToPage(idx, shouldBroadcast = false) {
   if (textAnchor) commitTextInput();
+  if (typeof selectCardSeg === 'function') selectCardSeg(null);
   const target = Math.max(0, Math.min(idx, MAX_PAGES - 1));
   while (pages.length <= target) {
     pages.push([]);
@@ -749,6 +805,7 @@ function drawSegmentOn(targetCtx, seg, w, h) {
     const mainText = String(seg.texto || '').trim();
     const subText = String(seg.subtexto || '').trim();
     const accent = seg.cor || (seg.kind === 'text' ? '#0f172a' : '#059669');
+    const mainTextColor = seg.textCor || (style === 'plain' ? accent : '#0f172a');
     const bgFill = seg.bg || (style === 'sticky' ? '#fef08a' : '#ffffff');
 
     targetCtx.save();
@@ -756,7 +813,7 @@ function drawSegmentOn(targetCtx, seg, w, h) {
     targetCtx.textBaseline = 'top';
 
     const baseFrac = seg.fonte || (seg.kind === 'text' ? 0.040 : 0.028);
-    const fontPx = Math.max(12, Math.min(42, baseFrac * h));
+    const fontPx = Math.max(12, Math.min(44, baseFrac * h));
     const subFontPx = Math.max(11, Math.round(fontPx * 0.78));
     const badgeFontPx = Math.max(10, Math.round(fontPx * 0.62));
 
@@ -796,7 +853,7 @@ function drawSegmentOn(targetCtx, seg, w, h) {
       }
 
       targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-      targetCtx.fillStyle = accent;
+      targetCtx.fillStyle = mainTextColor;
       mainLines.forEach((line, idx) => {
         targetCtx.fillText(line, bx, curY + idx * lineH);
       });
@@ -805,10 +862,12 @@ function drawSegmentOn(targetCtx, seg, w, h) {
       if (subLines.length) {
         curY += 4;
         targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-        targetCtx.fillStyle = '#475569';
+        targetCtx.fillStyle = seg.subCor || (seg.textCor ? mainTextColor : '#475569');
+        if (seg.textCor && !seg.subCor) targetCtx.globalAlpha = 0.78;
         subLines.forEach((line, idx) => {
           targetCtx.fillText(line, bx, curY + idx * subLineH);
         });
+        targetCtx.globalAlpha = 1;
       }
 
       seg._bounds = { x: bx - 4, y: by - 4, w: maxMeasuredW + 8, h: totalH + 8 };
@@ -893,9 +952,9 @@ function drawSegmentOn(targetCtx, seg, w, h) {
       curY += badgeBlockH;
     }
 
-    // Texto principal (Inglês)
+    // Texto principal (Inglês) — usa a cor de fonte escolhida pelo usuário (seg.textCor)
     targetCtx.font = `800 ${fontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-    targetCtx.fillStyle = '#0f172a';
+    targetCtx.fillStyle = mainTextColor;
     mainLines.forEach((l, i) => {
       targetCtx.fillText(l, textLeft, curY + i * lineH);
     });
@@ -905,10 +964,12 @@ function drawSegmentOn(targetCtx, seg, w, h) {
     if (subLines.length) {
       curY += 5;
       targetCtx.font = `600 ${subFontPx}px "Plus Jakarta Sans", system-ui, sans-serif`;
-      targetCtx.fillStyle = '#475569';
+      targetCtx.fillStyle = seg.subCor || (seg.textCor ? mainTextColor : '#475569');
+      if (seg.textCor && !seg.subCor) targetCtx.globalAlpha = 0.78;
       subLines.forEach((l, i) => {
         targetCtx.fillText(l, textLeft, curY + i * subLineH);
       });
+      targetCtx.globalAlpha = 1;
     }
 
     seg._bounds = { x: bx, y: by, w: boxW, h: boxH };
@@ -1019,6 +1080,7 @@ function clearBoard() {
   pages[currentPage] = [];
   strokes = pages[currentPage];
   redoStacks[currentPage] = [];
+  if (typeof selectCardSeg === 'function') selectCardSeg(null);
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, rect.width, rect.height);
   updateUndoRedoButtons();
@@ -1065,6 +1127,9 @@ function performUndo() {
   }
 
   if (removed.length > 0) {
+    if (selectedSegId && removed.some(r => r && r.id === selectedSegId)) {
+      selectCardSeg(null);
+    }
     if (!redoStacks[currentPage]) redoStacks[currentPage] = [];
     redoStacks[currentPage].push(removed);
     redrawAll();
@@ -1098,6 +1163,9 @@ function performRedo() {
 
 function removeByActionId(actionId) {
   if (!actionId) return;
+  if (selectedSegId && strokes.some(s => s && s.actionId === actionId && s.id === selectedSegId)) {
+    selectCardSeg(null);
+  }
   pages[currentPage] = strokes.filter(s => s.actionId !== actionId);
   strokes = pages[currentPage];
   redrawAll();
@@ -1169,6 +1237,11 @@ function addLaserPoint(x, y, shouldBroadcast = false) {
 
 // ── Export Board as PNG ─────────────────────────────────────────────────────
 function exportBoardPng() {
+  const prevSelected = selectedSegId;
+  if (prevSelected) {
+    selectedSegId = null;
+    redrawAll();
+  }
   const rect = canvas.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
   const out = document.createElement('canvas');
@@ -1212,6 +1285,11 @@ function exportBoardPng() {
   // Copy strokes layer on top
   ex.drawImage(canvas, 0, 0);
 
+  if (prevSelected) {
+    selectedSegId = prevSelected;
+    redrawAll();
+  }
+
   const link = document.createElement('a');
   const dateStr = new Date().toISOString().slice(0, 10);
   link.download = `quadro-${SALA}-pag${currentPage + 1}-${dateStr}.png`;
@@ -1242,20 +1320,43 @@ function showError(show) {
   document.getElementById('banner-error').classList.toggle('hidden', !show);
 }
 
-// ── Role detection (server-verified with client fallback for teacher/admin query) ──
-async function detectRole() {
-  const p = new URLSearchParams(location.search);
-  if (p.get('teacher') === '1' || p.get('admin') === '1' || localStorage.getItem('capyTeacher') === '1') return true;
+// ── CSRF & Role detection (server-verified with client fallback) ────────────
+let quadroCsrfToken = '';
+
+function getQuadroCsrfToken() {
+  if (quadroCsrfToken) return quadroCsrfToken;
+  try {
+    const s = sessionStorage.getItem('capyCsrf');
+    if (s) return s;
+  } catch (e) {}
+  try {
+    const m = document.cookie.match(/(?:^|;\s*)capy_csrf=([^;]+)/);
+    if (m && m[1]) return decodeURIComponent(m[1]);
+  } catch (e) {}
+  return '';
+}
+
+async function refreshQuadroCsrfToken() {
   try {
     const resp = await fetch('/api/auth/session', { credentials: 'same-origin' });
     if (resp.status === 200) {
       const data = await resp.json();
-      return !!(data && data.user && data.user.role === 'admin');
+      if (data && data.csrfToken) {
+        quadroCsrfToken = data.csrfToken;
+        try { sessionStorage.setItem('capyCsrf', data.csrfToken); } catch (e) {}
+      }
+      return data;
     }
-    return false;
-  } catch (e) {
-    return false;
-  }
+  } catch (e) {}
+  return null;
+}
+
+async function detectRole() {
+  const p = new URLSearchParams(location.search);
+  const localTeacher = p.get('teacher') === '1' || p.get('admin') === '1' || localStorage.getItem('capyTeacher') === '1';
+  const sessionData = await refreshQuadroCsrfToken();
+  if (localTeacher) return true;
+  return !!(sessionData && sessionData.user && sessionData.user.role === 'admin');
 }
 
 // ── Realtime config ─────────────────────────────────────────────────────────
@@ -1483,12 +1584,34 @@ const CARD_THEMES = [
   { name: 'Rosa',      cor: '#e11d48', bg: '#fff1f2', stickyBg: '#ffe4e6' },
   { name: 'Azul Céu',  cor: '#0284c7', bg: '#f0f9ff', stickyBg: '#bae6fd' },
   { name: 'Roxo',      cor: '#9333ea', bg: '#faf5ff', stickyBg: '#f3e8ff' },
+  { name: 'Turquesa',  cor: '#0d9488', bg: '#f0fdfa', stickyBg: '#99f6e4' },
+  { name: 'Laranja',   cor: '#ea580c', bg: '#fff7ed', stickyBg: '#fed7aa' },
+  { name: 'Marrom',    cor: '#78350f', bg: '#fefce8', stickyBg: '#fde68a' },
   { name: 'Marinho',   cor: '#0f172a', bg: '#f8fafc', stickyBg: '#e2e8f0' },
+];
+
+const FONT_COLORS = [
+  { name: 'Marinho (Padrão)', cor: '#0f172a' },
+  { name: 'Azul Profundo',    cor: '#1e3a8a' },
+  { name: 'Azul Royal',       cor: '#2563eb' },
+  { name: 'Azul Céu',         cor: '#0284c7' },
+  { name: 'Turquesa',         cor: '#0d9488' },
+  { name: 'Verde Esmeralda',  cor: '#059669' },
+  { name: 'Verde Floresta',   cor: '#15803d' },
+  { name: 'Âmbar / Dourado',  cor: '#b45309' },
+  { name: 'Laranja',          cor: '#ea580c' },
+  { name: 'Vermelho',         cor: '#dc2626' },
+  { name: 'Rosa Carmim',      cor: '#e11d48' },
+  { name: 'Pink',             cor: '#db2777' },
+  { name: 'Roxo',             cor: '#9333ea' },
+  { name: 'Índigo',           cor: '#4f46e5' },
+  { name: 'Marrom',           cor: '#78350f' },
 ];
 
 let draggingSeg = null;
 let dragOffset = { dx: 0, dy: 0 };
 let dragMoved = false;
+let pendingEditorFontColor = '';
 
 function getSelectedSeg() {
   if (!selectedSegId) return null;
@@ -1514,6 +1637,24 @@ function broadcastSegUpdate(seg) {
   broadcastEvent('update_seg', { seg: copy });
 }
 
+function applyFontColorToSelected(colorHex) {
+  const seg = getSelectedSeg();
+  if (!seg || !colorHex) return;
+  seg.textCor = colorHex;
+  const st = seg.cardStyle || (seg.kind === 'text' ? 'plain' : 'modern');
+  if (st === 'plain') {
+    seg.cor = colorHex;
+  }
+  const customFontInput = document.getElementById('cc-custom-font-color');
+  if (customFontInput && /^#[0-9a-f]{6}$/i.test(colorHex)) {
+    customFontInput.value = colorHex;
+  }
+  redrawAll();
+  positionCardCustomizer(seg);
+  saveLocalBoard();
+  broadcastSegUpdate(seg);
+}
+
 function positionCardCustomizer(seg) {
   const bar = document.getElementById('card-customizer');
   if (!bar) return;
@@ -1528,11 +1669,16 @@ function positionCardCustomizer(seg) {
   if (styleSel) {
     styleSel.value = seg.cardStyle || (seg.kind === 'text' ? 'plain' : ((seg.badge || seg.subtexto) ? 'modern' : 'sticky'));
   }
-  const barW = Math.min(rect.width - 16, bar.offsetWidth || 440);
+  const customFontInput = document.getElementById('cc-custom-font-color');
+  if (customFontInput) {
+    const activeFontCor = seg.textCor || seg.cor || '#0f172a';
+    if (/^#[0-9a-f]{6}$/i.test(activeFontCor)) customFontInput.value = activeFontCor;
+  }
+  const barW = Math.min(rect.width - 16, bar.offsetWidth || 520);
   const left = Math.max(8, Math.min(rect.width - barW - 8, b.x));
-  let top = b.y - (bar.offsetHeight || 48) - 10;
+  let top = b.y - (bar.offsetHeight || 52) - 10;
   if (top < 8) {
-    top = Math.min(rect.height - 56, b.y + b.h + 10);
+    top = Math.min(rect.height - 60, b.y + b.h + 10);
   }
   bar.style.left = Math.round(left) + 'px';
   bar.style.top = Math.round(top) + 'px';
@@ -1549,6 +1695,16 @@ function selectCardSeg(seg) {
   if (seg) positionCardCustomizer(seg);
 }
 
+function highlightEditorFontSwatches(activeHex) {
+  const wrap = document.getElementById('ce-font-swatches');
+  if (!wrap) return;
+  wrap.querySelectorAll('button[data-font-cor]').forEach(b => {
+    const isAct = (b.getAttribute('data-font-cor') || '').toLowerCase() === String(activeHex || '').toLowerCase();
+    b.style.boxShadow = isAct ? '0 0 0 2px #fff, 0 0 0 4px #4f46e5' : '';
+    b.style.transform = isAct ? 'scale(1.18)' : '';
+  });
+}
+
 function openCardEditor(seg) {
   if (!seg) return;
   const pop = document.getElementById('card-editor-popover');
@@ -1556,13 +1712,21 @@ function openCardEditor(seg) {
   document.getElementById('ce-badge').value = seg.badge || '';
   document.getElementById('ce-main').value = seg.texto || '';
   document.getElementById('ce-sub').value = seg.subtexto || '';
+  pendingEditorFontColor = seg.textCor || (seg.cardStyle === 'plain' ? (seg.cor || '#0f172a') : '#0f172a');
+  document.getElementById('ce-main').style.color = pendingEditorFontColor;
+  const customPicker = document.getElementById('ce-custom-font-color');
+  if (customPicker && /^#[0-9a-f]{6}$/i.test(pendingEditorFontColor)) {
+    customPicker.value = pendingEditorFontColor;
+  }
+  highlightEditorFontSwatches(pendingEditorFontColor);
+
   pop.classList.remove('hidden');
 
   const rect = canvas.getBoundingClientRect();
   const b = seg._bounds || { x: rect.width * 0.2, y: rect.height * 0.2, w: 220, h: 80 };
-  const popW = Math.min(340, rect.width - 16);
+  const popW = Math.min(365, rect.width - 16);
   const left = Math.max(8, Math.min(rect.width - popW - 8, b.x));
-  const top = Math.max(12, Math.min(rect.height - 290, b.y));
+  const top = Math.max(12, Math.min(rect.height - 340, b.y));
   pop.style.left = Math.round(left) + 'px';
   pop.style.top = Math.round(top) + 'px';
   setTimeout(() => {
@@ -1585,6 +1749,12 @@ function saveCardEditor() {
   if (main) seg.texto = main;
   seg.badge = badge;
   seg.subtexto = sub;
+  if (pendingEditorFontColor) {
+    seg.textCor = pendingEditorFontColor;
+    if ((seg.cardStyle || (seg.kind === 'text' ? 'plain' : 'modern')) === 'plain') {
+      seg.cor = pendingEditorFontColor;
+    }
+  }
   closeCardEditor();
   redrawAll();
   positionCardCustomizer(seg);
@@ -1607,16 +1777,23 @@ function speakCardText(seg) {
 function organizeBoardCards(cols = 1) {
   const cards = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text'));
   if (!cards.length) return;
-  const startX = 0.05;
-  const startY = 0.08;
+  // Garante que _bounds estejam calculados antes de medir alturas
+  redrawAll();
+  const rect = canvas.getBoundingClientRect();
+  const canvasH = Math.max(300, rect.height || 600);
+  const startX = 0.04;
   const colW = cols === 2 ? 0.46 : 0.88;
-  const rowH = cols === 2 ? 0.19 : 0.155;
+  const colCursorY = cols === 2 ? [0.07, 0.07] : [0.07];
+  const gapY = 0.024;
+
   cards.forEach((c, idx) => {
-    const col = idx % cols;
-    const row = Math.floor(idx / cols);
+    const col = cols === 2 ? (colCursorY[1] < colCursorY[0] - 0.01 ? 1 : (idx % 2)) : 0;
+    const cardFracH = (c._bounds && c._bounds.h) ? Math.min(0.45, Math.max(0.08, c._bounds.h / canvasH)) : 0.135;
     c.x1 = Math.min(0.88, startX + col * colW);
-    c.y1 = Math.min(0.86, startY + row * rowH);
+    c.y1 = Math.min(0.88, colCursorY[col]);
+    colCursorY[col] += cardFracH + gapY;
   });
+
   redrawAll();
   const sel = getSelectedSeg();
   if (sel) positionCardCustomizer(sel);
@@ -1630,6 +1807,64 @@ function organizeBoardCards(cols = 1) {
 }
 
 function initCardCustomizerEvents() {
+  // Swatches de cor da FONTE (Letra) na barra flutuante
+  const fontSwatchWrap = document.getElementById('cc-font-swatches');
+  if (fontSwatchWrap && !fontSwatchWrap.dataset.inited) {
+    fontSwatchWrap.dataset.inited = '1';
+    FONT_COLORS.slice(0, 10).forEach(fc => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'w-5 h-5 rounded-full border-2 border-white shadow-sm hover:scale-125 transition-transform flex items-center justify-center text-[9px] font-black text-white';
+      btn.style.background = fc.cor;
+      btn.title = 'Letra: ' + fc.name;
+      btn.textContent = 'A';
+      btn.addEventListener('click', () => applyFontColorToSelected(fc.cor));
+      fontSwatchWrap.appendChild(btn);
+    });
+  }
+
+  const customFontPicker = document.getElementById('cc-custom-font-color');
+  if (customFontPicker && !customFontPicker.dataset.bound) {
+    customFontPicker.dataset.bound = '1';
+    customFontPicker.addEventListener('input', () => {
+      applyFontColorToSelected(customFontPicker.value);
+    });
+  }
+
+  // Swatches de cor da FONTE (Letra) dentro do modal de edição
+  const ceFontWrap = document.getElementById('ce-font-swatches');
+  if (ceFontWrap && !ceFontWrap.dataset.inited) {
+    ceFontWrap.dataset.inited = '1';
+    FONT_COLORS.forEach(fc => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('data-font-cor', fc.cor);
+      btn.className = 'w-6 h-6 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform flex items-center justify-center text-[10px] font-black text-white';
+      btn.style.background = fc.cor;
+      btn.title = 'Letra: ' + fc.name;
+      btn.textContent = 'A';
+      btn.addEventListener('click', () => {
+        pendingEditorFontColor = fc.cor;
+        const mainArea = document.getElementById('ce-main');
+        if (mainArea) mainArea.style.color = fc.cor;
+        highlightEditorFontSwatches(fc.cor);
+      });
+      ceFontWrap.appendChild(btn);
+    });
+  }
+
+  const ceCustomFont = document.getElementById('ce-custom-font-color');
+  if (ceCustomFont && !ceCustomFont.dataset.bound) {
+    ceCustomFont.dataset.bound = '1';
+    ceCustomFont.addEventListener('input', () => {
+      pendingEditorFontColor = ceCustomFont.value;
+      const mainArea = document.getElementById('ce-main');
+      if (mainArea) mainArea.style.color = ceCustomFont.value;
+      highlightEditorFontSwatches(ceCustomFont.value);
+    });
+  }
+
+  // Swatches de cor do CARTÃO (Fundo/Borda)
   const swatchWrap = document.getElementById('cc-color-swatches');
   if (swatchWrap && !swatchWrap.dataset.inited) {
     swatchWrap.dataset.inited = '1';
@@ -1638,13 +1873,14 @@ function initCardCustomizerEvents() {
       btn.type = 'button';
       btn.className = 'w-5 h-5 rounded-full border-2 border-white shadow-sm hover:scale-125 transition-transform';
       btn.style.background = t.cor;
-      btn.title = 'Cor: ' + t.name;
+      btn.title = 'Cartão: ' + t.name;
       btn.addEventListener('click', () => {
         const seg = getSelectedSeg();
         if (!seg) return;
         seg.cor = t.cor;
         const st = seg.cardStyle || (seg.kind === 'text' ? 'plain' : 'modern');
         seg.bg = st === 'sticky' ? t.stickyBg : t.bg;
+        if (st === 'plain' && !seg.textCor) seg.textCor = t.cor;
         redrawAll();
         positionCardCustomizer(seg);
         saveLocalBoard();
@@ -1760,13 +1996,25 @@ function activeStrokeStyle() {
 // ── Ferramenta de texto & Post-it ───────────────────────────────────────────
 const TEXT_SIZES = { 2: 0.032, 5: 0.05, 10: 0.082 };
 const NOTE_BGS = {
-  '#059669': '#d1fae5',
-  '#dc2626': '#fee2e2',
-  '#2563eb': '#dbeafe',
-  '#f59e0b': '#fef08a',
-  '#9333ea': '#f3e8ff',
-  '#ec4899': '#fce7f3',
   '#111827': '#f1f5f9',
+  '#1e3a8a': '#dbeafe',
+  '#2563eb': '#dbeafe',
+  '#0284c7': '#e0f2fe',
+  '#0891b2': '#cffafe',
+  '#0d9488': '#ccfbf1',
+  '#059669': '#d1fae5',
+  '#16a34a': '#dcfce7',
+  '#65a30d': '#ecfccb',
+  '#d97706': '#fef3c7',
+  '#f59e0b': '#fef08a',
+  '#ea580c': '#ffedd5',
+  '#dc2626': '#fee2e2',
+  '#e11d48': '#ffe4e6',
+  '#db2777': '#fce7f3',
+  '#9333ea': '#f3e8ff',
+  '#4f46e5': '#e0e7ff',
+  '#78350f': '#fef3c7',
+  '#475569': '#f1f5f9',
   '#ffffff': '#fef9c3',
 };
 let textAnchor = null;
@@ -1785,11 +2033,12 @@ function openTextInput(p, kind = 'text') {
   const px = Math.round((kind === 'note' ? 0.032 : textFontFraction()) * rect.height);
   textAnchor = p;
   input.value = '';
+  const chosenColor = currentColor || myColor || '#0f172a';
   input.style.left = Math.min(rect.width - 180, Math.max(4, Math.round(p.x * rect.width))) + 'px';
   input.style.top = Math.max(4, Math.round(p.y * rect.height - px * 0.6)) + 'px';
   input.style.fontSize = Math.max(14, Math.min(28, px)) + 'px';
-  input.style.color = kind === 'note' ? '#0f172a' : (currentColor || myColor);
-  input.style.backgroundColor = kind === 'note' ? (NOTE_BGS[currentColor] || '#fef08a') : 'rgba(255,255,255,0.96)';
+  input.style.color = (kind === 'note' && chosenColor === '#ffffff') ? '#0f172a' : chosenColor;
+  input.style.backgroundColor = kind === 'note' ? (NOTE_BGS[chosenColor] || '#fef08a') : 'rgba(255,255,255,0.96)';
   input.style.maxWidth = Math.max(180, rect.width - p.x * rect.width - 12) + 'px';
   input.placeholder = kind === 'note' ? 'Post-it (Enter salva, Shift+Enter linha)…' : 'Digite (Enter confirma, Shift+Enter linha)…';
   input.classList.remove('hidden');
@@ -1820,6 +2069,7 @@ function commitTextInput() {
     x1: anchor.x,
     y1: anchor.y,
     cor: color,
+    textCor: (kind === 'note' && color === '#ffffff') ? '#0f172a' : color,
     bg: kind === 'note' ? (NOTE_BGS[color] || '#fef08a') : undefined,
     fonte: kind === 'note' ? 0.032 : textFontFraction(),
     actionId: actId,
@@ -2090,19 +2340,59 @@ function buildColorRow() {
     btn.className = `swatch tool-btn flex-shrink-0 rounded-full border-2 ${c === '#ffffff' ? 'border-slate-300' : 'border-white'} ${i === 0 ? 'active' : ''}`;
     btn.style.background = c;
     btn.style.color = c;
-    btn.style.width = '28px';
-    btn.style.height = '28px';
-    btn.style.minWidth = '34px';
-    btn.style.minHeight = '34px';
-    btn.title = 'Cor';
+    btn.style.width = '26px';
+    btn.style.height = '26px';
+    btn.style.minWidth = '30px';
+    btn.style.minHeight = '30px';
+    btn.title = 'Cor da caneta / fonte';
     btn.addEventListener('click', () => {
       currentColor = c;
       row.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
-      if (currentTool === 'eraser' || currentTool === 'laser') setTool('pen');
+      if (textAnchor) {
+        const input = document.getElementById('text-input');
+        if (input) input.style.color = c;
+      }
+      if (selectedSegId) {
+        applyFontColorToSelected(c);
+      } else if (currentTool === 'eraser' || currentTool === 'laser') {
+        setTool('pen');
+      }
     });
     row.appendChild(btn);
   });
+
+  // Seletor de cor livre (qualquer cor para caneta ou fonte)
+  const pickerLabel = document.createElement('label');
+  pickerLabel.className = 'swatch tool-btn flex-shrink-0 rounded-full border-2 border-slate-300 cursor-pointer flex items-center justify-center shadow-sm';
+  pickerLabel.style.width = '28px';
+  pickerLabel.style.height = '28px';
+  pickerLabel.style.minWidth = '32px';
+  pickerLabel.style.minHeight = '32px';
+  pickerLabel.style.background = 'conic-gradient(#ef4444,#f59e0b,#10b981,#3b82f6,#8b5cf6,#ec4899,#ef4444)';
+  pickerLabel.title = 'Escolher qualquer cor personalizada (caneta ou fonte)';
+  const pickerInput = document.createElement('input');
+  pickerInput.type = 'color';
+  pickerInput.id = 'toolbar-custom-color';
+  pickerInput.className = 'sr-only';
+  pickerInput.value = '#2563eb';
+  pickerInput.addEventListener('input', () => {
+    const c = pickerInput.value;
+    currentColor = c;
+    row.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    pickerLabel.classList.add('active');
+    if (textAnchor) {
+      const input = document.getElementById('text-input');
+      if (input) input.style.color = c;
+    }
+    if (selectedSegId) {
+      applyFontColorToSelected(c);
+    } else if (currentTool === 'eraser' || currentTool === 'laser') {
+      setTool('pen');
+    }
+  });
+  pickerLabel.appendChild(pickerInput);
+  row.appendChild(pickerLabel);
 }
 
 function setTool(tool) {
@@ -2632,11 +2922,21 @@ function inserirAulaCompletaEmNovaPagina() {
 
 // ── Chat de IA na Lousa (Yara IA · Canto Inferior Direito) ──────────────────
 const quadroChatHistory = [];
+let lastInsertedAIBatchIds = [];
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
 
 function parseRequestedCount(promptText) {
   const m = String(promptText || '').match(/\b([1-9]|1[0-2])\b/);
-  if (m) return Math.min(10, Math.max(1, parseInt(m[1], 10)));
-  const wordNums = { uma: 1, um: 1, duas: 2, dois: 2, tres: 3, três: 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10 };
+  if (m) return Math.min(12, Math.max(1, parseInt(m[1], 10)));
+  const wordNums = {
+    uma: 1, um: 1, duas: 2, dois: 2, tres: 3, três: 3, quatro: 4,
+    cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10, onze: 11, doze: 12
+  };
   const lower = String(promptText || '').toLowerCase();
   for (const [w, n] of Object.entries(wordNums)) {
     if (new RegExp(`\\b${w}\\b`, 'i').test(lower)) return n;
@@ -2644,11 +2944,60 @@ function parseRequestedCount(promptText) {
   return 5;
 }
 
+function detectPromptFontColor(promptText) {
+  const lower = String(promptText || '').toLowerCase();
+  if (!/(letra|fonte|cor|texto|em\s+(azul|vermelh|verd|rox|laranj|ros|amarel|marrom|turquesa|preto))/i.test(lower)) {
+    return '';
+  }
+  if (/azul\s*c[eé]u|celeste/i.test(lower)) return '#0284c7';
+  if (/azul\s*marinho|marinho/i.test(lower)) return '#1e3a8a';
+  if (/azul/i.test(lower)) return '#2563eb';
+  if (/vermelh/i.test(lower)) return '#dc2626';
+  if (/verde\s*escuro|floresta/i.test(lower)) return '#15803d';
+  if (/verd|esmeralda/i.test(lower)) return '#059669';
+  if (/turquesa|ciano/i.test(lower)) return '#0d9488';
+  if (/rox|violeta|lil[aá]s/i.test(lower)) return '#9333ea';
+  if (/índigo|indigo/i.test(lower)) return '#4f46e5';
+  if (/laranj/i.test(lower)) return '#ea580c';
+  if (/ros|pink/i.test(lower)) return '#e11d48';
+  if (/amarel|dourad|âmbar|ambar/i.test(lower)) return '#b45309';
+  if (/marrom/i.test(lower)) return '#78350f';
+  if (/pret|escur/i.test(lower)) return '#0f172a';
+  return '';
+}
+
 function generateLocalFallbackCards(userText) {
   const lower = String(userText || '').toLowerCase();
   const count = parseRequestedCount(userText);
+  const wantReplace = /\b(limp|substitu|troca\s+tudo|apag|nova\s+lousa)\b/i.test(lower);
 
   const pools = {
+    passado: [
+      { badge: 'Passado 1', en: 'I visited our main client yesterday afternoon.', pt: 'Eu visitei nosso cliente principal ontem à tarde.' },
+      { badge: 'Passado 2', en: 'Did you finish the report before leaving?', pt: 'Você terminou o relatório antes de sair?' },
+      { badge: 'Passado 3', en: 'We were talking about this project earlier today.', pt: 'Estávamos conversando sobre este projeto hoje mais cedo.' },
+      { badge: 'Passado 4', en: 'She bought the plane tickets last night.', pt: 'Ela comprou as passagens aéreas ontem à noite.' },
+      { badge: 'Passado 5', en: 'Everything went much better than we expected.', pt: 'Tudo correu muito melhor do que esperávamos.' },
+      { badge: 'Passado 6', en: 'Where did you stay during your trip?', pt: 'Onde você ficou hospedado durante a sua viagem?' },
+      { badge: 'Passado 7', en: 'I didn’t have enough time to check my emails.', pt: 'Eu não tive tempo suficiente para checar meus e-mails.' },
+      { badge: 'Passado 8', en: 'They arrived right on time for the presentation.', pt: 'Eles chegaram bem na hora para a apresentação.' },
+    ],
+    futuro: [
+      { badge: 'Futuro 1', en: 'I am going to start a new training course next Monday.', pt: 'Eu vou começar um novo curso de treinamento na próxima segunda.' },
+      { badge: 'Futuro 2', en: 'We will let you know as soon as the results arrive.', pt: 'Nós avisaremos você assim que os resultados chegarem.' },
+      { badge: 'Futuro 3', en: 'Are you going to attend the conference tomorrow?', pt: 'Você vai participar da conferência amanhã?' },
+      { badge: 'Futuro 4', en: 'It will probably rain in the late afternoon.', pt: 'Provavelmente vai chover no fim da tarde.' },
+      { badge: 'Futuro 5', en: 'I’ll help you organize the presentation slides.', pt: 'Eu vou te ajudar a organizar os slides da apresentação.' },
+      { badge: 'Futuro 6', en: 'What are you going to do this weekend?', pt: 'O que você vai fazer neste fim de semana?' },
+    ],
+    perguntas: [
+      { badge: 'Pergunta 1', en: 'What is the most interesting part of your daily work?', pt: 'Qual é a parte mais interessante do seu trabalho diário?' },
+      { badge: 'Pergunta 2', en: 'If you could travel anywhere right now, where would you go?', pt: 'Se você pudesse viajar para qualquer lugar agora, para onde iria?' },
+      { badge: 'Pergunta 3', en: 'How do you usually organize your routine on busy days?', pt: 'Como você costuma organizar sua rotina em dias corridos?' },
+      { badge: 'Pergunta 4', en: 'What skill would you like to master this year?', pt: 'Qual habilidade você gostaria de dominar este ano?' },
+      { badge: 'Pergunta 5', en: 'What was the best advice anyone ever gave you?', pt: 'Qual foi o melhor conselho que alguém já te deu?' },
+      { badge: 'Pergunta 6', en: 'How long have you been working in your current field?', pt: 'Há quanto tempo você trabalha na sua área atual?' },
+    ],
     lacuna: [
       { badge: 'Complete 1', en: 'I usually ___ coffee before starting work.', pt: 'Complete com o verbo de rotina (ex: drink / have)' },
       { badge: 'Complete 2', en: 'She ___ already finished the main report.', pt: 'Complete com o auxiliar correto (ex: has)' },
@@ -2663,6 +3012,7 @@ function generateLocalFallbackCards(userText) {
       { badge: 'Diálogo · A', en: 'I am trying to organize the schedule for Friday.', pt: 'Estou tentando organizar o cronograma de sexta-feira.' },
       { badge: 'Diálogo · B', en: 'Let’s review the priorities together right now.', pt: 'Vamos revisar as prioridades juntos agora mesmo.' },
       { badge: 'Diálogo · A', en: 'That sounds great, thank you so much!', pt: 'Parece ótimo, muito obrigado!' },
+      { badge: 'Diálogo · B', en: 'Anytime! Let me grab my notes.', pt: 'Sempre às ordens! Deixe-me pegar minhas anotações.' },
     ],
     viagem: [
       { badge: 'Viagem 1', en: 'Could you tell me where the boarding gate is?', pt: 'Você poderia me dizer onde fica o portão de embarque?' },
@@ -2671,6 +3021,21 @@ function generateLocalFallbackCards(userText) {
       { badge: 'Viagem 4', en: 'How can I get to the city center from here?', pt: 'Como posso chegar ao centro da cidade saindo daqui?' },
       { badge: 'Viagem 5', en: 'Could we have the bill, please?', pt: 'Você poderia nos trazer a conta, por favor?' },
       { badge: 'Viagem 6', en: 'Is there a pharmacy near this station?', pt: 'Tem uma farmácia perto desta estação?' },
+    ],
+    restaurante: [
+      { badge: 'Restaurante 1', en: 'Could we get a table for two by the window?', pt: 'Poderíamos pegar uma mesa para dois perto da janela?' },
+      { badge: 'Restaurante 2', en: 'What do you recommend from today’s menu?', pt: 'O que você recomenda do cardápio de hoje?' },
+      { badge: 'Restaurante 3', en: 'I would like the grilled salmon with vegetables, please.', pt: 'Eu gostaria do salmão grelhado com legumes, por favor.' },
+      { badge: 'Restaurante 4', en: 'Could you bring us some still water with ice?', pt: 'Você poderia nos trazer água sem gás com gelo?' },
+      { badge: 'Restaurante 5', en: 'Can I pay by credit card?', pt: 'Posso pagar com cartão de crédito?' },
+    ],
+    med: [
+      { badge: 'Saúde 1', en: 'How long have you been feeling this pain?', pt: 'Há quanto tempo você está sentindo essa dor?' },
+      { badge: 'Saúde 2', en: 'Does the pain get worse when you take a deep breath?', pt: 'A dor piora quando você respira fundo?' },
+      { badge: 'Saúde 3', en: 'Are you currently taking any daily medication?', pt: 'Você está tomando algum medicamento diário atualmente?' },
+      { badge: 'Saúde 4', en: 'Let’s check your blood pressure and temperature.', pt: 'Vamos verificar sua pressão arterial e temperatura.' },
+      { badge: 'Saúde 5', en: 'Take this tablet twice a day after meals.', pt: 'Tome este comprimido duas vezes ao dia após as refeições.' },
+      { badge: 'Saúde 6', en: 'Please let us know if you have any allergies.', pt: 'Por favor, avise-nos se você tiver alguma alergia.' },
     ],
     agro: [
       { badge: 'Agro 1', en: 'Soil moisture is ideal for planting soybeans this week.', pt: 'A umidade do solo está ideal para plantar soja nesta semana.' },
@@ -2696,6 +3061,20 @@ function generateLocalFallbackCards(userText) {
       { badge: 'Trabalho 5', en: 'Thank you for bringing this detail to my attention.', pt: 'Obrigado por trazer esse detalhe para a minha atenção.' },
       { badge: 'Trabalho 6', en: 'What are the next steps for our team this week?', pt: 'Quais são os próximos passos para nossa equipe nesta semana?' },
     ],
+    frances: [
+      { badge: 'Français 1', en: 'Bonjour ! Comment ça se passe aujourd’hui ?', pt: 'Olá! Como estão indo as coisas hoje?' },
+      { badge: 'Français 2', en: 'Je voudrais réserver une table pour deux personnes.', pt: 'Eu gostaria de reservar uma mesa para duas pessoas.' },
+      { badge: 'Français 3', en: 'Pourriez-vous répéter un peu plus lentement, s’il vous plaît ?', pt: 'Você poderia repetir um pouco mais devagar, por favor?' },
+      { badge: 'Français 4', en: 'Où se trouve la station de métro la plus proche ?', pt: 'Onde fica a estação de metrô mais próxima?' },
+      { badge: 'Français 5', en: 'J’apprends le français tous les jours avec plaisir.', pt: 'Eu aprendo francês todos os dias com prazer.' },
+    ],
+    turkish: [
+      { badge: 'Türkçe 1', en: 'Merhaba! Bugün nasılsınız?', pt: 'Olá! Como você está hoje?' },
+      { badge: 'Türkçe 2', en: 'Bir kahve alabilir miyim, lütfen?', pt: 'Posso pegar um café, por favor?' },
+      { badge: 'Türkçe 3', en: 'Bu kelime ne anlama geliyor?', pt: 'O que significa esta palavra?' },
+      { badge: 'Türkçe 4', en: 'Biraz daha yavaş konuşabilir misiniz?', pt: 'Você pode falar um pouco mais devagar?' },
+      { badge: 'Türkçe 5', en: 'Yardımınız için çok teşekkür ederim!', pt: 'Muito obrigado pela sua ajuda!' },
+    ],
     geral: [
       { badge: 'Frase 1', en: 'I have been practicing English every single day.', pt: 'Eu tenho praticado inglês todos os dias.' },
       { badge: 'Frase 2', en: 'Could you repeat that a little more slowly, please?', pt: 'Você poderia repetir isso um pouco mais devagar, por favor?' },
@@ -2709,12 +3088,19 @@ function generateLocalFallbackCards(userText) {
   };
 
   let chosen = pools.geral;
-  if (lower.includes('lacuna') || lower.includes('completar') || lower.includes('exerc')) chosen = pools.lacuna;
+  if (SALA === 'frances' || lower.includes('francês') || lower.includes('frances')) chosen = pools.frances;
+  else if (SALA === 'turkish' || lower.includes('turco')) chosen = pools.turkish;
+  else if (lower.includes('passado') || lower.includes('ontem') || lower.includes('past')) chosen = pools.passado;
+  else if (lower.includes('futuro') || lower.includes('amanhã') || lower.includes('future') || lower.includes('will')) chosen = pools.futuro;
+  else if (lower.includes('pergunta') || lower.includes('question')) chosen = pools.perguntas;
+  else if (lower.includes('lacuna') || lower.includes('completar') || lower.includes('exerc')) chosen = pools.lacuna;
   else if (lower.includes('diálogo') || lower.includes('dialogo') || lower.includes('conversa')) chosen = pools.dialogo;
+  else if (lower.includes('restaurante') || lower.includes('comida') || lower.includes('cardápio')) chosen = pools.restaurante;
+  else if (lower.includes('médic') || lower.includes('medic') || lower.includes('saúde') || lower.includes('sintoma') || SALA === 'med') chosen = pools.med;
   else if (lower.includes('viagem') || lower.includes('aeroporto') || lower.includes('hotel') || SALA === 'travel') chosen = pools.viagem;
-  else if (lower.includes('agro') || lower.includes('safra') || lower.includes('fazenda') || SALA === 'agro') chosen = pools.agro;
-  else if (lower.includes('gps') || lower.includes('piloto') || lower.includes('sensor') || SALA === 'gpstronic') chosen = pools.gpstronic;
-  else if (lower.includes('trabalho') || lower.includes('reuni') || lower.includes('entrevista') || SALA === 'business' || SALA === 'interview') chosen = pools.trabalho;
+  else if (lower.includes('agro') || lower.includes('safra') || lower.includes('fazenda') || lower.includes('lavoura') || SALA === 'agro') chosen = pools.agro;
+  else if (lower.includes('gps') || lower.includes('piloto') || lower.includes('sensor') || lower.includes('rtk') || SALA === 'gpstronic') chosen = pools.gpstronic;
+  else if (lower.includes('trabalho') || lower.includes('reuni') || lower.includes('entrevista') || lower.includes('negócio') || SALA === 'business' || SALA === 'interview') chosen = pools.trabalho;
 
   const cards = [];
   for (let i = 0; i < count; i++) {
@@ -2726,8 +3112,9 @@ function generateLocalFallbackCards(userText) {
     });
   }
   return {
-    reply: `Preparei ${cards.length} itens prontinhos para a sua lousa! Clique em qualquer cartão no quadro para arrastar, mudar as cores, ajustar a letra ou dar duplo-clique para editar.`,
+    reply: `Preparei ${cards.length} itens prontinhos para a sua lousa! Clique em qualquer cartão no quadro para arrastar, mudar a cor da letra, ajustar o tamanho ou dar duplo-clique para editar.`,
     cards,
+    boardAction: wantReplace ? 'replace' : 'append',
   };
 }
 
@@ -2743,29 +3130,63 @@ function insertAICardsOnBoard(cards, opts = {}) {
     if (bl) bl.classList.add('hidden');
   }
 
+  // Se pediu para substituir os cartões existentes na página atual
+  if (opts.replace === true) {
+    pages[currentPage] = strokes.filter(s => !s || (s.kind !== 'note' && s.kind !== 'text'));
+    strokes = pages[currentPage];
+    selectCardSeg(null);
+    redrawAll();
+  }
+
   const styleSel = document.getElementById('yw-card-style');
   const layoutSel = document.getElementById('yw-card-layout');
+  const fontColorSel = document.getElementById('yw-font-color');
   const cardStyle = opts.cardStyle || (styleSel ? styleSel.value : 'modern');
-  const layoutMode = opts.layout || (layoutSel ? layoutSel.value : (cards.length >= 6 ? '2col' : '1col'));
-  const cols = layoutMode === '2col' ? 2 : 1;
+  const chosenFontColor = opts.textCor || (fontColorSel ? fontColorSel.value : '');
 
-  // Verifica quantos cartões já existem na página atual para posicionar sem sobrepor
-  const existingCards = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text')).length;
-  const startX = 0.05;
-  const colW = cols === 2 ? 0.45 : 0.85;
-  const rowH = cols === 2 ? 0.175 : 0.15;
-  const baseRowOffset = existingCards > 0 && existingCards < 4 ? existingCards : 0;
-  const startY = 0.08 + (baseRowOffset * 0.14);
+  // Verifica quantos cartões já existem na página atual
+  redrawAll();
+  const rect = canvas.getBoundingClientRect();
+  const canvasH = Math.max(300, rect.height || 600);
+  const existingCards = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text'));
 
+  // Se já houver muitos cartões na página atual (10+), cria uma nova página automaticamente
+  if (!opts.replace && existingCards.length >= 10 && pages.length < MAX_PAGES) {
+    switchToPage(pages.length, true);
+  }
+
+  const currentCardsOnPage = strokes.filter(s => s && (s.kind === 'note' || s.kind === 'text'));
+  const totalAfterInsert = currentCardsOnPage.length + cards.length;
+  const layoutMode = opts.layout || (layoutSel ? layoutSel.value : (totalAfterInsert >= 5 ? '2col' : '1col'));
+  const cols = (layoutMode === '2col' || totalAfterInsert >= 6) ? 2 : 1;
+
+  // Calcula o ponto vertical livre em cada coluna com base nos _bounds reais dos cartões existentes
+  const colCursorY = cols === 2 ? [0.07, 0.07] : [0.07];
+  currentCardsOnPage.forEach(c => {
+    const colIdx = (cols === 2 && (c.x1 || 0) >= 0.42) ? 1 : 0;
+    const hFrac = (c._bounds && c._bounds.h) ? (c._bounds.h / canvasH) : 0.14;
+    const bottomFrac = (c.y1 || 0.07) + hFrac + 0.024;
+    if (bottomFrac > colCursorY[colIdx]) {
+      colCursorY[colIdx] = bottomFrac;
+    }
+  });
+
+  // Se o cursor vertical passou do limite inferior, reorganiza a página em 2 colunas
+  const startX = 0.04;
+  const colW = cols === 2 ? 0.46 : 0.88;
   const actId = nextActionId();
   const batch = [];
 
   cards.forEach((item, idx) => {
-    const col = idx % cols;
-    const row = Math.floor(idx / cols);
-    const theme = CARD_THEMES[(existingCards + idx) % CARD_THEMES.length];
+    const col = cols === 2 ? (colCursorY[1] < colCursorY[0] - 0.01 ? 1 : (idx % 2)) : 0;
+    const theme = CARD_THEMES[(currentCardsOnPage.length + idx) % CARD_THEMES.length];
     const x1 = Math.min(0.86, startX + col * colW);
-    const y1 = Math.min(0.84, (startY + row * rowH) % 0.82 + (startY + row * rowH >= 0.82 ? 0.08 : 0));
+    let y1 = colCursorY[col];
+    if (y1 > 0.84) {
+      y1 = 0.08 + ((idx % 5) * 0.14);
+    }
+
+    const itemTextCor = item.textCor || chosenFontColor || (cardStyle === 'plain' ? theme.cor : '');
 
     const seg = {
       id: 'ai_' + Date.now().toString(36) + '_' + idx + '_' + Math.random().toString(36).slice(2, 5),
@@ -2777,58 +3198,176 @@ function insertAICardsOnBoard(cards, opts = {}) {
       x1,
       y1,
       cor: theme.cor,
+      textCor: itemTextCor || undefined,
       bg: cardStyle === 'sticky' ? theme.stickyBg : theme.bg,
-      fonte: cards.length >= 6 ? 0.025 : 0.028,
+      fonte: totalAfterInsert >= 6 ? 0.025 : 0.028,
       actionId: actId,
       author: myId,
     };
     batch.push(seg);
     addSegment(seg, true);
+
+    // Atualiza o cursor da coluna com a altura real recém-desenhada do cartão
+    const drawnHFrac = (seg._bounds && seg._bounds.h) ? Math.min(0.42, Math.max(0.08, seg._bounds.h / canvasH)) : 0.14;
+    colCursorY[col] = y1 + drawnHFrac + 0.024;
   });
 
+  lastInsertedAIBatchIds = batch.map(b => b.id);
+
   if (batch.length > 0) {
-    broadcastEvent('stroke', { segments: batch });
+    if (opts.replace) {
+      broadcastEvent('snapshot', {
+        segments: strokes.slice(-MAX_HISTORY),
+        pageIndex: currentPage,
+        totalPages: pages.length,
+        bg: pageBgs[currentPage],
+      });
+    } else {
+      broadcastEvent('stroke', { segments: batch });
+    }
     selectCardSeg(batch[0]);
   }
   return batch;
 }
 
+function parseAIResponsePayload(data) {
+  if (!data || typeof data !== 'object') return null;
+  if (Array.isArray(data.cards) || typeof data.reply === 'string') {
+    return {
+      reply: String(data.reply || 'Prontinho! Aqui estão os cartões para a lousa:').trim(),
+      cards: Array.isArray(data.cards) ? data.cards : [],
+      boardAction: data.boardAction || 'append',
+    };
+  }
+  const candText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (typeof candText === 'string' && candText.trim()) {
+    try {
+      const cleanJson = candText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed && (Array.isArray(parsed.cards) || parsed.reply)) {
+        return {
+          reply: String(parsed.reply || 'Prontinho! Aqui estão os cartões para a lousa:').trim(),
+          cards: Array.isArray(parsed.cards) ? parsed.cards : [],
+          boardAction: parsed.boardAction || 'append',
+        };
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
 function initQuadroAIChat() {
+  const fabWrap = document.getElementById('yw-fab-wrap');
   const fab = document.getElementById('yw-fab');
   const panel = document.getElementById('yw-panel');
   const closeBtn = document.getElementById('yw-close');
+  const clearChatBtn = document.getElementById('yw-clear-chat');
   const input = document.getElementById('yw-input');
   const sendBtn = document.getElementById('yw-send');
   const messagesEl = document.getElementById('yw-messages');
   const autoPasteEl = document.getElementById('yw-auto-paste');
+  const fontColorSel = document.getElementById('yw-font-color');
+  const styleSel = document.getElementById('yw-card-style');
+  const layoutSel = document.getElementById('yw-card-layout');
 
   if (!fab || !panel) return;
+  let isSendingChat = false;
 
   const togglePanel = (forceOpen) => {
     const isHidden = panel.classList.contains('hidden');
     const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : isHidden;
     panel.classList.toggle('hidden', !shouldOpen);
+    if (fabWrap) fabWrap.classList.toggle('hidden', shouldOpen);
     if (shouldOpen && input) {
       setTimeout(() => input.focus(), 40);
     }
   };
 
-  fab.addEventListener('click', () => togglePanel());
+  fab.addEventListener('click', () => togglePanel(true));
   if (closeBtn) closeBtn.addEventListener('click', () => togglePanel(false));
+
+  if (clearChatBtn && messagesEl) {
+    clearChatBtn.addEventListener('click', () => {
+      quadroChatHistory.length = 0;
+      messagesEl.innerHTML = `
+        <div class="bg-white border border-emerald-200 rounded-2xl rounded-tl-sm p-3 shadow-sm text-slate-700 leading-relaxed">
+          <div class="font-black text-emerald-800 text-[11px] uppercase tracking-wider mb-1">🦫 Yara IA · Conversa limpa</div>
+          Histórico limpo! Peça novas frases, vocabulário ou exercícios para colar na lousa.
+        </div>
+      `;
+    });
+  }
+
+  // Trocar a cor da letra no seletor do chat também atualiza o cartão selecionado ou último lote colado
+  if (fontColorSel) {
+    fontColorSel.addEventListener('change', () => {
+      const cor = fontColorSel.value;
+      if (!cor) return;
+      const sel = getSelectedSeg();
+      if (sel) {
+        applyFontColorToSelected(cor);
+      } else if (lastInsertedAIBatchIds.length > 0) {
+        strokes.forEach(s => {
+          if (s && lastInsertedAIBatchIds.includes(s.id)) {
+            s.textCor = cor;
+            if (s.cardStyle === 'plain') s.cor = cor;
+            broadcastSegUpdate(s);
+          }
+        });
+        redrawAll();
+        saveLocalBoard();
+      }
+    });
+  }
+
+  // Trocar o estilo no seletor do chat atualiza o último lote colado
+  if (styleSel) {
+    styleSel.addEventListener('change', () => {
+      const val = styleSel.value;
+      if (lastInsertedAIBatchIds.length > 0) {
+        strokes.forEach(s => {
+          if (s && lastInsertedAIBatchIds.includes(s.id)) {
+            s.cardStyle = val;
+            s.kind = val === 'plain' ? 'text' : 'note';
+            const theme = CARD_THEMES.find(t => t.cor === s.cor) || CARD_THEMES[0];
+            s.bg = val === 'sticky' ? theme.stickyBg : theme.bg;
+            broadcastSegUpdate(s);
+          }
+        });
+        redrawAll();
+        const sel = getSelectedSeg();
+        if (sel) positionCardCustomizer(sel);
+        saveLocalBoard();
+      }
+    });
+  }
+
+  // Trocar 1 Coluna / 2 Colunas no chat reorganiza os cartões da lousa na hora
+  if (layoutSel) {
+    layoutSel.addEventListener('change', () => {
+      organizeBoardCards(layoutSel.value === '2col' ? 2 : 1);
+    });
+  }
 
   document.querySelectorAll('.yw-chip').forEach(chip => {
     chip.addEventListener('click', () => {
+      if (isSendingChat) return;
       const prompt = chip.getAttribute('data-prompt') || chip.textContent;
-      if (input) input.value = prompt;
       sendChatPrompt(prompt);
     });
   });
 
   if (input) {
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 90) + 'px';
+    });
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendChatPrompt(input.value);
+      } else if (e.key === 'Escape') {
+        togglePanel(false);
       }
     });
   }
@@ -2875,28 +3414,42 @@ function initQuadroAIChat() {
     if (Array.isArray(cards) && cards.length > 0) {
       const list = document.createElement('div');
       list.className = 'space-y-1.5 pt-1';
-      cards.forEach((c, idx) => {
+      cards.forEach((c) => {
         const itemRow = document.createElement('div');
-        itemRow.className = 'p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-2 hover:border-emerald-300 transition';
+        itemRow.className = 'p-2 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-1.5 hover:border-emerald-300 transition';
         const info = document.createElement('div');
         info.className = 'min-w-0 flex-1';
         info.innerHTML = `
-          ${c.badge ? `<div class="text-[9px] font-black uppercase tracking-wider text-emerald-700">${c.badge}</div>` : ''}
-          <div class="font-extrabold text-navy text-xs leading-snug">${c.en}</div>
-          ${c.pt ? `<div class="text-[11px] text-slate-500">${c.pt}</div>` : ''}
+          ${c.badge ? `<div class="text-[9px] font-black uppercase tracking-wider text-emerald-700">${escHtml(c.badge)}</div>` : ''}
+          <div class="font-extrabold text-navy text-xs leading-snug" style="${c.textCor ? 'color:' + escHtml(c.textCor) : ''}">${escHtml(c.en)}</div>
+          ${c.pt ? `<div class="text-[11px] text-slate-500">${escHtml(c.pt)}</div>` : ''}
         `;
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'flex items-center gap-1 flex-shrink-0';
+
+        const speakOneBtn = document.createElement('button');
+        speakOneBtn.type = 'button';
+        speakOneBtn.className = 'px-1.5 py-1 rounded-lg bg-white hover:bg-emerald-50 text-slate-600 border border-slate-200 text-[10px] font-bold transition';
+        speakOneBtn.title = 'Ouvir pronúncia desta frase';
+        speakOneBtn.textContent = '🔊';
+        speakOneBtn.addEventListener('click', () => speakCardText({ texto: c.en }));
+
         const addOneBtn = document.createElement('button');
         addOneBtn.type = 'button';
-        addOneBtn.className = 'px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-800 border border-emerald-200 text-[10px] font-black flex-shrink-0 transition';
-        addOneBtn.title = 'Colar apenas este cartão na lousa';
+        addOneBtn.className = 'px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-800 border border-emerald-200 text-[10px] font-black transition';
+        addOneBtn.title = 'Colar este cartão na lousa';
         addOneBtn.textContent = '➕ Lousa';
         addOneBtn.addEventListener('click', () => {
           insertAICardsOnBoard([c]);
-          addOneBtn.textContent = '✅ Colado';
-          setTimeout(() => { addOneBtn.textContent = '➕ Lousa'; }, 1400);
+          addOneBtn.textContent = '✅';
+          setTimeout(() => { addOneBtn.textContent = '➕ Lousa'; }, 1200);
         });
+
+        btnGroup.appendChild(speakOneBtn);
+        btnGroup.appendChild(addOneBtn);
         itemRow.appendChild(info);
-        itemRow.appendChild(addOneBtn);
+        itemRow.appendChild(btnGroup);
         list.appendChild(itemRow);
       });
       wrap.appendChild(list);
@@ -2906,12 +3459,23 @@ function initQuadroAIChat() {
 
       const pasteAllBtn = document.createElement('button');
       pasteAllBtn.type = 'button';
-      pasteAllBtn.className = 'flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs shadow-sm transition flex items-center justify-center gap-1.5';
-      pasteAllBtn.innerHTML = `📌 ${autoPasted ? 'Colar novamente na lousa' : 'Colar todos na lousa'} (${cards.length})`;
+      pasteAllBtn.className = 'flex-1 py-2 px-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-[11px] shadow-sm transition flex items-center justify-center gap-1';
+      pasteAllBtn.innerHTML = `📌 ${autoPasted ? 'Colar novamente' : 'Colar todos'} (${cards.length})`;
       pasteAllBtn.addEventListener('click', () => {
-        insertAICardsOnBoard(cards);
+        insertAICardsOnBoard(cards, { replace: false });
       });
+
+      const replaceAllBtn = document.createElement('button');
+      replaceAllBtn.type = 'button';
+      replaceAllBtn.className = 'py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 border border-slate-200 font-extrabold text-[11px] transition flex items-center justify-center gap-1';
+      replaceAllBtn.title = 'Limpa os cartões atuais da página e cola apenas estes';
+      replaceAllBtn.innerHTML = `🔄 Substituir lousa`;
+      replaceAllBtn.addEventListener('click', () => {
+        insertAICardsOnBoard(cards, { replace: true });
+      });
+
       actionsBar.appendChild(pasteAllBtn);
+      actionsBar.appendChild(replaceAllBtn);
       wrap.appendChild(actionsBar);
     }
 
@@ -2919,33 +3483,69 @@ function initQuadroAIChat() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  async function callQuadroAiEndpoint(payload) {
+    const buildHeaders = () => {
+      const h = { 'Content-Type': 'application/json' };
+      const csrf = getQuadroCsrfToken();
+      if (csrf) h['X-CSRF-Token'] = csrf;
+      return h;
+    };
+
+    let resp = await fetch('/api/quadro-ai', {
+      method: 'POST',
+      headers: buildHeaders(),
+      credentials: 'same-origin',
+      body: JSON.stringify(payload),
+    });
+
+    // Se o token CSRF expirou ou ainda não foi carregado, atualiza a sessão e tenta novamente
+    if (resp.status === 403) {
+      await refreshQuadroCsrfToken();
+      resp = await fetch('/api/quadro-ai', {
+        method: 'POST',
+        headers: buildHeaders(),
+        credentials: 'same-origin',
+        body: JSON.stringify(payload),
+      });
+    }
+    return resp;
+  }
+
   async function sendChatPrompt(rawText) {
     const text = String(rawText || '').trim();
-    if (!text) return;
-    if (input) input.value = '';
+    if (!text || isSendingChat) return;
+    isSendingChat = true;
+    if (sendBtn) sendBtn.disabled = true;
+    if (input) {
+      input.value = '';
+      input.style.height = 'auto';
+    }
+
+    // Se o usuário pediu uma cor específica de letra no prompt (ex: "com letra azul"), aplica!
+    const detectedColor = detectPromptFontColor(text);
+    if (detectedColor && fontColorSel) {
+      fontColorSel.value = detectedColor;
+    }
 
     appendUserBubble(text);
     const loadingEl = appendLoadingBubble();
 
+    const boardCards = strokes
+      .filter(s => s && (s.kind === 'note' || s.kind === 'text') && s.texto)
+      .slice(-15)
+      .map(s => ({ badge: s.badge || '', en: s.texto || '', pt: s.subtexto || '' }));
+
     let result = null;
     try {
-      const resp = await fetch('/api/quadro-ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sala: SALA,
-          message: text,
-          history: quadroChatHistory.slice(-8),
-        }),
+      const resp = await callQuadroAiEndpoint({
+        sala: SALA,
+        message: text,
+        history: quadroChatHistory.slice(-8),
+        boardCards,
       });
       if (resp.ok) {
         const data = await resp.json();
-        if (data && (Array.isArray(data.cards) || data.reply)) {
-          result = {
-            reply: data.reply || 'Prontinho! Aqui estão os cartões para a lousa:',
-            cards: Array.isArray(data.cards) ? data.cards : [],
-          };
-        }
+        result = parseAIResponsePayload(data);
       }
     } catch (e) {}
 
@@ -2953,15 +3553,25 @@ function initQuadroAIChat() {
       result = generateLocalFallbackCards(text);
     }
 
+    if (detectedColor && Array.isArray(result.cards)) {
+      result.cards.forEach(c => { if (!c.textCor) c.textCor = detectedColor; });
+    }
+
     loadingEl.remove();
+    isSendingChat = false;
+    if (sendBtn) sendBtn.disabled = false;
 
     quadroChatHistory.push({ role: 'user', content: text });
     quadroChatHistory.push({ role: 'assistant', content: result.reply || '' });
 
     const shouldAutoPaste = autoPasteEl ? autoPasteEl.checked : true;
+    const shouldReplace = result.boardAction === 'replace';
     let pasted = false;
-    if (shouldAutoPaste && Array.isArray(result.cards) && result.cards.length > 0) {
-      insertAICardsOnBoard(result.cards);
+    if (shouldAutoPaste && result.boardAction !== 'none' && Array.isArray(result.cards) && result.cards.length > 0) {
+      insertAICardsOnBoard(result.cards, {
+        replace: shouldReplace,
+        textCor: detectedColor || (fontColorSel ? fontColorSel.value : ''),
+      });
       pasted = true;
     }
 
