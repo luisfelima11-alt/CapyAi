@@ -1,4 +1,91 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rapid Translate — Capy Yara</title><script src="https://cdn.tailwindcss.com"></script><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Material+Symbols+Outlined&display=swap" rel="stylesheet"><style>body{font-family:'Plus Jakarta Sans',sans-serif}.option{min-height:62px}.option:focus-visible{outline:3px solid #fb923c;outline-offset:3px}</style><link rel="icon" href="/favicon.ico" sizes="any"/>
+<!DOCTYPE html>
+<html class="dark" lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rapid Translate — Capy Yara</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#fb923c",
+        "background-dark": "#001f3f",
+      },
+      fontFamily: {
+        display: ["Plus Jakarta Sans", "sans-serif"],
+      },
+    },
+  },
+};
+</script>
+<style>
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(251, 146, 60, 0.22);
+    border-color: #fb923c;
+    color: #fed7aa;
+    box-shadow: 0 0 16px rgba(251, 146, 60, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: #38bdf8;
+    color: #bae6fd;
+  }
+  .option-btn {
+    min-height: 68px;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(251, 146, 60, 0.65);
+    background: rgba(251, 146, 60, 0.14);
+  }
+  .option-btn:focus-visible {
+    outline: 3px solid #fb923c;
+    outline-offset: 2px;
+  }
+  .option-btn.correct {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border-color: #10b981 !important;
+    color: #a7f3d0 !important;
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.35);
+  }
+  .option-btn.wrong {
+    background: rgba(239, 68, 68, 0.24) !important;
+    border-color: #ef4444 !important;
+    color: #fecaca !important;
+    animation: shake 0.36s ease;
+  }
+  .option-btn.eliminated {
+    opacity: 0.22 !important;
+    pointer-events: none;
+    text-decoration: line-through;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
@@ -17,8 +104,773 @@
 <meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
-</head><body class="bg-[#001f3f] text-white min-h-screen"><div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div><main class="md:pl-32 pt-28 pb-24 px-5 max-w-3xl mx-auto"><a href="5_Game_Pavilion_Forest_Edition.html" class="text-orange-300 font-bold">← Pavilhão</a><header class="text-center mt-7"><p class="text-orange-300 text-xs font-black uppercase tracking-[.2em]">Tradução relâmpago</p><h1 class="text-4xl sm:text-6xl font-black mt-2">Rapid Translate</h1><p class="text-slate-400 mt-3">Escolha a tradução antes que a energia acabe.</p></header><section class="bg-white/5 border border-white/10 rounded-[2rem] p-5 sm:p-8 mt-8"><div class="flex justify-between font-black"><span id="round">1 / 10</span><span id="score" class="text-orange-300">0 XP</span></div><div class="h-3 rounded-full bg-white/10 mt-4 overflow-hidden"><div id="timer" class="h-full bg-gradient-to-r from-orange-500 to-yellow-300"></div></div><div class="text-center py-10"><p class="text-white/45 text-xs font-black uppercase tracking-widest">Traduza</p><h2 id="word" class="text-5xl sm:text-7xl font-black mt-2"></h2></div><div id="options" class="grid sm:grid-cols-2 gap-3"></div><p id="feedback" class="text-center font-black min-h-6 mt-5" aria-live="polite"></p></section></main><div id="mobile-nav-placeholder"></div><script src="capy-skins.js?v=skins1"></script>
+</head>
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-orange-300 hover:text-orange-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+        <span>🔥</span>
+        <span>Combo:</span>
+        <span id="streak-badge">0</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Termos dominados neste jogo">
+        <span>🏆</span>
+        <span id="mastered-badge">0/160</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="text-center mb-6">
+    <p class="text-orange-300 text-xs font-black uppercase tracking-[.22em]">Tradução Relâmpago • 160 Expressões Reais</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-orange-300 via-amber-200 to-yellow-300 bg-clip-text text-transparent">Rapid Translate</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Treine reflexo rápido entre Inglês e Português com vocabulário real do dia a dia, viagem, trabalho, Agro English, GPS Tronic e saúde.</p>
+  </header>
+
+  <!-- Track & Mode Selector Panel -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Escolha a Trilha de Vocabulário</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-orange-300">160 termos disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (160)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (20)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (20)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (20)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (20)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (20)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (20)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (20)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (20)</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-white/10">
+        <!-- Direction -->
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Direção da Tradução</span>
+          <div id="dir-buttons" class="flex flex-wrap gap-1.5">
+            <button data-dir="en2pt" class="mode-btn active text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">🇺🇸 EN → 🇧🇷 PT</button>
+            <button data-dir="pt2en" class="mode-btn text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">🇧🇷 PT → 🇺🇸 EN</button>
+            <button data-dir="mixed" class="mode-btn text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">🔄 Misto</button>
+          </div>
+        </div>
+        <!-- Speed Mode -->
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Ritmo do Relógio</span>
+          <div id="speed-buttons" class="flex flex-wrap gap-1.5">
+            <button data-speed="6" class="mode-btn text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">⚡ Relâmpago (6s)</button>
+            <button data-speed="10" class="mode-btn active text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 Normal (10s)</button>
+            <button data-speed="0" class="mode-btn text-xs font-extrabold px-2.5 py-1.5 rounded-xl border border-white/15 bg-white/5">🧘 Sem Tempo</button>
+          </div>
+        </div>
+        <!-- Session Length -->
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">4. Tamanho da Rodada</span>
+          <div id="len-buttons" class="flex flex-wrap gap-1.5">
+            <button data-len="10" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10</button>
+            <button data-len="15" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">15</button>
+            <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Game Area -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-8 relative overflow-hidden">
+    <!-- Progress & Timer Header -->
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black mb-2">
+      <div class="flex items-center gap-2">
+        <span id="round" class="bg-white/10 px-3 py-1 rounded-full text-orange-300">1 / 15</span>
+        <span id="track-pill" class="bg-orange-500/15 border border-orange-400/30 text-orange-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-speak" type="button" class="inline-flex items-center gap-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir pronúncia (Atalho: R)">
+          <span class="material-symbols-outlined text-sm">volume_up</span>
+          <span>Ouvir</span>
+        </button>
+        <button id="btn-hint" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Eliminar 2 alternativas (Atalho: H)">
+          <span>💡 50/50</span>
+          <span id="hints-left">(3)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Timer Bar -->
+    <div class="h-3 rounded-full bg-white/10 mt-3 overflow-hidden relative">
+      <div id="timer" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-orange-500 transition-all duration-100" style="width:100%"></div>
+    </div>
+    <div class="flex justify-between items-center text-[11px] text-slate-400 font-bold mt-1">
+      <span id="direction-label">Traduza do Inglês para o Português</span>
+      <span id="time-label">10.0s</span>
+    </div>
+
+    <!-- Prompt Term -->
+    <div class="text-center py-7 sm:py-9 px-3">
+      <div id="item-emoji" class="text-4xl sm:text-5xl mb-2">🌱</div>
+      <p id="prompt-subtitle" class="text-white/50 text-xs font-black uppercase tracking-widest">Qual é a tradução correta?</p>
+      <h2 id="word" class="text-3xl sm:text-5xl font-black mt-2 tracking-tight text-white break-words"></h2>
+    </div>
+
+    <!-- Options Grid -->
+    <div id="options" class="grid sm:grid-cols-2 gap-3"></div>
+
+    <!-- Feedback & Example Context Box -->
+    <div class="mt-5 min-h-[3.5rem] flex flex-col items-center justify-center">
+      <p id="feedback" class="text-center font-black text-base sm:text-lg" aria-live="polite"></p>
+      <div id="context-box" class="hidden mt-3 w-full bg-white/5 border border-white/10 rounded-2xl p-3.5 text-left">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-[11px] font-black uppercase tracking-wider text-orange-300">Exemplo em Contexto Real</p>
+            <p id="context-en" class="text-sm sm:text-base font-bold text-white mt-0.5"></p>
+            <p id="context-pt" class="text-xs sm:text-sm text-slate-300 mt-0.5"></p>
+          </div>
+          <button id="btn-speak-example" type="button" class="shrink-0 bg-white/10 hover:bg-white/20 p-2 rounded-xl text-sky-300" title="Ouvir frase de exemplo">
+            <span class="material-symbols-outlined text-lg">record_voice_over</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-[11px] text-slate-400 mt-3">
+      Atalhos: teclas <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd class="px-1.5 py-0.5 bg-white/10 rounded">4</kbd> para responder • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> para ouvir • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">H</kbd> para dica 50/50
+    </p>
+  </section>
+
+  <!-- Summary / End Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">⚡</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Rodada Concluída!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-orange-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+        <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0%</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+        <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">0</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-orange-500 hover:bg-orange-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Novamente
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <!-- Review List -->
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-orange-300 mb-3">📚 Revisão dos Termos da Partida (Toque no áudio para ouvir)</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
-<script src="store.js?v=xpfix"></script><script src="components.js?v=seg1"></script><script>Components.mount('top-nav-placeholder',Components.renderTopNav('games'));Components.mount('side-nav-placeholder',Components.renderSideNav('games'));Components.mount('mobile-nav-placeholder',Components.renderMobileNav('games'));const ITEMS=[['window','janela'],['teacher','professor'],['journey','viagem'],['cloud','nuvem'],['market','mercado'],['answer','resposta'],['morning','manhã'],['bridge','ponte'],['ticket','passagem'],['flower','flor'],['kitchen','cozinha'],['help','ajuda'],['street','rua'],['water','água']];let order=[],step=0,points=0,seconds=6,clock,locked=false;const shuffle=a=>[...a].sort(()=>Math.random()-.5);function render(){if(step>=10)return finish();locked=false;seconds=6;const correct=order[step];round.textContent=`${step+1} / 10`;score.textContent=`${points} XP`;word.textContent=correct[0];const opts=shuffle([correct,...shuffle(ITEMS.filter(x=>x!==correct)).slice(0,3)]);options.innerHTML=opts.map(x=>`<button class="option rounded-2xl bg-white/10 hover:bg-orange-500 border border-white/10 px-4 py-4 font-black" data-value="${x[1]}">${x[1]}</button>`).join('');options.querySelectorAll('button').forEach(b=>b.onclick=()=>choose(b,correct));feedback.textContent='';clearInterval(clock);tick();clock=setInterval(tick,100)}function tick(){seconds-=.1;timer.style.width=`${Math.max(0,seconds/6*100)}%`;if(seconds<=0){clearInterval(clock);choose(null,order[step])}}function choose(btn,correct){if(locked)return;locked=true;clearInterval(clock);const ok=btn&&btn.dataset.value===correct[1];if(ok){const earned=Math.max(4,Math.ceil(seconds));points+=earned;btn.classList.add('bg-emerald-500');feedback.textContent=`Rápido! +${earned} XP`;feedback.className='text-center font-black min-h-6 mt-5 text-emerald-300'}else{if(btn)btn.classList.add('bg-red-500');feedback.textContent=`A resposta era “${correct[1]}”.`;feedback.className='text-center font-black min-h-6 mt-5 text-red-300'}setTimeout(()=>{step++;render()},850)}function finish(){clearInterval(clock);if(window.Store){Store.addXP(points);Store.completeActivity('games');Store.activateStreak()}document.querySelector('section').innerHTML=`<div class="text-center py-8"><div class="text-7xl">⚡</div><h2 class="text-4xl font-black mt-4">Rodada concluída!</h2><p class="text-orange-300 text-2xl font-black mt-2">+${points} XP</p><div class="flex justify-center gap-3 mt-7"><button onclick="location.reload()" class="bg-white/10 px-6 py-3 rounded-full font-black">Jogar novamente</button><a href="5_Game_Pavilion_Forest_Edition.html" class="bg-orange-500 px-6 py-3 rounded-full font-black">Mais games</a></div></div>`}order=shuffle(ITEMS);render();</script><script src="celebration.js?v=cel3"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="components.js?v=seg1"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+const TRACK_META = {
+  starter:      { label: '🌱 Starter A1-A2',      color: 'text-emerald-300' },
+  intermediate: { label: '🚀 Intermediate B1-B2', color: 'text-sky-300' },
+  travel:       { label: '✈️ Viagem',             color: 'text-amber-300' },
+  work:         { label: '💼 Trabalho',           color: 'text-indigo-300' },
+  agro:         { label: '🚜 Agro English',       color: 'text-lime-300' },
+  gpstronic:    { label: '🛰️ GPS Tronic',         color: 'text-cyan-300' },
+  med:          { label: '🩺 Medical',            color: 'text-rose-300' },
+  advanced:     { label: '🔥 Avançado',           color: 'text-orange-300' }
+};
+
+// ── Banco de 160 Termos e Expressões Reais (8 Trilhas x 20 Itens) ────────────
+const VOCAB_BANK = [
+  // 1. STARTER A1-A2 (20)
+  { track: 'starter', emoji: '🌅', en: 'early in the morning', pt: 'cedo de manhã', exEn: 'I like to exercise early in the morning.', exPt: 'Eu gosto de me exercitar cedo de manhã.' },
+  { track: 'starter', emoji: '🛒', en: 'grocery store', pt: 'supermercado / mercearia', exEn: 'We need to stop by the grocery store after work.', exPt: 'Precisamos passar no supermercado depois do trabalho.' },
+  { track: 'starter', emoji: '🔑', en: 'spare key', pt: 'chave reserva', exEn: 'I keep a spare key inside my wallet.', exPt: 'Eu guardo uma chave reserva dentro da carteira.' },
+  { track: 'starter', emoji: '🌧️', en: 'heavy rain', pt: 'chuva forte', exEn: 'Drive carefully because of the heavy rain.', exPt: 'Dirija com cuidado por causa da chuva forte.' },
+  { track: 'starter', emoji: '🥐', en: 'fresh bread', pt: 'pão fresco', exEn: 'This bakery sells fresh bread every morning.', exPt: 'Esta padaria vende pão fresco todas as manhãs.' },
+  { track: 'starter', emoji: '🚌', en: 'bus stop', pt: 'ponto de ônibus', exEn: 'The bus stop is right across the street.', exPt: 'O ponto de ônibus fica bem do outro lado da rua.' },
+  { track: 'starter', emoji: '📱', en: 'low battery', pt: 'bateria fraca', exEn: 'My phone has a low battery right now.', exPt: 'Meu celular está com bateria fraca agora.' },
+  { track: 'starter', emoji: '🧹', en: 'daily routine', pt: 'rotina diária', exEn: 'Walking the dog is part of my daily routine.', exPt: 'Passear com o cachorro faz parte da minha rotina diária.' },
+  { track: 'starter', emoji: '🍽️', en: 'dinner table', pt: 'mesa de jantar', exEn: 'Please put the plates on the dinner table.', exPt: 'Por favor, coloque os pratos na mesa de jantar.' },
+  { track: 'starter', emoji: '🧥', en: 'warm jacket', pt: 'jaqueta quente', exEn: 'Bring a warm jacket because it gets cold at night.', exPt: 'Traga uma jaqueta quente porque esfria à noite.' },
+  { track: 'starter', emoji: '🏡', en: 'next-door neighbor', pt: 'vizinho do lado', exEn: 'Our next-door neighbor is very friendly.', exPt: 'Nosso vizinho do lado é muito simpático.' },
+  { track: 'starter', emoji: '🕒', en: 'free time', pt: 'tempo livre', exEn: 'What do you like to do in your free time?', exPt: 'O que você gosta de fazer no seu tempo livre?' },
+  { track: 'starter', emoji: '💳', en: 'in cash', pt: 'em dinheiro vivo', exEn: 'Do you want to pay by card or in cash?', exPt: 'Você quer pagar com cartão ou em dinheiro vivo?' },
+  { track: 'starter', emoji: '🧺', en: 'do the laundry', pt: 'lavar a roupa', exEn: 'I usually do the laundry on Saturday mornings.', exPt: 'Eu costumo lavar a roupa nas manhãs de sábado.' },
+  { track: 'starter', emoji: '🚰', en: 'sparkling water', pt: 'água com gás', exEn: 'Would you like still or sparkling water?', exPt: 'Você gostaria de água sem gás ou água com gás?' },
+  { track: 'starter', emoji: '🎟️', en: 'movie ticket', pt: 'ingresso de cinema', exEn: 'I bought two movie tickets online.', exPt: 'Comprei dois ingressos de cinema pela internet.' },
+  { track: 'starter', emoji: '🛏️', en: 'take a nap', pt: 'tirar um cochilo', exEn: 'He likes to take a short nap after lunch.', exPt: 'Ele gosta de tirar um cochilo rápido depois do almoço.' },
+  { track: 'starter', emoji: '🎁', en: 'birthday gift', pt: 'presente de aniversário', exEn: 'We chose a great birthday gift for our sister.', exPt: 'Escolhemos um ótimo presente de aniversário para nossa irmã.' },
+  { track: 'starter', emoji: '🐕', en: 'walk the dog', pt: 'passear com o cachorro', exEn: 'Can you walk the dog before dinner?', exPt: 'Você pode passear com o cachorro antes do jantar?' },
+  { track: 'starter', emoji: '📖', en: 'borrow a book', pt: 'pegar um livro emprestado', exEn: 'You can borrow a book from the city library.', exPt: 'Você pode pegar um livro emprestado na biblioteca da cidade.' },
+
+  // 2. INTERMEDIATE B1-B2 (20)
+  { track: 'intermediate', emoji: '🤝', en: 'keep in touch', pt: 'manter contato', exEn: 'Let’s keep in touch after the conference!', exPt: 'Vamos manter contato depois da conferência!' },
+  { track: 'intermediate', emoji: '🧠', en: 'change my mind', pt: 'mudar de ideia', exEn: 'I was going to stay home, but I changed my mind.', exPt: 'Eu ia ficar em casa, mas mudei de ideia.' },
+  { track: 'intermediate', emoji: '🚗', en: 'run out of gas', pt: 'ficar sem combustível', exEn: 'Stop at the next station so we don’t run out of gas.', exPt: 'Pare no próximo posto para não ficarmos sem combustível.' },
+  { track: 'intermediate', emoji: '⏳', en: 'sooner or later', pt: 'mais cedo ou mais tarde', exEn: 'Sooner or later, they will find a solution.', exPt: 'Mais cedo ou mais tarde, eles encontrarão uma solução.' },
+  { track: 'intermediate', emoji: '🔍', en: 'figure out', pt: 'descobrir / entender como resolver', exEn: 'Can you help me figure out how this app works?', exPt: 'Você pode me ajudar a entender como este aplicativo funciona?' },
+  { track: 'intermediate', emoji: '🌧️', en: 'call off', pt: 'cancelar', exEn: 'They had to call off the outdoor concert.', exPt: 'Eles tiveram que cancelar o show ao ar livre.' },
+  { track: 'intermediate', emoji: '📅', en: 'look forward to', pt: 'estar ansioso por / aguardar com expectativa', exEn: 'I look forward to hearing from you soon.', exPt: 'Aguardo com expectativa seu retorno em breve.' },
+  { track: 'intermediate', emoji: '🛠️', en: 'break down', pt: 'quebrar / parar de funcionar', exEn: 'The elevator broke down on the third floor.', exPt: 'O elevador quebrou no terceiro andar.' },
+  { track: 'intermediate', emoji: '💡', en: 'make sense', pt: 'fazer sentido', exEn: 'Your explanation makes total sense now.', exPt: 'Sua explicação faz total sentido agora.' },
+  { track: 'intermediate', emoji: '🏃', en: 'in a hurry', pt: 'com pressa', exEn: 'Sorry I can’t talk now—I am in a hurry.', exPt: 'Desculpe não poder falar agora — estou com pressa.' },
+  { track: 'intermediate', emoji: '📈', en: 'step by step', pt: 'passo a passo', exEn: 'Follow the instructions step by step.', exPt: 'Siga as instruções passo a passo.' },
+  { track: 'intermediate', emoji: '🎯', en: 'on purpose', pt: 'de propósito', exEn: 'He didn’t drop the cup on purpose; it was an accident.', exPt: 'Ele não derrubou o copo de propósito; foi um acidente.' },
+  { track: 'intermediate', emoji: '🧥', en: 'just in case', pt: 'por precaução / vai que', exEn: 'Bring an umbrella just in case it rains.', exPt: 'Traga um guarda-chuva por precaução, caso chova.' },
+  { track: 'intermediate', emoji: '🗣️', en: 'point of view', pt: 'ponto de vista', exEn: 'I respect your point of view on this topic.', exPt: 'Eu respeito o seu ponto de vista sobre este assunto.' },
+  { track: 'intermediate', emoji: '🕰️', en: 'from time to time', pt: 'de vez em quando', exEn: 'We still meet for coffee from time to time.', exPt: 'Ainda nos encontramos para um café de vez em quando.' },
+  { track: 'intermediate', emoji: '⚖️', en: 'pros and cons', pt: 'prós e contras', exEn: 'Let’s weigh the pros and cons before deciding.', exPt: 'Vamos pesar os prós e contras antes de decidir.' },
+  { track: 'intermediate', emoji: '🙌', en: 'count on someone', pt: 'contar com alguém', exEn: 'You can always count on me when you need help.', exPt: 'Você sempre pode contar comigo quando precisar de ajuda.' },
+  { track: 'intermediate', emoji: '🧹', en: 'get rid of', pt: 'livrar-se de / descartar', exEn: 'It is time to get rid of these old magazines.', exPt: 'Está na hora de se livrar destas revistas antigas.' },
+  { track: 'intermediate', emoji: '⏰', en: 'at the last minute', pt: 'na última hora', exEn: 'They changed the gate at the last minute.', exPt: 'Eles mudaram o portão na última hora.' },
+  { track: 'intermediate', emoji: '🌟', en: 'be worth it', pt: 'valer a pena', exEn: 'The hike was long, but the view was worth it.', exPt: 'A trilha foi longa, mas a vista valeu a pena.' },
+
+  // 3. TRAVEL / VIAGEM (20)
+  { track: 'travel', emoji: '🛂', en: 'boarding pass', pt: 'cartão de embarque', exEn: 'Please have your passport and boarding pass ready.', exPt: 'Por favor, tenha seu passaporte e cartão de embarque em mãos.' },
+  { track: 'travel', emoji: '🧳', en: 'carry-on luggage', pt: 'bagagem de mão', exEn: 'Put your carry-on luggage in the overhead bin.', exPt: 'Coloque sua bagagem de mão no compartimento superior.' },
+  { track: 'travel', emoji: '💺', en: 'aisle seat', pt: 'assento no corredor', exEn: 'Could I have an aisle seat instead of a window seat?', exPt: 'Eu poderia ficar em um assento no corredor em vez da janela?' },
+  { track: 'travel', emoji: 'ベルト', emoji: '🎒', en: 'baggage claim', pt: 'restituição de bagagens (esteiras)', exEn: 'Meet me at the baggage claim area on the ground floor.', exPt: 'Encontre-me na área de restituição de bagagens no térreo.' },
+  { track: 'travel', emoji: '🛫', en: 'connecting flight', pt: 'voo de conexão', exEn: 'We only have fifty minutes to catch our connecting flight.', exPt: 'Temos apenas cinquenta minutos para pegar nosso voo de conexão.' },
+  { track: 'travel', emoji: '📢', en: 'flight delayed', pt: 'voo atrasado', exEn: 'Our flight was delayed due to heavy fog.', exPt: 'Nosso voo atrasou devido ao nevoeiro forte.' },
+  { track: 'travel', emoji: '🏨', en: 'front desk', pt: 'recepção do hotel', exEn: 'Leave your room key at the front desk when checking out.', exPt: 'Deixe a chave do quarto na recepção ao fazer o check-out.' },
+  { track: 'travel', emoji: '🚆', en: 'round-trip ticket', pt: 'passagem de ida e volta', exEn: 'A round-trip ticket is cheaper than two one-way tickets.', exPt: 'Uma passagem de ida e volta é mais barata que duas só de ida.' },
+  { track: 'travel', emoji: '🚶', en: 'within walking distance', pt: 'a uma distância que dá para ir a pé', exEn: 'The beach is within walking distance of our hotel.', exPt: 'A praia fica a uma distância que dá para ir a pé do nosso hotel.' },
+  { track: 'travel', emoji: '🔌', en: 'power adapter', pt: 'adaptador de tomada', exEn: 'Can I borrow a power adapter at the reception?', exPt: 'Posso pegar um adaptador de tomada emprestado na recepção?' },
+  { track: 'travel', emoji: '💱', en: 'currency exchange', pt: 'câmbio de moeda', exEn: 'There is a currency exchange booth near exit B.', exPt: 'Há uma casa de câmbio perto da saída B.' },
+  { track: 'travel', emoji: '🛃', en: 'customs declaration', pt: 'declaração de alfândega', exEn: 'Fill out the customs declaration form before landing.', exPt: 'Preencha o formulário de declaração de alfândega antes do pouso.' },
+  { track: 'travel', emoji: '🍳', en: 'breakfast included', pt: 'café da manhã incluído', exEn: 'Our hotel booking comes with breakfast included.', exPt: 'Nossa reserva de hotel vem com café da manhã incluído.' },
+  { track: 'travel', emoji: '🗺️', en: 'guided tour', pt: 'passeio guiado', exEn: 'We booked a guided tour of the historic center.', exPt: 'Reservamos um passeio guiado pelo centro histórico.' },
+  { track: 'travel', emoji: '🚗', en: 'car rental', pt: 'aluguel de carros', exEn: 'Follow the signs to the car rental shuttle.', exPt: 'Siga as placas para o transporte de aluguel de carros.' },
+  { track: 'travel', emoji: '🧾', en: 'room rate', pt: 'tarifa / diária do quarto', exEn: 'What is the nightly room rate for a double room?', exPt: 'Qual é a diária por noite para um quarto duplo?' },
+  { track: 'travel', emoji: '🍽️', en: 'table for two', pt: 'mesa para dois', exEn: 'Good evening, do you have a table for two available?', exPt: 'Boa noite, vocês têm uma mesa para dois disponível?' },
+  { track: 'travel', emoji: '🥫', en: 'side dish', pt: 'acompanhamento (prato)', exEn: 'You can choose salad or fries as a side dish.', exPt: 'Você pode escolher salada ou batata frita como acompanhamento.' },
+  { track: 'travel', emoji: '🚇', en: 'subway station', pt: 'estação de metrô', exEn: 'Which subway station is closest to the museum?', exPt: 'Qual estação de metrô é mais próxima do museu?' },
+  { track: 'travel', emoji: '🕒', en: 'late check-out', pt: 'saída tardia do hotel', exEn: 'Could we request a late check-out until 2 PM?', exPt: 'Poderíamos solicitar um late check-out até as 14h?' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (20)
+  { track: 'work', emoji: '🎯', en: 'meet the deadline', pt: 'cumprir o prazo', exEn: 'We worked together to meet the Friday deadline.', exPt: 'Trabalhamos juntos para cumprir o prazo de sexta-feira.' },
+  { track: 'work', emoji: '💻', en: 'share my screen', pt: 'compartilhar minha tela', exEn: 'Let me share my screen to show the quarterly report.', exPt: 'Deixe-me compartilhar minha tela para mostrar o relatório trimestral.' },
+  { track: 'work', emoji: '🔇', en: 'you are on mute', pt: 'você está no mudo', exEn: 'We can’t hear you, Lucas—you are on mute!', exPt: 'Não conseguimos te ouvir, Lucas — você está no mudo!' },
+  { track: 'work', emoji: '📅', en: 'reschedule a meeting', pt: 'reagendar uma reunião', exEn: 'Could we reschedule our meeting to Wednesday morning?', exPt: 'Poderíamos reagendar nossa reunião para quarta-feira de manhã?' },
+  { track: 'work', emoji: '✉️', en: 'follow up with', pt: 'dar retorno / fazer acompanhamento com', exEn: 'I will follow up with the supplier this afternoon.', exPt: 'Vou fazer o acompanhamento com o fornecedor hoje à tarde.' },
+  { track: 'work', emoji: '📎', en: 'attached file', pt: 'arquivo em anexo', exEn: 'Please review the attached file before our call.', exPt: 'Por favor, revise o arquivo em anexo antes da nossa chamada.' },
+  { track: 'work', emoji: '📋', en: 'wrap up the meeting', pt: 'encerrar / concluir a reunião', exEn: 'Let’s wrap up the meeting by summarizing our next steps.', exPt: 'Vamos encerrar a reunião resumindo nossos próximos passos.' },
+  { track: 'work', emoji: '🏖️', en: 'out of the office', pt: 'ausente do escritório', exEn: 'I will be out of the office next Monday.', exPt: 'Estarei ausente do escritório na próxima segunda-feira.' },
+  { track: 'work', emoji: '📈', en: 'right on track', pt: 'dentro do cronograma / no caminho certo', exEn: 'The engineering team is right on track for the launch.', exPt: 'A equipe de engenharia está dentro do cronograma para o lançamento.' },
+  { track: 'work', emoji: '🏆', en: 'key strength', pt: 'ponto forte principal', exEn: 'Problem-solving is one of my key strengths.', exPt: 'Resolução de problemas é um dos meus principais pontos fortes.' },
+  { track: 'work', emoji: '🤝', en: 'team player', pt: 'pessoa que trabalha bem em equipe', exEn: 'We are looking for a collaborative team player.', exPt: 'Estamos procurando alguém colaborativo que trabalhe bem em equipe.' },
+  { track: 'work', emoji: '📊', en: 'quarterly results', pt: 'resultados trimestrais', exEn: 'The board presented the quarterly results today.', exPt: 'A diretoria apresentou os resultados trimestrais hoje.' },
+  { track: 'work', emoji: '🕒', en: 'push back the call', pt: 'adiar a chamada para mais tarde', exEn: 'Can we push back the call by thirty minutes?', exPt: 'Podemos adiar a chamada em trinta minutos?' },
+  { track: 'work', emoji: '🔍', en: 'look into an issue', pt: 'investigar um problema', exEn: 'Our IT support is looking into the login issue.', exPt: 'Nosso suporte de TI está investigando o problema de login.' },
+  { track: 'work', emoji: '💡', en: 'action items', pt: 'tarefas práticas / itens de ação', exEn: 'I will send an email with all the action items.', exPt: 'Enviarei um e-mail com todas as tarefas definidas.' },
+  { track: 'work', emoji: '🧾', en: 'budget approval', pt: 'aprovação de orçamento', exEn: 'We are waiting for final budget approval.', exPt: 'Estamos aguardando a aprovação final do orçamento.' },
+  { track: 'work', emoji: '🚀', en: 'career growth', pt: 'crescimento na carreira', exEn: 'This position offers great opportunities for career growth.', exPt: 'Esta vaga oferece ótimas oportunidades de crescimento na carreira.' },
+  { track: 'work', emoji: '🏠', en: 'remote work', pt: 'trabalho remoto', exEn: 'Our company offers a hybrid and remote work model.', exPt: 'Nossa empresa oferece modelo de trabalho híbrido e remoto.' },
+  { track: 'work', emoji: '📌', en: 'bring to your attention', pt: 'trazer ao seu conhecimento / atenção', exEn: 'I wanted to bring this delay to your attention.', exPt: 'Eu queria trazer este atraso ao seu conhecimento.' },
+  { track: 'work', emoji: '🤜🤛', en: 'on the same page', pt: 'alinhados / de comum acordo', exEn: 'Let’s make sure everyone is on the same page.', exPt: 'Vamos garantir que todos estejam alinhados.' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (20)
+  { track: 'agro', emoji: '🌱', en: 'soil moisture', pt: 'umidade do solo', exEn: 'Soil moisture is ideal for planting soybeans today.', exPt: 'A umidade do solo está ideal para plantar soja hoje.' },
+  { track: 'agro', emoji: '🌾', en: 'crop yield', pt: 'produtividade da lavoura', exEn: 'Good rainfall boosted our corn crop yield this season.', exPt: 'As boas chuvas aumentaram a produtividade da lavoura de milho nesta safra.' },
+  { track: 'agro', emoji: '🚜', en: 'combine harvester', pt: 'colheitadeira de grãos', exEn: 'The combine harvester is working in plot four.', exPt: 'A colheitadeira de grãos está trabalhando no talhão quatro.' },
+  { track: 'agro', emoji: '💦', en: 'sprayer nozzle', pt: 'bico de pulverização', exEn: 'Replace any worn or clogged sprayer nozzle.', exPt: 'Substitua qualquer bico de pulverização gasto ou entupido.' },
+  { track: 'agro', emoji: '🍃', en: 'chemical drift', pt: 'deriva de defensivo', exEn: 'Avoid spraying in high winds to prevent chemical drift.', exPt: 'Evite pulverizar com vento forte para impedir a deriva de defensivo.' },
+  { track: 'agro', emoji: '🌿', en: 'no-till farming', pt: 'plantio direto na palha', exEn: 'No-till farming protects the soil against erosion.', exPt: 'O plantio direto na palha protege o solo contra a erosão.' },
+  { track: 'agro', emoji: '🌻', en: 'crop rotation', pt: 'rotação de culturas', exEn: 'Crop rotation helps break the cycle of pests and diseases.', exPt: 'A rotação de culturas ajuda a quebrar o ciclo de pragas e doenças.' },
+  { track: 'agro', emoji: '🧪', en: 'agricultural lime', pt: 'calcário agrícola', exEn: 'We applied agricultural lime to reduce soil acidity.', exPt: 'Aplicamos calcário agrícola para reduzir a acidez do solo.' },
+  { track: 'agro', emoji: '🐛', en: 'field scouting', pt: 'monitoramento de pragas na lavoura', exEn: 'Field scouting revealed stink bugs in the soybean plot.', exPt: 'O monitoramento de lavoura revelou percevejos no talhão de soja.' },
+  { track: 'agro', emoji: '💧', en: 'center pivot irrigation', pt: 'irrigação por pivô central', exEn: 'The center pivot irrigation system runs all night.', exPt: 'O sistema de irrigação por pivô central funciona a noite toda.' },
+  { track: 'agro', emoji: '🌾', en: 'weed control', pt: 'controle de plantas daninhas', exEn: 'Early weed control is critical for high yields.', exPt: 'O controle precoce de plantas daninhas é crítico para altas produtividades.' },
+  { track: 'agro', emoji: '📏', en: 'planting depth', pt: 'profundidade de plantio', exEn: 'Check the planting depth across all row units.', exPt: 'Verifique a profundidade de plantio em todas as linhas.' },
+  { track: 'agro', emoji: '🏢', en: 'grain silo', pt: 'silo de grãos', exEn: 'Keep the aeration fans running inside the grain silo.', exPt: 'Mantenha os ventiladores de aeração ligados dentro do silo de grãos.' },
+  { track: 'agro', emoji: '🐄', en: 'rotational grazing', pt: 'pastejo rotacionado', exEn: 'Rotational grazing keeps the pasture healthy all year.', exPt: 'O pastejo rotacionado mantém a pastagem saudável o ano todo.' },
+  { track: 'agro', emoji: '🍂', en: 'cover crop', pt: 'cultura de cobertura / adubação verde', exEn: 'Brachiaria is widely used as a cover crop.', exPt: 'A braquiária é amplamente utilizada como cultura de cobertura.' },
+  { track: 'agro', emoji: '🚜', en: 'row spacing', pt: 'espaçamento entre linhas', exEn: 'We set the planter to fifty-centimeter row spacing.', exPt: 'Ajustamos a plantadeira para espaçamento entre linhas de 50 cm.' },
+  { track: 'agro', emoji: '🔥', en: 'burndown herbicide', pt: 'herbicida de dessecação', exEn: 'Apply the burndown herbicide two weeks before seeding.', exPt: 'Aplique o herbicida de dessecação duas semanas antes da semeadura.' },
+  { track: 'agro', emoji: '⚙️', en: 'power take-off (PTO)', pt: 'tomada de força (TDF)', exEn: 'Disengage the power take-off before inspecting the shaft.', exPt: 'Desacople a tomada de força antes de inspecionar o cardan.' },
+  { track: 'agro', emoji: '🌾', en: 'harvest loss', pt: 'perda na colheita', exEn: 'Adjust the rotor speed to minimize harvest loss.', exPt: 'Ajuste a rotação do rotor para minimizar a perda na colheita.' },
+  { track: 'agro', emoji: '🧫', en: 'seed treatment', pt: 'tratamento de sementes', exEn: 'Fungicide seed treatment protects young roots.', exPt: 'O tratamento de sementes com fungicida protege as raízes jovens.' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (20)
+  { track: 'gpstronic', emoji: '🔌', en: 'wiring harness', pt: 'chicote elétrico', exEn: 'Inspect the CAN bus wiring harness for damaged insulation.', exPt: 'Inspecione o chicote elétrico da rede CAN em busca de isolamento danificado.' },
+  { track: 'gpstronic', emoji: '⚡', en: 'terminating resistor', pt: 'resistor de terminação (120 ohms)', exEn: 'Each end of the CAN bus has a 120-ohm terminating resistor.', exPt: 'Cada extremidade da rede CAN possui um resistor de terminação de 120 ohms.' },
+  { track: 'gpstronic', emoji: '🛰️', en: 'RTK correction signal', pt: 'sinal de correção RTK', exEn: 'The tractor lost the RTK correction signal near the trees.', exPt: 'O trator perdeu o sinal de correção RTK perto das árvores.' },
+  { track: 'gpstronic', emoji: '🛞', en: 'steering angle sensor', pt: 'sensor de ângulo de direção', exEn: 'Calibrate the steering angle sensor on the front axle.', exPt: 'Calibre o sensor de ângulo de direção no eixo dianteiro.' },
+  { track: 'gpstronic', emoji: '🗺️', en: 'automatic section control', pt: 'corte automático de seção', exEn: 'Automatic section control prevents overlap at the headland.', exPt: 'O corte automático de seção evita sobreposição na cabeceira.' },
+  { track: 'gpstronic', emoji: '🌱', en: 'variable rate application', pt: 'aplicação em taxa variável', exEn: 'Load the prescription map for variable rate application.', exPt: 'Carregue o mapa de prescrição para aplicação em taxa variável.' },
+  { track: 'gpstronic', emoji: '🧭', en: 'AB guidance line', pt: 'linha guia AB do piloto automático', exEn: 'Record point A and point B to create an AB guidance line.', exPt: 'Grave o ponto A e o ponto B para criar uma linha guia AB.' },
+  { track: 'gpstronic', emoji: '💾', en: 'firmware update', pt: 'atualização de firmware', exEn: 'Keep the display powered on during the firmware update.', exPt: 'Mantenha o monitor alimentado durante a atualização de firmware.' },
+  { track: 'gpstronic', emoji: '🚜', en: 'terrain compensation', pt: 'compensação de inclinação de terreno', exEn: 'Terrain compensation corrects roll and pitch on slopes.', exPt: 'A compensação de terreno corrige a inclinação lateral e longitudinal em ladeiras.' },
+  { track: 'gpstronic', emoji: '💧', en: 'flowmeter calibration', pt: 'calibração do fluxômetro', exEn: 'Perform a catch test to verify the flowmeter calibration.', exPt: 'Realize um teste de coleta para verificar a calibração do fluxômetro.' },
+  { track: 'gpstronic', emoji: '📏', en: 'implement width', pt: 'largura de trabalho do implemento', exEn: 'Enter the exact implement width in the terminal setup.', exPt: 'Insira a largura exata do implemento na configuração do terminal.' },
+  { track: 'gpstronic', emoji: '🔋', en: 'voltage drop', pt: 'queda de tensão elétrica', exEn: 'A corroded battery terminal can cause a severe voltage drop.', exPt: 'Um polo de bateria oxidado pode causar uma forte queda de tensão elétrica.' },
+  { track: 'gpstronic', emoji: '📊', en: 'seed blockage alarm', pt: 'alarme de entupimento de semente', exEn: 'Clean the optical sensors if a false seed blockage alarm triggers.', exPt: 'Limpe os sensores ópticos se disparar um falso alarme de entupimento de semente.' },
+  { track: 'gpstronic', emoji: '🔄', en: 'overlap and skip', pt: 'sobreposição e falha de passada', exEn: 'Proper antenna offsets eliminate overlap and skip between passes.', exPt: 'Medidas corretas da antena eliminam sobreposição e falha entre passadas.' },
+  { track: 'gpstronic', emoji: '📡', en: 'GNSS receiver', pt: 'receptor GNSS / antena de satélite', exEn: 'Mount the GNSS receiver on the centerline of the cab roof.', exPt: 'Monte o receptor GNSS na linha central do teto da cabine.' },
+  { track: 'gpstronic', emoji: '🛠️', en: 'hydraulic steering valve', pt: 'válvula hidráulica do piloto automático', exEn: 'Check the coil resistance on the hydraulic steering valve.', exPt: 'Verifique a resistência da bobina na válvula hidráulica do piloto automático.' },
+  { track: 'gpstronic', emoji: '🖥️', en: 'ISOBUS virtual terminal', pt: 'terminal virtual ISOBUS (UT/VT)', exEn: 'The planter ECU loaded its screen on the ISOBUS virtual terminal.', exPt: 'A ECU da plantadeira carregou sua tela no terminal virtual ISOBUS.' },
+  { track: 'gpstronic', emoji: '🌾', en: 'yield monitor', pt: 'monitor de colheita / produtividade', exEn: 'Calibrate the moisture and weight sensors on the yield monitor.', exPt: 'Calibre os sensores de umidade e peso no monitor de colheita.' },
+  { track: 'gpstronic', emoji: '📐', en: 'field boundary', pt: 'bordadura / limite do talhão', exEn: 'Drive around the perimeter to record the field boundary.', exPt: 'Dirija ao redor do perímetro para gravar a bordadura do talhão.' },
+  { track: 'gpstronic', emoji: '⚠️', en: 'blown fuse', pt: 'fusível queimado', exEn: 'The display would not boot because of a blown 15-amp fuse.', exPt: 'O monitor não ligava por causa de um fusível de 15A queimado.' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (20)
+  { track: 'med', emoji: '🫁', en: 'shortness of breath', pt: 'falta de ar (dispneia)', exEn: 'Go to the emergency room if you experience shortness of breath.', exPt: 'Vá ao pronto-socorro se você sentir falta de ar.' },
+  { track: 'med', emoji: '🌡️', en: 'blood pressure cuff', pt: 'braçadeira / manguito de pressão arterial', exEn: 'I will wrap the blood pressure cuff around your left arm.', exPt: 'Vou colocar a braçadeira de pressão arterial no seu braço esquerdo.' },
+  { track: 'med', emoji: '💊', en: 'twice a day', pt: 'duas vezes ao dia', exEn: 'Take this antibiotic twice a day after meals.', exPt: 'Tome este antibiótico duas vezes ao dia após as refeições.' },
+  { track: 'med', emoji: '🦵', en: 'reduce the swelling', pt: 'reduzir o inchaço (edema)', exEn: 'Apply ice for fifteen minutes to reduce the swelling.', exPt: 'Aplique gelo por quinze minutos para reduzir o inchaço.' },
+  { track: 'med', emoji: '🩺', en: 'lower back pain', pt: 'dor na lombar', exEn: 'Stretching helps relieve chronic lower back pain.', exPt: 'Alongar ajuda a aliviar a dor crônica na lombar.' },
+  { track: 'med', emoji: '🩸', en: 'fasting blood test', pt: 'exame de sangue em jejum', exEn: 'Do not eat for twelve hours before your fasting blood test.', exPt: 'Não coma por doze horas antes do seu exame de sangue em jejum.' },
+  { track: 'med', emoji: '🏥', en: 'hospital discharge', pt: 'alta hospitalar', exEn: 'The physician signed your hospital discharge papers.', exPt: 'O médico assinou seus documentos de alta hospitalar.' },
+  { track: 'med', emoji: '💉', en: 'remove the stitches', pt: 'retirar os pontos cirúrgicos', exEn: 'Return to the clinic in ten days to remove the stitches.', exPt: 'Retorne à clínica em dez dias para retirar os pontos.' },
+  { track: 'med', emoji: '📋', en: 'allergic reaction', pt: 'reação alérgica', exEn: 'Have you ever had an allergic reaction to penicillin?', exPt: 'Você já teve alguma reação alérgica à penicilina?' },
+  { track: 'med', emoji: '🛍️', en: 'over-the-counter (OTC)', pt: 'vendido sem receita médica', exEn: 'You can buy this antihistamine over-the-counter.', exPt: 'Você pode comprar este antialérgico sem receita médica.' },
+  { track: 'med', emoji: '📅', en: 'follow-up appointment', pt: 'consulta de retorno', exEn: 'Schedule a follow-up appointment in two weeks.', exPt: 'Agende uma consulta de retorno em duas semanas.' },
+  { track: 'med', emoji: '🤕', en: 'dizziness and nausea', pt: 'tontura e enjoo', exEn: 'Sit down slowly if you feel dizziness and nausea.', exPt: 'Sente-se devagar se sentir tontura e enjoo.' },
+  { track: 'med', emoji: '🗣️', en: 'sore throat', pt: 'dor de garganta', exEn: 'Warm tea with honey helps soothe a sore throat.', exPt: 'Chá morno com mel ajuda a aliviar a dor de garganta.' },
+  { track: 'med', emoji: '🦴', en: 'sprained ankle', pt: 'tornozelo torcido / entorse', exEn: 'Keep your sprained ankle elevated on a pillow.', exPt: 'Mantenha seu tornozelo torcido elevado sobre um travesseiro.' },
+  { track: 'med', emoji: '💓', en: 'chest tightness', pt: 'aperto no peito', exEn: 'The patient reported chest tightness after climbing stairs.', exPt: 'O paciente relatou aperto no peito após subir escadas.' },
+  { track: 'med', emoji: '💧', en: 'keep fluids down', pt: 'manter líquidos no estômago (sem vomitar)', exEn: 'Take small sips of water to see if you can keep fluids down.', exPt: 'Tome pequenos goles de água para ver se consegue manter líquidos no estômago.' },
+  { track: 'med', emoji: '📄', en: 'side effects', pt: 'efeitos colaterais', exEn: 'Drowsiness is one of the common side effects.', exPt: 'Sonolência é um dos efeitos colaterais comuns.' },
+  { track: 'med', emoji: '🫁', en: 'take a deep breath', pt: 'respirar fundo', exEn: 'Please take a deep breath while I listen to your lungs.', exPt: 'Por favor, respire fundo enquanto ausculto seus pulmões.' },
+  { track: 'med', emoji: '🩹', en: 'wound dressing', pt: 'curativo de ferida', exEn: 'Change the sterile wound dressing once a day.', exPt: 'Troque o curativo estéril uma vez ao dia.' },
+  { track: 'med', emoji: '🧬', en: 'family medical history', pt: 'histórico médico familiar', exEn: 'Does hypertension run in your family medical history?', exPt: 'A hipertensão está presente no seu histórico médico familiar?' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (20)
+  { track: 'advanced', emoji: '🛠️', en: 'get the hang of it', pt: 'pegar o jeito da coisa', exEn: 'After two days of practice, I finally got the hang of it.', exPt: 'Depois de dois dias de prática, finalmente peguei o jeito.' },
+  { track: 'advanced', emoji: '🤝', en: 'meet halfway', pt: 'chegar a um meio-termo', exEn: 'Both sides agreed to meet halfway on the contract price.', exPt: 'Ambos os lados concordaram em chegar a um meio-termo no preço do contrato.' },
+  { track: 'advanced', emoji: '📌', en: 'once and for all', pt: 'de uma vez por todas', exEn: 'Let’s fix this synchronization bug once and for all.', exPt: 'Vamos corrigir esse bug de sincronização de uma vez por todas.' },
+  { track: 'advanced', emoji: '🌟', en: 'pay off in the long run', pt: 'compensar / valer a pena no longo prazo', exEn: 'Studying every day will pay off in the long run.', exPt: 'Estudar todos os dias vai valer a pena no longo prazo.' },
+  { track: 'advanced', emoji: '🕰️', en: 'it is high time', pt: 'já passou da hora', exEn: 'It is high time we upgraded our server infrastructure.', exPt: 'Já passou da hora de atualizarmos nossa infraestrutura de servidores.' },
+  { track: 'advanced', emoji: '🌧️', en: 'blessing in disguise', pt: 'um mal que veio para o bem', exEn: 'Missing that flight turned out to be a blessing in disguise.', exPt: 'Perder aquele voo acabou sendo um mal que veio para o bem.' },
+  { track: 'advanced', emoji: '🧩', en: 'there is no point in', pt: 'não adianta / não faz sentido', exEn: 'There is no point in arguing about something we cannot change.', exPt: 'Não adianta discutir sobre algo que não podemos mudar.' },
+  { track: 'advanced', emoji: '🔑', en: 'as far as I know', pt: 'até onde eu sei', exEn: 'As far as I know, the proposal has already been signed.', exPt: 'Até onde eu sei, a proposta já foi assinada.' },
+  { track: 'advanced', emoji: '⚡', en: 'off the top of my head', pt: 'de cabeça / sem consultar nada', exEn: 'Off the top of my head, I’d say the project cost around ten thousand.', exPt: 'De cabeça, eu diria que o projeto custou cerca de dez mil.' },
+  { track: 'advanced', emoji: '🎯', en: 'cut corners', pt: 'fazer de qualquer jeito para economizar tempo/custo', exEn: 'Never cut corners when it comes to safety standards.', exPt: 'Nunca pegue atalhos malfeitos quando se trata de normas de segurança.' },
+  { track: 'advanced', emoji: '🗣️', en: 'beat around the bush', pt: 'enrolar / ficar de rodeios', exEn: 'Stop beating around the bush and tell me what happened.', exPt: 'Pare de enrolar e me diga o que aconteceu.' },
+  { track: 'advanced', emoji: '🏋️', en: 'go the extra mile', pt: 'dar um passo além / esforçar-se acima do esperado', exEn: 'She always goes the extra mile to help her clients.', exPt: 'Ela sempre se esforça além do esperado para ajudar seus clientes.' },
+  { track: 'advanced', emoji: '🧊', en: 'break the ice', pt: 'quebrar o gelo', exEn: 'He told a funny travel story to break the ice at the meeting.', exPt: 'Ele contou uma história engraçada de viagem para quebrar o gelo na reunião.' },
+  { track: 'advanced', emoji: '⚖️', en: 'take it for granted', pt: 'dar como garantido / não valorizar', exEn: 'Don’t take good health for granted.', exPt: 'Não dê uma boa saúde como garantida.' },
+  { track: 'advanced', emoji: '🔍', en: 'read between the lines', pt: 'ler nas entrelinhas', exEn: 'If you read between the lines, they are asking for more time.', exPt: 'Se você ler nas entrelinhas, eles estão pedindo mais tempo.' },
+  { track: 'advanced', emoji: '🚀', en: 'second to none', pt: 'incomparável / o melhor de todos', exEn: 'Their customer service is truly second to none.', exPt: 'O atendimento ao cliente deles é realmente incomparável.' },
+  { track: 'advanced', emoji: '🧠', en: 'keep in mind', pt: 'ter em mente / lembrar-se de', exEn: 'Keep in mind that banks are closed on national holidays.', exPt: 'Tenha em mente que os bancos fecham em feriados nacionais.' },
+  { track: 'advanced', emoji: '⏳', en: 'call it a day', pt: 'encerrar o expediente por hoje', exEn: 'We’ve finished all the reports—let’s call it a day.', exPt: 'Terminamos todos os relatórios — vamos encerrar por hoje.' },
+  { track: 'advanced', emoji: '🌊', en: 'under the weather', pt: 'indisposto / sentindo-se meio adoentado', exEn: 'I am feeling a bit under the weather today.', exPt: 'Estou me sentindo um pouco indisposto hoje.' },
+  { track: 'advanced', emoji: '💡', en: 'on the spur of the moment', pt: 'no impulso do momento / de última hora', exEn: 'We booked the beach trip on the spur of the moment.', exPt: 'Reservamos a viagem para a praia no impulso do momento.' }
+];
+
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capyRapidTranslateMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+function saveMasteredItem(enText) {
+  try {
+    const set = getMasteredSet();
+    set.add(enText);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const count = getMasteredSet().size;
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${count}/${VOCAB_BANK.length}`;
+}
+
+// ── Estado da Partida ────────────────────────────────────────────────────────
+let selectedTrack = 'all';
+let directionMode = 'en2pt'; // 'en2pt' | 'pt2en' | 'mixed'
+let maxSeconds    = 10;      // 6 | 10 | 0 (untimed)
+let sessionLength = 15;      // 10 | 15 | 20
+
+let order         = [];
+let step          = 0;
+let points        = 0;
+let streak        = 0;
+let bestStreak    = 0;
+let correctCount  = 0;
+let hintsLeft     = 3;
+let seconds       = 10;
+let clock         = null;
+let locked        = false;
+let currentDir    = 'en2pt';
+let currentOpts   = [];
+let historyLog    = [];
+
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+
+// ── Elementos DOM ────────────────────────────────────────────────────────────
+const roundEl         = document.getElementById('round');
+const trackPillEl     = document.getElementById('track-pill');
+const scoreEl         = document.getElementById('score');
+const streakBadgeEl   = document.getElementById('streak-badge');
+const timerEl         = document.getElementById('timer');
+const timeLabelEl     = document.getElementById('time-label');
+const directionLabelEl= document.getElementById('direction-label');
+const itemEmojiEl     = document.getElementById('item-emoji');
+const promptSubEl     = document.getElementById('prompt-subtitle');
+const wordEl          = document.getElementById('word');
+const optionsEl       = document.getElementById('options');
+const feedbackEl      = document.getElementById('feedback');
+const contextBoxEl    = document.getElementById('context-box');
+const contextEnEl     = document.getElementById('context-en');
+const contextPtEl     = document.getElementById('context-pt');
+const hintsLeftEl     = document.getElementById('hints-left');
+const gameCardEl      = document.getElementById('game-card');
+const summaryCardEl   = document.getElementById('summary-card');
+
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakEnglish(text, rate = 0.92) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
+
+// ── Inicialização de Partida ─────────────────────────────────────────────────
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? VOCAB_BANK
+    : VOCAB_BANK.filter(item => item.track === selectedTrack);
+}
+
+function startSession() {
+  clearInterval(clock);
+  const pool = getFilteredPool();
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} termos disponíveis`;
+
+  order        = shuffle(pool).slice(0, Math.min(sessionLength, pool.length));
+  step         = 0;
+  points       = 0;
+  streak       = 0;
+  bestStreak   = 0;
+  correctCount = 0;
+  hintsLeft    = 3;
+  historyLog   = [];
+
+  summaryCardEl.classList.add('hidden');
+  gameCardEl.classList.remove('hidden');
+  updateMasteredBadge();
+  render();
+}
+
+function render() {
+  if (step >= order.length) return finish();
+  clearInterval(clock);
+  locked = false;
+
+  const current = order[step];
+  currentDir = directionMode === 'mixed'
+    ? (Math.random() < 0.5 ? 'en2pt' : 'pt2en')
+    : directionMode;
+
+  const meta = TRACK_META[current.track] || TRACK_META.starter;
+  roundEl.textContent = `${step + 1} / ${order.length}`;
+  trackPillEl.textContent = meta.label;
+  scoreEl.textContent = `${points} XP`;
+  streakBadgeEl.textContent = String(streak);
+  hintsLeftEl.textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+
+  itemEmojiEl.textContent = current.emoji || '⚡';
+  if (currentDir === 'en2pt') {
+    directionLabelEl.textContent = '🇺🇸 Inglês → 🇧🇷 Português';
+    promptSubEl.textContent = 'Escolha o significado em Português';
+    wordEl.textContent = current.en;
+  } else {
+    directionLabelEl.textContent = '🇧🇷 Português → 🇺🇸 Inglês';
+    promptSubEl.textContent = 'Escolha a expressão equivalente em Inglês';
+    wordEl.textContent = current.pt;
+  }
+
+  // Distratores preferencialmente da mesma trilha para nível realista
+  const sameTrackPool = VOCAB_BANK.filter(x => x.track === current.track && x.en !== current.en);
+  const fallbackPool  = VOCAB_BANK.filter(x => x.en !== current.en);
+  const distractorSource = sameTrackPool.length >= 3 ? sameTrackPool : fallbackPool;
+  const distractors = shuffle(distractorSource).slice(0, 3);
+  currentOpts = shuffle([current, ...distractors]);
+
+  optionsEl.innerHTML = currentOpts.map((item, idx) => {
+    const label = currentDir === 'en2pt' ? item.pt : item.en;
+    return `
+      <button type="button" class="option-btn rounded-2xl bg-white/10 border border-white/15 px-4 py-4 font-extrabold text-left flex items-center gap-3" data-idx="${idx}">
+        <span class="w-7 h-7 rounded-lg bg-white/10 text-orange-300 text-xs font-black flex items-center justify-center shrink-0">${idx + 1}</span>
+        <span class="text-sm sm:text-base leading-snug">${label}</span>
+      </button>
+    `;
+  }).join('');
+
+  optionsEl.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => choose(btn, current);
+  });
+
+  feedbackEl.textContent = '';
+  contextBoxEl.classList.add('hidden');
+
+  if (currentDir === 'en2pt') {
+    setTimeout(() => speakEnglish(current.en, 0.94), 120);
+  }
+
+  if (maxSeconds > 0) {
+    seconds = maxSeconds;
+    updateTimerUI();
+    clock = setInterval(tick, 100);
+  } else {
+    timerEl.style.width = '100%';
+    timeLabelEl.textContent = '🧘 Livre';
+  }
+}
+
+function updateTimerUI() {
+  const pct = Math.max(0, (seconds / maxSeconds) * 100);
+  timerEl.style.width = `${pct}%`;
+  timeLabelEl.textContent = `${Math.max(0, seconds).toFixed(1)}s`;
+}
+
+function tick() {
+  seconds = +(seconds - 0.1).toFixed(1);
+  updateTimerUI();
+  if (seconds <= 0) {
+    clearInterval(clock);
+    choose(null, order[step]);
+  }
+}
+
+function choose(btn, correct) {
+  if (locked) return;
+  locked = true;
+  clearInterval(clock);
+
+  const pickedItem = btn ? currentOpts[+btn.dataset.idx] : null;
+  const ok = pickedItem && pickedItem.en === correct.en;
+
+  optionsEl.querySelectorAll('button').forEach(b => {
+    b.disabled = true;
+    const item = currentOpts[+b.dataset.idx];
+    if (item.en === correct.en) {
+      b.classList.add('correct');
+    }
+  });
+
+  if (ok) {
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    correctCount++;
+    const speedBonus = maxSeconds > 0 ? Math.max(3, Math.ceil(seconds)) : 6;
+    const comboBonus = Math.min(8, (streak - 1) * 2);
+    const earned = 6 + speedBonus + comboBonus;
+    points += earned;
+    saveMasteredItem(correct.en);
+
+    feedbackEl.textContent = `⚡ Mandou bem! +${earned} XP ${streak >= 2 ? `(Combo ${streak}x 🔥)` : ''}`;
+    feedbackEl.className = 'text-center font-black text-base sm:text-lg text-emerald-300';
+  } else {
+    streak = 0;
+    if (btn) btn.classList.add('wrong');
+    const answerLabel = currentDir === 'en2pt' ? correct.pt : correct.en;
+    feedbackEl.textContent = btn
+      ? `Quase! A resposta correta é “${answerLabel}”.`
+      : `⏰ Tempo esgotado! A resposta era “${answerLabel}”.`;
+    feedbackEl.className = 'text-center font-black text-base sm:text-lg text-rose-300';
+  }
+
+  scoreEl.textContent = `${points} XP`;
+  streakBadgeEl.textContent = String(streak);
+
+  // Mostra frase de exemplo contextual
+  contextEnEl.textContent = correct.exEn;
+  contextPtEl.textContent = correct.exPt;
+  contextBoxEl.classList.remove('hidden');
+
+  if (currentDir === 'pt2en') {
+    speakEnglish(correct.en, 0.94);
+  }
+
+  historyLog.push({ item: correct, ok });
+
+  setTimeout(() => {
+    step++;
+    render();
+  }, ok ? 1550 : 2300);
+}
+
+// ── Dica 50/50 ───────────────────────────────────────────────────────────────
+function useHint() {
+  if (locked || hintsLeft <= 0) return;
+  const current = order[step];
+  const wrongBtns = [...optionsEl.querySelectorAll('button')].filter(b => {
+    const item = currentOpts[+b.dataset.idx];
+    return item.en !== current.en && !b.classList.contains('eliminated');
+  });
+  if (wrongBtns.length < 2) return;
+  shuffle(wrongBtns).slice(0, 2).forEach(b => {
+    b.classList.add('eliminated');
+    b.disabled = true;
+  });
+  hintsLeft--;
+  hintsLeftEl.textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+}
+
+// ── Finalização da Rodada ────────────────────────────────────────────────────
+function finish() {
+  clearInterval(clock);
+  if (window.Store) {
+    Store.addXP(points);
+    Store.completeActivity('games');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
+  }
+
+  gameCardEl.classList.add('hidden');
+  summaryCardEl.classList.remove('hidden');
+
+  const acc = order.length > 0 ? Math.round((correctCount / order.length) * 100) : 0;
+  document.getElementById('sum-xp').textContent = `+${points} XP`;
+  document.getElementById('sum-acc').textContent = `${acc}%`;
+  document.getElementById('sum-streak').textContent = `${bestStreak}x`;
+  document.getElementById('summary-subtitle').textContent =
+    `Você acertou ${correctCount} de ${order.length} expressões na trilha selecionada.`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = historyLog.map(({ item, ok }, i) => `
+    <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span>${ok ? '✅' : '❌'}</span>
+          <span class="font-extrabold text-sm text-white">${item.en}</span>
+          <span class="text-xs text-orange-300 font-bold">→ ${item.pt}</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-1">${item.exEn}</p>
+        <p class="text-[11px] text-slate-400">${item.exPt}</p>
+      </div>
+      <button type="button" data-review-idx="${i}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir expressão e exemplo">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const entry = historyLog[+btn.dataset.reviewIdx];
+      if (entry) speakEnglish(`${entry.item.en}. ${entry.item.exEn}`, 0.92);
+    };
+  });
+}
+
+// ── Eventos de Controle ──────────────────────────────────────────────────────
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#dir-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#dir-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    directionMode = btn.dataset.dir;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#speed-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#speed-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    maxSeconds = +btn.dataset.speed;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#len-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionLength = +btn.dataset.len;
+    startSession();
+  };
+});
+
+document.getElementById('btn-speak').onclick = () => {
+  const current = order[step];
+  if (current) speakEnglish(current.en, 0.92);
+};
+
+document.getElementById('btn-speak-example').onclick = () => {
+  const current = order[step];
+  if (current) speakEnglish(current.exEn, 0.92);
+};
+
+document.getElementById('btn-hint').onclick = useHint;
+document.getElementById('btn-play-again').onclick = startSession;
+
+window.addEventListener('keydown', e => {
+  if (gameCardEl.classList.contains('hidden')) return;
+  if (['1', '2', '3', '4'].includes(e.key)) {
+    const idx = +e.key - 1;
+    const btns = optionsEl.querySelectorAll('button');
+    if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+  } else if (e.key === 'r' || e.key === 'R') {
+    document.getElementById('btn-speak').click();
+  } else if (e.key === 'h' || e.key === 'H') {
+    useHint();
+  }
+});
+
+startSession();
+</script>
+<script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>
-</body></html>
+</body>
+</html>

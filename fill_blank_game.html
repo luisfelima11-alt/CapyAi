@@ -2,21 +2,32 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fill in the Blank — Capy Yara English</title>
+<title>Complete a Frase — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
-  darkMode:"class",
-  theme:{ extend:{
-    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
-    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
-    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
-  }}
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#001f3f",
+        "secondary": "#ec4899",
+        "tertiary": "#10b981",
+        "surface-container": "#002a54"
+      },
+      fontFamily: {
+        "headline": ["Plus Jakarta Sans", "sans-serif"],
+        "body": ["Be Vietnam Pro", "sans-serif"],
+        "label": ["Lexend", "sans-serif"]
+      },
+      borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }
+    }
+  }
 }
 </script>
 <style>
@@ -24,42 +35,75 @@ tailwind.config = {
 
   /* Blank underline */
   .blank-slot {
-    display: inline-block; min-width: 120px; border-bottom: 4px solid #ec4899;
+    display: inline-block; min-width: 125px; border-bottom: 4px solid #fb923c;
     font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900;
-    font-size: 1.6rem; color: #ec4899; text-align: center; padding: 0 8px;
-    margin: 0 6px; vertical-align: bottom; transition: all 0.2s;
+    font-size: 1.45rem; color: #fdba74; text-align: center; padding: 0 10px;
+    margin: 0 6px; vertical-align: baseline; transition: all 0.2s;
+    background: rgba(251, 146, 60, 0.12); border-radius: 10px 10px 0 0;
   }
-  .blank-slot.filled   { color: #fff; border-bottom-color: #10b981; }
-  .blank-slot.correct  { color: #10b981; border-bottom-color: #10b981; }
-  .blank-slot.wrong    { color: #ef4444; border-bottom-color: #ef4444; }
+  .blank-slot.filled  { color: #fff; border-bottom-color: #10b981; }
+  .blank-slot.correct { color: #34d399; border-bottom-color: #10b981; background: rgba(16, 185, 129, 0.18); }
+  .blank-slot.wrong   { color: #fb7185; border-bottom-color: #ef4444; background: rgba(239, 68, 68, 0.18); }
 
   /* Option chips */
   .option-chip {
-    display: inline-flex; align-items: center; justify-content: center;
-    padding: 12px 24px; border-radius: 999px; cursor: pointer;
-    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 1rem;
-    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 24px; border-radius: 18px; cursor: pointer;
+    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 1.02rem;
+    background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+    border: 2px solid rgba(255,255,255,0.18);
+    box-shadow: 0 5px 0 rgba(0,0,0,0.28);
     color: #fff; transition: all 0.15s; user-select: none;
   }
-  .option-chip:hover  { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
-  .option-chip:active { transform: scale(0.93); }
-  .option-chip.used   { opacity: 0.25; pointer-events: none; }
-  .option-chip.correct-chip { background: rgba(16,185,129,0.25); border-color: #10b981; }
-  .option-chip.wrong-chip   { background: rgba(239,68,68,0.2);   border-color: #ef4444; }
+  .option-chip:hover:not(.used) {
+    background: rgba(251, 146, 60, 0.22);
+    border-color: rgba(251, 146, 60, 0.65);
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 rgba(0,0,0,0.32);
+  }
+  .option-chip:active:not(.used) { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
+  .option-chip.used { pointer-events: none; }
+  .option-chip.correct-chip {
+    background: rgba(16, 185, 129, 0.3) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 4px 0 rgba(5, 150, 105, 0.5) !important;
+  }
+  .option-chip.wrong-chip {
+    background: rgba(239, 68, 68, 0.26) !important;
+    border-color: #ef4444 !important;
+  }
+  .option-chip.eliminated-chip {
+    opacity: 0.2 !important;
+    pointer-events: none !important;
+    text-decoration: line-through;
+  }
+  .option-chip:focus-visible, button:focus-visible {
+    outline: 3px solid #fb923c; outline-offset: 3px;
+  }
+
+  .track-pill { transition: all 0.15s ease; white-space: nowrap; }
+  .track-pill.active {
+    background: linear-gradient(135deg, #f97316, #ec4899);
+    color: #fff;
+    border-color: rgba(255,255,255,0.45);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.38);
+  }
 
   /* Animations */
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
   @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
-  @keyframes pop     { 0%{transform:scale(1)} 50%{transform:scale(1.07)} 100%{transform:scale(1)} }
   @keyframes spark   { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
 
-  .fade-up  { animation: fadeUp 0.4s ease both; }
-  .do-shake { animation: shake 0.4s ease; }
-  .do-pop   { animation: pop   0.3s ease; }
+  .fade-up  { animation: fadeUp 0.34s ease both; }
+  .do-shake { animation: shake 0.42s ease; }
   .spark    { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
 
-  #prog-fill { transition: width 0.5s ease; }
-  #sentence-area { line-height: 2.8; }
+  #prog-fill { transition: width 0.45s ease; }
+  #sentence-area { line-height: 2.2; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -69,64 +113,145 @@ tailwind.config = {
 <meta property="og:site_name" content="Capy Yara English"/>
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/fill_blank_game.html"/>
-<meta property="og:title" content="Fill in the Blank — Capy Yara English"/>
-<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:title" content="Complete a Frase — Capy Yara English"/>
+<meta property="og:description" content="Complete 130+ frases reais em inglês: dia a dia, tempos verbais, viagem, trabalho, Agro English, GPS Tronic e saúde!"/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Fill in the Blank — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:title" content="Complete a Frase — Capy Yara English"/>
+<meta name="twitter:description" content="Complete 130+ frases reais em inglês: dia a dia, tempos verbais, viagem, trabalho, Agro English, GPS Tronic e saúde!"/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
 <body class="bg-primary font-body text-white min-h-screen flex flex-col">
 
 <!-- Header -->
-<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
+<header class="flex flex-wrap items-center gap-3 px-4 sm:px-6 py-3.5 border-b border-white/10 bg-primary/95 backdrop-blur flex-shrink-0 z-20">
   <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all"
+          title="Voltar ao Pavilhão">
     <span class="material-symbols-outlined text-xl">arrow_back</span>
   </button>
-  <div>
-    <p class="font-label text-xs text-orange-400 uppercase tracking-widest font-bold">Complete a Frase</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Complete a frase! ✏️</h1>
+  <div class="min-w-0">
+    <p class="font-label text-[11px] text-orange-400 uppercase tracking-widest font-extrabold">Complete a Frase · 130+ Desafios</p>
+    <h1 class="font-headline font-extrabold text-white text-base sm:text-lg leading-tight truncate">Escolha a Palavra Exata! ✏️</h1>
   </div>
-  <div class="ml-auto flex items-center gap-4">
-    <div class="flex gap-1" id="hearts">
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="1">favorite</span>
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="2">favorite</span>
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="3">favorite</span>
+  <div class="ml-auto flex items-center gap-2.5 sm:gap-4">
+    <div id="combo-pill" class="hidden bg-amber-500/20 border border-amber-400/50 text-amber-300 rounded-full px-3 py-1 font-label font-extrabold text-xs">
+      🔥 <span id="combo-count">2</span>x Combo
     </div>
-    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
+    <div class="flex gap-0.5" id="hearts" title="Vidas restantes">
+      <span class="material-symbols-outlined text-red-400 text-2xl transition-all" style="font-variation-settings:'FILL' 1;" data-h="1">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl transition-all" style="font-variation-settings:'FILL' 1;" data-h="2">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl transition-all" style="font-variation-settings:'FILL' 1;" data-h="3">favorite</span>
+      <span class="material-symbols-outlined text-red-400 text-2xl transition-all" style="font-variation-settings:'FILL' 1;" data-h="4">favorite</span>
+    </div>
+    <div class="bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5 font-label font-extrabold text-sm">
       <span id="score-disp">0</span> pts
     </div>
   </div>
 </header>
 
-<div class="h-1.5 bg-white/10">
-  <div id="prog-fill" class="h-full bg-gradient-to-r from-orange-400 to-pink-500 w-0"></div>
+<div class="h-1.5 bg-white/10 flex-shrink-0">
+  <div id="prog-fill" class="h-full bg-gradient-to-r from-orange-400 via-amber-500 to-pink-500 w-0"></div>
 </div>
 
-<main class="flex-1 flex flex-col items-center justify-center px-6 py-10 gap-10">
+<!-- Barra de Trilhas & Modos -->
+<section class="bg-surface-container/80 border-b border-white/10 px-4 sm:px-6 py-3 flex-shrink-0">
+  <div class="max-w-4xl mx-auto flex flex-col gap-2.5">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="track-bar" role="tablist" aria-label="Escolher trilha">
+      <button type="button" data-track="all" class="track-pill active px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🎲 Todas (Mix)</button>
+      <button type="button" data-track="starter" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🌱 Dia a Dia (A1-A2)</button>
+      <button type="button" data-track="intermediate" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🚀 Tempos & Preposições (B1-B2)</button>
+      <button type="button" data-track="travel" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">✈️ Viagem & Hotel</button>
+      <button type="button" data-track="work" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">💼 Trabalho & Entrevista</button>
+      <button type="button" data-track="agro" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🌾 Agro English</button>
+      <button type="button" data-track="gpstronic" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🛰️ GPS Tronic</button>
+      <button type="button" data-track="med" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🩺 Medical English</button>
+      <button type="button" data-track="advanced" class="track-pill px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-bold text-xs">🔥 Desafio Fluência</button>
+    </div>
 
-  <!-- Question number -->
-  <p class="font-label text-orange-400 text-sm font-bold uppercase tracking-widest fade-up" id="q-label">Pergunta 1 de 10</p>
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex items-center gap-1.5 font-label font-bold text-slate-300">
+          <span>Modo:</span>
+          <select id="mode-select" class="bg-primary/90 border border-white/20 rounded-xl px-2.5 py-1 text-xs font-label font-bold text-white focus:outline-none cursor-pointer">
+            <option value="standard">🟢 Padrão (4 Opções)</option>
+            <option value="typing">⌨️ Digitação (Escrever a Palavra)</option>
+          </select>
+        </label>
 
-  <!-- Emoji hint -->
-  <div class="text-7xl fade-up" id="q-emoji">🌿</div>
+        <label class="flex items-center gap-1.5 font-label font-bold text-slate-300">
+          <span>Rodadas:</span>
+          <select id="length-select" class="bg-primary/90 border border-white/20 rounded-xl px-2.5 py-1 text-xs font-label font-bold text-white focus:outline-none cursor-pointer">
+            <option value="10">10 Frases</option>
+            <option value="15" selected>15 Frases</option>
+            <option value="20">20 Frases</option>
+          </select>
+        </label>
+      </div>
 
-  <!-- Sentence with blank -->
-  <div id="sentence-area"
-       class="w-full max-w-2xl bg-surface-container border border-white/10 rounded-2xl px-8 py-8 text-center text-2xl font-body text-white leading-relaxed shadow-xl fade-up">
+      <div class="text-slate-400 font-label font-semibold text-[11px]">
+        🏆 <span id="mastered-num">0</span>/130 frases dominadas
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Arena -->
+<main class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-6 gap-5 max-w-3xl mx-auto w-full">
+
+  <!-- Top Info & Emoji -->
+  <div class="w-full flex items-center justify-between flex-wrap gap-2">
+    <p class="font-label text-orange-400 text-xs sm:text-sm font-extrabold uppercase tracking-widest fade-up" id="q-label">Pergunta 1 de 15</p>
+    <div class="flex items-center gap-2">
+      <span id="track-badge" class="px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-200 font-label font-bold text-xs">🌱 Dia a Dia</span>
+      <button type="button" onclick="useHint()" id="hint-btn" class="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 font-label font-bold text-xs transition" title="Eliminar 2 opções ou revelar letra inicial">
+        💡 Dica (<span id="hints-left">3</span>)
+      </button>
+    </div>
   </div>
 
-  <!-- Feedback -->
-  <div id="feedback" class="hidden font-label font-bold text-base px-6 py-3 rounded-xl text-center border w-full max-w-2xl fade-up"></div>
+  <!-- Sentence Card -->
+  <div class="w-full bg-surface-container border border-white/10 rounded-3xl px-6 sm:px-8 py-7 text-center shadow-2xl fade-up space-y-4">
+    <div class="text-5xl sm:text-6xl" id="q-emoji">🌿</div>
+    <div id="sentence-area" class="text-xl sm:text-2xl font-headline font-extrabold text-white leading-relaxed"></div>
+    <p id="sentence-pt" class="text-sm sm:text-base font-body text-slate-300"></p>
 
-  <!-- Option chips -->
-  <div id="options-row" class="flex flex-wrap gap-3 justify-center max-w-2xl fade-up"></div>
+    <div class="flex items-center justify-center gap-2 pt-1">
+      <button type="button" onclick="speakFullSentence(0.94)" class="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-orange-200 font-label font-bold text-xs transition">
+        🔊 Ouvir Frase
+      </button>
+      <button type="button" onclick="speakFullSentence(0.72)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 font-label font-bold text-xs transition">
+        🐢 Devagar
+      </button>
+    </div>
+  </div>
+
+  <!-- Options or Typing Input -->
+  <div id="options-row" class="flex flex-wrap gap-3 justify-center w-full fade-up"></div>
+
+  <div id="typing-row" class="hidden w-full max-w-md flex items-center gap-2 fade-up">
+    <input id="typing-input" type="text" autocomplete="off" spellcheck="false"
+           class="flex-1 bg-white/10 border-2 border-orange-400/50 focus:border-orange-400 rounded-2xl px-4 py-3 text-white font-label font-extrabold text-base text-center focus:outline-none"
+           placeholder="Digite a palavra que falta…"/>
+    <button type="button" onclick="submitTypedAnswer()" class="bg-orange-500 hover:bg-orange-400 text-white font-label font-extrabold px-6 py-3 rounded-2xl shadow-lg transition">
+      Confirmar
+    </button>
+  </div>
+
+  <!-- Feedback & Explanation -->
+  <div id="feedback" class="hidden font-label text-left px-5 py-4 rounded-2xl border w-full fade-up space-y-2">
+    <div id="feedback-title" class="font-extrabold text-base"></div>
+    <div id="feedback-tip" class="font-body text-xs sm:text-sm text-slate-200 leading-relaxed"></div>
+    <div class="flex justify-end pt-1">
+      <button type="button" onclick="next()" id="next-btn" class="px-5 py-2 rounded-full bg-orange-500 hover:bg-orange-400 text-white font-label font-extrabold text-xs sm:text-sm shadow-lg transition">
+        Próxima Frase (Enter) →
+      </button>
+    </div>
+  </div>
 
 </main>
 
@@ -137,147 +262,520 @@ tailwind.config = {
 <script src="levelup-overlay.js?v=land1"></script>
 <script src="badge-toast.js?v=c52d7db"></script>
 <script>
-// ── Questions ─────────────────────────────────────────────────────────────────
+const TRACK_LABELS = {
+  all: '🎲 Mix Geral',
+  starter: '🌱 Dia a Dia (A1-A2)',
+  intermediate: '🚀 Tempos & Preposições (B1-B2)',
+  travel: '✈️ Viagem & Hotel',
+  work: '💼 Trabalho & Entrevista',
+  agro: '🌾 Agro English',
+  gpstronic: '🛰️ GPS Tronic',
+  med: '🩺 Medical English',
+  advanced: '🔥 Desafio Fluência',
+};
+
+// ── 130 Questões Reais Contextualizadas por Trilha ──────────────────────────
 const QUESTIONS = [
-  { sentence: 'The ___ is bright and warm.',         answer: 'sun',      emoji: '☀️', distractors: ['moon','star','rain'] },
-  { sentence: 'I have a pet ___.',                   answer: 'dog',      emoji: '🐶', distractors: ['bird','tree','cake'] },
-  { sentence: 'She climbed the big ___.',            answer: 'tree',     emoji: '🌳', distractors: ['fish','apple','star'] },
-  { sentence: 'We ate ___ for breakfast.',           answer: 'bread',    emoji: '🍞', distractors: ['rain','sun','bird'] },
-  { sentence: 'The ___ swims in the river.',         answer: 'fish',     emoji: '🐟', distractors: ['dog','flower','cake'] },
-  { sentence: 'I feel very ___ today!',              answer: 'happy',    emoji: '😊', distractors: ['rain','tree','bird'] },
-  { sentence: 'The sky is full of ___ at night.',    answer: 'stars',    emoji: '⭐', distractors: ['dogs','cakes','fish'] },
-  { sentence: 'A ___ flies high in the sky.',        answer: 'bird',     emoji: '🐦', distractors: ['fish','moon','bread'] },
-  { sentence: 'It began to ___ so we stayed inside.',answer: 'rain',     emoji: '🌧️', distractors: ['jump','sleep','sing'] },
-  { sentence: 'She picked a beautiful ___.',         answer: 'flower',   emoji: '🌸', distractors: ['river','star','dog'] },
-  { sentence: 'We counted to ___ in class.',         answer: 'ten',      emoji: '🔢', distractors: ['cat','bird','rain'] },
-  { sentence: 'The ___ hopped across the pond.',     answer: 'frog',     emoji: '🐸', distractors: ['cake','sun','star'] },
+  // ── 1. STARTER / DIA A DIA (18 questões) ──
+  { track: 'starter', emoji: '☕', sentence: 'I usually ___ a cup of coffee before work.', answer: 'drink', distractors: ['drinks', 'drinking', 'drank'], pt: 'Eu costumo tomar uma xícara de café antes do trabalho.', tip: 'Para rotina no presente com "I", usamos o verbo na forma simples: "I usually drink".' },
+  { track: 'starter', emoji: '🕖', sentence: 'What time ___ your brother wake up on Mondays?', answer: 'does', distractors: ['do', 'is', 'are'], pt: 'A que horas o seu irmão acorda às segundas-feiras?', tip: 'Para perguntas no presente com "he / she / your brother", o auxiliar é "does".' },
+  { track: 'starter', emoji: '🛒', sentence: 'We need to buy some fresh ___ at the bakery.', answer: 'bread', distractors: ['shoes', 'tickets', 'keys'], pt: 'Precisamos comprar pão fresco na padaria.', tip: '"Bakery" é padaria, onde compramos "fresh bread" (pão fresco).' },
+  { track: 'starter', emoji: '🌧️', sentence: 'Take an umbrella because it is ___ outside.', answer: 'raining', distractors: ['rain', 'rains', 'sunny'], pt: 'Leve um guarda-chuva porque está chovendo lá fora.', tip: 'Com "it is" para descrever o que acontece agora, usamos final -ing: "it is raining".' },
+  { track: 'starter', emoji: '🚌', sentence: 'She always goes to the office ___ bus.', answer: 'by', distractors: ['in', 'on', 'with'], pt: 'Ela sempre vai para o escritório de ônibus.', tip: 'Para meios de transporte em geral, usamos "by" (by bus, by car, by train).' },
+  { track: 'starter', emoji: '📱', sentence: 'Can you ___ me a text message when you arrive?', answer: 'send', distractors: ['sending', 'sends', 'sent'], pt: 'Você pode me mandar uma mensagem de texto quando chegar?', tip: 'Depois de "Can you", o verbo fica sempre na forma base: "Can you send".' },
+  { track: 'starter', emoji: '🧥', sentence: 'How ___ does this winter coat cost?', answer: 'much', distractors: ['many', 'long', 'often'], pt: 'Quanto custa este casaco de inverno?', tip: 'Para perguntar preços ("quanto custa"), usamos sempre "How much".' },
+  { track: 'starter', emoji: '🎧', sentence: 'I love listening ___ music while I exercise.', answer: 'to', distractors: ['at', 'for', 'in'], pt: 'Eu adoro ouvir música enquanto me exercito.', tip: 'O verbo "listen" vem sempre acompanhado de "to" (listen to music).' },
+  { track: 'starter', emoji: '🔑', sentence: 'I looked everywhere, but I can’t ___ my keys.', answer: 'find', distractors: ['found', 'finding', 'finds'], pt: 'Procurei em todo lugar, mas não consigo encontrar minhas chaves.', tip: 'Após "can’t", usamos o verbo na forma simples: "can’t find".' },
+  { track: 'starter', emoji: '🍕', sentence: '___ you like a slice of pizza for dinner?', answer: 'Would', distractors: ['Are', 'Does', 'Have'], pt: 'Você gostaria de uma fatia de pizza no jantar?', tip: '"Would you like...?" é a estrutura padrão para oferecer algo com educação.' },
+  { track: 'starter', emoji: '🐕', sentence: 'They ___ two friendly dogs in their backyard.', answer: 'have', distractors: ['has', 'having', 'are'], pt: 'Eles têm dois cachorros amigáveis no quintal.', tip: 'Com "They / We / I / You", usamos "have" (e "has" apenas para he/she/it).' },
+  { track: 'starter', emoji: '📚', sentence: 'My sister ___ English every Tuesday and Thursday.', answer: 'studies', distractors: ['study', 'studying', 'studied'], pt: 'Minha irmã estuda inglês toda terça e quinta-feira.', tip: 'Para rotina com "My sister (she)", "study" troca o -y por -ies: "studies".' },
+  { track: 'starter', emoji: '🎬', sentence: 'Let’s ___ a movie together tonight!', answer: 'watch', distractors: ['watching', 'watches', 'watched'], pt: 'Vamos assistir a um filme juntos hoje à noite!', tip: 'Depois de "Let’s", o verbo vem na forma simples: "Let’s watch".' },
+  { track: 'starter', emoji: '💧', sentence: 'Could you bring me a ___ of cold water, please?', answer: 'glass', distractors: ['plate', 'fork', 'slice'], pt: 'Você poderia me trazer um copo de água gelada, por favor?', tip: '"A glass of water" = um copo de água.' },
+  { track: 'starter', emoji: '🧹', sentence: 'We usually clean the house ___ Saturday mornings.', answer: 'on', distractors: ['in', 'at', 'to'], pt: 'Nós costumamos limpar a casa nas manhãs de sábado.', tip: 'Quando citamos o dia da semana (Saturday mornings), usamos a preposição "on".' },
+  { track: 'starter', emoji: '🎂', sentence: 'Where ___ you born?', answer: 'were', distractors: ['was', 'did', 'are'], pt: 'Onde você nasceu?', tip: 'Em inglês dizemos "Where were you born?" (e "I was born in...").' },
+  { track: 'starter', emoji: '🥪', sentence: 'He didn’t ___ breakfast before leaving home.', answer: 'eat', distractors: ['ate', 'eating', 'eats'], pt: 'Ele não tomou café da manhã antes de sair de casa.', tip: 'Quando usamos "didn’t" no passado, o verbo principal volta à forma base ("didn’t eat").' },
+  { track: 'starter', emoji: '🏥', sentence: 'My mother works as a nurse at the local ___.', answer: 'hospital', distractors: ['airport', 'bakery', 'library'], pt: 'Minha mãe trabalha como enfermeira no hospital local.', tip: 'Enfermeiros e médicos atuam no "hospital" ou "clinic".' },
+
+  // ── 2. INTERMEDIATE / TEMPOS VERBAIS & PREPOSIÇÕES (18 questões) ──
+  { track: 'intermediate', emoji: '⏳', sentence: 'We have lived in this city ___ 2021.', answer: 'since', distractors: ['for', 'from', 'in'], pt: 'Nós moramos nesta cidade desde 2021.', tip: 'Usamos "since" para o ponto exato de início no tempo (since 2021) e "for" para a duração (for five years).' },
+  { track: 'intermediate', emoji: '📞', sentence: 'What ___ you doing when the power went out?', answer: 'were', distractors: ['was', 'did', 'have'], pt: 'O que você estava fazendo quando a energia acabou?', tip: 'Com "you / we / they" no passado em andamento, usamos "were + verbo-ing".' },
+  { track: 'intermediate', emoji: '🗓️', sentence: 'The training session starts ___ Monday at 9 AM.', answer: 'on', distractors: ['in', 'at', 'by'], pt: 'A sessão de treinamento começa na segunda-feira às 9h.', tip: 'Regra de ouro: "on" para dias da semana (on Monday), "at" para horários (at 9 AM) e "in" para meses/anos.' },
+  { track: 'intermediate', emoji: '☔', sentence: 'If it ___ tomorrow, we will move the party indoors.', answer: 'rains', distractors: ['will rain', 'rained', 'raining'], pt: 'Se chover amanhã, passaremos a festa para dentro.', tip: 'Depois de "If" em condições reais do futuro, usamos o presente simples: "If it rains".' },
+  { track: 'intermediate', emoji: '🎸', sentence: 'I ___ to play soccer every day when I was a teenager.', answer: 'used', distractors: ['use', 'using', 'usually'], pt: 'Eu costumava jogar futebol todos os dias quando era adolescente.', tip: '"Used to + verbo" descreve um hábito do passado que não acontece mais.' },
+  { track: 'intermediate', emoji: '🪟', sentence: 'Would you mind ___ the door on your way out?', answer: 'closing', distractors: ['close', 'to close', 'closed'], pt: 'Você se importaria de fechar a porta ao sair?', tip: 'Após "Would you mind...", o verbo vem sempre com final -ing ("closing").' },
+  { track: 'intermediate', emoji: '📩', sentence: 'She hasn’t replied to my email ___.', answer: 'yet', distractors: ['already', 'still', 'ever'], pt: 'Ela ainda não respondeu ao meu e-mail.', tip: 'No final de frases negativas e perguntas sobre o que ainda não ocorreu, usamos "yet".' },
+  { track: 'intermediate', emoji: '🚗', sentence: 'Our car broke ___ on the way to the beach.', answer: 'down', distractors: ['up', 'out', 'off'], pt: 'Nosso carro quebrou no caminho para a praia.', tip: '"Break down" é a combinação verbal para máquinas ou veículos que param de funcionar.' },
+  { track: 'intermediate', emoji: '📅', sentence: 'I am really looking forward to ___ you next week!', answer: 'seeing', distractors: ['see', 'saw', 'seen'], pt: 'Estou muito ansioso para ver você na próxima semana!', tip: 'Em "looking forward to", o "to" é preposição e pede o verbo com -ing ("seeing").' },
+  { track: 'intermediate', emoji: '🎁', sentence: 'When we arrived at the station, the train had ___ left.', answer: 'already', distractors: ['yet', 'still', 'never'], pt: 'Quando chegamos à estação, o trem já tinha partido.', tip: '"Had already left" mostra que o trem saiu antes do momento em que chegamos.' },
+  { track: 'intermediate', emoji: '🤔', sentence: 'Have you ___ visited the south of Brazil?', answer: 'ever', distractors: ['never', 'yet', 'since'], pt: 'Você já visitou o sul do Brasil alguma vez?', tip: 'Em perguntas sobre experiências de vida ("alguma vez na vida"), usamos "Have you ever...?".' },
+  { track: 'intermediate', emoji: '🏋️', sentence: 'I have been ___ for this exam for three weeks.', answer: 'preparing', distractors: ['prepare', 'prepared', 'prepares'], pt: 'Eu venho me preparando para esta prova há três semanas.', tip: '"Have been preparing" destaca uma ação contínua que começou antes e segue até agora.' },
+  { track: 'intermediate', emoji: '💡', sentence: 'If I ___ more free time, I would learn Italian.', answer: 'had', distractors: ['have', 'will have', 'would have'], pt: 'Se eu tivesse mais tempo livre, aprenderia italiano.', tip: 'Para situações imaginárias no presente, usamos o passado após o "If": "If I had..., I would...".' },
+  { track: 'intermediate', emoji: '🕰️', sentence: 'We were just ___ to leave when the phone rang.', answer: 'about', distractors: ['ready', 'around', 'almost'], pt: 'Estávamos prestes a sair quando o telefone tocou.', tip: '"Be about to + verbo" significa estar prestes a fazer algo.' },
+  { track: 'intermediate', emoji: '🌆', sentence: 'My flight arrives ___ night, around eleven thirty.', answer: 'at', distractors: ['in', 'on', 'for'], pt: 'Meu voo chega à noite, por volta das onze e meia.', tip: 'Dizemos "in the morning / in the afternoon / in the evening", mas sempre "at night"!' },
+  { track: 'intermediate', emoji: '🗣️', sentence: 'You don’t need to shout—I can hear you ___.', answer: 'clearly', distractors: ['clear', 'clearing', 'cleared'], pt: 'Você não precisa gritar — consigo te ouvir claramente.', tip: 'Para descrever COMO ouvimos (modificando o verbo "hear"), usamos o advérbio com -ly: "clearly".' },
+  { track: 'intermediate', emoji: '🔑', sentence: 'Please remind me ___ call the dentist tomorrow.', answer: 'to', distractors: ['for', 'of', 'at'], pt: 'Por favor, me lembre de ligar para o dentista amanhã.', tip: '"Remind someone to do something" = lembrar alguém de fazer algo.' },
+  { track: 'intermediate', emoji: '🌧️', sentence: '___ it was raining heavily, they continued the match.', answer: 'Although', distractors: ['Despite', 'However', 'Because'], pt: 'Embora estivesse chovendo forte, eles continuaram a partida.', tip: 'Antes de uma frase completa com sujeito e verbo ("it was raining"), usamos "Although" (e não "Despite").' },
+
+  // ── 3. TRAVEL / VIAGEM, AEROPORTO & HOTEL (16 questões) ──
+  { track: 'travel', emoji: '🛫', sentence: 'Please proceed to boarding ___ number twelve.', answer: 'gate', distractors: ['door', 'seat', 'bag'], pt: 'Por favor, dirija-se ao portão de embarque número doze.', tip: '"Boarding gate" é o portão de embarque no aeroporto.' },
+  { track: 'travel', emoji: '🏨', sentence: 'I have a hotel ___ under the name Silva.', answer: 'reservation', distractors: ['receipt', 'passport', 'luggage'], pt: 'Eu tenho uma reserva de hotel em nome de Silva.', tip: '"Have a reservation under the name..." é a frase padrão no check-in do hotel.' },
+  { track: 'travel', emoji: '💺', sentence: 'Would you prefer a window seat or an ___ seat?', answer: 'aisle', distractors: ['island', 'alley', 'open'], pt: 'Você prefere assento na janela ou no corredor?', tip: '"Aisle seat" é o assento do corredor no avião ou trem.' },
+  { track: 'travel', emoji: '🧳', sentence: 'Where is the baggage ___ area for flights from Madrid?', answer: 'claim', distractors: ['check', 'carry', 'gate'], pt: 'Onde fica a área de restituição de bagagens para voos de Madri?', tip: '"Baggage claim" é o setor das esteiras onde retiramos as malas despachadas.' },
+  { track: 'travel', emoji: '🛂', sentence: 'May I see your passport and ___ pass, please?', answer: 'boarding', distractors: ['traveling', 'flying', 'walking'], pt: 'Posso ver seu passaporte e cartão de embarque, por favor?', tip: '"Boarding pass" é o cartão de embarque.' },
+  { track: 'travel', emoji: '🍽️', sentence: 'Excuse me, waiter, could we have the ___, please?', answer: 'bill', distractors: ['price', 'money', 'ticket'], pt: 'Com licença, garçom, você poderia nos trazer a conta, por favor?', tip: 'Em restaurantes, pedimos a conta dizendo "the bill" ou "the check".' },
+  { track: 'travel', emoji: '🚇', sentence: 'Is the museum within walking ___ from the hotel?', answer: 'distance', distractors: ['time', 'street', 'way'], pt: 'O museu fica a uma distância que dá para ir a pé do hotel?', tip: '"Within walking distance" significa perto o suficiente para ir a pé.' },
+  { track: 'travel', emoji: '📢', sentence: 'Our flight was ___ by two hours due to bad weather.', answer: 'delayed', distractors: ['missed', 'lost', 'forgot'], pt: 'Nosso voo atrasou duas horas devido ao mau tempo.', tip: '"Flight delayed" = voo atrasado; "flight canceled" = voo cancelado.' },
+  { track: 'travel', emoji: '🔌', sentence: 'Do you have a power ___ for European outlets?', answer: 'adapter', distractors: ['charger', 'battery', 'screen'], pt: 'Você tem um adaptador de tomada para o padrão europeu?', tip: '"Power adapter" é o adaptador de pinos de tomada.' },
+  { track: 'travel', emoji: '🚆', sentence: 'I’d like a ___ ticket to London—going today and returning Sunday.', answer: 'round-trip', distractors: ['one-way', 'single', 'direct'], pt: 'Eu gostaria de uma passagem de ida e volta para Londres — indo hoje e voltando domingo.', tip: '"Round-trip ticket" é a passagem de ida e volta.' },
+  { track: 'travel', emoji: '🥐', sentence: 'Is breakfast ___ in the room rate?', answer: 'included', distractors: ['inside', 'invited', 'involved'], pt: 'O café da manhã está incluído na diária do quarto?', tip: '"Included in the room rate" = incluído no valor da diária.' },
+  { track: 'travel', emoji: '🚕', sentence: 'How long does it ___ to get to the airport by taxi?', answer: 'take', distractors: ['last', 'spend', 'make'], pt: 'Quanto tempo leva para chegar ao aeroporto de táxi?', tip: 'Para perguntar quanto tempo dura um trajeto, usamos "How long does it take...?".' },
+  { track: 'travel', emoji: '🧳', sentence: 'You are allowed one ___ bag and one personal item on board.', answer: 'carry-on', distractors: ['checked', 'heavy', 'lost'], pt: 'Você tem direito a uma mala de mão e um item pessoal a bordo.', tip: '"Carry-on bag" é a bagagem de mão que vai na cabine.' },
+  { track: 'travel', emoji: '💳', sentence: 'Can I pay ___ credit card, or is it cash only?', answer: 'by', distractors: ['with', 'in', 'on'], pt: 'Posso pagar com cartão de crédito ou é só em dinheiro?', tip: 'Dizemos "pay by credit card" e "pay in cash"!' },
+  { track: 'travel', emoji: '🕘', sentence: 'What time is ___ at this hotel? Is it at 11 AM?', answer: 'check-out', distractors: ['boarding', 'departure', 'landing'], pt: 'A que horas é o check-out neste hotel? É às 11h?', tip: '"Check-in" é a entrada e "check-out" é o encerramento da hospedagem.' },
+  { track: 'travel', emoji: '🗺️', sentence: 'Go straight ahead and turn left ___ the traffic light.', answer: 'at', distractors: ['in', 'on', 'to'], pt: 'Siga em frente e vire à esquerda no semáforo.', tip: 'Para pontos de referência em direções, usamos "at" (turn left at the traffic light / at the corner).' },
+
+  // ── 4. WORK / TRABALHO, REUNIÕES & ENTREVISTA (16 questões) ──
+  { track: 'work', emoji: '💻', sentence: 'Let me ___ my screen so everyone can see the chart.', answer: 'share', distractors: ['show', 'send', 'open'], pt: 'Deixe-me compartilhar minha tela para que todos vejam o gráfico.', tip: '"Share my screen" é a expressão universal em videochamadas.' },
+  { track: 'work', emoji: '📅', sentence: 'Could we ___ our 2 PM meeting to tomorrow morning?', answer: 'reschedule', distractors: ['cancel', 'remember', 'repeat'], pt: 'Poderíamos reagendar nossa reunião das 14h para amanhã de manhã?', tip: '"Reschedule" significa remarcar/reagendar para uma nova data ou horário.' },
+  { track: 'work', emoji: '🎯', sentence: 'Our team is working hard to meet the Friday ___.', answer: 'deadline', distractors: ['schedule', 'calendar', 'finish'], pt: 'Nossa equipe está trabalhando duro para cumprir o prazo de sexta-feira.', tip: '"Meet the deadline" = entregar dentro do prazo limite.' },
+  { track: 'work', emoji: '🗣️', sentence: 'We can’t hear you, Ana—I think you are on ___.', answer: 'mute', distractors: ['silent', 'pause', 'quiet'], pt: 'Não conseguimos te ouvir, Ana — acho que você está no mudo.', tip: '"You are on mute" avisa que o microfone está silenciado na chamada.' },
+  { track: 'work', emoji: '🤝', sentence: 'I have over six years of ___ in software development.', answer: 'experience', distractors: ['practice', 'time', 'work'], pt: 'Tenho mais de seis anos de experiência em desenvolvimento de software.', tip: '"Years of experience in..." é a estrutura essencial para entrevistas.' },
+  { track: 'work', emoji: '✉️', sentence: 'I will ___ up with the client tomorrow to check their feedback.', answer: 'follow', distractors: ['look', 'call', 'catch'], pt: 'Farei o acompanhamento com o cliente amanhã para ver o retorno deles.', tip: '"Follow up with..." significa dar sequência ou cobrar retorno de um contato.' },
+  { track: 'work', emoji: '📌', sentence: 'Thank you for bringing this issue to my ___.', answer: 'attention', distractors: ['notice', 'mind', 'view'], pt: 'Obrigado por trazer essa questão para a minha atenção.', tip: '"Bring to my attention" agradece quem alertou sobre um problema importante.' },
+  { track: 'work', emoji: '📋', sentence: 'Before we ___ up the meeting, let’s review the next steps.', answer: 'wrap', distractors: ['close', 'finish', 'end'], pt: 'Antes de encerrarmos a reunião, vamos revisar os próximos passos.', tip: '"Wrap up a meeting" significa concluir/fechar uma reunião.' },
+  { track: 'work', emoji: '📈', sentence: 'Sales increased by fifteen percent in the third ___.', answer: 'quarter', distractors: ['season', 'period', 'part'], pt: 'As vendas aumentaram 15% no terceiro trimestre.', tip: '"Quarter" (Q1, Q2, Q3, Q4) é o trimestre fiscal ou comercial.' },
+  { track: 'work', emoji: '💡', sentence: 'I am responsible ___ coordinating the logistics team.', answer: 'for', distractors: ['of', 'to', 'with'], pt: 'Eu sou responsável por coordenar a equipe de logística.', tip: '"Responsible" pede sempre "for + verbo-ing" ("responsible for coordinating").' },
+  { track: 'work', emoji: '🛠️', sentence: 'Our engineers are looking ___ the server issue right now.', answer: 'into', distractors: ['for', 'after', 'at'], pt: 'Nossos engenheiros estão investigando o problema do servidor agora mesmo.', tip: '"Look into" significa investigar ou analisar a causa de um problema.' },
+  { track: 'work', emoji: '📊', sentence: 'Please find the updated budget spreadsheet ___ to this email.', answer: 'attached', distractors: ['joined', 'included', 'added'], pt: 'Segue a planilha de orçamento atualizada em anexo a este e-mail.', tip: '"Attached to this email" indica que o arquivo está em anexo.' },
+  { track: 'work', emoji: '🕒', sentence: 'Can we ___ the meeting back by thirty minutes?', answer: 'push', distractors: ['pull', 'take', 'put'], pt: 'Podemos adiar a reunião em trinta minutos?', tip: '"Push back a meeting" = adiar para um horário mais tarde.' },
+  { track: 'work', emoji: '🏆', sentence: 'What would you say is your greatest professional ___?', answer: 'strength', distractors: ['strong', 'power', 'force'], pt: 'Qual você diria que é o seu maior ponto forte profissional?', tip: '"Strength" (substantivo) = ponto forte; "strong" (adjetivo) = forte.' },
+  { track: 'work', emoji: '🏖️', sentence: 'I will be out of the ___ on Thursday and Friday.', answer: 'office', distractors: ['work', 'job', 'room'], pt: 'Estarei fora do escritório na quinta e na sexta-feira.', tip: '"Out of the office" (OOO) é a expressão padrão de ausência profissional.' },
+  { track: 'work', emoji: '🙌', sentence: 'We are right on ___ to launch the product in November.', answer: 'track', distractors: ['line', 'way', 'road'], pt: 'Estamos bem dentro do cronograma para lançar o produto em novembro.', tip: '"On track" significa dentro do planejado/cronograma.' },
+
+  // ── 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (16 questões) ──
+  { track: 'agro', emoji: '🌱', sentence: 'Soil ___ is ideal for planting soybeans this week.', answer: 'moisture', distractors: ['water', 'rain', 'wet'], pt: 'A umidade do solo está ideal para plantar soja nesta semana.', tip: '"Soil moisture" é o termo técnico para umidade do solo.' },
+  { track: 'agro', emoji: '🚜', sentence: 'Check the sprayer ___ to make sure none of them are clogged.', answer: 'nozzles', distractors: ['wheels', 'tires', 'doors'], pt: 'Verifique os bicos do pulverizador para garantir que nenhum esteja entupido.', tip: '"Sprayer nozzles" são os bicos/pontas de pulverização.' },
+  { track: 'agro', emoji: '🌾', sentence: 'Our average soybean ___ reached sixty-eight bags per hectare.', answer: 'yield', distractors: ['result', 'size', 'weight'], pt: 'Nossa produtividade média de soja atingiu 68 sacas por hectare.', tip: '"Yield" na agronomia significa produtividade/rendimento colhido.' },
+  { track: 'agro', emoji: '🍃', sentence: 'Spraying in high winds can cause chemical ___ to nearby crops.', answer: 'drift', distractors: ['drop', 'flow', 'cloud'], pt: 'Pulverizar com vento forte pode causar deriva de defensivos para lavouras vizinhas.', tip: '"Chemical drift" é a deriva de gotas levadas pelo vento.' },
+  { track: 'agro', emoji: '🧪', sentence: 'We applied agricultural ___ to correct the soil acidity.', answer: 'lime', distractors: ['salt', 'sand', 'seed'], pt: 'Aplicamos calcário agrícola para corrigir a acidez do solo.', tip: '"Agricultural lime" (ou limestone) é o calcário agrícola.' },
+  { track: 'agro', emoji: '📦', sentence: 'Turn on the aeration fans inside the grain ___ to cool the corn.', answer: 'silo', distractors: ['barn', 'field', 'cabin'], pt: 'Ligue os ventiladores de aeração dentro do silo de grãos para resfriar o milho.', tip: '"Grain silo" (ou grain bin) é o silo de armazenamento de grãos.' },
+  { track: 'agro', emoji: '🐛', sentence: 'The agronomist found stink bugs during field ___ this morning.', answer: 'scouting', distractors: ['looking', 'watching', 'walking'], pt: 'O agrônomo encontrou percevejos durante o monitoramento de lavoura hoje de manhã.', tip: '"Field scouting" é a vistoria/monitoramento de pragas no talhão.' },
+  { track: 'agro', emoji: '🌻', sentence: 'Crop ___ helps prevent soil exhaustion and reduces pests.', answer: 'rotation', distractors: ['change', 'turn', 'movement'], pt: 'A rotação de culturas ajuda a evitar o esgotamento do solo e reduz pragas.', tip: '"Crop rotation" é a rotação de culturas entre safras.' },
+  { track: 'agro', emoji: '🔧', sentence: 'The combine ___ is ready to start cutting the wheat plot.', answer: 'harvester', distractors: ['planter', 'sprayer', 'spreader'], pt: 'A colheitadeira está pronta para começar a colher o talhão de trigo.', tip: '"Combine harvester" é a colheitadeira de grãos.' },
+  { track: 'agro', emoji: '💧', sentence: 'The center ___ irrigation system covers one hundred hectares.', answer: 'pivot', distractors: ['circle', 'wheel', 'tower'], pt: 'O sistema de irrigação por pivô central cobre cem hectares.', tip: '"Center pivot irrigation" = irrigação por pivô central.' },
+  { track: 'agro', emoji: '🌿', sentence: 'We need a burndown herbicide to control ___ before planting.', answer: 'weeds', distractors: ['leaves', 'roots', 'trees'], pt: 'Precisamos de um herbicida dessecante para controlar as plantas daninhas antes do plantio.', tip: '"Weeds" são plantas daninhas / invasoras.' },
+  { track: 'agro', emoji: '🚜', sentence: 'Adjust the planter ___ so the seeds are placed four centimeters deep.', answer: 'depth', distractors: ['width', 'length', 'height'], pt: 'Ajuste a profundidade da plantadeira para que as sementes fiquem a 4 cm.', tip: '"Depth" = profundidade; "width" = largura; "height" = altura.' },
+  { track: 'agro', emoji: '🐄', sentence: 'Rotational grazing improves ___ quality for the beef cattle.', answer: 'pasture', distractors: ['harvest', 'silo', 'orchard'], pt: 'O pastejo rotacionado melhora a qualidade da pastagem para o gado de corte.', tip: '"Pasture" = pastagem; "rotational grazing" = pastejo rotacionado.' },
+  { track: 'agro', emoji: '⛽', sentence: 'Clean the tractor air ___ every day when working in dusty fields.', answer: 'filter', distractors: ['tank', 'pump', 'belt'], pt: 'Limpe o filtro de ar do trator todos os dias ao trabalhar em talhões com poeira.', tip: '"Air filter" é o filtro de ar do motor.' },
+  { track: 'agro', emoji: '🌾', sentence: 'No-till farming keeps straw cover on the ___ to retain moisture.', answer: 'soil', distractors: ['roof', 'road', 'barn'], pt: 'O plantio direto mantém a cobertura de palha sobre o solo para reter umidade.', tip: '"No-till farming" = plantio direto na palha sobre o solo ("soil").' },
+  { track: 'agro', emoji: '🚛', sentence: 'The truck is waiting at the scale to weigh the soybean ___.', answer: 'load', distractors: ['bag', 'seed', 'leaf'], pt: 'O caminhão está aguardando na balança para pesar a carga de soja.', tip: '"Load" refere-se à carga transportada pelo caminhão.' },
+
+  // ── 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & OFICINA (16 questões) ──
+  { track: 'gpstronic', emoji: '🛰️', sentence: 'The RTK correction signal is locked with two-centimeter ___.', answer: 'accuracy', distractors: ['velocity', 'distance', 'frequency'], pt: 'O sinal de correção RTK está travado com precisão de dois centímetros.', tip: '"Accuracy" é a precisão de posicionamento do receptor GNSS.' },
+  { track: 'gpstronic', emoji: '🔌', sentence: 'Inspect the CAN bus wiring ___ for any pinched or broken wires.', answer: 'harness', distractors: ['screen', 'antenna', 'bracket'], pt: 'Inspecione o chicote elétrico da rede CAN para ver se há fios prensados ou rompidos.', tip: '"Wiring harness" é o termo técnico para chicote elétrico.' },
+  { track: 'gpstronic', emoji: '⚡', sentence: 'A healthy CAN bus measures sixty ohms across the terminating ___.', answer: 'resistors', distractors: ['capacitors', 'batteries', 'relays'], pt: 'Uma rede CAN saudável mede 60 ohms nos resistores de terminação.', tip: 'Dois "terminating resistors" de 120 ohms fecham as extremidades da rede CAN.' },
+  { track: 'gpstronic', emoji: '🗺️', sentence: 'Automatic section control prevents ___ at the headland.', answer: 'overlap', distractors: ['voltage', 'current', 'firmware'], pt: 'O controle automático de seção evita sobreposição na cabeceira.', tip: '"Overlap" = sobreposição de aplicação; "skip / gap" = falha sem aplicar.' },
+  { track: 'gpstronic', emoji: '🛞', sentence: 'We need to calibrate the steering angle ___ on the front axle.', answer: 'sensor', distractors: ['monitor', 'modem', 'fuse'], pt: 'Precisamos calibrar o sensor de ângulo de direção no eixo dianteiro.', tip: '"Steering angle sensor" (ou WAS - Wheel Angle Sensor) lê a posição das rodas.' },
+  { track: 'gpstronic', emoji: '💾', sentence: 'Format the USB drive to FAT32 before updating the terminal ___.', answer: 'firmware', distractors: ['hardware', 'harness', 'hydraulic'], pt: 'Formate o pen drive em FAT32 antes de atualizar o firmware do terminal.', tip: '"Firmware" é o software interno embarcado nos módulos e monitores.' },
+  { track: 'gpstronic', emoji: '🌱', sentence: 'Variable ___ application adjusts fertilizer dosage across the field.', answer: 'rate', distractors: ['line', 'speed', 'pass'], pt: 'A aplicação em taxa variável ajusta a dosagem de fertilizante pelo talhão.', tip: '"Variable rate application" (VRA) = aplicação em taxa variável.' },
+  { track: 'gpstronic', emoji: '🚜', sentence: 'The terrain compensation module corrects vehicle roll and ___.', answer: 'pitch', distractors: ['width', 'depth', 'flow'], pt: 'O módulo de compensação de terreno corrige a inclinação lateral e longitudinal.', tip: '"Roll" (inclinação lateral), "pitch" (inclinação longitudinal) e "yaw" (guinada).' },
+  { track: 'gpstronic', emoji: '🧭', sentence: 'Set point A and point B to create a straight ___ line.', answer: 'guidance', distractors: ['pressure', 'boundary', 'voltage'], pt: 'Defina o ponto A e o ponto B para criar uma linha guia reta.', tip: '"AB guidance line" é a linha guia de orientação do piloto automático.' },
+  { track: 'gpstronic', emoji: '🛠️', sentence: 'One of the metal pins was pushed back inside the Deutsch ___.', answer: 'connector', distractors: ['display', 'satellite', 'valve'], pt: 'Um dos pinos metálicos estava recuado dentro do conector Deutsch.', tip: '"Deutsch connector" é o conector vedado padrão em máquinas agrícolas.' },
+  { track: 'gpstronic', emoji: '💧', sentence: 'Enter the flowmeter ___ number after completing the catch test.', answer: 'calibration', distractors: ['navigation', 'connection', 'direction'], pt: 'Insira a constante de calibração do fluxômetro após concluir o teste de coleta.', tip: '"Calibration number" ajusta os pulsos por litro do fluxômetro.' },
+  { track: 'gpstronic', emoji: '📡', sentence: 'Mount the GPS ___ on the center of the cab roof with a clear sky view.', answer: 'antenna', distractors: ['pedal', 'switch', 'relay'], pt: 'Monte a antena GPS no centro do teto da cabine com visão livre do céu.', tip: 'A "GPS antenna / receiver" vai no topo da cabine sem obstruções.' },
+  { track: 'gpstronic', emoji: '📏', sentence: 'If there is a gap between passes, verify the implement ___ in the setup.', answer: 'width', distractors: ['weight', 'color', 'brand'], pt: 'Se houver falha entre as passadas, verifique a largura do implemento na configuração.', tip: '"Implement width" é a largura útil de trabalho do implemento.' },
+  { track: 'gpstronic', emoji: '🔋', sentence: 'Low battery ___ during engine cranking can cause the monitor to reboot.', answer: 'voltage', distractors: ['resistance', 'frequency', 'coverage'], pt: 'A baixa tensão da bateria durante a partida do motor pode reiniciar o monitor.', tip: '"Voltage drop" = queda de tensão elétrica.' },
+  { track: 'gpstronic', emoji: '📊', sentence: 'Dust inside the optical seed tube sensor can trigger a blockage ___.', answer: 'alarm', distractors: ['map', 'cable', 'fuse'], pt: 'Poeira no sensor óptico do tubo de semente pode disparar um alarme de entupimento.', tip: '"Blockage alarm" alerta sobre linha de plantio entupida ou sem fluxo.' },
+  { track: 'gpstronic', emoji: '⚠️', sentence: 'Check the 15-amp ___ in the power harness if the display won’t turn on.', answer: 'fuse', distractors: ['screen', 'map', 'wheel'], pt: 'Verifique o fusível de 15 ampères no chicote de força se o monitor não ligar.', tip: '"Fuse" é o fusível de proteção elétrica do chicote.' },
+
+  // ── 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (15 questões) ──
+  { track: 'med', emoji: '🩺', sentence: 'How long have you been experiencing this lower back ___?', answer: 'pain', distractors: ['cough', 'fever', 'rash'], pt: 'Há quanto tempo você está sentindo essa dor na lombar?', tip: '"Lower back pain" é dor na região lombar.' },
+  { track: 'med', emoji: '🫁', sentence: 'Please take a deep ___ and hold it for three seconds.', answer: 'breath', distractors: ['breathe', 'breathing', 'chest'], pt: 'Por favor, respire fundo e segure o ar por três segundos.', tip: '"Breath" (sem e no final) é o substantivo ("take a deep breath"); "breathe" é o verbo.' },
+  { track: 'med', emoji: '💊', sentence: 'Take one tablet ___ a day, every twelve hours after meals.', answer: 'twice', distractors: ['two', 'double', 'second'], pt: 'Tome um comprimido duas vezes ao dia, a cada doze horas após as refeições.', tip: '"Once a day" = 1x ao dia; "twice a day" = 2x ao dia; "three times a day" = 3x ao dia.' },
+  { track: 'med', emoji: '📋', sentence: 'Are you ___ to penicillin or any other medication?', answer: 'allergic', distractors: ['allergy', 'sensitive', 'afraid'], pt: 'Você é alérgico a penicilina ou a algum outro medicamento?', tip: '"Allergic to..." (adjetivo) = alérgico a; "allergy" (substantivo) = alergia.' },
+  { track: 'med', emoji: '🌡️', sentence: 'Let me wrap this cuff around your arm to check your blood ___.', answer: 'pressure', distractors: ['pulse', 'sugar', 'level'], pt: 'Deixe-me colocar esta braçadeira no seu braço para medir sua pressão arterial.', tip: '"Blood pressure" é pressão arterial; "cuff" é o manguito/braçadeira.' },
+  { track: 'med', emoji: '🦵', sentence: 'Put an ice pack on your ankle to help reduce the ___.', answer: 'swelling', distractors: ['bleeding', 'coughing', 'sneezing'], pt: 'Coloque uma bolsa de gelo no tornozelo para ajudar a reduzir o inchaço.', tip: '"Swelling" é o termo usado com pacientes para edema/inchaço.' },
+  { track: 'med', emoji: '🩸', sentence: 'You need to ___ for twelve hours before the blood glucose test.', answer: 'fast', distractors: ['rest', 'sleep', 'wait'], pt: 'Você precisa ficar em jejum por doze horas antes do exame de glicemia.', tip: 'Como verbo na medicina, "to fast" significa fazer jejum.' },
+  { track: 'med', emoji: '🤕', sentence: 'The patient complained of a severe ___ and sensitivity to light.', answer: 'headache', distractors: ['stomachache', 'toothache', 'earache'], pt: 'O paciente queixou-se de forte dor de cabeça e sensibilidade à luz.', tip: '"Headache" = dor de cabeça / cefaleia.' },
+  { track: 'med', emoji: '🏥', sentence: 'The doctor will ___ you from the hospital tomorrow morning.', answer: 'discharge', distractors: ['release', 'remove', 'deliver'], pt: 'O médico dará sua alta do hospital amanhã de manhã.', tip: '"Discharge a patient" é o termo clínico para dar alta hospitalar.' },
+  { track: 'med', emoji: '💉', sentence: 'Come back in ten days to have your ___ removed.', answer: 'stitches', distractors: ['tablets', 'drops', 'bandages'], pt: 'Volte em dez dias para retirar os pontos.', tip: '"Stitches" (ou sutures) são os pontos cirúrgicos.' },
+  { track: 'med', emoji: '🤢', sentence: 'Has the child been able to keep ___ down today?', answer: 'fluids', distractors: ['air', 'fever', 'sleep'], pt: 'A criança tem conseguido manter líquidos no estômago hoje?', tip: '"Keep fluids down" significa beber líquidos sem vomitar.' },
+  { track: 'med', emoji: '🕒', sentence: 'Return to the emergency room if you develop shortness of ___.', answer: 'breath', distractors: ['heart', 'cough', 'throat'], pt: 'Retorne à emergência se desenvolver falta de ar.', tip: '"Shortness of breath" é a expressão padrão para falta de ar (dispneia).' },
+  { track: 'med', emoji: '💊', sentence: 'You can buy this mild painkiller ___-the-counter at any pharmacy.', answer: 'over', distractors: ['under', 'on', 'across'], pt: 'Você pode comprar este analgésico leve sem receita em qualquer farmácia.', tip: '"Over-the-counter" (OTC) significa medicamento vendido sem prescrição.' },
+  { track: 'med', emoji: '📄', sentence: 'Please schedule a ___-up appointment in two weeks.', answer: 'follow', distractors: ['check', 'look', 'back'], pt: 'Por favor, agende uma consulta de retorno em duas semanas.', tip: '"Follow-up appointment" é a consulta médica de retorno/acompanhamento.' },
+  { track: 'med', emoji: '🛌', sentence: 'Get plenty of rest and ___ lifting heavy objects this week.', answer: 'avoid', distractors: ['prevent', 'refuse', 'deny'], pt: 'Descanse bastante e evite levantar objetos pesados nesta semana.', tip: '"Avoid + verbo-ing" = evitar fazer determinada ação.' },
+
+  // ── 8. ADVANCED / FLUÊNCIA AVANÇADA (15 questões) ──
+  { track: 'advanced', emoji: '⚡', sentence: 'We had ___ leave right now if we don’t want to miss the flight.', answer: 'better', distractors: ['rather', 'best', 'prefer'], pt: 'É melhor sairmos agora mesmo se não quisermos perder o voo.', tip: '"Had better + verbo simples" indica recomendação urgente com consequência caso não seja feita.' },
+  { track: 'advanced', emoji: '☕', sentence: 'I would ___ work from home today than get stuck in traffic.', answer: 'rather', distractors: ['better', 'prefer', 'instead'], pt: 'Eu prefiro trabalhar de casa hoje a ficar preso no trânsito.', tip: '"Would rather ... than ..." expressa preferência direta usando o verbo na forma base.' },
+  { track: 'advanced', emoji: '🔍', sentence: 'Not ___ did she solve the bug, she also optimized the whole database.', answer: 'only', distractors: ['just', 'even', 'also'], pt: 'Ela não apenas resolveu o bug, como também otimizou todo o banco de dados.', tip: '"Not only did she..." usa inversão para dar ênfase forte.' },
+  { track: 'advanced', emoji: '🌧️', sentence: '___ the heavy traffic, we managed to arrive five minutes early.', answer: 'Despite', distractors: ['Although', 'Even', 'However'], pt: 'Apesar do trânsito pesado, conseguimos chegar cinco minutos adiantados.', tip: 'Antes de um substantivo ("the heavy traffic"), usamos "Despite" ou "In spite of" (e não "Although").' },
+  { track: 'advanced', emoji: '🕰️', sentence: 'If I ___ known about the traffic jam, I would have taken the train.', answer: 'had', distractors: ['have', 'would', 'did'], pt: 'Se eu soubesse do engarrafamento, teria pegado o trem.', tip: 'Para condição hipotética no passado, usamos "If I had known..., I would have...".' },
+  { track: 'advanced', emoji: '📈', sentence: 'It is high ___ we replaced this outdated software.', answer: 'time', distractors: ['hour', 'moment', 'day'], pt: 'Já passou da hora de substituirmos este software desatualizado.', tip: '"It is high time + passado" significa "já passou da hora de fazermos isso".' },
+  { track: 'advanced', emoji: '🧩', sentence: 'There is no ___ in worrying about things we cannot control.', answer: 'point', distractors: ['reason', 'use', 'way'], pt: 'Não adianta se preocupar com coisas que não podemos controlar.', tip: '"There is no point in + verbo-ing" = não faz sentido / não adianta.' },
+  { track: 'advanced', emoji: '🛠️', sentence: 'It took me a few weeks, but I finally got the ___ of the new system.', answer: 'hang', distractors: ['hold', 'hand', 'habit'], pt: 'Levou algumas semanas, mas finalmente peguei o jeito do novo sistema.', tip: '"Get the hang of something" é a expressão idiomática para "pegar o jeito de algo".' },
+  { track: 'advanced', emoji: '🤝', sentence: 'Let’s meet ___ and close the deal at twelve percent discount.', answer: 'halfway', distractors: ['middle', 'center', 'between'], pt: 'Vamos chegar a um meio-termo e fechar o negócio com 12% de desconto.', tip: '"Meet halfway" = ceder dos dois lados e fechar no meio-termo.' },
+  { track: 'advanced', emoji: '🚀', sentence: 'By the end of this year, she will ___ completed her master’s degree.', answer: 'have', distractors: ['be', 'had', 'has'], pt: 'Até o final deste ano, ela já terá concluído o mestrado.', tip: '"By + data futura" pede "will have + particípio" para indicar algo que já estará concluído.' },
+  { track: 'advanced', emoji: '📌', sentence: 'Let’s resolve this billing discrepancy once and for ___.', answer: 'all', distractors: ['ever', 'always', 'good'], pt: 'Vamos resolver essa divergência de faturamento de uma vez por todas.', tip: '"Once and for all" = de uma vez por todas.' },
+  { track: 'advanced', emoji: '🧠', sentence: 'Hardly had the meeting started ___ the fire alarm went off.', answer: 'when', distractors: ['than', 'then', 'that'], pt: 'Mal a reunião tinha começado quando o alarme de incêndio disparou.', tip: '"Hardly had ... when ..." conecta duas ações quase imediatas no passado.' },
+  { track: 'advanced', emoji: '🌟', sentence: 'All our hard work finally paid ___ when we won the international contract.', answer: 'off', distractors: ['out', 'up', 'back'], pt: 'Todo o nosso trabalho duro finalmente valeu a pena quando ganhamos o contrato internacional.', tip: '"Pay off" significa dar frutos / compensar / valer a pena.' },
+  { track: 'advanced', emoji: '🔑', sentence: 'As ___ as I know, the conference is still scheduled for October.', answer: 'far', distractors: ['long', 'much', 'well'], pt: 'Até onde eu sei, a conferência continua agendada para outubro.', tip: '"As far as I know" = até onde eu sei.' },
+  { track: 'advanced', emoji: '🎯', sentence: 'She succeeded ___ negotiating a much better timeline for the team.', answer: 'in', distractors: ['on', 'at', 'to'], pt: 'Ela teve sucesso em negociar um cronograma muito melhor para a equipe.', tip: '"Succeed" pede sempre "in + verbo-ing" ("succeeded in negotiating").' },
 ];
 
-// ── State ─────────────────────────────────────────────────────────────────────
-const shuffled  = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
-let currentQ    = 0;
-let score       = 0;
-let lives       = 3;
-let answered    = false;
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack  = 'all';
+let gameMode       = 'standard'; // 'standard' | 'typing'
+let sessionLength  = 15;
+let shuffled       = [];
+let currentQ       = 0;
+let score          = 0;
+let lives          = 4;
+let combo          = 0;
+let maxCombo       = 0;
+let hintsLeft      = 3;
+let correctCount   = 0;
+let answered       = false;
+let practicedList  = [];
+let masteredSet    = new Set();
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-renderQuestion();
+const MASTERY_KEY = 'capyFillBlankMastered_v1';
 
+function loadMastered() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]');
+    if (Array.isArray(raw)) masteredSet = new Set(raw);
+  } catch (e) {}
+  updateMasteryUI();
+}
+
+function saveMastered(sentenceStr) {
+  if (sentenceStr) masteredSet.add(sentenceStr);
+  try {
+    localStorage.setItem(MASTERY_KEY, JSON.stringify([...masteredSet]));
+  } catch (e) {}
+  updateMasteryUI();
+}
+
+function updateMasteryUI() {
+  const el = document.getElementById('mastered-num');
+  if (el) el.textContent = masteredSet.size;
+}
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── Áudio TTS ────────────────────────────────────────────────────────────────
+function speakText(text, rate = 0.94) {
+  if (!text || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function speakFullSentence(rate = 0.94) {
+  const q = shuffled[currentQ];
+  if (!q) return;
+  const full = q.sentence.replace('___', q.answer);
+  speakText(full, rate);
+}
+
+// ── Inicializar Partida ──────────────────────────────────────────────────────
+function buildDeck() {
+  const pool = selectedTrack === 'all'
+    ? QUESTIONS
+    : QUESTIONS.filter(q => q.track === selectedTrack);
+  const unmastered = shuffleArr(pool.filter(q => !masteredSet.has(q.sentence)));
+  const mastered   = shuffleArr(pool.filter(q => masteredSet.has(q.sentence)));
+  shuffled = [...unmastered, ...mastered].slice(0, Math.min(sessionLength, pool.length));
+}
+
+function startNewSession() {
+  currentQ = 0;
+  score = 0;
+  lives = 4;
+  combo = 0;
+  maxCombo = 0;
+  hintsLeft = 3;
+  correctCount = 0;
+  practicedList = [];
+
+  document.getElementById('score-disp').textContent = '0';
+  document.getElementById('hints-left').textContent = String(hintsLeft);
+  document.getElementById('hint-btn').disabled = false;
+  updateComboUI();
+  updateHearts();
+  buildDeck();
+  renderQuestion();
+}
+
+function updateComboUI() {
+  const pill = document.getElementById('combo-pill');
+  const countEl = document.getElementById('combo-count');
+  if (!pill || !countEl) return;
+  if (combo >= 2) {
+    countEl.textContent = String(combo);
+    pill.classList.remove('hidden');
+  } else {
+    pill.classList.add('hidden');
+  }
+}
+
+// ── Renderizar Questão ───────────────────────────────────────────────────────
 function renderQuestion() {
   answered = false;
-  const q  = shuffled[currentQ];
+  const q = shuffled[currentQ];
+  if (!q) return;
 
-  document.getElementById('q-label').textContent   = `Pergunta ${currentQ+1} de ${shuffled.length}`;
-  document.getElementById('q-emoji').textContent   = q.emoji;
-  document.getElementById('prog-fill').style.width = `${(currentQ/shuffled.length)*100}%`;
+  document.getElementById('q-label').textContent = `Pergunta ${currentQ + 1} de ${shuffled.length}`;
+  document.getElementById('track-badge').textContent = TRACK_LABELS[q.track] || '🌱 Inglês';
+  document.getElementById('q-emoji').textContent = q.emoji || '✏️';
+  document.getElementById('prog-fill').style.width = `${(currentQ / shuffled.length) * 100}%`;
+  document.getElementById('sentence-pt').textContent = q.pt ? `🇧🇷 "${q.pt}"` : '';
   document.getElementById('feedback').classList.add('hidden');
 
-  // Build sentence with blank
   const parts = q.sentence.split('___');
   document.getElementById('sentence-area').innerHTML =
     parts[0] + `<span class="blank-slot" id="blank">___</span>` + (parts[1] || '');
 
-  // Build options (shuffle answer + distractors)
-  const opts = [q.answer, ...q.distractors].sort(() => Math.random() - 0.5);
-  document.getElementById('options-row').innerHTML = opts.map(opt =>
-    `<button class="option-chip" onclick="pickOption(this,'${opt}','${q.answer}')">${opt}</button>`
-  ).join('');
+  const optRow = document.getElementById('options-row');
+  const typRow = document.getElementById('typing-row');
+  const typInput = document.getElementById('typing-input');
 
-  // Animate
-  ['sentence-area','options-row','q-emoji','q-label'].forEach(id => {
-    const el = document.getElementById(id);
-    el.classList.remove('fade-up'); void el.offsetWidth; el.classList.add('fade-up');
-  });
+  if (gameMode === 'typing') {
+    optRow.classList.add('hidden');
+    typRow.classList.remove('hidden');
+    typInput.value = '';
+    typInput.disabled = false;
+    setTimeout(() => typInput.focus(), 40);
+  } else {
+    typRow.classList.add('hidden');
+    optRow.classList.remove('hidden');
+    const opts = shuffleArr([q.answer, ...q.distractors]);
+    optRow.innerHTML = opts.map((opt, idx) => `
+      <button type="button" class="option-chip" data-opt="${opt.replace(/"/g, '&quot;')}">
+        <span class="w-5 h-5 rounded-md bg-white/15 text-orange-300 text-xs font-extrabold flex items-center justify-center">${idx + 1}</span>
+        <span>${opt}</span>
+      </button>
+    `).join('');
+
+    optRow.querySelectorAll('.option-chip').forEach(btn => {
+      btn.addEventListener('click', () => pickOption(btn, btn.getAttribute('data-opt'), q));
+    });
+  }
 }
 
-// ── Pick an option ─────────────────────────────────────────────────────────────
-function pickOption(btn, chosen, correct) {
+// ── Dica (50/50 ou Letra Inicial) ────────────────────────────────────────────
+function useHint() {
+  if (answered || hintsLeft <= 0) return;
+  const q = shuffled[currentQ];
+  if (!q) return;
+
+  if (gameMode === 'typing') {
+    const typInput = document.getElementById('typing-input');
+    const nextLen = Math.min(q.answer.length, (typInput.value.length || 0) + 2);
+    typInput.value = q.answer.slice(0, nextLen);
+    typInput.focus();
+  } else {
+    const wrongChips = Array.from(document.querySelectorAll('.option-chip'))
+      .filter(b => b.getAttribute('data-opt') !== q.answer && !b.classList.contains('eliminated-chip'));
+    if (wrongChips.length < 2) return;
+    shuffleArr(wrongChips).slice(0, 2).forEach(b => b.classList.add('eliminated-chip'));
+  }
+
+  hintsLeft--;
+  document.getElementById('hints-left').textContent = String(hintsLeft);
+  if (hintsLeft <= 0) document.getElementById('hint-btn').disabled = true;
+}
+
+// ── Avaliar Resposta ─────────────────────────────────────────────────────────
+function submitTypedAnswer() {
   if (answered) return;
+  const q = shuffled[currentQ];
+  if (!q) return;
+  const typInput = document.getElementById('typing-input');
+  const val = typInput.value.trim();
+  if (!val) return;
+  typInput.disabled = true;
+  evaluateAnswer(val, q, null);
+}
+
+function pickOption(btn, chosen, q) {
+  if (answered) return;
+  evaluateAnswer(chosen, q, btn);
+}
+
+function evaluateAnswer(chosen, q, clickedBtn) {
   answered = true;
+  const blank = document.getElementById('blank');
+  const fb = document.getElementById('feedback');
+  const fbTitle = document.getElementById('feedback-title');
+  const fbTip = document.getElementById('feedback-tip');
+  const isRight = String(chosen || '').trim().toLowerCase() === String(q.answer || '').trim().toLowerCase();
 
-  const blank   = document.getElementById('blank');
-  const fb      = document.getElementById('feedback');
-  const isRight = chosen === correct;
-
-  // Fill blank
-  blank.textContent = chosen;
+  blank.textContent = q.answer;
   blank.classList.add('filled');
 
-  // Disable all options
   document.querySelectorAll('.option-chip').forEach(b => {
     b.classList.add('used');
-    if (b !== btn) b.style.opacity = '0.2';
+    if (b.getAttribute('data-opt').toLowerCase() === q.answer.toLowerCase()) {
+      b.classList.add('correct-chip');
+    } else if (b !== clickedBtn) {
+      b.style.opacity = '0.25';
+    }
   });
 
-  fb.classList.remove('hidden','bg-emerald-500/20','text-emerald-300','border-emerald-500/40',
-                                'bg-red-500/20','text-red-300','border-red-500/40');
+  fb.classList.remove(
+    'hidden',
+    'bg-emerald-500/20', 'text-emerald-200', 'border-emerald-500/40',
+    'bg-red-500/20', 'text-red-200', 'border-red-500/40'
+  );
+
+  const fullSentence = q.sentence.replace('___', q.answer);
 
   if (isRight) {
-    score += 10;
-    document.getElementById('score-disp').textContent = score;
+    combo++;
+    if (combo > maxCombo) maxCombo = combo;
+    correctCount++;
+    const bonus = Math.min(12, (combo - 1) * 3);
+    const pts = 12 + bonus;
+    score += pts;
+    document.getElementById('score-disp').textContent = String(score);
+    updateComboUI();
+    saveMastered(q.sentence);
+    practicedList.push({ en: fullSentence, pt: q.pt, ok: true });
+
     blank.classList.add('correct');
-    btn.classList.add('correct-chip');
-    fb.textContent = `✅ Correto! "${correct}" — muito bem! 🎉`;
-    fb.classList.add('bg-emerald-500/20','text-emerald-300','border-emerald-500/40');
+    if (clickedBtn) clickedBtn.classList.add('correct-chip');
+    fbTitle.textContent = `✅ Correto! "${q.answer}" (+${pts} pts)`;
+    fbTip.textContent = `💡 ${q.tip}`;
+    fb.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border-emerald-500/40');
+
+    speakText(fullSentence, 0.94);
     launchSparks();
-    setTimeout(next, 1500);
   } else {
+    combo = 0;
+    updateComboUI();
     lives--;
     updateHearts();
+    practicedList.push({ en: fullSentence, pt: q.pt, ok: false });
+
     blank.classList.add('wrong');
-    btn.classList.add('wrong-chip');
-    // Highlight correct
-    document.querySelectorAll('.option-chip').forEach(b => {
-      if (b.textContent === correct) b.classList.add('correct-chip');
-    });
-    fb.textContent = `❌ A resposta é "${correct}". Continue! 💪`;
-    fb.classList.add('bg-red-500/20','text-red-300','border-red-500/40');
+    if (clickedBtn) clickedBtn.classList.add('wrong-chip');
+    fbTitle.textContent = `❌ Você escolheu "${chosen}", mas o correto é "${q.answer}".`;
+    fbTip.textContent = `💡 ${q.tip}`;
+    fb.classList.add('bg-red-500/20', 'text-red-200', 'border-red-500/40');
 
     const area = document.getElementById('sentence-area');
     area.classList.add('do-shake');
     setTimeout(() => area.classList.remove('do-shake'), 450);
 
-    if (lives <= 0) { setTimeout(showFinished, 1800); return; }
-    setTimeout(next, 2000);
+    speakText(fullSentence, 0.92);
+    if (lives <= 0) {
+      document.getElementById('next-btn').textContent = 'Ver Resultado Final →';
+    }
   }
 }
 
 function updateHearts() {
   document.querySelectorAll('[data-h]').forEach(h => {
-    if (parseInt(h.dataset.h) > lives) {
-      h.style.opacity   = '0.2';
-      h.style.transform = 'scale(0.7)';
+    const idx = parseInt(h.dataset.h, 10);
+    if (idx > lives) {
+      h.style.opacity = '0.2';
+      h.style.transform = 'scale(0.65)';
+    } else {
+      h.style.opacity = '1';
+      h.style.transform = 'scale(1)';
     }
   });
 }
 
 function next() {
+  if (lives <= 0) {
+    showFinished();
+    return;
+  }
   currentQ++;
   if (currentQ >= shuffled.length) showFinished();
   else renderQuestion();
 }
 
-// ── Sparks ─────────────────────────────────────────────────────────────────────
+// ── Teclado (1..4 para opções, Enter para avançar/confirmar) ─────────────────
+window.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'typing-input') {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!answered) submitTypedAnswer();
+      else next();
+    }
+    return;
+  }
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
+
+  if (e.key === 'Enter' && answered) {
+    e.preventDefault();
+    next();
+    return;
+  }
+  if (!answered && gameMode === 'standard' && /^[1-4]$/.test(e.key)) {
+    const idx = parseInt(e.key, 10) - 1;
+    const chips = document.querySelectorAll('.option-chip');
+    if (chips[idx] && !chips[idx].classList.contains('eliminated-chip')) {
+      e.preventDefault();
+      chips[idx].click();
+    }
+  }
+});
+
+// ── Sparks ───────────────────────────────────────────────────────────────────
 function launchSparks() {
   const colors = ['#f97316','#ec4899','#10b981','#f59e0b','#a855f7'];
   for (let i = 0; i < 14; i++) {
     const sp = document.createElement('div');
     sp.className = 'spark';
-    const a = (i/14)*360, d = 55+Math.random()*65;
-    sp.style.setProperty('--tx',`${Math.cos(a*Math.PI/180)*d}px`);
-    sp.style.setProperty('--ty',`${Math.sin(a*Math.PI/180)*d}px`);
-    sp.style.background = colors[i%colors.length];
+    const a = (i / 14) * 360, d = 55 + Math.random() * 65;
+    sp.style.setProperty('--tx', `${Math.cos(a * Math.PI / 180) * d}px`);
+    sp.style.setProperty('--ty', `${Math.sin(a * Math.PI / 180) * d}px`);
+    sp.style.background = colors[i % colors.length];
     sp.style.left = '50vw'; sp.style.top = '45vh';
     document.body.appendChild(sp);
     setTimeout(() => sp.remove(), 950);
   }
 }
 
-// ── Finished ──────────────────────────────────────────────────────────────────
+function recordStats(xpEarned, pct) {
+  try {
+    const stats = JSON.parse(localStorage.getItem('capyGameStats') || '{}');
+    const prev = stats.fillBlank || { plays: 0, bestScore: 0, totalXP: 0 };
+    stats.fillBlank = {
+      plays: (prev.plays || 0) + 1,
+      bestScore: Math.max(prev.bestScore || 0, score),
+      totalXP: (prev.totalXP || 0) + xpEarned,
+      lastAccuracy: Math.round(pct * 100),
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('capyGameStats', JSON.stringify(stats));
+  } catch (e) {}
+}
+
+// ── Resultado Final + Revisão ────────────────────────────────────────────────
 function showFinished() {
-  const pct   = score / (shuffled.length * 10);
-  const xp    = Math.round(pct * 40) + 10;
+  const total = Math.max(1, shuffled.length);
+  const pct   = Math.min(1, correctCount / total);
+  const xp    = Math.round(pct * 50) + 15 + Math.min(18, maxCombo * 2);
   const stars = pct >= 0.85 ? 3 : pct >= 0.5 ? 2 : 1;
+
+  recordStats(xp, pct);
 
   if (window.Store) {
     Store.addXP(xp);
@@ -286,38 +784,87 @@ function showFinished() {
     if (stars === 3) Store.unlockBadge('grammar_star');
   }
 
+  const prevOv = document.getElementById('fb-result-overlay');
+  if (prevOv) prevOv.remove();
+
+  const reviewHtml = practicedList.slice(0, 12).map(item => `
+    <div class="flex items-center justify-between gap-2 bg-white/5 border border-white/10 rounded-2xl px-3.5 py-2 text-left">
+      <div class="min-w-0">
+        <p class="font-label font-bold text-xs text-white truncate">${item.ok ? '✅' : '📌'} ${item.en}</p>
+        <p class="font-body text-[11px] text-slate-400 truncate">${item.pt || ''}</p>
+      </div>
+      <button type="button" data-speak="${item.en.replace(/"/g, '&quot;')}" class="fb-review-speak px-2.5 py-1 rounded-xl bg-orange-500/25 hover:bg-orange-500/40 text-orange-200 text-xs font-bold flex-shrink-0">🔊</button>
+    </div>
+  `).join('');
+
   const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
+  overlay.id = 'fb-result-overlay';
+  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto';
   overlay.innerHTML = `
     <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-orange-500/60
-         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
+         rounded-[2.5rem] px-6 sm:px-9 py-8 flex flex-col items-center gap-4 shadow-2xl text-center max-w-lg w-full my-auto
          scale-0 opacity-0 transition-all duration-500">
-      <div class="text-7xl">✏️</div>
+      <div class="text-6xl">✏️</div>
       <div>
-        <p class="font-label text-orange-400 font-bold text-sm uppercase tracking-widest mb-1">Completo!</p>
-        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
-        <p class="font-body text-slate-300">${score} / ${shuffled.length * 10} pontos</p>
+        <p class="font-label text-orange-400 font-extrabold text-xs uppercase tracking-widest mb-1">Concluído · ${TRACK_LABELS[selectedTrack]}</p>
+        <h2 class="font-headline text-4xl sm:text-5xl font-black text-white mb-1">+${xp} XP</h2>
+        <p class="font-body text-slate-300 text-sm">${score} pontos · ${correctCount}/${total} acertos · Combo máx: 🔥 ${maxCombo}x</p>
       </div>
       <div class="flex gap-1">
-        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
-             style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
+        ${[1,2,3].map(i => `<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}" style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
       </div>
-      <p class="font-body text-slate-400 text-sm">
-        ${stars===3?'🏅 Medalha Estrela da Gramática! Pontuação perfeita!':stars===2?'Muito bem! Você manda bem nas frases! 🌿':'Continue praticando — você está melhorando! 💪'}
-      </p>
-      <div class="flex gap-3 flex-wrap justify-center">
-        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Jogar de novo 🔄</button>
-        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-orange-500 hover:bg-orange-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-orange-500/30">Jogos 🌿</button>
+      ${stars === 3 ? `<div class="bg-orange-500/20 border border-orange-500/40 rounded-xl px-4 py-2 text-orange-200 font-label font-bold text-xs">🏅 Medalha Mestre das Expressões desbloqueada!</div>` : ''}
+
+      ${practicedList.length ? `
+        <div class="w-full text-left mt-1">
+          <p class="font-label text-[11px] uppercase tracking-wider text-orange-300 font-bold mb-1.5">🔊 Revisão das Frases Praticadas:</p>
+          <div class="space-y-1.5 max-h-44 overflow-y-auto pr-1">${reviewHtml}</div>
+        </div>
+      ` : ''}
+
+      <div class="flex gap-3 flex-wrap justify-center mt-2">
+        <button type="button" id="btn-play-again" class="bg-orange-500 hover:bg-orange-400 text-white font-label font-extrabold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-orange-500/30 text-sm">🔄 Jogar de Novo</button>
+        <button type="button" onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-6 py-3 rounded-full border border-white/20 active:scale-95 transition-all text-sm">Voltar ao Pavilhão 🌿</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const f = document.getElementById('fin');
-    f.style.transform = 'scale(1)'; f.style.opacity = '1';
+
+  overlay.querySelectorAll('.fb-review-speak').forEach(btn => {
+    btn.addEventListener('click', () => speakText(btn.getAttribute('data-speak'), 0.92));
+  });
+  document.getElementById('btn-play-again').addEventListener('click', () => {
+    overlay.remove();
+    startNewSession();
+  });
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const c = document.getElementById('fin');
+    if (c) { c.style.transform = 'scale(1)'; c.style.opacity = '1'; }
   }));
   launchSparks();
 }
+
+// ── Controles de Trilha e Modo ───────────────────────────────────────────────
+document.querySelectorAll('#track-bar [data-track]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedTrack = btn.getAttribute('data-track') || 'all';
+    document.querySelectorAll('#track-bar [data-track]').forEach(b => b.classList.toggle('active', b === btn));
+    startNewSession();
+  });
+});
+
+document.getElementById('mode-select').addEventListener('change', e => {
+  gameMode = e.target.value || 'standard';
+  startNewSession();
+});
+
+document.getElementById('length-select').addEventListener('change', e => {
+  sessionLength = parseInt(e.target.value, 10) || 15;
+  startNewSession();
+});
+
+loadMastered();
+startNewSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>
