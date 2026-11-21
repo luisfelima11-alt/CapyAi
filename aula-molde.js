@@ -33,7 +33,10 @@
     const SEM_APOSTROFO_2 = { im: "i'm", ive: "i've", youre: "you're", youve: "you've", theyre: "they're", theyve: "they've", weve: "we've", hes: "he's", shes: "she's", thats: "that's", whats: "what's", theres: "there's" };
     function devolverApostrofo(t) {
         return String(t || '').replace(SEM_APOSTROFO, "$1n't")
-            .replace(/\b(im|ive|youre|youve|theyre|theyve|weve|hes|shes|thats|whats|theres)\b/gi, m => SEM_APOSTROFO_2[m.toLowerCase()]);
+            .replace(/\b(im|ive|youre|youve|theyre|theyve|weve|hes|shes|thats|whats|theres)\b/gi, m => SEM_APOSTROFO_2[m.toLowerCase()])
+            // "id" sozinho pode ser outra palavra, mas antes de like/love/rather/prefer é sempre
+            // "I'd" (o "I'd like…" da aula Agro 19 levava "Quase" quando vinha sem apóstrofo).
+            .replace(/\bid (like|love|rather|prefer)\b/gi, "i'd $1");
     }
 
     function normalizarResposta(t) {
