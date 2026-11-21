@@ -1,5 +1,6 @@
 // "Ouvir o diálogo" nas aulas do molde novo (Agro, GPS Tronic...). As aulas sem
-// arquivo gravado (Agro 11 a 15, GPS 15 a 27) apontavam para mp3 que não existem:
+// arquivo gravado (GPS 15 a 27; Agro 11 a 15 até 21/nov, quando foram gravadas)
+// apontavam para mp3 que não existem:
 // dava 404 e o plano B falava cada frase duas vezes e andava a fila por tempo
 // fixo (16/nov/2026). Agora cada fala sai uma vez, na ordem, uma depois da outra,
 // na voz do personagem; quem tem arquivo gravado continua tocando o arquivo.
@@ -33,7 +34,7 @@ async function abrir(page, pagina) {
 }
 
 test('aula sem arquivo gravado: cada fala uma vez, em ordem, na voz do personagem, sem pedir mp3', async ({ page }) => {
-  const pedidosMp3 = await abrir(page, 'agro_aula_12.html');
+  const pedidosMp3 = await abrir(page, 'gpstronic_aula_20.html');
   const esperadas = await page.evaluate(() => DIALOGO.filter(l => !l.extra).map(l => ({ t: l.en, voz: l.voz, mp3: l.mp3 })));
   expect(esperadas.length).toBeGreaterThan(5);
   expect(esperadas.every(l => !l.mp3 && l.voz)).toBe(true);
@@ -70,11 +71,13 @@ test('tocar uma fala só: uma chamada, na voz de quem fala', async ({ page }) =>
   expect(falas[0].voice).toBe(await page.evaluate(() => DIALOGO[1].voz));
 });
 
-test('aula com arquivo gravado continua tocando o arquivo', async ({ page }) => {
-  await abrir(page, 'agro_aula_05.html');
-  await page.evaluate(() => { dlgTocarUma(0); });
-  await page.waitForTimeout(150);
-  const falas = await page.evaluate(() => window.__falas);
-  expect(falas.length).toBe(1);
-  expect(falas[0].mp3).toBe('/assets/audio/agro05/s01.mp3');
-});
+for (const [pagina, pasta] of [['agro_aula_05.html', 'agro05'], ['agro_aula_12.html', 'agro12']]) {
+  test(`aula com arquivo gravado continua tocando o arquivo (${pagina})`, async ({ page }) => {
+    await abrir(page, pagina);
+    await page.evaluate(() => { dlgTocarUma(0); });
+    await page.waitForTimeout(150);
+    const falas = await page.evaluate(() => window.__falas);
+    expect(falas.length).toBe(1);
+    expect(falas[0].mp3).toBe(`/assets/audio/${pasta}/s01.mp3`);
+  });
+}
