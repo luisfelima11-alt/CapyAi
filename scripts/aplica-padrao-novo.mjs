@@ -16,7 +16,7 @@ import path from 'node:path';
 import { VERSAO_JS } from './lib/gramatica-slides.mjs';
 
 const RAIZ = path.resolve(new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
-export const VERSAO_MOLDE = 'am1';
+export const VERSAO_MOLDE = 'am2';
 export const TAG_MOLDE = `<script src="aula-molde.js?v=${VERSAO_MOLDE}"></script>`;
 const checar = process.argv.includes('--checar');
 

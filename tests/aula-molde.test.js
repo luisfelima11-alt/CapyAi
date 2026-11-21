@@ -43,6 +43,20 @@ for (const comFala of [true, false]) {
     });
 }
 
+for (const comFala of [true, false]) {
+    test(`tradução: contração digitada sem apóstrofo vale (${comFala ? 'com' : 'sem'} CapyFala)`, () => {
+        const p = carregarPuras({ comFala });
+        // No celular é comum digitar "didnt" e "im": antes isso levava "Faltou: did, not".
+        assert.equal(p.conferirTraducao('I didnt have the part', ["I didn't have the part."]).ok, true);
+        assert.equal(p.conferirTraducao('im going to plant soy', ["I'm going to plant soy."]).ok, true);
+        assert.equal(p.conferirTraducao('it doesnt work', ["It doesn't work."]).ok, true);
+        assert.equal(p.conferirTraducao('you cant miss it', ["You can't miss it!"]).ok, true);
+        // "its", "well" e "were" são palavras de verdade e não viram contração.
+        assert.equal(p.normalizarResposta('we were well'), 'we were well');
+        assert.ok(!/\bit is\b/.test(p.normalizarResposta('its color')), 'its continua its');
+    });
+}
+
 test('tradução: número em algarismo vale o mesmo que por extenso (com CapyFala)', () => {
     const p = carregarPuras({ comFala: true });
     assert.equal(p.conferirTraducao("I'm meeting my boss at 3. It's all arranged.", ["I'm meeting my boss at three. It's all arranged."]).ok, true);
@@ -87,7 +101,7 @@ test('toda aula do molde carrega o aula-molde.js uma vez, antes do cartão da fo
     assert.ok(aulasDoMolde.length >= 50, `aulas do molde: ${aulasDoMolde.length}`);
     for (const arq of aulasDoMolde) {
         const html = ler(arq);
-        const tags = html.match(/<script src="aula-molde\.js\?v=am1"><\/script>/g) || [];
+        const tags = html.match(/<script src="aula-molde\.js\?v=am2"><\/script>/g) || [];
         assert.equal(tags.length, 1, arq);
         const folha = html.indexOf('folha-da-aula.js');
         if (folha >= 0) assert.ok(html.indexOf('aula-molde.js') < folha, arq + ': aula-molde antes da folha');

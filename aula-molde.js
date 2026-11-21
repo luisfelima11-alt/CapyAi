@@ -26,7 +26,18 @@
     const TETO_EXTRAS = 2;      // palavras a mais aceitas na tradução
 
     // ── Funções puras ─────────────────────────────────────────────────────
+    // No celular muita gente digita a contração sem apóstrofo ("didnt", "im"). Sem isto,
+    // "I didnt have the part" levava "Quase. Faltou: did, not". Só as formas que não são
+    // outra palavra: its, ill, well, were, hell, shell, id e lets ficam como estão.
+    const SEM_APOSTROFO = /\b(did|do|does|is|are|was|were|ca|wo|could|should|would|have|has|had)nt\b/g;
+    const SEM_APOSTROFO_2 = { im: "i'm", ive: "i've", youre: "you're", youve: "you've", theyre: "they're", theyve: "they've", weve: "we've", hes: "he's", shes: "she's", thats: "that's", whats: "what's", theres: "there's" };
+    function devolverApostrofo(t) {
+        return String(t || '').replace(SEM_APOSTROFO, "$1n't")
+            .replace(/\b(im|ive|youre|youve|theyre|theyve|weve|hes|shes|thats|whats|theres)\b/gi, m => SEM_APOSTROFO_2[m.toLowerCase()]);
+    }
+
     function normalizarResposta(t) {
+        t = devolverApostrofo(t);
         const fala = raiz.CapyFala;
         if (fala && typeof fala.normalizar === 'function') return fala.normalizar(t, 'en');
         return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
