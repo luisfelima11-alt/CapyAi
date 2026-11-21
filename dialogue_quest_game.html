@@ -1,4 +1,89 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dialogue Quest — Capy Yara</title><script src="https://cdn.tailwindcss.com"></script><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Material+Symbols+Outlined&display=swap" rel="stylesheet"><style>body{font-family:'Plus Jakarta Sans',sans-serif}.choice{min-height:64px}.choice:focus-visible{outline:3px solid #34d399;outline-offset:3px}</style><link rel="icon" href="/favicon.ico" sizes="any"/>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dialogue Quest — Capy Yara English</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lexend:wght@500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#001f3f",
+        "secondary": "#ec4899",
+        "tertiary": "#10b981",
+        "surface-container": "#002a54"
+      },
+      fontFamily: {
+        "headline": ["Plus Jakarta Sans", "sans-serif"],
+        "body": ["Be Vietnam Pro", "sans-serif"],
+        "label": ["Lexend", "sans-serif"]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  .choice-btn {
+    min-height: 62px;
+    transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease;
+  }
+  .choice-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(52, 211, 153, 0.55);
+  }
+  .choice-btn:active:not(:disabled) { transform: translateY(1px); }
+  .choice-btn:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 3px solid #34d399;
+    outline-offset: 3px;
+  }
+  .choice-btn.choice-correct {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.25)) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+  }
+  .choice-btn.choice-wrong {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.32), rgba(190, 18, 60, 0.22)) !important;
+    border-color: #fb7185 !important;
+  }
+  .choice-btn.choice-eliminated {
+    opacity: 0.22 !important;
+    pointer-events: none !important;
+    text-decoration: line-through;
+  }
+
+  .track-pill { transition: all 0.15s ease; white-space: nowrap; }
+  .track-pill.active {
+    background: linear-gradient(135deg, #10b981, #0d9488);
+    color: #022c22;
+    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  }
+
+  @keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spark   { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
+  .slide-up { animation: slideUp 0.32s ease both; }
+  .spark    { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
+
+  .heart { transition: transform 0.22s, opacity 0.22s; }
+  .heart.lost { transform: scale(0.6); opacity: 0.2; }
+  #prog-bar { transition: width 0.4s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=cap1"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cap1"/>
@@ -7,18 +92,768 @@
 <meta property="og:locale" content="pt_BR"/>
 <meta property="og:url" content="https://www.capyenglish.com.br/dialogue_quest_game.html"/>
 <meta property="og:title" content="Dialogue Quest — Capy Yara"/>
-<meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta property="og:description" content="Domine 124+ diálogos reais em inglês: dia a dia, viagem, reuniões, entrevistas, Agro English, GPS Tronic e saúde!"/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Dialogue Quest — Capy Yara"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
+<meta name="twitter:description" content="Domine 124+ diálogos reais em inglês: dia a dia, viagem, reuniões, entrevistas, Agro English, GPS Tronic e saúde!"/>
 <meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
-</head><body class="bg-[#001f3f] text-white min-h-screen"><div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div><main class="md:pl-32 pt-28 pb-24 px-5 max-w-3xl mx-auto"><a href="5_Game_Pavilion_Forest_Edition.html" class="text-emerald-300 font-bold">← Pavilhão</a><header class="text-center mt-7"><p class="text-emerald-300 text-xs font-black uppercase tracking-[.2em]">Conversa real</p><h1 class="text-4xl sm:text-6xl font-black mt-2">Dialogue Quest</h1><p class="text-slate-400 mt-3">Ajude a Yara a escolher a resposta mais natural.</p></header><section class="bg-white/5 border border-white/10 rounded-[2rem] p-5 sm:p-8 mt-8"><div class="flex justify-between font-black"><span id="round">1 / 8</span><span id="score" class="text-emerald-300">0 XP</span></div><div class="flex items-end gap-4 mt-8"><img src="yara.png" alt="Yara" class="w-20 h-20 rounded-full object-cover border-4 border-pink-400"><div class="bg-white text-[#001f3f] rounded-3xl rounded-bl-md px-5 py-4 flex-1"><p id="prompt" class="font-black text-lg"></p></div></div><p class="text-white/45 text-xs font-black uppercase tracking-widest mt-8 mb-3">O que você responde?</p><div id="choices" class="grid gap-3"></div><p id="feedback" class="text-center font-black min-h-6 mt-5" aria-live="polite"></p></section></main><div id="mobile-nav-placeholder"></div><script src="capy-skins.js?v=skins1"></script>
+</head>
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
+
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="md:pl-32 pt-24 pb-24 px-4 sm:px-6 max-w-4xl mx-auto w-full flex-1 flex flex-col">
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition">
+      <span>←</span> <span>Voltar ao Pavilhão</span>
+    </a>
+
+    <div class="flex items-center gap-2.5 sm:gap-3.5">
+      <div id="combo-pill" class="hidden bg-amber-500/20 border border-amber-400/50 text-amber-300 rounded-full px-3 py-1 font-label font-extrabold text-xs">
+        🔥 <span id="combo-count">2</span>x Combo
+      </div>
+      <div class="flex gap-0.5" id="hearts" title="Vidas restantes">
+        <span class="material-symbols-outlined heart text-red-400 text-xl" style="font-variation-settings:'FILL' 1;" data-heart="1">favorite</span>
+        <span class="material-symbols-outlined heart text-red-400 text-xl" style="font-variation-settings:'FILL' 1;" data-heart="2">favorite</span>
+        <span class="material-symbols-outlined heart text-red-400 text-xl" style="font-variation-settings:'FILL' 1;" data-heart="3">favorite</span>
+        <span class="material-symbols-outlined heart text-red-400 text-xl" style="font-variation-settings:'FILL' 1;" data-heart="4">favorite</span>
+      </div>
+      <div id="score" class="bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 rounded-full px-4 py-1.5 font-label font-black text-sm">
+        0 XP
+      </div>
+    </div>
+  </div>
+
+  <!-- Title Header -->
+  <header class="text-center mt-5 mb-4">
+    <p class="text-emerald-300 text-xs font-black uppercase tracking-[.2em]">Simulador de Conversa Real · 124+ Cenários</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1.5">Dialogue Quest 💬</h1>
+    <p class="text-slate-300 text-sm mt-1.5 max-w-xl mx-auto">Entre na cena, ouça a pessoa falar e escolha a resposta mais natural em inglês para cada situação.</p>
+  </header>
+
+  <!-- Track & Mode Selector -->
+  <section class="bg-white/5 border border-white/10 rounded-3xl p-3.5 sm:p-4 mb-5 space-y-3">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="track-bar" role="tablist" aria-label="Escolher trilha de conversação">
+      <button type="button" data-track="all" class="track-pill active px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🎲 Todas (Mix)</button>
+      <button type="button" data-track="starter" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🌱 Dia a Dia (A1-A2)</button>
+      <button type="button" data-track="intermediate" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🚀 Fluência (B1-B2)</button>
+      <button type="button" data-track="travel" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">✈️ Viagem & Aeroporto</button>
+      <button type="button" data-track="work" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">💼 Trabalho & Entrevista</button>
+      <button type="button" data-track="agro" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🌾 Agro English</button>
+      <button type="button" data-track="gpstronic" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🛰️ GPS Tronic</button>
+      <button type="button" data-track="med" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🩺 Medical English</button>
+      <button type="button" data-track="advanced" class="track-pill px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 font-label font-extrabold text-xs">🔥 Negociação Avançada</button>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="flex items-center gap-1.5 font-label font-bold text-slate-300">
+          <span>Modo:</span>
+          <select id="mode-select" class="bg-[#001f3f] border border-white/20 rounded-xl px-2.5 py-1 text-xs font-label font-bold text-white focus:outline-none cursor-pointer">
+            <option value="guided">🟢 Guiado (Com Tradução da Fala)</option>
+            <option value="realistic">🟡 Realista (Fala só em Inglês)</option>
+            <option value="listening">🎧 Escuta Pura (Ouvir sem Ler)</option>
+          </select>
+        </label>
+
+        <label class="flex items-center gap-1.5 font-label font-bold text-slate-300">
+          <span>Rodadas:</span>
+          <select id="length-select" class="bg-[#001f3f] border border-white/20 rounded-xl px-2.5 py-1 text-xs font-label font-bold text-white focus:outline-none cursor-pointer">
+            <option value="10">10 Diálogos</option>
+            <option value="12" selected>12 Diálogos</option>
+            <option value="18">18 Diálogos</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="text-slate-400 font-label font-semibold text-[11px]">
+        🏆 <span id="mastered-num">0</span>/124 diálogos dominados
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Dialogue Arena -->
+  <section id="arena-section" class="bg-white/5 border border-white/10 rounded-[2rem] p-5 sm:p-7 shadow-2xl flex-1 flex flex-col justify-between">
+    <!-- Top Progress & Scene Banner -->
+    <div>
+      <div class="flex items-center justify-between font-black text-xs sm:text-sm mb-2">
+        <span id="round" class="text-emerald-300 uppercase tracking-wider">Diálogo 1 / 12</span>
+        <span id="track-badge" class="px-3 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-xs font-bold">🌱 Dia a Dia</span>
+      </div>
+      <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
+        <div id="prog-bar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 w-0"></div>
+      </div>
+
+      <!-- Context Scene Pill -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl px-4 py-2.5 mb-5 flex items-center justify-between gap-2 flex-wrap">
+        <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-200">
+          <span>🎬</span>
+          <span id="scene-text">Cena: Encontro casual no escritório</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="speakCurrentPrompt(0.94)" class="px-3 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/35 border border-emerald-400/40 text-emerald-200 text-xs font-bold transition flex items-center gap-1" title="Ouvir a fala novamente (Tecla R)">
+            🔊 Ouvir
+          </button>
+          <button type="button" onclick="speakCurrentPrompt(0.72)" class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold transition" title="Ouvir mais devagar">
+            🐢 Devagar
+          </button>
+          <button type="button" onclick="useFiftyFiftyHint()" id="hint-5050-btn" class="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 text-xs font-bold transition" title="Eliminar 2 respostas incorretas">
+            💡 50/50 (<span id="hints-left">3</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Incoming Message Bubble (Interlocutor) -->
+      <div class="flex items-start gap-3.5 sm:gap-4 slide-up" id="speaker-row">
+        <div class="relative flex-shrink-0">
+          <img src="yara.png" alt="Yara" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg bg-emerald-950" onerror="this.style.display='none'"/>
+          <span id="speaker-emoji" class="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-[#001f3f] border border-white/20 flex items-center justify-center text-base shadow">💬</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div id="speaker-name" class="text-[11px] font-black uppercase tracking-wider text-emerald-300 mb-1">Colega de Trabalho</div>
+          <div class="bg-white text-[#001f3f] rounded-3xl rounded-tl-md px-5 py-4 shadow-lg">
+            <p id="prompt" class="font-black text-base sm:text-lg leading-snug"></p>
+            <p id="prompt-pt" class="text-xs sm:text-sm font-semibold text-slate-500 mt-1"></p>
+            <button id="reveal-prompt-btn" type="button" onclick="revealHiddenPrompt()" class="hidden mt-2 text-xs font-extrabold text-emerald-700 hover:underline">
+              👁️ Mostrar o que foi dito por escrito
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outgoing Student Reply Preview (appears after choosing) -->
+      <div id="student-reply-row" class="hidden flex items-start justify-end gap-3 mt-4 slide-up">
+        <div class="max-w-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-slate-950 rounded-3xl rounded-tr-md px-5 py-3.5 shadow-lg">
+          <div class="text-[10px] font-black uppercase tracking-wider text-emerald-950/75 mb-0.5">Sua Resposta</div>
+          <p id="student-reply-en" class="font-black text-sm sm:text-base leading-snug"></p>
+          <p id="student-reply-pt" class="text-xs font-bold text-emerald-950/80 mt-0.5"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Choices Area -->
+    <div class="mt-6">
+      <div class="flex items-center justify-between mb-2.5">
+        <p class="text-white/60 text-xs font-black uppercase tracking-widest">O que você responde? <span class="hidden sm:inline font-semibold text-white/40">(Teclas 1–4)</span></p>
+      </div>
+      <div id="choices" class="grid sm:grid-cols-2 gap-3"></div>
+
+      <!-- Pedagogical Feedback Box -->
+      <div id="feedback-box" class="hidden mt-4 p-4 rounded-2xl border slide-up">
+        <p id="feedback" class="font-black text-sm sm:text-base" aria-live="polite"></p>
+        <p id="feedback-tip" class="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed"></p>
+        <div class="mt-3 flex items-center justify-end gap-2">
+          <button type="button" onclick="speakIdealAnswer()" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition">
+            🔊 Ouvir resposta ideal
+          </button>
+          <button type="button" onclick="advanceStep()" id="next-dialogue-btn" class="px-5 py-2 rounded-full bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition">
+            Próximo Diálogo (Enter) →
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="mobile-nav-placeholder"></div>
+
+<script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
-<script src="store.js?v=xpfix"></script><script src="components.js?v=seg1"></script><script>Components.mount('top-nav-placeholder',Components.renderTopNav('games'));Components.mount('side-nav-placeholder',Components.renderSideNav('games'));Components.mount('mobile-nav-placeholder',Components.renderMobileNav('games'));const D=[{q:'Hi! How are you?',a:'I am great, thanks!',o:['Blue is my favorite.','At seven o’clock.']},{q:'Excuse me, where is the station?',a:'It is next to the bank.',o:['I like sandwiches.','Yes, I can swim.']},{q:'Would you like some tea?',a:'Yes, please.',o:['It is very tall.','My name is Leo.']},{q:'What time do you wake up?',a:'At seven o’clock.',o:['In the kitchen.','Two tickets, please.']},{q:'Can you help me?',a:'Of course!',o:['It is raining.','I am twelve.']},{q:'How much is this?',a:'It is ten dollars.',o:['Tomorrow morning.','She is my sister.']},{q:'What do you do for fun?',a:'I like reading.',o:['Turn left here.','It is on the table.']},{q:'See you tomorrow!',a:'See you!',o:['You are welcome.','A glass of water.']},{q:'Thank you very much!',a:'You are welcome!',o:['I go by bus.','It is cloudy.']}];let order=[],step=0,points=0,locked=false;const shuffle=a=>[...a].sort(()=>Math.random()-.5);function render(){if(step>=8)return finish();locked=false;const d=order[step];round.textContent=`${step+1} / 8`;score.textContent=`${points} XP`;prompt.textContent=d.q;choices.innerHTML=shuffle([d.a,...d.o]).map(x=>`<button class="choice text-left rounded-2xl bg-white/10 hover:bg-emerald-500 border border-white/10 px-5 py-4 font-black" data-ok="${x===d.a}">${x}</button>`).join('');choices.querySelectorAll('button').forEach(b=>b.onclick=()=>choose(b,d));feedback.textContent=''}function choose(btn,d){if(locked)return;locked=true;const ok=btn.dataset.ok==='true';if(ok){points+=12;btn.classList.add('bg-emerald-500');feedback.textContent='Resposta natural! +12 XP';feedback.className='text-center font-black min-h-6 mt-5 text-emerald-300'}else{btn.classList.add('bg-red-500');feedback.textContent=`Uma resposta melhor seria: “${d.a}”`;feedback.className='text-center font-black min-h-6 mt-5 text-amber-300'}setTimeout(()=>{step++;render()},1100)}function finish(){if(window.Store){Store.addXP(points);Store.completeActivity('games');Store.activateStreak()}document.querySelector('section').innerHTML=`<div class="text-center py-8"><div class="text-7xl">💬</div><h2 class="text-4xl font-black mt-4">Conversa concluída!</h2><p class="text-emerald-300 text-2xl font-black mt-2">+${points} XP</p><div class="flex justify-center gap-3 mt-7"><button onclick="location.reload()" class="bg-white/10 px-6 py-3 rounded-full font-black">Jogar novamente</button><a href="5_Game_Pavilion_Forest_Edition.html" class="bg-emerald-500 px-6 py-3 rounded-full font-black">Mais games</a></div></div>`}order=shuffle(D).slice(0,8);render();</script><script src="celebration.js?v=cel3"></script>
+<script src="store.js?v=xpfix"></script>
+<script src="components.js?v=seg1"></script>
+<script>
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+const TRACK_LABELS = {
+  all: '🎲 Mix Geral',
+  starter: '🌱 Dia a Dia (A1-A2)',
+  intermediate: '🚀 Fluência (B1-B2)',
+  travel: '✈️ Viagem & Aeroporto',
+  work: '💼 Trabalho & Entrevista',
+  agro: '🌾 Agro English',
+  gpstronic: '🛰️ GPS Tronic',
+  med: '🩺 Medical English',
+  advanced: '🔥 Negociação Avançada',
+};
+
+// ── 124 Diálogos Reais Contextualizados por Trilha ──────────────────────────
+const D = [
+  // ── 1. STARTER / DIA A DIA (16 diálogos) ──
+  { track: 'starter', emoji: '👋', speaker: 'Vizinho', scene: 'Encontro pela manhã no prédio', q: 'Good morning! How is everything going today?', qPt: 'Bom dia! Como estão indo as coisas hoje?', a: 'Everything is great, thanks! How about you?', aPt: 'Está tudo ótimo, obrigado! E com você?', o: ['At seven o’clock in the morning.', 'Yes, I have two brothers.', 'It is next to the supermarket.'], tip: 'Quando alguém pergunta como vão as coisas, respondemos e devolvemos a gentileza com "How about you?".' },
+  { track: 'starter', emoji: '☕', speaker: 'Barista da Cafeteria', scene: 'Pedindo um café pela manhã', q: 'Hi there! What can I get for you today?', qPt: 'Olá! O que posso trazer para você hoje?', a: 'Could I have a medium coffee with milk, please?', aPt: 'Poderia me vê um café médio com leite, por favor?', o: ['I work at an office downtown.', 'No, I did not watch the movie.', 'The table is very clean.'], tip: '"What can I get for you?" é a pergunta padrão de atendentes; respondemos com "Could I have..., please?".' },
+  { track: 'starter', emoji: '🏦', speaker: 'Pedestre na Rua', scene: 'Pedindo informação na calçada', q: 'Excuse me, where is the nearest metro station?', qPt: 'Com licença, onde fica a estação de metrô mais próxima?', a: 'Go straight ahead and turn left at the bank.', aPt: 'Siga em frente e vire à esquerda no banco.', o: ['I like reading adventure books.', 'Yes, the train is very fast.', 'Two tickets for the cinema, please.'], tip: '"Go straight ahead and turn left..." é a combinação ideal para dar direções na rua.' },
+  { track: 'starter', emoji: '🍵', speaker: 'Anfitriã', scene: 'Visitando a casa de amigos', q: 'Would you like a cup of tea or some water?', qPt: 'Você gostaria de uma xícara de chá ou um pouco de água?', a: 'A glass of water would be great, thank you.', aPt: 'Um copo de água seria ótimo, muito obrigado.', o: ['It is raining outside.', 'My favorite color is green.', 'I wake up at six thirty.'], tip: 'Responder com "...would be great, thank you" soa muito educado ao aceitar algo oferecido.' },
+  { track: 'starter', emoji: '🕖', speaker: 'Colega de Curso', scene: 'Conversando sobre rotina diária', q: 'What time do you usually start working?', qPt: 'A que horas você costuma começar a trabalhar?', a: 'I usually start around eight thirty.', aPt: 'Eu costumo começar por volta das oito e meia.', o: ['In the big building on Main Street.', 'By bus or sometimes by car.', 'I have worked here for two years.'], tip: 'Para responder "What time...?", usamos "at" (hora exata) ou "around" (por volta de).' },
+  { track: 'starter', emoji: '🛍️', speaker: 'Cliente na Loja', scene: 'Perguntando o preço de uma camisa', q: 'How much is this blue shirt on display?', qPt: 'Quanto custa esta camisa azul na vitrine?', a: 'It is twenty-five dollars, and it’s on sale.', aPt: 'Custa vinte e cinco dólares, e está em promoção.', o: ['Tomorrow afternoon at three.', 'Yes, we accept credit cards.', 'She is wearing a red dress.'], tip: '"On sale" significa que o produto está com desconto/em promoção.' },
+  { track: 'starter', emoji: '📚', speaker: 'Amigo', scene: 'Falando sobre passatempos', q: 'What do you like to do in your free time?', qPt: 'O que você gosta de fazer no seu tempo livre?', a: 'I really enjoy cooking and listening to music.', aPt: 'Eu gosto bastante de cozinhar e ouvir música.', o: ['Turn right at the traffic light.', 'It is on the kitchen table.', 'No, I am not hungry right now.'], tip: 'Depois de "enjoy" ou "like", usamos a ação com final -ing (cooking, listening).' },
+  { track: 'starter', emoji: '📦', speaker: 'Colega', scene: 'Carregando caixas pesadas', q: 'Can you give me a hand with these boxes?', qPt: 'Você pode me dar uma mãozinha com essas caixas?', a: 'Of course! Where should we put them?', aPt: 'Claro! Onde devemos colocá-las?', o: ['It is ten o’clock right now.', 'I bought a new pair of shoes.', 'No, I don’t speak French.'], tip: '"Give me a hand" significa ajudar alguém com uma tarefa.' },
+  { track: 'starter', emoji: '🌧️', speaker: 'Familiar', scene: 'Saindo de casa em dia nublado', q: 'Is it still raining outside?', qPt: 'Ainda está chovendo lá fora?', a: 'No, it stopped, but the streets are wet.', aPt: 'Não, já parou, mas as ruas estão molhadas.', o: ['Yes, I like summer very much.', 'At the end of the corridor.', 'My umbrella is black.'], tip: 'A pergunta começa com "Is it still raining?", então respondemos sobre o estado do tempo agora.' },
+  { track: 'starter', emoji: '🍕', speaker: 'Garçom', scene: 'Escolhendo o jantar', q: 'Are you ready to order, or do you need a few minutes?', qPt: 'Vocês estão prontos para pedir ou precisam de alguns minutos?', a: 'We are ready! I’ll have the roast chicken, please.', aPt: 'Estamos prontos! Eu vou querer o frango assado, por favor.', o: ['The restaurant closes at midnight.', 'Yes, the food was delicious.', 'I cooked pasta yesterday.'], tip: 'Ao fazer um pedido no restaurante, dizemos "I’ll have..." ou "I’d like...".' },
+  { track: 'starter', emoji: '🎬', speaker: 'Amiga pelo WhatsApp', scene: 'Combinando o fim de semana', q: 'Do you want to go to the movies this Saturday?', qPt: 'Você quer ir ao cinema neste sábado?', a: 'That sounds fun! What time does the movie start?', aPt: 'Parece divertido! A que horas começa o filme?', o: ['I went there last month.', 'Because it is very expensive.', 'My sister lives in São Paulo.'], tip: '"That sounds fun!" ou "That sounds great!" é a reação natural para aceitar um convite.' },
+  { track: 'starter', emoji: '🙌', speaker: 'Turista', scene: 'Agradecendo uma ajuda', q: 'Thank you so much for showing me the way!', qPt: 'Muito obrigado por me mostrar o caminho!', a: 'You’re very welcome! Have a great day.', aPt: 'De nada! Tenha um ótimo dia.', o: ['I go there every Tuesday.', 'Please turn off the lights.', 'It costs fifteen dollars.'], tip: '"You’re very welcome!" é a resposta mais calorosa para um agradecimento.' },
+  { track: 'starter', emoji: '📱', speaker: 'Recepcionista', scene: 'Confirmando contato telefônico', q: 'Could I have your phone number, please?', qPt: 'Você poderia me passar o seu número de telefone, por favor?', a: 'Sure, it’s five-five-five, two-three-nine-eight.', aPt: 'Claro, é 555-2398.', o: ['I bought this phone last year.', 'Yes, I called my mother.', 'My email is on the card.'], tip: 'Em inglês, costumamos dizer os números de telefone dígito por dígito.' },
+  { track: 'starter', emoji: '🚌', speaker: 'Passageiro no Ponto', scene: 'Esperando o ônibus', q: 'Excuse me, does this bus go downtown?', qPt: 'Com licença, este ônibus vai para o centro?', a: 'Yes, it stops right in front of the central square.', aPt: 'Sim, ele para bem em frente à praça central.', o: ['I prefer riding a bicycle.', 'The ticket was five dollars.', 'At half past four.'], tip: '"Does this bus go...?" pergunta o destino da linha de ônibus.' },
+  { track: 'starter', emoji: '🔑', speaker: 'Irmão', scene: 'Procurando a chave do carro', q: 'Have you seen my car keys anywhere?', qPt: 'Você viu as chaves do meu carro em algum lugar?', a: 'I think they are on the kitchen counter.', aPt: 'Acho que elas estão no balcão da cozinha.', o: ['Your car is parked outside.', 'I drove to work yesterday.', 'Yes, I can drive very well.'], tip: '"On the kitchen counter" indica que o objeto está sobre a superfície do balcão.' },
+  { track: 'starter', emoji: '👋', speaker: 'Colega na Saída', scene: 'Despedindo-se na sexta-feira', q: 'Have a wonderful weekend! See you on Monday.', qPt: 'Tenha um excelente fim de semana! Até segunda-feira.', a: 'Thanks, you too! See you on Monday morning.', aPt: 'Obrigado, para você também! Até segunda de manhã.', o: ['Today is Wednesday.', 'Nice to meet you too.', 'I arrived ten minutes ago.'], tip: 'Respondemos a votos de bom dia ou bom fim de semana com "Thanks, you too!".' },
+
+  // ── 2. INTERMEDIATE / FLUÊNCIA & SITUAÇÕES REAIS (16 diálogos) ──
+  { track: 'intermediate', emoji: '⏳', speaker: 'Amigo no Café', scene: 'Chegando atrasado por causa do trânsito', q: 'Have you been waiting here for a long time?', qPt: 'Você está esperando aqui há muito tempo?', a: 'Not really, I just got here five minutes ago.', aPt: 'Na verdade não, acabei de chegar há cinco minutos.', o: ['I will wait for you tomorrow.', 'Yes, I go there every week.', 'It takes about thirty minutes.'], tip: '"I just got here ... ago" tranquiliza a pessoa dizendo que você acabou de chegar.' },
+  { track: 'intermediate', emoji: '🪟', speaker: 'Colega de Sala', scene: 'Pedindo para fechar a janela por causa do barulho', q: 'Would you mind if I closed the window for a bit?', qPt: 'Você se importaria se eu fechasse a janela um pouquinho?', a: 'Not at all, go right ahead! It’s pretty noisy outside.', aPt: 'De jeito nenhum, pode fechar! Está bem barulhento lá fora.', o: ['Yes, please close the window.', 'I opened it yesterday morning.', 'The window is made of glass.'], tip: 'Cuidado! Para permitir em "Would you mind...?" (Você se importaria?), dizemos "Not at all!" (Não me importo de jeito nenhum!).' },
+  { track: 'intermediate', emoji: '🚗', speaker: 'Mecânico / Amigo', scene: 'Explicando por que não foi ao encontro ontem', q: 'Why didn’t you come to the dinner last night?', qPt: 'Por que você não veio ao jantar ontem à noite?', a: 'My car broke down on the way, and I had to call a tow truck.', aPt: 'Meu carro quebrou no caminho e tive que chamar um guincho.', o: ['I am not going tomorrow night.', 'The dinner was very delicious.', 'Because I will be busy next week.'], tip: '"Broke down on the way" explica um imprevisto com o veículo no meio do trajeto.' },
+  { track: 'intermediate', emoji: '📅', speaker: 'Parceiro de Projeto', scene: 'Tentando marcar uma chamada', q: 'Are you free to talk sometime tomorrow afternoon?', qPt: 'Você está livre para conversar em algum momento amanhã à tarde?', a: 'I’m tied up until three, but I’m free after that.', aPt: 'Estou ocupado até as três, mas estou livre depois disso.', o: ['Yes, we talked yesterday.', 'I work from Monday to Friday.', 'Please call me last night.'], tip: '"I’m tied up" é uma expressão muito natural para dizer "estou preso em compromissos / ocupado".' },
+  { track: 'intermediate', emoji: '🏖️', speaker: 'Colega no Almoço', scene: 'Falando sobre planos de férias', q: 'Have you decided where you’re going on vacation yet?', qPt: 'Você já decidiu para onde vai nas férias?', a: 'We haven’t booked anything yet, but we’re thinking about Bahia.', aPt: 'Ainda não reservamos nada, mas estamos pensando na Bahia.', o: ['We went to the beach last summer.', 'Yes, my vacation was wonderful.', 'I travel by plane twice a year.'], tip: '"We haven’t booked anything yet, but we’re thinking about..." mostra um plano ainda em aberto.' },
+  { track: 'intermediate', emoji: '🎸', speaker: 'Conhecido', scene: 'Conversando sobre hobbies antigos', q: 'Do you still play tennis on weekends?', qPt: 'Você ainda joga tênis nos fins de semana?', a: 'I used to play a lot, but I haven’t had much time lately.', aPt: 'Eu costumava jogar bastante, mas não tenho tido muito tempo ultimamente.', o: ['I will play tennis yesterday.', 'Yes, I bought a guitar.', 'The match starts at four.'], tip: '"I used to..., but I haven’t ... lately" contrasta um hábito antigo com a rotina atual.' },
+  { track: 'intermediate', emoji: '💡', speaker: 'Amigo Indeciso', scene: 'Pedindo conselho sobre compra de notebook', q: 'What would you do if you were in my shoes?', qPt: 'O que você faria se estivesse no meu lugar?', a: 'If I were you, I’d wait for next week’s discount.', aPt: 'Se eu fosse você, esperaria pelo desconto da próxima semana.', o: ['I bought new shoes last month.', 'You should wore a jacket.', 'I am going to the store now.'], tip: '"In my shoes" significa "no meu lugar"; respondemos com "If I were you, I’d...".' },
+  { track: 'intermediate', emoji: '📦', speaker: 'Vizinha', scene: 'Recebendo uma encomenda', q: 'Did the courier deliver my package while I was out?', qPt: 'O entregador trouxe minha encomenda enquanto eu estava fora?', a: 'Yes, he left it with me about an hour ago.', aPt: 'Sim, ele deixou comigo há cerca de uma hora.', o: ['The post office opens at nine.', 'I will send the letter tomorrow.', 'No, I am staying at home.'], tip: '"He left it with me" explica que a entrega ficou guardada com você.' },
+  { track: 'intermediate', emoji: '🗣️', speaker: 'Professor na Aula', scene: 'Checando se a explicação ficou clara', q: 'Does that explanation make sense to you?', qPt: 'Essa explicação faz sentido para você?', a: 'It makes total sense now, thanks for clarifying!', aPt: 'Faz total sentido agora, obrigado por esclarecer!', o: ['Could you repeat the price?', 'I have studied for three hours.', 'Yes, the book is on the shelf.'], tip: '"It makes total sense" confirma que você compreendeu perfeitamente.' },
+  { track: 'intermediate', emoji: '☔', speaker: 'Colega na Portaria', scene: 'Oferecendo carona na chuva', q: 'It’s pouring outside! Do you need a ride home?', qPt: 'Está caindo um toró lá fora! Você precisa de uma carona para casa?', a: 'That would save my life, thank you so much!', aPt: 'Isso salvaria minha vida, muito obrigado mesmo!', o: ['I brought my sunglasses today.', 'My house has three bedrooms.', 'No, I don’t like driving at night.'], tip: '"It’s pouring" significa chovendo muito forte; "need a ride" é precisar de carona.' },
+  { track: 'intermediate', emoji: '🔋', speaker: 'Amigo no Evento', scene: 'Celular ficando sem bateria', q: 'My phone is about to die. Do you have a charger?', qPt: 'Meu celular está quase desligando sem bateria. Você tem um carregador?', a: 'I have a power bank in my backpack if you need it.', aPt: 'Eu tenho um carregador portátil na mochila se você precisar.', o: ['I called him ten minutes ago.', 'Your phone has a big screen.', 'Yes, the wifi is very fast.'], tip: '"My phone is about to die" é o jeito natural de dizer que a bateria está acabando.' },
+  { track: 'intermediate', emoji: '🍽️', speaker: 'Anfitrião no Jantar', scene: 'Oferecendo repetir o prato', q: 'Would you care for some more lasagna?', qPt: 'Você aceita mais um pouco de lasanha?', a: 'It was delicious, but I’m completely full, thank you!', aPt: 'Estava deliciosa, mas estou completamente satisfeito, obrigado!', o: ['I am allergic to peanuts.', 'We ordered pizza last Friday.', 'The kitchen is downstairs.'], tip: 'Para recusar mais comida educadamente, elogie o prato e diga "I’m completely full, thank you!".' },
+  { track: 'intermediate', emoji: '🏃', speaker: 'Colega no Corredor', scene: 'Pessoa com pressa', q: 'Sorry I can’t stop to chat, I’m running late!', qPt: 'Desculpe não poder parar para conversar, estou atrasado!', a: 'No worries at all! Catch up with you later.', aPt: 'Sem problema nenhum! A gente coloca o papo em dia mais tarde.', o: ['Why did you arrive early?', 'I ran five kilometers today.', 'The meeting was yesterday.'], tip: '"I’m running late" = estou atrasado; "Catch up with you later" = nos falamos depois.' },
+  { track: 'intermediate', emoji: '🏠', speaker: 'Amigo', scene: 'Perguntando sobre mudança de apartamento', q: 'How are you settling into your new apartment?', qPt: 'Como você está se adaptando ao seu apartamento novo?', a: 'We’re still unpacking boxes, but we love the location!', aPt: 'Ainda estamos desempacotando caixas, mas adoramos a localização!', o: ['The rent is due on the fifth.', 'I lived there five years ago.', 'It has a blue front door.'], tip: '"Settling into..." pergunta como está sendo a adaptação a uma casa ou emprego novo.' },
+  { track: 'intermediate', emoji: '🎟️', speaker: 'Amiga na Fila', scene: 'Ingressos esgotados para o show', q: 'I heard the concert tickets sold out in ten minutes!', qPt: 'Ouvi dizer que os ingressos do show esgotaram em dez minutos!', a: 'Luckily I managed to grab two tickets right on time!', aPt: 'Por sorte eu consegui garantir dois ingressos bem na hora!', o: ['The band played very well.', 'I don’t listen to radio.', 'It starts at eight o’clock.'], tip: '"Sold out" = esgotaram; "managed to grab" = consegui pegar/garantir.' },
+  { track: 'intermediate', emoji: '🤔', speaker: 'Colega de Equipe', scene: 'Pedindo opinião sincera', q: 'What do you honestly think about this new layout?', qPt: 'O que você acha sinceramente deste novo layout?', a: 'To be honest, I think the previous version was easier to read.', aPt: 'Para ser sincero, acho que a versão anterior era mais fácil de ler.', o: ['I designed it on my computer.', 'Yes, the printer is working.', 'We need ten more copies.'], tip: '"To be honest, I think..." introduz uma crítica construtiva com educação.' },
+
+  // ── 3. TRAVEL / VIAGEM, AEROPORTO & HOTEL (16 diálogos) ──
+  { track: 'travel', emoji: '🛂', speaker: 'Agente de Imigração', scene: 'Passando pela imigração nos EUA/Europa', q: 'What is the purpose of your visit, and how long will you stay?', qPt: 'Qual é o motivo da sua visita e por quanto tempo vai ficar?', a: 'I’m here on vacation for ten days, staying at a hotel downtown.', aPt: 'Estou aqui de férias por dez dias, hospedado em um hotel no centro.', o: ['I have two suitcases and a backpack.', 'My flight was very comfortable.', 'Yes, I visited New York last year.'], tip: 'Na imigração, responda de forma direta: motivo ("on vacation / on business") + duração ("for ten days").' },
+  { track: 'travel', emoji: '🛫', speaker: 'Atendente do Check-in', scene: 'Escolhendo assento no avião', q: 'Would you prefer a window seat or an aisle seat?', qPt: 'Você prefere assento na janela ou no corredor?', a: 'An aisle seat, please, if there is one available.', aPt: 'No corredor, por favor, se houver um disponível.', o: ['I have a boarding pass already.', 'The flight takes six hours.', 'Just one carry-on bag, thanks.'], tip: '"Window seat" = janela; "aisle seat" (pronuncia-se áiol) = corredor.' },
+  { track: 'travel', emoji: '🧳', speaker: 'Agente de Bagagem', scene: 'Despachando mala no aeroporto', q: 'Did you pack these bags yourself, and are you carrying any liquids?', qPt: 'Você mesmo fez suas malas e está levando algum líquido?', a: 'Yes, I packed them myself, and all liquids are in my checked bag.', aPt: 'Sim, eu mesmo fiz as malas, e todos os líquidos estão na mala despachada.', o: ['My suitcase is blue and medium-sized.', 'I bought these gifts at the duty-free.', 'The gate is number twenty-four.'], tip: '"Checked bag" é a mala despachada; "carry-on" é a bagagem de mão.' },
+  { track: 'travel', emoji: '📢', speaker: 'Agente do Portão de Embarque', scene: 'Voo atrasado no aeroporto', q: 'I’m afraid your flight has been delayed by two hours.', qPt: 'Receio informar que o seu voo atrasou duas horas.', a: 'Oh no! Will I still make my connecting flight in Miami?', aPt: 'Ah não! Eu ainda vou conseguir pegar meu voo de conexão em Miami?', o: ['Thank you for a great flight.', 'I would like the chicken pasta.', 'Where is the baggage claim?'], tip: '"Make my connecting flight" significa conseguir alcançar o voo de conexão a tempo.' },
+  { track: 'travel', emoji: '🏨', speaker: 'Recepcionista do Hotel', scene: 'Chegando ao hotel antes do horário de check-in', q: 'Check-in starts at three, but I can check if your room is ready.', qPt: 'O check-in começa às três, mas posso ver se o seu quarto já está pronto.', a: 'I appreciate that! Otherwise, could we leave our bags at reception?', aPt: 'Eu agradeço! Caso contrário, poderíamos deixar nossas malas na recepção?', o: ['We would like to check out now.', 'The room on the fifth floor is nice.', 'Breakfast is included in the rate.'], tip: '"Leave our bags at reception" resolve a vida do viajante que chega antes do horário do quarto.' },
+  { track: 'travel', emoji: '❄️', speaker: 'Hóspede na Recepção', scene: 'Problema com o ar-condicionado do quarto', q: 'How can I help you from the front desk this evening?', qPt: 'Como posso ajudá-lo aqui da recepção nesta noite?', a: 'The air conditioning in room 402 isn’t working properly.', aPt: 'O ar-condicionado do quarto 402 não está funcionando direito.', o: ['I have a reservation for two nights.', 'Could you call a taxi for tomorrow?', 'Yes, the bed is very comfortable.'], tip: '"Isn’t working properly" explica que um equipamento do quarto está com defeito.' },
+  { track: 'travel', emoji: '🍽️', speaker: 'Garçom no Restaurante', scene: 'Pedindo recomendação do cardápio', q: 'Do you have any questions about today’s specials?', qPt: 'Vocês têm alguma dúvida sobre os pratos especiais de hoje?', a: 'Yes, what do you recommend between the salmon and the steak?', aPt: 'Sim, o que você recomenda entre o salmão e o bife?', o: ['Could we pay separately, please?', 'The table by the window is free.', 'We didn’t make a reservation.'], tip: '"What do you recommend between...?" pede a sugestão do garçom.' },
+  { track: 'travel', emoji: '💳', speaker: 'Caixa da Loja / Restaurante', scene: 'Hora de pagar a conta no exterior', q: 'Will that be cash or card today?', qPt: 'Vai ser no dinheiro ou cartão hoje?', a: 'Card, please. Can I just tap my card here?', aPt: 'Cartão, por favor. Posso só aproximar meu cartão aqui?', o: ['I would like a receipt, please.', 'It costs forty-five euros.', 'Do you have a smaller size?'], tip: '"Tap my card" é a expressão usada em todo o mundo para pagamento por aproximação (contactless).' },
+  { track: 'travel', emoji: '🚕', speaker: 'Motorista de Táxi', scene: 'Entrando no táxi no aeroporto', q: 'Where are we heading to today?', qPt: 'Para onde estamos indo hoje?', a: 'To the Grand Hotel on Fifth Avenue, please.', aPt: 'Para o Grand Hotel na Quinta Avenida, por favor.', o: ['My flight just landed ten minutes ago.', 'It took about forty minutes.', 'Can I have the window seat?'], tip: '"Where are we heading to?" significa "Para onde vamos?".' },
+  { track: 'travel', emoji: '🗺️', speaker: 'Morador Local', scene: 'Confirmando se dá para ir a pé', q: 'Are you looking for the Natural History Museum?', qPt: 'Você está procurando o Museu de História Natural?', a: 'Yes! Is it within walking distance, or should we take the subway?', aPt: 'Sim! Dá para ir a pé ou deveríamos pegar o metrô?', o: ['The museum closes on Mondays.', 'We bought the tickets online.', 'It was built a hundred years ago.'], tip: '"Is it within walking distance, or should we take...?" é ótima para decidir como se deslocar.' },
+  { track: 'travel', emoji: '🧳', speaker: 'Funcionário de Bagagens Perdidas', scene: 'Mala não apareceu na esteira', q: 'Can you describe what your missing suitcase looks like?', qPt: 'Você pode descrever como é a sua mala desaparecida?', a: 'It’s a large hard-shell navy blue suitcase with a red tag.', aPt: 'É uma mala grande rígida azul-marinho com uma etiqueta vermelha.', o: ['I checked it in at the counter.', 'It has all my clothes inside.', 'My flight came from São Paulo.'], tip: 'Ao descrever bagagem, diga tamanho + material/cor + detalhe ("large hard-shell navy blue with a red tag").' },
+  { track: 'travel', emoji: '💊', speaker: 'Farmacêutico', scene: 'Comprando remédio leve em viagem', q: 'Hi! What symptoms are you looking to treat?', qPt: 'Olá! Quais sintomas você está procurando tratar?', a: 'I have a mild headache and a sore throat. Do you have something over-the-counter?', aPt: 'Estou com uma dor de cabeça leve e dor de garganta. Tem algo sem receita?', o: ['I have travel insurance with me.', 'The hospital is two blocks away.', 'Twice a day after breakfast.'], tip: '"Over-the-counter" (OTC) significa medicamento vendido na farmácia sem necessidade de receita médica.' },
+  { track: 'travel', emoji: '🔌', speaker: 'Camareira / Recepção', scene: 'Pedindo ferro de passar ou adaptador', q: 'Good evening! Did you request something for room 305?', qPt: 'Boa noite! Você solicitou algo para o quarto 305?', a: 'Yes, could you send up an extra towel and a power adapter, please?', aPt: 'Sim, poderia mandar subir uma toalha extra e um adaptador de tomada, por favor?', o: ['We are checking out tomorrow.', 'The wifi password is on the desk.', 'Thank you for cleaning the room.'], tip: '"Send up..." no hotel significa mandar entregar no quarto.' },
+  { track: 'travel', emoji: '🚆', speaker: 'Bilheteiro da Estação de Trem', scene: 'Comprando passagem de trem', q: 'One-way or round-trip to Boston, and for what time?', qPt: 'Só ida ou ida e volta para Boston, e para que horário?', a: 'Round-trip, please, leaving on the next available train.', aPt: 'Ida e volta, por favor, saindo no próximo trem disponível.', o: ['Platform four is over there.', 'The train was very crowded.', 'I prefer traveling by plane.'], tip: '"One-way" = só ida; "round-trip" (EUA) ou "return" (Reino Unido) = ida e volta.' },
+  { track: 'travel', emoji: '🥗', speaker: 'Garçonete', scene: 'Avisando restrição alimentar', q: 'Does anyone at the table have any food allergies?', qPt: 'Alguém na mesa tem alguma alergia alimentar?', a: 'Yes, I’m allergic to shrimp. Does this sauce contain seafood?', aPt: 'Sim, sou alérgico a camarão. Este molho contém frutos do mar?', o: ['Everything tasted wonderful, thanks.', 'We would like to split the bill.', 'A bottle of sparkling water, please.'], tip: 'Sempre confirme ingredientes com "Does this ... contain ...?".' },
+  { track: 'travel', emoji: '🕘', speaker: 'Recepcionista no Check-out', scene: 'Encerrando a estadia no hotel', q: 'How was your stay with us? Everything on the bill looks right?', qPt: 'Como foi sua estadia conosco? Tudo certo na conta?', a: 'Everything was wonderful! Could we just get a printed receipt, please?', aPt: 'Foi tudo ótimo! Poderíamos só pegar um recibo impresso, por favor?', o: ['We arrived three days ago.', 'My room key is in my pocket.', 'What time is breakfast served?'], tip: '"A printed receipt" é o comprovante/nota impressa para reembolso ou controle.' },
+
+  // ── 4. WORK / TRABALHO, REUNIÕES & ENTREVISTA (16 diálogos) ──
+  { track: 'work', emoji: '💼', speaker: 'Recrutadora', scene: 'Início de uma entrevista de emprego em inglês', q: 'To start off, could you tell me a little about your background?', qPt: 'Para começar, você poderia me contar um pouco sobre sua trajetória?', a: 'Sure! I’ve worked in project management for six years, focusing on logistics.', aPt: 'Claro! Trabalho com gestão de projetos há seis anos, com foco em logística.', o: ['I was born in a small town in Brazil.', 'My favorite hobby is playing soccer.', 'I am looking for a higher salary.'], tip: 'Em entrevistas, "background" refere-se à sua experiência profissional e formação principal.' },
+  { track: 'work', emoji: '💻', speaker: 'Gerente na Videochamada', scene: 'Apresentando slides na reunião online', q: 'We can’t see your presentation yet. Are you sharing your screen?', qPt: 'Ainda não conseguimos ver sua apresentação. Você está compartilhando sua tela?', a: 'Give me just a second—can everyone see my screen now?', aPt: 'Só um segundinho — todos conseguem ver minha tela agora?', o: ['My camera is turned off today.', 'I sent the email yesterday morning.', 'The meeting will last one hour.'], tip: '"Can everyone see my screen now?" é a frase indispensável em reuniões remotas.' },
+  { track: 'work', emoji: '📅', speaker: 'Cliente Internacional', scene: 'Pedindo para adiantar um prazo', q: 'Would it be possible to deliver the prototype by Wednesday instead of Friday?', qPt: 'Seria possível entregar o protótipo até quarta em vez de sexta?', a: 'Wednesday is tight, but we can send a preliminary version by Thursday morning.', aPt: 'Quarta fica apertado, mas podemos enviar uma versão preliminar até quinta de manhã.', o: ['No, that is completely impossible.', 'We delivered it last week.', 'Friday is my favorite day.'], tip: 'Em vez de dizer apenas "não", ofereça uma alternativa viável ("Wednesday is tight, but we can...").' },
+  { track: 'work', emoji: '🗣️', speaker: 'Colega na Call', scene: 'Áudio cortando durante a reunião', q: 'Sorry, your audio is breaking up a bit. Could you repeat that last part?', qPt: 'Desculpe, seu áudio está cortando um pouco. Poderia repetir essa última parte?', a: 'Let me turn off my video to improve the connection. Is it clearer now?', aPt: 'Deixe-me desligar meu vídeo para melhorar a conexão. Ficou mais claro agora?', o: ['I am speaking on the microphone.', 'The presentation has ten slides.', 'We agreed on the budget.'], tip: '"Breaking up" significa que a voz está falhando/picotando na chamada.' },
+  { track: 'work', emoji: '🎯', speaker: 'Entrevistador', scene: 'Pergunta clássica sobre pontos fortes', q: 'How do you usually handle high-pressure situations and tight deadlines?', qPt: 'Como você costuma lidar com situações de alta pressão e prazos curtos?', a: 'I break large tasks into priorities and communicate early with the team.', aPt: 'Eu divido tarefas grandes em prioridades e me comunico cedo com a equipe.', o: ['I don’t like working under pressure.', 'My previous boss was very strict.', 'I usually work eight hours a day.'], tip: 'Mostre método e comunicação ao responder perguntas comportamentais em entrevistas.' },
+  { track: 'work', emoji: '📊', speaker: 'Diretora', scene: 'Pedindo atualização rápida de status', q: 'Where do we stand on the Q3 budget report?', qPt: 'Em que pé estamos com o relatório de orçamento do 3º trimestre?', a: 'We’re finalizing the numbers today and will send it over by 4 PM.', aPt: 'Estamos finalizando os números hoje e enviaremos até as 16h.', o: ['The report is on the third floor.', 'We had a meeting last month.', 'Yes, the budget was approved.'], tip: '"Where do we stand on...?" significa "Em que pé estamos com...?".' },
+  { track: 'work', emoji: '🤝', speaker: 'Recrutador no Final da Entrevista', scene: 'Momento aberto para perguntas do candidato', q: 'Do you have any questions for us about the role or the company?', qPt: 'Você tem alguma pergunta para nós sobre a vaga ou a empresa?', a: 'Yes! What would success look like in the first ninety days in this role?', aPt: 'Sim! Como seria um resultado de sucesso nos primeiros 90 dias nesta vaga?', o: ['No, I don’t have any questions.', 'How many vacation days do I get?', 'What time do you close on Fridays?'], tip: 'Perguntar sobre expectativas para os primeiros 90 dias causa excelente impressão em entrevistas.' },
+  { track: 'work', emoji: '✉️', speaker: 'Colega de Departamento', scene: 'Cobrando retorno de um fornecedor', q: 'Have we heard back from the supplier regarding the shipment?', qPt: 'Tivemos algum retorno do fornecedor sobre a remessa?', a: 'Not yet—I’ll follow up with them right after lunch.', aPt: 'Ainda não — vou cobrar um retorno deles logo após o almoço.', o: ['The supplier is in Germany.', 'We shipped the boxes yesterday.', 'Yes, I heard a loud noise.'], tip: '"Hear back from..." = receber resposta de; "follow up with..." = fazer contato de acompanhamento.' },
+  { track: 'work', emoji: '🕒', speaker: 'Parceiro Comercial', scene: 'Conflito de agenda', q: 'I have a conflict at 10 AM tomorrow. Can we push our call back an hour?', qPt: 'Tenho um conflito às 10h amanhã. Podemos adiar nossa chamada em uma hora?', a: '11 AM works perfectly for me. I’ll update the calendar invite.', aPt: '11h funciona perfeitamente para mim. Vou atualizar o convite na agenda.', o: ['We talked at 10 AM yesterday.', 'Please bring the contract.', 'I am busy all week.'], tip: '"Push back" um compromisso significa adiar para mais tarde; "move up" significa antecipar.' },
+  { track: 'work', emoji: '💡', speaker: 'Líder de Produto', scene: 'Discordando com diplomacia em uma reunião', q: 'I think we should launch the new feature without testing it first.', qPt: 'Acho que deveríamos lançar a nova função sem testá-la antes.', a: 'I see your point, but running a quick test could save us major headaches.', aPt: 'Entendo seu ponto, mas rodar um teste rápido pode nos poupar grandes dores de cabeça.', o: ['That is a terrible idea.', 'The feature is already finished.', 'I don’t know how to test it.'], tip: '"I see your point, but..." permite discordar com elegância e respeito profissional.' },
+  { track: 'work', emoji: '📈', speaker: 'Entrevistadora', scene: 'Perguntando o motivo de buscar novo emprego', q: 'Why are you looking to leave your current position?', qPt: 'Por que você está buscando sair do seu cargo atual?', a: 'I’m ready for new challenges where I can work with international teams.', aPt: 'Estou pronto para novos desafios onde eu possa trabalhar com equipes internacionais.', o: ['Because my current job is boring.', 'I want to work fewer hours.', 'My office is too far from home.'], tip: 'Sempre foque no crescimento e no que você busca construir no novo cargo.' },
+  { track: 'work', emoji: '📋', speaker: 'Gerente de Conta', scene: 'Encerrando reunião e definindo próximos passos', q: 'Before we wrap up, are we all aligned on the next steps?', qPt: 'Antes de encerrarmos, estamos todos alinhados sobre os próximos passos?', a: 'Yes! I’ll send a quick recap email with all action items.', aPt: 'Sim! Vou enviar um e-mail rápido de resumo com todas as tarefas.', o: ['The meeting started at nine.', 'Let’s open a new topic now.', 'I wrapped the gift yesterday.'], tip: '"Wrap up" = encerrar uma reunião; "recap email" = e-mail com o resumo do que foi combinado.' },
+  { track: 'work', emoji: '🛠️', speaker: 'Cliente no Suporte', scene: 'Relatando erro no sistema', q: 'We’re getting an error message whenever we try to export the invoice.', qPt: 'Estamos recebendo uma mensagem de erro sempre que tentamos exportar a fatura.', a: 'Could you send me a screenshot so our technical team can look into it?', aPt: 'Você poderia me enviar um print da tela para nossa equipe técnica investigar?', o: ['The invoice was paid last month.', 'Our system never has errors.', 'Please restart your computer tomorrow.'], tip: '"Look into it" significa investigar a fundo um problema.' },
+  { track: 'work', emoji: '🏖️', speaker: 'Colega', scene: 'Preparando saída para férias', q: 'Who will be covering your accounts while you’re away next week?', qPt: 'Quem vai cobrir suas contas enquanto você estiver fora na semana que vem?', a: 'Lucas is fully briefed and will handle any urgent requests.', aPt: 'O Lucas já está totalmente inteirado e cuidará de qualquer pedido urgente.', o: ['I am going to Florianópolis.', 'My vacation lasts two weeks.', 'I will check my emails every hour.'], tip: '"Fully briefed" significa que a pessoa já recebeu todas as instruções necessárias.' },
+  { track: 'work', emoji: '🎤', speaker: 'Moderador de Evento', scene: 'Passando a palavra na apresentação', q: 'I’ll now hand it over to you to present the financial results.', qPt: 'Agora passo a palavra para você apresentar os resultados financeiros.', a: 'Thank you! Let’s take a look at the key numbers on slide three.', aPt: 'Obrigado! Vamos dar uma olhada nos números principais no slide três.', o: ['I finished my presentation.', 'Please hand me that folder.', 'The results were calculated yesterday.'], tip: '"Hand it over to..." é a expressão usada para passar a palavra a outro apresentador.' },
+  { track: 'work', emoji: '🙌', speaker: 'Diretor de Operações', scene: 'Elogiando entrega da equipe', q: 'Great job on the client presentation today—they were really impressed!', qPt: 'Ótimo trabalho na apresentação para o cliente hoje — eles ficaram muito impressionados!', a: 'Thank you! It was a real team effort from everyone involved.', aPt: 'Obrigado! Foi um verdadeiro esforço em equipe de todos os envolvidos.', o: ['I did everything by myself.', 'The client arrived late.', 'We will present it next Friday.'], tip: '"It was a real team effort" valoriza a equipe ao receber um elogio.' },
+
+  // ── 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (16 diálogos) ──
+  { track: 'agro', emoji: '🌱', speaker: 'Agrônoma da Fazenda', scene: 'Avaliando condições para iniciar o plantio de soja', q: 'How is the soil moisture looking in the southern plot after yesterday’s rain?', qPt: 'Como está a umidade do solo no talhão sul após a chuva de ontem?', a: 'Moisture is ideal at five centimeters—we can start planting soybeans today.', aPt: 'A umidade está ideal a cinco centímetros — podemos começar a plantar soja hoje.', o: ['The corn harvest finished last month.', 'We need to buy more diesel fuel.', 'The silo is completely full.'], tip: '"Soil moisture" = umidade do solo; "start planting" = iniciar o plantio.' },
+  { track: 'agro', emoji: '🚜', speaker: 'Operador do Pulverizador', scene: 'Vento aumentando durante a pulverização', q: 'Wind speed just hit twenty kilometers per hour. Should we keep spraying?', qPt: 'A velocidade do vento acabou de atingir 20 km/h. Devemos continuar pulverizando?', a: 'No, stop immediately so we avoid chemical drift onto the neighbor’s crop.', aPt: 'Não, pare imediatamente para evitarmos deriva de defensivo na lavoura vizinha.', o: ['Increase the tractor speed now.', 'Fill the tank with more water.', 'The nozzles are brand new.'], tip: 'Vento forte causa "chemical drift" (deriva), exigindo interromper a aplicação.' },
+  { track: 'agro', emoji: '🌾', speaker: 'Gerente de Colheita', scene: 'Conferindo umidade dos grãos na colheitadeira', q: 'What is the grain moisture reading on the combine monitor right now?', qPt: 'Qual é a leitura de umidade de grãos no monitor da colheitadeira agora?', a: 'It’s averaging thirteen point five percent—perfect for storage.', aPt: 'Está com média de 13,5% — perfeito para armazenamento.', o: ['The combine tank holds ten tons.', 'We planted this field in October.', 'The header width is thirty feet.'], tip: 'Em números decimais em inglês, lemos o ponto como "point" (thirteen point five percent).' },
+  { track: 'agro', emoji: '🐛', speaker: 'Consultor Técnico', scene: 'Inspeção de pragas na lavoura (Scouting)', q: 'Did you find any signs of caterpillars during field scouting this morning?', qPt: 'Você encontrou algum sinal de lagartas durante o monitoramento do talhão hoje de manhã?', a: 'Yes, we reached the action threshold near the edge of plot four.', aPt: 'Sim, atingimos o nível de controle perto da borda do talhão quatro.', o: ['The fertilizer arrived yesterday.', 'We irrigated the field all night.', 'The tractor tire is flat.'], tip: '"Field scouting" é o monitoramento de pragas; "action threshold" é o nível de controle.' },
+  { track: 'agro', emoji: '🔧', speaker: 'Chefe de Oficina da Fazenda', scene: 'Manutenção preventiva antes de ir para o campo', q: 'Did you check the sprayer nozzles and clean the filters before loading?', qPt: 'Você conferiu os bicos do pulverizador e limpou os filtros antes de abastecer?', a: 'Yes, I replaced two clogged nozzles and checked the pressure.', aPt: 'Sim, substituí dois bicos entupidos e conferi a pressão.', o: ['The tractor is parked in the shed.', 'We harvested fifty bags per hectare.', 'It is going to rain tonight.'], tip: '"Clogged nozzles" significa bicos de pulverização entupidos.' },
+  { track: 'agro', emoji: '📦', speaker: 'Operador do Silo', scene: 'Monitoramento de grãos armazenados', q: 'The temperature sensor inside silo two is rising. What should we do?', qPt: 'O sensor de temperatura dentro do silo dois está subindo. O que devemos fazer?', a: 'Turn on the aeration fans right away to cool down the grain mass.', aPt: 'Ligue os ventiladores de aeração imediatamente para resfriar a massa de grãos.', o: ['Close all the warehouse doors.', 'Load the trucks for export.', 'Plant the seeds deeper.'], tip: '"Aeration fans" são os ventiladores de aeração do silo.' },
+  { track: 'agro', emoji: '🧪', speaker: 'Fornecedor de Insumos', scene: 'Entrega de calcário e corretivos de solo', q: 'Where should our drivers unload thetwenty tons of agricultural lime?', qPt: 'Onde nossos motoristas devem descarregar as vinte toneladas de calcário agrícola?', a: 'Have them unload it next to the main shed in the northern sector.', aPt: 'Peça para descarregarem ao lado do galpão principal no setor norte.', o: ['We applied nitrogen last week.', 'The soil pH is already six.', 'The harvest starts in March.'], tip: '"Unload" = descarregar; "agricultural lime" = calcário agrícola.' },
+  { track: 'agro', emoji: '🐄', speaker: 'Veterinário / Zootecnista', scene: 'Avaliando nutrição do rebanho', q: 'Have you noticed any change in milk production with the new silage?', qPt: 'Você notou alguma mudança na produção de leite com a nova silagem?', a: 'Yes, daily yield per cow increased by almost two liters this week.', aPt: 'Sim, a produção diária por vaca aumentou quase dois litros nesta semana.', o: ['The pasture fence needs repair.', 'We vaccinated the calves in May.', 'The water trough is clean.'], tip: '"Daily yield" refere-se à produção/rendimento diário.' },
+  { track: 'agro', emoji: '💧', speaker: 'Técnico de Irrigação', scene: 'Checando pressão do pivô central', q: 'Why did the center pivot stop in the middle of the cycle?', qPt: 'Por que o pivô central parou no meio do ciclo?', a: 'There was a pressure drop at the main pump, but we’re fixing it now.', aPt: 'Houve uma queda de pressão na bomba principal, mas já estamos consertando.', o: ['It rained thirty millimeters yesterday.', 'The corn is growing very fast.', 'We need more seed bags.'], tip: '"Pressure drop at the main pump" = queda de pressão na bomba principal.' },
+  { track: 'agro', emoji: '🚜', speaker: 'Operador de Plantadeira', scene: 'Conferindo profundidade de semeadura', q: 'Are the planter units placing the seeds at a uniform depth?', qPt: 'As linhas da plantadeira estão depositando as sementes em profundidade uniforme?', a: 'Yes, we adjusted the downforce and the spacing looks spot on.', aPt: 'Sim, ajustamos a pressão de solo e o espaçamento está impecável.', o: ['The fertilizer tank is empty.', 'We finished spraying the weeds.', 'Drive faster on the road.'], tip: '"Planter units" = linhas da plantadeira; "downforce" = pressão nas linhas; "spot on" = exato/perfeito.' },
+  { track: 'agro', emoji: '⛈️', speaker: 'Gerente Agrícola', scene: 'Planejando janela operacional antes da frente fria', q: 'The forecast shows heavy rain coming on Thursday. Can we finish plot six before then?', qPt: 'A previsão indica chuva forte na quinta. Conseguimos terminar o talhão seis antes disso?', a: 'If we run two shifts today and tomorrow, we’ll finish ahead of the rain.', aPt: 'Se rodarmos dois turnos hoje e amanhã, terminaremos antes da chuva.', o: ['The rain was very good last month.', 'Plot six has fifty hectares.', 'Turn off the tractor engine.'], tip: '"Run two shifts" = operar em dois turnos; "ahead of the rain" = antes da chuva chegar.' },
+  { track: 'agro', emoji: '🌻', speaker: 'Agrônomo Visitante', scene: 'Conversando sobre cobertura de solo e plantio direto', q: 'What cover crop are you using for your no-till system this winter?', qPt: 'Qual cultura de cobertura vocês estão usando para o sistema de plantio direto neste inverno?', a: 'We’re planting brachiaria and oats to protect the soil and retain moisture.', aPt: 'Estamos plantando braquiária e aveia para proteger o solo e reter umidade.', o: ['We plowed the entire field twice.', 'The harvest yield was sixty bags.', 'Soybean prices rose today.'], tip: '"Cover crop" = cultura de cobertura/palhada; "no-till system" = plantio direto na palha.' },
+  { track: 'agro', emoji: '⛽', speaker: 'Motorista do Comboio', scene: 'Abastecimento e manutenção diária no campo', q: 'While I refuel the tractor, do you need grease or hydraulic oil?', qPt: 'Enquanto abasteço o trator, você precisa de graxa ou óleo hidráulico?', a: 'Please top up the hydraulic reservoir and let’s blow out the air filter.', aPt: 'Por favor, complete o reservatório hidráulico e vamos limpar o filtro de ar.', o: ['The diesel tank holds four hundred liters.', 'I started working at six.', 'The road to the farm is muddy.'], tip: '"Top up" significa completar o nível de um fluido/reservatório.' },
+  { track: 'agro', emoji: '🚛', speaker: 'Encarregado da Balança', scene: 'Pesagem de caminhão de grãos', q: 'Did the grain truck already pass the moisture and impurity test?', qPt: 'O caminhão de grãos já passou pelo teste de umidade e impureza?', a: 'Yes, the sample was approved and it’s heading to the scale now.', aPt: 'Sim, a amostra foi aprovada e ele está indo para a balança agora.', o: ['The driver is having lunch.', 'We need three more tarps.', 'The highway is ten kilometers away.'], tip: '"Sample" = amostra de grãos; "scale" = balança rodoviária.' },
+  { track: 'agro', emoji: '📈', speaker: 'Comprador da Cooperativa', scene: 'Negociando venda de sacas de soja', q: 'Are you looking to lock in the price for part of your soybean crop today?', qPt: 'Você pretende travar o preço de parte da sua safra de soja hoje?', a: 'Yes, let’s lock in three thousand bags at today’s futures price.', aPt: 'Sim, vamos travar três mil sacas na cotação futura de hoje.', o: ['We haven’t planted the corn yet.', 'The warehouse is closed on Sundays.', 'Our tractor has two hundred horsepower.'], tip: '"Lock in the price" no agronegócio significa travar o preço de venda.' },
+  { track: 'agro', emoji: '🍃', speaker: 'Técnico de Campo', scene: 'Avaliando dessecação pré-plantio', q: 'How many days ago did you finish the burndown application here?', qPt: 'Há quantos dias vocês terminaram a aplicação de dessecação aqui?', a: 'Ten days ago—the weeds are completely dry and ready for the planter.', aPt: 'Há dez dias — as plantas daninhas estão totalmente secas e prontas para a plantadeira.', o: ['We will spray again next month.', 'The nozzles are green and yellow.', 'It is a very sunny morning.'], tip: '"Burndown application" é a dessecação pré-plantio; "weeds" são plantas daninhas.' },
+
+  // ── 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & SUPORTE (16 diálogos) ──
+  { track: 'gpstronic', emoji: '🛰️', speaker: 'Operador pelo Rádio', scene: 'Perda de sinal RTK durante o plantio', q: 'The monitor says RTK signal lost and accuracy dropped. What should I check first?', qPt: 'O monitor diz sinal RTK perdido e a precisão caiu. O que devo checar primeiro?', a: 'Check if the radio antenna cable is tight and if the base station LED is blinking.', aPt: 'Verifique se o cabo da antena de rádio está firme e se o LED da base está piscando.', o: ['Replace the tractor front tires.', 'Clean the grain moisture sensor.', 'Change the engine oil filter.'], tip: 'Em perda de RTK, o primeiro passo é checar antena/cabo de rádio e o link com a base ("base station").' },
+  { track: 'gpstronic', emoji: '🔌', speaker: 'Técnico de Oficina', scene: 'Diagnóstico de rede CAN com multímetro', q: 'What resistance reading are you getting across CAN High and CAN Low with power off?', qPt: 'Qual leitura de resistência você está obtendo entre CAN High e CAN Low com a chave desligada?', a: 'I’m getting sixty ohms, which means both terminating resistors are intact.', aPt: 'Estou obtendo 60 ohms, o que significa que ambos os resistores de terminação estão intactos.', o: ['The battery is twelve volts.', 'The fuse in slot four is blown.', 'The harness is three meters long.'], tip: 'Dois resistores de 120 ohms em paralelo na rede CAN resultam em 60 ohms!' },
+  { track: 'gpstronic', emoji: '🛞', speaker: 'Cliente na Cabine', scene: 'Trator fazendo zigue-zague no piloto automático', q: 'The tractor is oscillating left and right on the AB line. How do we fix it?', qPt: 'O trator está oscilando para a esquerda e direita na linha AB. Como corrigimos isso?', a: 'Let’s lower the steering aggressiveness and recalibrate the wheel angle sensor.', aPt: 'Vamos reduzir a agressividade da direção e recalibrar o sensor de ângulo de roda.', o: ['Increase the sprayer boom height.', 'Format the USB flash drive.', 'Turn off the section control.'], tip: '"Steering aggressiveness" (agressividade) alta ou sensor descalibrado faz o trator oscilar ("hunting/oscillating").' },
+  { track: 'gpstronic', emoji: '🗺️', speaker: 'Operador de Pulverizador', scene: 'Falha no desligamento automático de seção', q: 'Why isn’t the section control turning off automatically at the headland?', qPt: 'Por que o corte de seção não está desligando automaticamente na cabeceira?', a: 'Make sure the boundary is loaded and the master switch on the screen is enabled.', aPt: 'Certifique-se de que a bordadura está carregada e a chave geral na tela está ativada.', o: ['The GPS antenna is on the roof.', 'We sprayed two hundred hectares.', 'The hydraulic oil is warm.'], tip: '"Boundary" é a bordadura do talhão; sem ela ou sem o master ativo, o corte não atua.' },
+  { track: 'gpstronic', emoji: '💾', speaker: 'Técnico Júnior', scene: 'Atualizando firmware de monitor ISOBUS', q: 'The terminal isn’t recognizing the firmware file on the USB drive. Any idea why?', qPt: 'O terminal não está reconhecendo o arquivo de firmware no pen drive. Alguma ideia do porquê?', a: 'Format the USB drive to FAT32 and place the update folder directly in the root.', aPt: 'Formate o pen drive em FAT32 e coloque a pasta de atualização direto na raiz.', o: ['Unplug the GPS receiver cable.', 'Turn the steering wheel to the left.', 'Enter the implement width again.'], tip: 'Terminais agrícolas exigem pen drive em "FAT32" com a pasta na raiz ("in the root").' },
+  { track: 'gpstronic', emoji: '⚠️', speaker: 'Produtor Rural', scene: 'Piloto automático desarmando sozinho', q: 'The autopilot keeps disengaging every time I hit a bump in the field.', qPt: 'O piloto automático continua desarmando toda vez que passo em um solavanco no talhão.', a: 'The steering valve pressure switch might be too sensitive or have a loose wire.', aPt: 'O pressostato da válvula de direção pode estar sensível demais ou com mau contato no fio.', o: ['Your prescription map is ready.', 'The satellite signal is 100 percent.', 'Please save the AB line first.'], tip: '"Keeps disengaging" = fica desarmando; o sensor/pressostato de movimento do volante costuma ser a causa.' },
+  { track: 'gpstronic', emoji: '🌱', speaker: 'Agrônomo de Precisão', scene: 'Importando mapa de taxa variável', q: 'Which file format does this display require for variable rate prescription maps?', qPt: 'Qual formato de arquivo este monitor exige para mapas de prescrição em taxa variável?', a: 'It uses standard Shapefiles—just copy the SHP, SHX, and DBF files together.', aPt: 'Ele usa Shapefiles padrão — basta copiar os arquivos SHP, SHX e DBF juntos.', o: ['It only reads PDF documents.', 'Connect the red wire to positive.', 'Calibrate the radar speed sensor.'], tip: 'Mapas de prescrição Shapefile sempre precisam da tríade `.shp`, `.shx` e `.dbf`.' },
+  { track: 'gpstronic', emoji: '📏', speaker: 'Operador de Plantadeira', scene: 'Deixando faixa sem plantar entre passadas', q: 'We’re seeing a thirty-centimeter gap between passes. What is wrong in the setup?', qPt: 'Estamos vendo uma falha de 30 cm entre as passadas. O que está errado na configuração?', a: 'Check the implement width and the lateral offset measurement of the antenna.', aPt: 'Verifique a largura do implemento e a medida de deslocamento lateral da antena.', o: ['The seed hopper is full.', 'Clean the terminal touch screen.', 'Update the radio frequency.'], tip: '"Gap between passes" = falha/fecho aberto; "lateral offset" = deslocamento lateral da antena/implemento.' },
+  { track: 'gpstronic', emoji: '🚜', speaker: 'Instalador em Campo', scene: 'Calibrando módulo de compensação de terreno (IMU/TCM)', q: 'How should we position the tractor to calibrate the terrain compensation module?', qPt: 'Como devemos posicionar o trator para calibrar o módulo de compensação de terreno?', a: 'Park on a flat surface, mark the tire positions, then turn 180 degrees in the exact same spot.', aPt: 'Estacione em local plano, marque os pneus e depois gire 180 graus exatamente no mesmo lugar.', o: ['Drive at twenty kilometers per hour.', 'Disconnect the battery cables first.', 'Lower the implement into the soil.'], tip: 'A calibração de giroscópio/TCM exige estacionar no plano e girar 180° na mesma marcação.' },
+  { track: 'gpstronic', emoji: '🔋', speaker: 'Eletricista Agrícola', scene: 'Monitor reiniciando ao dar partida no trator', q: 'Why does the GPS display reboot every time we crank the tractor engine?', qPt: 'Por que o monitor GPS reinicia toda vez que damos partida no motor do trator?', a: 'Voltage drops during cranking—wire the power harness directly to a clean battery supply.', aPt: 'A tensão cai na partida — ligue o chicote de alimentação direto em uma bateria limpa.', o: ['The GPS antenna is too high.', 'Delete the old field boundaries.', 'Switch from RTK to autonomous mode.'], tip: '"Crank the engine" = dar partida; ligar o chicote de força direto na bateria com fusível evita queda de tensão.' },
+  { track: 'gpstronic', emoji: '🛠️', speaker: 'Técnico de Suporte', scene: 'Inspecionando conector Deutsch de 12 vias', q: 'We lost communication with the rate controller. Did you inspect the main connector?', qPt: 'Perdemos comunicação com o controlador de vazão. Você inspecionou o conector principal?', a: 'Yes! Pin number seven was pushed back inside the Deutsch connector housing.', aPt: 'Sim! O pino número sete estava recuado dentro da carcaça do conector Deutsch.', o: ['The monitor brightness is at maximum.', 'We created a curved guidance line.', 'The boom has seven sections.'], tip: '"Pushed back pin" (pino recuado) é um defeito clássico de mau contato em chicotes.' },
+  { track: 'gpstronic', emoji: '📊', speaker: 'Gerente de Operações', scene: 'Monitoramento de sementes linha a linha', q: 'The seed monitor is alerting low population on row number eight. Is it a sensor issue?', qPt: 'O monitor de sementes está alertando baixa população na linha oito. É problema no sensor?', a: 'Let’s clean the optical seed tube sensor first to see if dust is blocking it.', aPt: 'Vamos limpar o sensor óptico do tubo de semente primeiro para ver se a poeira está bloqueando.', o: ['Replace the entire planter harness.', 'Reset the GPS receiver to factory.', 'Change the guidance pattern to circle.'], tip: 'Poeira ou grafite no "optical seed tube sensor" causa alerta falso de falha de semente.' },
+  { track: 'gpstronic', emoji: '💧', speaker: 'Técnico de Pulverização', scene: 'Calibrando fluxômetro do pulverizador', q: 'The volume applied in the tank doesn’t match the monitor reading. What do we adjust?', qPt: 'O volume aplicado no tanque não bate com a leitura do monitor. O que ajustamos?', a: 'Enter the new flowmeter calibration number based on our catch test.', aPt: 'Insira a nova constante de calibração do fluxômetro com base no nosso teste de coleta.', o: ['Adjust the GPS baud rate to 19200.', 'Tighten the steering wheel nut.', 'Move the antenna to the cab roof.'], tip: '"Flowmeter calibration number" é a constante (pulsos por litro) do fluxômetro.' },
+  { track: 'gpstronic', emoji: '📡', speaker: 'Engenheiro de Aplicação', scene: 'Configurando saída NMEA serial', q: 'The external controller isn’t receiving speed from the GPS. How is the NMEA port set?', qPt: 'O controlador externo não está recebendo velocidade do GPS. Como está configurada a porta NMEA?', a: 'Set the baud rate to 38400 and enable VTG and GGA messages at 10 Hertz.', aPt: 'Ajuste o baud rate para 38400 e habilite as mensagens VTG e GGA em 10 Hz.', o: ['Turn off the backlight on the screen.', 'Check the tire pressure on the rear.', 'Save the task data to the cloud.'], tip: 'Na comunicação NMEA 0183, "VTG" envia velocidade, "GGA" envia posição e o "baud rate" deve casar nos dois lados.' },
+  { track: 'gpstronic', emoji: '🧭', speaker: 'Operador Noturno', scene: 'Deslocamento da linha AB de um dia para o outro', q: 'Why did my guidance line shift by half a meter compared to yesterday?', qPt: 'Por que minha linha guia deslocou meio metro em comparação com ontem?', a: 'You’re on a free signal—use the nudge button or re-center the line on your last pass.', aPt: 'Você está em sinal livre — use o botão de deslocamento (nudge) ou recentralize na última passada.', o: ['The hydraulic oil is too cold.', 'Your USB drive is full of maps.', 'The CAN bus has 60 ohms.'], tip: 'Sem correção RTK repetível, sinais livres sofrem deriva ("drift") e exigem recentralizar ("re-center / nudge").' },
+  { track: 'gpstronic', emoji: '📋', speaker: 'Coordenador de Frota', scene: 'Fechamento de ordem de serviço técnica', q: 'Is the autopilot system on tractor 14 tested and ready for the night shift?', qPt: 'O sistema de piloto automático do trator 14 está testado e pronto para o turno da noite?', a: 'All calibrated and tested! Line acquisition is fast and holding within two centimeters.', aPt: 'Tudo calibrado e testado! A entrada na linha está rápida e mantendo dentro de dois centímetros.', o: ['We will order the parts next month.', 'The tractor is still disassembled.', 'No, I haven’t looked at it yet.'], tip: '"Line acquisition" é a entrada do trator na linha guia; "holding within 2 cm" indica precisão excelente.' },
+
+  // ── 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (14 diálogos) ──
+  { track: 'med', emoji: '🩺', speaker: 'Paciente no Consultório', scene: 'Início de consulta médica (Anamnese)', q: 'Doctor, I’ve had this sharp pain in my lower back since Tuesday.', qPt: 'Doutor, estou com essa dor aguda na lombar desde terça-feira.', a: 'Did it start suddenly after lifting something, or did it build up gradually?', aPt: 'Ela começou de repente após levantar algo ou foi aumentando aos poucos?', o: ['Your blood test results are normal.', 'Take this syrup for your cough.', 'The pharmacy is on the first floor.'], tip: 'Na anamnese da dor, investigar o início ("suddenly" vs "gradually") é essencial.' },
+  { track: 'med', emoji: '🫁', speaker: 'Médico no Pronto Atendimento', scene: 'Avaliando dor torácica / respiração', q: 'Does the tightness in your chest get worse when you take a deep breath?', qPt: 'O aperto no seu peito piora quando você respira fundo?', a: 'Yes, it hurts right here whenever I breathe in deeply or cough.', aPt: 'Sim, dói bem aqui sempre que puxo o ar fundo ou tusso.', o: ['I twisted my ankle playing soccer.', 'My eyesight has been blurry lately.', 'I drink two liters of water daily.'], tip: '"Tightness in your chest" = aperto no peito; "breathe in deeply" = inspirar fundo.' },
+  { track: 'med', emoji: '💊', speaker: 'Paciente', scene: 'Confirmando como tomar a medicação prescrita', q: 'How often should I take these antibiotic capsules, Doctor?', qPt: 'Com que frequência devo tomar essas cápsulas de antibiótico, Doutor?', a: 'Take one capsule every eight hours for seven days, even if you feel better.', aPt: 'Tome uma cápsula a cada oito horas por sete dias, mesmo que já se sinta melhor.', o: ['Apply the cream to your knee.', 'You don’t need any medication.', 'Come back for surgery tomorrow.'], tip: '"Every eight hours for seven days" explica claramente o intervalo e a duração do tratamento.' },
+  { track: 'med', emoji: '📋', speaker: 'Enfermeira na Triagem', scene: 'Verificando histórico de alergias', q: 'Before we give you the painkiller, are you allergic to any medications?', qPt: 'Antes de aplicarmos o analgésico, você tem alergia a algum medicamento?', a: 'Yes, I’m allergic to penicillin and anti-inflammatory drugs.', aPt: 'Sim, sou alérgico a penicilina e a anti-inflamatórios.', o: ['My fever started yesterday evening.', 'I have health insurance coverage.', 'My blood type is O positive.'], tip: '"Painkiller" é o termo comum usado com pacientes para analgésico.' },
+  { track: 'med', emoji: '🌡️', speaker: 'Mãe na Pediatria', scene: 'Criança com febre alta', q: 'His fever went up to thirty-nine degrees last night and he barely slept.', qPt: 'A febre dele subiu para 39 graus ontem à noite e ele mal dormiu.', a: 'Has he been able to keep fluids down, or has he been vomiting?', aPt: 'Ele tem conseguido manter líquidos no estômago ou tem vomitado?', o: ['He needs a pair of glasses.', 'His tooth is completely healed.', 'You can go back to work today.'], tip: '"Keep fluids down" significa conseguir ingerir líquidos sem vomitar.' },
+  { track: 'med', emoji: '🦵', speaker: 'Ortopedista', scene: 'Examinando entorse de tornozelo', q: 'Can you put any weight on your right foot right now?', qPt: 'Você consegue apoiar algum peso no pé direito agora?', a: 'A little bit, Doctor, but my ankle is really swollen and tender.', aPt: 'Um pouquinho, Doutor, mas meu tornozelo está muito inchado e sensível ao toque.', o: ['My wrist hurts when I type.', 'I had a headache this morning.', 'Yes, I run marathons every week.'], tip: '"Put weight on..." = apoiar o peso; "swollen" = inchado; "tender" = dolorido ao toque.' },
+  { track: 'med', emoji: '🩸', speaker: 'Enfermeiro do Laboratório', scene: 'Orientação antes de coleta de sangue', q: 'We’re doing a fasting glucose test today. When did you last eat?', qPt: 'Vamos fazer um exame de glicemia em jejum hoje. Quando você comeu pela última vez?', a: 'I haven’t eaten anything since eight o’clock last night—only plain water.', aPt: 'Não comi nada desde as oito da noite de ontem — apenas água pura.', o: ['I had bacon and eggs an hour ago.', 'I take vitamins after lunch.', 'The results take three days.'], tip: '"Fasting" em exames médicos significa em jejum.' },
+  { track: 'med', emoji: '🤕', speaker: 'Médica Plantonista', scene: 'Investigando tontura do paciente', q: 'Tell me more about the dizziness. Does the room feel like it’s spinning?', qPt: 'Conte-me mais sobre a tontura. Parece que a sala está girando?', a: 'Yes, especially when I stand up quickly from bed in the morning.', aPt: 'Sim, principalmente quando me levanto rápido da cama de manhã.', o: ['My stomach burns after coffee.', 'I have a rash on my arm.', 'My knee clicks when I walk.'], tip: '"Dizziness" = tontura; "feel like it’s spinning" ajuda a diferenciar vertigem de fraqueza.' },
+  { track: 'med', emoji: '🏥', speaker: 'Cirurgião na Visita Pós-Operatória', scene: 'Avaliando recuperação após cirurgia', q: 'How are you feeling this morning after yesterday’s procedure?', qPt: 'Como você está se sentindo hoje de manhã após o procedimento de ontem?', a: 'Much better, Doctor! The pain is mild and I walked down the hall.', aPt: 'Muito melhor, Doutor! A dor está leve e já caminhei pelo corredor.', o: ['What time does the surgery start?', 'I need to schedule an X-ray.', 'The waiting room is full.'], tip: 'No pós-operatório, relatar nível de dor ("mild") e mobilidade ("walked down the hall") é fundamental.' },
+  { track: 'med', emoji: '💉', speaker: 'Enfermeira de Vacinação', scene: 'Aplicando vacina no braço', q: 'Which arm do you prefer for the injection? Relax your shoulder for me.', qPt: 'Qual braço você prefere para a injeção? Relaxe o ombro para mim.', a: 'My left arm, please, since I’m right-handed.', aPt: 'No braço esquerdo, por favor, já que sou destro.', o: ['I take one pill before bed.', 'My blood pressure is normal.', 'Open your mouth and say ah.'], tip: '"Right-handed" = destro; "left-handed" = canhoto.' },
+  { track: 'med', emoji: '📄', speaker: 'Médico na Alta', scene: 'Dando orientações de retorno e sinais de alerta', q: 'We’re discharging you today, but return if you develop a fever or shortness of breath.', qPt: 'Vamos te dar alta hoje, mas retorne se tiver febre ou falta de ar.', a: 'Understood, Doctor. And when should I come back to have the stitches removed?', aPt: 'Entendido, Doutor. E quando devo voltar para tirar os pontos?', o: ['Where is the ambulance entrance?', 'I arrived here two hours ago.', 'Do I need to fast for the X-ray?'], tip: '"Discharging you" = dando alta hospitalar; "shortness of breath" = falta de ar; "stitches" = pontos.' },
+  { track: 'med', emoji: '🤢', speaker: 'Paciente na Emergência', scene: 'Descrevendo dor abdominal', q: 'Can you point with one finger to where the stomach pain is worst?', qPt: 'Você pode apontar com um dedo onde a dor abdominal está mais forte?', a: 'It started around my belly button and moved to the lower right side.', aPt: 'Começou ao redor do umbigo e passou para o lado inferior direito.', o: ['I have a sore throat and cough.', 'My back hurts when I sit.', 'I wear contact lenses daily.'], tip: '"Belly button" é o termo em linguagem simples que todo paciente usa para umbigo (navel/umbilicus).' },
+  { track: 'med', emoji: '🕒', speaker: 'Colega na Passagem de Plantão', scene: 'Passando o caso do leito 4', q: 'Anything we need to watch closely on the patient in bed four tonight?', qPt: 'Algo que precisemos monitorar de perto no paciente do leito quatro esta noite?', a: 'Keep an eye on his blood pressure and recheck his oxygen levels at midnight.', aPt: 'Fique de olho na pressão arterial dele e reavalie a saturação de oxigênio à meia-noite.', o: ['He was discharged last week.', 'The cafeteria closes at eight.', 'His family lives in Curitiba.'], tip: '"Keep an eye on..." significa monitorar com atenção.' },
+  { track: 'med', emoji: '👓', speaker: 'Oftalmologista', scene: 'Exame de vista', q: 'Is the bottom line clearer with lens number one, or with lens number two?', qPt: 'A linha de baixo fica mais nítida com a lente número um ou com a número dois?', a: 'Lens number two is much sharper—I can read all the letters clearly.', aPt: 'A lente número dois está muito mais nítida — consigo ler todas as letras claramente.', o: ['My ears have been ringing.', 'I sprained my left wrist.', 'Take a deep breath and hold it.'], tip: '"Sharper" ou "clearer" em exames de visão significa imagem mais nítida.' },
+
+  // ── 8. ADVANCED / NEGOCIAÇÃO & EXPRESSÕES NATURAIS (14 diálogos) ──
+  { track: 'advanced', emoji: '⚡', speaker: 'Diretor Executivo', scene: 'Tomando decisão urgente sob pressão', q: 'Should we wait another week for more data before announcing the change?', qPt: 'Devemos esperar mais uma semana por mais dados antes de anunciar a mudança?', a: 'We’d better act now—waiting any longer could cost us our competitive edge.', aPt: 'É melhor agirmos agora — esperar mais pode nos custar nossa vantagem competitiva.', o: ['We announced it two months ago.', 'The data is stored on the server.', 'I prefer working in the morning.'], tip: '"We’d better act now" expressa recomendação urgente; "competitive edge" é vantagem competitiva.' },
+  { track: 'advanced', emoji: '🤝', speaker: 'Negociador Comercial', scene: 'Buscando meio-termo em contrato', q: 'Fifteen percent discount is steeper than we usually offer on annual contracts.', qPt: 'Quinze por cento de desconto é mais alto do que costumamos oferecer em contratos anuais.', a: 'What if we meet halfway at twelve percent and sign a two-year commitment?', aPt: 'E se fecharmos no meio-termo em 12% e assinarmos um compromisso de dois anos?', o: ['Thank you for canceling the contract.', 'The invoice is due next Monday.', 'We only sell products online.'], tip: '"Meet halfway" é a expressão idiomática perfeita para "chegar a um meio-termo" em negociações.' },
+  { track: 'advanced', emoji: '🔍', speaker: 'Gerente de Engenharia', scene: 'Avaliando resultado inesperado de um teste', q: 'Did the root cause of the outage turn out to be a hardware failure?', qPt: 'A causa raiz da queda do sistema acabou se revelando uma falha de hardware?', a: 'Actually, not only was the hardware fine, it turned out to be a simple config typo.', aPt: 'Na verdade, não apenas o hardware estava ótimo, como acabou sendo um simples erro de configuração.', o: ['We bought new servers last year.', 'The outage lasted twenty minutes.', 'Please plug in the monitor.'], tip: '"Turned out to be..." = acabou se revelando; "not only was..." = estrutura avançada de ênfase.' },
+  { track: 'advanced', emoji: '🌧️', speaker: 'Organizadora de Conferência', scene: 'Evento lotado apesar do mau tempo', q: 'I was worried the storm would hurt attendance at our keynote today.', qPt: 'Eu estava preocupada que a tempestade prejudicasse a presença na nossa palestra hoje.', a: 'Despite the awful weather, the auditorium was packed from start to finish!', aPt: 'Apesar do tempo ruim, o auditório ficou lotado do início ao fim!', o: ['If it rains, we will cancel it.', 'The keynote speaker is from Canada.', 'Bring an umbrella tomorrow.'], tip: '"Despite..." (apesar de) + "packed" (lotado) cria uma resposta fluida e natural.' },
+  { track: 'advanced', emoji: '🕰️', speaker: 'Colega de Projeto', scene: 'Lamentando não ter sido avisado antes', q: 'We spent three hours formatting the spreadsheet manually this morning.', qPt: 'Passamos três horas formatando a planilha manualmente hoje de manhã.', a: 'If only you had told me earlier! I have a script that automates that in seconds.', aPt: 'Se você tivesse me falado antes! Eu tenho um script que automatiza isso em segundos.', o: ['I will format it yesterday.', 'The spreadsheet has five tabs.', 'You should use a calculator.'], tip: '"If only you had told me earlier!" expressa algo que teria evitado trabalho no passado.' },
+  { track: 'advanced', emoji: '📈', speaker: 'Sócio da Empresa', scene: 'Cobrando modernização de processo antigo', q: 'We’re still tracking all customer requests on paper forms.', qPt: 'Ainda estamos controlando todos os pedidos de clientes em formulários de papel.', a: 'It’s high time we digitized our workflow once and for all.', aPt: 'Já passou da hora de digitalizarmos nosso fluxo de trabalho de uma vez por todas.', o: ['We bought more paper yesterday.', 'The customers are very friendly.', 'I wrote my name on the form.'], tip: '"It’s high time we digitized..." (já passou da hora de) + "once and for all" (de uma vez por todas).' },
+  { track: 'advanced', emoji: '🧩', speaker: 'Consultora Sênior', scene: 'Evitando discussão improdutiva', q: 'Should we keep debating whose fault the delay was?', qPt: 'Devemos continuar debatendo de quem foi a culpa pelo atraso?', a: 'There’s no point in pointing fingers now—let’s focus on the recovery plan.', aPt: 'Não adianta ficar apontando culpados agora — vamos focar no plano de recuperação.', o: ['The delay was three days long.', 'My finger hurts a little bit.', 'We finished the project early.'], tip: '"There’s no point in..." (não adianta) + "pointing fingers" (apontar culpados).' },
+  { track: 'advanced', emoji: '☕', speaker: 'Amigo no Fim do Expediente', scene: 'Escolhendo entre bar barulhento ou jantar tranquilo', q: 'Do you feel like going to that crowded club downtown tonight?', qPt: 'Você está a fim de ir àquela balada lotada no centro hoje à noite?', a: 'Honestly, I’d much rather grab a quiet dinner where we can actually talk.', aPt: 'Sinceramente, eu prefiro muito mais pegar um jantar tranquilo onde dê para conversar de verdade.', o: ['I went downtown last Tuesday.', 'The club opens at eleven.', 'Yes, I am very hungry now.'], tip: '"I’d much rather..." é o jeito mais natural de expressar preferência forte no inglês falado.' },
+  { track: 'advanced', emoji: '🚀', speaker: 'Mentor de Carreira', scene: 'Projetando conquista futura', q: 'You’ve been leading this international rollout for almost a year now!', qPt: 'Você já está liderando essa implantação internacional há quase um ano!', a: 'Yes! By next month, we’ll have launched the platform in twelve countries.', aPt: 'Sim! Até o mês que vem, já teremos lançado a plataforma em doze países.', o: ['We launched it two years ago.', 'I traveled to twelve countries.', 'The platform is very fast.'], tip: '"By next month, we’ll have launched..." marca uma meta que estará concluída até aquela data.' },
+  { track: 'advanced', emoji: '🛠️', speaker: 'Líder de Equipe', scene: 'Adaptando-se a uma ferramenta nova', q: 'How are you finding the new enterprise ERP system so far?', qPt: 'O que você está achando do novo sistema ERP até agora?', a: 'It has a steep learning curve, but I’m finally getting the hang of it.', aPt: 'Tem uma curva de aprendizado íngreme, mas finalmente estou pegando o jeito.', o: ['I installed it on my laptop.', 'The system costs a lot of money.', 'We use it every day at work.'], tip: '"Steep learning curve" = exige bastante aprendizado inicial; "getting the hang of it" = pegando o jeito.' },
+  { track: 'advanced', emoji: '📌', speaker: 'Diretora de RH', scene: 'Confirmando boato sobre mudança na empresa', q: 'Have you heard anything about a reorganization in the marketing department?', qPt: 'Você ouviu alguma coisa sobre uma reorganização no departamento de marketing?', a: 'As far as I know, nothing official has been decided yet.', aPt: 'Até onde eu sei, nada oficial foi decidido ainda.', o: ['The marketing team has ten people.', 'I work in the finance department.', 'Yes, the office is on the second floor.'], tip: '"As far as I know..." introduz o que você sabe sem afirmar além da conta.' },
+  { track: 'advanced', emoji: '🧠', speaker: 'Colega no Café', scene: 'Coincidência de ligação', q: 'You won’t believe how fast the client replied to our proposal!', qPt: 'Você não vai acreditar quão rápido o cliente respondeu à nossa proposta!', a: 'Really? Hardly had we sent the email when they called to approve it?', aPt: 'Sério? Mal tínhamos enviado o e-mail e eles já ligaram para aprovar?', o: ['We will send the proposal tomorrow.', 'The client is very polite.', 'I wrote the email this morning.'], tip: '"Hardly had we ... when ..." expressa surpresa com algo que aconteceu imediatamente em seguida.' },
+  { track: 'advanced', emoji: '🌟', speaker: 'Parceiro de Negócios', scene: 'Agradecendo sugestão estratégica', q: 'Your suggestion to simplify the onboarding flow cut drop-offs by half!', qPt: 'A sua sugestão de simplificar o cadastro reduziu as desistências pela metade!', a: 'I’m glad it paid off! Small tweaks can make a world of difference.', aPt: 'Fico feliz que tenha valido a pena! Pequenos ajustes podem fazer toda a diferença.', o: ['I paid the bill yesterday.', 'The flow is on the whiteboard.', 'We need more customers today.'], tip: '"Paid off" = valeu a pena / deu retorno; "make a world of difference" = fazer toda a diferença.' },
+  { track: 'advanced', emoji: '🔑', speaker: 'Investidor', scene: 'Perguntando sobre riscos do projeto', q: 'What is our backup plan if the main supplier misses the delivery window?', qPt: 'Qual é o nosso plano B se o fornecedor principal perder a janela de entrega?', a: 'We have a secondary supplier on standby so production won’t skip a beat.', aPt: 'Temos um fornecedor secundário de prontidão para que a produção não perca o ritmo.', o: ['The supplier is very reliable.', 'We ordered the parts last month.', 'Production starts at seven AM.'], tip: '"On standby" = de prontidão; "won’t skip a beat" = não vai perder o ritmo / não vai parar.' },
+];
+
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack   = 'all';
+let gameMode        = 'guided'; // 'guided' | 'realistic' | 'listening'
+let sessionLength   = 12;
+let order           = [];
+let step            = 0;
+let points          = 0;
+let lives           = 4;
+let combo           = 0;
+let maxCombo        = 0;
+let hintsLeft       = 3;
+let correctCount    = 0;
+let locked          = false;
+let currentChoices  = [];
+let practicedDialogues = [];
+let masteredSet     = new Set();
+
+const MASTERY_KEY = 'capyDialogueQuestMastered_v1';
+
+const roundEl   = document.getElementById('round');
+const scoreEl   = document.getElementById('score');
+const promptEl  = document.getElementById('prompt');
+const promptPtEl= document.getElementById('prompt-pt');
+const choicesEl = document.getElementById('choices');
+const feedbackEl= document.getElementById('feedback');
+
+function loadMastered() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(MASTERY_KEY) || '[]');
+    if (Array.isArray(raw)) masteredSet = new Set(raw);
+  } catch (e) {}
+  updateMasteryUI();
+}
+
+function saveMastered(qText) {
+  if (qText) masteredSet.add(qText);
+  try {
+    localStorage.setItem(MASTERY_KEY, JSON.stringify([...masteredSet]));
+  } catch (e) {}
+  updateMasteryUI();
+}
+
+function updateMasteryUI() {
+  const el = document.getElementById('mastered-num');
+  if (el) el.textContent = masteredSet.size;
+}
+
+const shuffle = a => {
+  const arr = [...a];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
+// ── Síntese de Voz (TTS) ────────────────────────────────────────────────────
+function speakText(text, rate = 0.94) {
+  if (!text || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function speakCurrentPrompt(rate = 0.94) {
+  const d = order[step];
+  if (!d) return;
+  speakText(d.q, rate);
+}
+
+function speakIdealAnswer() {
+  const d = order[step];
+  if (!d) return;
+  speakText(d.a, 0.94);
+}
+
+// ── Construir Baralho e Iniciar Partida ─────────────────────────────────────
+function buildDeck() {
+  const pool = selectedTrack === 'all'
+    ? D
+    : D.filter(item => item.track === selectedTrack);
+  const unmastered = shuffle(pool.filter(item => !masteredSet.has(item.q)));
+  const mastered   = shuffle(pool.filter(item => masteredSet.has(item.q)));
+  order = [...unmastered, ...mastered].slice(0, Math.min(sessionLength, pool.length));
+}
+
+function startNewMatch() {
+  step = 0;
+  points = 0;
+  lives = 4;
+  combo = 0;
+  maxCombo = 0;
+  hintsLeft = 3;
+  correctCount = 0;
+  practicedDialogues = [];
+
+  document.getElementById('hints-left').textContent = String(hintsLeft);
+  document.getElementById('hint-5050-btn').disabled = false;
+  updateComboUI();
+  updateHearts();
+  buildDeck();
+  render();
+}
+
+function updateComboUI() {
+  const pill = document.getElementById('combo-pill');
+  const countEl = document.getElementById('combo-count');
+  if (!pill || !countEl) return;
+  if (combo >= 2) {
+    countEl.textContent = String(combo);
+    pill.classList.remove('hidden');
+  } else {
+    pill.classList.add('hidden');
+  }
+}
+
+function updateHearts() {
+  document.querySelectorAll('[data-heart]').forEach(h => {
+    const idx = parseInt(h.dataset.heart, 10);
+    h.classList.toggle('lost', idx > lives);
+  });
+}
+
+// ── Renderizar Diálogo Atual ─────────────────────────────────────────────────
+function render() {
+  if (step >= order.length) return finish();
+  locked = false;
+  const d = order[step];
+
+  roundEl.textContent = `Diálogo ${step + 1} / ${order.length}`;
+  scoreEl.textContent = `${points} XP`;
+  document.getElementById('track-badge').textContent = TRACK_LABELS[d.track] || '🌱 Conversa';
+  document.getElementById('prog-bar').style.width = `${(step / order.length) * 100}%`;
+
+  document.getElementById('scene-text').textContent = `Cena: ${d.scene || 'Conversa em inglês'}`;
+  document.getElementById('speaker-emoji').textContent = d.emoji || '💬';
+  document.getElementById('speaker-name').textContent = d.speaker || 'Interlocutor';
+
+  const revBtn = document.getElementById('reveal-prompt-btn');
+  if (gameMode === 'listening') {
+    promptEl.textContent = '🎧 (Ouça a fala pelo áudio e escolha a resposta abaixo)';
+    promptPtEl.textContent = '';
+    revBtn.classList.remove('hidden');
+  } else if (gameMode === 'realistic') {
+    promptEl.textContent = `“${d.q}”`;
+    promptPtEl.textContent = '';
+    revBtn.classList.remove('hidden');
+    revBtn.textContent = '👁️ Mostrar tradução em português';
+  } else {
+    promptEl.textContent = `“${d.q}”`;
+    promptPtEl.textContent = d.qPt ? `🇧🇷 ${d.qPt}` : '';
+    revBtn.classList.add('hidden');
+  }
+
+  document.getElementById('student-reply-row').classList.add('hidden');
+  document.getElementById('feedback-box').classList.add('hidden');
+
+  currentChoices = shuffle([d.a, ...d.o]);
+  choicesEl.innerHTML = currentChoices.map((x, idx) => `
+    <button type="button" class="choice choice-btn text-left rounded-2xl bg-white/10 border border-white/15 px-5 py-4 font-bold flex items-start gap-3" data-idx="${idx}" data-ok="${x === d.a}">
+      <span class="w-6 h-6 rounded-lg bg-white/15 text-emerald-300 font-label font-extrabold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">${idx + 1}</span>
+      <span class="leading-snug text-sm sm:text-base">${x}</span>
+    </button>
+  `).join('');
+
+  choicesEl.querySelectorAll('button').forEach(b => {
+    b.onclick = () => choose(b, d);
+  });
+
+  setTimeout(() => speakCurrentPrompt(0.94), 240);
+}
+
+function revealHiddenPrompt() {
+  const d = order[step];
+  if (!d) return;
+  promptEl.textContent = `“${d.q}”`;
+  promptPtEl.textContent = d.qPt ? `🇧🇷 ${d.qPt}` : '';
+  document.getElementById('reveal-prompt-btn').classList.add('hidden');
+}
+
+// ── Dica 50/50 (Elimina 2 opções incorretas) ─────────────────────────────────
+function useFiftyFiftyHint() {
+  if (locked || hintsLeft <= 0) return;
+  const wrongBtns = Array.from(choicesEl.querySelectorAll('button[data-ok="false"]'))
+    .filter(b => !b.classList.contains('choice-eliminated'));
+  if (wrongBtns.length < 2) return;
+
+  shuffle(wrongBtns).slice(0, 2).forEach(b => {
+    b.classList.add('choice-eliminated');
+    b.disabled = true;
+  });
+
+  hintsLeft--;
+  document.getElementById('hints-left').textContent = String(hintsLeft);
+  if (hintsLeft <= 0) document.getElementById('hint-5050-btn').disabled = true;
+}
+
+// ── Escolher Resposta ────────────────────────────────────────────────────────
+function choose(btn, d) {
+  if (locked) return;
+  locked = true;
+
+  // Revela a pergunta e tradução caso estivesse oculta
+  promptEl.textContent = `“${d.q}”`;
+  promptPtEl.textContent = d.qPt ? `🇧🇷 ${d.qPt}` : '';
+  document.getElementById('reveal-prompt-btn').classList.add('hidden');
+
+  const ok = btn.dataset.ok === 'true';
+  const fbBox = document.getElementById('feedback-box');
+  const fbTip = document.getElementById('feedback-tip');
+
+  choicesEl.querySelectorAll('button').forEach(b => {
+    b.disabled = true;
+    if (b.dataset.ok === 'true') b.classList.add('choice-correct');
+  });
+
+  // Exibe bolha de resposta do aluno
+  const replyRow = document.getElementById('student-reply-row');
+  document.getElementById('student-reply-en').textContent = `“${d.a}”`;
+  document.getElementById('student-reply-pt').textContent = d.aPt ? `🇧🇷 ${d.aPt}` : '';
+  replyRow.classList.remove('hidden');
+
+  fbBox.classList.remove(
+    'hidden',
+    'bg-emerald-500/20', 'border-emerald-400/40',
+    'bg-rose-500/20', 'border-rose-400/40'
+  );
+
+  if (ok) {
+    combo++;
+    if (combo > maxCombo) maxCombo = combo;
+    correctCount++;
+    const bonus = Math.min(12, (combo - 1) * 3);
+    const earned = 15 + bonus;
+    points += earned;
+    scoreEl.textContent = `${points} XP`;
+    updateComboUI();
+    saveMastered(d.q);
+    practicedDialogues.push({ scene: d.scene, q: d.q, a: d.a, aPt: d.aPt, ok: true });
+
+    feedbackEl.textContent = `✅ Resposta natural! +${earned} XP`;
+    feedbackEl.className = 'font-black text-sm sm:text-base text-emerald-300';
+    fbTip.textContent = `💡 ${d.tip || ''} ${d.aPt ? '— Tradução: "' + d.aPt + '"' : ''}`;
+    fbBox.classList.add('bg-emerald-500/20', 'border-emerald-400/40');
+
+    speakText(d.a, 0.94);
+    launchSparks();
+  } else {
+    combo = 0;
+    updateComboUI();
+    lives--;
+    updateHearts();
+    btn.classList.add('choice-wrong');
+    practicedDialogues.push({ scene: d.scene, q: d.q, a: d.a, aPt: d.aPt, ok: false });
+
+    feedbackEl.textContent = `❌ Uma resposta melhor seria: “${d.a}”`;
+    feedbackEl.className = 'font-black text-sm sm:text-base text-rose-300';
+    fbTip.textContent = `💡 ${d.tip || ''} ${d.aPt ? '— Significado: "' + d.aPt + '"' : ''}`;
+    fbBox.classList.add('bg-rose-500/20', 'border-rose-400/40');
+
+    speakText(d.a, 0.92);
+
+    if (lives <= 0) {
+      document.getElementById('next-dialogue-btn').textContent = 'Ver Resultado Final →';
+    }
+  }
+}
+
+function advanceStep() {
+  if (!locked) return;
+  if (lives <= 0) {
+    finish();
+    return;
+  }
+  step++;
+  render();
+}
+
+// ── Atalhos de Teclado (1..4 escolhe opção, R repete áudio, Enter avança) ──
+window.addEventListener('keydown', e => {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
+
+  if (e.key === 'Enter' && locked) {
+    e.preventDefault();
+    advanceStep();
+    return;
+  }
+  if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    speakCurrentPrompt(0.92);
+    return;
+  }
+  if (!locked && /^[1-4]$/.test(e.key)) {
+    const idx = parseInt(e.key, 10) - 1;
+    const btns = choicesEl.querySelectorAll('button');
+    if (btns[idx] && !btns[idx].disabled) {
+      e.preventDefault();
+      btns[idx].click();
+    }
+  }
+});
+
+function launchSparks() {
+  const colors = ['#10b981','#34d399','#f59e0b','#38bdf8','#ec4899'];
+  for (let i = 0; i < 14; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const angle = (i / 14) * 360;
+    const dist  = 55 + Math.random() * 65;
+    sp.style.setProperty('--tx', `${Math.cos(angle * Math.PI / 180) * dist}px`);
+    sp.style.setProperty('--ty', `${Math.sin(angle * Math.PI / 180) * dist}px`);
+    sp.style.background = colors[i % colors.length];
+    sp.style.left = '50vw';
+    sp.style.top  = '48vh';
+    document.body.appendChild(sp);
+    setTimeout(() => sp.remove(), 900);
+  }
+}
+
+function recordStats(xpEarned, pct) {
+  try {
+    const stats = JSON.parse(localStorage.getItem('capyGameStats') || '{}');
+    const prev = stats.dialogueQuest || { plays: 0, bestScore: 0, totalXP: 0 };
+    stats.dialogueQuest = {
+      plays: (prev.plays || 0) + 1,
+      bestScore: Math.max(prev.bestScore || 0, points),
+      totalXP: (prev.totalXP || 0) + xpEarned,
+      lastAccuracy: Math.round(pct * 100),
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('capyGameStats', JSON.stringify(stats));
+  } catch (e) {}
+}
+
+// ── Tela Final e Revisão dos Diálogos Praticados ─────────────────────────────
+function finish() {
+  const total = Math.max(1, order.length);
+  const pct = Math.min(1, correctCount / total);
+  const totalXP = Math.max(15, points);
+  recordStats(totalXP, pct);
+
+  if (window.Store) {
+    Store.addXP(totalXP);
+    Store.completeActivity('games');
+    Store.activateStreak();
+  }
+
+  const reviewHtml = practicedDialogues.slice(0, 12).map(item => `
+    <div class="bg-white/5 border border-white/10 rounded-2xl p-3 text-left flex items-start justify-between gap-2">
+      <div class="min-w-0">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-300">${item.ok ? '✅' : '📌'} ${item.scene || 'Diálogo'}</div>
+        <p class="text-xs text-slate-300 mt-0.5">🗣️ “${item.q}”</p>
+        <p class="text-xs sm:text-sm font-black text-white mt-0.5">👉 “${item.a}”</p>
+        ${item.aPt ? `<p class="text-[11px] text-slate-400">${item.aPt}</p>` : ''}
+      </div>
+      <button type="button" data-q="${item.q.replace(/"/g, '&quot;')}" data-a="${item.a.replace(/"/g, '&quot;')}" class="dq-review-speak px-2.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/35 text-emerald-200 text-xs font-bold flex-shrink-0" title="Ouvir pergunta e resposta">
+        🔊
+      </button>
+    </div>
+  `).join('');
+
+  const arena = document.getElementById('arena-section');
+  arena.innerHTML = `
+    <div class="text-center py-4 slide-up">
+      <div class="text-6xl sm:text-7xl">💬</div>
+      <p class="text-xs font-black uppercase tracking-widest text-emerald-300 mt-2">${TRACK_LABELS[selectedTrack]}</p>
+      <h2 class="text-3xl sm:text-4xl font-black mt-1">Conversa Concluída!</h2>
+      <p class="text-emerald-300 text-2xl sm:text-3xl font-black mt-1">+${totalXP} XP</p>
+      <p class="text-slate-300 text-sm mt-1">${correctCount}/${total} respostas naturais · Combo máximo: 🔥 ${maxCombo}x</p>
+
+      ${practicedDialogues.length ? `
+        <div class="max-w-2xl mx-auto mt-5 text-left">
+          <p class="text-xs font-black uppercase tracking-wider text-emerald-300 mb-2">🔊 Revisão dos Diálogos Praticados:</p>
+          <div class="space-y-2 max-h-64 overflow-y-auto pr-1">${reviewHtml}</div>
+        </div>
+      ` : ''}
+
+      <div class="flex flex-wrap justify-center gap-3 mt-6">
+        <button type="button" onclick="location.reload()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-7 py-3 rounded-full font-black shadow-lg transition">🔄 Jogar Novamente</button>
+        <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/20 border border-white/15 px-6 py-3 rounded-full font-black transition">Mais Games 🌿</a>
+      </div>
+    </div>
+  `;
+
+  arena.querySelectorAll('.dq-review-speak').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const q = btn.getAttribute('data-q') || '';
+      const a = btn.getAttribute('data-a') || '';
+      speakText(`${q} ... ${a}`, 0.92);
+    });
+  });
+  launchSparks();
+}
+
+// ── Eventos de Trilha e Modo ─────────────────────────────────────────────────
+document.querySelectorAll('#track-bar [data-track]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedTrack = btn.getAttribute('data-track') || 'all';
+    document.querySelectorAll('#track-bar [data-track]').forEach(b => b.classList.toggle('active', b === btn));
+    // Se a tela final substituiu a arena, recarrega mantendo a trilha na URL
+    if (!document.getElementById('choices')) {
+      location.reload();
+      return;
+    }
+    startNewMatch();
+  });
+});
+
+document.getElementById('mode-select').addEventListener('change', e => {
+  gameMode = e.target.value || 'guided';
+  if (document.getElementById('choices')) startNewMatch();
+});
+
+document.getElementById('length-select').addEventListener('change', e => {
+  sessionLength = parseInt(e.target.value, 10) || 12;
+  if (document.getElementById('choices')) startNewMatch();
+});
+
+loadMastered();
+startNewMatch();
+</script>
+<script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>
-</body></html>
+</body>
+</html>
