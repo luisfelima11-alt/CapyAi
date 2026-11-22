@@ -1,63 +1,89 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Matching Pairs — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script>
-tailwind.config = {
-  darkMode:"class",
-  theme:{ extend:{
-    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
-    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
-    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
-  }}
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
-
-  /* Card flip */
-  .card-wrap { perspective: 600px; cursor: pointer; }
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(6, 182, 212, 0.22);
+    border-color: #06b6d4;
+    color: #a5f3fc;
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: #10b981;
+    color: #a7f3d0;
+  }
+  /* 3D Card Flip */
+  .card-wrap {
+    perspective: 750px;
+    cursor: pointer;
+    height: 112px;
+  }
   .card-inner {
-    position: relative; width: 100%; height: 100%;
+    position: relative;
+    width: 100%;
+    height: 100%;
     transform-style: preserve-3d;
-    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+  .card-wrap.flipped .card-inner,
+  .card-wrap.matched .card-inner {
+    transform: rotateY(180deg);
+  }
   .card-face {
-    position: absolute; inset: 0; backface-visibility: hidden;
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    text-align: center;
   }
-  .card-back-face  { background: linear-gradient(135deg, #002a54, #001f3f); border: 2px solid rgba(255,255,255,0.1); }
-  .card-front-face { transform: rotateY(180deg); border: 2px solid rgba(255,255,255,0.15);
-                     background: linear-gradient(135deg, #0a3060, #002a54); }
-  .card-wrap.matched .card-front-face { border-color: #10b981; background: linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05)); }
-  .card-wrap.matched .card-inner { transform: rotateY(180deg); }
-
-  /* Animations */
-  @keyframes matched-pop { 0%{transform:rotateY(180deg)scale(1)} 40%{transform:rotateY(180deg)scale(1.12)} 100%{transform:rotateY(180deg)scale(1)} }
-  @keyframes wrong-shake  { 0%,100%{transform:rotateY(180deg)translateX(0)} 25%{transform:rotateY(180deg)translateX(-6px)} 75%{transform:rotateY(180deg)translateX(6px)} }
-  .do-match { animation: matched-pop 0.4s ease; }
-  .do-wrong  { animation: wrong-shake 0.35s ease; }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  .fade-up { animation: fadeUp 0.4s ease both; }
-
-  @keyframes spark { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
-  .spark { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
-
-  /* Timer ring */
-  #timer-ring { transition: stroke-dashoffset 1s linear; }
-
-  /* Progress bar */
-  #prog-fill { transition: width 0.5s ease; }
+  .card-back-face {
+    background: linear-gradient(135deg, rgba(14, 116, 144, 0.28), rgba(0, 31, 63, 0.85));
+    border: 2px solid rgba(255, 255, 255, 0.13);
+  }
+  .card-back-face:hover {
+    border-color: rgba(34, 211, 238, 0.55);
+  }
+  .card-front-face {
+    transform: rotateY(180deg);
+    border: 2px solid rgba(56, 189, 248, 0.45);
+    background: linear-gradient(135deg, #0a3060, #002347);
+  }
+  .card-wrap.matched .card-front-face {
+    border-color: #10b981;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(6, 95, 70, 0.35));
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.3);
+  }
+  .card-wrap.wrong .card-front-face {
+    border-color: #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(127, 29, 29, 0.35));
+  }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -70,315 +96,663 @@ tailwind.config = {
 <meta property="og:title" content="Matching Pairs — Capy Yara English"/>
 <meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Matching Pairs — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
-<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body class="bg-primary font-body text-white min-h-screen flex flex-col">
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
 
-<!-- Header -->
-<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
-  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
-    <span class="material-symbols-outlined text-xl">arrow_back</span>
-  </button>
-  <div>
-    <p class="font-label text-xs text-cyan-400 uppercase tracking-widest font-bold">Matching Pairs</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Encontre os pares! 🃏</h1>
-  </div>
-  <div class="ml-auto flex items-center gap-4">
-    <!-- Timer ring -->
-    <div class="relative w-12 h-12">
-      <svg viewBox="0 0 48 48" class="w-full h-full -rotate-90">
-        <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
-        <circle id="timer-ring" cx="24" cy="24" r="20" fill="none" stroke="#06b6d4" stroke-width="4"
-                stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0"/>
-      </svg>
-      <span id="timer-txt" class="absolute inset-0 flex items-center justify-center font-headline font-black text-sm text-white">60</span>
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+        <span>🔥</span>
+        <span>Combo:</span>
+        <span id="streak-badge">0</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score-disp">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-cyan-300 border border-cyan-400/20" title="Pares dominados">
+        <span>🃏</span>
+        <span id="mastered-badge">0/160</span>
+      </div>
     </div>
-    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
-      <span id="score-disp">0</span> pts
+  </div>
+
+  <!-- Header -->
+  <header class="text-center mb-6">
+    <p class="text-cyan-300 text-xs font-black uppercase tracking-[.22em]">Memória & Associação • 160 Pares Reais</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-cyan-300 via-sky-200 to-emerald-300 bg-clip-text text-transparent">Matching Pairs 🃏</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Vire as cartas, ouça a pronúncia em inglês e conecte cada expressão com sua tradução ou ícone contextual.</p>
+  </header>
+
+  <!-- Track & Mode Selector -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha de Vocabulário</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-cyan-300">160 pares disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (160)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (20)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (20)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (20)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (20)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (20)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (20)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (20)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (20)</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Tipo de Par</span>
+          <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+            <button data-mode="en2pt" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🇺🇸 Inglês ↔ 🇧🇷 Português</button>
+            <button data-mode="en2icon" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🇺🇸 Inglês ↔ 🎯 Ícone + Dica</button>
+          </div>
+        </div>
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Tamanho do Tabuleiro</span>
+          <div id="size-buttons" class="flex flex-wrap gap-1.5">
+            <button data-pairs="6" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">6 Pares (12 Cartas)</button>
+            <button data-pairs="8" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">8 Pares (16 Cartas)</button>
+            <button data-pairs="10" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Pares (20 Cartas)</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
+  </section>
 
-<div class="h-1.5 bg-white/10">
-  <div id="prog-fill" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 w-0"></div>
-</div>
+  <!-- Game Board Section -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-7">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black mb-4">
+      <div class="flex items-center gap-2">
+        <span id="pairs-progress" class="bg-white/10 px-3 py-1 rounded-full text-cyan-300">0 / 6 Pares</span>
+        <span id="moves-label" class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-slate-300">Tentativas: 0</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-peek" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-colors">
+          <span>👁️ Espiar Cartas</span>
+          <span id="peeks-left">(2)</span>
+        </button>
+        <button id="btn-shuffle-board" type="button" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-colors">
+          <span>🔄 Novo Tabuleiro</span>
+        </button>
+      </div>
+    </div>
 
-<!-- Round label -->
-<div class="text-center py-4 fade-up">
-  <p class="font-label text-cyan-400 text-sm font-bold uppercase tracking-widest" id="round-lbl">Rodada 1 — Combine a palavra com o emoji!</p>
-</div>
+    <!-- Last Matched Pair Banner -->
+    <div id="match-banner" class="hidden mb-4 bg-emerald-500/15 border border-emerald-400/30 rounded-2xl px-4 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <span id="banner-emoji" class="text-xl">✅</span>
+        <span id="banner-text" class="font-bold text-emerald-200"></span>
+      </div>
+      <button id="banner-speak" type="button" class="bg-white/10 hover:bg-white/20 text-sky-200 p-1.5 rounded-xl" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
 
-<!-- Card grid -->
-<main class="flex-1 flex items-center justify-center px-4 pb-8">
-  <div id="card-grid" class="grid gap-3 w-full max-w-lg" style="grid-template-columns: repeat(4, 1fr);">
-    <!-- cards injected by JS -->
-  </div>
+    <!-- Cards Grid -->
+    <div id="card-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+  </section>
+
+  <!-- Summary Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">🏆</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Tabuleiro Concluído!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-cyan-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Tentativas</p>
+        <p id="sum-moves" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+        <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">0x</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Outro Tabuleiro
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-cyan-300 mb-3">📚 Pares Combinados nesta Partida</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
+
 </main>
+
+<div id="mobile-nav-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=land1"></script>
-<script src="levelup-overlay.js?v=land1"></script>
-<script src="badge-toast.js?v=c52d7db"></script>
+<script src="components.js?v=seg1"></script>
 <script>
-// ── Card pairs ────────────────────────────────────────────────────────────────
-const ALL_PAIRS = [
-  { word:'Cat',       emoji:'🐱' }, { word:'Dog',       emoji:'🐶' },
-  { word:'Sun',       emoji:'☀️' }, { word:'Tree',      emoji:'🌳' },
-  { word:'Fish',      emoji:'🐟' }, { word:'Bird',      emoji:'🐦' },
-  { word:'Cake',      emoji:'🎂' }, { word:'Star',      emoji:'⭐' },
-  { word:'Rain',      emoji:'🌧️' }, { word:'Frog',      emoji:'🐸' },
-  { word:'Apple',     emoji:'🍎' }, { word:'Moon',      emoji:'🌙' },
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+// ── 160 Pares Reais (8 Trilhas x 20 Pares) ───────────────────────────────────
+const PAIRS_BANK = [
+  // 1. STARTER A1-A2 (20)
+  { track:'starter', emoji:'🌅', en:'early morning', pt:'manhã cedo' },
+  { track:'starter', emoji:'🛒', en:'grocery store', pt:'supermercado' },
+  { track:'starter', emoji:'🔑', en:'spare key', pt:'chave reserva' },
+  { track:'starter', emoji:'🌧️', en:'heavy rain', pt:'chuva forte' },
+  { track:'starter', emoji:'🥐', en:'fresh bread', pt:'pão fresco' },
+  { track:'starter', emoji:'🚌', en:'bus stop', pt:'ponto de ônibus' },
+  { track:'starter', emoji:'📱', en:'low battery', pt:'bateria fraca' },
+  { track:'starter', emoji:'🧹', en:'daily routine', pt:'rotina diária' },
+  { track:'starter', emoji:'🍽️', en:'dinner table', pt:'mesa de jantar' },
+  { track:'starter', emoji:'🧥', en:'warm jacket', pt:'jaqueta quente' },
+  { track:'starter', emoji:'🏡', en:'next-door neighbor', pt:'vizinho do lado' },
+  { track:'starter', emoji:'🕒', en:'free time', pt:'tempo livre' },
+  { track:'starter', emoji:'💵', en:'pay in cash', pt:'pagar em dinheiro' },
+  { track:'starter', emoji:'🧺', en:'do the laundry', pt:'lavar a roupa' },
+  { track:'starter', emoji:'🚰', en:'sparkling water', pt:'água com gás' },
+  { track:'starter', emoji:'🎟️', en:'movie ticket', pt:'ingresso de cinema' },
+  { track:'starter', emoji:'🛏️', en:'take a nap', pt:'tirar um cochilo' },
+  { track:'starter', emoji:'🎁', en:'birthday gift', pt:'presente de aniversário' },
+  { track:'starter', emoji:'🐕', en:'walk the dog', pt:'passear com o cão' },
+  { track:'starter', emoji:'📖', en:'borrow a book', pt:'pegar livro emprestado' },
+
+  // 2. INTERMEDIATE B1-B2 (20)
+  { track:'intermediate', emoji:'🤝', en:'keep in touch', pt:'manter contato' },
+  { track:'intermediate', emoji:'🧠', en:'change my mind', pt:'mudar de ideia' },
+  { track:'intermediate', emoji:'⛽', en:'run out of gas', pt:'ficar sem combustível' },
+  { track:'intermediate', emoji:'⏳', en:'sooner or later', pt:'mais cedo ou mais tarde' },
+  { track:'intermediate', emoji:'🔍', en:'figure out', pt:'descobrir / resolver' },
+  { track:'intermediate', emoji:'🚫', en:'call off', pt:'cancelar um evento' },
+  { track:'intermediate', emoji:'📅', en:'look forward to', pt:'aguardar com expectativa' },
+  { track:'intermediate', emoji:'🛠️', en:'break down', pt:'quebrar (máquina/carro)' },
+  { track:'intermediate', emoji:'💡', en:'make sense', pt:'fazer sentido' },
+  { track:'intermediate', emoji:'🏃', en:'in a hurry', pt:'com pressa' },
+  { track:'intermediate', emoji:'🪜', en:'step by step', pt:'passo a passo' },
+  { track:'intermediate', emoji:'🎯', en:'on purpose', pt:'de propósito' },
+  { track:'intermediate', emoji:'☔', en:'just in case', pt:'por precaução' },
+  { track:'intermediate', emoji:'🗣️', en:'point of view', pt:'ponto de vista' },
+  { track:'intermediate', emoji:'🕰️', en:'from time to time', pt:'de vez em quando' },
+  { track:'intermediate', emoji:'⚖️', en:'pros and cons', pt:'prós e contras' },
+  { track:'intermediate', emoji:'🙌', en:'count on me', pt:'contar comigo' },
+  { track:'intermediate', emoji:'🗑️', en:'get rid of', pt:'livrar-se de algo' },
+  { track:'intermediate', emoji:'⏰', en:'at the last minute', pt:'na última hora' },
+  { track:'intermediate', emoji:'🌟', en:'be worth it', pt:'valer a pena' },
+
+  // 3. TRAVEL / VIAGEM (20)
+  { track:'travel', emoji:'🛂', en:'boarding pass', pt:'cartão de embarque' },
+  { track:'travel', emoji:'🧳', en:'carry-on bag', pt:'bagagem de mão' },
+  { track:'travel', emoji:'💺', en:'aisle seat', pt:'assento no corredor' },
+  { track:'travel', emoji:'🎒', en:'baggage claim', pt:'esteira de bagagens' },
+  { track:'travel', emoji:'🛫', en:'connecting flight', pt:'voo de conexão' },
+  { track:'travel', emoji:'📢', en:'flight delayed', pt:'voo atrasado' },
+  { track:'travel', emoji:'🏨', en:'front desk', pt:'recepção do hotel' },
+  { track:'travel', emoji:'🚆', en:'round-trip ticket', pt:'ida e volta' },
+  { track:'travel', emoji:'🚶', en:'walking distance', pt:'distância a pé' },
+  { track:'travel', emoji:'🔌', en:'power adapter', pt:'adaptador de tomada' },
+  { track:'travel', emoji:'💱', en:'currency exchange', pt:'câmbio de moeda' },
+  { track:'travel', emoji:'🛃', en:'customs officer', pt:'agente da alfândega' },
+  { track:'travel', emoji:'🍳', en:'breakfast included', pt:'café incluído' },
+  { track:'travel', emoji:'🗺️', en:'guided tour', pt:'passeio guiado' },
+  { track:'travel', emoji:'🚗', en:'car rental', pt:'aluguel de carros' },
+  { track:'travel', emoji:'🧾', en:'room rate', pt:'diária do quarto' },
+  { track:'travel', emoji:'🍽️', en:'table for two', pt:'mesa para dois' },
+  { track:'travel', emoji:'🍟', en:'side dish', pt:'acompanhamento' },
+  { track:'travel', emoji:'🚇', en:'subway station', pt:'estação de metrô' },
+  { track:'travel', emoji:'🕒', en:'late check-out', pt:'saída tardia' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (20)
+  { track:'work', emoji:'🎯', en:'meet the deadline', pt:'cumprir o prazo' },
+  { track:'work', emoji:'💻', en:'share my screen', pt:'compartilhar a tela' },
+  { track:'work', emoji:'🔇', en:'on mute', pt:'no mudo (microfone)' },
+  { track:'work', emoji:'📅', en:'reschedule a call', pt:'reagendar chamada' },
+  { track:'work', emoji:'✉️', en:'follow up with', pt:'fazer acompanhamento' },
+  { track:'work', emoji:'📎', en:'attached file', pt:'arquivo em anexo' },
+  { track:'work', emoji:'📋', en:'wrap up the meeting', pt:'encerrar a reunião' },
+  { track:'work', emoji:'🏖️', en:'out of the office', pt:'ausente do escritório' },
+  { track:'work', emoji:'📈', en:'right on track', pt:'dentro do cronograma' },
+  { track:'work', emoji:'🏆', en:'key strength', pt:'ponto forte principal' },
+  { track:'work', emoji:'🤝', en:'team player', pt:'colaborativo em equipe' },
+  { track:'work', emoji:'📊', en:'quarterly report', pt:'relatório trimestral' },
+  { track:'work', emoji:'🕒', en:'push back the call', pt:'adiar a chamada' },
+  { track:'work', emoji:'🔍', en:'look into an issue', pt:'investigar um problema' },
+  { track:'work', emoji:'💡', en:'action items', pt:'tarefas práticas' },
+  { track:'work', emoji:'🧾', en:'budget approval', pt:'aprovação de orçamento' },
+  { track:'work', emoji:'🚀', en:'career growth', pt:'crescimento na carreira' },
+  { track:'work', emoji:'🏠', en:'remote work', pt:'trabalho remoto' },
+  { track:'work', emoji:'📌', en:'bring to attention', pt:'trazer ao conhecimento' },
+  { track:'work', emoji:'📄', en:'on the same page', pt:'totalmente alinhados' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (20)
+  { track:'agro', emoji:'🌱', en:'soil moisture', pt:'umidade do solo' },
+  { track:'agro', emoji:'🌾', en:'crop yield', pt:'produtividade da safra' },
+  { track:'agro', emoji:'🚜', en:'combine harvester', pt:'colheitadeira' },
+  { track:'agro', emoji:'💦', en:'sprayer nozzle', pt:'bico pulverizador' },
+  { track:'agro', emoji:'🍃', en:'chemical drift', pt:'deriva de defensivo' },
+  { track:'agro', emoji:'🌿', en:'no-till farming', pt:'plantio direto' },
+  { track:'agro', emoji:'🌻', en:'crop rotation', pt:'rotação de culturas' },
+  { track:'agro', emoji:'🧪', en:'agricultural lime', pt:'calcário agrícola' },
+  { track:'agro', emoji:'🐛', en:'field scouting', pt:'monitoramento de pragas' },
+  { track:'agro', emoji:'💧', en:'center pivot', pt:'pivô central' },
+  { track:'agro', emoji:'🌾', en:'weed control', pt:'controle de daninhas' },
+  { track:'agro', emoji:'📏', en:'planting depth', pt:'profundidade de plantio' },
+  { track:'agro', emoji:'🏢', en:'grain silo', pt:'silo de grãos' },
+  { track:'agro', emoji:'🐄', en:'rotational grazing', pt:'pastejo rotacionado' },
+  { track:'agro', emoji:'🍂', en:'cover crop', pt:'cultura de cobertura' },
+  { track:'agro', emoji:'↔️', en:'row spacing', pt:'espaçamento entre linhas' },
+  { track:'agro', emoji:'🔥', en:'burndown herbicide', pt:'herbicida dessecante' },
+  { track:'agro', emoji:'⚙️', en:'power take-off', pt:'tomada de força (TDF)' },
+  { track:'agro', emoji:'📉', en:'harvest loss', pt:'perda na colheita' },
+  { track:'agro', emoji:'🧫', en:'seed treatment', pt:'tratamento de sementes' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (20)
+  { track:'gpstronic', emoji:'🔌', en:'wiring harness', pt:'chicote elétrico' },
+  { track:'gpstronic', emoji:'⚡', en:'terminating resistor', pt:'resistor de terminação' },
+  { track:'gpstronic', emoji:'🛰️', en:'RTK signal', pt:'sinal de correção RTK' },
+  { track:'gpstronic', emoji:'🛞', en:'wheel angle sensor', pt:'sensor de ângulo de roda' },
+  { track:'gpstronic', emoji:'🗺️', en:'section control', pt:'corte de seção' },
+  { track:'gpstronic', emoji:'🌱', en:'variable rate', pt:'taxa variável (VRA)' },
+  { track:'gpstronic', emoji:'🧭', en:'AB guidance line', pt:'linha guia AB' },
+  { track:'gpstronic', emoji:'💾', en:'firmware update', pt:'atualização de firmware' },
+  { track:'gpstronic', emoji:'⛰️', en:'terrain compensation', pt:'compensação de terreno' },
+  { track:'gpstronic', emoji:'💧', en:'flowmeter calibration', pt:'calibração do fluxômetro' },
+  { track:'gpstronic', emoji:'📏', en:'implement width', pt:'largura do implemento' },
+  { track:'gpstronic', emoji:'🔋', en:'voltage drop', pt:'queda de tensão' },
+  { track:'gpstronic', emoji:'🚨', en:'blockage alarm', pt:'alarme de entupimento' },
+  { track:'gpstronic', emoji:'🔄', en:'overlap and skip', pt:'sobreposição e falha' },
+  { track:'gpstronic', emoji:'📡', en:'GNSS receiver', pt:'receptor GNSS' },
+  { track:'gpstronic', emoji:'🛠️', en:'steering valve', pt:'válvula de direção' },
+  { track:'gpstronic', emoji:'🖥️', en:'virtual terminal', pt:'terminal virtual ISOBUS' },
+  { track:'gpstronic', emoji:'🌾', en:'yield monitor', pt:'monitor de colheita' },
+  { track:'gpstronic', emoji:'📐', en:'field boundary', pt:'bordadura do talhão' },
+  { track:'gpstronic', emoji:'⚠️', en:'blown fuse', pt:'fusível queimado' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (20)
+  { track:'med', emoji:'🫁', en:'shortness of breath', pt:'falta de ar' },
+  { track:'med', emoji:'🌡️', en:'blood pressure cuff', pt:'braçadeira de pressão' },
+  { track:'med', emoji:'💊', en:'twice a day', pt:'duas vezes ao dia' },
+  { track:'med', emoji:'🦵', en:'reduce swelling', pt:'reduzir o inchaço' },
+  { track:'med', emoji:'🩺', en:'lower back pain', pt:'dor na lombar' },
+  { track:'med', emoji:'🩸', en:'fasting blood test', pt:'exame em jejum' },
+  { track:'med', emoji:'🏥', en:'hospital discharge', pt:'alta hospitalar' },
+  { track:'med', emoji:'💉', en:'remove stitches', pt:'retirar os pontos' },
+  { track:'med', emoji:'📋', en:'allergic reaction', pt:'reação alérgica' },
+  { track:'med', emoji:'🛍️', en:'over-the-counter', pt:'vendido sem receita' },
+  { track:'med', emoji:'📅', en:'follow-up visit', pt:'consulta de retorno' },
+  { track:'med', emoji:'🤕', en:'dizziness and nausea', pt:'tontura e enjoo' },
+  { track:'med', emoji:'🗣️', en:'sore throat', pt:'dor de garganta' },
+  { track:'med', emoji:'🦴', en:'sprained ankle', pt:'tornozelo torcido' },
+  { track:'med', emoji:'💓', en:'chest tightness', pt:'aperto no peito' },
+  { track:'med', emoji:'💧', en:'keep fluids down', pt:'reter líquidos sem vomitar' },
+  { track:'med', emoji:'📄', en:'side effects', pt:'efeitos colaterais' },
+  { track:'med', emoji:'🌬️', en:'deep breath', pt:'respiração profunda' },
+  { track:'med', emoji:'🩹', en:'wound dressing', pt:'curativo de ferida' },
+  { track:'med', emoji:'🧬', en:'medical history', pt:'histórico médico' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (20)
+  { track:'advanced', emoji:'🛠️', en:'get the hang of it', pt:'pegar o jeito' },
+  { track:'advanced', emoji:'🤝', en:'meet halfway', pt:'chegar ao meio-termo' },
+  { track:'advanced', emoji:'📌', en:'once and for all', pt:'de uma vez por todas' },
+  { track:'advanced', emoji:'🌟', en:'pay off', pt:'valer a pena / dar frutos' },
+  { track:'advanced', emoji:'🕰️', en:'it is high time', pt:'já passou da hora' },
+  { track:'advanced', emoji:'🎭', en:'blessing in disguise', pt:'mal que veio para o bem' },
+  { track:'advanced', emoji:'🧩', en:'no point in', pt:'não adianta / sem sentido' },
+  { track:'advanced', emoji:'🔑', en:'as far as I know', pt:'até onde eu sei' },
+  { track:'advanced', emoji:'⚡', en:'off the top of my head', pt:'de cabeça (sem olhar)' },
+  { track:'advanced', emoji:'✂️', en:'cut corners', pt:'fazer malfeito p/ poupar' },
+  { track:'advanced', emoji:'🌳', en:'beat around the bush', pt:'ficar de rodeios' },
+  { track:'advanced', emoji:'🏋️', en:'go the extra mile', pt:'ir além do esperado' },
+  { track:'advanced', emoji:'🧊', en:'break the ice', pt:'quebrar o gelo' },
+  { track:'advanced', emoji:'⚖️', en:'take for granted', pt:'dar como garantido' },
+  { track:'advanced', emoji:'🔍', en:'between the lines', pt:'nas entrelinhas' },
+  { track:'advanced', emoji:'🥇', en:'second to none', pt:'incomparável / o melhor' },
+  { track:'advanced', emoji:'🧠', en:'keep in mind', pt:'ter em mente' },
+  { track:'advanced', emoji:'⏳', en:'call it a day', pt:'encerrar o expediente' },
+  { track:'advanced', emoji:'🤒', en:'under the weather', pt:'meio indisposto' },
+  { track:'advanced', emoji:'💡', en:'spur of the moment', pt:'no impulso do momento' }
 ];
 
-const ROUNDS = [
-  { pairs: 4, time: 60, label: 'Rodada 1 — Combine a palavra com o emoji!' },
-  { pairs: 6, time: 75, label: 'Rodada 2 — Mais pares, você consegue achar?' },
-  { pairs: 8, time: 90, label: 'Rodada 3 — Nível expert! 💪' },
-];
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capyMatchingPairsMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+function saveMasteredItem(enText) {
+  try {
+    const set = getMasteredSet();
+    set.add(enText);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${getMasteredSet().size}/${PAIRS_BANK.length}`;
+}
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let round        = 0;
-let score        = 0;
-let matchedCount = 0;
-let flipped      = [];   // at most 2 card elements
-let locked       = false; // prevent clicking during check
-let timerInterval = null;
-let timeLeft     = 60;
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakEnglish(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.92;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-startRound();
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack = 'all';
+let pairMode      = 'en2pt'; // 'en2pt' | 'en2icon'
+let pairCount     = 6;       // 6 | 8 | 10
 
-function startRound() {
+let activePairs   = [];
+let matchedCount  = 0;
+let moves         = 0;
+let score         = 0;
+let streak        = 0;
+let bestStreak    = 0;
+let peeksLeft     = 2;
+let flipped       = [];
+let locked        = false;
+let lastMatched   = null;
+
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? PAIRS_BANK
+    : PAIRS_BANK.filter(x => x.track === selectedTrack);
+}
+
+function startSession() {
+  const pool = getFilteredPool();
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} pares disponíveis`;
+
+  activePairs  = shuffle(pool).slice(0, Math.min(pairCount, pool.length));
   matchedCount = 0;
+  moves        = 0;
+  score        = 0;
+  streak       = 0;
+  bestStreak   = 0;
+  peeksLeft    = 2;
   flipped      = [];
   locked       = false;
-  const cfg    = ROUNDS[round];
-  timeLeft     = cfg.time;
+  lastMatched  = null;
 
-  document.getElementById('round-lbl').textContent = cfg.label;
-  document.getElementById('prog-fill').style.width = `${(round / ROUNDS.length) * 100}%`;
-  updateTimerRing();
+  document.getElementById('summary-card').classList.add('hidden');
+  document.getElementById('game-card').classList.remove('hidden');
+  document.getElementById('match-banner').classList.add('hidden');
 
-  // Pick random pairs
-  const chosen = [...ALL_PAIRS].sort(() => Math.random() - 0.5).slice(0, cfg.pairs);
+  updateStatsUI();
+  updateMasteredBadge();
+  buildBoard();
+}
 
-  // Build cards array: one word card + one emoji card per pair
+function updateStatsUI() {
+  document.getElementById('pairs-progress').textContent = `${matchedCount} / ${activePairs.length} Pares`;
+  document.getElementById('moves-label').textContent = `Tentativas: ${moves}`;
+  document.getElementById('score-disp').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+  document.getElementById('peeks-left').textContent = `(${peeksLeft})`;
+  document.getElementById('btn-peek').disabled = peeksLeft <= 0;
+}
+
+function buildBoard() {
   const cards = [];
-  chosen.forEach((p, i) => {
-    cards.push({ id: i, type: 'word',  content: p.word,  pairId: i });
-    cards.push({ id: i, type: 'emoji', content: p.emoji, pairId: i });
+  activePairs.forEach((p, idx) => {
+    cards.push({
+      pairId: idx,
+      type: 'en',
+      title: p.en,
+      sub: '🇺🇸 EN',
+      emoji: p.emoji,
+      pair: p
+    });
+    if (pairMode === 'en2pt') {
+      cards.push({
+        pairId: idx,
+        type: 'pt',
+        title: p.pt,
+        sub: '🇧🇷 PT',
+        emoji: p.emoji,
+        pair: p
+      });
+    } else {
+      cards.push({
+        pairId: idx,
+        type: 'icon',
+        title: p.pt,
+        sub: '🎯 Ícone',
+        emoji: p.emoji,
+        pair: p,
+        bigEmoji: true
+      });
+    }
   });
-  cards.sort(() => Math.random() - 0.5);
 
-  // Adjust grid columns
-  const cols = cfg.pairs <= 4 ? 4 : cfg.pairs <= 6 ? 4 : 4;
-  document.getElementById('card-grid').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-  // Render
+  const shuffledCards = shuffle(cards);
   const grid = document.getElementById('card-grid');
+  grid.className = activePairs.length >= 10
+    ? 'grid grid-cols-4 sm:grid-cols-5 gap-2.5 sm:gap-3'
+    : 'grid grid-cols-3 sm:grid-cols-4 gap-3';
+
   grid.innerHTML = '';
-  cards.forEach((card, idx) => {
-    const wrap = document.createElement('div');
-    wrap.className    = 'card-wrap fade-up';
-    wrap.style.animationDelay = `${idx * 0.04}s`;
-    wrap.style.height = '100px';
-    wrap.dataset.pairId = card.pairId;
+  shuffledCards.forEach((card, i) => {
+    const wrap = document.createElement('button');
+    wrap.type = 'button';
+    wrap.className = 'card-wrap text-left focus:outline-none';
+    wrap.dataset.pairId = String(card.pairId);
     wrap.dataset.type   = card.type;
-    wrap.dataset.content = card.content;
+    wrap.dataset.en     = card.pair.en;
 
     wrap.innerHTML = `
       <div class="card-inner">
         <div class="card-face card-back-face">
-          <span class="material-symbols-outlined text-3xl text-cyan-500/40" style="font-variation-settings:'FILL' 1;">style</span>
+          <span class="text-2xl opacity-75">🃏</span>
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-300/80 mt-1">Carta ${i + 1}</span>
         </div>
-        <div class="card-face card-front-face flex-col gap-1">
-          ${card.type === 'emoji'
-            ? `<span class="text-4xl">${card.content}</span>`
-            : `<span class="font-headline font-black text-white text-lg">${card.content}</span>`
+        <div class="card-face card-front-face">
+          ${card.bigEmoji
+            ? `<span class="text-3xl mb-0.5">${card.emoji}</span>
+               <span class="font-bold text-xs text-slate-200 leading-tight line-clamp-2">${card.title}</span>`
+            : `<span class="text-[10px] font-black uppercase tracking-wider ${card.type === 'en' ? 'text-cyan-300' : 'text-emerald-300'} mb-0.5">${card.sub}</span>
+               <span class="font-extrabold text-xs sm:text-sm text-white leading-snug break-words">${card.title}</span>`
           }
         </div>
-      </div>`;
+      </div>
+    `;
 
-    wrap.addEventListener('click', () => flipCard(wrap));
+    wrap.addEventListener('click', () => flipCard(wrap, card));
     grid.appendChild(wrap);
   });
-
-  // Start timer
-  clearInterval(timerInterval);
-  timerInterval = setInterval(tickTimer, 1000);
 }
 
-// ── Timer ─────────────────────────────────────────────────────────────────────
-function tickTimer() {
-  timeLeft--;
-  document.getElementById('timer-txt').textContent = timeLeft;
-  updateTimerRing();
-  if (timeLeft <= 0) {
-    clearInterval(timerInterval);
-    showRoundEnd(false);
-  }
-}
-
-function updateTimerRing() {
-  const cfg  = ROUNDS[round];
-  const pct  = timeLeft / cfg.time;
-  const circ = 125.7;
-  document.getElementById('timer-ring').style.strokeDashoffset = circ * (1 - pct);
-  document.getElementById('timer-ring').setAttribute('stroke', timeLeft <= 10 ? '#ef4444' : '#06b6d4');
-}
-
-// ── Flip a card ───────────────────────────────────────────────────────────────
-function flipCard(card) {
+function flipCard(cardEl, cardObj) {
   if (locked) return;
-  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
   if (flipped.length >= 2) return;
 
-  card.classList.add('flipped');
-  flipped.push(card);
+  cardEl.classList.add('flipped');
+  if (cardObj.type === 'en') {
+    speakEnglish(cardObj.pair.en);
+  }
+  flipped.push({ el: cardEl, obj: cardObj });
 
   if (flipped.length === 2) {
     locked = true;
-    setTimeout(checkMatch, 600);
+    moves++;
+    updateStatsUI();
+    setTimeout(checkMatch, 580);
   }
 }
 
 function checkMatch() {
   const [a, b] = flipped;
-  const sameId   = a.dataset.pairId === b.dataset.pairId;
-  const diffType = a.dataset.type   !== b.dataset.type;
+  const isMatch = a.obj.pairId === b.obj.pairId && a.obj.type !== b.obj.type;
 
-  if (sameId && diffType) {
-    // ✅ Match!
-    a.classList.add('matched'); b.classList.add('matched');
-    a.classList.add('do-match'); b.classList.add('do-match');
-    setTimeout(() => { a.classList.remove('do-match'); b.classList.remove('do-match'); }, 450);
-
-    const pts = Math.ceil(timeLeft / 5) + 5;
-    score += pts;
-    document.getElementById('score-disp').textContent = score;
-    launchSparksAt(a);
+  if (isMatch) {
+    a.el.classList.add('matched');
+    b.el.classList.add('matched');
     matchedCount++;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
 
+    const earned = 10 + Math.min(10, (streak - 1) * 3);
+    score += earned;
+    lastMatched = a.obj.pair;
+    saveMasteredItem(lastMatched.en);
+
+    // Exibe banner do par combinado
+    const banner = document.getElementById('match-banner');
+    document.getElementById('banner-emoji').textContent = lastMatched.emoji;
+    document.getElementById('banner-text').textContent = `${lastMatched.en} = ${lastMatched.pt} (+${earned} XP)`;
+    banner.classList.remove('hidden');
+
+    speakEnglish(lastMatched.en);
     flipped = [];
-    locked  = false;
+    locked = false;
+    updateStatsUI();
 
-    if (matchedCount === ROUNDS[round].pairs) {
-      clearInterval(timerInterval);
-      setTimeout(() => showRoundEnd(true), 700);
+    if (matchedCount >= activePairs.length) {
+      setTimeout(finishGame, 650);
     }
   } else {
-    // ❌ No match
-    a.classList.add('do-wrong'); b.classList.add('do-wrong');
+    streak = 0;
+    a.el.classList.add('wrong');
+    b.el.classList.add('wrong');
+    updateStatsUI();
     setTimeout(() => {
-      a.classList.remove('flipped','do-wrong');
-      b.classList.remove('flipped','do-wrong');
+      a.el.classList.remove('flipped', 'wrong');
+      b.el.classList.remove('flipped', 'wrong');
       flipped = [];
-      locked  = false;
-    }, 900);
+      locked = false;
+    }, 850);
   }
 }
 
-// ── Round end ─────────────────────────────────────────────────────────────────
-function showRoundEnd(success) {
-  const isLastRound = round >= ROUNDS.length - 1;
+function usePeek() {
+  if (locked || peeksLeft <= 0) return;
+  locked = true;
+  peeksLeft--;
+  updateStatsUI();
 
-  if (success && !isLastRound) {
-    // Brief success toast, advance
-    showToast(`✅ Rodada ${round+1} completa! +bônus 🎉`, '#10b981');
-    round++;
-    setTimeout(startRound, 1500);
-    return;
-  }
+  const unmatched = [...document.querySelectorAll('#card-grid .card-wrap:not(.matched):not(.flipped)')];
+  unmatched.forEach(c => c.classList.add('flipped'));
+  setTimeout(() => {
+    unmatched.forEach(c => c.classList.remove('flipped'));
+    locked = false;
+  }, 1750);
+}
 
-  // Final / time-out overlay
-  const xpEarned = Math.round(score / 5) + 10;
-  const stars    = success ? 3 : matchedCount >= ROUNDS[round].pairs / 2 ? 2 : 1;
-
+function finishGame() {
   if (window.Store) {
-    Store.addXP(xpEarned);
-    Store.activateStreak();
+    Store.addXP(score);
     Store.completeActivity('games');
-    if (stars === 3) Store.unlockBadge('game_hero');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
   }
 
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
-  overlay.innerHTML = `
-    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-cyan-500/60
-         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
-         scale-0 opacity-0 transition-all duration-500">
-      <div class="text-7xl">${success ? '🏆' : '⏰'}</div>
-      <div>
-        <p class="font-label text-cyan-400 font-bold text-sm uppercase tracking-widest mb-1">
-          ${success ? 'Tudo Combinado!' : "Tempo Esgotado!"}
-        </p>
-        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xpEarned} XP</h2>
-        <p class="font-body text-slate-300">Pontuação: ${score} pts · ${matchedCount}/${ROUNDS[round].pairs} pares encontrados</p>
+  document.getElementById('game-card').classList.add('hidden');
+  document.getElementById('summary-card').classList.remove('hidden');
+
+  document.getElementById('sum-xp').textContent = `+${score} XP`;
+  document.getElementById('sum-moves').textContent = String(moves);
+  document.getElementById('sum-streak').textContent = `${bestStreak}x`;
+  document.getElementById('summary-subtitle').textContent =
+    `Você encontrou todos os ${activePairs.length} pares em ${moves} tentativas!`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = activePairs.map((item, idx) => `
+    <div class="bg-white/5 border border-emerald-400/25 rounded-2xl p-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">${item.emoji}</span>
+        <div>
+          <p class="font-extrabold text-sm text-white">${item.en}</p>
+          <p class="text-xs text-cyan-300 font-bold">${item.pt}</p>
+        </div>
       </div>
-      <div class="flex gap-1">
-        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
-             style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
-      </div>
-      ${stars===3?'<div class="bg-cyan-500/20 border border-cyan-500/40 rounded-xl px-4 py-2 text-cyan-300 font-label font-bold text-sm">🏅 Medalha Herói do Jogo desbloqueada!</div>':''}
-      <div class="flex gap-3 flex-wrap justify-center">
-        <button onclick="restartGame()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Jogar de novo 🔄</button>
-        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-cyan-500 hover:bg-cyan-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-cyan-500/30">Jogos 🌿</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const f=document.getElementById('fin');
-    f.style.transform='scale(1)'; f.style.opacity='1';
-  }));
-  launchSparksAt(document.getElementById('card-grid'));
+      <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir expressão">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const item = activePairs[+btn.dataset.reviewIdx];
+      if (item) speakEnglish(item.en);
+    };
+  });
 }
 
-function restartGame() {
-  round = 0; score = 0;
-  document.getElementById('score-disp').textContent = '0';
-  document.querySelectorAll('[class*="fixed"]').forEach(el => { if(el.id!=='badge-toast-container') el.remove(); });
-  startRound();
-}
+// ── Controles ────────────────────────────────────────────────────────────────
+document.getElementById('btn-peek').onclick = usePeek;
+document.getElementById('btn-shuffle-board').onclick = startSession;
+document.getElementById('btn-play-again').onclick = startSession;
+document.getElementById('banner-speak').onclick = () => {
+  if (lastMatched) speakEnglish(lastMatched.en);
+};
 
-// ── Toast banner ──────────────────────────────────────────────────────────────
-function showToast(msg, color) {
-  const t = document.createElement('div');
-  t.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-50 font-label font-bold px-8 py-3 rounded-full shadow-xl text-white fade-up';
-  t.style.background = color;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 1400);
-}
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
+  };
+});
 
-// ── Sparks ────────────────────────────────────────────────────────────────────
-function launchSparksAt(el) {
-  const colors = ['#06b6d4','#10b981','#f59e0b','#ec4899','#a855f7'];
-  const rect   = el?.getBoundingClientRect() || { left: window.innerWidth/2, top: window.innerHeight/2, width:0, height:0 };
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top  + rect.height/2;
-  for (let i = 0; i < 14; i++) {
-    const sp = document.createElement('div');
-    sp.className = 'spark';
-    const a = (i/14)*360, d = 50+Math.random()*70;
-    sp.style.setProperty('--tx',`${Math.cos(a*Math.PI/180)*d}px`);
-    sp.style.setProperty('--ty',`${Math.sin(a*Math.PI/180)*d}px`);
-    sp.style.background = colors[i%colors.length];
-    sp.style.left = cx+'px'; sp.style.top = cy+'px';
-    document.body.appendChild(sp);
-    setTimeout(()=>sp.remove(), 950);
-  }
-}
+document.querySelectorAll('#mode-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pairMode = btn.dataset.mode;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#size-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#size-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pairCount = +btn.dataset.pairs;
+    startSession();
+  };
+});
+
+startSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>

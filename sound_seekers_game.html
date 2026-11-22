@@ -1,35 +1,79 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Sound Seekers — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-  tailwind.config={darkMode:"class",theme:{extend:{
-    colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
-    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
-    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"}
-  }}}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-  .clue-card { animation: clueIn .5s cubic-bezier(.34,1.56,.64,1) both; }
-  .tile-pop   { animation: tilePop .35s ease; }
-  .tile-shake { animation: tileShake .4s ease; }
-  @keyframes clueIn     { from{opacity:0;transform:scale(.85) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
-  @keyframes tilePop    { 0%{transform:scale(1)} 45%{transform:scale(1.12)} 100%{transform:scale(1)} }
-  @keyframes tileShake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
-  .sound-wave span { display:inline-block; animation: wave 1s ease-in-out infinite; }
-  .sound-wave span:nth-child(2){animation-delay:.15s}
-  .sound-wave span:nth-child(3){animation-delay:.3s}
-  .sound-wave span:nth-child(4){animation-delay:.45s}
-  .sound-wave span:nth-child(5){animation-delay:.6s}
-  @keyframes wave { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(2.2)} }
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: #38bdf8;
+    color: #bae6fd;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: #10b981;
+    color: #a7f3d0;
+  }
+  .option-card {
+    min-height: 88px;
+    transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .option-card:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.65);
+    background: rgba(56, 189, 248, 0.14);
+  }
+  .option-card.correct {
+    background: rgba(16, 185, 129, 0.26) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.35);
+  }
+  .option-card.wrong {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: #ef4444 !important;
+    animation: tileShake 0.36s ease;
+  }
+  .option-card.eliminated {
+    opacity: 0.22 !important;
+    pointer-events: none;
+    text-decoration: line-through;
+  }
+  @keyframes tileShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .sound-wave span {
+    display: inline-block;
+    animation: wave 1s ease-in-out infinite;
+  }
+  .sound-wave span:nth-child(2) { animation-delay: 0.15s; }
+  .sound-wave span:nth-child(3) { animation-delay: 0.3s; }
+  .sound-wave span:nth-child(4) { animation-delay: 0.45s; }
+  .sound-wave span:nth-child(5) { animation-delay: 0.6s; }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(2.2); }
+  }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -42,242 +86,643 @@
 <meta property="og:title" content="Sound Seekers — Capy Yara English"/>
 <meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Sound Seekers — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
-<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
+
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
 
-<main class="md:pl-32 pt-28 pb-20 px-4 flex flex-col items-center gap-8 max-w-2xl mx-auto">
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-sky-300 hover:text-sky-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+        <span>🔥</span>
+        <span>Combo:</span>
+        <span id="streak-badge">0</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score-display">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Enigmas dominados">
+        <span>🕵️</span>
+        <span id="mastered-badge">0/120</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
-  <div class="text-center">
-    <span class="font-label text-sky-400 text-sm font-bold uppercase tracking-widest">Mini-Jogo</span>
-    <h1 class="font-headline text-5xl md:text-6xl font-black text-white mt-1">Sound Seekers</h1>
-    <p class="font-body text-slate-400 text-lg mt-1">Leia a dica e ache a imagem correspondente!</p>
-  </div>
+  <header class="text-center mb-6">
+    <p class="text-sky-300 text-xs font-black uppercase tracking-[.22em]">Detetive de Pistas & Áudio • 120 Definições em Inglês</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-sky-300 via-cyan-200 to-emerald-300 bg-clip-text text-transparent">Sound Seekers 🕵️</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Pense diretamente em inglês: ouça e leia a definição contextual e descubra a qual conceito, objeto ou situação ela se refere!</p>
+  </header>
 
-  <!-- Stats bar -->
-  <div class="w-full flex items-center justify-between bg-white/5 rounded-2xl px-6 py-4 border border-white/10">
-    <div class="flex items-center gap-2">
-      <span class="material-symbols-outlined text-sky-400 text-2xl" style="font-variation-settings:'FILL' 1;">hearing</span>
-      <span id="score-display" class="font-headline font-black text-2xl">0</span>
-      <span class="font-label text-slate-400 text-sm">pts</span>
-    </div>
-    <span id="round-display" class="font-label text-slate-400 text-sm font-bold">Dica 1 / 8</span>
-    <div id="hearts-display" class="flex gap-1"></div>
-  </div>
+  <!-- Track & Mode Selector -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha do Curso</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-sky-300">120 pistas disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (120)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (15)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (15)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (15)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (15)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (15)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (15)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (15)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (15)</button>
+        </div>
+      </div>
 
-  <!-- Clue card -->
-  <div id="clue-card"
-       class="clue-card w-full bg-gradient-to-br from-sky-900/60 to-navy rounded-[2.5rem]
-              border border-sky-500/30 p-10 flex flex-col items-center gap-6 shadow-2xl">
-    <!-- Animated sound icon -->
-    <div class="flex items-end gap-1 h-10 sound-wave">
-      <span class="w-1.5 rounded-full bg-sky-400 h-3"></span>
-      <span class="w-1.5 rounded-full bg-sky-400 h-5"></span>
-      <span class="w-1.5 rounded-full bg-sky-400 h-8"></span>
-      <span class="w-1.5 rounded-full bg-sky-400 h-5"></span>
-      <span class="w-1.5 rounded-full bg-sky-400 h-3"></span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Modo Detetive</span>
+          <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+            <button data-mode="bilingual" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 Pista em EN + Apoio PT</button>
+            <button data-mode="english" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🔥 Imersão 100% em Inglês</button>
+            <button data-mode="audio" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🎧 Radar Auditivo (Escuta Pura)</button>
+          </div>
+        </div>
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Pistas por Partida</span>
+          <div id="len-buttons" class="flex flex-wrap gap-1.5">
+            <button data-len="10" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Pistas</button>
+            <button data-len="15" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">15 Pistas</button>
+            <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20 Pistas</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="clue-emoji" class="text-7xl select-none">🎵</div>
-    <p id="clue-text"
-       class="font-headline text-2xl md:text-3xl font-bold text-white text-center leading-snug max-w-md">
-      Loading clue…
+  </section>
+
+  <!-- Main Game Card -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black">
+      <div class="flex items-center gap-2">
+        <span id="round-display" class="bg-white/10 px-3 py-1 rounded-full text-sky-300">Pista 1 / 10</span>
+        <span id="clue-category" class="bg-sky-500/15 border border-sky-400/30 text-sky-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-speak" type="button" class="inline-flex items-center gap-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir pista (Atalho: R)">
+          <span class="material-symbols-outlined text-sm">volume_up</span>
+          <span>Ouvir Pista</span>
+        </button>
+        <button id="btn-slow" type="button" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir devagar">
+          <span>🐢</span>
+          <span>Lento</span>
+        </button>
+        <button id="btn-hint" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Dica 50/50 (Atalho: H)">
+          <span>💡 50/50</span>
+          <span id="hints-left">(3)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="h-2 bg-white/10 rounded-full mt-3 overflow-hidden">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-emerald-400 transition-all duration-300" style="width:10%"></div>
+    </div>
+
+    <!-- Clue Card -->
+    <div id="clue-card" class="my-5 bg-gradient-to-br from-sky-900/45 to-slate-900/75 rounded-3xl border border-sky-400/30 p-6 sm:p-8 flex flex-col items-center text-center shadow-xl">
+      <div class="flex items-end gap-1 h-7 sound-wave mb-3">
+        <span class="w-1.5 rounded-full bg-sky-400 h-2.5"></span>
+        <span class="w-1.5 rounded-full bg-sky-400 h-4"></span>
+        <span class="w-1.5 rounded-full bg-sky-400 h-6"></span>
+        <span class="w-1.5 rounded-full bg-sky-400 h-4"></span>
+        <span class="w-1.5 rounded-full bg-sky-400 h-2.5"></span>
+      </div>
+      <p id="clue-text" class="text-lg sm:text-2xl font-extrabold text-white leading-relaxed max-w-2xl"></p>
+      <p id="clue-pt" class="text-xs sm:text-sm text-sky-200/80 mt-2.5 max-w-xl"></p>
+      <button id="btn-reveal-text" type="button" class="hidden mt-3 text-xs font-bold text-sky-300 underline">Mostrar transcrição da pista</button>
+    </div>
+
+    <!-- 4 Options Grid -->
+    <div id="tiles-grid" class="grid sm:grid-cols-2 gap-3.5"></div>
+
+    <!-- Feedback -->
+    <div class="mt-5 min-h-[2.5rem] flex items-center justify-center">
+      <p id="feedback-text" class="text-center font-black text-base sm:text-lg" aria-live="polite"></p>
+    </div>
+
+    <p class="text-center text-[11px] text-slate-400 mt-2">
+      Atalhos: <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd class="px-1.5 py-0.5 bg-white/10 rounded">4</kbd> responder • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> ouvir • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">H</kbd> dica 50/50
     </p>
-    <p id="clue-category" class="font-label text-sky-400 text-xs uppercase tracking-widest font-bold"></p>
-  </div>
+  </section>
 
-  <!-- Image tiles -->
-  <div id="tiles-grid" class="w-full grid grid-cols-2 gap-5"></div>
+  <!-- Summary Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">🕵️</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Investigação Concluída!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
 
-  <!-- Feedback -->
-  <div id="feedback-bar"
-       class="w-full rounded-2xl px-8 py-5 flex items-center gap-4 text-lg font-label font-bold
-              opacity-0 transition-opacity duration-300">
-    <span id="feedback-icon" class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;"></span>
-    <span id="feedback-text"></span>
-  </div>
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-sky-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+        <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0%</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+        <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">0x</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-sky-500 hover:bg-sky-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Novamente
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-sky-300 mb-3">📚 Revisão das Definições Descobertas</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
 
 </main>
 
 <div id="mobile-nav-placeholder"></div>
-<div id="footer-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=land1"></script>
-<script src="levelup-overlay.js?v=land1"></script>
-<script src="badge-toast.js?v=c52d7db"></script>
 <script src="components.js?v=seg1"></script>
 <script>
-  Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
-  Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
-  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
-  Components.mount('footer-placeholder', Components.renderFooter());
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
 
-  // ── Clue bank ─────────────────────────────────────────────────────────────
-  // Each clue points to a correct SUBJECT and 3 distractors (by name)
-  const SUBJECTS = {
-    Apple:    { emoji:'🍎', image:'' },
-    River:    { emoji:'🌊', image:'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?auto=format&fit=crop&q=80&w=400&h=400' },
-    Sun:      { emoji:'☀️', image:'https://images.unsplash.com/photo-1533316238634-118805fdbac9?auto=format&fit=crop&q=80&w=400&h=400' },
-    Mountain: { emoji:'🏔️', image:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=400&h=400' },
-    Bird:     { emoji:'🐦', image:'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&q=80&w=400&h=400' },
-    Tree:     { emoji:'🌳', image:'https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&q=80&w=400&h=400' },
-    Flower:   { emoji:'🌸', image:'https://images.unsplash.com/photo-1490750967868-88df5691cc5e?auto=format&fit=crop&q=80&w=400&h=400' },
-    Rain:     { emoji:'🌧️', image:'https://images.unsplash.com/photo-1428592953211-077101b2021b?auto=format&fit=crop&q=80&w=400&h=400' },
+const TRACK_META = {
+  starter:      { label: '🌱 Starter A1-A2' },
+  intermediate: { label: '🚀 Intermediate B1-B2' },
+  travel:       { label: '✈️ Viagem' },
+  work:         { label: '💼 Trabalho' },
+  agro:         { label: '🚜 Agro English' },
+  gpstronic:    { label: '🛰️ GPS Tronic' },
+  med:          { label: '🩺 Medical' },
+  advanced:     { label: '🔥 Avançado' }
+};
+
+// ── 120 Pistas Contextuais em Inglês (8 Trilhas x 15 Enigmas) ────────────────
+const CLUES = [
+  // 1. STARTER A1-A2 (15)
+  { track:'starter', answer:'Bakery', pt:'Padaria', emoji:'🥐', text:'You visit this neighborhood shop early in the morning to buy warm, fresh bread and croissants.', ptClue:'Você visita esta loja do bairro cedo de manhã para comprar pão quentinho e croissants.' },
+  { track:'starter', answer:'Umbrella', pt:'Guarda-chuva', emoji:'☔', text:'You open this object above your head when you walk outside in heavy rain.', ptClue:'Você abre este objeto acima da cabeça quando caminha lá fora na chuva forte.' },
+  { track:'starter', answer:'Spare Key', pt:'Chave reserva', emoji:'🔑', text:'An extra copy of your house key that you keep in a safe place in case you lose the main one.', ptClue:'Uma cópia extra da chave de casa guardada em local seguro caso você perca a principal.' },
+  { track:'starter', answer:'Public Library', pt:'Biblioteca pública', emoji:'📚', text:'A quiet place full of bookshelves where students and readers can borrow books for free.', ptClue:'Um lugar silencioso cheio de estantes onde leitores pegam livros emprestados gratuitamente.' },
+  { track:'starter', answer:'Bus Stop', pt:'Ponto de ônibus', emoji:'🚏', text:'The place on the sidewalk where commuters wait in line to catch the city bus.', ptClue:'O local na calçada onde os passageiros aguardam para pegar o ônibus urbano.' },
+  { track:'starter', answer:'Alarm Clock', pt:'Despertador', emoji:'⏰', text:'It rings loudly on your bedside table at six thirty to wake you up for work.', ptClue:'Ele toca alto na mesa de cabeceira às 6h30 para acordar você para o trabalho.' },
+  { track:'starter', answer:'Wallet', pt:'Carteira', emoji:'👛', text:'A small folding case inside your pocket where you keep your cash, ID, and credit cards.', ptClue:'Um pequeno acessório de bolso onde você guarda dinheiro, documento e cartões.' },
+  { track:'starter', answer:'Refrigerator', pt:'Geladeira', emoji:'🧊', text:'The large kitchen appliance that keeps your milk, fruit, and vegetables cold and fresh.', ptClue:'O eletrodoméstico da cozinha que mantém leite, frutas e verduras frios e frescos.' },
+  { track:'starter', answer:'Pharmacy', pt:'Farmácia', emoji:'💊', text:'The store where you take a doctor’s prescription to buy medicine and bandages.', ptClue:'O estabelecimento onde você leva a receita médica para comprar remédios.' },
+  { track:'starter', answer:'Traffic Light', pt:'Semáforo', emoji:'🚦', text:'It stands at street intersections and shines red, yellow, or green to control cars.', ptClue:'Fica nos cruzamentos e acende vermelho, amarelo ou verde para controlar os carros.' },
+  { track:'starter', answer:'Sparkling Water', pt:'Água com gás', emoji:'🫧', text:'Refreshing cold water full of tiny bubbles that many people order at restaurants.', ptClue:'Água gelada refrescante cheia de pequenas bolhas pedida em restaurantes.' },
+  { track:'starter', answer:'Washing Machine', pt:'Máquina de lavar roupa', emoji:'🧺', text:'You put dirty clothes and soap inside this appliance on Saturday to do the laundry.', ptClue:'Você coloca roupas sujas e sabão dentro deste aparelho no sábado para lavar a roupa.' },
+  { track:'starter', answer:'Sunglasses', pt:'Óculos de sol', emoji:'🕶️', text:'You wear them over your eyes on a bright summer afternoon at the beach.', ptClue:'Você os usa nos olhos em uma tarde ensolarada de verão na praia.' },
+  { track:'starter', answer:'Headphones', pt:'Fones de ouvido', emoji:'🎧', text:'You wear them on your ears to listen to music or English lessons without disturbing others.', ptClue:'Você os coloca nos ouvidos para ouvir música ou aulas sem incomodar os outros.' },
+  { track:'starter', answer:'Next-door Neighbor', pt:'Vizinho do lado', emoji:'🏡', text:'The person or family who lives in the house or apartment right beside yours.', ptClue:'A pessoa ou família que mora na casa ou apartamento bem ao lado do seu.' },
+
+  // 2. INTERMEDIATE B1-B2 (15)
+  { track:'intermediate', answer:'Receipt', pt:'Recibo / Comprovante', emoji:'🧾', text:'The printed slip of paper a cashier gives you after paying, which you need if you want a refund.', ptClue:'O comprovante impresso entregue após o pagamento, necessário caso precise de reembolso.' },
+  { track:'intermediate', answer:'Traffic Jam', pt:'Engarrafamento', emoji:'🚗', text:'A long line of cars stopped on the highway during rush hour, making everyone late.', ptClue:'Uma longa fila de carros parados na rodovia no horário de pico.' },
+  { track:'intermediate', answer:'Power Outage', pt:'Queda de energia / Apagão', emoji:'🕯️', text:'When the electricity suddenly goes out in your neighborhood during a heavy storm.', ptClue:'Quando a eletricidade acaba de repente no bairro durante uma tempestade.' },
+  { track:'intermediate', answer:'Pros and Cons', pt:'Prós e contras', emoji:'⚖️', text:'The advantages and disadvantages that you carefully compare before making an important decision.', ptClue:'As vantagens e desvantagens que você compara antes de tomar uma decisão importante.' },
+  { track:'intermediate', answer:'Shortcut', pt:'Atalho (caminho mais curto)', emoji:'🧭', text:'A faster, alternative route that helps you reach your destination in less time.', ptClue:'Um caminho alternativo mais rápido que ajuda a chegar ao destino em menos tempo.' },
+  { track:'intermediate', answer:'Package', pt:'Encomenda / Pacote', emoji:'📦', text:'A cardboard box delivered to your front door by a courier after you shop online.', ptClue:'Uma caixa entregue na sua porta por uma transportadora após uma compra online.' },
+  { track:'intermediate', answer:'Spare Tire', pt:'Pneu estepe', emoji:'🛞', text:'The extra wheel kept in the trunk of your car in case you get a flat tire on the road.', ptClue:'A roda reserva guardada no porta-malas caso fure um pneu na estrada.' },
+  { track:'intermediate', answer:'Schedule', pt:'Cronograma / Agenda', emoji:'🗓️', text:'A detailed plan listing all your appointments, classes, and times for the week.', ptClue:'Um planejamento detalhado listando seus compromissos e horários da semana.' },
+  { track:'intermediate', answer:'Low Battery', pt:'Bateria fraca', emoji:'🪫', text:'When your smartphone screen drops to five percent and you urgently need a charger.', ptClue:'Quando a carga do celular cai para 5% e você precisa urgentemente de um carregador.' },
+  { track:'intermediate', answer:'Seatbelt', pt:'Cinto de segurança', emoji:'💺', text:'The safety strap you fasten across your chest as soon as you sit inside a car or airplane.', ptClue:'A faixa de segurança que você afivela assim que senta no carro ou avião.' },
+  { track:'intermediate', answer:'Crosswalk', pt:'Faixa de pedestres', emoji:'🚸', text:'The painted white stripes on the asphalt where pedestrians safely walk across the street.', ptClue:'As faixas brancas pintadas no asfalto onde pedestres atravessam a rua com segurança.' },
+  { track:'intermediate', answer:'Raincoat', pt:'Capa de chuva', emoji:'🧥', text:'A waterproof jacket you pack in your bag just in case the weather turns rainy.', ptClue:'Uma jaqueta impermeável que você leva na bolsa caso o tempo vire.' },
+  { track:'intermediate', answer:'Point of View', pt:'Ponto de vista / Opinião', emoji:'🗣️', text:'Your personal perspective or way of looking at a topic during a conversation.', ptClue:'Sua perspectiva pessoal ou maneira de enxergar um assunto em uma conversa.' },
+  { track:'intermediate', answer:'Appointment', pt:'Hora marcada / Consulta', emoji:'📅', text:'A formal arrangement to meet a doctor, dentist, or professional at a specific time.', ptClue:'Um horário formalmente agendado com médico, dentista ou profissional.' },
+  { track:'intermediate', answer:'Refund', pt:'Reembolso / Estorno', emoji:'💵', text:'The money returned to you when you bring back a defective product to the store.', ptClue:'O dinheiro devolvido a você quando retorna um produto com defeito à loja.' },
+
+  // 3. TRAVEL / VIAGEM (15)
+  { track:'travel', answer:'Boarding Pass', pt:'Cartão de embarque', emoji:'🎫', text:'The document—printed or on your phone—showing your flight number, seat, and gate.', ptClue:'O documento impresso ou no celular que mostra seu voo, assento e portão de embarque.' },
+  { track:'travel', answer:'Baggage Claim', pt:'Restituição de bagagens', emoji:'🎒', text:'The area in the arrivals terminal with moving carousels where you pick up your checked suitcases.', ptClue:'A área no desembarque com esteiras rolantes onde você retira suas malas despachadas.' },
+  { track:'travel', answer:'Aisle Seat', pt:'Assento no corredor', emoji:'💺', text:'The airplane seat next to the walkway, allowing you to stand up easily without waking others.', ptClue:'O assento do avião ao lado do corredor, permitindo levantar facilmente.' },
+  { track:'travel', answer:'Carry-on Bag', pt:'Bagagem de mão', emoji:'🧳', text:'A small suitcase that you bring with you into the airplane cabin instead of checking it.', ptClue:'A mala pequena que você leva consigo dentro da cabine do avião.' },
+  { track:'travel', answer:'Power Adapter', pt:'Adaptador de tomada', emoji:'🔌', text:'A small device that lets you plug your Brazilian charger into European or American wall outlets.', ptClue:'Dispositivo que permite conectar seu carregador em tomadas de outros países.' },
+  { track:'travel', answer:'Connecting Flight', pt:'Voo de conexão', emoji:'🛫', text:'When your journey requires landing at an intermediate airport and boarding a second plane.', ptClue:'Quando sua viagem exige pousar em um aeroporto intermediário e pegar um segundo avião.' },
+  { track:'travel', answer:'Currency Exchange', pt:'Câmbio de moeda', emoji:'💱', text:'The counter at the airport where travelers convert their money into euros, dollars, or pounds.', ptClue:'O guichê onde viajantes convertem dinheiro em euros, dólares ou libras.' },
+  { track:'travel', answer:'Passport Control', pt:'Imigração / Controle de passaporte', emoji:'🛂', text:'The official checkpoint where officers verify your identity and stamp your passport upon arrival.', ptClue:'O posto oficial onde agentes verificam sua identidade e carimbam seu passaporte.' },
+  { track:'travel', answer:'Round-trip Ticket', pt:'Passagem de ida e volta', emoji:'🚆', text:'A single travel booking that covers both your journey to a destination and your return home.', ptClue:'Uma passagem que cobre tanto a ida para o destino quanto a volta para casa.' },
+  { track:'travel', answer:'Front Desk', pt:'Recepção do hotel', emoji:'🛎️', text:'The main counter in a hotel lobby where guests check in, get room keys, and ask for help.', ptClue:'O balcão principal no saguão do hotel onde hóspedes fazem check-in e pegam as chaves.' },
+  { track:'travel', answer:'Overhead Bin', pt:'Compartimento superior', emoji:'✈️', text:'The storage cabinet above your seat on an airplane where you place your backpack and coat.', ptClue:'O compartimento acima do assento no avião onde você guarda sua mochila.' },
+  { track:'travel', answer:'Shuttle Bus', pt:'Ônibus de traslado', emoji:'🚐', text:'A vehicle that runs back and forth on a short route between the airport terminal and hotels.', ptClue:'Veículo que faz o transporte contínuo entre o terminal do aeroporto e os hotéis.' },
+  { track:'travel', answer:'Late Check-out', pt:'Saída tardia do hotel', emoji:'🕒', text:'Special permission from the hotel allowing you to stay in your room past the usual 11 AM limit.', ptClue:'Permissão do hotel para desocupar o quarto mais tarde que o horário padrão.' },
+  { track:'travel', answer:'Guided Tour', pt:'Passeio guiado', emoji:'🗺️', text:'A visit to a museum or historic center led by an expert who explains the local history.', ptClue:'Visita a um museu ou centro histórico conduzida por um guia especialista.' },
+  { track:'travel', answer:'Room Rate', pt:'Diária do quarto', emoji:'🏨', text:'The price charged per night to stay in a hotel room, often including breakfast.', ptClue:'O valor cobrado por noite de hospedagem em um quarto de hotel.' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (15)
+  { track:'work', answer:'Deadline', pt:'Prazo limite de entrega', emoji:'🎯', text:'The final date or time by which a task, report, or project must be completed and delivered.', ptClue:'A data ou hora limite até a qual um projeto ou relatório deve ser entregue.' },
+  { track:'work', answer:'On Mute', pt:'No mudo (microfone)', emoji:'🔇', text:'When you are speaking during a video call, your lips are moving, but nobody can hear your voice.', ptClue:'Quando você fala na videochamada, mas seu microfone está silenciado e ninguém ouve.' },
+  { track:'work', answer:'Share Screen', pt:'Compartilhar a tela', emoji:'💻', text:'A video meeting feature that lets all participants see your slides or spreadsheet live.', ptClue:'Recurso de videochamada que permite a todos verem seus slides ou planilha ao vivo.' },
+  { track:'work', answer:'Attached File', pt:'Arquivo em anexo', emoji:'📎', text:'A PDF document or spreadsheet sent together inside an email message for the recipient to open.', ptClue:'Um documento PDF ou planilha enviado junto a uma mensagem de e-mail.' },
+  { track:'work', answer:'Action Items', pt:'Tarefas práticas definidas', emoji:'📋', text:'The specific tasks assigned to team members at the end of a meeting, with clear owners and dates.', ptClue:'As tarefas específicas atribuídas à equipe ao final de uma reunião.' },
+  { track:'work', answer:'Reschedule', pt:'Reagendar / Remarcar', emoji:'📅', text:'To move a planned meeting or phone call to a new day or time because of a conflict.', ptClue:'Transferir uma reunião planejada para um novo dia ou horário.' },
+  { track:'work', answer:'Out of Office', pt:'Ausente do escritório (OOO)', emoji:'🏖️', text:'An automatic email reply letting colleagues know you are away on vacation or at an event.', ptClue:'Resposta automática de e-mail avisando que você está ausente ou em férias.' },
+  { track:'work', answer:'Quarterly Report', pt:'Relatório trimestral', emoji:'📈', text:'A financial or sales summary presented every three months—Q1, Q2, Q3, and Q4.', ptClue:'Um resumo financeiro ou comercial apresentado a cada três meses.' },
+  { track:'work', answer:'Key Strength', pt:'Ponto forte principal', emoji:'🏆', text:'A standout professional skill—like leadership or problem-solving—that you highlight in an interview.', ptClue:'Uma habilidade profissional de destaque que você apresenta em uma entrevista.' },
+  { track:'work', answer:'Follow Up', pt:'Fazer acompanhamento / Dar retorno', emoji:'✉️', text:'To contact a client or colleague again after a meeting to check progress or confirm a decision.', ptClue:'Entrar em contato novamente com um cliente após uma reunião para verificar o andamento.' },
+  { track:'work', answer:'Remote Work', pt:'Trabalho remoto', emoji:'🏠', text:'Working professionally from home or another location using the internet instead of commuting.', ptClue:'Trabalhar profissionalmente de casa pela internet em vez de ir ao escritório físico.' },
+  { track:'work', answer:'Invoice', pt:'Nota fiscal / Fatura comercial', emoji:'🧾', text:'An official billing document sent by a supplier requesting payment for goods or services.', ptClue:'Documento oficial de cobrança enviado por um fornecedor solicitando pagamento.' },
+  { track:'work', answer:'On the Same Page', pt:'Totalmente alinhados', emoji:'📄', text:'When every member of a team shares the exact same understanding of the project goals.', ptClue:'Quando todos os membros da equipe compartilham o mesmo entendimento das metas.' },
+  { track:'work', answer:'Brainstorming', pt:'Chuva de ideias em equipe', emoji:'💡', text:'A creative group session where everyone suggests new ideas freely to solve a problem.', ptClue:'Sessão criativa em grupo onde todos sugerem novas ideias para resolver um problema.' },
+  { track:'work', answer:'Wrap Up', pt:'Encerrar / Concluir a reunião', emoji:'🏁', text:'To bring a meeting or presentation to a close by summarizing the main points.', ptClue:'Concluir uma reunião resumindo os pontos principais.' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (15)
+  { track:'agro', answer:'Soil Moisture', pt:'Umidade do solo', emoji:'🌱', text:'The amount of water held in the earth, which must be checked before planting soybeans or corn.', ptClue:'A quantidade de água presente na terra, essencial para iniciar o plantio.' },
+  { track:'agro', answer:'Combine Harvester', pt:'Colheitadeira de grãos', emoji:'🚜', text:'The heavy farm machine that cuts the mature crop, threshes the grain, and cleans it in one pass.', ptClue:'A máquina agrícola que corta a lavoura madura, trilha e limpa os grãos.' },
+  { track:'agro', answer:'Sprayer Nozzle', pt:'Bico de pulverização', emoji:'💦', text:'The small tip on a sprayer boom that breaks liquid into droplets; it must be checked for clogging.', ptClue:'A ponteira na barra do pulverizador que forma as gotas e não pode estar entupida.' },
+  { track:'agro', answer:'Chemical Drift', pt:'Deriva de defensivo', emoji:'🍃', text:'When strong wind blows sprayed droplets away from the target field onto neighboring crops.', ptClue:'Quando o vento forte carrega as gotas pulverizadas para fora do talhão-alvo.' },
+  { track:'agro', answer:'Crop Yield', pt:'Produtividade da lavoura', emoji:'🌾', text:'The total amount of grain harvested per unit of land, such as sixty-eight bags per hectare.', ptClue:'A quantidade total de grãos colhida por área, como 68 sacas por hectare.' },
+  { track:'agro', answer:'Center Pivot', pt:'Pivô central de irrigação', emoji:'💧', text:'A long wheeled irrigation pipe that rotates in a giant circle around a central water point.', ptClue:'Estrutura longa sobre rodas que gira em círculo irrigando a lavoura.' },
+  { track:'agro', answer:'Field Scouting', pt:'Monitoramento de pragas', emoji:'🐛', text:'Walking through the crop rows to inspect leaves and stems for stink bugs, caterpillars, or rust.', ptClue:'Vistoriar as linhas da lavoura para identificar percevejos, lagartas ou ferrugem.' },
+  { track:'agro', answer:'Crop Rotation', pt:'Rotação de culturas', emoji:'🌻', text:'Alternating different plants—like soybeans, corn, and cover crops—across seasons to protect the soil.', ptClue:'Alternar diferentes culturas entre as safras para proteger o solo e reduzir pragas.' },
+  { track:'agro', answer:'No-till Farming', pt:'Plantio direto na palha', emoji:'🍂', text:'Seeding directly into the straw residue of the previous crop without plowing the earth.', ptClue:'Semear diretamente sobre a palhada da cultura anterior sem revolver o solo.' },
+  { track:'agro', answer:'Agricultural Lime', pt:'Calcário agrícola', emoji:'🧪', text:'Crushed limestone spread across the field to neutralize soil acidity and supply calcium.', ptClue:'Pó de rocha calcária aplicado no talhão para corrigir a acidez do solo.' },
+  { track:'agro', answer:'Grain Silo', pt:'Silo de grãos', emoji:'🏢', text:'A tall cylindrical metal tower equipped with aeration fans to store harvested corn and soybeans.', ptClue:'Torre cilíndrica equipada com ventiladores de aeração para armazenar a safra.' },
+  { track:'agro', answer:'Burndown Herbicide', pt:'Herbicida de dessecação', emoji:'🔥', text:'A product applied two weeks before planting to eliminate existing weeds and prepare clean straw.', ptClue:'Produto aplicado antes da semeadura para dessecar plantas daninhas.' },
+  { track:'agro', answer:'Rotational Grazing', pt:'Pastejo rotacionado', emoji:'🐄', text:'Moving beef cattle between divided paddocks so the pasture grass can rest and regrow.', ptClue:'Alternar o gado entre piquetes divididos para o capim descansar e rebrotar.' },
+  { track:'agro', answer:'Power Take-Off', pt:'Tomada de força (TDF)', emoji:'⚙️', text:'The rotating splined shaft at the back of a tractor that transfers engine power to an implement.', ptClue:'O eixo estriado giratório na traseira do trator que transmite potência ao implemento.' },
+  { track:'agro', answer:'Planting Depth', pt:'Profundidade de plantio', emoji:'📏', text:'How deep the planter places the seed into the furrow—usually around four centimeters.', ptClue:'A profundidade em que a plantadeira deposita a semente no sulco.' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (15)
+  { track:'gpstronic', answer:'Terminating Resistor', pt:'Resistor de terminação (120Ω)', emoji:'⚡', text:'A 120-ohm component placed at each end of a CAN bus backbone, resulting in a 60-ohm reading.', ptClue:'Componente de 120 ohms nas duas pontas da rede CAN, resultando em leitura de 60 ohms.' },
+  { track:'gpstronic', answer:'Wiring Harness', pt:'Chicote elétrico', emoji:'🔌', text:'The bundled assembly of power cables, twisted CAN wires, and waterproof Deutsch connectors.', ptClue:'O conjunto de cabos de força, par trançado CAN e conectores vedados da máquina.' },
+  { track:'gpstronic', answer:'RTK Signal', pt:'Sinal de correção RTK', emoji:'🛰️', text:'A real-time base station correction that locks satellite guidance to two-centimeter accuracy.', ptClue:'Correção de base em tempo real que garante precisão de 2 cm no piloto automático.' },
+  { track:'gpstronic', answer:'Section Control', pt:'Corte automático de seção', emoji:'🗺️', text:'The system that automatically shuts off boom valves or planter rows over already covered areas.', ptClue:'Sistema que desliga automaticamente seções da barra ou linhas onde já foi aplicado.' },
+  { track:'gpstronic', answer:'Wheel Angle Sensor', pt:'Sensor de ângulo de direção', emoji:'🛞', text:'A sensor mounted on the front axle kingpin that tells the autopilot the exact position of the wheels.', ptClue:'Sensor montado no eixo dianteiro que informa ao piloto a posição exata das rodas.' },
+  { track:'gpstronic', answer:'Firmware Update', pt:'Atualização de firmware', emoji:'💾', text:'Installing a new internal software version on a display or ECU via a FAT32 USB flash drive.', ptClue:'Instalar uma nova versão do software interno no monitor ou módulo via pen drive.' },
+  { track:'gpstronic', answer:'Terrain Compensation', pt:'Compensação de terreno (TCM/IMU)', emoji:'⛰️', text:'An internal gyroscope module that corrects the GPS roof antenna position when driving on slopes.', ptClue:'Módulo giroscópico que corrige a posição da antena no teto quando o trator inclina.' },
+  { track:'gpstronic', answer:'Variable Rate', pt:'Aplicação em taxa variável (VRA)', emoji:'🌱', text:'Automatically changing fertilizer or seed dosage across the field based on a prescription map.', ptClue:'Variar automaticamente a dose de adubo ou sementes conforme o mapa de prescrição.' },
+  { track:'gpstronic', answer:'AB Guidance Line', pt:'Linha guia AB', emoji:'🧭', text:'A straight reference path created by marking two points in the field for the autopilot to follow.', ptClue:'Traçado reto de referência criado marcando o ponto A e o ponto B no talhão.' },
+  { track:'gpstronic', answer:'Flowmeter', pt:'Fluxômetro', emoji:'💧', text:'A turbine sensor in the sprayer plumbing that counts pulses per liter to measure liquid flow.', ptClue:'Sensor na tubulação do pulverizador que conta pulsos por litro para medir a vazão.' },
+  { track:'gpstronic', answer:'Voltage Drop', pt:'Queda de tensão elétrica', emoji:'🔋', text:'A loss of electrical potential caused by oxidized battery terminals or thin cables during cranking.', ptClue:'Perda de tensão elétrica causada por polos oxidados ou cabos finos na partida.' },
+  { track:'gpstronic', answer:'Blockage Alarm', pt:'Alarme de entupimento', emoji:'🚨', text:'A warning on the monitor triggered when seeds stop falling past the optical tube sensor.', ptClue:'Alerta no monitor disparado quando as sementes param de passar pelo sensor óptico.' },
+  { track:'gpstronic', answer:'Virtual Terminal', pt:'Terminal virtual ISOBUS (UT/VT)', emoji:'🖥️', text:'The universal cabin screen capable of displaying the graphic interface of any ISOBUS implement.', ptClue:'Tela universal na cabine capaz de exibir a interface de qualquer implemento ISOBUS.' },
+  { track:'gpstronic', answer:'Field Boundary', pt:'Bordadura / Limite do talhão', emoji:'📐', text:'The outer GPS polygon recorded by driving around the perimeter of a cultivation plot.', ptClue:'O polígono externo de GPS gravado ao contornar o perímetro do talhão.' },
+  { track:'gpstronic', answer:'Blown Fuse', pt:'Fusível queimado', emoji:'⚠️', text:'A melted protection element inside the power harness that prevents the display from turning on.', ptClue:'Elemento de proteção rompido no chicote que impede o monitor de ligar.' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (15)
+  { track:'med', answer:'Blood Pressure Cuff', pt:'Braçadeira de pressão arterial', emoji:'🌡️', text:'The inflatable band wrapped around a patient’s upper arm to measure systolic and diastolic pressure.', ptClue:'A faixa inflável colocada no braço do paciente para aferir a pressão arterial.' },
+  { track:'med', answer:'Shortness of Breath', pt:'Falta de ar (dispneia)', emoji:'🫁', text:'A clinical symptom where a patient feels unable to get enough air into their lungs.', ptClue:'Sintoma clínico em que o paciente sente dificuldade para puxar ar suficiente.' },
+  { track:'med', answer:'Swelling', pt:'Inchaço / Edema', emoji:'🦵', text:'Enlargement of an injured ankle or joint caused by fluid accumulation, often treated with ice.', ptClue:'Aumento de volume em um tornozelo ou articulação lesionada, tratado com gelo.' },
+  { track:'med', answer:'Fasting Blood Test', pt:'Exame de sangue em jejum', emoji:'🩸', text:'A morning laboratory exam that requires the patient not to eat or drink calories for twelve hours.', ptClue:'Exame de laboratório matinal que exige doze horas sem ingerir alimentos.' },
+  { track:'med', answer:'Hospital Discharge', pt:'Alta hospitalar', emoji:'🏥', text:'The official medical release allowing a recovered inpatient to leave the hospital and go home.', ptClue:'A liberação médica oficial permitindo que o paciente recuperado vá para casa.' },
+  { track:'med', answer:'Stitches', pt:'Pontos cirúrgicos', emoji:'💉', text:'Surgical threads used by a doctor to close a deep cut, usually removed after ten days.', ptClue:'Fios cirúrgicos usados para fechar um corte profundo, retirados após dez dias.' },
+  { track:'med', answer:'Over-the-Counter', pt:'Vendido sem receita médica (OTC)', emoji:'🛍️', text:'Medications like mild painkillers or eye drops that you can buy directly without a prescription.', ptClue:'Medicamentos vendidos livremente na farmácia sem necessidade de receita médica.' },
+  { track:'med', answer:'Allergic Reaction', pt:'Reação alérgica', emoji:'📋', text:'An immune response—such as skin rash or itching—triggered by a medication like penicillin.', ptClue:'Resposta imunológica como vermelhidão ou coceira causada por um medicamento.' },
+  { track:'med', answer:'Follow-up Visit', pt:'Consulta de retorno', emoji:'📅', text:'A second appointment scheduled two weeks later so the doctor can check your recovery.', ptClue:'Uma segunda consulta agendada semanas depois para avaliar sua recuperação.' },
+  { track:'med', answer:'Wound Dressing', pt:'Curativo estéril', emoji:'🩹', text:'A sterile pad and bandage placed over a healing skin incision to keep it clean.', ptClue:'Gaze e proteção estéril colocadas sobre uma incisão para mantê-la limpa.' },
+  { track:'med', answer:'Sprained Ankle', pt:'Tornozelo torcido / Entorse', emoji:'🦴', text:'An injury to the ligaments of the foot joint after twisting it while walking or running.', ptClue:'Lesão nos ligamentos da articulação do pé após uma torção.' },
+  { track:'med', answer:'Side Effects', pt:'Efeitos colaterais', emoji:'📄', text:'Unintended secondary reactions to a drug, such as drowsiness, dry mouth, or mild nausea.', ptClue:'Reações secundárias de um medicamento, como sonolência ou boca seca.' },
+  { track:'med', answer:'Sore Throat', pt:'Dor de garganta', emoji:'🗣️', text:'Pain or scratchiness when swallowing, commonly experienced during a cold or flu.', ptClue:'Dor ou irritação ao engolir, comum durante resfriados ou gripes.' },
+  { track:'med', answer:'Dizziness', pt:'Tontura / Vertigem', emoji:'🌀', text:'The sensation that the room is spinning around you and you might lose your balance.', ptClue:'A sensação de que o ambiente está girando e você pode perder o equilíbrio.' },
+  { track:'med', answer:'Twice a Day', pt:'Duas vezes ao dia (12/12h)', emoji:'💊', text:'A dosage instruction meaning you should take your medication once every twelve hours.', ptClue:'Orientação posológica indicando tomar o medicamento a cada doze horas.' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (15)
+  { track:'advanced', answer:'Meet Halfway', pt:'Chegar a um meio-termo', emoji:'🤝', text:'To reach a fair compromise where both sides in a negotiation give up a little to close the deal.', ptClue:'Chegar a um acordo justo em que ambos os lados cedem um pouco para fechar negócio.' },
+  { track:'advanced', answer:'Blessing in Disguise', pt:'Um mal que veio para o bem', emoji:'🎭', text:'Something that seems unlucky or negative at first, but later produces a very positive outcome.', ptClue:'Algo que parece ruim no início, mas depois traz um resultado muito positivo.' },
+  { track:'advanced', answer:'Cut Corners', pt:'Fazer de qualquer jeito p/ poupar', emoji:'✂️', text:'To skip important steps in order to save time or money, sacrificing quality and safety.', ptClue:'Pular etapas importantes para economizar tempo ou dinheiro, sacrificando a qualidade.' },
+  { track:'advanced', answer:'Get the Hang of It', pt:'Pegar o jeito da coisa', emoji:'🛠️', text:'To finally understand how to operate a complex tool or software after practicing a few times.', ptClue:'Aprender a dominar o funcionamento de uma ferramenta ou sistema após praticar.' },
+  { track:'advanced', answer:'Go the Extra Mile', pt:'Ir além do esperado', emoji:'🏋️', text:'To make a special effort far beyond what is required in order to deliver outstanding results.', ptClue:'Fazer um esforço adicional muito além do exigido para entregar um resultado excelente.' },
+  { track:'advanced', answer:'Call It a Day', pt:'Encerrar o expediente por hoje', emoji:'⏳', text:'To stop working on a project for the rest of the day after finishing the main priorities.', ptClue:'Dar o trabalho por encerrado no dia após concluir as prioridades principais.' },
+  { track:'advanced', answer:'Once and for All', pt:'De uma vez por todas', emoji:'📌', text:'To solve a recurring problem completely and permanently so it never happens again.', ptClue:'Resolver um problema recorrente de forma definitiva para que não volte a ocorrer.' },
+  { track:'advanced', answer:'Break the Ice', pt:'Quebrar o gelo', emoji:'🧊', text:'To say or do something friendly at the start of a meeting so people relax and feel comfortable.', ptClue:'Dizer algo amigável no início de uma conversa para deixar todos à vontade.' },
+  { track:'advanced', answer:'Under the Weather', pt:'Meio indisposto / Adoentado', emoji:'🤒', text:'An idiomatic way to say you are feeling slightly sick, tired, or lacking your usual energy.', ptClue:'Expressão idiomática para dizer que você está se sentindo levemente indisposto.' },
+  { track:'advanced', answer:'Read Between the Lines', pt:'Ler nas entrelinhas', emoji:'🔍', text:'To understand the hidden or implied meaning behind someone’s polite words or email.', ptClue:'Compreender a mensagem implícita por trás das palavras formais de alguém.' },
+  { track:'advanced', answer:'Bottleneck', pt:'Gargalo operacional', emoji:'⏳', text:'A single slow stage in a process or system that holds back overall productivity.', ptClue:'Uma etapa lenta em um processo ou sistema que trava a velocidade de todo o fluxo.' },
+  { track:'advanced', answer:'Milestone', pt:'Marco importante', emoji:'🏁', text:'A significant achievement or turning point that marks major progress in a project.', ptClue:'Uma conquista significativa que marca o avanço de uma etapa decisiva no projeto.' },
+  { track:'advanced', answer:'Second to None', pt:'Incomparável / O melhor de todos', emoji:'🥇', text:'So high in quality or reliability that nothing else in the market is better than it.', ptClue:'Tão elevado em qualidade que nenhum outro no mercado é superior.' },
+  { track:'advanced', answer:'Take for Granted', pt:'Dar como garantido / Não valorizar', emoji:'⚖️', text:'To fail to appreciate the value of something because you assume it will always be there.', ptClue:'Deixar de valorizar algo por achar que estará sempre disponível.' },
+  { track:'advanced', answer:'Pay Off', pt:'Valer a pena / Dar frutos', emoji:'🌟', text:'When months of hard study or investment finally produce great rewards in the long run.', ptClue:'Quando meses de estudo ou investimento finalmente trazem ótimos frutos.' }
+];
+
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capySoundSeekersMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+function saveMasteredItem(ans) {
+  try {
+    const set = getMasteredSet();
+    set.add(ans);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${getMasteredSet().size}/${CLUES.length}`;
+}
+
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakEnglish(text, rate = 0.94) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
+
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack = 'all';
+let seekerMode    = 'bilingual'; // 'bilingual' | 'english' | 'audio'
+let sessionLength = 10;
+
+let deck          = [];
+let round         = 0;
+let score         = 0;
+let streak        = 0;
+let bestStreak    = 0;
+let correctCount  = 0;
+let hintsLeft     = 3;
+let currentOpts   = [];
+let waitingNext   = false;
+let historyLog    = [];
+
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? CLUES
+    : CLUES.filter(x => x.track === selectedTrack);
+}
+
+function startSession() {
+  const pool = getFilteredPool();
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} pistas disponíveis`;
+
+  deck         = shuffle(pool).slice(0, Math.min(sessionLength, pool.length));
+  round        = 0;
+  score        = 0;
+  streak       = 0;
+  bestStreak   = 0;
+  correctCount = 0;
+  hintsLeft    = 3;
+  historyLog   = [];
+
+  document.getElementById('summary-card').classList.add('hidden');
+  document.getElementById('game-card').classList.remove('hidden');
+  updateMasteredBadge();
+  renderRound();
+}
+
+function renderRound() {
+  if (round >= deck.length) return finishGame();
+  waitingNext = false;
+
+  const clue = deck[round];
+  const meta = TRACK_META[clue.track] || TRACK_META.starter;
+
+  document.getElementById('round-display').textContent = `Pista ${round + 1} / ${deck.length}`;
+  document.getElementById('clue-category').textContent = meta.label;
+  document.getElementById('score-display').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+  document.getElementById('progress-bar').style.width = `${((round + 1) / deck.length) * 100}%`;
+  document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+
+  const clueTextEl = document.getElementById('clue-text');
+  const cluePtEl   = document.getElementById('clue-pt');
+  const revealBtn  = document.getElementById('btn-reveal-text');
+
+  clueTextEl.textContent = `"${clue.text}"`;
+  cluePtEl.textContent   = `🇧🇷 ${clue.ptClue}`;
+
+  if (seekerMode === 'bilingual') {
+    clueTextEl.classList.remove('blur-md', 'select-none');
+    cluePtEl.classList.remove('hidden');
+    revealBtn.classList.add('hidden');
+  } else if (seekerMode === 'english') {
+    clueTextEl.classList.remove('blur-md', 'select-none');
+    cluePtEl.classList.add('hidden');
+    revealBtn.classList.add('hidden');
+  } else {
+    clueTextEl.classList.add('blur-md', 'select-none');
+    cluePtEl.classList.add('hidden');
+    revealBtn.classList.remove('hidden');
+  }
+
+  const sameTrack = CLUES.filter(x => x.track === clue.track && x.answer !== clue.answer);
+  const fallback  = CLUES.filter(x => x.answer !== clue.answer);
+  const source    = sameTrack.length >= 3 ? sameTrack : fallback;
+  currentOpts     = shuffle([clue, ...shuffle(source).slice(0, 3)]);
+
+  const grid = document.getElementById('tiles-grid');
+  grid.innerHTML = currentOpts.map((item, idx) => `
+    <button type="button" data-idx="${idx}" class="option-card rounded-2xl bg-white/10 border border-white/15 p-4 flex items-center gap-3.5 text-left">
+      <span class="w-8 h-8 rounded-xl bg-white/10 text-sky-300 font-black text-xs flex items-center justify-center shrink-0">${idx + 1}</span>
+      <span class="text-3xl shrink-0">${item.emoji}</span>
+      <div>
+        <p class="font-extrabold text-base sm:text-lg text-white leading-tight">${item.answer}</p>
+        <p class="text-xs font-bold text-sky-300 mt-0.5">${item.pt}</p>
+      </div>
+    </button>
+  `).join('');
+
+  grid.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => handleTile(btn, clue);
+  });
+
+  document.getElementById('feedback-text').textContent = '';
+  setTimeout(() => speakEnglish(clue.text, 0.94), 160);
+}
+
+function handleTile(btn, correctClue) {
+  if (waitingNext) return;
+  waitingNext = true;
+
+  const picked = currentOpts[+btn.dataset.idx];
+  const isCorrect = picked && picked.answer === correctClue.answer;
+
+  document.querySelectorAll('#tiles-grid button').forEach(b => {
+    b.disabled = true;
+    const item = currentOpts[+b.dataset.idx];
+    if (item.answer === correctClue.answer) b.classList.add('correct');
+  });
+
+  document.getElementById('clue-text').classList.remove('blur-md', 'select-none');
+  document.getElementById('clue-pt').classList.remove('hidden');
+  document.getElementById('btn-reveal-text').classList.add('hidden');
+
+  const fb = document.getElementById('feedback-text');
+  if (isCorrect) {
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    correctCount++;
+
+    const earned = (seekerMode === 'audio' ? 15 : (seekerMode === 'english' ? 12 : 10)) + Math.min(8, (streak - 1) * 2);
+    score += earned;
+    saveMasteredItem(correctClue.answer);
+
+    fb.textContent = `🕵️ Elementar! É "${correctClue.answer}" (${correctClue.pt}) +${earned} XP`;
+    fb.className = 'text-center font-black text-base sm:text-lg text-emerald-300';
+    speakEnglish(correctClue.answer, 0.92);
+  } else {
+    streak = 0;
+    btn.classList.add('wrong');
+    fb.textContent = `Quase! A pista descrevia "${correctClue.answer}" (${correctClue.pt}).`;
+    fb.className = 'text-center font-black text-base sm:text-lg text-rose-300';
+  }
+
+  document.getElementById('score-display').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+
+  historyLog.push({ item: correctClue, ok: isCorrect });
+  round++;
+  setTimeout(renderRound, isCorrect ? 1650 : 2400);
+}
+
+function useHint() {
+  if (waitingNext || hintsLeft <= 0) return;
+  const correctClue = deck[round];
+  const wrongBtns = [...document.querySelectorAll('#tiles-grid button')].filter(b => {
+    const item = currentOpts[+b.dataset.idx];
+    return item.answer !== correctClue.answer && !b.classList.contains('eliminated');
+  });
+  if (wrongBtns.length < 2) return;
+  shuffle(wrongBtns).slice(0, 2).forEach(b => {
+    b.classList.add('eliminated');
+    b.disabled = true;
+  });
+  hintsLeft--;
+  document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+}
+
+function finishGame() {
+  if (window.Store) {
+    Store.addXP(score);
+    Store.completeActivity('games');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
+    if (score >= 80 && typeof Store.unlockBadge === 'function') Store.unlockBadge('word_wizard');
+  }
+
+  document.getElementById('game-card').classList.add('hidden');
+  document.getElementById('summary-card').classList.remove('hidden');
+
+  const acc = deck.length > 0 ? Math.round((correctCount / deck.length) * 100) : 0;
+  document.getElementById('sum-xp').textContent = `+${score} XP`;
+  document.getElementById('sum-acc').textContent = `${acc}%`;
+  document.getElementById('sum-streak').textContent = `${bestStreak}x`;
+  document.getElementById('summary-subtitle').textContent =
+    `Você desvendou ${correctCount} de ${deck.length} pistas em inglês!`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = historyLog.map(({ item, ok }, idx) => `
+    <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span>${ok ? '✅' : '❌'}</span>
+          <span class="font-extrabold text-sm text-white">${item.emoji} ${item.answer}</span>
+          <span class="text-xs text-sky-300 font-bold">→ ${item.pt}</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-1">${item.text}</p>
+      </div>
+      <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir pista e resposta">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const entry = historyLog[+btn.dataset.reviewIdx];
+      if (entry) speakEnglish(`${entry.item.answer}. ${entry.item.text}`, 0.92);
+    };
+  });
+}
+
+// ── Controles & Atalhos ──────────────────────────────────────────────────────
+document.getElementById('btn-speak').onclick = () => {
+  const clue = deck[round];
+  if (clue) speakEnglish(clue.text, 0.94);
+};
+document.getElementById('btn-slow').onclick = () => {
+  const clue = deck[round];
+  if (clue) speakEnglish(clue.text, 0.72);
+};
+document.getElementById('btn-reveal-text').onclick = () => {
+  document.getElementById('clue-text').classList.remove('blur-md', 'select-none');
+  document.getElementById('btn-reveal-text').classList.add('hidden');
+};
+document.getElementById('btn-hint').onclick = useHint;
+document.getElementById('btn-play-again').onclick = startSession;
+
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
   };
+});
 
-  const CLUES = [
-    { correct:'Bird',     emoji:'🐦', category:'Nature Sound', text:'"Tweet tweet! I wake up the whole forest every morning and soar through the sky with wings."', distractors:['Tree','Flower','River'] },
-    { correct:'River',    emoji:'🌊', category:'Water Sound',  text:'"Splash! Gurgle! Fish swim inside me, and I flow from mountains all the way to the sea."', distractors:['Rain','Mountain','Apple'] },
-    { correct:'Rain',     emoji:'🌧️', category:'Weather Sound', text:'"Pitter-patter, pitter-patter! I fall from clouds and make puddles on the ground."', distractors:['River','Sun','Flower'] },
-    { correct:'Sun',      emoji:'☀️', category:'Nature Clue',  text:'"I am big, bright, and warm. Every morning I rise and give light to the whole world!"', distractors:['Mountain','Bird','Tree'] },
-    { correct:'Tree',     emoji:'🌳', category:'Forest Clue',  text:'"Rustle, rustle! I grow tall, my leaves dance in the wind, and birds build nests in me."', distractors:['Flower','Mountain','Apple'] },
-    { correct:'Flower',   emoji:'🌸', category:'Garden Clue',  text:'"Bees love to visit me! I have colourful petals and a sweet scent that fills the meadow."', distractors:['Tree','Apple','River'] },
-    { correct:'Mountain', emoji:'🏔️', category:'Earth Clue',  text:'"I am very tall and covered with snow at the top. Climbers love to reach my peak!"', distractors:['Tree','River','Sun'] },
-    { correct:'Apple',    emoji:'🍎', category:'Food Clue',    text:'"Crunch! I am round, red or green, and I grow on trees. Yara loves to eat me for a snack!"', distractors:['Flower','Bird','Rain'] },
-  ];
+document.querySelectorAll('#mode-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    seekerMode = btn.dataset.mode;
+    startSession();
+  };
+});
 
-  const TOTAL_ROUNDS = CLUES.length, MAX_LIVES = 3;
-  let lives=MAX_LIVES, score=0, round=0, clueOrder=[], correctName='', waitingNext=false;
+document.querySelectorAll('#len-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionLength = +btn.dataset.len;
+    startSession();
+  };
+});
 
-  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-
-  function renderHearts(){
-    document.getElementById('hearts-display').innerHTML=
-      Array.from({length:MAX_LIVES},(_,i)=>
-        `<span class="material-symbols-outlined text-xl ${i<lives?'text-red-400':'text-white/20'}"
-               style="${i<lives?"font-variation-settings:'FILL' 1;":""}">favorite</span>`
-      ).join('');
+window.addEventListener('keydown', e => {
+  if (document.getElementById('game-card').classList.contains('hidden')) return;
+  if (['1', '2', '3', '4'].includes(e.key) && !waitingNext) {
+    const idx = +e.key - 1;
+    const btns = document.querySelectorAll('#tiles-grid button');
+    if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+  } else if (e.key === 'r' || e.key === 'R') {
+    document.getElementById('btn-speak').click();
+  } else if (e.key === 'h' || e.key === 'H') {
+    useHint();
   }
+});
 
-  function renderRound(){
-    if(round>=TOTAL_ROUNDS){finishGame();return;}
-    waitingNext=false;hideFeedback();
-
-    const clue=CLUES[clueOrder[round]];
-    correctName=clue.correct;
-
-    // Update clue card
-    document.getElementById('clue-emoji').textContent=clue.emoji;
-    document.getElementById('clue-text').textContent=clue.text;
-    document.getElementById('clue-category').textContent=clue.category;
-    document.getElementById('round-display').textContent=`Dica ${round+1} / ${TOTAL_ROUNDS}`;
-
-    // Re-animate clue card
-    const card=document.getElementById('clue-card');
-    card.classList.remove('clue-card');
-    void card.offsetWidth;
-    card.classList.add('clue-card');
-
-    // Build 4 tiles: correct + 3 distractors
-    const names=shuffle([clue.correct,...clue.distractors]);
-    document.getElementById('tiles-grid').innerHTML=names.map(name=>{
-      const s=SUBJECTS[name]||{emoji:'❓',image:''};
-      return `<button data-name="${name}" onclick="handleTile(this)"
-                      class="relative aspect-square rounded-[2rem] overflow-hidden border-4 border-white/10
-                             hover:border-sky-400 hover:scale-[1.03] active:scale-95
-                             transition-all duration-200 shadow-xl group">
-        ${s.image
-          ? `<img src="${s.image}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>`
-          : `<div class="w-full h-full flex items-center justify-center text-6xl bg-navy-light">${s.emoji}</div>`
-        }
-        <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
-        <span class="absolute bottom-3 left-0 right-0 text-center font-label text-xs font-bold text-white/80 uppercase tracking-wider">${name}</span>
-      </button>`;
-    }).join('');
-  }
-
-  function handleTile(btn){
-    if(waitingNext)return;
-    waitingNext=true;
-    document.querySelectorAll('#tiles-grid button').forEach(b=>b.disabled=true);
-
-    const isCorrect=btn.dataset.name===correctName;
-    if(isCorrect){
-      score+=10;
-      document.getElementById('score-display').textContent=score;
-      btn.classList.add('tile-pop');
-      btn.style.borderColor='#10b981';
-      showFeedback(true,`🎉 Isso aí! That's a ${correctName}!`);
-      round++;
-    } else {
-      lives=Math.max(0,lives-1); renderHearts();
-      btn.classList.add('tile-shake');
-      btn.style.borderColor='#ef4444';
-      document.querySelectorAll('#tiles-grid button').forEach(b=>{
-        if(b.dataset.name===correctName) b.style.borderColor='#10b981';
-      });
-      showFeedback(false,`Not quite! The answer was "${correctName}".`);
-      round++;
-      if(lives<=0){setTimeout(finishGame,1200);return;}
-    }
-    setTimeout(renderRound,1500);
-  }
-
-  function showFeedback(correct,msg){
-    const bar=document.getElementById('feedback-bar');
-    const icon=document.getElementById('feedback-icon');
-    bar.className=bar.className.replace(/bg-\S+/g,'').replace(/border\S*/g,'').trim();
-    if(correct){bar.classList.add('bg-green-brand/20','border','border-green-brand/40');icon.textContent='check_circle';icon.style.color='#10b981';}
-    else{bar.classList.add('bg-red-500/20','border','border-red-500/40');icon.textContent='cancel';icon.style.color='#f87171';}
-    document.getElementById('feedback-text').textContent=msg;
-    bar.style.opacity='1';
-  }
-
-  function hideFeedback(){document.getElementById('feedback-bar').style.opacity='0';}
-
-  function finishGame(){
-    const xp=score;
-    const stars=score>=70?3:score>=40?2:1;
-    if(window.Store){Store.addXP(xp);Store.activateStreak();Store.completeActivity('games');if(stars>=3)Store.unlockBadge('word_wizard');}
-    const starHTML=Array.from({length:3},(_,i)=>
-      `<span class="material-symbols-outlined text-4xl ${i<stars?'text-yellow-400':'text-white/20'}"
-             style="${i<stars?"font-variation-settings:'FILL' 1;":""}">star</span>`
-    ).join('');
-    const overlay=document.createElement('div');
-    overlay.className='fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
-    overlay.innerHTML=`
-      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-sky-400/60
-                  rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl
-                  text-center max-w-sm mx-4 scale-0 opacity-0 transition-all duration-500" id="finish-card">
-        <div class="w-24 h-24 rounded-full bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/40">
-          <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">hearing</span>
-        </div>
-        <div>
-          <p class="font-label text-sky-400 font-bold text-sm uppercase tracking-widest mb-1">Seeker Complete!</p>
-          <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
-          <p class="font-body text-slate-300">Score: <span class="text-white font-bold">${score} pts</span></p>
-        </div>
-        <div class="flex gap-2">${starHTML}</div>
-        <div class="flex gap-3 flex-wrap justify-center">
-          <button onclick="startGame()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-8 py-3 rounded-full text-base active:scale-95 transition-all border border-white/20">Jogar de novo</button>
-          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'" class="bg-sky-500 hover:bg-sky-600 text-white font-label font-bold px-8 py-3 rounded-full text-base active:scale-95 transition-all shadow-lg">Back to Games</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=document.getElementById('finish-card');c.style.transform='scale(1)';c.style.opacity='1';}));
-  }
-
-  function startGame(){
-    document.querySelectorAll('.fixed.inset-0').forEach(e=>e.remove());
-    lives=MAX_LIVES;score=0;round=0;
-    clueOrder=shuffle(CLUES.map((_,i)=>i));
-    document.getElementById('score-display').textContent='0';
-    renderHearts();renderRound();
-  }
-
-  document.addEventListener('DOMContentLoaded',startGame);
+startSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>

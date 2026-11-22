@@ -1,48 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Word Match — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "navy":        "#001f3f",
-          "navy-light":  "#002d5c",
-          "pink-brand":  "#ec4899",
-          "green-brand": "#10b981",
-        },
-        fontFamily: {
-          "headline": ["Plus Jakarta Sans"],
-          "body":     ["Be Vietnam Pro"],
-          "label":    ["Lexend"]
-        },
-        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
-      }
-    }
-  }
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .tile-correct  { animation: correctPulse 0.45s ease; }
-  .tile-wrong    { animation: wrongShake 0.4s ease; }
-  @keyframes correctPulse {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16,185,129,.4); }
-    100% { transform: scale(1); }
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(236, 72, 153, 0.22);
+    border-color: #ec4899;
+    color: #fbcfe8;
+    box-shadow: 0 0 16px rgba(236, 72, 153, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: #10b981;
+    color: #a7f3d0;
+  }
+  .tile-btn {
+    min-height: 118px;
+    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tile-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: rgba(236, 72, 153, 0.65);
+    background: rgba(236, 72, 153, 0.14);
+  }
+  .tile-btn.correct {
+    background: rgba(16, 185, 129, 0.26) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
+  }
+  .tile-btn.wrong {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: #ef4444 !important;
+    animation: wrongShake 0.38s ease;
+  }
+  .tile-btn.eliminated {
+    opacity: 0.2 !important;
+    pointer-events: none;
   }
   @keyframes wrongShake {
-    0%,100% { transform: translateX(0); }
-    20%     { transform: translateX(-8px); }
-    60%     { transform: translateX(8px); }
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
   }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
@@ -56,308 +73,666 @@
 <meta property="og:title" content="Word Match — Capy Yara English"/>
 <meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Word Match — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
-<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body class="bg-navy font-body text-white min-h-screen overflow-x-hidden">
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
 
-<!-- Top Nav -->
 <div id="top-nav-placeholder"></div>
 <div id="side-nav-placeholder"></div>
 
-<main class="md:pl-32 pt-28 pb-20 px-4 flex flex-col items-center gap-8 max-w-3xl mx-auto">
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-pink-300 hover:text-pink-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+        <span>🔥</span>
+        <span>Combo:</span>
+        <span id="streak-badge">0</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score-display">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-pink-300 border border-pink-400/20" title="Termos dominados">
+        <span>🎯</span>
+        <span id="mastered-badge">0/144</span>
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
-  <div class="w-full flex flex-col items-center gap-2 text-center">
-    <span class="font-label text-green-brand text-sm font-bold uppercase tracking-widest">Mini-Jogo</span>
-    <h1 class="font-headline text-5xl md:text-6xl font-black text-white">Word Match</h1>
-    <p class="font-body text-slate-400 text-lg">Toque na imagem que corresponde à palavra!</p>
-  </div>
+  <header class="text-center mb-6">
+    <p class="text-pink-300 text-xs font-black uppercase tracking-[.22em]">Associação Visual & Pronúncia • 144 Cartões Reais</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-pink-300 via-rose-200 to-emerald-300 bg-clip-text text-transparent">Word Match 🎯</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Conecte cada termo com seu cartão visual, pronúncia fonética e frase de aplicação real.</p>
+  </header>
 
-  <!-- Stats bar -->
-  <div class="w-full flex items-center justify-between bg-white/5 rounded-2xl px-6 py-4 border border-white/10">
-    <div class="flex items-center gap-3">
-      <span class="material-symbols-outlined text-pink-brand text-2xl" style="font-variation-settings:'FILL' 1;">stars</span>
-      <span id="score-display" class="font-headline font-black text-2xl text-white">0</span>
-      <span class="font-label text-slate-400 text-sm">pts</span>
+  <!-- Track & Mode Selector -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha de Vocabulário</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-pink-300">144 cartões disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (144)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (18)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (18)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (18)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (18)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (18)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (18)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (18)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (18)</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Modo de Associação</span>
+          <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+            <button data-mode="en2visual" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🇺🇸 Inglês → 🎨 Cartão Visual</button>
+            <button data-mode="visual2en" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🎨 Visual PT → 🇺🇸 Inglês</button>
+            <button data-mode="audio2visual" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🎧 Apenas Áudio → Visual</button>
+          </div>
+        </div>
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Rodadas por Partida</span>
+          <div id="len-buttons" class="flex flex-wrap gap-1.5">
+            <button data-len="10" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Rodadas</button>
+            <button data-len="15" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">15 Rodadas</button>
+            <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20 Rodadas</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="progress-display" class="font-label text-slate-400 text-sm font-bold">Rodada 1 / 6</div>
-    <div id="hearts-display" class="flex gap-1"></div>
-  </div>
+  </section>
 
-  <!-- Target word card -->
-  <div class="w-full bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-8 flex flex-col items-center gap-3">
-    <span class="font-label text-slate-400 text-xs uppercase tracking-widest">O que essa palavra significa?</span>
-    <h2 id="target-word" class="font-headline text-6xl md:text-7xl font-black text-white tracking-tight"></h2>
-    <p id="target-pron" class="font-body text-pink-brand text-xl"></p>
-  </div>
+  <!-- Main Game Card -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black">
+      <div class="flex items-center gap-2">
+        <span id="progress-display" class="bg-white/10 px-3 py-1 rounded-full text-pink-300">Rodada 1 / 10</span>
+        <span id="track-pill" class="bg-pink-500/15 border border-pink-400/30 text-pink-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-speak" type="button" class="inline-flex items-center gap-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir pronúncia (Atalho: R)">
+          <span class="material-symbols-outlined text-sm">volume_up</span>
+          <span>Ouvir</span>
+        </button>
+        <button id="btn-hint" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Dica 50/50 (Atalho: H)">
+          <span>💡 50/50</span>
+          <span id="hints-left">(3)</span>
+        </button>
+      </div>
+    </div>
 
-  <!-- Image tiles grid -->
-  <div id="tiles-grid" class="w-full grid grid-cols-2 gap-4"></div>
+    <!-- Progress Bar -->
+    <div class="h-2 bg-white/10 rounded-full mt-3 overflow-hidden">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-pink-400 to-emerald-400 transition-all duration-300" style="width:10%"></div>
+    </div>
 
-  <!-- Feedback bar (hidden until answer) -->
-  <div id="feedback-bar"
-       class="w-full rounded-2xl px-8 py-5 flex items-center gap-4 text-lg font-label font-bold
-              opacity-0 transition-opacity duration-300 pointer-events-none">
-    <span id="feedback-icon" class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1;"></span>
-    <span id="feedback-text"></span>
-  </div>
+    <!-- Target Word Card -->
+    <div class="text-center py-6 px-4 my-4 rounded-3xl bg-white/5 border border-white/10">
+      <span id="prompt-label" class="text-[11px] font-black uppercase tracking-widest text-slate-400">O que este termo significa?</span>
+      <h2 id="target-word" class="text-3xl sm:text-5xl font-black text-white mt-2 tracking-tight"></h2>
+      <p id="target-pron" class="text-pink-300 text-sm sm:text-base font-bold mt-1"></p>
+    </div>
+
+    <!-- 4 Visual Tiles Grid -->
+    <div id="tiles-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+
+    <!-- Feedback & Context Box -->
+    <div class="mt-5 min-h-[3.5rem] flex flex-col items-center justify-center">
+      <p id="feedback-text" class="text-center font-black text-base sm:text-lg" aria-live="polite"></p>
+      <div id="context-box" class="hidden mt-3 w-full bg-white/5 border border-white/10 rounded-2xl p-3.5 text-left">
+        <p class="text-[11px] font-black uppercase tracking-wider text-pink-300">Aplicação em Frase Real</p>
+        <p id="context-en" class="text-sm sm:text-base font-bold text-white mt-0.5"></p>
+      </div>
+    </div>
+
+    <p class="text-center text-[11px] text-slate-400 mt-3">
+      Atalhos: <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd class="px-1.5 py-0.5 bg-white/10 rounded">4</kbd> escolher cartão • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> ouvir • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">H</kbd> dica 50/50
+    </p>
+  </section>
+
+  <!-- Summary Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">🎯</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Partida Concluída!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-pink-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+        <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0%</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+        <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">0x</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-pink-500 hover:bg-pink-400 text-white px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Novamente
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-pink-300 mb-3">📚 Revisão Visual da Partida</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
 
 </main>
 
-<!-- Completion overlay (injected by JS) -->
-
 <div id="mobile-nav-placeholder"></div>
-<div id="footer-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=land1"></script>
-<script src="levelup-overlay.js?v=land1"></script>
-<script src="badge-toast.js?v=c52d7db"></script>
 <script src="components.js?v=seg1"></script>
 <script>
-  Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
-  Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
-  Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
-  Components.mount('footer-placeholder', Components.renderFooter());
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
 
-  // ── Game data (word + image pairs) ──────────────────────────────────────
-  const CARDS = [
-    { word: "Apple",    pron: "/ˈæp.əl/",      image: "", emoji: "🍎" },
-    { word: "River",    pron: "/ˈrɪv.ər/",      image: "", emoji: "🌊" },
-    { word: "Sun",      pron: "/sʌn/",           image: "", emoji: "☀️" },
-    { word: "Mountain", pron: "/ˈmaʊn.tən/",    image: "", emoji: "⛰️" },
-    { word: "Bird",     pron: "/bɜːrd/",         image: "", emoji: "🐦" },
-    { word: "Tree",     pron: "/triː/",           image: "", emoji: "🌲" },
-    { word: "Water",    pron: "/ˈwɔː.tər/",      image: "", emoji: "💧" },
-    { word: "Flower",   pron: "/ˈflaʊ.ər/",      image: "", emoji: "🌸" },
-    { word: "Fire",     pron: "/faɪər/",          image: "", emoji: "🔥" },
-    { word: "Rain",     pron: "/reɪn/",           image: "", emoji: "🌧️" },
-    { word: "Cat",      pron: "/kæt/",            image: "", emoji: "🐱" },
-    { word: "Dog",      pron: "/dɒɡ/",            image: "", emoji: "🐶" },
-    { word: "House",    pron: "/haʊs/",           image: "", emoji: "🏠" },
-    { word: "Book",     pron: "/bʊk/",            image: "", emoji: "📚" },
-    { word: "Star",     pron: "/stɑːr/",          image: "", emoji: "⭐" },
-    { word: "Fish",     pron: "/fɪʃ/",            image: "", emoji: "🐟" },
-  ];
+const TRACK_META = {
+  starter:      { label: '🌱 Starter A1-A2' },
+  intermediate: { label: '🚀 Intermediate B1-B2' },
+  travel:       { label: '✈️ Viagem' },
+  work:         { label: '💼 Trabalho' },
+  agro:         { label: '🚜 Agro English' },
+  gpstronic:    { label: '🛰️ GPS Tronic' },
+  med:          { label: '🩺 Medical' },
+  advanced:     { label: '🔥 Avançado' }
+};
 
-  const TOTAL_ROUNDS = 6;
-  const MAX_LIVES    = 3;
+// ── 144 Cartões Visuais (8 Trilhas x 18 Itens) ───────────────────────────────
+const CARDS = [
+  // 1. STARTER A1-A2 (18)
+  { track:'starter', word:'Bakery', pron:'/ˈbeɪ.kər.i/', emoji:'🥐', pt:'Padaria', ex:'We buy fresh bread at the bakery every morning.' },
+  { track:'starter', word:'Umbrella', pron:'/ʌmˈbrel.ə/', emoji:'☔', pt:'Guarda-chuva', ex:'Take an umbrella because it is raining.' },
+  { track:'starter', word:'Spare Key', pron:'/speər kiː/', emoji:'🔑', pt:'Chave reserva', ex:'Your spare key is on the kitchen table.' },
+  { track:'starter', word:'Grocery Store', pron:'/ˈɡroʊ.sər.i stɔːr/', emoji:'🛒', pt:'Supermercado', ex:'Let’s stop at the grocery store after work.' },
+  { track:'starter', word:'Bus Stop', pron:'/ˈbʌs stɑːp/', emoji:'🚏', pt:'Ponto de ônibus', ex:'The bus stop is right across the street.' },
+  { track:'starter', word:'Warm Jacket', pron:'/wɔːrm ˈdʒæk.ɪt/', emoji:'🧥', pt:'Jaqueta quente', ex:'Wear a warm jacket tonight.' },
+  { track:'starter', word:'Sparkling Water', pron:'/ˈspɑːr.klɪŋ ˈwɔː.tər/', emoji:'🫧', pt:'Água com gás', ex:'Would you like still or sparkling water?' },
+  { track:'starter', word:'Laundry', pron:'/ˈlɔːn.dri/', emoji:'🧺', pt:'Roupa para lavar', ex:'I usually do the laundry on Saturdays.' },
+  { track:'starter', word:'Library', pron:'/ˈlaɪ.brer.i/', emoji:'📚', pt:'Biblioteca', ex:'You can borrow books from the public library.' },
+  { track:'starter', word:'Wallet', pron:'/ˈwɑː.lɪt/', emoji:'👛', pt:'Carteira', ex:'I keep my ID card inside my wallet.' },
+  { track:'starter', word:'Breakfast', pron:'/ˈbrek.fəst/', emoji:'🥞', pt:'Café da manhã', ex:'We eat breakfast at seven o’clock.' },
+  { track:'starter', word:'Pharmacy', pron:'/ˈfɑːr.mə.si/', emoji:'💊', pt:'Farmácia', ex:'There is a 24-hour pharmacy near here.' },
+  { track:'starter', word:'Neighbor', pron:'/ˈneɪ.bər/', emoji:'🏡', pt:'Vizinho(a)', ex:'Our next-door neighbor is very helpful.' },
+  { track:'starter', word:'Bridge', pron:'/brɪdʒ/', emoji:'🌉', pt:'Ponte', ex:'Walk across the bridge to reach the park.' },
+  { track:'starter', word:'Headphones', pron:'/ˈhed.foʊnz/', emoji:'🎧', pt:'Fones de ouvido', ex:'Put on your headphones to listen to the audio.' },
+  { track:'starter', word:'Backpack', pron:'/ˈbæk.pæk/', emoji:'🎒', pt:'Mochila', ex:'My laptop is inside my backpack.' },
+  { track:'starter', word:'Traffic Light', pron:'/ˈtræf.ɪk laɪt/', emoji:'🚦', pt:'Semáforo', ex:'Turn left at the next traffic light.' },
+  { track:'starter', word:'Sunglasses', pron:'/ˈsʌnˌɡlæs.ɪz/', emoji:'🕶️', pt:'Óculos de sol', ex:'Don’t forget your sunglasses at the beach.' },
 
-  let lives         = MAX_LIVES;
-  let score         = 0;
-  let round         = 0;
-  let roundOrder    = [];   // shuffled indices of CARDS for this game
-  let correctIdx    = -1;   // index in CARDS of the correct answer this round
-  let waitingNext   = false;
+  // 2. INTERMEDIATE B1-B2 (18)
+  { track:'intermediate', word:'Highway', pron:'/ˈhaɪ.weɪ/', emoji:'🛣️', pt:'Rodovia / Estrada', ex:'Our car broke down on the highway.' },
+  { track:'intermediate', word:'Receipt', pron:'/rɪˈsiːt/', emoji:'🧾', pt:'Recibo / Comprovante', ex:'Keep the receipt in case you need a refund.' },
+  { track:'intermediate', word:'Package', pron:'/ˈpæk.ɪdʒ/', emoji:'📦', pt:'Encomenda / Pacote', ex:'The courier delivered your package today.' },
+  { track:'intermediate', word:'Schedule', pron:'/ˈskedʒ.uːl/', emoji:'🗓️', pt:'Cronograma / Agenda', ex:'Everything is running on schedule.' },
+  { track:'intermediate', word:'Low Battery', pron:'/loʊ ˈbæt.ər.i/', emoji:'🪫', pt:'Bateria fraca', ex:'My phone has a low battery right now.' },
+  { track:'intermediate', word:'Pros and Cons', pron:'/proʊz ænd kɑːnz/', emoji:'⚖️', pt:'Prós e contras', ex:'Let’s weigh the pros and cons together.' },
+  { track:'intermediate', word:'Traffic Jam', pron:'/ˈtræf.ɪk dʒæm/', emoji:'🚗', pt:'Engarrafamento', ex:'We were stuck in a traffic jam for an hour.' },
+  { track:'intermediate', word:'Raincoat', pron:'/ˈreɪn.koʊt/', emoji:'🧥', pt:'Capa de chuva', ex:'Bring a raincoat just in case it rains.' },
+  { track:'intermediate', word:'Step by Step', pron:'/step baɪ step/', emoji:'🪜', pt:'Passo a passo', ex:'Follow the instructions step by step.' },
+  { track:'intermediate', word:'In a Hurry', pron:'/ɪn ə ˈhɜːr.i/', emoji:'🏃', pt:'Com pressa', ex:'Sorry I can’t stay, I am in a hurry!' },
+  { track:'intermediate', word:'Power Outage', pron:'/ˈpaʊ.ər ˈaʊ.tɪdʒ/', emoji:'🕯️', pt:'Queda de energia / Apagão', ex:'What were you doing during the power outage?' },
+  { track:'intermediate', word:'Alarm Clock', pron:'/əˈlɑːrm klɑːk/', emoji:'⏰', pt:'Despertador', ex:'My alarm clock didn’t go off this morning.' },
+  { track:'intermediate', word:'Seatbelt', pron:'/ˈsiːt.belt/', emoji:'💺', pt:'Cinto de segurança', ex:'Please fasten your seatbelt before driving.' },
+  { track:'intermediate', word:'Shortcut', pron:'/ˈʃɔːrt.kʌt/', emoji:'🧭', pt:'Atalho (caminho mais curto)', ex:'We took a shortcut to avoid the main avenue.' },
+  { track:'intermediate', word:'Spare Tire', pron:'/speər taɪər/', emoji:'🛞', pt:'Pneu estepe', ex:'Always check the pressure of your spare tire.' },
+  { track:'intermediate', word:'Trash Bin', pron:'/træʃ bɪn/', emoji:'🗑️', pt:'Cesto de lixo', ex:'Throw the empty bottle in the recycling bin.' },
+  { track:'intermediate', word:'Keychain', pron:'/ˈkiː.tʃeɪn/', emoji:'🗝️', pt:'Chaveiro', ex:'I bought a souvenir keychain in Lisbon.' },
+  { track:'intermediate', word:'Crosswalk', pron:'/ˈkrɔːs.wɔːk/', emoji:'🚸', pt:'Faixa de pedestres', ex:'Always cross the avenue at the crosswalk.' },
 
-  // ── Utilities ────────────────────────────────────────────────────────────
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+  // 3. TRAVEL / VIAGEM (18)
+  { track:'travel', word:'Boarding Pass', pron:'/ˈbɔːr.dɪŋ pæs/', emoji:'🎫', pt:'Cartão de embarque', ex:'Please show your passport and boarding pass.' },
+  { track:'travel', word:'Carry-on Bag', pron:'/ˈkær.i ɑːn bæɡ/', emoji:'🧳', pt:'Bagagem de mão', ex:'Put your carry-on bag in the overhead bin.' },
+  { track:'travel', word:'Aisle Seat', pron:'/aɪl siːt/', emoji:'💺', pt:'Assento no corredor', ex:'I prefer an aisle seat on long flights.' },
+  { track:'travel', word:'Baggage Claim', pron:'/ˈbæɡ.ɪdʒ kleɪm/', emoji:'🎒', pt:'Restituição de bagagens', ex:'Meet me at the baggage claim carousel.' },
+  { track:'travel', word:'Power Adapter', pron:'/ˈpaʊ.ər əˈdæp.tər/', emoji:'🔌', pt:'Adaptador de tomada', ex:'Can I borrow a power adapter at reception?' },
+  { track:'travel', word:'Currency Exchange', pron:'/ˈkɜːr.ən.si ɪksˈtʃeɪndʒ/', emoji:'💱', pt:'Câmbio de moeda', ex:'There is a currency exchange booth near exit B.' },
+  { track:'travel', word:'Passport Control', pron:'/ˈpæs.pɔːrt kənˈtroʊl/', emoji:'🛂', pt:'Controle de imigração', ex:'Follow the signs to passport control.' },
+  { track:'travel', word:'Round-trip Ticket', pron:'/raʊnd trɪp ˈtɪk.ɪt/', emoji:'🚆', pt:'Passagem de ida e volta', ex:'A round-trip ticket is cheaper than two singles.' },
+  { track:'travel', word:'Front Desk', pron:'/frʌnt desk/', emoji:'🛎️', pt:'Recepção do hotel', ex:'Leave your key card at the front desk.' },
+  { track:'travel', word:'Flight Delayed', pron:'/flaɪt dɪˈleɪd/', emoji:'📢', pt:'Voo atrasado', ex:'Our flight was delayed by two hours due to fog.' },
+  { track:'travel', word:'Window Seat', pron:'/ˈwɪn.doʊ siːt/', emoji:'🪟', pt:'Assento na janela', ex:'Could I have a window seat, please?' },
+  { track:'travel', word:'Subway Station', pron:'/ˈsʌb.weɪ ˈsteɪ.ʃən/', emoji:'🚇', pt:'Estação de metrô', ex:'The subway station is two blocks from here.' },
+  { track:'travel', word:'Car Rental', pron:'/kɑːr ˈren.təl/', emoji:'🚘', pt:'Aluguel de carros', ex:'We picked up the keys at the car rental desk.' },
+  { track:'travel', word:'Life Vest', pron:'/laɪf vest/', emoji:'🦺', pt:'Colete salva-vidas', ex:'Your life vest is located under your seat.' },
+  { track:'travel', word:'Overhead Bin', pron:'/ˌoʊ.vərˈhed bɪn/', emoji:'✈️', pt:'Compartimento superior', ex:'Store your backpack in the overhead bin.' },
+  { track:'travel', word:'Room Service', pron:'/ruːm ˈsɜːr.vɪs/', emoji:'🍽️', pt:'Serviço de quarto', ex:'We ordered dinner from room service.' },
+  { track:'travel', word:'Shuttle Bus', pron:'/ˈʃʌt.əl bʌs/', emoji:'🚐', pt:'Ônibus de traslado', ex:'The free shuttle bus runs every 15 minutes.' },
+  { track:'travel', word:'Customs Form', pron:'/ˈkʌs.təmz fɔːrm/', emoji:'🛃', pt:'Declaração de alfândega', ex:'Fill out the customs form before landing.' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (18)
+  { track:'work', word:'Deadline', pron:'/ˈded.laɪn/', emoji:'🎯', pt:'Prazo final de entrega', ex:'We are working together to meet the Friday deadline.' },
+  { track:'work', word:'Share Screen', pron:'/ʃeər skriːn/', emoji:'💻', pt:'Compartilhar a tela', ex:'Let me share my screen to show the chart.' },
+  { track:'work', word:'On Mute', pron:'/ɑːn mjuːt/', emoji:'🔇', pt:'No mudo (microfone)', ex:'We can’t hear you—your microphone is on mute.' },
+  { track:'work', word:'Attached File', pron:'/əˈtætʃt faɪl/', emoji:'📎', pt:'Arquivo em anexo', ex:'Please review the attached file before our call.' },
+  { track:'work', word:'Spreadsheet', pron:'/ˈspred.ʃiːt/', emoji:'📊', pt:'Planilha (Excel)', ex:'I updated the budget spreadsheet this morning.' },
+  { track:'work', word:'Reschedule', pron:'/ˌriːˈskedʒ.uːl/', emoji:'📅', pt:'Reagendar / Remarcar', ex:'Could we reschedule our 2 PM meeting to Thursday?' },
+  { track:'work', word:'Out of Office', pron:'/aʊt əv ˈɔː.fɪs/', emoji:'🏖️', pt:'Ausente do escritório', ex:'I will be out of the office next Friday.' },
+  { track:'work', word:'Action Items', pron:'/ˈæk.ʃən ˈaɪ.təmz/', emoji:'📋', pt:'Tarefas definidas na reunião', ex:'I will send an email listing all action items.' },
+  { track:'work', word:'Key Strength', pron:'/kiː streŋθ/', emoji:'🏆', pt:'Ponto forte principal', ex:'Problem-solving is one of my key strengths.' },
+  { track:'work', word:'Remote Work', pron:'/rɪˈmoʊt wɜːrk/', emoji:'🏠', pt:'Trabalho remoto', ex:'Our team works in a hybrid and remote model.' },
+  { track:'work', word:'Quarterly Report', pron:'/ˈkwɔːr.tər.li rɪˈpɔːrt/', emoji:'📈', pt:'Relatório trimestral', ex:'The director presented the quarterly report.' },
+  { track:'work', word:'Job Interview', pron:'/dʒɑːb ˈɪn.tər.vjuː/', emoji:'🤝', pt:'Entrevista de emprego', ex:'She felt confident during her job interview.' },
+  { track:'work', word:'Business Card', pron:'/ˈbɪz.nɪs kɑːrd/', emoji:'🪪', pt:'Cartão de visitas', ex:'Here is my business card with my direct number.' },
+  { track:'work', word:'Headquarters', pron:'/ˈhedˌkwɔːr.tərz/', emoji:'🏢', pt:'Sede / Matriz da empresa', ex:'Our company headquarters is in São Paulo.' },
+  { track:'work', word:'Invoice', pron:'/ˈɪn.vɔɪs/', emoji:'🧾', pt:'Nota fiscal / Fatura comercial', ex:'The supplier sent the invoice for the equipment.' },
+  { track:'work', word:'Promotion', pron:'/prəˈmoʊ.ʃən/', emoji:'🚀', pt:'Promoção de cargo', ex:'Congratulations on your promotion to manager!' },
+  { track:'work', word:'Brainstorming', pron:'/ˈbreɪnˌstɔːr.mɪŋ/', emoji:'💡', pt:'Chuva de ideias em equipe', ex:'We held a brainstorming session for the campaign.' },
+  { track:'work', word:'Signature', pron:'/ˈsɪɡ.nə.tʃər/', emoji:'✒️', pt:'Assinatura', ex:'We just need your signature on the contract.' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (18)
+  { track:'agro', word:'Soil Moisture', pron:'/sɔɪl ˈmɔɪs.tʃər/', emoji:'🌱', pt:'Umidade do solo', ex:'Soil moisture is ideal for planting soybeans.' },
+  { track:'agro', word:'Combine Harvester', pron:'/ˈkɑːm.baɪn ˈhɑːr.və.stər/', emoji:'🚜', pt:'Colheitadeira de grãos', ex:'The combine harvester is cutting the wheat plot.' },
+  { track:'agro', word:'Sprayer Nozzle', pron:'/ˈspreɪ.ər ˈnɑː.zəl/', emoji:'💦', pt:'Bico de pulverização', ex:'Check all sprayer nozzles for clogging.' },
+  { track:'agro', word:'Chemical Drift', pron:'/ˈkem.ɪ.kəl drɪft/', emoji:'🍃', pt:'Deriva de defensivo', ex:'Avoid spraying in strong winds to prevent drift.' },
+  { track:'agro', word:'Crop Yield', pron:'/krɑːp jiːld/', emoji:'🌾', pt:'Produtividade da safra', ex:'Our soybean crop yield reached 68 bags per hectare.' },
+  { track:'agro', word:'Center Pivot', pron:'/ˈsen.tər ˈpɪv.ət/', emoji:'💧', pt:'Pivô central de irrigação', ex:'The center pivot irrigates one hundred hectares.' },
+  { track:'agro', word:'Grain Silo', pron:'/ɡreɪn ˈsaɪ.loʊ/', emoji:'🏢', pt:'Silo de grãos', ex:'Turn on the aeration fans inside the grain silo.' },
+  { track:'agro', word:'Field Scouting', pron:'/fiːld ˈskaʊ.tɪŋ/', emoji:'🐛', pt:'Monitoramento de pragas', ex:'Field scouting detected stink bugs this morning.' },
+  { track:'agro', word:'Crop Rotation', pron:'/krɑːp roʊˈteɪ.ʃən/', emoji:'🌻', pt:'Rotação de culturas', ex:'Crop rotation improves soil health and reduces pests.' },
+  { track:'agro', word:'Agricultural Lime', pron:'/ˌæɡ.rɪˈkʌl.tʃər.əl laɪm/', emoji:'🧪', pt:'Calcário agrícola', ex:'We applied agricultural lime to correct soil acidity.' },
+  { track:'agro', word:'No-till Farming', pron:'/noʊ tɪl ˈfɑːr.mɪŋ/', emoji:'🍂', pt:'Plantio direto na palha', ex:'No-till farming protects the soil against erosion.' },
+  { track:'agro', word:'Weed Control', pron:'/wiːd kənˈtroʊl/', emoji:'🌿', pt:'Controle de plantas daninhas', ex:'Early weed control is essential for high yields.' },
+  { track:'agro', word:'Planting Depth', pron:'/ˈplæn.tɪŋ depθ/', emoji:'📏', pt:'Profundidade de plantio', ex:'Keep the planting depth at four centimeters.' },
+  { track:'agro', word:'Beef Cattle', pron:'/biːf ˈkæt.əl/', emoji:'🐄', pt:'Gado de corte', ex:'Rotational grazing keeps the pasture green for beef cattle.' },
+  { track:'agro', word:'Air Filter', pron:'/eər ˈfɪl.tər/', emoji:'⛽', pt:'Filtro de ar do motor', ex:'Clean the tractor air filter every day in dust.' },
+  { track:'agro', word:'Power Take-Off', pron:'/ˈpaʊ.ər teɪk ɔːf/', emoji:'⚙️', pt:'Tomada de força (TDF)', ex:'Disengage the power take-off before maintenance.' },
+  { track:'agro', word:'Seed Treatment', pron:'/siːd ˈtriːt.mənt/', emoji:'🧫', pt:'Tratamento de sementes', ex:'Fungicide seed treatment protects young roots.' },
+  { track:'agro', word:'Truck Scale', pron:'/trʌk skeɪl/', emoji:'🚛', pt:'Balança rodoviária', ex:'The truck is on the scale weighing the soybean load.' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (18)
+  { track:'gpstronic', word:'Wiring Harness', pron:'/ˈwaɪə.rɪŋ ˈhɑːr.nəs/', emoji:'🔌', pt:'Chicote elétrico', ex:'Inspect the CAN bus wiring harness for damaged wires.' },
+  { track:'gpstronic', word:'Terminating Resistor', pron:'/ˈtɜːr.mɪ.neɪ.tɪŋ rɪˈzɪs.tər/', emoji:'⚡', pt:'Resistor de terminação (120Ω)', ex:'A healthy CAN bus measures 60 ohms across the resistors.' },
+  { track:'gpstronic', word:'RTK Signal', pron:'/ɑːr tiː keɪ ˈsɪɡ.nəl/', emoji:'🛰️', pt:'Sinal de correção RTK', ex:'The RTK signal provides two-centimeter accuracy.' },
+  { track:'gpstronic', word:'Wheel Angle Sensor', pron:'/wiːl ˈæŋ.ɡəl ˈsen.sər/', emoji:'🛞', pt:'Sensor de ângulo de direção', ex:'Calibrate the wheel angle sensor on the front axle.' },
+  { track:'gpstronic', word:'Section Control', pron:'/ˈsek.ʃən kənˈtroʊl/', emoji:'🗺️', pt:'Corte automático de seção', ex:'Section control prevents overlap at the headland.' },
+  { track:'gpstronic', word:'Firmware Update', pron:'/ˈfɜːrm.weər ˈʌp.deɪt/', emoji:'💾', pt:'Atualização de firmware', ex:'Use a FAT32 USB drive for the display firmware update.' },
+  { track:'gpstronic', word:'Variable Rate', pron:'/ˈver.i.ə.bəl reɪt/', emoji:'🌱', pt:'Aplicação em taxa variável', ex:'Load the shapefile for variable rate fertilizer application.' },
+  { track:'gpstronic', word:'AB Guidance Line', pron:'/eɪ biː ˈɡaɪ.dəns laɪn/', emoji:'🧭', pt:'Linha guia AB do piloto', ex:'Set point A and point B to create a guidance line.' },
+  { track:'gpstronic', word:'Terrain Compensation', pron:'/təˈreɪn ˌkɑːm.penˈseɪ.ʃən/', emoji:'⛰️', pt:'Compensação de inclinação', ex:'Terrain compensation corrects roll and pitch on slopes.' },
+  { track:'gpstronic', word:'Flowmeter', pron:'/ˈfloʊˌmiː.tər/', emoji:'💧', pt:'Fluxômetro de pulverização', ex:'Enter the new flowmeter calibration factor.' },
+  { track:'gpstronic', word:'Voltage Drop', pron:'/ˈvoʊl.tɪdʒ drɑːp/', emoji:'🔋', pt:'Queda de tensão elétrica', ex:'Low battery voltage during cranking can reboot the display.' },
+  { track:'gpstronic', word:'Blockage Alarm', pron:'/ˈblɑː.kɪdʒ əˈlɑːrm/', emoji:'🚨', pt:'Alarme de entupimento', ex:'Dust inside the optical tube triggered a blockage alarm.' },
+  { track:'gpstronic', word:'GNSS Receiver', pron:'/dʒiː en es es rɪˈsiː.vər/', emoji:'📡', pt:'Antena / Receptor GNSS', ex:'Mount the GNSS receiver on the center of the cab roof.' },
+  { track:'gpstronic', word:'Implement Width', pron:'/ˈɪm.plə.mənt wɪdθ/', emoji:'📏', pt:'Largura de trabalho do implemento', ex:'Verify the implement width in the monitor setup.' },
+  { track:'gpstronic', word:'Virtual Terminal', pron:'/ˈvɜːr.tʃu.əl ˈtɜːr.mɪ.nəl/', emoji:'🖥️', pt:'Terminal virtual ISOBUS', ex:'The planter ECU loaded its screen on the virtual terminal.' },
+  { track:'gpstronic', word:'Field Boundary', pron:'/fiːld ˈbaʊn.dri/', emoji:'📐', pt:'Bordadura / Limite do talhão', ex:'Drive around the perimeter to record the field boundary.' },
+  { track:'gpstronic', word:'Blown Fuse', pron:'/bloʊn fjuːz/', emoji:'⚠️', pt:'Fusível queimado', ex:'Replace the blown 15-amp fuse in the power harness.' },
+  { track:'gpstronic', word:'Steering Valve', pron:'/ˈstɪr.ɪŋ vælv/', emoji:'🛠️', pt:'Válvula hidráulica do piloto', ex:'Measure the coil resistance on the steering valve.' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (18)
+  { track:'med', word:'Blood Pressure', pron:'/blʌd ˈpreʃ.ər/', emoji:'🌡️', pt:'Pressão arterial', ex:'Let me wrap this cuff around your arm to check your blood pressure.' },
+  { track:'med', word:'Shortness of Breath', pron:'/ˈʃɔːrt.nəs əv breθ/', emoji:'🫁', pt:'Falta de ar (dispneia)', ex:'Go to the ER if you develop shortness of breath.' },
+  { track:'med', word:'Swelling', pron:'/ˈswel.ɪŋ/', emoji:'🦵', pt:'Inchaço / Edema', ex:'Apply an ice pack to your ankle to reduce the swelling.' },
+  { track:'med', word:'Stitches', pron:'/ˈstɪtʃ.ɪz/', emoji:'💉', pt:'Pontos cirúrgicos', ex:'Return to the clinic in ten days to remove the stitches.' },
+  { track:'med', word:'Hospital Discharge', pron:'/ˈhɑː.spɪ.təl ˈdɪs.tʃɑːrdʒ/', emoji:'🏥', pt:'Alta hospitalar', ex:'The physician signed your hospital discharge papers.' },
+  { track:'med', word:'Fasting Blood Test', pron:'/ˈfæs.tɪŋ blʌd test/', emoji:'🩸', pt:'Exame de sangue em jejum', ex:'You must fast for 12 hours before the blood test.' },
+  { track:'med', word:'Lower Back Pain', pron:'/ˈloʊ.ər bæk peɪn/', emoji:'🩺', pt:'Dor na região lombar', ex:'How long have you had this lower back pain?' },
+  { track:'med', word:'Allergic Reaction', pron:'/əˈlɜːr.dʒɪk riˈæk.ʃən/', emoji:'📋', pt:'Reação alérgica', ex:'Are you allergic to penicillin or any other medication?' },
+  { track:'med', word:'Twice a Day', pron:'/twaɪs ə deɪ/', emoji:'💊', pt:'Duas vezes ao dia (12/12h)', ex:'Take one tablet twice a day after meals.' },
+  { track:'med', word:'Over-the-Counter', pron:'/ˌoʊ.vər.ðəˈkaʊn.tər/', emoji:'🛍️', pt:'Vendido sem receita médica', ex:'You can buy this mild painkiller over-the-counter.' },
+  { track:'med', word:'Wound Dressing', pron:'/wuːnd ˈdres.ɪŋ/', emoji:'🩹', pt:'Curativo de ferida', ex:'Change the sterile wound dressing once a day.' },
+  { track:'med', word:'Sore Throat', pron:'/sɔːr θroʊt/', emoji:'🗣️', pt:'Dor de garganta', ex:'Warm tea with honey helps soothe a sore throat.' },
+  { track:'med', word:'Sprained Ankle', pron:'/spreɪnd ˈæŋ.kəl/', emoji:'🦴', pt:'Tornozelo torcido / Entorse', ex:'Keep your sprained ankle elevated on a pillow.' },
+  { track:'med', word:'Dizziness', pron:'/ˈdɪz.i.nəs/', emoji:'🌀', pt:'Tontura / Vertigem', ex:'Sit down slowly if you feel dizziness or nausea.' },
+  { track:'med', word:'Side Effects', pron:'/saɪd ɪˈfekts/', emoji:'📄', pt:'Efeitos colaterais', ex:'Drowsiness is one of the common side effects.' },
+  { track:'med', word:'Follow-up Visit', pron:'/ˈfɑː.loʊ ʌp ˈvɪz.ɪt/', emoji:'📅', pt:'Consulta de retorno', ex:'Schedule a follow-up visit in two weeks.' },
+  { track:'med', word:'Eye Drops', pron:'/aɪ drɑːps/', emoji:'👁️', pt:'Colírio', ex:'Apply two eye drops in each eye before bed.' },
+  { track:'med', word:'Chest Tightness', pron:'/tʃest ˈtaɪt.nəs/', emoji:'💓', pt:'Aperto no peito', ex:'Seek immediate care if you feel chest tightness.' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (18)
+  { track:'advanced', word:'Meet Halfway', pron:'/miːt ˌhæfˈweɪ/', emoji:'🤝', pt:'Chegar a um meio-termo', ex:'Both parties agreed to meet halfway on the price.' },
+  { track:'advanced', word:'Get the Hang of It', pron:'/ɡet ðə hæŋ əv ɪt/', emoji:'🛠️', pt:'Pegar o jeito da coisa', ex:'After two days, I finally got the hang of the new system.' },
+  { track:'advanced', word:'Once and for All', pron:'/wʌns ænd fɔːr ɔːl/', emoji:'📌', pt:'De uma vez por todas', ex:'Let’s resolve this billing issue once and for all.' },
+  { track:'advanced', word:'Blessing in Disguise', pron:'/ˈbles.ɪŋ ɪn dɪsˈɡaɪz/', emoji:'🎭', pt:'Um mal que veio para o bem', ex:'Missing that flight turned out to be a blessing in disguise.' },
+  { track:'advanced', word:'Cut Corners', pron:'/kʌt ˈkɔːr.nərz/', emoji:'✂️', pt:'Fazer de qualquer jeito p/ poupar', ex:'Never cut corners when it comes to safety.' },
+  { track:'advanced', word:'Go the Extra Mile', pron:'/ɡoʊ ði ˈek.strə maɪl/', emoji:'🏋️', pt:'Ir além do esperado', ex:'Our team always goes the extra mile for clients.' },
+  { track:'advanced', word:'Break the Ice', pron:'/breɪk ði aɪs/', emoji:'🧊', pt:'Quebrar o gelo inicial', ex:'He told a funny story to break the ice at the meeting.' },
+  { track:'advanced', word:'Call It a Day', pron:'/kɔːl ɪt ə deɪ/', emoji:'⏳', pt:'Encerrar o expediente por hoje', ex:'We finished all reports, so let’s call it a day.' },
+  { track:'advanced', word:'Under the Weather', pron:'/ˈʌn.dər ðə ˈweð.ər/', emoji:'🤒', pt:'Sentindo-se meio indisposto', ex:'I am feeling a little under the weather today.' },
+  { track:'advanced', word:'Between the Lines', pron:'/bɪˈtwiːn ðə laɪnz/', emoji:'🔍', pt:'Ler nas entrelinhas', ex:'If you read between the lines, they want more time.' },
+  { track:'advanced', word:'Second to None', pron:'/ˈsek.ənd tə nʌn/', emoji:'🥇', pt:'Incomparável / O melhor', ex:'Their engineering quality is truly second to none.' },
+  { track:'advanced', word:'Bottleneck', pron:'/ˈbɑː.təl.nek/', emoji:'⏳', pt:'Gargalo operacional', ex:'Upgrading the server removed our main bottleneck.' },
+  { track:'advanced', word:'Milestone', pron:'/ˈmaɪl.stoʊn/', emoji:'🏁', pt:'Marco importante conquistado', ex:'Reaching ten thousand users was a major milestone.' },
+  { track:'advanced', word:'Take for Granted', pron:'/teɪk fɔːr ˈɡræn.tɪd/', emoji:'⚖️', pt:'Dar como garantido / Não valorizar', ex:'Never take good health for granted.' },
+  { track:'advanced', word:'It Is High Time', pron:'/ɪt ɪz haɪ taɪm/', emoji:'🕰️', pt:'Já passou da hora', ex:'It is high time we replaced this outdated software.' },
+  { track:'advanced', word:'Pay Off', pron:'/peɪ ɔːf/', emoji:'🌟', pt:'Valer a pena / Dar frutos', ex:'Studying every day will pay off in the long run.' },
+  { track:'advanced', word:'Thorough', pron:'/ˈθɜːr.oʊ/', emoji:'📋', pt:'Minucioso / Completo', ex:'They conducted a thorough inspection of the machine.' },
+  { track:'advanced', word:'Seamless', pron:'/ˈsiːm.ləs/', emoji:'✨', pt:'Fluido / Sem interrupções', ex:'The new integration offers a seamless experience.' }
+];
+
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capyWordMatchMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
   }
+}
+function saveMasteredItem(word) {
+  try {
+    const set = getMasteredSet();
+    set.add(word);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${getMasteredSet().size}/${CARDS.length}`;
+}
 
-  function pick4(correctCardIdx) {
-    // Pick 3 distractors from the other cards
-    const others = shuffle(CARDS.map((_, i) => i).filter(i => i !== correctCardIdx));
-    const picks = [correctCardIdx, ...others.slice(0, 3)];
-    return shuffle(picks);
-  }
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakEnglish(text, rate = 0.9) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
 
-  // ── Render helpers ───────────────────────────────────────────────────────
-  function renderHearts() {
-    document.getElementById('hearts-display').innerHTML =
-      Array.from({ length: MAX_LIVES }, (_, i) =>
-        `<span class="material-symbols-outlined text-xl ${i < lives ? 'text-red-400' : 'text-white/20'}"
-               style="${i < lives ? "font-variation-settings:'FILL' 1;" : ''}">favorite</span>`
-      ).join('');
-  }
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack = 'all';
+let matchMode     = 'en2visual'; // 'en2visual' | 'visual2en' | 'audio2visual'
+let sessionLength = 10;
 
-  function renderRound() {
-    if (round >= TOTAL_ROUNDS) { finishGame(); return; }
+let deck          = [];
+let round         = 0;
+let score         = 0;
+let streak        = 0;
+let bestStreak    = 0;
+let correctCount  = 0;
+let hintsLeft     = 3;
+let currentOpts   = [];
+let waitingNext   = false;
+let historyLog    = [];
 
-    waitingNext = false;
-    correctIdx = roundOrder[round];
-    const card = CARDS[correctIdx];
-    const tileIndices = pick4(correctIdx);
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
 
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? CARDS
+    : CARDS.filter(x => x.track === selectedTrack);
+}
+
+function startSession() {
+  const pool = getFilteredPool();
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} cartões disponíveis`;
+
+  deck         = shuffle(pool).slice(0, Math.min(sessionLength, pool.length));
+  round        = 0;
+  score        = 0;
+  streak       = 0;
+  bestStreak   = 0;
+  correctCount = 0;
+  hintsLeft    = 3;
+  historyLog   = [];
+
+  document.getElementById('summary-card').classList.add('hidden');
+  document.getElementById('game-card').classList.remove('hidden');
+  updateMasteredBadge();
+  renderRound();
+}
+
+function renderRound() {
+  if (round >= deck.length) return finishGame();
+  waitingNext = false;
+
+  const card = deck[round];
+  const meta = TRACK_META[card.track] || TRACK_META.starter;
+
+  document.getElementById('progress-display').textContent = `Rodada ${round + 1} / ${deck.length}`;
+  document.getElementById('track-pill').textContent = meta.label;
+  document.getElementById('score-display').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+  document.getElementById('progress-bar').style.width = `${((round + 1) / deck.length) * 100}%`;
+  document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+
+  document.getElementById('feedback-text').textContent = '';
+  document.getElementById('context-box').classList.add('hidden');
+
+  if (matchMode === 'en2visual') {
+    document.getElementById('prompt-label').textContent = 'Toque no cartão visual correspondente a:';
     document.getElementById('target-word').textContent = card.word;
     document.getElementById('target-pron').textContent = card.pron;
-    document.getElementById('progress-display').textContent = `Rodada ${round + 1} / ${TOTAL_ROUNDS}`;
-    hideFeedback();
+    setTimeout(() => speakEnglish(card.word), 140);
+  } else if (matchMode === 'visual2en') {
+    document.getElementById('prompt-label').textContent = 'Como dizemos este conceito em Inglês?';
+    document.getElementById('target-word').textContent = `${card.emoji} ${card.pt}`;
+    document.getElementById('target-pron').textContent = 'Escolha o termo correspondente em Inglês';
+  } else {
+    document.getElementById('prompt-label').textContent = '🎧 Ouça a pronúncia e escolha o cartão correspondente:';
+    document.getElementById('target-word').textContent = '🔊 Toque em Ouvir (ou tecla R)';
+    document.getElementById('target-pron').textContent = card.pron;
+    setTimeout(() => speakEnglish(card.word), 150);
+  }
 
-    document.getElementById('tiles-grid').innerHTML = tileIndices.map(idx => {
-      const c = CARDS[idx];
+  const sameTrack = CARDS.filter(x => x.track === card.track && x.word !== card.word);
+  const fallback  = CARDS.filter(x => x.word !== card.word);
+  const source    = sameTrack.length >= 3 ? sameTrack : fallback;
+  currentOpts     = shuffle([card, ...shuffle(source).slice(0, 3)]);
+
+  const grid = document.getElementById('tiles-grid');
+  grid.innerHTML = currentOpts.map((c, idx) => {
+    if (matchMode === 'visual2en') {
       return `
-        <button data-idx="${idx}"
-                onclick="handleTile(this)"
-                class="relative aspect-square rounded-[2rem] overflow-hidden border-4 border-white/10
-                       hover:border-pink-brand hover:scale-[1.03] active:scale-95
-                       transition-all duration-200 shadow-xl group">
-          ${c.image
-            ? `<img src="${c.image}" alt="${c.word}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>`
-            : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-navy-light to-navy text-7xl group-hover:scale-105 transition-transform duration-300">${c.emoji||'📖'}</div>`}
-          <div class="absolute inset-0 bg-gradient-to-t from-navy/80 to-transparent"></div>
-        </button>`;
-    }).join('');
-  }
-
-  function showFeedback(correct, word) {
-    const bar  = document.getElementById('feedback-bar');
-    const icon = document.getElementById('feedback-icon');
-    const text = document.getElementById('feedback-text');
-
-    if (correct) {
-      bar.className  = bar.className.replace(/bg-\S+/g, '').trim();
-      bar.classList.add('bg-green-brand/20', 'border', 'border-green-brand/40');
-      icon.textContent = 'check_circle';
-      icon.className   = icon.className.replace(/text-\S+/g, 'text-green-brand');
-      text.textContent = `Correto! É "${word}"! +10 pts 🎉`;
-    } else {
-      bar.className  = bar.className.replace(/bg-\S+/g, '').trim();
-      bar.classList.add('bg-red-500/20', 'border', 'border-red-500/40');
-      icon.textContent = 'cancel';
-      icon.className   = icon.className.replace(/text-\S+/g, 'text-red-400');
-      text.textContent = `Quase! A resposta era "${word}". Tente de novo!`;
+        <button type="button" data-idx="${idx}" class="tile-btn rounded-3xl bg-white/5 border-2 border-white/15 p-5 flex items-center gap-4 text-left">
+          <span class="w-9 h-9 rounded-xl bg-white/10 text-pink-300 font-black text-sm flex items-center justify-center shrink-0">${idx + 1}</span>
+          <div>
+            <p class="text-xl sm:text-2xl font-black text-white">${c.word}</p>
+            <p class="text-xs font-bold text-pink-300 mt-0.5">${c.pron}</p>
+          </div>
+        </button>
+      `;
     }
-    bar.style.opacity = '1';
-    bar.style.pointerEvents = 'auto';
-  }
-
-  function hideFeedback() {
-    const bar = document.getElementById('feedback-bar');
-    bar.style.opacity = '0';
-    bar.style.pointerEvents = 'none';
-  }
-
-  // ── Game logic ───────────────────────────────────────────────────────────
-  function handleTile(btn) {
-    if (waitingNext) return;
-    waitingNext = true;
-
-    const chosenIdx = parseInt(btn.dataset.idx, 10);
-    const isCorrect = chosenIdx === correctIdx;
-    const correctCard = CARDS[correctIdx];
-
-    // Disable all tiles
-    document.querySelectorAll('#tiles-grid button').forEach(b => b.disabled = true);
-
-    if (isCorrect) {
-      score += 10;
-      document.getElementById('score-display').textContent = score;
-      btn.classList.add('tile-correct');
-      btn.style.borderColor = '#10b981';
-      showFeedback(true, correctCard.word);
-      round++;
-    } else {
-      lives = Math.max(0, lives - 1);
-      renderHearts();
-      btn.classList.add('tile-wrong');
-      btn.style.borderColor = '#ef4444';
-      // Highlight correct answer
-      document.querySelectorAll('#tiles-grid button').forEach(b => {
-        if (parseInt(b.dataset.idx, 10) === correctIdx) {
-          b.style.borderColor = '#10b981';
-        }
-      });
-      showFeedback(false, correctCard.word);
-      if (lives <= 0) {
-        setTimeout(finishGame, 1200);
-        return;
-      }
-      round++;
-    }
-
-    setTimeout(renderRound, 1400);
-  }
-
-  function finishGame() {
-    const xpEarned = score;
-    if (window.Store) {
-      Store.addXP(xpEarned);
-      Store.activateStreak();
-      if (score >= 40) Store.unlockBadge('game_hero');
-      Store.completeActivity('games');
-    }
-
-    const stars = score >= 50 ? 3 : score >= 30 ? 2 : 1;
-    const starHTML = Array.from({ length: 3 }, (_, i) =>
-      `<span class="material-symbols-outlined text-4xl ${i < stars ? 'text-yellow-400' : 'text-white/20'}"
-             style="${i < stars ? "font-variation-settings:'FILL' 1;" : ''}">star</span>`
-    ).join('');
-
-    const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
-    overlay.innerHTML = `
-      <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-pink-brand/60
-                  rounded-[3rem] px-12 py-12 flex flex-col items-center gap-6 shadow-2xl
-                  text-center max-w-sm mx-4 scale-0 opacity-0 transition-all duration-500"
-           id="finish-card">
-        <div class="w-24 h-24 rounded-full bg-pink-brand flex items-center justify-center shadow-lg shadow-pink-500/40">
-          <span class="material-symbols-outlined text-white text-6xl" style="font-variation-settings:'FILL' 1;">sports_esports</span>
+    return `
+      <button type="button" data-idx="${idx}" class="tile-btn rounded-3xl bg-white/5 border-2 border-white/15 p-5 flex items-center gap-4 text-left">
+        <span class="text-4xl sm:text-5xl shrink-0">${c.emoji}</span>
+        <div class="flex-grow">
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-md bg-white/10 text-pink-300 font-black text-xs flex items-center justify-center">${idx + 1}</span>
+            <p class="text-base sm:text-lg font-extrabold text-white leading-snug">${c.pt}</p>
+          </div>
+          <p class="text-xs text-slate-400 mt-1 line-clamp-1">${c.ex}</p>
         </div>
+      </button>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => handleTile(btn, card);
+  });
+}
+
+function handleTile(btn, correctCard) {
+  if (waitingNext) return;
+  waitingNext = true;
+
+  const picked = currentOpts[+btn.dataset.idx];
+  const isCorrect = picked && picked.word === correctCard.word;
+
+  document.querySelectorAll('#tiles-grid button').forEach(b => {
+    b.disabled = true;
+    const item = currentOpts[+b.dataset.idx];
+    if (item.word === correctCard.word) b.classList.add('correct');
+  });
+
+  const fb = document.getElementById('feedback-text');
+  document.getElementById('target-word').textContent = `${correctCard.emoji} ${correctCard.word}`;
+
+  if (isCorrect) {
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    correctCount++;
+
+    const earned = (matchMode === 'audio2visual' ? 14 : 10) + Math.min(8, (streak - 1) * 2);
+    score += earned;
+    saveMasteredItem(correctCard.word);
+
+    fb.textContent = `🎉 Isso mesmo! "${correctCard.word}" = ${correctCard.pt} (+${earned} XP)`;
+    fb.className = 'text-center font-black text-base sm:text-lg text-emerald-300';
+  } else {
+    streak = 0;
+    btn.classList.add('wrong');
+    fb.textContent = `Quase! A resposta correta é "${correctCard.word}" (${correctCard.pt}).`;
+    fb.className = 'text-center font-black text-base sm:text-lg text-rose-300';
+  }
+
+  document.getElementById('score-display').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+
+  document.getElementById('context-en').textContent = `${correctCard.ex}`;
+  document.getElementById('context-box').classList.remove('hidden');
+
+  if (matchMode === 'visual2en') {
+    speakEnglish(correctCard.word);
+  }
+
+  historyLog.push({ item: correctCard, ok: isCorrect });
+  round++;
+  setTimeout(renderRound, isCorrect ? 1550 : 2300);
+}
+
+function useHint() {
+  if (waitingNext || hintsLeft <= 0) return;
+  const correctCard = deck[round];
+  const wrongBtns = [...document.querySelectorAll('#tiles-grid button')].filter(b => {
+    const item = currentOpts[+b.dataset.idx];
+    return item.word !== correctCard.word && !b.classList.contains('eliminated');
+  });
+  if (wrongBtns.length < 2) return;
+  shuffle(wrongBtns).slice(0, 2).forEach(b => {
+    b.classList.add('eliminated');
+    b.disabled = true;
+  });
+  hintsLeft--;
+  document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+  document.getElementById('btn-hint').disabled = hintsLeft <= 0;
+}
+
+function finishGame() {
+  if (window.Store) {
+    Store.addXP(score);
+    Store.completeActivity('games');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
+    if (score >= 80 && typeof Store.unlockBadge === 'function') Store.unlockBadge('game_hero');
+  }
+
+  document.getElementById('game-card').classList.add('hidden');
+  document.getElementById('summary-card').classList.remove('hidden');
+
+  const acc = deck.length > 0 ? Math.round((correctCount / deck.length) * 100) : 0;
+  document.getElementById('sum-xp').textContent = `+${score} XP`;
+  document.getElementById('sum-acc').textContent = `${acc}%`;
+  document.getElementById('sum-streak').textContent = `${bestStreak}x`;
+  document.getElementById('summary-subtitle').textContent =
+    `Você associou corretamente ${correctCount} de ${deck.length} cartões!`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = historyLog.map(({ item, ok }, idx) => `
+    <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+      <div class="flex items-start gap-2.5">
+        <span class="text-2xl">${item.emoji}</span>
         <div>
-          <p class="font-label text-pink-brand font-bold text-sm uppercase tracking-widest mb-1">Fim de Jogo!</p>
-          <h2 class="font-headline text-5xl font-black text-white mb-1">+${xpEarned} XP</h2>
-          <p class="font-body text-slate-300">Pontuação: <span class="text-white font-bold">${score} pts</span></p>
+          <p class="font-extrabold text-sm text-white">${item.word} <span class="text-xs text-pink-300 font-normal">${item.pron}</span></p>
+          <p class="text-xs text-emerald-300 font-bold">${item.pt}</p>
+          <p class="text-[11px] text-slate-300 mt-0.5">${item.ex}</p>
         </div>
-        <div class="flex gap-2">${starHTML}</div>
-        ${score >= 40 ? `<div class="bg-green-brand/20 border border-green-brand/30 rounded-2xl px-6 py-3">
-          <p class="font-label text-green-brand text-sm font-bold">🏅 Badge Unlocked: Game Hero!</p>
-        </div>` : ''}
-        <div class="flex gap-3 flex-wrap justify-center">
-          <button onclick="startGame()"
-                  class="bg-white/10 hover:bg-white/20 text-white font-label font-bold
-                         px-8 py-3 rounded-full text-base active:scale-95 transition-all border border-white/20">
-            Jogar de novo
-          </button>
-          <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                  class="bg-pink-brand hover:bg-pink-600 text-white font-label font-bold
-                         px-8 py-3 rounded-full text-base active:scale-95 transition-all shadow-lg shadow-pink-500/30">
-            Voltar aos Jogos
-          </button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const card = document.getElementById('finish-card');
-      card.style.transform = 'scale(1)';
-      card.style.opacity   = '1';
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay) overlay.remove();
-      });
-    }));
+      </div>
+      <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir pronúncia">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const entry = historyLog[+btn.dataset.reviewIdx];
+      if (entry) speakEnglish(`${entry.item.word}. ${entry.item.ex}`, 0.9);
+    };
+  });
+}
+
+// ── Controles & Atalhos ──────────────────────────────────────────────────────
+document.getElementById('btn-speak').onclick = () => {
+  const card = deck[round];
+  if (card) speakEnglish(card.word);
+};
+document.getElementById('btn-hint').onclick = useHint;
+document.getElementById('btn-play-again').onclick = startSession;
+
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#mode-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    matchMode = btn.dataset.mode;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#len-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionLength = +btn.dataset.len;
+    startSession();
+  };
+});
+
+window.addEventListener('keydown', e => {
+  if (document.getElementById('game-card').classList.contains('hidden')) return;
+  if (['1', '2', '3', '4'].includes(e.key) && !waitingNext) {
+    const idx = +e.key - 1;
+    const btns = document.querySelectorAll('#tiles-grid button');
+    if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+  } else if (e.key === 'r' || e.key === 'R') {
+    document.getElementById('btn-speak').click();
+  } else if (e.key === 'h' || e.key === 'H') {
+    useHint();
   }
+});
 
-  function startGame() {
-    // Remove any leftover finish overlay
-    const old = document.querySelector('.fixed.inset-0.z-\\[9000\\]');
-    if (old) old.remove();
-
-    lives  = MAX_LIVES;
-    score  = 0;
-    round  = 0;
-    roundOrder = shuffle(CARDS.map((_, i) => i)).slice(0, TOTAL_ROUNDS);
-
-    document.getElementById('score-display').textContent = '0';
-    renderHearts();
-    renderRound();
-  }
-
-  // ── Boot ─────────────────────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', startGame);
+startSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>

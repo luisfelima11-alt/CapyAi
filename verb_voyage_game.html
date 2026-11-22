@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,148 +8,779 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700&family=Lexend:wght@600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <style>
-    :root{--navy:#001f3f;--deep:#001326;--pink:#ec4899;--green:#10b981;--sky:#38bdf8;--lilac:#a78bfa;--mist:#f8fafc}
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 8%,rgba(56,189,248,.14),transparent 28rem),radial-gradient(circle at 90% 70%,rgba(236,72,153,.13),transparent 30rem),var(--navy);color:var(--mist);font-family:'Be Vietnam Pro',sans-serif}
-    button,a{font:inherit}
-    button:focus-visible,a:focus-visible{outline:4px solid var(--sky);outline-offset:4px}
-    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
-    .shell{width:min(960px,calc(100% - 32px));margin:auto;padding:128px 0 72px}
-    .back{display:inline-flex;align-items:center;gap:8px;color:#bae6fd;text-decoration:none;font-weight:800}
-    .hero{text-align:center;margin:32px auto 24px}
-    .eyebrow{font:700 12px 'Lexend',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#7dd3fc}
-    h1{font:800 clamp(38px,8vw,72px)/.96 'Plus Jakarta Sans',sans-serif;margin:10px 0 14px;letter-spacing:-.055em}
-    .hero p{max-width:620px;margin:auto;color:#a8bad0;line-height:1.65}
-    .voyage-map{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:min(560px,100%);margin:26px auto 0}
-    .voyage-map::before{content:'';position:absolute;left:8%;right:8%;top:18px;height:7px;border-radius:999px;background:rgba(255,255,255,.09)}
-    .map-stop{position:relative;z-index:1;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#173653;color:#8da4ba;font:700 13px 'Lexend',sans-serif;box-shadow:0 0 0 6px var(--navy)}
-    .map-stop.done{background:var(--green);color:white}.map-stop.current{background:var(--pink);color:white;transform:scale(1.12);box-shadow:0 0 0 6px var(--navy),0 0 0 10px rgba(236,72,153,.2)}
-    .panel{background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045));border-radius:48px;padding:clamp(22px,5vw,44px);box-shadow:0 28px 80px rgba(0,0,0,.3);backdrop-filter:blur(16px)}
-    .topline{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-    .counter,.score{font:700 13px 'Lexend',sans-serif;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.08)}
-    .score{color:#86efac}.combo{color:#f9a8d4;margin-left:6px}
-    .progress{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:18px 0 30px}
-    .progress>div{height:100%;width:10%;border-radius:inherit;background:linear-gradient(90deg,var(--sky),var(--pink));transition:width .35s ease}
-    .time-sign{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:rgba(167,139,250,.15);color:#ddd6fe;font:700 12px 'Lexend',sans-serif}
-    .prompt{margin:22px 0 8px;font:800 clamp(23px,5vw,38px)/1.3 'Plus Jakarta Sans',sans-serif;letter-spacing:-.025em}
-    .translation{color:#94a9bd;margin:0 0 25px}
-    .blank{display:inline-block;min-width:110px;color:#f9a8d4;border-bottom:5px solid var(--pink);text-align:center;padding:0 8px}
-    .answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-    .answer{min-height:68px;border:0;border-radius:22px;background:#fff;color:var(--navy);font:800 16px 'Lexend',sans-serif;padding:15px;cursor:pointer;box-shadow:0 8px 0 #b7c4d1;transition:transform .15s,box-shadow .15s,background .15s}
-    .answer:hover{transform:translateY(-2px);box-shadow:0 10px 0 #b7c4d1}.answer:active{transform:translateY(5px);box-shadow:0 3px 0 #b7c4d1}.answer:disabled{cursor:default}
-    .answer.correct{background:#34d399;color:#052e25;box-shadow:0 7px 0 #059669}.answer.wrong{background:#fb7185;color:#4c0519;box-shadow:0 7px 0 #be123c}
-    .feedback{min-height:88px;margin-top:24px;padding:17px 20px;border-radius:24px;background:rgba(0,0,0,.18);color:#c7d5e3;line-height:1.55}
-    .feedback strong{display:block;color:white;margin-bottom:4px}.feedback.good strong{color:#86efac}.feedback.bad strong{color:#fda4af}
-    .next{display:none;width:100%;margin-top:16px;border:0;border-radius:999px;background:var(--pink);color:white;padding:16px 22px;font:800 15px 'Lexend',sans-serif;cursor:pointer}.next.show{display:block}
-    .finish{text-align:center;padding:12px 0}.finish .emoji{font-size:76px}.finish h2{font:800 38px 'Plus Jakarta Sans',sans-serif;margin:10px 0}.finish .xp{font:800 26px 'Lexend',sans-serif;color:#86efac}.finish-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:26px}.finish-actions a,.finish-actions button{border:0;border-radius:999px;padding:14px 22px;color:white;text-decoration:none;font-weight:800;cursor:pointer}.again{background:var(--pink)}.more{background:rgba(255,255,255,.12)}
-    @media(max-width:600px){.shell{width:min(100% - 20px,960px);padding-top:108px}.panel{border-radius:32px}.answers{grid-template-columns:1fr}.hero{margin-top:24px}.answer{min-height:58px}.voyage-map{padding:0 5px}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.map-stop.current{transform:none}}
+    body {
+      background-color: #001f3f;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid #38bdf8;
+      outline-offset: 3px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.045);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .track-chip {
+      transition: all 0.18s ease;
+    }
+    .track-chip.active {
+      background: rgba(236, 72, 153, 0.22);
+      border-color: #ec4899;
+      color: #fbcfe8;
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.25);
+    }
+    .mode-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: #38bdf8;
+      color: #bae6fd;
+    }
+    .answer {
+      min-height: 66px;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .answer:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: rgba(236, 72, 153, 0.65);
+      background: rgba(236, 72, 153, 0.15);
+    }
+    .answer.correct {
+      background: rgba(16, 185, 129, 0.26) !important;
+      border-color: #10b981 !important;
+      color: #a7f3d0 !important;
+      box-shadow: 0 0 22px rgba(16, 185, 129, 0.35);
+    }
+    .answer.wrong {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #fecaca !important;
+    }
+    .answer.eliminated {
+      opacity: 0.22 !important;
+      pointer-events: none;
+      text-decoration: line-through;
+    }
+    .map-stop {
+      width: 34px;
+      height: 34px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+    .map-stop.done {
+      background: #10b981;
+      border-color: #34d399;
+      color: #022c22;
+    }
+    .map-stop.current {
+      background: #ec4899;
+      border-color: #f472b6;
+      color: #fff;
+      transform: scale(1.12);
+      box-shadow: 0 0 14px rgba(236, 72, 153, 0.45);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+      }
+      .map-stop.current { transform: none; }
+    }
   </style>
-<script src="analytics.js?v=ga1" defer></script>
+  <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body>
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
   <div id="top-nav-placeholder"></div>
   <div id="side-nav-placeholder"></div>
-  <main class="shell">
-    <a class="back" href="5_Game_Pavilion_Forest_Edition.html">← Voltar ao Pavilhão</a>
-    <header class="hero">
-      <div class="eyebrow">Expedição de gramática</div>
-      <h1>Verb Voyage ⛵</h1>
-      <p>Viaje pelo presente, passado e futuro. Use a pista de tempo para escolher a forma verbal que completa cada frase.</p>
-      <div id="voyage-map" class="voyage-map" aria-label="Progresso da expedição"></div>
-    </header>
-    <section id="game-panel" class="panel" aria-live="polite">
-      <div class="topline">
-        <span id="round" class="counter">Rodada 1 de 10</span>
-        <span class="score"><span id="score">0 XP</span><span id="combo" class="combo"></span></span>
+
+  <main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+    <!-- Top Navigation & Stats -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-sky-300 hover:text-sky-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Voltar ao Pavilhão
+      </a>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-pink-300 border border-pink-400/20">
+          <span>🔥</span>
+          <span>Combo:</span>
+          <span id="combo-badge">0</span>
+        </div>
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+          <span>⭐</span>
+          <span id="score">0 XP</span>
+        </div>
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Questões dominadas">
+          <span>⛵</span>
+          <span id="mastered-badge">0/120</span>
+        </div>
       </div>
-      <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
-      <span id="time-sign" class="time-sign">🧭 every day</span>
-      <h2 id="prompt" class="prompt"></h2>
-      <p id="translation" class="translation"></p>
-      <div id="answers" class="answers"></div>
-      <div id="feedback" class="feedback">Escolha uma resposta para a Yara explicar a regra.</div>
-      <button id="next" class="next">Próxima parada →</button>
+    </div>
+
+    <!-- Header -->
+    <header class="text-center mb-6">
+      <p class="text-sky-300 text-xs font-black uppercase tracking-[.22em]">Expedição pelos Tempos Verbais • 120 Situações Reais</p>
+      <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-sky-300 via-pink-200 to-emerald-300 bg-clip-text text-transparent">Verb Voyage ⛵</h1>
+      <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Navegue entre presente, passado, ações contínuas, perfeito, futuro e condicionais usando a pista de tempo de cada cenário.</p>
+      <div id="voyage-map" class="flex flex-wrap items-center justify-center gap-1.5 mt-4" aria-label="Progresso da expedição"></div>
+    </header>
+
+    <!-- Track & Mode Selector -->
+    <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+      <div class="flex flex-col gap-3.5">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha do Curso</span>
+            <span id="track-count-label" class="text-[11px] font-bold text-pink-300">120 questões disponíveis</span>
+          </div>
+          <div id="track-chips" class="flex flex-wrap gap-1.5">
+            <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (120)</button>
+            <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (15)</button>
+            <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (15)</button>
+            <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (15)</button>
+            <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (15)</button>
+            <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (15)</button>
+            <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (15)</button>
+            <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (15)</button>
+            <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (15)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Modo de Resposta</span>
+            <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+              <button data-mode="choice" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 4 Alternativas</button>
+              <button data-mode="typing" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">⌨️ Digitar o Verbo</button>
+            </div>
+          </div>
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Paradas por Expedição</span>
+            <div id="len-buttons" class="flex flex-wrap gap-1.5">
+              <button data-len="10" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Paradas</button>
+              <button data-len="15" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">15 Paradas</button>
+              <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20 Paradas</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- Main Game Panel -->
+    <section id="game-panel" class="glass-card rounded-[2rem] p-5 sm:p-8" aria-live="polite">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black">
+        <div class="flex items-center gap-2">
+          <span id="round" class="bg-white/10 px-3 py-1 rounded-full text-sky-300">Parada 1 de 10</span>
+          <span id="track-pill" class="bg-pink-500/15 border border-pink-400/30 text-pink-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-speak" type="button" class="inline-flex items-center gap-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir frase (Atalho: R)">
+            <span class="material-symbols-outlined text-sm">volume_up</span>
+            <span>Ouvir</span>
+          </button>
+          <button id="btn-hint" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Usar dica (Atalho: H)">
+            <span>💡 Dica</span>
+            <span id="hints-left">(3)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="h-2.5 bg-white/10 rounded-full mt-3 mb-5 overflow-hidden" aria-hidden="true">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-pink-500 transition-all duration-300" style="width:10%"></div>
+      </div>
+
+      <!-- Time Signal Badge -->
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Pista de Tempo:</span>
+        <span id="time-sign" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-black">🧭 every day</span>
+      </div>
+
+      <!-- Prompt Sentence -->
+      <h2 id="prompt" class="text-2xl sm:text-4xl font-black leading-snug text-white"></h2>
+      <p id="translation" class="text-slate-300 text-sm sm:text-base mt-2 mb-6"></p>
+
+      <!-- Multiple Choice Answers -->
+      <div id="answers" class="grid sm:grid-cols-2 gap-3"></div>
+
+      <!-- Typing Input Box -->
+      <div id="typing-area" class="hidden max-w-xl mx-auto my-2">
+        <div class="flex gap-2">
+          <input id="typing-input" type="text" autocomplete="off" spellcheck="false" placeholder="Digite a forma verbal correta..." class="flex-grow rounded-2xl bg-slate-900/90 border border-white/20 px-4 py-3.5 text-white font-bold focus:outline-none focus:border-pink-400"/>
+          <button id="typing-submit" type="button" class="bg-pink-500 hover:bg-pink-400 text-white font-black px-6 py-3.5 rounded-2xl transition-colors">
+            Confirmar
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback Box -->
+      <div id="feedback" class="mt-5 p-4 rounded-2xl bg-black/25 border border-white/10 text-sm text-slate-200 leading-relaxed">
+        Observe a pista de tempo acima e escolha a forma verbal que completa a frase com naturalidade.
+      </div>
+
+      <button id="next" type="button" class="hidden w-full mt-4 rounded-full bg-pink-500 hover:bg-pink-400 text-white font-black py-3.5 px-6 transition-colors">
+        Próxima parada →
+      </button>
+
+      <p class="text-center text-[11px] text-slate-400 mt-3">
+        Atalhos: <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd class="px-1.5 py-0.5 bg-white/10 rounded">4</kbd> responder • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">Enter</kbd> próxima parada • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> ouvir • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">H</kbd> dica
+      </p>
+    </section>
+
+    <!-- Summary Panel -->
+    <section id="summary-panel" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+      <div class="text-6xl sm:text-7xl">🏝️</div>
+      <h2 class="text-3xl sm:text-4xl font-black mt-3">Expedição Concluída!</h2>
+      <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+      <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+          <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">+0 XP</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+          <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-sky-300 mt-1">0%</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+          <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-pink-300 mt-1">0x</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-3 mb-7">
+        <button id="btn-play-again" type="button" class="bg-pink-500 hover:bg-pink-400 text-white px-6 py-3 rounded-full font-black transition-colors">
+          🔄 Nova Expedição
+        </button>
+        <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+          🎮 Ver Mais Jogos
+        </a>
+      </div>
+
+      <div class="text-left border-t border-white/10 pt-5">
+        <h3 class="text-sm font-black uppercase tracking-wider text-pink-300 mb-3">📚 Revisão dos Tempos Verbais da Partida</h3>
+        <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+      </div>
+    </section>
+
   </main>
+
   <div id="mobile-nav-placeholder"></div>
   <script src="capy-skins.js?v=skins1"></script>
-<script src="auth-secure.js?v=seg1"></script>
-<script src="store.js?v=xpfix"></script>
+  <script src="auth-secure.js?v=seg1"></script>
+  <script src="store.js?v=xpfix"></script>
   <script src="components.js?v=seg1"></script>
   <script>
     Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
     Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
     Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
 
-    const ITEMS = [
-      {signal:'every day',sentence:'Yara ___ English every day.',pt:'Yara estuda inglês todos os dias.',answer:'studies',options:['study','studies','studied','will study'],rule:'“Every day” indica rotina. Com she/he/it, o verbo recebe -s.'},
-      {signal:'right now',sentence:'We ___ a new game right now.',pt:'Nós estamos jogando um jogo novo agora.',answer:'are playing',options:['play','played','are playing','will play'],rule:'“Right now” pede Present Continuous: am/is/are + verbo-ing.'},
-      {signal:'yesterday',sentence:'Leo ___ his homework yesterday.',pt:'Leo terminou a tarefa ontem.',answer:'finished',options:['finishes','finish','finished','will finish'],rule:'“Yesterday” situa a ação no passado. O verbo regular recebe -ed.'},
-      {signal:'last night',sentence:'I ___ a funny story last night.',pt:'Eu li uma história engraçada ontem à noite.',answer:'read',options:['reads','am reading','read','will read'],rule:'No passado, “read” mantém a escrita, mas é pronunciado como “red”.'},
-      {signal:'tomorrow',sentence:'They ___ the museum tomorrow.',pt:'Eles visitarão o museu amanhã.',answer:'will visit',options:['visited','visit','are visit','will visit'],rule:'“Tomorrow” aponta para o futuro. “Will + verbo” expressa uma ação futura.'},
-      {signal:'usually',sentence:'My teacher usually ___ early.',pt:'Minha professora geralmente chega cedo.',answer:'arrives',options:['arrive','arrives','arrived','is arrive'],rule:'“Usually” marca hábito. Com my teacher (she), usamos arrives.'},
-      {signal:'at the moment',sentence:'The children ___ at the moment.',pt:'As crianças estão correndo neste momento.',answer:'are running',options:['run','ran','are running','will running'],rule:'Ação acontecendo agora: are + running. Dobramos o n em run → running.'},
-      {signal:'two days ago',sentence:'We ___ to the beach two days ago.',pt:'Nós fomos à praia dois dias atrás.',answer:'went',options:['go','goes','went','will go'],rule:'“Ago” pede passado. O passado irregular de go é went.'},
-      {signal:'next week',sentence:'I ___ my cousin next week.',pt:'Eu vou visitar minha prima na próxima semana.',answer:'will visit',options:['visited','visits','will visit','am visit'],rule:'“Next week” é futuro. Use will + forma base do verbo.'},
-      {signal:'never',sentence:'He never ___ coffee at night.',pt:'Ele nunca bebe café à noite.',answer:'drinks',options:['drink','drinks','drank','is drinking'],rule:'“Never” descreve hábito. He pede drinks no Simple Present.'},
-      {signal:'when I was a child',sentence:'I ___ in a small town when I was a child.',pt:'Eu morava em uma cidade pequena quando era criança.',answer:'lived',options:['live','lives','lived','will live'],rule:'Um período concluído no passado pede Simple Past: lived.'},
-      {signal:'look!',sentence:'Look! The bird ___ away.',pt:'Olhe! O pássaro está voando para longe.',answer:'is flying',options:['flies','flew','is flying','will fly'],rule:'“Look!” chama atenção para algo acontecendo agora: is flying.'},
-      {signal:'every Saturday',sentence:'We ___ soccer every Saturday.',pt:'Nós jogamos futebol todo sábado.',answer:'play',options:['play','plays','played','are playing'],rule:'Rotina com we usa a forma base no Simple Present: play.'},
-      {signal:'last weekend',sentence:'She ___ a cake last weekend.',pt:'Ela fez um bolo no fim de semana passado.',answer:'made',options:['make','makes','made','is making'],rule:'O passado irregular de make é made.'},
-      {signal:'soon',sentence:'The bus ___ soon.',pt:'O ônibus chegará em breve.',answer:'will arrive',options:['arrived','arrives yesterday','will arrive','will arrived'],rule:'Depois de will, o verbo fica na forma base: will arrive.'}
-    ];
-    const $ = id => document.getElementById(id);
-    const shuffle = list => [...list].sort(() => Math.random() - .5);
-    let deck = [], step = 0, points = 0, streak = 0, locked = false;
+    const TRACK_META = {
+      starter:      { label: '🌱 Starter A1-A2' },
+      intermediate: { label: '🚀 Intermediate B1-B2' },
+      travel:       { label: '✈️ Viagem' },
+      work:         { label: '💼 Trabalho' },
+      agro:         { label: '🚜 Agro English' },
+      gpstronic:    { label: '🛰️ GPS Tronic' },
+      med:          { label: '🩺 Medical' },
+      advanced:     { label: '🔥 Avançado' }
+    };
 
-    function buildMap(){
-      $('voyage-map').innerHTML = Array.from({length:10},(_,i)=>`<span class="map-stop ${i<step?'done':i===step?'current':''}">${i<step?'✓':i+1}</span>`).join('');
+    // ── 120 Desafios de Tempos Verbais (8 Trilhas x 15 Questões) ─────────────
+    const ITEMS = [
+      // 1. STARTER A1-A2 (15)
+      { track:'starter', signal:'every day', sentence:'Yara ___ English with her students every day.', pt:'Yara pratica inglês com seus alunos todos os dias.', answer:'practices', options:['practice','practices','practiced','will practice'], rule:'“Every day” indica rotina no presente. Com she/he/it, o verbo recebe -s: practices.' },
+      { track:'starter', signal:'right now', sentence:'We ___ dinner in the kitchen right now.', pt:'Nós estamos preparando o jantar na cozinha agora mesmo.', answer:'are cooking', options:['cook','cooked','are cooking','will cook'], rule:'“Right now” indica algo em andamento neste instante: are + verbo com -ing.' },
+      { track:'starter', signal:'yesterday', sentence:'Lucas ___ his apartment yesterday afternoon.', pt:'Lucas limpou o apartamento dele ontem à tarde.', answer:'cleaned', options:['cleans','clean','cleaned','will clean'], rule:'“Yesterday” situa a ação no passado concluído: verbo regular com -ed (cleaned).' },
+      { track:'starter', signal:'last night', sentence:'I ___ a great documentary last night.', pt:'Eu assisti a um ótimo documentário ontem à noite.', answer:'watched', options:['watches','am watching','watched','will watch'], rule:'“Last night” pede o passado simples: watched.' },
+      { track:'starter', signal:'tomorrow morning', sentence:'They ___ the city museum tomorrow morning.', pt:'Eles visitarão o museu da cidade amanhã de manhã.', answer:'will visit', options:['visited','visit','are visit','will visit'], rule:'“Tomorrow morning” aponta para o futuro: will + verbo na forma base.' },
+      { track:'starter', signal:'usually', sentence:'My brother usually ___ up at six thirty.', pt:'Meu irmão geralmente acorda às seis e meia.', answer:'wakes', options:['wake','wakes','woke','is waking'], rule:'“Usually” marca hábito no presente. Com my brother (he), usamos wakes.' },
+      { track:'starter', signal:'at the moment', sentence:'Listen! The neighbors ___ music at the moment.', pt:'Ouça! Os vizinhos estão tocando música neste momento.', answer:'are playing', options:['play','played','are playing','will playing'], rule:'Uma ação acontecendo neste exato momento usa am/is/are + verbo-ing.' },
+      { track:'starter', signal:'two days ago', sentence:'We ___ to the beach two days ago.', pt:'Nós fomos à praia dois dias atrás.', answer:'went', options:['go','goes','went','will go'], rule:'“Two days ago” marca passado concluído. O passado de go é went.' },
+      { track:'starter', signal:'next weekend', sentence:'I ___ my grandparents next weekend.', pt:'Eu vou visitar meus avós no próximo fim de semana.', answer:'will visit', options:['visited','visits','will visit','am visit'], rule:'“Next weekend” é futuro: will + verbo na forma simples.' },
+      { track:'starter', signal:'never', sentence:'He never ___ coffee late at night.', pt:'Ele nunca bebe café tarde da noite.', answer:'drinks', options:['drink','drinks','drank','is drinking'], rule:'“Never” descreve rotina/hábito. Com he, o verbo recebe -s: drinks.' },
+      { track:'starter', signal:'in 2019', sentence:'She ___ in a small town in 2019.', pt:'Ela morava em uma cidade pequena em 2019.', answer:'lived', options:['live','lives','lived','will live'], rule:'Um ano que já passou (in 2019) pede o passado simples: lived.' },
+      { track:'starter', signal:'look!', sentence:'Look! It ___ heavily outside.', pt:'Olhe! Está chovendo forte lá fora.', answer:'is raining', options:['rains','rained','is raining','will rain'], rule:'“Look!” chama atenção para o que acontece agora: is raining.' },
+      { track:'starter', signal:'every Saturday', sentence:'We ___ groceries at the market every Saturday.', pt:'Nós compramos mantimentos no mercado todo sábado.', answer:'buy', options:['buy','buys','bought','are buying'], rule:'Rotina no presente com we/you/they usa o verbo na forma base: buy.' },
+      { track:'starter', signal:'last Sunday', sentence:'She ___ a homemade cake last Sunday.', pt:'Ela fez um bolo caseiro no domingo passado.', answer:'made', options:['make','makes','made','is making'], rule:'“Last Sunday” é passado concluído. O passado de make é made.' },
+      { track:'starter', signal:'didn’t + yesterday', sentence:'He didn’t ___ breakfast before leaving yesterday.', pt:'Ele não tomou café da manhã antes de sair ontem.', answer:'eat', options:['eat','ate','eats','eating'], rule:'Depois do auxiliar “didn’t”, o verbo principal volta sempre à forma simples: eat.' },
+
+      // 2. INTERMEDIATE B1-B2 (15)
+      { track:'intermediate', signal:'since 2021', sentence:'We ___ in this neighborhood since 2021.', pt:'Nós moramos neste bairro desde 2021.', answer:'have lived', options:['live','lived','have lived','are living'], rule:'“Since 2021” conecta o passado até hoje, pedindo have/has + particípio: have lived.' },
+      { track:'intermediate', signal:'when the lights went out', sentence:'What ___ you doing when the lights went out?', pt:'O que você estava fazendo quando a luz acabou?', answer:'were', options:['were','was','did','have'], rule:'Ação em andamento no passado com “you” usa were + verbo-ing.' },
+      { track:'intermediate', signal:'not ... yet', sentence:'She ___ to my message yet.', pt:'Ela ainda não respondeu à minha mensagem.', answer:'hasn’t replied', options:['didn’t reply','hasn’t replied','doesn’t reply','won’t reply'], rule:'“Yet” para algo que ainda não ocorreu até agora pede Present Perfect: hasn’t replied.' },
+      { track:'intermediate', signal:'by the time we arrived', sentence:'By the time we arrived, the movie ___.', pt:'Quando chegamos, o filme já tinha começado.', answer:'had already started', options:['already started','has already started','had already started','was starting'], rule:'Uma ação que aconteceu antes de outra no passado usa had + particípio: had already started.' },
+      { track:'intermediate', signal:'if + tomorrow', sentence:'If it ___ tomorrow, we will work from home.', pt:'Se chover amanhã, trabalharemos de casa.', answer:'rains', options:['rains','will rain','rained','is raining'], rule:'Em condições reais do futuro, depois de “If” usamos o presente simples: If it rains.' },
+      { track:'intermediate', signal:'when I was a teenager', sentence:'I ___ to play basketball every afternoon when I was a teenager.', pt:'Eu costumava jogar basquete todas as tardes quando era adolescente.', answer:'used', options:['used','use','was using','have used'], rule:'“Used to + verbo” expressa um hábito do passado que não acontece mais.' },
+      { track:'intermediate', signal:'for three hours', sentence:'They ___ for this exam for three hours now.', pt:'Eles estão estudando para esta prova há três horas.', answer:'have been studying', options:['study','studied','have been studying','are studying'], rule:'“For three hours” com ação contínua até o presente pede have been + verbo-ing.' },
+      { track:'intermediate', signal:'ever (in your life)', sentence:'Have you ever ___ the south of Brazil?', pt:'Você já visitou o sul do Brasil alguma vez?', answer:'visited', options:['visit','visited','visiting','visits'], rule:'Depois de “Have you ever...”, usamos o verbo no particípio: visited.' },
+      { track:'intermediate', signal:'while I was driving', sentence:'My phone ___ while I was driving to work.', pt:'Meu celular tocou enquanto eu estava dirigindo para o trabalho.', answer:'rang', options:['rings','rang','was ringing','has rung'], rule:'A ação curta que interrompe outra em andamento fica no passado simples: rang (passado de ring).' },
+      { track:'intermediate', signal:'if I had more time (imaginary)', sentence:'If I ___ more free time, I would learn French.', pt:'Se eu tivesse mais tempo livre, aprenderia francês.', answer:'had', options:['have','had','will have','would have'], rule:'Situação hipotética no presente usa o passado após o “If”: If I had..., I would...' },
+      { track:'intermediate', signal:'just (a moment ago)', sentence:'The courier has just ___ your package.', pt:'O entregador acabou de entregar sua encomenda.', answer:'delivered', options:['deliver','delivers','delivered','delivering'], rule:'“Has just + particípio” indica algo que acabou de acontecer.' },
+      { track:'intermediate', signal:'look at those dark clouds!', sentence:'Look at those dark clouds! It ___ rain.', pt:'Olhe aquelas nuvens escuras! Vai chover.', answer:'is going to', options:['is going to','goes to','rained','has'], rule:'Quando há evidência visível agora (nuvens escuras), usamos “is going to + verbo”.' },
+      { track:'intermediate', signal:'since last Monday', sentence:'He ___ any junk food since last Monday.', pt:'Ele não comeu nada de besteira desde segunda-feira passada.', answer:'hasn’t eaten', options:['didn’t eat','doesn’t eat','hasn’t eaten','isn’t eating'], rule:'“Since last Monday” conecta segunda até hoje: hasn’t eaten.' },
+      { track:'intermediate', signal:'at 8 PM last night', sentence:'At 8 PM last night, we ___ a movie together.', pt:'Às 20h ontem à noite, estávamos assistindo a um filme juntos.', answer:'were watching', options:['watched','were watching','have watched','are watching'], rule:'Um horário específico no passado com ação em curso pede was/were + verbo-ing.' },
+      { track:'intermediate', signal:'before I moved here', sentence:'I ___ never seen snow before I moved here.', pt:'Eu nunca tinha visto neve antes de me mudar para cá.', answer:'had', options:['have','had','did','was'], rule:'Experiência anterior a um momento passado (“before I moved”) usa had never seen.' },
+
+      // 3. TRAVEL / VIAGEM (15)
+      { track:'travel', signal:'in ten minutes', sentence:'Boarding for flight 402 ___ in ten minutes.', pt:'O embarque do voo 402 começará em dez minutos.', answer:'will begin', options:['began','will begin','has begun','begins yesterday'], rule:'“In ten minutes” aponta para o futuro próximo: will begin.' },
+      { track:'travel', signal:'already', sentence:'We have already ___ in online for our flight.', pt:'Nós já fizemos o check-in online para o nosso voo.', answer:'checked', options:['check','checked','checking','checks'], rule:'Com “have already”, usamos o particípio passado: have already checked in.' },
+      { track:'travel', signal:'when we reached the gate', sentence:'When we reached the gate, the plane ___.', pt:'Quando chegamos ao portão, o avião já tinha decolado.', answer:'had already taken off', options:['already took off','has taken off','had already taken off','takes off'], rule:'O avião decolou antes de chegarmos ao portão: had already taken off.' },
+      { track:'travel', signal:'two weeks ago', sentence:'I ___ a double room at this hotel two weeks ago.', pt:'Eu reservei um quarto duplo neste hotel há duas semanas.', answer:'booked', options:['book','booked','have booked','am booking'], rule:'“Two weeks ago” define o momento exato no passado: booked.' },
+      { track:'travel', signal:'right now at the counter', sentence:'The agent ___ our boarding passes right now.', pt:'O atendente está imprimindo nossos cartões de embarque agora mesmo.', answer:'is printing', options:['prints','printed','is printing','will printing'], rule:'“Right now” pede ação em andamento: is printing.' },
+      { track:'travel', signal:'every 15 minutes', sentence:'The airport shuttle ___ every fifteen minutes.', pt:'O ônibus de traslado do aeroporto sai a cada quinze minutos.', answer:'leaves', options:['leave','leaves','left','is leaving'], rule:'Horários fixos e frequência (“every 15 minutes”) usam o presente simples: leaves.' },
+      { track:'travel', signal:'due to last night’s fog', sentence:'Our flight ___ by two hours last night.', pt:'Nosso voo foi atrasado em duas horas ontem à noite.', answer:'was delayed', options:['is delayed','was delayed','has delayed','will delay'], rule:'“Last night” na voz passiva usa was/were + particípio: was delayed.' },
+      { track:'travel', signal:'since 9 AM', sentence:'Passengers ___ at the terminal since 9 AM.', pt:'Os passageiros estão aguardando no terminal desde as 9h.', answer:'have been waiting', options:['wait','waited','have been waiting','are waiting'], rule:'“Since 9 AM” mostra espera contínua que começou às 9h e continua: have been waiting.' },
+      { track:'travel', signal:'while we were walking', sentence:'We found a great café while we ___ through the old town.', pt:'Encontramos um ótimo café enquanto caminhávamos pelo centro histórico.', answer:'were walking', options:['walked','were walking','have walked','are walking'], rule:'Após “while” para descrever a cena em andamento no passado, usamos were walking.' },
+      { track:'travel', signal:'as soon as we land', sentence:'I will call you as soon as the plane ___.', pt:'Eu te ligarei assim que o avião pousar.', answer:'lands', options:['lands','will land','landed','is landing'], rule:'Depois de “as soon as” referindo-se ao futuro, usamos o presente simples: lands.' },
+      { track:'travel', signal:'not ... yet', sentence:'Our suitcases ___ on the carousel yet.', pt:'Nossas malas ainda não apareceram na esteira.', answer:'haven’t appeared', options:['didn’t appear','haven’t appeared','don’t appear','aren’t appearing'], rule:'“Yet” no final da frase negativa pede have/has not + particípio.' },
+      { track:'travel', signal:'tomorrow at 11 AM', sentence:'We ___ out of the hotel tomorrow at 11 AM.', pt:'Nós faremos o check-out do hotel amanhã às 11h.', answer:'are checking', options:['checked','are checking','have checked','checks'], rule:'Planos agendados para amanhã podem usar am/is/are + verbo-ing: are checking out.' },
+      { track:'travel', signal:'ever', sentence:'Have you ever ___ on a high-speed train?', pt:'Você já viajou em um trem de alta velocidade alguma vez?', answer:'traveled', options:['travel','traveled','traveling','travels'], rule:'“Have you ever...” pede sempre o verbo no particípio: traveled.' },
+      { track:'travel', signal:'before the trip started', sentence:'Luckily, I ___ travel insurance before the trip started.', pt:'Felizmente, eu tinha comprado seguro-viagem antes de a viagem começar.', answer:'had bought', options:['bought','have bought','had bought','buy'], rule:'Ação anterior ao início da viagem no passado: had bought.' },
+      { track:'travel', signal:'by 6 PM tonight', sentence:'By 6 PM tonight, we ___ in Lisbon!', pt:'Até as 18h de hoje, já teremos pousado em Lisboa!', answer:'will have landed', options:['will land','have landed','will have landed','landed'], rule:'“By + horário futuro” pede will have + particípio para indicar ação já concluída até lá.' },
+
+      // 4. WORK / TRABALHO & ENTREVISTA (15)
+      { track:'work', signal:'for over six years', sentence:'I ___ in software development for over six years.', pt:'Eu trabalho com desenvolvimento de software há mais de seis anos.', answer:'have worked', options:['work','worked','have worked','am working'], rule:'Para experiência que começou no passado e continua até hoje (“for over six years”), usamos have worked.' },
+      { track:'work', signal:'at the moment', sentence:'Our IT engineers ___ into the server issue at the moment.', pt:'Nossos engenheiros de TI estão investigando o problema do servidor neste momento.', answer:'are looking', options:['look','looked','are looking','have looked'], rule:'“At the moment” indica ação acontecendo agora: are looking into.' },
+      { track:'work', signal:'yesterday morning', sentence:'We ___ the quarterly budget in yesterday morning’s call.', pt:'Nós aprovamos o orçamento trimestral na chamada de ontem de manhã.', answer:'approved', options:['approve','approved','have approved','will approve'], rule:'“Yesterday morning” define tempo concluído no passado: approved.' },
+      { track:'work', signal:'by Friday afternoon', sentence:'The design team ___ the prototype by Friday afternoon.', pt:'A equipe de design terá finalizado o protótipo até sexta-feira à tarde.', answer:'will have finished', options:['finishes','finished','will have finished','has finished'], rule:'“By Friday afternoon” (prazo futuro) pede will have + particípio: will have finished.' },
+      { track:'work', signal:'not ... yet', sentence:'The client ___ the new contract yet.', pt:'O cliente ainda não assinou o novo contrato.', answer:'hasn’t signed', options:['didn’t sign','hasn’t signed','doesn’t sign','won’t sign'], rule:'“Yet” com ação pendente até o presente pede hasn’t signed.' },
+      { track:'work', signal:'when the manager joined', sentence:'We ___ the sales report when the manager joined the call.', pt:'Estávamos discutindo o relatório de vendas quando o gerente entrou na chamada.', answer:'were discussing', options:['discussed','were discussing','have discussed','are discussing'], rule:'Ação que estava em progresso quando outra ocorreu no passado: were discussing.' },
+      { track:'work', signal:'tomorrow at 2 PM', sentence:'I ___ with the logistics supplier tomorrow at 2 PM.', pt:'Vou me reunir com o fornecedor de logística amanhã às 14h.', answer:'am meeting', options:['met','am meeting','have met','meets'], rule:'Compromissos agendados na agenda futura usam am/is/are + verbo-ing: am meeting.' },
+      { track:'work', signal:'in my previous role', sentence:'In my previous role, I ___ a team of twelve analysts.', pt:'No meu cargo anterior, eu liderava uma equipe de doze analistas.', answer:'led', options:['lead','leads','led','have led'], rule:'“In my previous role” é um período encerrado no passado. O passado de lead é led.' },
+      { track:'work', signal:'just', sentence:'I have just ___ the updated spreadsheet to your email.', pt:'Acabei de enviar a planilha atualizada para o seu e-mail.', answer:'sent', options:['send','sends','sent','sending'], rule:'“Have just + particípio” (sent) expressa algo que acabou de ser feito.' },
+      { track:'work', signal:'every Monday at 9 AM', sentence:'Our department ___ a quick alignment call every Monday at 9 AM.', pt:'Nosso departamento realiza uma chamada rápida de alinhamento toda segunda às 9h.', answer:'holds', options:['hold','holds','held','is holding'], rule:'Rotina corporativa semanal com “our department (it)” usa holds.' },
+      { track:'work', signal:'since January', sentence:'Sales ___ by eighteen percent since January.', pt:'As vendas cresceram 18% desde janeiro.', answer:'have grown', options:['grow','grew','have grown','are growing'], rule:'“Since January” liga janeiro até agora: have grown.' },
+      { track:'work', signal:'before the deadline expired', sentence:'Thankfully, we ___ the proposal before the deadline expired.', pt:'Felizmente, tínhamos enviado a proposta antes de o prazo expirar.', answer:'had submitted', options:['submitted','have submitted','had submitted','submit'], rule:'Ação concluída antes de outro marco passado: had submitted.' },
+      { track:'work', signal:'as soon as I receive feedback', sentence:'I will follow up with you as soon as I ___ their feedback.', pt:'Darei retorno a você assim que eu receber o feedback deles.', answer:'receive', options:['receive','will receive','received','am receiving'], rule:'Após “as soon as” para eventos futuros, usamos o presente simples: receive.' },
+      { track:'work', signal:'if we hire two more devs', sentence:'If we ___ two more developers, we will deliver ahead of schedule.', pt:'Se contratarmos mais dois desenvolvedores, entregaremos antes do prazo.', answer:'hire', options:['hire','will hire','hired','would hire'], rule:'Condição real para o futuro usa presente simples após o “If”: If we hire.' },
+      { track:'work', signal:'all morning', sentence:'I ___ client presentations all morning.', pt:'Eu venho preparando apresentações para clientes a manhã toda.', answer:'have been preparing', options:['prepare','prepared','have been preparing','am prepare'], rule:'“All morning” destacando esforço contínuo até agora usa have been preparing.' },
+
+      // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (15)
+      { track:'agro', signal:'this morning at 6 AM', sentence:'The operator ___ the sprayer nozzles this morning at 6 AM.', pt:'O operador limpou os bicos do pulverizador hoje de manhã às 6h.', answer:'cleaned', options:['cleans','cleaned','has cleaned','will clean'], rule:'Um horário específico que já passou (“at 6 AM”) pede o passado simples: cleaned.' },
+      { track:'agro', signal:'since Tuesday', sentence:'It ___ forty millimeters on the farm since Tuesday.', pt:'Choveu quarenta milímetros na fazenda desde terça-feira.', answer:'has rained', options:['rains','rained','has rained','is raining'], rule:'“Since Tuesday” conecta terça-feira até o presente: has rained.' },
+      { track:'agro', signal:'right now in plot 4', sentence:'The combine harvester ___ soybeans in plot four right now.', pt:'A colheitadeira está colhendo soja no talhão quatro agora mesmo.', answer:'is harvesting', options:['harvests','harvested','is harvesting','has harvested'], rule:'“Right now” descreve a operação em andamento no campo: is harvesting.' },
+      { track:'agro', signal:'before the rain started', sentence:'We ___ applying the burndown herbicide before the rain started.', pt:'Nós já tínhamos terminado de aplicar o herbicida dessecante antes de a chuva começar.', answer:'had finished', options:['finished','have finished','had finished','finish'], rule:'Operação concluída antes da chuva no passado: had finished.' },
+      { track:'agro', signal:'if the wind speed exceeds 15 km/h', sentence:'If the wind speed ___ 15 km/h, we will pause spraying to avoid drift.', pt:'Se a velocidade do vento ultrapassar 15 km/h, pausaremos a pulverização para evitar deriva.', answer:'exceeds', options:['exceeds','will exceed','exceeded','is exceeding'], rule:'Após “If” em regra operacional futura, usamos o presente simples: exceeds.' },
+      { track:'agro', signal:'every day during harvest', sentence:'The mechanic ___ the tractor air filter every day during harvest.', pt:'O mecânico verifica o filtro de ar do trator todos os dias durante a colheita.', answer:'checks', options:['check','checks','checked','is checking'], rule:'Rotina diária de manutenção com “the mechanic (he)” recebe -s: checks.' },
+      { track:'agro', signal:'last season', sentence:'Our corn crop ___ eighty-five bags per hectare last season.', pt:'Nossa lavoura de milho rendeu 85 sacas por hectare na safra passada.', answer:'yielded', options:['yield','yields','yielded','has yielded'], rule:'“Last season” é uma safra encerrada no passado: yielded.' },
+      { track:'agro', signal:'for the last four hours', sentence:'The center pivot ___ the cornfield for the last four hours.', pt:'O pivô central vem irrigando o milharal pelas últimas quatro horas.', answer:'has been irrigating', options:['irrigates','irrigated','has been irrigating','is irrigate'], rule:'Duração contínua até o momento atual (“for the last four hours”) usa has been irrigating.' },
+      { track:'agro', signal:'while the agronomist was scouting', sentence:'The agronomist found stink bugs while he ___ the field.', pt:'O agrônomo encontrou percevejos enquanto monitorava o talhão.', answer:'was scouting', options:['scouted','was scouting','has scouted','scouts'], rule:'Ação longa em curso no passado após “while”: was scouting.' },
+      { track:'agro', signal:'by the end of this week', sentence:'By the end of this week, we ___ planting all five hundred hectares.', pt:'Até o final desta semana, já teremos concluído o plantio de todos os 500 hectares.', answer:'will have completed', options:['complete','completed','will have completed','have completed'], rule:'Meta concluída até um marco futuro (“By the end of this week”) usa will have completed.' },
+      { track:'agro', signal:'not ... yet', sentence:'The grain truck ___ at the silo scale yet.', pt:'O caminhão graneleiro ainda não chegou à balança do silo.', answer:'hasn’t arrived', options:['didn’t arrive','hasn’t arrived','doesn’t arrive','isn’t arriving'], rule:'Com “yet” em frase negativa sobre o momento atual, usamos hasn’t arrived.' },
+      { track:'agro', signal:'next month', sentence:'We ___ agricultural lime across the new pasture next month.', pt:'Aplicaremos calcário agrícola na nova pastagem no mês que vem.', answer:'will apply', options:['applied','apply','will apply','have applied'], rule:'Planejamento para “next month” usa will + verbo na forma base: will apply.' },
+      { track:'agro', signal:'for ten years', sentence:'This farm ___ no-till farming for ten years.', pt:'Esta fazenda utiliza o plantio direto na palha há dez anos.', answer:'has practiced', options:['practices','practiced','has practiced','is practicing'], rule:'Prática iniciada há dez anos e que permanece ativa hoje: has practiced.' },
+      { track:'agro', signal:'as soon as soil moisture improves', sentence:'We will start seeding as soon as soil moisture ___.', pt:'Começaremos a semeadura assim que a umidade do solo melhorar.', answer:'improves', options:['improves','will improve','improved','is improving'], rule:'Depois de “as soon as” apontando para o futuro, usamos o presente simples: improves.' },
+      { track:'agro', signal:'all night', sentence:'The aeration fans ___ inside the grain silo all night.', pt:'Os ventiladores de aeração funcionaram dentro do silo a noite toda.', answer:'Have been running', options:['run','ran','have been running','will run'], rule:'“All night” com efeito até a manhã atual destaca continuidade: have been running.' },
+
+      // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (15)
+      { track:'gpstronic', signal:'just now', sentence:'The GNSS receiver has just ___ onto the RTK correction signal.', pt:'O receptor GNSS acabou de travar no sinal de correção RTK.', answer:'locked', options:['lock','locks','locked','locking'], rule:'“Has just + particípio” (locked) indica que o sinal acabou de estabilizar.' },
+      { track:'gpstronic', signal:'while the tractor was cranking', sentence:'The monitor rebooted while the tractor engine ___.', pt:'O monitor reiniciou enquanto o motor do trator estava dando partida.', answer:'was cranking', options:['cranked','was cranking','has cranked','cranks'], rule:'Ação que estava em progresso no momento da queda de tensão: was cranking.' },
+      { track:'gpstronic', signal:'not ... yet', sentence:'We ___ the steering angle sensor on the front axle yet.', pt:'Ainda não calibramos o sensor de ângulo de direção no eixo dianteiro.', answer:'haven’t calibrated', options:['didn’t calibrate','haven’t calibrated','don’t calibrate','aren’t calibrating'], rule:'Para uma calibração pendente até agora (“yet”), usamos haven’t calibrated.' },
+      { track:'gpstronic', signal:'before we updated the firmware', sentence:'We ___ the USB drive to FAT32 before we updated the firmware.', pt:'Tínhamos formatado o pen drive em FAT32 antes de atualizarmos o firmware.', answer:'had formatted', options:['formatted','have formatted','had formatted','format'], rule:'Etapa realizada antes de outra ação no passado: had formatted.' },
+      { track:'gpstronic', signal:'every time the boom crosses the headland', sentence:'Automatic section control ___ off the valves every time the boom crosses the headland.', pt:'O corte automático de seção fecha as válvulas toda vez que a barra cruza a cabeceira.', answer:'shuts', options:['shut','shuts','shutted','is shutting'], rule:'Funcionamento constante de sistema com “automatic section control (it)” usa shuts.' },
+      { track:'gpstronic', signal:'for the last 30 minutes', sentence:'The technician ___ the CAN bus wiring harness for the last thirty minutes.', pt:'O técnico está testando o chicote elétrico da rede CAN há trinta minutos.', answer:'has been testing', options:['tests','tested','has been testing','is test'], rule:'“For the last 30 minutes” com diagnóstico em andamento pede has been testing.' },
+      { track:'gpstronic', signal:'yesterday afternoon', sentence:'We ___ a blown 15-amp fuse in the power harness yesterday afternoon.', pt:'Substituímos um fusível de 15A queimado no chicote de força ontem à tarde.', answer:'replaced', options:['replace','replaced','have replaced','will replace'], rule:'“Yesterday afternoon” marca reparo concluído no passado: replaced.' },
+      { track:'gpstronic', signal:'if the resistance reads 120 ohms', sentence:'If the CAN bus resistance ___ 120 ohms, one terminating resistor is open.', pt:'Se a resistência da rede CAN marcar 120 ohms, um resistor de terminação está aberto.', answer:'reads', options:['reads','will read','read','is reading'], rule:'Em diagnóstico técnico condicional (“If...”), usamos o presente simples: reads.' },
+      { track:'gpstronic', signal:'right now on the bench', sentence:'I ___ the Deutsch connector pins on the workbench right now.', pt:'Estou crimpando os pinos do conector Deutsch na bancada agora mesmo.', answer:'am crimping', options:['crimp','crimped','am crimping','have crimped'], rule:'“Right now” indica trabalho em execução neste instante: am crimping.' },
+      { track:'gpstronic', signal:'as soon as the ECU boots', sentence:'The ISOBUS object pool will load as soon as the ECU ___.', pt:'A tela ISOBUS carregará assim que a ECU inicializar.', answer:'boots', options:['boots','will boot','booted','is booting'], rule:'Após “as soon as” para sequência futura, usamos o presente simples: boots.' },
+      { track:'gpstronic', signal:'since we cleaned the optical tube', sentence:'No false blockage alarms ___ since we cleaned the optical seed tube.', pt:'Nenhum falso alarme de entupimento ocorreu desde que limpamos o tubo óptico de semente.', answer:'have occurred', options:['occurred','have occurred','occur','are occurring'], rule:'“Since we cleaned...” conecta o reparo até o momento atual: have occurred.' },
+      { track:'gpstronic', signal:'when the signal dropped', sentence:'The autopilot ___ an AB guidance line when the satellite signal dropped.', pt:'O piloto automático estava seguindo uma linha guia AB quando o sinal de satélite caiu.', answer:'was following', options:['followed','was following','has followed','follows'], rule:'Operação em andamento no passado quando houve a interrupção: was following.' },
+      { track:'gpstronic', signal:'by the time the operator starts seeding', sentence:'By the time the operator starts seeding, we ___ the prescription shapefile.', pt:'Quando o operador começar a plantar, já teremos carregado o mapa de prescrição shapefile.', answer:'will have loaded', options:['load','loaded','will have loaded','have loaded'], rule:'Ação futura concluída antes de outro evento futuro: will have loaded.' },
+      { track:'gpstronic', signal:'after the catch test yesterday', sentence:'The technician ___ the new flowmeter calibration number yesterday.', pt:'O técnico inseriu a nova constante de calibração do fluxômetro ontem.', answer:'entered', options:['enters','entered','has entered','will enter'], rule:'“Yesterday” exige o verbo no passado simples: entered.' },
+      { track:'gpstronic', signal:'if we hadn’t checked the antenna offset', sentence:'If we ___ checked the antenna offset, the planter would have left gaps.', pt:'Se não tivéssemos conferido a medida da antena, a plantadeira teria deixado falhas.', answer:'hadn’t', options:['didn’t','haven’t','hadn’t','wouldn’t'], rule:'Condição hipotética no passado (“would have left”) pede “If we hadn’t + particípio”.' },
+
+      // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (15)
+      { track:'med', signal:'for the past three days', sentence:'How long ___ you been experiencing this lower back pain?', pt:'Há quanto tempo você vem sentindo essa dor na lombar?', answer:'have', options:['have','did','are','were'], rule:'Para sintomas que começaram no passado e continuam (“been experiencing”), usamos Have you been...' },
+      { track:'med', signal:'last night after dinner', sentence:'The patient’s fever ___ last night after dinner.', pt:'A febre do paciente começou ontem à noite após o jantar.', answer:'started', options:['starts','started','has started','is starting'], rule:'“Last night” define o início exato no passado simples: started.' },
+      { track:'med', signal:'right now', sentence:'The nurse ___ your blood pressure right now.', pt:'A enfermeira está aferindo sua pressão arterial agora mesmo.', answer:'is checking', options:['checks','checked','is checking','has checked'], rule:'Procedimento em andamento agora (“right now”): is checking.' },
+      { track:'med', signal:'since this morning', sentence:'Has the child ___ able to keep fluids down since this morning?', pt:'A criança tem conseguido manter líquidos no estômago desde hoje de manhã?', answer:'been', options:['be','was','been','being'], rule:'Com “Has ... + since this morning”, usamos o particípio been.' },
+      { track:'med', signal:'tomorrow morning', sentence:'The physician ___ you from the hospital tomorrow morning.', pt:'O médico dará sua alta do hospital amanhã de manhã.', answer:'will discharge', options:['discharged','discharges','will discharge','has discharged'], rule:'“Tomorrow morning” aponta para decisão clínica futura: will discharge.' },
+      { track:'med', signal:'before the blood test today', sentence:'I ___ for twelve hours before the blood glucose test today.', pt:'Eu tinha feito jejum por doze horas antes do exame de glicemia de hoje.', answer:'had fasted', options:['fast','have fasted','had fasted','am fasting'], rule:'Jejum realizado antes do momento da coleta: had fasted.' },
+      { track:'med', signal:'twice a day', sentence:'The patient ___ one antibiotic tablet twice a day.', pt:'O paciente toma um comprimido de antibiótico duas vezes ao dia.', answer:'takes', options:['take','takes','took','is taking'], rule:'Rotina posológica com “the patient (he/she)” usa takes.' },
+      { track:'med', signal:'ever', sentence:'Have you ever ___ an allergic reaction to penicillin?', pt:'Você já teve alguma reação alérgica à penicilina alguma vez?', answer:'had', options:['have','had','having','has'], rule:'Em “Have you ever...”, o particípio do verbo have é had.' },
+      { track:'med', signal:'while he was climbing the stairs', sentence:'He felt chest tightness while he ___ the stairs.', pt:'Ele sentiu aperto no peito enquanto estava subindo as escadas.', answer:'was climbing', options:['climbed','was climbing','has climbed','climbs'], rule:'Atividade em andamento no momento do sintoma: was climbing.' },
+      { track:'med', signal:'not ... yet', sentence:'The lab results ___ back from pathology yet.', pt:'Os resultados do laboratório ainda não voltaram da patologia.', answer:'haven’t come', options:['didn’t come','haven’t come','don’t come','aren’t coming'], rule:'“Yet” no final de frase negativa pede haven’t + particípio (come).' },
+      { track:'med', signal:'if the swelling doesn’t go down', sentence:'If the ankle swelling ___ down in two days, return to the clinic.', pt:'Se o inchaço no tornozelo não diminuir em dois dias, retorne à clínica.', answer:'doesn’t go', options:['doesn’t go','won’t go','didn’t go','isn’t go'], rule:'Na oração com “If” para orientação futura, usamos o presente simples: doesn’t go.' },
+      { track:'med', signal:'just', sentence:'The doctor has just ___ your prescription.', pt:'O médico acabou de assinar sua receita.', answer:'signed', options:['sign','signs','signed','signing'], rule:'“Has just + particípio” (signed) indica ação recém-concluída.' },
+      { track:'med', signal:'in ten days', sentence:'You ___ back to the clinic in ten days to remove the stitches.', pt:'Você voltará à clínica em dez dias para retirar os pontos.', answer:'will come', options:['came','will come','have come','comes'], rule:'Retorno agendado para daqui a dez dias (“in ten days”): will come.' },
+      { track:'med', signal:'by the time the ambulance arrived', sentence:'By the time the ambulance arrived, the bleeding ___.', pt:'Quando a ambulância chegou, o sangramento já havia parado.', answer:'had stopped', options:['stopped','has stopped','had stopped','stops'], rule:'Fato ocorrido antes da chegada da ambulância no passado: had stopped.' },
+      { track:'med', signal:'for two weeks now', sentence:'She ___ physical therapy for her knee for two weeks now.', pt:'Ela vem fazendo fisioterapia para o joelho há duas semanas.', answer:'has been doing', options:['does','did','has been doing','is doing'], rule:'Tratamento em curso contínuo até agora (“for two weeks now”): has been doing.' },
+
+      // 8. ADVANCED / FLUÊNCIA AVANÇADA (15)
+      { track:'advanced', signal:'if I had known earlier', sentence:'If I ___ known about the traffic jam, I would have taken the subway.', pt:'Se eu soubesse do engarrafamento antes, teria pegado o metrô.', answer:'had', options:['have','had','would','did'], rule:'Para condição hipotética no passado (“would have taken”), usamos “If I had known”.' },
+      { track:'advanced', signal:'it is high time', sentence:'It is high time we ___ this legacy database.', pt:'Já passou da hora de atualizarmos este banco de dados legado.', answer:'upgraded', options:['upgrade','upgraded','will upgrade','have upgraded'], rule:'A expressão “It is high time + sujeito” pede sempre o verbo no passado: upgraded.' },
+      { track:'advanced', signal:'by the end of this decade', sentence:'By the end of this decade, renewable energy ___ our main power source.', pt:'Até o final desta década, a energia renovável terá se tornado nossa principal fonte.', answer:'will have become', options:['becomes','became','will have become','has become'], rule:'“By + marco futuro” pede will have + particípio (become).' },
+      { track:'advanced', signal:'had better (urgent advice)', sentence:'We had better ___ right now if we don’t want to miss the flight.', pt:'É melhor sairmos agora mesmo se não quisermos perder o voo.', answer:'leave', options:['leave','to leave','left','leaving'], rule:'Depois de “had better”, o verbo vem sempre na forma simples sem “to”: leave.' },
+      { track:'advanced', signal:'would rather ... than', sentence:'I would rather ___ from home today than commute in the rain.', pt:'Prefiro trabalhar de casa hoje a me deslocar na chuva.', answer:'work', options:['work','to work','working','worked'], rule:'Depois de “would rather”, usamos o verbo na forma simples: would rather work.' },
+      { track:'advanced', signal:'hardly ... when', sentence:'Hardly ___ the meeting started when the fire alarm went off.', pt:'Mal a reunião tinha começado quando o alarme de incêndio disparou.', answer:'had', options:['had','has','did','was'], rule:'Na inversão enfática com “Hardly”, usamos “Hardly had + sujeito + particípio... when...”.' },
+      { track:'advanced', signal:'not only ... (inversion)', sentence:'Not only ___ she fix the bug, she also improved performance by 40%.', pt:'Ela não apenas corrigiu o bug, como também melhorou o desempenho em 40%.', answer:'did', options:['did','does','has','was'], rule:'Quando começamos a frase com “Not only” no passado, invertemos usando o auxiliar did.' },
+      { track:'advanced', signal:'for the last five years (continuous)', sentence:'Our research lab ___ new drought-resistant seeds for the last five years.', pt:'Nosso laboratório vem desenvolvendo novas sementes resistentes à seca nos últimos cinco anos.', answer:'has been developing', options:['develops','developed','has been developing','is developing'], rule:'Esforço contínuo que começou há 5 anos e segue ativo: has been developing.' },
+      { track:'advanced', signal:'if they had followed the protocol', sentence:'The outage ___ happened if they had followed the security protocol.', pt:'A queda do sistema não teria acontecido se eles tivessem seguido o protocolo de segurança.', answer:'wouldn’t have', options:['won’t have','wouldn’t have','hadn’t','didn’t'], rule:'Consequência no passado de condição não realizada usa wouldn’t have + particípio.' },
+      { track:'advanced', signal:'no sooner ... than', sentence:'No sooner had we signed the contract ___ the client requested an expansion.', pt:'Mal tínhamos assinado o contrato quando o cliente solicitou uma expansão.', answer:'than', options:['than','when','that','then'], rule:'A estrutura fixa de inversão temporal é “No sooner had ... than ...”.' },
+      { track:'advanced', signal:'wish + right now', sentence:'I wish I ___ more time to explore the historic center today.', pt:'Eu gostaria de ter mais tempo para explorar o centro histórico hoje.', answer:'had', options:['have','had','will have','would have'], rule:'Para desejos sobre o presente (“I wish... today”), usamos o verbo no passado: I wish I had.' },
+      { track:'advanced', signal:'wish + last week (regret)', sentence:'She wishes she ___ accepted that international job offer last year.', pt:'Ela gostaria de ter aceitado aquela proposta de emprego internacional no ano passado.', answer:'had', options:['has','had','would','did'], rule:'Para arrependimentos sobre o passado (“last year”), usamos wish + had + particípio.' },
+      { track:'advanced', signal:'by the time she retired', sentence:'By the time she retired, she ___ at the hospital for thirty-five years.', pt:'Quando se aposentou, ela tinha trabalhado no hospital por trinta e cinco anos.', answer:'had worked', options:['worked','has worked','had worked','was working'], rule:'Período acumulado até um ponto do passado (“by the time she retired”) usa had worked.' },
+      { track:'advanced', signal:'look forward to + verb', sentence:'We look forward to ___ with your engineering team next quarter.', pt:'Aguardamos com expectativa colaborar com sua equipe de engenharia no próximo trimestre.', answer:'collaborating', options:['collaborate','collaborating','collaborated','will collaborate'], rule:'Em “look forward to”, o “to” é preposição e exige o verbo com -ing: collaborating.' },
+      { track:'advanced', signal:'succeeded in + verb', sentence:'They finally succeeded in ___ the latency by half.', pt:'Eles finalmente tiveram sucesso em reduzir a latência pela metade.', answer:'reducing', options:['reduce','to reduce','reducing','reduced'], rule:'Após preposições como “succeeded in”, o verbo recebe -ing: reducing.' }
+    ];
+
+    // ── Persistência de Domínio ──────────────────────────────────────────────
+    const MASTERED_KEY = 'capyVerbVoyageMastered_v1';
+    function getMasteredSet() {
+      try {
+        const raw = localStorage.getItem(MASTERED_KEY);
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch (_) {
+        return new Set();
+      }
     }
-    function speak(text){
-      if(!('speechSynthesis' in window)) return;
-      const utterance = new SpeechSynthesisUtterance(text.replace('___', deck[step].answer));
-      utterance.lang='en-US'; utterance.rate=.82; speechSynthesis.cancel(); speechSynthesis.speak(utterance);
+    function saveMasteredItem(sentence) {
+      try {
+        const set = getMasteredSet();
+        set.add(sentence);
+        localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+        updateMasteredBadge();
+      } catch (_) {}
     }
-    function render(){
-      if(step >= 10) return finish();
-      locked=false; buildMap(); const item=deck[step];
-      $('round').textContent=`Rodada ${step+1} de 10`;
-      $('score').textContent=`${points} XP`;
-      $('combo').textContent=streak>=2?` · combo x${streak}`:'';
-      $('progress-bar').style.width=`${(step+1)*10}%`;
-      $('time-sign').textContent=`🧭 ${item.signal}`;
-      $('prompt').innerHTML=item.sentence.replace('___','<span class="blank">___</span>');
-      $('translation').textContent=item.pt;
-      $('answers').innerHTML=shuffle(item.options).map(option=>`<button class="answer" data-answer="${option}">${option}</button>`).join('');
-      $('answers').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>choose(button,item)));
-      $('feedback').className='feedback'; $('feedback').textContent='Escolha uma resposta para a Yara explicar a regra.';
-      $('next').classList.remove('show');
+    function updateMasteredBadge() {
+      const el = document.getElementById('mastered-badge');
+      if (el) el.textContent = `${getMasteredSet().size}/${ITEMS.length}`;
     }
-    function choose(button,item){
-      if(locked) return; locked=true;
-      const correct=button.dataset.answer===item.answer;
-      $('answers').querySelectorAll('button').forEach(btn=>{btn.disabled=true;if(btn.dataset.answer===item.answer)btn.classList.add('correct')});
-      if(correct){streak++;const earned=10+Math.min(6,(streak-1)*2);points+=earned;$('feedback').innerHTML=`<strong>Boa viagem! +${earned} XP</strong>${item.rule}`;$('feedback').className='feedback good'}
-      else{streak=0;button.classList.add('wrong');$('feedback').innerHTML=`<strong>Quase! A resposta é “${item.answer}”.</strong>${item.rule}`;$('feedback').className='feedback bad'}
-      $('score').textContent=`${points} XP`; speak(item.sentence); $('next').classList.add('show'); $('next').focus();
+
+    // ── Estado do Jogo ───────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const shuffle = list => [...list].sort(() => Math.random() - 0.5);
+
+    let selectedTrack = 'all';
+    let answerMode    = 'choice'; // 'choice' | 'typing'
+    let sessionLength = 10;
+
+    let deck         = [];
+    let step         = 0;
+    let points       = 0;
+    let streak       = 0;
+    let bestStreak   = 0;
+    let correctCount = 0;
+    let hintsLeft    = 3;
+    let locked       = false;
+    let historyLog   = [];
+
+    function getFilteredPool() {
+      return selectedTrack === 'all'
+        ? ITEMS
+        : ITEMS.filter(x => x.track === selectedTrack);
     }
-    function saveResult(){
-      try{const stats=JSON.parse(localStorage.getItem('capyGameStats')||'{}');const old=stats.verb_voyage||{};stats.verb_voyage={plays:(old.plays||0)+1,best:Math.max(old.best||0,points),lastPlayed:Date.now()};localStorage.setItem('capyGameStats',JSON.stringify(stats))}catch(e){}
+
+    function startSession() {
+      const pool = getFilteredPool();
+      const countLabel = $('track-count-label');
+      if (countLabel) countLabel.textContent = `${pool.length} questões disponíveis`;
+
+      deck         = shuffle(pool).slice(0, Math.min(sessionLength, pool.length));
+      step         = 0;
+      points       = 0;
+      streak       = 0;
+      bestStreak   = 0;
+      correctCount = 0;
+      hintsLeft    = 3;
+      historyLog   = [];
+
+      $('summary-panel').classList.add('hidden');
+      $('game-panel').classList.remove('hidden');
+      updateMasteredBadge();
+      render();
     }
-    function finish(){
-      buildMap(); saveResult();
-      if(window.Store){Store.addXP(points);Store.completeActivity('games')}
-      $('game-panel').innerHTML=`<div class="finish"><div class="emoji">🏝️</div><h2>Expedição concluída!</h2><p>Você atravessou presente, passado e futuro.</p><div class="xp">+${points} XP</div><div class="finish-actions"><button class="again" onclick="location.reload()">Jogar novamente</button><a class="more" href="5_Game_Pavilion_Forest_Edition.html">Ver mais jogos</a></div></div>`;
+
+    function buildMap() {
+      $('voyage-map').innerHTML = Array.from({ length: deck.length }, (_, i) =>
+        `<span class="map-stop ${i < step ? 'done' : i === step ? 'current' : ''}">${i < step ? '✓' : i + 1}</span>`
+      ).join('');
     }
-    $('next').addEventListener('click',()=>{step++;render()});
-    deck=shuffle(ITEMS).slice(0,10);render();
+
+    function speak(text, answer) {
+      if (!('speechSynthesis' in window) || !text) return;
+      try {
+        const full = text.replace('___', answer || deck[step]?.answer || '');
+        const utterance = new SpeechSynthesisUtterance(full);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.88;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      } catch (_) {}
+    }
+
+    function render() {
+      if (step >= deck.length) return finish();
+      locked = false;
+      buildMap();
+
+      const item = deck[step];
+      const meta = TRACK_META[item.track] || TRACK_META.starter;
+
+      $('round').textContent = `Parada ${step + 1} de ${deck.length}`;
+      $('track-pill').textContent = meta.label;
+      $('score').textContent = `${points} XP`;
+      $('combo-badge').textContent = String(streak);
+      $('progress-bar').style.width = `${((step + 1) / deck.length) * 100}%`;
+      $('time-sign').textContent = `🧭 ${item.signal}`;
+      $('prompt').innerHTML = item.sentence.replace('___', '<span class="inline-block min-w-[110px] text-pink-300 border-b-4 border-pink-400 text-center px-2">___</span>');
+      $('translation').textContent = item.pt;
+      $('hints-left').textContent = `(${hintsLeft})`;
+      $('btn-hint').disabled = hintsLeft <= 0;
+
+      if (answerMode === 'typing') {
+        $('answers').classList.add('hidden');
+        $('typing-area').classList.remove('hidden');
+        const inp = $('typing-input');
+        inp.value = '';
+        inp.placeholder = 'Digite a forma verbal correta...';
+        inp.disabled = false;
+        $('typing-submit').disabled = false;
+        setTimeout(() => inp.focus(), 60);
+      } else {
+        $('typing-area').classList.add('hidden');
+        $('answers').classList.remove('hidden');
+        const opts = shuffle(item.options);
+        $('answers').innerHTML = opts.map((option, idx) => `
+          <button type="button" class="answer rounded-2xl bg-white/10 border border-white/15 font-extrabold px-4 py-4 text-left flex items-center gap-3" data-answer="${option}">
+            <span class="w-7 h-7 rounded-lg bg-white/10 text-pink-300 text-xs font-black flex items-center justify-center shrink-0">${idx + 1}</span>
+            <span class="text-base sm:text-lg">${option}</span>
+          </button>
+        `).join('');
+        $('answers').querySelectorAll('button').forEach(button => {
+          button.addEventListener('click', () => choose(button, item));
+        });
+      }
+
+      $('feedback').className = 'mt-5 p-4 rounded-2xl bg-black/25 border border-white/10 text-sm text-slate-200 leading-relaxed';
+      $('feedback').textContent = 'Observe a pista de tempo acima e escolha a forma verbal que completa a frase.';
+      $('next').classList.add('hidden');
+    }
+
+    function normalizeVerb(str) {
+      return (str || '').trim().toLowerCase().replace(/[’']/g, "'");
+    }
+
+    function choose(button, item) {
+      if (locked) return;
+      locked = true;
+      const correct = button.dataset.answer === item.answer;
+      $('answers').querySelectorAll('button').forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.answer === item.answer) btn.classList.add('correct');
+      });
+      if (!correct) button.classList.add('wrong');
+      processResult(correct, item);
+    }
+
+    function checkTyping() {
+      if (locked) return;
+      const item = deck[step];
+      const typed = normalizeVerb($('typing-input').value);
+      if (!typed) return;
+      locked = true;
+      $('typing-input').disabled = true;
+      $('typing-submit').disabled = true;
+      const correct = typed === normalizeVerb(item.answer);
+      processResult(correct, item);
+    }
+
+    function processResult(correct, item) {
+      $('prompt').innerHTML = item.sentence.replace('___', `<span class="inline-block text-emerald-300 border-b-4 border-emerald-400 px-2">${item.answer}</span>`);
+
+      if (correct) {
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        correctCount++;
+        const earned = (answerMode === 'typing' ? 14 : 10) + Math.min(8, (streak - 1) * 2);
+        points += earned;
+        saveMasteredItem(item.sentence);
+        $('feedback').innerHTML = `<strong class="block text-emerald-300 text-base mb-1">⛵ Boa viagem! +${earned} XP ${streak >= 2 ? `(Combo ${streak}x 🔥)` : ''}</strong>${item.rule}`;
+        $('feedback').className = 'mt-5 p-4 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 text-sm text-slate-100 leading-relaxed';
+      } else {
+        streak = 0;
+        $('feedback').innerHTML = `<strong class="block text-rose-300 text-base mb-1">Quase! A forma correta é “${item.answer}”.</strong>${item.rule}`;
+        $('feedback').className = 'mt-5 p-4 rounded-2xl bg-rose-500/15 border border-rose-400/35 text-sm text-slate-100 leading-relaxed';
+      }
+
+      $('score').textContent = `${points} XP`;
+      $('combo-badge').textContent = String(streak);
+      speak(item.sentence, item.answer);
+      historyLog.push({ item, ok: correct });
+
+      $('next').classList.remove('hidden');
+      $('next').focus();
+    }
+
+    function useHint() {
+      if (locked || hintsLeft <= 0) return;
+      const item = deck[step];
+      if (answerMode === 'typing') {
+        const ans = item.answer;
+        const half = ans.slice(0, Math.ceil(ans.length / 2));
+        $('typing-input').placeholder = `Começa com: "${half}..."`;
+        $('typing-input').focus();
+      } else {
+        const wrongBtns = [...$('answers').querySelectorAll('button')].filter(b =>
+          b.dataset.answer !== item.answer && !b.classList.contains('eliminated')
+        );
+        if (wrongBtns.length < 2) return;
+        shuffle(wrongBtns).slice(0, 2).forEach(b => {
+          b.classList.add('eliminated');
+          b.disabled = true;
+        });
+      }
+      hintsLeft--;
+      $('hints-left').textContent = `(${hintsLeft})`;
+      $('btn-hint').disabled = hintsLeft <= 0;
+    }
+
+    function saveResult() {
+      try {
+        const stats = JSON.parse(localStorage.getItem('capyGameStats') || '{}');
+        const old = stats.verb_voyage || {};
+        stats.verb_voyage = {
+          plays: (old.plays || 0) + 1,
+          best: Math.max(old.best || 0, points),
+          lastPlayed: Date.now()
+        };
+        localStorage.setItem('capyGameStats', JSON.stringify(stats));
+      } catch (e) {}
+    }
+
+    function finish() {
+      buildMap();
+      saveResult();
+      if (window.Store) {
+        Store.addXP(points);
+        Store.completeActivity('games');
+        if (typeof Store.activateStreak === 'function') Store.activateStreak();
+      }
+
+      $('game-panel').classList.add('hidden');
+      $('summary-panel').classList.remove('hidden');
+
+      const acc = deck.length > 0 ? Math.round((correctCount / deck.length) * 100) : 0;
+      $('sum-xp').textContent = `+${points} XP`;
+      $('sum-acc').textContent = `${acc}%`;
+      $('sum-streak').textContent = `${bestStreak}x`;
+      $('summary-subtitle').textContent = `Você acertou ${correctCount} de ${deck.length} paradas verbais na expedição!`;
+
+      const reviewEl = $('review-list');
+      reviewEl.innerHTML = historyLog.map(({ item, ok }, idx) => {
+        const full = item.sentence.replace('___', `[${item.answer}]`);
+        return `
+          <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span>${ok ? '✅' : '❌'}</span>
+                <span class="text-xs font-black text-purple-300 uppercase">🧭 ${item.signal}</span>
+              </div>
+              <p class="font-extrabold text-sm text-white mt-1">${full}</p>
+              <p class="text-xs text-slate-300 mt-0.5">${item.pt}</p>
+              <p class="text-[11px] text-pink-300 mt-1">💡 ${item.rule}</p>
+            </div>
+            <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir frase">
+              <span class="material-symbols-outlined text-base">volume_up</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+        btn.onclick = () => {
+          const entry = historyLog[+btn.dataset.reviewIdx];
+          if (entry) speak(entry.item.sentence, entry.item.answer);
+        };
+      });
+    }
+
+    // ── Controles & Atalhos ──────────────────────────────────────────────────
+    $('next').addEventListener('click', () => {
+      step++;
+      render();
+    });
+
+    $('btn-speak').addEventListener('click', () => {
+      const item = deck[step];
+      if (item) speak(item.sentence, locked ? item.answer : 'blank');
+    });
+
+    $('btn-hint').addEventListener('click', useHint);
+    $('btn-play-again').addEventListener('click', startSession);
+    $('typing-submit').addEventListener('click', checkTyping);
+    $('typing-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!locked) checkTyping();
+        else $('next').click();
+      }
+    });
+
+    document.querySelectorAll('#track-chips button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTrack = btn.dataset.track;
+        startSession();
+      };
+    });
+
+    document.querySelectorAll('#mode-buttons button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        answerMode = btn.dataset.mode;
+        startSession();
+      };
+    });
+
+    document.querySelectorAll('#len-buttons button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sessionLength = +btn.dataset.len;
+        startSession();
+      };
+    });
+
+    window.addEventListener('keydown', e => {
+      if ($('game-panel').classList.contains('hidden')) return;
+      if (document.activeElement === $('typing-input')) return;
+
+      if (['1', '2', '3', '4'].includes(e.key) && !locked && answerMode === 'choice') {
+        const idx = +e.key - 1;
+        const btns = $('answers').querySelectorAll('button');
+        if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+      } else if (e.key === 'Enter' && locked) {
+        e.preventDefault();
+        $('next').click();
+      } else if (e.key === 'r' || e.key === 'R') {
+        $('btn-speak').click();
+      } else if (e.key === 'h' || e.key === 'H') {
+        useHint();
+      }
+    });
+
+    startSession();
   </script>
-<script src="celebration.js?v=cel3"></script>
-<script src="game-celebra.js?v=gc1"></script>
+  <script src="celebration.js?v=cel3"></script>
+  <script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

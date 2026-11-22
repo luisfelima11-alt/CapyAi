@@ -1,68 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Word Search — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script>
-tailwind.config = {
-  darkMode:"class",
-  theme:{ extend:{
-    colors:{"navy":"#001f3f","navy-light":"#002d5c","pink-brand":"#ec4899","green-brand":"#10b981"},
-    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
-    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
-  }}
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-
-  /* Grid cells */
-  #grid-wrap { display:grid; gap:4px; user-select:none; touch-action:none; }
-  .cell {
-    display:flex; align-items:center; justify-content:center;
-    aspect-ratio:1; border-radius:10px; cursor:pointer;
-    font-family:'Lexend',sans-serif; font-weight:700; font-size:1rem;
-    background:rgba(255,255,255,0.07); color:#fff;
-    border:1.5px solid rgba(255,255,255,0.1);
-    transition:background 0.1s, transform 0.1s;
-    -webkit-tap-highlight-color:transparent;
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
   }
-  .cell.selecting  { background:rgba(236,72,153,0.5); border-color:#ec4899; transform:scale(1.08); }
-  .cell.found      { background:rgba(16,185,129,0.35); border-color:#10b981; color:#6ee7b7; }
-  .cell.found.new  { animation:cellPop 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-
-  /* Word list chips */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(20, 184, 166, 0.22);
+    border-color: #14b8a6;
+    color: #99f6e4;
+    box-shadow: 0 0 16px rgba(20, 184, 166, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: #38bdf8;
+    color: #bae6fd;
+  }
+  #grid-wrap {
+    display: grid;
+    gap: 4px;
+    user-select: none;
+    touch-action: none;
+  }
+  .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    transition: background 0.12s, transform 0.12s, border-color 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cell:hover {
+    border-color: rgba(45, 212, 191, 0.5);
+  }
+  .cell.selecting {
+    background: rgba(236, 72, 153, 0.52);
+    border-color: #ec4899;
+    transform: scale(1.06);
+  }
+  .cell.found {
+    background: rgba(16, 185, 129, 0.35);
+    border-color: #10b981;
+    color: #a7f3d0;
+  }
+  .cell.radar-hint {
+    background: rgba(245, 158, 11, 0.45) !important;
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.6);
+  }
   .word-chip {
-    font-family:'Lexend',sans-serif; font-weight:700; font-size:0.8rem;
-    padding:5px 14px; border-radius:999px;
-    background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.15);
-    color:#cbd5e1; transition:all 0.2s;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #e2e8f0;
+    transition: all 0.2s;
+    cursor: pointer;
   }
   .word-chip.found {
-    background:rgba(16,185,129,0.2); border-color:#10b981; color:#6ee7b7;
-    text-decoration:line-through; text-decoration-color:#10b981;
+    background: rgba(16, 185, 129, 0.22);
+    border-color: #10b981;
+    color: #6ee7b7;
+    text-decoration: line-through;
   }
-
-  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes cellPop{ 0%{transform:scale(0.8)} 80%{transform:scale(1.15)} 100%{transform:scale(1)} }
-  @keyframes confettiFall{ 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(180px) rotate(360deg);opacity:0} }
-
-  .fade-up { animation:fadeUp 0.4s ease both; }
-
-  .confetti-piece{
-    position:fixed;pointer-events:none;z-index:9999;
-    width:9px;height:9px;border-radius:2px;
-    animation:confettiFall 1.1s ease-out forwards;
-  }
-
-  /* Timer ring */
-  #timer-ring { transition:stroke-dashoffset 1s linear; }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -75,120 +101,422 @@ tailwind.config = {
 <meta property="og:title" content="Word Search — Capy Yara English"/>
 <meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Word Search — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
-<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body class="bg-navy font-body text-white min-h-screen flex flex-col">
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
 
-<!-- Header -->
-<header class="flex items-center gap-4 px-5 py-4 border-b border-white/10 bg-navy/90 backdrop-blur sticky top-0 z-50 flex-shrink-0">
-  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-90">
-    <span class="material-symbols-outlined text-xl">arrow_back</span>
-  </button>
-  <div class="flex-1">
-    <p class="font-label text-xs text-teal-400 uppercase tracking-widest font-bold">Word Search</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Encontre as palavras! 🔍</h1>
-  </div>
-  <!-- Timer -->
-  <div class="relative w-12 h-12">
-    <svg class="w-full h-full -rotate-90" viewBox="0 0 48 48">
-      <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
-      <circle id="timer-ring" cx="24" cy="24" r="20" fill="none" stroke="#10b981" stroke-width="4"
-              stroke-dasharray="125.66" stroke-dashoffset="0" stroke-linecap="round"/>
-    </svg>
-    <span id="timer-text" class="absolute inset-0 flex items-center justify-center font-label font-bold text-sm">90</span>
-  </div>
-  <!-- Score -->
-  <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
-    <span id="score-disp">0</span> pts
-  </div>
-</header>
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
 
-<main class="flex-1 flex flex-col gap-4 px-4 py-5 max-w-lg mx-auto w-full">
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
 
-  <!-- Round indicator -->
-  <div class="flex items-center justify-between fade-up">
-    <div class="flex gap-1.5" id="round-pips"></div>
-    <p class="font-label text-xs text-slate-400 font-bold uppercase tracking-widest" id="round-label">Rodada 1 de 3</p>
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-teal-300 hover:text-teal-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-teal-300 border border-teal-400/20">
+        <span>🔍</span>
+        <span>Encontradas:</span>
+        <span id="found-count">0</span>/<span id="total-count">6</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score-disp">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Palavras dominadas">
+        <span>🏆</span>
+        <span id="mastered-badge">0/144</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Word chips -->
-  <div class="flex flex-wrap gap-2 fade-up" id="word-list"></div>
+  <!-- Header -->
+  <header class="text-center mb-6">
+    <p class="text-teal-300 text-xs font-black uppercase tracking-[.22em]">Caça-Palavras Inteligente • 144 Termos em 8 Trilhas</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-teal-300 via-emerald-200 to-sky-300 bg-clip-text text-transparent">Word Search 🔍</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Arraste sobre as letras (ou clique na primeira e na última letra da palavra) para encontrar o vocabulário de cada trilha.</p>
+  </header>
 
-  <!-- Grid -->
-  <div id="grid-wrap" class="fade-up mx-auto w-full max-w-[380px]" style="animation-delay:0.1s"></div>
+  <!-- Track & Mode Selector -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha Temática</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-teal-300">144 palavras disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (144)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (18)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (18)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (18)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (18)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (18)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (18)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (18)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (18)</button>
+        </div>
+      </div>
 
-  <!-- Found count -->
-  <p class="text-center font-label text-sm text-slate-400 fade-up" id="found-label">
-    Found <span id="found-count">0</span> of <span id="total-count">0</span> words
-  </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Modo de Pistas</span>
+          <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+            <button data-mode="bilingual" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 Inglês + Tradução</button>
+            <button data-mode="ptclue" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🔥 Dica em Português (Achar em EN)</button>
+          </div>
+        </div>
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Palavras por Grade</span>
+          <div id="size-buttons" class="flex flex-wrap gap-1.5">
+            <button data-words="6" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">6 Palavras (3 Rodadas)</button>
+            <button data-words="8" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">8 Palavras (3 Rodadas)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Game Card -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black mb-4">
+      <div class="flex items-center gap-2">
+        <span id="round-label" class="bg-white/10 px-3 py-1 rounded-full text-teal-300">Grade 1 de 3</span>
+        <div id="round-pips" class="flex gap-1.5"></div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-radar" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Destacar 1ª letra de uma palavra">
+          <span>💡 Radar</span>
+          <span id="radars-left">(3)</span>
+        </button>
+        <button id="btn-new-grid" type="button" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors">
+          <span>🔄 Nova Grade</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Word Chips (Click any chip to hear pronunciation!) -->
+    <div class="mb-4">
+      <p class="text-[11px] font-bold text-slate-400 mb-2">Palavras desta grade (toque em uma palavra para ouvir a pronúncia):</p>
+      <div id="word-list" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Last Found Banner -->
+    <div id="found-banner" class="hidden mb-4 bg-emerald-500/15 border border-emerald-400/35 rounded-2xl px-4 py-2.5 flex items-center justify-between gap-2">
+      <span id="found-banner-text" class="text-xs sm:text-sm font-extrabold text-emerald-200"></span>
+      <button id="found-banner-speak" type="button" class="bg-white/10 hover:bg-white/20 text-sky-200 p-1.5 rounded-xl">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+
+    <!-- Letter Grid -->
+    <div id="grid-wrap" class="mx-auto w-full max-w-[410px]"></div>
+  </section>
+
+  <!-- Summary Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">🔍</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Caça-Palavras Concluído!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+    <div class="grid grid-cols-2 gap-3 max-w-md mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-teal-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Palavras Encontradas</p>
+        <p id="sum-found" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-teal-500 hover:bg-teal-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Novamente
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-teal-300 mb-3">📚 Vocabulário Encontrado na Partida</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
 
 </main>
+
+<div id="mobile-nav-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=land1"></script>
-<script src="levelup-overlay.js?v=land1"></script>
-<script src="badge-toast.js?v=c52d7db"></script>
+<script src="components.js?v=seg1"></script>
 <script>
-// ── Word Sets per round ────────────────────────────────────────────────────────
-const ROUNDS = [
-  { label:'Animals 🐾',    words:['CAT','DOG','BIRD','FISH','BEAR'] },
-  { label:'Colors 🎨',     words:['RED','BLUE','GREEN','PINK','GOLD'] },
-  { label:'Forest 🌳',     words:['TREE','LEAF','RAIN','WIND','FROG'] },
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+// ── 144 Palavras Reais (4 a 9 letras) nas 8 Trilhas ──────────────────────────
+const WORD_POOL = [
+  // 1. STARTER A1-A2 (18)
+  { track:'starter', word:'BAKERY', pt:'Padaria' },
+  { track:'starter', word:'MORNING', pt:'Manhã' },
+  { track:'starter', word:'KITCHEN', pt:'Cozinha' },
+  { track:'starter', word:'JACKET', pt:'Jaqueta' },
+  { track:'starter', word:'WALLET', pt:'Carteira' },
+  { track:'starter', word:'MARKET', pt:'Mercado' },
+  { track:'starter', word:'DINNER', pt:'Jantar' },
+  { track:'starter', word:'STREET', pt:'Rua' },
+  { track:'starter', word:'WINDOW', pt:'Janela' },
+  { track:'starter', word:'FRIEND', pt:'Amigo(a)' },
+  { track:'starter', word:'FAMILY', pt:'Família' },
+  { track:'starter', word:'COFFEE', pt:'Café' },
+  { track:'starter', word:'LAUNDRY', pt:'Lavanderia / Roupa' },
+  { track:'starter', word:'LIBRARY', pt:'Biblioteca' },
+  { track:'starter', word:'SHOWER', pt:'Chuveiro / Banho' },
+  { track:'starter', word:'GARDEN', pt:'Jardim' },
+  { track:'starter', word:'OFFICE', pt:'Escritório' },
+  { track:'starter', word:'BRIDGE', pt:'Ponte' },
+
+  // 2. INTERMEDIATE B1-B2 (18)
+  { track:'intermediate', word:'WEATHER', pt:'Clima' },
+  { track:'intermediate', word:'HIGHWAY', pt:'Rodovia' },
+  { track:'intermediate', word:'ROUTINE', pt:'Rotina' },
+  { track:'intermediate', word:'MISTAKE', pt:'Erro / Engano' },
+  { track:'intermediate', word:'OPINION', pt:'Opinião' },
+  { track:'intermediate', word:'PROMISE', pt:'Promessa' },
+  { track:'intermediate', word:'PURPOSE', pt:'Propósito' },
+  { track:'intermediate', word:'SUPPORT', pt:'Apoio' },
+  { track:'intermediate', word:'RECEIPT', pt:'Recibo' },
+  { track:'intermediate', word:'PACKAGE', pt:'Encomenda' },
+  { track:'intermediate', word:'TRAFFIC', pt:'Trânsito' },
+  { track:'intermediate', word:'BATTERY', pt:'Bateria' },
+  { track:'intermediate', word:'NEIGHBOR', pt:'Vizinho(a)' },
+  { track:'intermediate', word:'JOURNEY', pt:'Jornada' },
+  { track:'intermediate', word:'DECISION', pt:'Decisão' },
+  { track:'intermediate', word:'SCHEDULE', pt:'Cronograma' },
+  { track:'intermediate', word:'LANGUAGE', pt:'Idioma' },
+  { track:'intermediate', word:'ADVICE', pt:'Conselho' },
+
+  // 3. TRAVEL / VIAGEM (18)
+  { track:'travel', word:'PASSPORT', pt:'Passaporte' },
+  { track:'travel', word:'AIRPORT', pt:'Aeroporto' },
+  { track:'travel', word:'LUGGAGE', pt:'Bagagem' },
+  { track:'travel', word:'BOARDING', pt:'Embarque' },
+  { track:'travel', word:'DELAYED', pt:'Atrasado' },
+  { track:'travel', word:'CUSTOMS', pt:'Alfândega' },
+  { track:'travel', word:'ADAPTER', pt:'Adaptador' },
+  { track:'travel', word:'TICKET', pt:'Passagem' },
+  { track:'travel', word:'SUBWAY', pt:'Metrô' },
+  { track:'travel', word:'CURRENCY', pt:'Moeda / Câmbio' },
+  { track:'travel', word:'BOOKING', pt:'Reserva' },
+  { track:'travel', word:'CABIN', pt:'Cabine' },
+  { track:'travel', word:'ARRIVAL', pt:'Chegada' },
+  { track:'travel', word:'TOURIST', pt:'Turista' },
+  { track:'travel', word:'SHUTTLE', pt:'Traslado' },
+  { track:'travel', word:'AISLE', pt:'Corredor' },
+  { track:'travel', word:'MUSEUM', pt:'Museu' },
+  { track:'travel', word:'VACATION', pt:'Férias' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (18)
+  { track:'work', word:'DEADLINE', pt:'Prazo limite' },
+  { track:'work', word:'MEETING', pt:'Reunião' },
+  { track:'work', word:'BUDGET', pt:'Orçamento' },
+  { track:'work', word:'CLIENT', pt:'Cliente' },
+  { track:'work', word:'STRENGTH', pt:'Ponto forte' },
+  { track:'work', word:'QUARTER', pt:'Trimestre' },
+  { track:'work', word:'SCREEN', pt:'Tela' },
+  { track:'work', word:'ATTACHED', pt:'Em anexo' },
+  { track:'work', word:'MANAGER', pt:'Gerente' },
+  { track:'work', word:'FEEDBACK', pt:'Retorno' },
+  { track:'work', word:'CONTRACT', pt:'Contrato' },
+  { track:'work', word:'REMOTE', pt:'Remoto' },
+  { track:'work', word:'SALARY', pt:'Salário' },
+  { track:'work', word:'CAREER', pt:'Carreira' },
+  { track:'work', word:'REPORT', pt:'Relatório' },
+  { track:'work', word:'SUPPLIER', pt:'Fornecedor' },
+  { track:'work', word:'LAUNCH', pt:'Lançamento' },
+  { track:'work', word:'TEAMWORK', pt:'Trabalho em equipe' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (18)
+  { track:'agro', word:'MOISTURE', pt:'Umidade' },
+  { track:'agro', word:'HARVEST', pt:'Colheita' },
+  { track:'agro', word:'NOZZLE', pt:'Bico pulverizador' },
+  { track:'agro', word:'YIELD', pt:'Produtividade' },
+  { track:'agro', word:'DRIFT', pt:'Deriva' },
+  { track:'agro', word:'TRACTOR', pt:'Trator' },
+  { track:'agro', word:'PLANTER', pt:'Plantadeira' },
+  { track:'agro', word:'SPRAYER', pt:'Pulverizador' },
+  { track:'agro', word:'PASTURE', pt:'Pastagem' },
+  { track:'agro', word:'ROTATION', pt:'Rotação' },
+  { track:'agro', word:'SCOUTING', pt:'Monitoramento' },
+  { track:'agro', word:'PIVOT', pt:'Pivô' },
+  { track:'agro', word:'WEEDS', pt:'Daninhas' },
+  { track:'agro', word:'DEPTH', pt:'Profundidade' },
+  { track:'agro', word:'SILO', pt:'Silo' },
+  { track:'agro', word:'SOYBEAN', pt:'Soja' },
+  { track:'agro', word:'EROSION', pt:'Erosão' },
+  { track:'agro', word:'SEEDLING', pt:'Plântula' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (18)
+  { track:'gpstronic', word:'HARNESS', pt:'Chicote elétrico' },
+  { track:'gpstronic', word:'RESISTOR', pt:'Resistor' },
+  { track:'gpstronic', word:'FIRMWARE', pt:'Firmware' },
+  { track:'gpstronic', word:'SENSOR', pt:'Sensor' },
+  { track:'gpstronic', word:'ANTENNA', pt:'Antena' },
+  { track:'gpstronic', word:'OVERLAP', pt:'Sobreposição' },
+  { track:'gpstronic', word:'GUIDANCE', pt:'Linha guia' },
+  { track:'gpstronic', word:'VOLTAGE', pt:'Tensão elétrica' },
+  { track:'gpstronic', word:'ACCURACY', pt:'Precisão' },
+  { track:'gpstronic', word:'TERRAIN', pt:'Terreno' },
+  { track:'gpstronic', word:'TERMINAL', pt:'Terminal' },
+  { track:'gpstronic', word:'BOUNDARY', pt:'Bordadura' },
+  { track:'gpstronic', word:'HEADLAND', pt:'Cabeceira' },
+  { track:'gpstronic', word:'BLOCKAGE', pt:'Entupimento' },
+  { track:'gpstronic', word:'VALVE', pt:'Válvula' },
+  { track:'gpstronic', word:'RECEIVER', pt:'Receptor' },
+  { track:'gpstronic', word:'FUSE', pt:'Fusível' },
+  { track:'gpstronic', word:'OFFSET', pt:'Medida / Offset' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (18)
+  { track:'med', word:'PRESSURE', pt:'Pressão' },
+  { track:'med', word:'SWELLING', pt:'Inchaço' },
+  { track:'med', word:'ALLERGIC', pt:'Alérgico' },
+  { track:'med', word:'STITCHES', pt:'Pontos' },
+  { track:'med', word:'HEADACHE', pt:'Dor de cabeça' },
+  { track:'med', word:'BREATH', pt:'Respiração' },
+  { track:'med', word:'SYMPTOM', pt:'Sintoma' },
+  { track:'med', word:'TABLET', pt:'Comprimido' },
+  { track:'med', word:'PHARMACY', pt:'Farmácia' },
+  { track:'med', word:'FASTING', pt:'Jejum' },
+  { track:'med', word:'DRESSING', pt:'Curativo' },
+  { track:'med', word:'FLUIDS', pt:'Líquidos' },
+  { track:'med', word:'FEVER', pt:'Febre' },
+  { track:'med', word:'ANKLE', pt:'Tornozelo' },
+  { track:'med', word:'THROAT', pt:'Garganta' },
+  { track:'med', word:'PATIENT', pt:'Paciente' },
+  { track:'med', word:'CLINIC', pt:'Clínica' },
+  { track:'med', word:'SURGERY', pt:'Cirurgia' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (18)
+  { track:'advanced', word:'DESPITE', pt:'Apesar de' },
+  { track:'advanced', word:'HALFWAY', pt:'Meio-termo' },
+  { track:'advanced', word:'OUTDATED', pt:'Obsoleto' },
+  { track:'advanced', word:'OUTCOME', pt:'Desfecho' },
+  { track:'advanced', word:'DISGUISE', pt:'Disfarce' },
+  { track:'advanced', word:'GRANTED', pt:'Garantido' },
+  { track:'advanced', word:'RATHER', pt:'De preferência' },
+  { track:'advanced', word:'ACCURATE', pt:'Preciso' },
+  { track:'advanced', word:'RELIABLE', pt:'Confiável' },
+  { track:'advanced', word:'THOROUGH', pt:'Minucioso' },
+  { track:'advanced', word:'DEADLOCK', pt:'Impasse' },
+  { track:'advanced', word:'BACKLOG', pt:'Pendências' },
+  { track:'advanced', word:'INSIGHT', pt:'Percepção' },
+  { track:'advanced', word:'LEVERAGE', pt:'Alavancar' },
+  { track:'advanced', word:'MINDSET', pt:'Mentalidade' },
+  { track:'advanced', word:'SEAMLESS', pt:'Fluido' },
+  { track:'advanced', word:'DRAWBACK', pt:'Desvantagem' },
+  { track:'advanced', word:'FEASIBLE', pt:'Viável' }
 ];
 
-const GRID_SIZE = 10;
-const TIMER_MAX = 90;
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capyWordSearchMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+function saveMasteredWord(w) {
+  try {
+    const set = getMasteredSet();
+    set.add(w);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${getMasteredSet().size}/${WORD_POOL.length}`;
+}
 
-// ── State ──────────────────────────────────────────────────────────────────────
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakWord(w) {
+  if (!('speechSynthesis' in window) || !w) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(w.toLowerCase());
+    u.lang = 'en-US';
+    u.rate = 0.88;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
+
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+const GRID_SIZE = 10;
+let selectedTrack = 'all';
+let clueMode      = 'bilingual'; // 'bilingual' | 'ptclue'
+let wordsPerRound = 6;
+
+let ROUNDS        = [];
 let currentRound  = 0;
-let grid          = [];      // 2D array of letters
-let placements    = {};      // word → [{r,c}]
+let grid          = [];
+let placements    = {};
 let selecting     = false;
-let selectCells   = [];      // [{r,c}] currently dragging
+let clickOrigin   = null;
+let selectCells   = [];
 let foundWords    = new Set();
 let score         = 0;
-let timeLeft      = TIMER_MAX;
-let timerInterval = null;
-let roundScores   = [];
+let radarsLeft    = 3;
+let allFoundItems = [];
+let lastFoundWord = '';
 
-// Directions must exist before the first round builds its grid.
+const shuffle = a => [...a].sort(() => Math.random() - 0.5);
+
+// Directions must exist before starting the first round
 const DIRS = [
-  [0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1] // 8 directions
+  [0,1],[1,0],[1,1],[0,-1],[-1,0],[-1,-1],[1,-1],[-1,1]
 ];
 
-// ── Boot ───────────────────────────────────────────────────────────────────────
-renderRoundPips();
-startRound(0);
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? WORD_POOL
+    : WORD_POOL.filter(x => x.track === selectedTrack);
+}
 
-// ── Round management ──────────────────────────────────────────────────────────
-function startRound(idx) {
-  currentRound = idx;
-  foundWords   = new Set();
-  selectCells  = [];
-  selecting    = false;
-  timeLeft     = TIMER_MAX;
+function buildRoundsFromTrack() {
+  const pool = shuffle(getFilteredPool());
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} palavras disponíveis`;
 
-  clearInterval(timerInterval);
+  ROUNDS = [0, 1, 2].map(rIdx => {
+    const slice = pool.slice(rIdx * wordsPerRound, (rIdx + 1) * wordsPerRound);
+    return {
+      items: slice,
+      words: slice.map(x => x.word)
+    };
+  }).filter(r => r.words.length > 0);
+}
 
-  document.getElementById('round-label').textContent = `Rodada ${idx + 1} de ${ROUNDS.length}`;
-  document.getElementById('found-count').textContent = 0;
-  document.getElementById('total-count').textContent = ROUNDS[idx].words.length;
-
-  buildGrid(ROUNDS[idx].words);
-  renderGrid();
-  renderWordList();
-  updateRoundPips();
-  startTimer();
+function startSession() {
+  buildRoundsFromTrack();
+  score         = 0;
+  radarsLeft    = 3;
+  allFoundItems = [];
+  document.getElementById('score-disp').textContent = '0 XP';
+  document.getElementById('summary-card').classList.add('hidden');
+  document.getElementById('game-card').classList.remove('hidden');
+  document.getElementById('found-banner').classList.add('hidden');
+  updateMasteredBadge();
+  renderRoundPips();
+  startRound(0);
 }
 
 function renderRoundPips() {
@@ -200,28 +528,45 @@ function renderRoundPips() {
 function updateRoundPips() {
   ROUNDS.forEach((_, i) => {
     const el = document.getElementById(`pip-${i}`);
-    el.className = `w-2.5 h-2.5 rounded-full ${i < currentRound ? 'bg-green-brand' : i === currentRound ? 'bg-teal-400' : 'bg-white/20'}`;
+    if (el) {
+      el.className = `w-2.5 h-2.5 rounded-full ${i < currentRound ? 'bg-emerald-400' : i === currentRound ? 'bg-teal-400' : 'bg-white/20'}`;
+    }
   });
 }
 
-// ── Grid building ──────────────────────────────────────────────────────────────
+function startRound(idx) {
+  currentRound = idx;
+  foundWords   = new Set();
+  selectCells  = [];
+  selecting    = false;
+  clickOrigin  = null;
+
+  document.getElementById('round-label').textContent = `Grade ${idx + 1} de ${ROUNDS.length}`;
+  document.getElementById('found-count').textContent = '0';
+  document.getElementById('total-count').textContent = String(ROUNDS[idx].words.length);
+  document.getElementById('radars-left').textContent = `(${radarsLeft})`;
+  document.getElementById('btn-radar').disabled = radarsLeft <= 0;
+
+  buildGrid(ROUNDS[idx].words);
+  renderGrid();
+  renderWordList();
+  updateRoundPips();
+}
+
 function buildGrid(words) {
-  // Try to place every word; if any word fails, rebuild the whole grid.
-  // Guarantees placements[word] exists for all words (prevents markFound crash).
-  for (let gridAttempt = 0; gridAttempt < 50; gridAttempt++) {
+  for (let gridAttempt = 0; gridAttempt < 60; gridAttempt++) {
     if (tryBuildGrid(words)) break;
   }
 }
 
 function tryBuildGrid(words) {
-  // Empty grid
-  grid = Array.from({length:GRID_SIZE}, () => Array(GRID_SIZE).fill(''));
+  grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(''));
   placements = {};
 
   for (const word of words) {
     let placed = false;
-    for (let attempt = 0; attempt < 200 && !placed; attempt++) {
-      const [dr, dc] = DIRS[Math.floor(Math.random() * 4)]; // only 4 main directions for readability
+    for (let attempt = 0; attempt < 220 && !placed; attempt++) {
+      const [dr, dc] = DIRS[Math.floor(Math.random() * 4)];
       const r0 = Math.floor(Math.random() * GRID_SIZE);
       const c0 = Math.floor(Math.random() * GRID_SIZE);
       const cells = [];
@@ -230,7 +575,7 @@ function tryBuildGrid(words) {
         const r = r0 + dr * i, c = c0 + dc * i;
         if (r < 0 || r >= GRID_SIZE || c < 0 || c >= GRID_SIZE) { ok = false; break; }
         if (grid[r][c] !== '' && grid[r][c] !== word[i])        { ok = false; break; }
-        cells.push({r, c});
+        cells.push({ r, c });
       }
       if (ok) {
         cells.forEach((pos, i) => { grid[pos.r][pos.c] = word[i]; });
@@ -238,19 +583,18 @@ function tryBuildGrid(words) {
         placed = true;
       }
     }
-    if (!placed) return false;  // bail → caller rebuilds the whole grid
+    if (!placed) return false;
   }
 
-  // Fill remaining with random uppercase letters
   const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for (let r = 0; r < GRID_SIZE; r++)
-    for (let c = 0; c < GRID_SIZE; c++)
+  for (let r = 0; r < GRID_SIZE; r++) {
+    for (let c = 0; c < GRID_SIZE; c++) {
       if (!grid[r][c]) grid[r][c] = alpha[Math.floor(Math.random() * alpha.length)];
-
+    }
+  }
   return true;
 }
 
-// ── Render ─────────────────────────────────────────────────────────────────────
 function renderGrid() {
   const wrap = document.getElementById('grid-wrap');
   wrap.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
@@ -259,54 +603,81 @@ function renderGrid() {
   for (let r = 0; r < GRID_SIZE; r++) {
     for (let c = 0; c < GRID_SIZE; c++) {
       const cell = document.createElement('div');
-      cell.className  = 'cell';
+      cell.className   = 'cell';
       cell.textContent = grid[r][c];
       cell.dataset.r   = r;
       cell.dataset.c   = c;
 
-      // Touch & mouse events
-      cell.addEventListener('mousedown',  e => { e.preventDefault(); startSelect(r, c); });
-      cell.addEventListener('mouseenter', e => { if (selecting) extendSelect(r, c); });
-      cell.addEventListener('touchstart', e => { e.preventDefault(); startSelect(r, c); }, {passive:false});
-      cell.addEventListener('touchmove',  e => {
+      cell.addEventListener('mousedown', e => {
+        e.preventDefault();
+        if (clickOrigin && (clickOrigin.r !== r || clickOrigin.c !== c)) {
+          extendSelect(r, c);
+          endSelect();
+          clickOrigin = null;
+        } else {
+          clickOrigin = { r, c };
+          startSelect(r, c);
+        }
+      });
+      cell.addEventListener('mouseenter', () => {
+        if (selecting) extendSelect(r, c);
+      });
+      cell.addEventListener('touchstart', e => {
+        e.preventDefault();
+        startSelect(r, c);
+      }, { passive: false });
+      cell.addEventListener('touchmove', e => {
         e.preventDefault();
         const t = e.touches[0];
         const el = document.elementFromPoint(t.clientX, t.clientY);
         if (el && el.classList.contains('cell')) extendSelect(+el.dataset.r, +el.dataset.c);
-      }, {passive:false});
+      }, { passive: false });
 
       wrap.appendChild(cell);
     }
   }
-
-  document.addEventListener('mouseup',  endSelect);
-  document.addEventListener('touchend', endSelect);
 }
 
+document.addEventListener('mouseup', () => {
+  if (selecting && selectCells.length > 1) {
+    clickOrigin = null;
+    endSelect();
+  } else {
+    selecting = false;
+  }
+});
+document.addEventListener('touchend', endSelect);
+
 function renderWordList() {
-  document.getElementById('word-list').innerHTML = ROUNDS[currentRound].words.map(w =>
-    `<span class="word-chip${foundWords.has(w) ? ' found' : ''}" id="chip-${w}">${w}</span>`
-  ).join('');
+  const roundObj = ROUNDS[currentRound];
+  const container = document.getElementById('word-list');
+  container.innerHTML = roundObj.items.map(item => {
+    const isFound = foundWords.has(item.word);
+    const label = clueMode === 'bilingual' || isFound
+      ? `${item.word} • ${item.pt}`
+      : `🇧🇷 ${item.pt} (${item.word.length} letras)`;
+    return `<button type="button" class="word-chip ${isFound ? 'found' : ''}" data-word="${item.word}" id="chip-${item.word}">🔊 ${label}</button>`;
+  }).join('');
+
+  container.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => speakWord(btn.dataset.word);
+  });
 }
 
 function getCellEl(r, c) {
   return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
 }
 
-// ── Selection ──────────────────────────────────────────────────────────────────
 function startSelect(r, c) {
-  selecting    = true;
-  selectCells  = [{r, c}];
+  selecting   = true;
+  selectCells = [{ r, c }];
   highlightSelecting();
 }
 
 function extendSelect(r, c) {
-  if (!selecting) return;
-  // Only extend in a straight line from the first cell
-  const first = selectCells[0];
+  const first = selectCells[0] || clickOrigin;
+  if (!first) return;
   const dr = r - first.r, dc = c - first.c;
-
-  // Must be along one of the 8 directions
   if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return;
 
   const len = Math.max(Math.abs(dr), Math.abs(dc)) + 1;
@@ -314,188 +685,171 @@ function extendSelect(r, c) {
   const stepC = dc === 0 ? 0 : dc / Math.abs(dc);
 
   const cells = [];
-  for (let i = 0; i < len; i++) cells.push({r: first.r + stepR*i, c: first.c + stepC*i});
-
+  for (let i = 0; i < len; i++) {
+    cells.push({ r: first.r + stepR * i, c: first.c + stepC * i });
+  }
   selectCells = cells;
   highlightSelecting();
 }
 
 function endSelect() {
-  if (!selecting) return;
+  if (!selectCells.length) return;
   selecting = false;
   checkSelection();
-  // Clear selection highlight (keep found cells green)
-  document.querySelectorAll('.cell.selecting').forEach(el => el.classList.remove('selecting'));
-  selectCells = [];
+  if (!clickOrigin) {
+    document.querySelectorAll('.cell.selecting').forEach(el => el.classList.remove('selecting'));
+    selectCells = [];
+  }
 }
 
 function highlightSelecting() {
-  document.querySelectorAll('.cell').forEach(el => {
-    if (!el.classList.contains('found')) el.classList.remove('selecting');
-  });
-  selectCells.forEach(({r,c}) => {
+  document.querySelectorAll('.cell.selecting').forEach(el => el.classList.remove('selecting'));
+  selectCells.forEach(({ r, c }) => {
     const el = getCellEl(r, c);
-    if (el && !el.classList.contains('found')) el.classList.add('selecting');
+    if (el) el.classList.add('selecting');
   });
 }
 
-// ── Check if selection matches a word ─────────────────────────────────────────
 function checkSelection() {
-  const selected = selectCells.map(({r,c}) => grid[r][c]).join('');
+  const selected = selectCells.map(({ r, c }) => grid[r][c]).join('');
   const reversed = selected.split('').reverse().join('');
 
-  for (const word of ROUNDS[currentRound].words) {
+  for (const item of ROUNDS[currentRound].items) {
+    const word = item.word;
     if (foundWords.has(word)) continue;
     if (selected === word || reversed === word) {
-      markFound(word);
+      clickOrigin = null;
+      markFound(item);
       return;
     }
   }
 }
 
-function markFound(word) {
+function markFound(item) {
+  const word = item.word;
   foundWords.add(word);
-  const pts = 10 + Math.floor(timeLeft / 10);
-  score += pts;
-  document.getElementById('score-disp').textContent = score;
+  allFoundItems.push(item);
+  saveMasteredWord(word);
 
-  // Green cells
-  placements[word].forEach(({r,c}) => {
+  const earned = clueMode === 'ptclue' ? 14 : 10;
+  score += earned;
+  document.getElementById('score-disp').textContent = `${score} XP`;
+
+  (placements[word] || []).forEach(({ r, c }) => {
     const el = getCellEl(r, c);
-    el.classList.remove('selecting');
-    el.classList.add('found', 'new');
-    setTimeout(() => el.classList.remove('new'), 400);
+    if (el) {
+      el.classList.remove('selecting', 'radar-hint');
+      el.classList.add('found');
+    }
   });
 
-  // Chip
-  const chip = document.getElementById(`chip-${word}`);
-  if (chip) chip.classList.add('found');
+  renderWordList();
+  document.getElementById('found-count').textContent = String(foundWords.size);
 
-  document.getElementById('found-count').textContent = foundWords.size;
+  lastFoundWord = word;
+  const banner = document.getElementById('found-banner');
+  document.getElementById('found-banner-text').textContent = `✅ Encontrou: ${word} = ${item.pt} (+${earned} XP)`;
+  banner.classList.remove('hidden');
+  speakWord(word);
 
-  // Check all found
   if (foundWords.size === ROUNDS[currentRound].words.length) {
-    clearInterval(timerInterval);
-    setTimeout(() => advanceRound(true), 600);
+    setTimeout(() => {
+      if (currentRound + 1 < ROUNDS.length) {
+        startRound(currentRound + 1);
+      } else {
+        showGameOver();
+      }
+    }, 950);
   }
 }
 
-// ── Timer ──────────────────────────────────────────────────────────────────────
-function startTimer() {
-  updateTimerUI();
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI();
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      advanceRound(false);
-    }
-  }, 1000);
-}
+function useRadar() {
+  if (radarsLeft <= 0) return;
+  const unfound = ROUNDS[currentRound].words.filter(w => !foundWords.has(w) && placements[w]);
+  if (!unfound.length) return;
 
-function updateTimerUI() {
-  const pct = timeLeft / TIMER_MAX;
-  const circumference = 125.66;
-  document.getElementById('timer-ring').style.strokeDashoffset = circumference * (1 - pct);
-  document.getElementById('timer-ring').style.stroke = timeLeft <= 15 ? '#f43f5e' : '#10b981';
-  document.getElementById('timer-text').textContent = timeLeft;
-  document.getElementById('timer-text').style.color = timeLeft <= 15 ? '#f87171' : '#fff';
-}
-
-// ── Round advance ──────────────────────────────────────────────────────────────
-function advanceRound(completed) {
-  roundScores.push({ found: foundWords.size, total: ROUNDS[currentRound].words.length, completed });
-
-  if (currentRound + 1 < ROUNDS.length) {
-    showRoundComplete(completed, () => startRound(currentRound + 1));
-  } else {
-    showGameOver();
+  const target = unfound[0];
+  const firstPos = placements[target][0];
+  const cellEl = getCellEl(firstPos.r, firstPos.c);
+  if (cellEl) {
+    cellEl.classList.add('radar-hint');
+    radarsLeft--;
+    document.getElementById('radars-left').textContent = `(${radarsLeft})`;
+    document.getElementById('btn-radar').disabled = radarsLeft <= 0;
+    speakWord(target);
   }
 }
 
-function showRoundComplete(completed, onNext) {
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/50 backdrop-blur-sm';
-  const emoji = completed ? '🎉' : '⏰';
-  const msg   = completed ? 'All words found!' : `Found ${foundWords.size}/${ROUNDS[currentRound].words.length}`;
-  overlay.innerHTML = `
-    <div class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-teal-500/50
-         rounded-[2.5rem] px-10 py-8 flex flex-col items-center gap-4 shadow-2xl text-center max-w-xs mx-4">
-      <div class="text-6xl">${emoji}</div>
-      <h3 class="font-headline text-3xl font-black text-white">${completed ? 'Rodada concluída!' : 'Time\'s Up!'}</h3>
-      <p class="font-body text-slate-300">${msg}</p>
-      <button onclick="this.closest('.fixed').remove(); (${onNext.toString()})()"
-              class="bg-teal-500 hover:bg-teal-400 text-white font-label font-bold px-8 py-3 rounded-full active:scale-95 transition-all mt-2">
-        Next Round →
-      </button>
-    </div>`;
-  document.body.appendChild(overlay);
-}
-
-// ── Game Over ──────────────────────────────────────────────────────────────────
 function showGameOver() {
-  const totalFound = roundScores.reduce((s,r) => s + r.found, 0);
-  const totalWords = roundScores.reduce((s,r) => s + r.total, 0);
-  const allComplete = roundScores.every(r => r.completed);
-  const stars = allComplete ? 3 : totalFound >= totalWords * 0.7 ? 2 : 1;
-
-  // XP & badge
-  const xpAward = stars === 3 ? 40 : stars === 2 ? 25 : 10;
   if (window.Store) {
-    Store.addXP(xpAward);
+    Store.addXP(score);
     Store.completeActivity('games');
-    if (stars === 3) Store.unlockBadge('game_hero');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
   }
 
-  if (stars === 3) launchConfetti();
+  document.getElementById('game-card').classList.add('hidden');
+  document.getElementById('summary-card').classList.remove('hidden');
 
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
-  overlay.innerHTML = `
-    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-teal-500/40
-         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
-         scale-0 opacity-0 transition-all duration-500">
-      <div class="text-7xl">🔍</div>
+  document.getElementById('sum-xp').textContent = `+${score} XP`;
+  document.getElementById('sum-found').textContent = String(allFoundItems.length);
+  document.getElementById('summary-subtitle').textContent =
+    `Você encontrou todas as ${allFoundItems.length} palavras nas 3 grades temáticas!`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = allFoundItems.map((item, idx) => `
+    <div class="bg-white/5 border border-emerald-400/25 rounded-2xl p-3 flex items-center justify-between gap-2">
       <div>
-        <p class="font-label text-teal-400 font-bold text-sm uppercase tracking-widest mb-1">Game Over!</p>
-        <h2 class="font-headline text-5xl font-black text-white mb-1">${score} pts</h2>
-        <p class="font-body text-slate-300">${totalFound}/${totalWords} words found</p>
+        <span class="font-extrabold text-sm text-white">${item.word}</span>
+        <span class="text-xs text-teal-300 font-bold ml-2">→ ${item.pt}</span>
       </div>
-      <div class="flex gap-1">
-        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-slate-600'}"
-          style="font-variation-settings:'FILL' ${i<=stars?1:0};">star</span>`).join('')}
-      </div>
-      <p class="font-body text-slate-400 text-sm">+${xpAward} XP earned!</p>
-      <div class="flex gap-3">
-        <button onclick="location.reload()"
-                class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">
-          Play Again 🔄
-        </button>
-        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-teal-500 hover:bg-teal-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-teal-500/30">
-          Games 🌿
-        </button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const f = document.getElementById('fin');
-    f.style.transform='scale(1)'; f.style.opacity='1';
-  }));
+      <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir palavra">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const item = allFoundItems[+btn.dataset.reviewIdx];
+      if (item) speakWord(item.word);
+    };
+  });
 }
 
-function launchConfetti() {
-  const colors = ['#10b981','#ec4899','#06b6d4','#facc15','#818cf8'];
-  for (let i = 0; i < 45; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};
-      animation-delay:${Math.random()*0.7}s;animation-duration:${0.9+Math.random()*0.6}s;
-      transform:rotate(${Math.random()*360}deg)`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), 2000);
-  }
-}
+// ── Controles ────────────────────────────────────────────────────────────────
+document.getElementById('btn-radar').onclick = useRadar;
+document.getElementById('btn-new-grid').onclick = startSession;
+document.getElementById('btn-play-again').onclick = startSession;
+document.getElementById('found-banner-speak').onclick = () => speakWord(lastFoundWord);
+
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#mode-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    clueMode = btn.dataset.mode;
+    renderWordList();
+  };
+});
+
+document.querySelectorAll('#size-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#size-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    wordsPerRound = +btn.dataset.words;
+    startSession();
+  };
+});
+
+startSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>

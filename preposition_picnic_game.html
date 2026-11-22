@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,71 +8,769 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;700&family=Lexend:wght@600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <style>
-    :root{--navy:#001f3f;--deep:#001326;--pink:#ec4899;--green:#10b981;--leaf:#34d399;--sky:#38bdf8;--mist:#f8fafc}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 8% 12%,rgba(16,185,129,.2),transparent 28rem),radial-gradient(circle at 92% 75%,rgba(236,72,153,.16),transparent 30rem),var(--navy);color:var(--mist);font-family:'Be Vietnam Pro',sans-serif}button,a{font:inherit}button:focus-visible,a:focus-visible{outline:4px solid var(--sky);outline-offset:4px}
-    .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}.shell{width:min(960px,calc(100% - 32px));margin:auto;padding:128px 0 72px}.back{display:inline-flex;align-items:center;gap:8px;color:#a7f3d0;text-decoration:none;font-weight:800}.hero{text-align:center;margin:32px auto 24px}.eyebrow{font:700 12px 'Lexend',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#6ee7b7}h1{font:800 clamp(38px,8vw,72px)/.96 'Plus Jakarta Sans',sans-serif;margin:10px 0 14px;letter-spacing:-.055em}.hero p{max-width:620px;margin:auto;color:#a8bad0;line-height:1.65}
-    .berries{display:flex;justify-content:center;gap:9px;margin-top:24px}.berry{width:35px;height:35px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.08);font-size:17px}.berry.done{background:var(--green)}.berry.current{background:var(--pink);box-shadow:0 0 0 7px rgba(236,72,153,.15);transform:scale(1.12)}
-    .panel{background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045));border-radius:48px;padding:clamp(22px,5vw,44px);box-shadow:0 28px 80px rgba(0,0,0,.3);backdrop-filter:blur(16px)}.topline{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.counter,.score{font:700 13px 'Lexend',sans-serif;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.08)}.score{color:#86efac}.hearts{color:#fda4af;margin-left:8px}.progress{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:18px 0 25px}.progress>div{height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--green),var(--pink));transition:width .35s ease}
-    .scene{height:240px;border-radius:36px;background:linear-gradient(180deg,#b8edff 0 55%,#65d99c 55%);position:relative;overflow:hidden;display:grid;place-items:center;box-shadow:inset 0 -20px 50px rgba(0,49,35,.16)}.scene::before{content:'☁️';position:absolute;top:20px;left:13%;font-size:45px;opacity:.8}.scene::after{content:'🌳';position:absolute;right:6%;bottom:18px;font-size:72px}.visual{position:relative;z-index:2;min-width:220px;min-height:150px;display:grid;place-items:center;font-size:64px;filter:drop-shadow(0 10px 7px rgba(0,0,0,.18))}.visual .small{font-size:48px}.stack{display:flex;flex-direction:column;align-items:center;line-height:.8}.row{display:flex;align-items:center;gap:16px}.overlap{position:relative;width:135px;height:120px}.overlap span{position:absolute}.overlap .back{font-size:92px;left:20px;top:22px}.overlap .front{font-size:45px;left:54px;top:53px}.behind .front{z-index:2;left:15px;top:26px}.behind .back{z-index:1;left:65px;top:18px}.above{display:flex;flex-direction:column;align-items:center;gap:26px}.below{display:flex;flex-direction:column-reverse;align-items:center;gap:20px}
-    .question{text-align:center;font:800 clamp(22px,5vw,34px)/1.3 'Plus Jakarta Sans',sans-serif;margin:24px 0 8px;letter-spacing:-.02em}.hint{text-align:center;color:#94a9bd;margin:0 0 22px}.blank{color:#f9a8d4;border-bottom:5px solid var(--pink);padding:0 12px}.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.answer{min-height:62px;border:0;border-radius:22px;background:#fff;color:var(--navy);font:800 15px 'Lexend',sans-serif;padding:14px;cursor:pointer;box-shadow:0 8px 0 #b7c4d1;transition:transform .15s,box-shadow .15s,background .15s}.answer:hover{transform:translateY(-2px);box-shadow:0 10px 0 #b7c4d1}.answer:active{transform:translateY(5px);box-shadow:0 3px 0 #b7c4d1}.answer:disabled{cursor:default}.answer.correct{background:#34d399;color:#052e25;box-shadow:0 7px 0 #059669}.answer.wrong{background:#fb7185;color:#4c0519;box-shadow:0 7px 0 #be123c}
-    .feedback{min-height:84px;margin-top:23px;padding:17px 20px;border-radius:24px;background:rgba(0,0,0,.18);color:#c7d5e3;line-height:1.55}.feedback strong{display:block;color:white;margin-bottom:4px}.feedback.good strong{color:#86efac}.feedback.bad strong{color:#fda4af}.next{display:none;width:100%;margin-top:16px;border:0;border-radius:999px;background:var(--pink);color:white;padding:16px 22px;font:800 15px 'Lexend',sans-serif;cursor:pointer}.next.show{display:block}
-    .finish{text-align:center;padding:12px 0}.finish .emoji{font-size:76px}.finish h2{font:800 38px 'Plus Jakarta Sans',sans-serif;margin:10px 0}.finish .xp{font:800 26px 'Lexend',sans-serif;color:#86efac}.finish-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:26px}.finish-actions a,.finish-actions button{border:0;border-radius:999px;padding:14px 22px;color:white;text-decoration:none;font-weight:800;cursor:pointer}.again{background:var(--pink)}.more{background:rgba(255,255,255,.12)}
-    @media(max-width:600px){.shell{width:min(100% - 20px,960px);padding-top:108px}.panel{border-radius:32px}.answers{grid-template-columns:1fr}.hero{margin-top:24px}.scene{height:205px}.visual{transform:scale(.86)}.answer{min-height:56px}.berries{gap:5px}.berry{width:29px;height:29px;font-size:14px}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}.berry.current{transform:none}}
+    body {
+      background-color: #001f3f;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid #38bdf8;
+      outline-offset: 3px;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.045);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .track-chip {
+      transition: all 0.18s ease;
+    }
+    .track-chip.active {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #10b981;
+      color: #a7f3d0;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    }
+    .mode-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: #38bdf8;
+      color: #bae6fd;
+    }
+    .answer {
+      min-height: 64px;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .answer:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: rgba(16, 185, 129, 0.65);
+      background: rgba(16, 185, 129, 0.14);
+    }
+    .answer.correct {
+      background: rgba(16, 185, 129, 0.26) !important;
+      border-color: #10b981 !important;
+      color: #a7f3d0 !important;
+      box-shadow: 0 0 22px rgba(16, 185, 129, 0.35);
+    }
+    .answer.wrong {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: #ef4444 !important;
+      color: #fecaca !important;
+    }
+    .answer.eliminated {
+      opacity: 0.22 !important;
+      pointer-events: none;
+      text-decoration: line-through;
+    }
+    .berry {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 14px;
+      font-weight: 800;
+      transition: all 0.2s ease;
+    }
+    .berry.done {
+      background: #10b981;
+      color: #022c22;
+    }
+    .berry.current {
+      background: #ec4899;
+      color: #fff;
+      transform: scale(1.12);
+      box-shadow: 0 0 14px rgba(236, 72, 153, 0.4);
+    }
+    .scene-box {
+      min-height: 150px;
+      border-radius: 28px;
+      background: radial-gradient(circle at 50% 25%, rgba(56, 189, 248, 0.18), rgba(16, 185, 129, 0.12) 70%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
+      }
+      .berry.current { transform: none; }
+    }
   </style>
-<script src="analytics.js?v=ga1" defer></script>
+  <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body>
-  <div id="top-nav-placeholder"></div><div id="side-nav-placeholder"></div>
-  <main class="shell">
-    <a class="back" href="5_Game_Pavilion_Forest_Edition.html">← Voltar ao Pavilhão</a>
-    <header class="hero"><div class="eyebrow">Expedição visual</div><h1>Preposition Picnic 🧺</h1><p>Observe a cena do piquenique e escolha onde cada objeto está. Aprenda preposições enxergando a posição.</p><div id="berries" class="berries" aria-label="Progresso do piquenique"></div></header>
-    <section id="game-panel" class="panel" aria-live="polite">
-      <div class="topline"><span id="round" class="counter">Cena 1 de 10</span><span class="score"><span id="score">0 XP</span><span id="hearts" class="hearts">♥ ♥ ♥</span></span></div>
-      <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
-      <div id="scene" class="scene"><div id="visual" class="visual"></div></div>
-      <h2 id="question" class="question"></h2><p id="hint" class="hint"></p><div id="answers" class="answers"></div>
-      <div id="feedback" class="feedback">Olhe a posição dos objetos antes de responder.</div><button id="next" class="next">Próxima cena →</button>
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
+  <div id="top-nav-placeholder"></div>
+  <div id="side-nav-placeholder"></div>
+
+  <main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+    <!-- Top Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-emerald-300 hover:text-emerald-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Voltar ao Pavilhão
+      </a>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+          <span>🔥</span>
+          <span>Combo:</span>
+          <span id="combo-badge">0</span>
+        </div>
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+          <span>⭐</span>
+          <span id="score">0 XP</span>
+        </div>
+        <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Preposições dominadas">
+          <span>🧺</span>
+          <span id="mastered-badge">0/112</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="text-center mb-6">
+      <p class="text-emerald-300 text-xs font-black uppercase tracking-[.22em]">Expedição Visual • 112 Preposições de Lugar, Tempo & Contexto</p>
+      <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent">Preposition Picnic 🧺</h1>
+      <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Observe a cena visual e domine o uso de IN, ON, AT, BY, FOR, SINCE, BETWEEN, ACROSS e preposições profissionais.</p>
+      <div id="berries" class="flex flex-wrap justify-center gap-1.5 mt-4" aria-label="Progresso do piquenique"></div>
+    </header>
+
+    <!-- Track & Mode Selector -->
+    <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+      <div class="flex flex-col gap-3.5">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha do Curso</span>
+            <span id="track-count-label" class="text-[11px] font-bold text-emerald-300">112 cenas disponíveis</span>
+          </div>
+          <div id="track-chips" class="flex flex-wrap gap-1.5">
+            <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (112)</button>
+            <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (14)</button>
+            <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (14)</button>
+            <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (14)</button>
+            <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (14)</button>
+            <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (14)</button>
+            <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (14)</button>
+            <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (14)</button>
+            <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (14)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Modo de Resposta</span>
+            <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+              <button data-mode="choice" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 4 Opções</button>
+              <button data-mode="typing" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">⌨️ Digitar Preposição</button>
+            </div>
+          </div>
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Cenas por Rodada</span>
+            <div id="len-buttons" class="flex flex-wrap gap-1.5">
+              <button data-len="10" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Cenas</button>
+              <button data-len="14" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">14 Cenas</button>
+              <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20 Cenas</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- Main Game Panel -->
+    <section id="game-panel" class="glass-card rounded-[2rem] p-5 sm:p-8" aria-live="polite">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black">
+        <div class="flex items-center gap-2">
+          <span id="round" class="bg-white/10 px-3 py-1 rounded-full text-emerald-300">Cena 1 de 10</span>
+          <span id="track-pill" class="bg-emerald-500/15 border border-emerald-400/30 text-emerald-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-speak" type="button" class="inline-flex items-center gap-1 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Ouvir frase (Atalho: R)">
+            <span class="material-symbols-outlined text-sm">volume_up</span>
+            <span>Ouvir</span>
+          </button>
+          <button id="btn-hint" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors" title="Dica 50/50 (Atalho: H)">
+            <span>💡 Dica</span>
+            <span id="hints-left">(3)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="h-2.5 bg-white/10 rounded-full mt-3 mb-5 overflow-hidden" aria-hidden="true">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-sky-400 transition-all duration-300" style="width:10%"></div>
+      </div>
+
+      <!-- Visual Diagram Scene -->
+      <div id="scene" class="scene-box mb-5">
+        <div id="visual" class="text-4xl sm:text-5xl font-black text-center flex flex-col items-center gap-2"></div>
+      </div>
+
+      <!-- Question & Hint -->
+      <h2 id="question" class="text-center text-2xl sm:text-3xl font-black leading-snug text-white"></h2>
+      <p id="hint" class="text-center text-slate-300 text-sm sm:text-base mt-1.5 mb-6"></p>
+
+      <!-- Multiple Choice Answers -->
+      <div id="answers" class="grid sm:grid-cols-2 gap-3"></div>
+
+      <!-- Typing Input Box -->
+      <div id="typing-area" class="hidden max-w-xl mx-auto my-2">
+        <div class="flex gap-2">
+          <input id="typing-input" type="text" autocomplete="off" spellcheck="false" placeholder="Digite a preposição correta..." class="flex-grow rounded-2xl bg-slate-900/90 border border-white/20 px-4 py-3.5 text-white font-bold focus:outline-none focus:border-emerald-400"/>
+          <button id="typing-submit" type="button" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-3.5 rounded-2xl transition-colors">
+            Confirmar
+          </button>
+        </div>
+      </div>
+
+      <!-- Feedback Box -->
+      <div id="feedback" class="mt-5 p-4 rounded-2xl bg-black/25 border border-white/10 text-sm text-slate-200 leading-relaxed">
+        Observe o diagrama visual acima e escolha a preposição exata para o contexto.
+      </div>
+
+      <button id="next" type="button" class="hidden w-full mt-4 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3.5 px-6 transition-colors">
+        Próxima cena →
+      </button>
+
+      <p class="text-center text-[11px] text-slate-400 mt-3">
+        Atalhos: <kbd class="px-1.5 py-0.5 bg-white/10 rounded">1</kbd>–<kbd class="px-1.5 py-0.5 bg-white/10 rounded">4</kbd> responder • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">Enter</kbd> avançar • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">R</kbd> ouvir • <kbd class="px-1.5 py-0.5 bg-white/10 rounded">H</kbd> dica
+      </p>
+    </section>
+
+    <!-- Summary Panel -->
+    <section id="summary-panel" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+      <div class="text-6xl sm:text-7xl">🧺</div>
+      <h2 class="text-3xl sm:text-4xl font-black mt-3">Piquenique Completo!</h2>
+      <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+      <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+          <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">+0 XP</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+          <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-sky-300 mt-1">0%</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+          <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+          <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">0x</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-3 mb-7">
+        <button id="btn-play-again" type="button" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+          🔄 Jogar Novamente
+        </button>
+        <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+          🎮 Ver Mais Jogos
+        </a>
+      </div>
+
+      <div class="text-left border-t border-white/10 pt-5">
+        <h3 class="text-sm font-black uppercase tracking-wider text-emerald-300 mb-3">📚 Revisão das Preposições da Partida</h3>
+        <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+      </div>
+    </section>
+
   </main>
+
   <div id="mobile-nav-placeholder"></div>
   <script src="capy-skins.js?v=skins1"></script>
-<script src="auth-secure.js?v=seg1"></script>
-<script src="store.js?v=xpfix"></script><script src="components.js?v=seg1"></script>
+  <script src="auth-secure.js?v=seg1"></script>
+  <script src="store.js?v=xpfix"></script>
+  <script src="components.js?v=seg1"></script>
   <script>
-    Components.mount('top-nav-placeholder',Components.renderTopNav('games'));Components.mount('side-nav-placeholder',Components.renderSideNav('games'));Components.mount('mobile-nav-placeholder',Components.renderMobileNav('games'));
-    const ALL=['on','under','in','next to','between','behind','in front of','above','near'];
-    const ITEMS=[
-      {visual:'<div class="stack"><span class="small">🍓</span><span>🧺</span></div>',sentence:'The strawberry is ___ the basket.',pt:'O morango está sobre a cesta.',answer:'on',rule:'Use on quando algo está sobre uma superfície e a toca.'},
-      {visual:'<div class="below"><span class="small">🍓</span><span>🧺</span></div>',sentence:'The strawberry is ___ the basket.',pt:'O morango está embaixo da cesta.',answer:'under',rule:'Under significa embaixo de algo.'},
-      {visual:'<div class="overlap"><span class="back">🧺</span><span class="front">🍓</span></div>',sentence:'The strawberry is ___ the basket.',pt:'O morango está dentro da cesta.',answer:'in',rule:'Use in quando algo está dentro de um espaço ou recipiente.'},
-      {visual:'<div class="row"><span>🧺</span><span class="small">🍓</span></div>',sentence:'The strawberry is ___ the basket.',pt:'O morango está ao lado da cesta.',answer:'next to',rule:'Next to significa bem ao lado.'},
-      {visual:'<div class="row"><span>🌳</span><span class="small">🧺</span><span>🌳</span></div>',sentence:'The basket is ___ the trees.',pt:'A cesta está entre as árvores.',answer:'between',rule:'Between é usado quando algo fica no meio de duas coisas.'},
-      {visual:'<div class="overlap behind"><span class="front">🧺</span><span class="back">🐿️</span></div>',sentence:'The squirrel is ___ the basket.',pt:'O esquilo está atrás da cesta.',answer:'behind',rule:'Behind significa atrás, escondido pela posição de outro objeto.'},
-      {visual:'<div class="overlap behind"><span class="front">🐿️</span><span class="back">🧺</span></div>',sentence:'The squirrel is ___ the basket.',pt:'O esquilo está na frente da cesta.',answer:'in front of',rule:'In front of indica uma posição à frente de algo.'},
-      {visual:'<div class="above"><span class="small">🦋</span><span>🌼</span></div>',sentence:'The butterfly is ___ the flower.',pt:'A borboleta está acima da flor.',answer:'above',rule:'Above significa acima, sem necessariamente tocar.'},
-      {visual:'<div class="row"><span>🧺</span><span class="small">🌼</span></div>',sentence:'The flower is ___ the basket.',pt:'A flor está perto da cesta.',answer:'near',rule:'Near significa perto, mas não exige que os objetos estejam lado a lado.'},
-      {visual:'<div class="stack"><span class="small">🥪</span><span>🧺</span></div>',sentence:'The sandwich is ___ the basket.',pt:'O sanduíche está sobre a cesta.',answer:'on',rule:'On indica contato com a superfície.'},
-      {visual:'<div class="row"><span>🧃</span><span>🧺</span></div>',sentence:'The juice is ___ the basket.',pt:'O suco está ao lado da cesta.',answer:'next to',rule:'Next to é a escolha mais precisa para objetos lado a lado.'},
-      {visual:'<div class="overlap"><span class="back">🎒</span><span class="front">📖</span></div>',sentence:'The book is ___ the backpack.',pt:'O livro está dentro da mochila.',answer:'in',rule:'In descreve algo contido dentro de outro objeto.'},
-      {visual:'<div class="below"><span class="small">⚽</span><span>🪑</span></div>',sentence:'The ball is ___ the chair.',pt:'A bola está embaixo da cadeira.',answer:'under',rule:'Under indica que a bola está em uma posição inferior à cadeira.'},
-      {visual:'<div class="row"><span>🌼</span><span class="small">🐞</span><span>🌼</span></div>',sentence:'The ladybug is ___ the flowers.',pt:'A joaninha está entre as flores.',answer:'between',rule:'Between coloca a joaninha no meio de duas flores.'}
+    Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+    Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+    Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+    const TRACK_META = {
+      starter:      { label: '🌱 Starter A1-A2' },
+      intermediate: { label: '🚀 Intermediate B1-B2' },
+      travel:       { label: '✈️ Viagem' },
+      work:         { label: '💼 Trabalho' },
+      agro:         { label: '🚜 Agro English' },
+      gpstronic:    { label: '🛰️ GPS Tronic' },
+      med:          { label: '🩺 Medical' },
+      advanced:     { label: '🔥 Avançado' }
+    };
+
+    // ── 112 Desafios Visuais e Contextuais de Preposições (8 Trilhas x 14) ───
+    const ITEMS = [
+      // 1. STARTER A1-A2 (14)
+      { track:'starter', visual:'<div>🔑 ⬆️ 🍽️</div><span class="text-xs font-bold text-emerald-300">Superfície da mesa</span>', sentence:'The spare key is ___ the kitchen table.', pt:'A chave reserva está sobre a mesa da cozinha.', answer:'on', options:['on','in','under','between'], rule:'Use “on” quando um objeto está apoiado sobre uma superfície.' },
+      { track:'starter', visual:'<div>👟 ⬇️ 🛏️</div><span class="text-xs font-bold text-emerald-300">Debaixo da cama</span>', sentence:'Your running shoes are ___ the bed.', pt:'Seus tênis de corrida estão debaixo da cama.', answer:'under', options:['under','on','above','in'], rule:'“Under” indica que algo está embaixo de outro objeto.' },
+      { track:'starter', visual:'<div>🥛 ➡️ 🧊</div><span class="text-xs font-bold text-emerald-300">Interior da geladeira</span>', sentence:'The fresh milk is ___ the refrigerator.', pt:'O leite fresco está dentro da geladeira.', answer:'in', options:['in','on','at','next to'], rule:'Use “in” quando algo está dentro de um espaço fechado ou recipiente.' },
+      { track:'starter', visual:'<div>🏦 ↔️ 🥖</div><span class="text-xs font-bold text-emerald-300">Lado a lado</span>', sentence:'The bakery is right ___ the bank.', pt:'A padaria fica bem ao lado do banco.', answer:'next to', options:['next to','between','under','in'], rule:'“Next to” significa imediatamente ao lado.' },
+      { track:'starter', visual:'<div>🌳 🧺 🌳</div><span class="text-xs font-bold text-emerald-300">No meio de dois</span>', sentence:'The picnic basket is ___ the two trees.', pt:'A cesta de piquenique está entre as duas árvores.', answer:'between', options:['between','behind','on','in'], rule:'“Between” é usado quando algo fica no meio de dois pontos distintos.' },
+      { track:'starter', visual:'<div>🕖 9:00 AM</div><span class="text-xs font-bold text-emerald-300">Horário exato</span>', sentence:'Our English class starts ___ nine o’clock.', pt:'Nossa aula de inglês começa às nove horas.', answer:'at', options:['at','on','in','to'], rule:'Para horários exatos no relógio, usamos sempre “at” (at nine o’clock).' },
+      { track:'starter', visual:'<div>📅 MONDAY</div><span class="text-xs font-bold text-emerald-300">Dia da semana</span>', sentence:'I always go to the gym ___ Mondays.', pt:'Eu sempre vou à academia às segundas-feiras.', answer:'on', options:['on','in','at','by'], rule:'Para dias da semana (on Monday, on Saturdays), usamos sempre “on”.' },
+      { track:'starter', visual:'<div>🗓️ JULY</div><span class="text-xs font-bold text-emerald-300">Mês / Estação / Ano</span>', sentence:'My sister’s birthday is ___ July.', pt:'O aniversário da minha irmã é em julho.', answer:'in', options:['in','on','at','from'], rule:'Para meses, estações e anos sem dia específico (in July, in 2026), usamos “in”.' },
+      { track:'starter', visual:'<div>🚌 ➡️ 🏢</div><span class="text-xs font-bold text-emerald-300">Meio de transporte</span>', sentence:'She goes to the office ___ bus every morning.', pt:'Ela vai para o escritório de ônibus todas as manhãs.', answer:'by', options:['by','on','in','with'], rule:'Para meios de transporte em geral, usamos “by” (by bus, by car, by train).' },
+      { track:'starter', visual:'<div>🎧 ➡️ 🎵</div><span class="text-xs font-bold text-emerald-300">Ouvir música</span>', sentence:'I love listening ___ music while I cook.', pt:'Eu adoro ouvir música enquanto cozinho.', answer:'to', options:['to','at','for','on'], rule:'O verbo “listen” vem sempre acompanhado de “to” (listen to music).' },
+      { track:'starter', visual:'<div>🌙 23:00</div><span class="text-xs font-bold text-emerald-300">Período da noite</span>', sentence:'The streets are very quiet ___ night.', pt:'As ruas ficam muito silenciosas à noite.', answer:'at', options:['at','in','on','by'], rule:'Dizemos “in the morning / in the afternoon”, mas sempre “at night”!' },
+      { track:'starter', visual:'<div>🚗 🏠</div><span class="text-xs font-bold text-emerald-300">Na frente da casa</span>', sentence:'His car is parked ___ the house.', pt:'O carro dele está estacionado na frente da casa.', answer:'in front of', options:['in front of','inside','under','above'], rule:'“In front of” indica posição dianteira / em frente a.' },
+      { track:'starter', visual:'<div>🏠 🌳</div><span class="text-xs font-bold text-emerald-300">Atrás da casa</span>', sentence:'There is a small garden ___ our house.', pt:'Há um pequeno jardim atrás da nossa casa.', answer:'behind', options:['behind','between','on','in'], rule:'“Behind” significa na parte de trás.' },
+      { track:'starter', visual:'<div>🖼️ ⬆️ 🛋️</div><span class="text-xs font-bold text-emerald-300">Acima na parede, sem encostar</span>', sentence:'We hung a painting ___ the sofa.', pt:'Penduramos um quadro acima do sofá.', answer:'above', options:['above','under','in','between'], rule:'“Above” significa em nível superior / acima de, sem tocar.' },
+
+      // 2. INTERMEDIATE B1-B2 (14)
+      { track:'intermediate', visual:'<div>⏳ 2021 ➔ HOJE</div><span class="text-xs font-bold text-sky-300">Marco inicial no tempo</span>', sentence:'We have lived in this city ___ 2021.', pt:'Nós moramos nesta cidade desde 2021.', answer:'since', options:['since','for','from','in'], rule:'Use “since” para o ponto de partida exato no tempo (since 2021).' },
+      { track:'intermediate', visual:'<div>⏱️ [ 5 YEARS ]</div><span class="text-xs font-bold text-sky-300">Duração total</span>', sentence:'They have worked together ___ five years.', pt:'Eles trabalham juntos há cinco anos.', answer:'for', options:['for','since','during','in'], rule:'Use “for” para indicar a duração acumulada de tempo (for five years).' },
+      { track:'intermediate', visual:'<div>📅 ➡️ 👀</div><span class="text-xs font-bold text-sky-300">Aguardar com expectativa</span>', sentence:'I am looking forward ___ seeing you next week.', pt:'Estou ansioso para ver você na próxima semana.', answer:'to', options:['to','for','at','on'], rule:'A expressão é “look forward to + verbo-ing”.' },
+      { track:'intermediate', visual:'<div>🤝 ➡️ 🛡️</div><span class="text-xs font-bold text-sky-300">Contar com alguém</span>', sentence:'You can always count ___ me when you need help.', pt:'Você sempre pode contar comigo quando precisar de ajuda.', answer:'on', options:['on','with','in','to'], rule:'Em inglês dizemos “count ON someone” (e nunca “count with”).' },
+      { track:'intermediate', visual:'<div>🎨 ⭐</div><span class="text-xs font-bold text-sky-300">Ter habilidade em</span>', sentence:'My cousin is really good ___ drawing portraits.', pt:'Minha prima é muito boa em desenhar retratos.', answer:'at', options:['at','in','on','with'], rule:'Para habilidades (“bom em algo”), usamos “good at + verbo-ing”.' },
+      { track:'intermediate', visual:'<div>📚 💡</div><span class="text-xs font-bold text-sky-300">Ter interesse em</span>', sentence:'Are you interested ___ learning photography?', pt:'Você tem interesse em aprender fotografia?', answer:'in', options:['in','on','at','for'], rule:'O adjetivo “interested” pede sempre a preposição “in” (interested in).' },
+      { track:'intermediate', visual:'<div>☔ ↔️ ☀️</div><span class="text-xs font-bold text-sky-300">Depender de</span>', sentence:'Our weekend plans depend ___ the weather.', pt:'Nossos planos de fim de semana dependem do clima.', answer:'on', options:['on','of','from','in'], rule:'O verbo “depend” usa sempre “on” (depend on — nunca “depend of”).' },
+      { track:'intermediate', visual:'<div>🎂 15 DE MAIO</div><span class="text-xs font-bold text-sky-300">Data completa com dia</span>', sentence:'The conference takes place ___ May 15th.', pt:'A conferência acontece no dia 15 de maio.', answer:'on', options:['on','in','at','to'], rule:'Quando o mês vem acompanhado do dia (May 15th), usamos “on”!' },
+      { track:'intermediate', visual:'<div>🎯 INTENCIONAL</div><span class="text-xs font-bold text-sky-300">De propósito</span>', sentence:'He didn’t break the glass ___ purpose; it slipped.', pt:'Ele não quebrou o copo de propósito; escorregou.', answer:'on', options:['on','by','in','for'], rule:'Dizemos “on purpose” (de propósito) e “by accident / by mistake” (por acidente).' },
+      { track:'intermediate', visual:'<div>🏃‍♂️ 💨</div><span class="text-xs font-bold text-sky-300">Com pressa</span>', sentence:'Sorry I can’t stop to chat, I am ___ a hurry!', pt:'Desculpe não poder parar para conversar, estou com pressa!', answer:'in', options:['in','with','on','at'], rule:'A expressão para “com pressa” é “in a hurry”.' },
+      { track:'intermediate', visual:'<div>☕ 💰</div><span class="text-xs font-bold text-sky-300">Pagar por algo</span>', sentence:'Let me pay ___ your coffee today.', pt:'Deixe-me pagar pelo seu café hoje.', answer:'for', options:['for','to','on','with'], rule:'Usamos “pay for something” quando pagamos por um produto ou conta.' },
+      { track:'intermediate', visual:'<div>📱 🔔</div><span class="text-xs font-bold text-sky-300">Lembrar alguém de fazer</span>', sentence:'Please remind me ___ call the dentist.', pt:'Por favor, me lembre de ligar para o dentista.', answer:'to', options:['to','of','for','on'], rule:'“Remind someone TO do something” = lembrar alguém de realizar uma tarefa.' },
+      { track:'intermediate', visual:'<div>🧹 🗑️</div><span class="text-xs font-bold text-sky-300">Livrar-se de algo</span>', sentence:'It is time to get rid ___ these old boxes.', pt:'Está na hora de se livrar destas caixas velhas.', answer:'of', options:['of','from','out','off'], rule:'A expressão completa é “get rid of” (descartar / livrar-se de).' },
+      { track:'intermediate', visual:'<div>🌉 ➡️ 🏙️</div><span class="text-xs font-bold text-sky-300">Atravessando de um lado ao outro</span>', sentence:'We walked ___ the bridge to the historic center.', pt:'Caminhamos pela ponte (atravessando-a) até o centro histórico.', answer:'across', options:['across','under','between','inside'], rule:'“Across” indica movimento de um lado ao outro de uma ponte, rua ou rio.' },
+
+      // 3. TRAVEL / VIAGEM (14)
+      { track:'travel', visual:'<div>🛫 GATE 12</div><span class="text-xs font-bold text-amber-300">Ponto específico no aeroporto</span>', sentence:'Boarding begins ___ gate twelve in ten minutes.', pt:'O embarque começa no portão doze em dez minutos.', answer:'at', options:['at','in','on','to'], rule:'Para pontos de encontro e portões de embarque, usamos “at” (at gate twelve).' },
+      { track:'travel', visual:'<div>🏨 📋 SILVA</div><span class="text-xs font-bold text-amber-300">Reserva registrada no nome</span>', sentence:'I have a reservation ___ the name Silva.', pt:'Tenho uma reserva em nome de Silva.', answer:'under', options:['under','on','at','by'], rule:'Em hotéis e restaurantes, dizemos “a reservation under the name...”.' },
+      { track:'travel', visual:'<div>✈️ 🚶‍♂️</div><span class="text-xs font-bold text-amber-300">A bordo de avião / trem / ônibus</span>', sentence:'There are two hundred passengers ___ the plane.', pt:'Há duzentos passageiros no avião.', answer:'on', options:['on','at','by','over'], rule:'Para transportes coletivos onde podemos caminhar (plane, train, bus, ship), usamos “on”.' },
+      { track:'travel', visual:'<div>🥐 ➕ 🛏️</div><span class="text-xs font-bold text-amber-300">Incluído na diária</span>', sentence:'Is breakfast included ___ the room rate?', pt:'O café da manhã está incluído na diária do quarto?', answer:'in', options:['in','on','at','for'], rule:'Usamos “included in” (included in the room rate / in the price).' },
+      { track:'travel', visual:'<div>🚶 5 MIN 🏛️</div><span class="text-xs font-bold text-amber-300">Dentro de um raio a pé</span>', sentence:'The museum is ___ walking distance of our hotel.', pt:'O museu fica a uma distância a pé do nosso hotel.', answer:'within', options:['within','between','under','above'], rule:'“Within walking distance” significa dentro de uma distância que dá para ir a pé.' },
+      { track:'travel', visual:'<div>📢 ⏱️ +2H</div><span class="text-xs font-bold text-amber-300">Margem de atraso</span>', sentence:'Our flight was delayed ___ two hours.', pt:'Nosso voo atrasou em duas horas.', answer:'by', options:['by','in','on','at'], rule:'Para indicar a quantidade de atraso ou diferença, usamos “delayed by two hours”.' },
+      { track:'travel', visual:'<div>💳 ➡️ POS</div><span class="text-xs font-bold text-amber-300">Pagamento com cartão</span>', sentence:'Can I pay ___ credit card here?', pt:'Posso pagar com cartão de crédito aqui?', answer:'by', options:['by','in','on','for'], rule:'Regra prática: “pay BY credit card” e “pay IN cash”.' },
+      { track:'travel', visual:'<div>💵 ➡️ 🧾</div><span class="text-xs font-bold text-amber-300">Pagamento em dinheiro vivo</span>', sentence:'We paid for the taxi ___ cash.', pt:'Pagamos o táxi em dinheiro vivo.', answer:'in', options:['in','by','on','at'], rule:'Para dinheiro em espécie, usamos sempre “in cash”.' },
+      { track:'travel', visual:'<div>🗺️ ⬅️ 🚦</div><span class="text-xs font-bold text-amber-300">Ponto de referência na rua</span>', sentence:'Go straight ahead and turn left ___ the traffic light.', pt:'Siga em frente e vire à esquerda no semáforo.', answer:'at', options:['at','in','on','by'], rule:'Para cruzamentos, esquinas e semáforos, usamos “at” (at the traffic light / at the corner).' },
+      { track:'travel', visual:'<div>✈️ ➔ 🇵🇹</div><span class="text-xs font-bold text-amber-300">Chegar em cidade ou país</span>', sentence:'Our flight arrives ___ Lisbon at 7 AM.', pt:'Nosso voo chega em Lisboa às 7h da manhã.', answer:'in', options:['in','at','to','on'], rule:'Com o verbo “arrive”, usamos “arrive IN” para cidades e países, e “arrive AT” para locais como airport/hotel.' },
+      { track:'travel', visual:'<div>🚕 ➔ 🏢</div><span class="text-xs font-bold text-amber-300">Chegar em um prédio/estação</span>', sentence:'We arrived ___ the airport three hours early.', pt:'Chegamos ao aeroporto com três horas de antecedência.', answer:'at', options:['at','to','on','for'], rule:'Usamos “arrive AT” para locais específicos (at the airport, at the hotel, at the station) — nunca “arrive to”!' },
+      { track:'travel', visual:'<div>🍽️ 👥</div><span class="text-xs font-bold text-amber-300">Reserva de mesa</span>', sentence:'Good evening, do you have a table ___ two?', pt:'Boa noite, vocês têm uma mesa para dois?', answer:'for', options:['for','to','of','with'], rule:'Em restaurantes, pedimos “a table for two / for four”.' },
+      { track:'travel', visual:'<div>🔑 ➡️ 🛎️</div><span class="text-xs font-bold text-amber-300">Balcão da recepção</span>', sentence:'Please leave your key card ___ the front desk.', pt:'Por favor, deixe seu cartão-chave na recepção.', answer:'at', options:['at','in','to','for'], rule:'Usamos “at the front desk / at the reception”.' },
+      { track:'travel', visual:'<div>🕒 10:00 (NO HORÁRIO)</div><span class="text-xs font-bold text-amber-300">Pontualmente</span>', sentence:'Thankfully, the high-speed train departed right ___ time.', pt:'Felizmente, o trem de alta velocidade partiu pontualmente no horário.', answer:'on', options:['on','at','by','to'], rule:'“On time” significa pontualmente no horário previsto.' },
+
+      // 4. WORK / TRABALHO & ENTREVISTA (14)
+      { track:'work', visual:'<div>🔇 MIC OFF</div><span class="text-xs font-bold text-indigo-300">Microfone silenciado</span>', sentence:'We can’t hear you, Ana—you are ___ mute.', pt:'Não conseguimos te ouvir, Ana — você está no mudo.', answer:'on', options:['on','in','at','by'], rule:'Em chamadas de vídeo, dizemos “you are on mute”.' },
+      { track:'work', visual:'<div>📎 ➡️ ✉️</div><span class="text-xs font-bold text-indigo-300">Anexo no e-mail</span>', sentence:'Please find the budget report attached ___ this email.', pt:'Segue o relatório de orçamento anexado a este e-mail.', answer:'to', options:['to','in','with','on'], rule:'“Attached TO this email” é a combinação padrão em e-mails profissionais.' },
+      { track:'work', visual:'<div>👩‍💼 ➡️ 👥</div><span class="text-xs font-bold text-indigo-300">Responsável por</span>', sentence:'I am responsible ___ coordinating the logistics team.', pt:'Sou responsável por coordenar a equipe de logística.', answer:'for', options:['for','of','to','with'], rule:'“Responsible FOR + verbo-ing” (e nunca “responsible of”).' },
+      { track:'work', visual:'<div>🔍 ➡️ 🖥️</div><span class="text-xs font-bold text-indigo-300">Investigar um problema</span>', sentence:'Our IT team is looking ___ the server issue right now.', pt:'Nossa equipe de TI está investigando o problema do servidor agora.', answer:'into', options:['into','for','after','to'], rule:'“Look into an issue” significa investigar ou analisar a causa de um problema.' },
+      { track:'work', visual:'<div>🏖️ 🚫🏢</div><span class="text-xs font-bold text-indigo-300">Ausente do escritório</span>', sentence:'I will be out ___ the office next Friday.', pt:'Estarei fora do escritório na próxima sexta-feira.', answer:'of', options:['of','from','to','at'], rule:'A expressão corporativa é “out of the office” (OOO).' },
+      { track:'work', visual:'<div>📈 🛤️</div><span class="text-xs font-bold text-indigo-300">Dentro do cronograma</span>', sentence:'The project is right ___ track for the November launch.', pt:'O projeto está bem dentro do cronograma para o lançamento em novembro.', answer:'on', options:['on','in','at','by'], rule:'“On track” significa dentro do cronograma planejado.' },
+      { track:'work', visual:'<div>📄 🤝 📄</div><span class="text-xs font-bold text-indigo-300">Totalmente alinhados</span>', sentence:'Let’s make sure all teams are ___ the same page.', pt:'Vamos garantir que todas as equipes estejam alinhadas.', answer:'on', options:['on','in','at','with'], rule:'“On the same page” significa de comum acordo / alinhados.' },
+      { track:'work', visual:'<div>⏳ SEXTA 17H (LIMITE)</div><span class="text-xs font-bold text-indigo-300">Prazo máximo (até)</span>', sentence:'We need to submit the final proposal ___ Friday at 5 PM.', pt:'Precisamos enviar a proposta final até sexta-feira às 17h.', answer:'by', options:['by','until','in','on'], rule:'Para prazos de entrega (“até tal data/hora no máximo”), usamos “by” (by Friday).' },
+      { track:'work', visual:'<div>✉️ 🔄 🤝</div><span class="text-xs font-bold text-indigo-300">Fazer acompanhamento com</span>', sentence:'I will follow up ___ the supplier tomorrow morning.', pt:'Farei o acompanhamento com o fornecedor amanhã de manhã.', answer:'with', options:['with','to','on','at'], rule:'Dizemos “follow up WITH someone” (dar retorno / cobrar posição de alguém).' },
+      { track:'work', visual:'<div>📌 ➡️ 👀</div><span class="text-xs font-bold text-indigo-300">Trazer à atenção</span>', sentence:'Thank you for bringing this delay ___ my attention.', pt:'Obrigado por trazer este atraso para a minha atenção.', answer:'to', options:['to','for','in','at'], rule:'A expressão é “bring something TO someone’s attention”.' },
+      { track:'work', visual:'<div>💼 +6 ANOS</div><span class="text-xs font-bold text-indigo-300">Experiência em uma área</span>', sentence:'She has six years of experience ___ project management.', pt:'Ela tem seis anos de experiência em gestão de projetos.', answer:'in', options:['in','on','at','to'], rule:'Para área de atuação, usamos “experience IN project management / IN sales”.' },
+      { track:'work', visual:'<div>🕒 ➔ 🕒 (+30 MIN)</div><span class="text-xs font-bold text-indigo-300">Adiar em 30 minutos</span>', sentence:'Can we push the meeting back ___ thirty minutes?', pt:'Podemos adiar a reunião em trinta minutos?', answer:'by', options:['by','in','to','at'], rule:'Para a margem de tempo que algo foi adiado ou antecipado, usamos “by” (by thirty minutes).' },
+      { track:'work', visual:'<div>📅 14H ➔ QUI</div><span class="text-xs font-bold text-indigo-300">Remarcar para nova data</span>', sentence:'Could we reschedule our call ___ Thursday morning?', pt:'Poderíamos reagendar nossa chamada para quinta-feira de manhã?', answer:'to', options:['to','in','at','by'], rule:'Ao transferir uma reunião para outro dia, usamos “reschedule TO Thursday”.' },
+      { track:'work', visual:'<div>🏢 👨‍💼</div><span class="text-xs font-bold text-indigo-300">No comando / encarregado de</span>', sentence:'Who is ___ charge of the marketing campaign?', pt:'Quem está no comando da campanha de marketing?', answer:'in', options:['in','on','at','by'], rule:'“In charge of” significa responsável por / no comando de.' },
+
+      // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (14)
+      { track:'agro', visual:'<div>🌾 68 SACAS / HA</div><span class="text-xs font-bold text-lime-300">Rendimento por hectare</span>', sentence:'Our soybean yield reached sixty-eight bags ___ hectare.', pt:'Nossa produtividade de soja atingiu 68 sacas por hectare.', answer:'per', options:['per','by','for','in'], rule:'Para taxas e produtividade (“por hectare”), usamos “per hectare”.' },
+      { track:'agro', visual:'<div>🚜 PLOT #4</div><span class="text-xs font-bold text-lime-300">Dentro do talhão</span>', sentence:'The combine harvester is working ___ plot four.', pt:'A colheitadeira está trabalhando no talhão quatro.', answer:'in', options:['in','on','at','by'], rule:'Para áreas agrícolas, campos e talhões, usamos “in” (in the field, in plot four).' },
+      { track:'agro', visual:'<div>🍂 ⬆️ 🌱</div><span class="text-xs font-bold text-lime-300">Palhada sobre a superfície</span>', sentence:'No-till farming keeps straw cover ___ the soil surface.', pt:'O plantio direto mantém a cobertura de palha sobre a superfície do solo.', answer:'on', options:['on','in','under','at'], rule:'Como a palhada fica sobre a superfície do solo, usamos “on the soil surface”.' },
+      { track:'agro', visual:'<div>💨 💦 ➡️ 🌿</div><span class="text-xs font-bold text-lime-300">Evitar pulverizar sob vento forte</span>', sentence:'Never spray ___ strong winds to avoid chemical drift.', pt:'Nunca pulverize sob ventos fortes para evitar deriva de defensivos.', answer:'in', options:['in','on','at','to'], rule:'Para condições climáticas durante uma operação, usamos “in” (in strong winds, in dusty conditions).' },
+      { track:'agro', visual:'<div>🌀 ➡️ 🏢</div><span class="text-xs font-bold text-lime-300">No interior do silo</span>', sentence:'Turn on the aeration fans ___ the grain silo.', pt:'Ligue os ventiladores de aeração dentro do silo de grãos.', answer:'inside', options:['inside','on','above','between'], rule:'“Inside the grain silo” destaca o interior do silo onde o grão está armazenado.' },
+      { track:'agro', visual:'<div>🌱 ↔️ 50 CM ↔️ 🌱</div><span class="text-xs font-bold text-lime-300">Espaçamento entre linhas</span>', sentence:'Check the spacing ___ the planter rows.', pt:'Verifique o espaçamento entre as linhas da plantadeira.', answer:'between', options:['between','under','behind','inside'], rule:'Para o intervalo entre linhas de plantio, usamos “between the rows”.' },
+      { track:'agro', visual:'<div>🌱 ⬇️ 4 CM</div><span class="text-xs font-bold text-lime-300">Em uma profundidade exata</span>', sentence:'Place the corn seeds ___ a depth of four centimeters.', pt:'Deposite as sementes de milho a uma profundidade de quatro centímetros.', answer:'at', options:['at','in','on','by'], rule:'Para medidas e níveis específicos (at a depth of 4 cm, at a pressure of 3 bar), usamos “at”.' },
+      { track:'agro', visual:'<div>🌻 🔄 🌽</div><span class="text-xs font-bold text-lime-300">Rotação entre duas culturas</span>', sentence:'Crop rotation ___ soybeans and corn improves soil health.', pt:'A rotação de culturas entre soja e milho melhora a saúde do solo.', answer:'between', options:['between','among','inside','under'], rule:'Quando alternamos duas culturas específicas (soybeans and corn), usamos “between”.' },
+      { track:'agro', visual:'<div>🛡️ 🌱 🦠</div><span class="text-xs font-bold text-lime-300">Proteger contra fungos</span>', sentence:'Seed treatment protects young roots ___ soil fungi.', pt:'O tratamento de sementes protege as raízes jovens contra fungos de solo.', answer:'against', options:['against','for','with','to'], rule:'“Protect against / from” significa proteger contra uma ameaça.' },
+      { track:'agro', visual:'<div>🚛 ⚖️</div><span class="text-xs font-bold text-lime-300">Caminhão sobre a plataforma da balança</span>', sentence:'The grain truck is parked ___ the scale to weigh the load.', pt:'O caminhão graneleiro está estacionado sobre a balança para pesar a carga.', answer:'on', options:['on','in','under','inside'], rule:'Como o caminhão sobe na plataforma da balança, dizemos “on the scale”.' },
+      { track:'agro', visual:'<div>🌿 ⏳ 2 SEMANAS ANTES</div><span class="text-xs font-bold text-lime-300">Antes da semeadura</span>', sentence:'Apply the burndown herbicide two weeks ___ planting.', pt:'Aplique o herbicida de dessecação duas semanas antes do plantio.', answer:'before', options:['before','after','during','since'], rule:'A dessecação pré-plantio é feita “before planting”.' },
+      { track:'agro', visual:'<div>🚜 💨 😷</div><span class="text-xs font-bold text-lime-300">Durante todo o período de colheita</span>', sentence:'Clean the radiator screen every morning ___ the harvest season.', pt:'Limpe a tela do radiador todas as manhãs durante a temporada de colheita.', answer:'during', options:['during','since','until','by'], rule:'Use “during + substantivo” (during the harvest season) para dizer “durante”.' },
+      { track:'agro', visual:'<div>🐄 🔄 🌿</div><span class="text-xs font-bold text-lime-300">Mover o gado de um piquete para outro</span>', sentence:'Move the cattle from paddock A ___ paddock B tomorrow.', pt:'Mova o gado do piquete A para o piquete B amanhã.', answer:'to', options:['to','at','in','by'], rule:'O par clássico de origem e destino é “from A to B”.' },
+      { track:'agro', visual:'<div>🧪 ➡️ 🚜</div><span class="text-xs font-bold text-lime-300">Abastecer a calda no tanque</span>', sentence:'Pour the clean water ___ the sprayer tank first.', pt:'Despeje a água limpa para dentro do tanque do pulverizador primeiro.', answer:'into', options:['into','onto','above','between'], rule:'“Into” indica movimento entrando em um recipiente (pour water into the tank).' },
+
+      // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (14)
+      { track:'gpstronic', visual:'<div>📡 ⬆️ 🚜</div><span class="text-xs font-bold text-cyan-300">No topo do teto da cabine</span>', sentence:'Mount the GNSS receiver ___ the center of the cab roof.', pt:'Monte o receptor GNSS no centro do teto da cabine.', answer:'on', options:['on','under','inside','behind'], rule:'Como a antena fica fixada sobre a superfície externa do teto, usamos “on the cab roof”.' },
+      { track:'gpstronic', visual:'<div>⚡ 60 Ω [CAN H ↔️ CAN L]</div><span class="text-xs font-bold text-cyan-300">Medindo nos terminais do resistor</span>', sentence:'Measure sixty ohms ___ the CAN High and CAN Low lines.', pt:'Meça sessenta ohms entre as linhas CAN High e CAN Low.', answer:'between', options:['between','inside','under','behind'], rule:'Ao medir resistência ou tensão entre dois fios (CAN High e CAN Low), usamos “between”.' },
+      { track:'gpstronic', visual:'<div>🛞 📐 🚜</div><span class="text-xs font-bold text-cyan-300">Instalado no eixo dianteiro</span>', sentence:'Calibrate the steering angle sensor ___ the front axle.', pt:'Calibre o sensor de ângulo de direção no eixo dianteiro.', answer:'on', options:['on','into','above','between'], rule:'Componentes montados sobre o eixo usam “on the front axle”.' },
+      { track:'gpstronic', visual:'<div>🗺️ 🚫 🔄</div><span class="text-xs font-bold text-cyan-300">Manobra na cabeceira do talhão</span>', sentence:'Section control prevents overlap ___ the headland.', pt:'O controle de seção evita sobreposição na cabeceira.', answer:'at', options:['at','under','between','from'], rule:'Para pontos de referência operacional como a cabeceira, usamos “at the headland”.' },
+      { track:'gpstronic', visual:'<div>🔌 📌 🔍</div><span class="text-xs font-bold text-cyan-300">Dentro do corpo do conector Deutsch</span>', sentence:'One of the metal pins was pushed back ___ the Deutsch connector.', pt:'Um dos pinos metálicos estava recuado dentro do conector Deutsch.', answer:'inside', options:['inside','above','between','on'], rule:'“Inside the connector” indica a cavidade interna do alojamento plástico.' },
+      { track:'gpstronic', visual:'<div>🛰️ 🎯 ±2 CM</div><span class="text-xs font-bold text-cyan-300">Travado com precisão centimétrica</span>', sentence:'The RTK signal is locked ___ two-centimeter accuracy.', pt:'O sinal RTK está travado com precisão de dois centímetros.', answer:'with', options:['with','by','in','on'], rule:'Dizemos “locked WITH two-centimeter accuracy”.' },
+      { track:'gpstronic', visual:'<div>🚜 ↔️ GAP ↔️ 🚜</div><span class="text-xs font-bold text-cyan-300">Falha entre uma passada e outra</span>', sentence:'Wrong implement width causes gaps ___ passes.', pt:'A largura incorreta do implemento causa falhas entre as passadas.', answer:'between', options:['between','inside','under','above'], rule:'Falhas ou sobreposições ocorrem “between passes” (entre as passadas).' },
+      { track:'gpstronic', visual:'<div>💾 ➡️ FAT32</div><span class="text-xs font-bold text-cyan-300">Formatar para o padrão FAT32</span>', sentence:'Format the USB drive ___ FAT32 before copying the firmware.', pt:'Formate o pen drive em FAT32 antes de copiar o firmware.', answer:'to', options:['to','on','at','with'], rule:'Em informática e eletrônica, dizemos “format a drive TO FAT32”.' },
+      { track:'gpstronic', visual:'<div>🔋 📉 🔄</div><span class="text-xs font-bold text-cyan-300">Durante a partida do motor</span>', sentence:'A voltage drop ___ engine cranking can reboot the display.', pt:'Uma queda de tensão durante a partida do motor pode reiniciar o monitor.', answer:'during', options:['during','since','until','between'], rule:'Use “during” antes de um substantivo/evento (“during engine cranking”).' },
+      { track:'gpstronic', visual:'<div>📊 🌫️ 🚨</div><span class="text-xs font-bold text-cyan-300">Poeira acumulada no interior do tubo</span>', sentence:'Dust ___ the optical seed tube triggered a false alarm.', pt:'Poeira dentro do tubo óptico de semente disparou um alarme falso.', answer:'inside', options:['inside','above','behind','across'], rule:'A poeira se acumula na parte interna do tubo (“inside the seed tube”).' },
+      { track:'gpstronic', visual:'<div>🖥️ 🔄 ECU</div><span class="text-xs font-bold text-cyan-300">Carregado na tela do terminal virtual</span>', sentence:'The planter interface loaded ___ the ISOBUS virtual terminal.', pt:'A interface da plantadeira carregou no terminal virtual ISOBUS.', answer:'on', options:['on','under','between','behind'], rule:'Para telas, monitores e displays, usamos “on” (on the screen, on the virtual terminal).' },
+      { track:'gpstronic', visual:'<div>📐 🔄 🌾</div><span class="text-xs font-bold text-cyan-300">Contornando o perímetro do talhão</span>', sentence:'Drive ___ the perimeter to record the field boundary.', pt:'Dirija ao redor do perímetro para gravar a bordadura do talhão.', answer:'around', options:['around','under','between','into'], rule:'“Around the perimeter” = contornando / ao redor do perímetro.' },
+      { track:'gpstronic', visual:'<div>🚜 ⛰️ 📐</div><span class="text-xs font-bold text-cyan-300">Operando sobre encostas inclinadas</span>', sentence:'Terrain compensation corrects the GPS position ___ steep slopes.', pt:'A compensação de terreno corrige a posição do GPS em ladeiras íngremes.', answer:'on', options:['on','inside','under','between'], rule:'Como a máquina trafega sobre a superfície da encosta, usamos “on steep slopes”.' },
+      { track:'gpstronic', visual:'<div>🛰️ 🔒 ➡️ 📡</div><span class="text-xs font-bold text-cyan-300">Conectar/travar em uma base RTK</span>', sentence:'The rover radio locked ___ the base station frequency.', pt:'O rádio rover travou na frequência da estação base.', answer:'onto', options:['onto','under','behind','between'], rule:'“Lock onto a signal / frequency” é o termo técnico para sincronizar e travar no sinal.' },
+
+      // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (14)
+      { track:'med', visual:'<div>⚠️ 💊 PENICILLIN</div><span class="text-xs font-bold text-rose-300">Alergia a medicamento</span>', sentence:'Are you allergic ___ penicillin or any other medication?', pt:'Você é alérgico a penicilina ou a algum outro medicamento?', answer:'to', options:['to','with','of','for'], rule:'O adjetivo “allergic” exige sempre a preposição “to” (allergic to penicillin).' },
+      { track:'med', visual:'<div>💊 🍽️</div><span class="text-xs font-bold text-rose-300">Após as refeições</span>', sentence:'Take one tablet twice a day ___ meals.', pt:'Tome um comprimido duas vezes ao dia após as refeições.', answer:'after', options:['after','during','since','until'], rule:'“After meals” = após as refeições; “before meals” = antes das refeições.' },
+      { track:'med', visual:'<div>🌡️ 💪</div><span class="text-xs font-bold text-rose-300">Enrolar a braçadeira ao redor do braço</span>', sentence:'Let me wrap this blood pressure cuff ___ your arm.', pt:'Deixe-me enrolar esta braçadeira de pressão ao redor do seu braço.', answer:'around', options:['around','inside','under','between'], rule:'“Wrap around” descreve envolver/enrolar em volta do braço.' },
+      { track:'med', visual:'<div>🧊 ➡️ 🦵</div><span class="text-xs font-bold text-rose-300">Bolsa de gelo sobre o tornozelo</span>', sentence:'Put an ice pack ___ your ankle to reduce the swelling.', pt:'Coloque uma bolsa de gelo sobre o tornozelo para reduzir o inchaço.', answer:'on', options:['on','in','inside','between'], rule:'Aplicamos a bolsa de gelo sobre a superfície da articulação (“on your ankle”).' },
+      { track:'med', visual:'<div>🩸 ⏱️ 12 HORAS</div><span class="text-xs font-bold text-rose-300">Duração do jejum</span>', sentence:'You must fast ___ twelve hours before the blood test.', pt:'Você deve ficar em jejum por doze horas antes do exame de sangue.', answer:'for', options:['for','since','at','on'], rule:'Para a duração total do jejum, usamos “for twelve hours”.' },
+      { track:'med', visual:'<div>🏥 ➡️ 🏠</div><span class="text-xs font-bold text-rose-300">Alta do hospital</span>', sentence:'The doctor will discharge you ___ the hospital tomorrow.', pt:'O médico dará sua alta do hospital amanhã.', answer:'from', options:['from','of','to','at'], rule:'Dizemos “discharge a patient FROM the hospital”.' },
+      { track:'med', visual:'<div>💉 🗓️ +10 DIAS</div><span class="text-xs font-bold text-rose-300">Daqui a dez dias</span>', sentence:'Come back ___ ten days to have your stitches removed.', pt:'Volte daqui a dez dias para retirar os pontos.', answer:'in', options:['in','on','at','since'], rule:'“In + período de tempo” no futuro significa “daqui a” (in ten days = daqui a dez dias).' },
+      { track:'med', visual:'<div>🫁 😮‍💨</div><span class="text-xs font-bold text-rose-300">Falta de ar (dispneia)</span>', sentence:'Go to the emergency room if you develop shortness ___ breath.', pt:'Vá à emergência se desenvolver falta de ar.', answer:'of', options:['of','in','with','from'], rule:'A expressão clínica fixa é “shortness of breath”.' },
+      { track:'med', visual:'<div>🛍️ 💊 FARMÁCIA</div><span class="text-xs font-bold text-rose-300">Vendido sem receita (no balcão)</span>', sentence:'You can buy this mild painkiller ___ the counter.', pt:'Você pode comprar este analgésico leve sem receita médica.', answer:'over', options:['over','under','in','at'], rule:'“Over the counter” (OTC) significa medicamento de venda livre, sem receita.' },
+      { track:'med', visual:'<div>💊 ⬇️ 👅</div><span class="text-xs font-bold text-rose-300">Uso sublingual</span>', sentence:'Place this tablet ___ your tongue and let it dissolve.', pt:'Coloque este comprimido debaixo da língua e deixe dissolver.', answer:'under', options:['under','above','behind','between'], rule:'Medicação sublingual é colocada “under your tongue” (debaixo da língua).' },
+      { track:'med', visual:'<div>🤕 📋</div><span class="text-xs font-bold text-rose-300">Apresentar queixa de</span>', sentence:'The patient complained ___ a severe headache and dizziness.', pt:'O paciente queixou-se de forte dor de cabeça e tontura.', answer:'of', options:['of','for','with','at'], rule:'Na anamnese médica, usamos “complain OF + sintoma”.' },
+      { track:'med', visual:'<div>🦵 ⬆️ 🛋️</div><span class="text-xs font-bold text-rose-300">Apoiar a perna sobre um travesseiro</span>', sentence:'Keep your sprained ankle elevated ___ a pillow.', pt:'Mantenha seu tornozelo torcido elevado sobre um travesseiro.', answer:'on', options:['on','in','under','inside'], rule:'O tornozelo fica apoiado sobre o travesseiro (“on a pillow”).' },
+      { track:'med', visual:'<div>🩺 ➡️ 🫁</div><span class="text-xs font-bold text-rose-300">Auscultar os pulmões</span>', sentence:'Take a deep breath while I listen ___ your lungs.', pt:'Respire fundo enquanto eu ausculto seus pulmões.', answer:'to', options:['to','at','in','for'], rule:'“Listen TO your lungs / heart” é usado para ausculta médica.' },
+      { track:'med', visual:'<div>🧬 👨‍👩‍👧</div><span class="text-xs font-bold text-rose-300">Presente no histórico familiar</span>', sentence:'Does diabetes run ___ your family?', pt:'O diabetes é comum na sua família (histórico familiar)?', answer:'in', options:['in','on','at','with'], rule:'A expressão médica idiomática é “Does [condition] run IN your family?”.' },
+
+      // 8. ADVANCED / FLUÊNCIA AVANÇADA (14)
+      { track:'advanced', visual:'<div>🧩 🚫 😟</div><span class="text-xs font-bold text-orange-300">Não adianta / não faz sentido</span>', sentence:'There is no point ___ worrying about the past.', pt:'Não adianta se preocupar com o passado.', answer:'in', options:['in','on','at','to'], rule:'A estrutura fixa é “There is no point IN + verbo-ing”.' },
+      { track:'advanced', visual:'<div>🏆 🤝</div><span class="text-xs font-bold text-orange-300">Ter sucesso em algo</span>', sentence:'She succeeded ___ negotiating a much better contract.', pt:'Ela teve sucesso em negociar um contrato muito melhor.', answer:'in', options:['in','on','at','to'], rule:'O verbo “succeed” exige sempre “in + verbo-ing” (succeeded in negotiating).' },
+      { track:'advanced', visual:'<div>🛠️ 💡</div><span class="text-xs font-bold text-orange-300">Pegar o jeito de algo</span>', sentence:'After a few tries, I finally got the hang ___ the new software.', pt:'Depois de algumas tentativas, finalmente peguei o jeito do novo software.', answer:'of', options:['of','in','on','with'], rule:'A expressão idiomática é “get the hang OF something”.' },
+      { track:'advanced', visual:'<div>📌 ✅</div><span class="text-xs font-bold text-orange-300">De uma vez por todas</span>', sentence:'Let’s solve this synchronization issue once and ___ all.', pt:'Vamos resolver esse problema de sincronização de uma vez por todas.', answer:'for', options:['for','to','of','in'], rule:'A expressão fixa é “once and FOR all”.' },
+      { track:'advanced', visual:'<div>🌟 📈</div><span class="text-xs font-bold text-orange-300">No longo prazo</span>', sentence:'Investing in quality training always pays off ___ the long run.', pt:'Investir em treinamento de qualidade sempre vale a pena no longo prazo.', answer:'in', options:['in','on','at','for'], rule:'Dizemos “IN the long run” (no longo prazo) e “IN the short term” (no curto prazo).' },
+      { track:'advanced', visual:'<div>🎁 🎭</div><span class="text-xs font-bold text-orange-300">Um mal que veio para o bem</span>', sentence:'Losing that client turned out to be a blessing ___ disguise.', pt:'Perder aquele cliente acabou sendo um mal que veio para o bem.', answer:'in', options:['in','on','under','with'], rule:'A expressão idiomática é “a blessing IN disguise”.' },
+      { track:'advanced', visual:'<div>🧠 ⚡</div><span class="text-xs font-bold text-orange-300">De cabeça / sem consultar</span>', sentence:'___ the top of my head, I’d say the total is around five thousand.', pt:'De cabeça, eu diria que o total é cerca de cinco mil.', answer:'Off', options:['Off','On','From','In'], rule:'“Off the top of my head” significa dizer algo de cabeça, sem consultar anotações.' },
+      { track:'advanced', visual:'<div>🔍 📄</div><span class="text-xs font-bold text-orange-300">Ler nas entrelinhas</span>', sentence:'If you read ___ the lines, they are asking for an extension.', pt:'Se você ler nas entrelinhas, eles estão pedindo uma prorrogação.', answer:'between', options:['between','under','inside','across'], rule:'“Read BETWEEN the lines” = ler nas entrelinhas.' },
+      { track:'advanced', visual:'<div>🌊 🤒</div><span class="text-xs font-bold text-orange-300">Sentindo-se indisposto</span>', sentence:'I am feeling a little ___ the weather today.', pt:'Estou me sentindo um pouco indisposto hoje.', answer:'under', options:['under','below','in','on'], rule:'“Under the weather” significa sentir-se levemente adoentado ou indisposto.' },
+      { track:'advanced', visual:'<div>⚡ 🎟️</div><span class="text-xs font-bold text-orange-300">No impulso do momento</span>', sentence:'We decided to take the road trip ___ the spur of the moment.', pt:'Decidimos fazer a viagem de carro no impulso do momento.', answer:'on', options:['on','in','at','by'], rule:'A expressão completa é “ON the spur of the moment”.' },
+      { track:'advanced', visual:'<div>🥇 🚀</div><span class="text-xs font-bold text-orange-300">Incomparável / o melhor</span>', sentence:'Their engineering precision is second ___ none.', pt:'A precisão de engenharia deles é incomparável (não perde para ninguém).', answer:'to', options:['to','for','from','of'], rule:'“Second TO none” significa o melhor de todos.' },
+      { track:'advanced', visual:'<div>🌧️ ➡️ 🎉</div><span class="text-xs font-bold text-orange-300">Apesar de</span>', sentence:'In spite ___ the heavy rain, the exhibition was packed.', pt:'Apesar da chuva forte, a exposição estava lotada.', answer:'of', options:['of','to','for','with'], rule:'Usamos “In spite OF” (com of) ou “Despite” (sem of).' },
+      { track:'advanced', visual:'<div>🛡️ ⚠️</div><span class="text-xs font-bold text-orange-300">Quando se trata de</span>', sentence:'Never cut corners when it comes ___ safety.', pt:'Nunca faça de qualquer jeito quando se trata de segurança.', answer:'to', options:['to','for','in','on'], rule:'“When it comes TO + substantivo/verbo-ing” significa “quando se trata de”.' },
+      { track:'advanced', visual:'<div>🧠 📌</div><span class="text-xs font-bold text-orange-300">Ter em mente</span>', sentence:'Keep ___ mind that international transfers take two business days.', pt:'Tenha em mente que transferências internacionais levam dois dias úteis.', answer:'in', options:['in','on','at','to'], rule:'A expressão é “keep IN mind” (ter em mente / lembrar-se).' }
     ];
-    const $=id=>document.getElementById(id),shuffle=list=>[...list].sort(()=>Math.random()-.5);let deck=[],step=0,points=0,lives=3,locked=false;
-    function choicesFor(answer){return shuffle([answer,...shuffle(ALL.filter(x=>x!==answer)).slice(0,3)])}
-    function buildBerries(){$('berries').innerHTML=Array.from({length:10},(_,i)=>`<span class="berry ${i<step?'done':i===step?'current':''}">${i<step?'✓':'🍓'}</span>`).join('')}
-    function speak(text,answer){if(!('speechSynthesis'in window))return;const u=new SpeechSynthesisUtterance(text.replace('___',answer));u.lang='en-US';u.rate=.82;speechSynthesis.cancel();speechSynthesis.speak(u)}
-    function render(){if(step>=10||lives<=0)return finish();locked=false;buildBerries();const item=deck[step];$('round').textContent=`Cena ${step+1} de 10`;$('score').textContent=`${points} XP`;$('hearts').textContent=Array.from({length:3},(_,i)=>i<lives?'♥':'♡').join(' ');$('progress-bar').style.width=`${(step+1)*10}%`;$('visual').innerHTML=item.visual;$('question').innerHTML=item.sentence.replace('___','<span class="blank">___</span>');$('hint').textContent=item.pt;$('answers').innerHTML=choicesFor(item.answer).map(answer=>`<button class="answer" data-answer="${answer}">${answer}</button>`).join('');$('answers').querySelectorAll('button').forEach(button=>button.addEventListener('click',()=>choose(button,item)));$('feedback').className='feedback';$('feedback').textContent='Olhe a posição dos objetos antes de responder.';$('next').classList.remove('show')}
-    function choose(button,item){if(locked)return;locked=true;const correct=button.dataset.answer===item.answer;$('answers').querySelectorAll('button').forEach(btn=>{btn.disabled=true;if(btn.dataset.answer===item.answer)btn.classList.add('correct')});if(correct){points+=12;$('feedback').innerHTML=`<strong>Encontrou! +12 XP</strong>${item.rule}`;$('feedback').className='feedback good'}else{lives--;button.classList.add('wrong');$('hearts').textContent=Array.from({length:3},(_,i)=>i<lives?'♥':'♡').join(' ');$('feedback').innerHTML=`<strong>A resposta é “${item.answer}”.</strong>${item.rule}`;$('feedback').className='feedback bad'}speak(item.sentence,item.answer);$('next').textContent=lives<=0?'Ver resultado →':'Próxima cena →';$('next').classList.add('show');$('next').focus()}
-    function saveResult(){try{const stats=JSON.parse(localStorage.getItem('capyGameStats')||'{}');const old=stats.preposition_picnic||{};stats.preposition_picnic={plays:(old.plays||0)+1,best:Math.max(old.best||0,points),lastPlayed:Date.now()};localStorage.setItem('capyGameStats',JSON.stringify(stats))}catch(e){}}
-    function finish(){buildBerries();saveResult();if(window.Store){Store.addXP(points);Store.completeActivity('games')}const complete=step>=10;$('game-panel').innerHTML=`<div class="finish"><div class="emoji">${complete?'🧺':'🌱'}</div><h2>${complete?'Piquenique completo!':'Boa tentativa!'}</h2><p>${complete?'Você encontrou todos os objetos da floresta.':'Você já aprendeu novas posições. Tente mais uma vez!'}</p><div class="xp">+${points} XP</div><div class="finish-actions"><button class="again" onclick="location.reload()">Jogar novamente</button><a class="more" href="5_Game_Pavilion_Forest_Edition.html">Ver mais jogos</a></div></div>`}
-    $('next').addEventListener('click',()=>{step++;render()});deck=shuffle(ITEMS).slice(0,10);render();
+
+    // ── Persistência de Domínio ──────────────────────────────────────────────
+    const MASTERED_KEY = 'capyPrepositionPicnicMastered_v1';
+    function getMasteredSet() {
+      try {
+        const raw = localStorage.getItem(MASTERED_KEY);
+        return new Set(raw ? JSON.parse(raw) : []);
+      } catch (_) {
+        return new Set();
+      }
+    }
+    function saveMasteredItem(sentence) {
+      try {
+        const set = getMasteredSet();
+        set.add(sentence);
+        localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+        updateMasteredBadge();
+      } catch (_) {}
+    }
+    function updateMasteredBadge() {
+      const el = document.getElementById('mastered-badge');
+      if (el) el.textContent = `${getMasteredSet().size}/${ITEMS.length}`;
+    }
+
+    // ── Estado do Jogo ───────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const shuffle = list => [...list].sort(() => Math.random() - 0.5);
+
+    let selectedTrack = 'all';
+    let answerMode    = 'choice'; // 'choice' | 'typing'
+    let sessionLength = 10;
+
+    let deck         = [];
+    let step         = 0;
+    let points       = 0;
+    let streak       = 0;
+    let bestStreak   = 0;
+    let correctCount = 0;
+    let hintsLeft    = 3;
+    let locked       = false;
+    let historyLog   = [];
+
+    function getFilteredPool() {
+      return selectedTrack === 'all'
+        ? ITEMS
+        : ITEMS.filter(x => x.track === selectedTrack);
+    }
+
+    function startSession() {
+      const pool = getFilteredPool();
+      const countLabel = $('track-count-label');
+      if (countLabel) countLabel.textContent = `${pool.length} cenas disponíveis`;
+
+      deck         = shuffle(pool).slice(0, Math.min(sessionLength, pool.length));
+      step         = 0;
+      points       = 0;
+      streak       = 0;
+      bestStreak   = 0;
+      correctCount = 0;
+      hintsLeft    = 3;
+      historyLog   = [];
+
+      $('summary-panel').classList.add('hidden');
+      $('game-panel').classList.remove('hidden');
+      updateMasteredBadge();
+      render();
+    }
+
+    function buildBerries() {
+      $('berries').innerHTML = Array.from({ length: deck.length }, (_, i) =>
+        `<span class="berry ${i < step ? 'done' : i === step ? 'current' : ''}">${i < step ? '✓' : '🍓'}</span>`
+      ).join('');
+    }
+
+    function speak(text, answer) {
+      if (!('speechSynthesis' in window) || !text) return;
+      try {
+        const u = new SpeechSynthesisUtterance(text.replace('___', answer || deck[step]?.answer || ''));
+        u.lang = 'en-US';
+        u.rate = 0.88;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      } catch (_) {}
+    }
+
+    function render() {
+      if (step >= deck.length) return finish();
+      locked = false;
+      buildBerries();
+
+      const item = deck[step];
+      const meta = TRACK_META[item.track] || TRACK_META.starter;
+
+      $('round').textContent = `Cena ${step + 1} de ${deck.length}`;
+      $('track-pill').textContent = meta.label;
+      $('score').textContent = `${points} XP`;
+      $('combo-badge').textContent = String(streak);
+      $('progress-bar').style.width = `${((step + 1) / deck.length) * 100}%`;
+      $('visual').innerHTML = item.visual;
+      $('question').innerHTML = item.sentence.replace('___', '<span class="inline-block min-w-[85px] text-emerald-300 border-b-4 border-emerald-400 text-center px-2">___</span>');
+      $('hint').textContent = item.pt;
+      $('hints-left').textContent = `(${hintsLeft})`;
+      $('btn-hint').disabled = hintsLeft <= 0;
+
+      if (answerMode === 'typing') {
+        $('answers').classList.add('hidden');
+        $('typing-area').classList.remove('hidden');
+        const inp = $('typing-input');
+        inp.value = '';
+        inp.placeholder = 'Digite a preposição correta...';
+        inp.disabled = false;
+        $('typing-submit').disabled = false;
+        setTimeout(() => inp.focus(), 60);
+      } else {
+        $('typing-area').classList.add('hidden');
+        $('answers').classList.remove('hidden');
+        const opts = shuffle(item.options);
+        $('answers').innerHTML = opts.map((answer, idx) => `
+          <button type="button" class="answer rounded-2xl bg-white/10 border border-white/15 font-extrabold px-4 py-4 text-left flex items-center gap-3" data-answer="${answer}">
+            <span class="w-7 h-7 rounded-lg bg-white/10 text-emerald-300 text-xs font-black flex items-center justify-center shrink-0">${idx + 1}</span>
+            <span class="text-base sm:text-lg">${answer}</span>
+          </button>
+        `).join('');
+        $('answers').querySelectorAll('button').forEach(button =>
+          button.addEventListener('click', () => choose(button, item))
+        );
+      }
+
+      $('feedback').className = 'mt-5 p-4 rounded-2xl bg-black/25 border border-white/10 text-sm text-slate-200 leading-relaxed';
+      $('feedback').textContent = 'Observe o diagrama visual acima e escolha a preposição exata para o contexto.';
+      $('next').classList.add('hidden');
+    }
+
+    function choose(button, item) {
+      if (locked) return;
+      locked = true;
+      const correct = button.dataset.answer.toLowerCase() === item.answer.toLowerCase();
+      $('answers').querySelectorAll('button').forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.answer.toLowerCase() === item.answer.toLowerCase()) btn.classList.add('correct');
+      });
+      if (!correct) button.classList.add('wrong');
+      processResult(correct, item);
+    }
+
+    function checkTyping() {
+      if (locked) return;
+      const item = deck[step];
+      const typed = ($('typing-input').value || '').trim().toLowerCase();
+      if (!typed) return;
+      locked = true;
+      $('typing-input').disabled = true;
+      $('typing-submit').disabled = true;
+      const correct = typed === item.answer.trim().toLowerCase();
+      processResult(correct, item);
+    }
+
+    function processResult(correct, item) {
+      $('question').innerHTML = item.sentence.replace('___', `<span class="inline-block text-emerald-300 border-b-4 border-emerald-400 px-2">${item.answer}</span>`);
+
+      if (correct) {
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        correctCount++;
+        const earned = (answerMode === 'typing' ? 15 : 12) + Math.min(8, (streak - 1) * 2);
+        points += earned;
+        saveMasteredItem(item.sentence);
+        $('feedback').innerHTML = `<strong class="block text-emerald-300 text-base mb-1">🧺 Encontrou! +${earned} XP ${streak >= 2 ? `(Combo ${streak}x 🔥)` : ''}</strong>${item.rule}`;
+        $('feedback').className = 'mt-5 p-4 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 text-sm text-slate-100 leading-relaxed';
+      } else {
+        streak = 0;
+        $('feedback').innerHTML = `<strong class="block text-rose-300 text-base mb-1">A preposição correta é “${item.answer}”.</strong>${item.rule}`;
+        $('feedback').className = 'mt-5 p-4 rounded-2xl bg-rose-500/15 border border-rose-400/35 text-sm text-slate-100 leading-relaxed';
+      }
+
+      $('score').textContent = `${points} XP`;
+      $('combo-badge').textContent = String(streak);
+      speak(item.sentence, item.answer);
+      historyLog.push({ item, ok: correct });
+
+      $('next').classList.remove('hidden');
+      $('next').focus();
+    }
+
+    function useHint() {
+      if (locked || hintsLeft <= 0) return;
+      const item = deck[step];
+      if (answerMode === 'typing') {
+        const ans = item.answer;
+        $('typing-input').placeholder = `Começa com: "${ans[0]}..." (${ans.length} letras)`;
+        $('typing-input').focus();
+      } else {
+        const wrongBtns = [...$('answers').querySelectorAll('button')].filter(b =>
+          b.dataset.answer.toLowerCase() !== item.answer.toLowerCase() && !b.classList.contains('eliminated')
+        );
+        if (wrongBtns.length < 2) return;
+        shuffle(wrongBtns).slice(0, 2).forEach(b => {
+          b.classList.add('eliminated');
+          b.disabled = true;
+        });
+      }
+      hintsLeft--;
+      $('hints-left').textContent = `(${hintsLeft})`;
+      $('btn-hint').disabled = hintsLeft <= 0;
+    }
+
+    function saveResult() {
+      try {
+        const stats = JSON.parse(localStorage.getItem('capyGameStats') || '{}');
+        const old = stats.preposition_picnic || {};
+        stats.preposition_picnic = {
+          plays: (old.plays || 0) + 1,
+          best: Math.max(old.best || 0, points),
+          lastPlayed: Date.now()
+        };
+        localStorage.setItem('capyGameStats', JSON.stringify(stats));
+      } catch (e) {}
+    }
+
+    function finish() {
+      buildBerries();
+      saveResult();
+      if (window.Store) {
+        Store.addXP(points);
+        Store.completeActivity('games');
+        if (typeof Store.activateStreak === 'function') Store.activateStreak();
+      }
+
+      $('game-panel').classList.add('hidden');
+      $('summary-panel').classList.remove('hidden');
+
+      const acc = deck.length > 0 ? Math.round((correctCount / deck.length) * 100) : 0;
+      $('sum-xp').textContent = `+${points} XP`;
+      $('sum-acc').textContent = `${acc}%`;
+      $('sum-streak').textContent = `${bestStreak}x`;
+      $('summary-subtitle').textContent = `Você acertou ${correctCount} de ${deck.length} cenas de preposição!`;
+
+      const reviewEl = $('review-list');
+      reviewEl.innerHTML = historyLog.map(({ item, ok }, idx) => {
+        const full = item.sentence.replace('___', `[${item.answer}]`);
+        return `
+          <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span>${ok ? '✅' : '❌'}</span>
+                <span class="font-extrabold text-sm text-white">${full}</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-1">${item.pt}</p>
+              <p class="text-[11px] text-emerald-300 mt-1">💡 ${item.rule}</p>
+            </div>
+            <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir frase">
+              <span class="material-symbols-outlined text-base">volume_up</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+        btn.onclick = () => {
+          const entry = historyLog[+btn.dataset.reviewIdx];
+          if (entry) speak(entry.item.sentence, entry.item.answer);
+        };
+      });
+    }
+
+    // ── Controles & Atalhos ──────────────────────────────────────────────────
+    $('next').addEventListener('click', () => {
+      step++;
+      render();
+    });
+
+    $('btn-speak').addEventListener('click', () => {
+      const item = deck[step];
+      if (item) speak(item.sentence, locked ? item.answer : 'blank');
+    });
+
+    $('btn-hint').addEventListener('click', useHint);
+    $('btn-play-again').addEventListener('click', startSession);
+    $('typing-submit').addEventListener('click', checkTyping);
+    $('typing-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!locked) checkTyping();
+        else $('next').click();
+      }
+    });
+
+    document.querySelectorAll('#track-chips button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTrack = btn.dataset.track;
+        startSession();
+      };
+    });
+
+    document.querySelectorAll('#mode-buttons button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        answerMode = btn.dataset.mode;
+        startSession();
+      };
+    });
+
+    document.querySelectorAll('#len-buttons button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sessionLength = +btn.dataset.len;
+        startSession();
+      };
+    });
+
+    window.addEventListener('keydown', e => {
+      if ($('game-panel').classList.contains('hidden')) return;
+      if (document.activeElement === $('typing-input')) return;
+
+      if (['1', '2', '3', '4'].includes(e.key) && !locked && answerMode === 'choice') {
+        const idx = +e.key - 1;
+        const btns = $('answers').querySelectorAll('button');
+        if (btns[idx] && !btns[idx].disabled) btns[idx].click();
+      } else if (e.key === 'Enter' && locked) {
+        e.preventDefault();
+        $('next').click();
+      } else if (e.key === 'r' || e.key === 'R') {
+        $('btn-speak').click();
+      } else if (e.key === 'h' || e.key === 'H') {
+        useHint();
+      }
+    });
+
+    startSession();
   </script>
-<script src="celebration.js?v=cel3"></script>
-<script src="game-celebra.js?v=gc1"></script>
+  <script src="celebration.js?v=cel3"></script>
+  <script src="game-celebra.js?v=gc1"></script>
 </body>
 </html>

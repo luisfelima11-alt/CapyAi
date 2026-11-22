@@ -1,71 +1,101 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html class="dark" lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-  <meta http-equiv="Pragma" content="no-cache"/>
-  <meta http-equiv="Expires" content="0"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Spelling Bee — Capy Yara English</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;700&family=Lexend:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script>
-tailwind.config = {
-  darkMode:"class",
-  theme:{ extend:{
-    colors:{"primary":"#001f3f","secondary":"#ec4899","tertiary":"#10b981","surface-container":"#002a54"},
-    fontFamily:{"headline":["Plus Jakarta Sans"],"body":["Be Vietnam Pro"],"label":["Lexend"]},
-    borderRadius:{"DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px"},
-  }}
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
-
-  /* Letter boxes */
+  body {
+    background-color: #001f3f;
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.045);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .track-chip {
+    transition: all 0.18s ease;
+  }
+  .track-chip.active {
+    background: rgba(245, 158, 11, 0.22);
+    border-color: #f59e0b;
+    color: #fde68a;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+  }
+  .mode-btn.active {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: #38bdf8;
+    color: #bae6fd;
+  }
   .letter-box {
-    width: 52px; height: 60px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 900;
-    font-size: 1.6rem; color: #fff;
-    border: 2px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    transition: all 0.15s;
+    width: 44px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.35rem;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.07);
+    transition: all 0.15s ease;
   }
-  .letter-box.active  { border-color: #f59e0b; background: rgba(245,158,11,0.15); box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
-  .letter-box.correct { border-color: #10b981; background: rgba(16,185,129,0.2); }
-  .letter-box.wrong   { border-color: #ef4444; background: rgba(239,68,68,0.15); }
-  .letter-box.hint    { border-color: rgba(255,255,255,0.5); }
-
-  /* Keyboard */
+  .letter-box.active {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.18);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+  }
+  .letter-box.correct {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.26);
+    color: #a7f3d0;
+  }
+  .letter-box.wrong {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.24);
+    color: #fecaca;
+  }
   .key-btn {
-    display: flex; align-items: center; justify-content: center;
-    min-width: 36px; height: 44px; padding: 0 8px; border-radius: 10px;
-    font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 0.95rem;
-    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.15);
-    color: #fff; cursor: pointer; user-select: none;
-    transition: background 0.1s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 44px;
+    padding: 0 9px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s ease;
   }
-  .key-btn:hover  { background: rgba(255,255,255,0.2); }
-  .key-btn:active { transform: scale(0.88); }
-  .key-btn.used-correct { background: rgba(16,185,129,0.3); border-color: #10b981; color: #6ee7b7; }
-  .key-btn.used-wrong   { background: rgba(239,68,68,0.2);  border-color: #ef4444; color: #fca5a5; opacity: 0.5; pointer-events:none; }
-
-  /* Animations */
-  @keyframes popIn   { from{opacity:0;transform:scale(0.7)rotate(-5deg)} to{opacity:1;transform:scale(1)rotate(0)} }
-  @keyframes shake   { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
-  @keyframes correct { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
-  @keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  @keyframes spark   { 0%{opacity:1;transform:translate(0,0)scale(1)} 100%{opacity:0;transform:translate(var(--tx),var(--ty))scale(0)} }
-
-  .pop-in    { animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-  .do-shake  { animation: shake 0.4s ease; }
-  .do-correct{ animation: correct 0.35s ease; }
-  .float     { animation: float 2.5s ease-in-out infinite; }
-  .spark     { position:fixed; width:9px; height:9px; border-radius:50%; animation:spark 0.85s ease forwards; pointer-events:none; z-index:9999; }
-
-  /* Progress */
-  #prog-fill { transition: width 0.5s ease; }
+  .key-btn:hover {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: #f59e0b;
+  }
+  .key-btn:active {
+    transform: scale(0.9);
+  }
+  .key-btn.used-correct {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: #10b981;
+    color: #a7f3d0;
+  }
+  .key-btn.used-wrong {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cap1"/>
@@ -78,157 +108,511 @@ tailwind.config = {
 <meta property="og:title" content="Spelling Bee — Capy Yara English"/>
 <meta property="og:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
 <meta property="og:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="A Yara, capivara professora, ao lado da frase Aprenda inglês conversando."/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Spelling Bee — Capy Yara English"/>
-<meta name="twitter:description" content="Aprenda inglês (e francês) conversando com a Yara: trilha diária, cursos completos, jogos e correção por IA. Comece de graça."/>
-<meta name="twitter:image" content="https://www.capyenglish.com.br/og-cover.png?v=og2"/>
 <script src="analytics.js?v=ga1" defer></script>
 </head>
-<body class="bg-primary font-body text-white min-h-screen flex flex-col select-none">
+<body class="bg-[#001f3f] text-white min-h-screen flex flex-col">
 
-<!-- Header -->
-<header class="flex items-center gap-4 px-6 py-4 border-b border-white/10 bg-primary/90 backdrop-blur flex-shrink-0">
-  <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
-    <span class="material-symbols-outlined text-xl">arrow_back</span>
-  </button>
-  <div>
-    <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold">🐝 Spelling Bee</p>
-    <h1 class="font-headline font-bold text-white text-lg leading-none">Soletre a palavra!</h1>
-  </div>
-  <div class="ml-auto flex items-center gap-4">
-    <div class="flex gap-1" id="hearts">
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="1">favorite</span>
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="2">favorite</span>
-      <span class="material-symbols-outlined text-red-400 text-2xl" style="font-variation-settings:'FILL' 1;" data-h="3">favorite</span>
+<div id="top-nav-placeholder"></div>
+<div id="side-nav-placeholder"></div>
+
+<main class="flex-grow pt-24 pb-28 px-4 sm:px-6 md:pl-32 max-w-5xl mx-auto w-full">
+
+  <!-- Top Bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+    <a href="5_Game_Pavilion_Forest_Edition.html" class="inline-flex items-center gap-2 text-amber-300 hover:text-amber-200 font-bold text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Pavilhão de Jogos
+    </a>
+    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-amber-300 border border-amber-400/20">
+        <span>🔥</span>
+        <span>Combo:</span>
+        <span id="streak-badge">0</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-emerald-300 border border-emerald-400/20">
+        <span>⭐</span>
+        <span id="score-disp">0 XP</span>
+      </div>
+      <div class="glass-card px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-extrabold text-sky-300 border border-sky-400/20" title="Palavras dominadas">
+        <span>🐝</span>
+        <span id="mastered-badge">0/144</span>
+      </div>
     </div>
-    <div class="bg-white/10 border border-white/15 rounded-full px-4 py-2 font-label font-bold text-sm">
-      <span id="score-disp">0</span> pts
+  </div>
+
+  <!-- Header -->
+  <header class="text-center mb-6">
+    <p class="text-amber-300 text-xs font-black uppercase tracking-[.22em]">Torneio de Soletração • 144 Palavras em 8 Trilhas</p>
+    <h1 class="text-3xl sm:text-5xl font-black mt-1 bg-gradient-to-r from-amber-300 via-yellow-200 to-orange-300 bg-clip-text text-transparent">Spelling Bee 🐝</h1>
+    <p class="text-slate-300 text-sm sm:text-base mt-1.5 max-w-2xl mx-auto">Ouça a palavra e o exemplo em contexto real, depois soletre letra por letra no teclado.</p>
+  </header>
+
+  <!-- Track & Mode Selector -->
+  <section class="glass-card rounded-3xl p-4 sm:p-5 mb-6">
+    <div class="flex flex-col gap-3.5">
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">1. Trilha do Curso</span>
+          <span id="track-count-label" class="text-[11px] font-bold text-amber-300">144 palavras disponíveis</span>
+        </div>
+        <div id="track-chips" class="flex flex-wrap gap-1.5">
+          <button data-track="all" class="track-chip active text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌎 Todas (144)</button>
+          <button data-track="starter" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🌱 Starter A1-A2 (18)</button>
+          <button data-track="intermediate" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚀 Intermediate B1-B2 (18)</button>
+          <button data-track="travel" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">✈️ Viagem (18)</button>
+          <button data-track="work" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">💼 Trabalho & Entrevista (18)</button>
+          <button data-track="agro" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🚜 Agro English (18)</button>
+          <button data-track="gpstronic" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🛰️ GPS Tronic (18)</button>
+          <button data-track="med" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🩺 Medical (18)</button>
+          <button data-track="advanced" class="track-chip text-xs font-extrabold px-3 py-1.5 rounded-full border border-white/15 bg-white/5">🔥 Avançado (18)</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">2. Formato do Torneio</span>
+          <div id="mode-buttons" class="flex flex-wrap gap-1.5">
+            <button data-mode="guided" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🟢 Guiado (Tradução + Dica + Áudio)</button>
+            <button data-mode="bee" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">🐝 Oficial (Escuta Pura + Frase)</button>
+          </div>
+        </div>
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">3. Palavras por Rodada</span>
+          <div id="len-buttons" class="flex flex-wrap gap-1.5">
+            <button data-len="10" class="mode-btn active text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">10 Palavras</button>
+            <button data-len="15" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">15 Palavras</button>
+            <button data-len="20" class="mode-btn text-xs font-extrabold px-3 py-1.5 rounded-xl border border-white/15 bg-white/5">20 Palavras</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
+  </section>
 
-<div class="h-1.5 bg-white/10 flex-shrink-0">
-  <div id="prog-fill" class="h-full bg-gradient-to-r from-yellow-400 to-orange-500 w-0"></div>
-</div>
-
-<!-- Main -->
-<main class="flex-1 flex flex-col items-center justify-start px-4 py-8 gap-6 overflow-y-auto">
-
-  <!-- Round label + image hint -->
-  <div class="text-center pop-in" id="top-area">
-    <p class="font-label text-yellow-400 text-xs font-bold uppercase tracking-widest mb-3" id="round-lbl">Palavra 1 de 10</p>
-    <!-- Image / emoji hint -->
-    <div class="w-32 h-32 mx-auto rounded-2xl overflow-hidden mb-3 shadow-xl border border-white/10 bg-surface-container float" id="img-wrap">
-      <span class="text-8xl flex items-center justify-center h-full" id="word-emoji">🌿</span>
+  <!-- Main Game Card -->
+  <section id="game-card" class="glass-card rounded-[2rem] p-5 sm:p-8">
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-black">
+      <div class="flex items-center gap-2">
+        <span id="round-lbl" class="bg-white/10 px-3 py-1 rounded-full text-amber-300">Palavra 1 de 10</span>
+        <span id="track-pill" class="bg-amber-500/15 border border-amber-400/30 text-amber-200 px-3 py-1 rounded-full text-xs">🌱 Starter</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="hint-btn" type="button" class="inline-flex items-center gap-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/30 text-amber-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors">
+          <span>💡 Letra</span>
+          <span id="hints-left">(4)</span>
+        </button>
+        <button id="clear-btn" type="button" class="inline-flex items-center gap-1 bg-white/10 hover:bg-white/15 border border-white/15 text-slate-200 px-3 py-1.5 rounded-full text-xs font-extrabold transition-colors">
+          <span>🧹 Limpar</span>
+        </button>
+      </div>
     </div>
-    <p class="font-label text-slate-400 text-sm" id="word-hint">Ouça a palavra e soletre!</p>
-  </div>
 
-  <!-- Hear button -->
-  <button onclick="hearWord()" id="hear-btn"
-          class="flex items-center gap-3 bg-yellow-500 hover:bg-yellow-400 text-white font-headline font-black text-lg px-8 py-4 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">
-    <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1;">volume_up</span>
-    Hear the Word!
-  </button>
+    <!-- Progress Bar -->
+    <div class="h-2 bg-white/10 rounded-full mt-3 overflow-hidden">
+      <div id="prog-fill" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-300" style="width:10%"></div>
+    </div>
 
-  <!-- Letter boxes -->
-  <div id="letter-row" class="flex gap-2 flex-wrap justify-center"></div>
+    <!-- Word Clue & Audio Hub -->
+    <div class="text-center mt-6 mb-5">
+      <div id="word-emoji" class="text-5xl mb-2">🐝</div>
+      <p id="word-pt" class="text-amber-200 text-xl sm:text-2xl font-black"></p>
+      <p id="word-hint" class="text-slate-300 text-xs sm:text-sm mt-1 max-w-lg mx-auto"></p>
 
-  <!-- Feedback -->
-  <div id="feedback" class="hidden font-label font-bold text-base px-6 py-3 rounded-xl text-center"></div>
+      <div class="flex flex-wrap justify-center gap-2.5 mt-4">
+        <button id="hear-btn" type="button" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm px-5 py-2.5 rounded-full shadow-lg shadow-amber-500/25 transition-colors">
+          <span class="material-symbols-outlined text-lg">volume_up</span>
+          <span>Ouvir Palavra</span>
+        </button>
+        <button id="hear-slow-btn" type="button" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/15 text-white font-extrabold text-sm px-4 py-2.5 rounded-full transition-colors">
+          <span>🐢</span>
+          <span>Devagar</span>
+        </button>
+        <button id="hear-sentence-btn" type="button" class="inline-flex items-center gap-1.5 bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/30 text-sky-200 font-extrabold text-sm px-4 py-2.5 rounded-full transition-colors">
+          <span class="material-symbols-outlined text-base">record_voice_over</span>
+          <span>Ouvir na Frase</span>
+        </button>
+      </div>
+    </div>
 
-  <!-- Hint & Clear -->
-  <div class="flex gap-3">
-    <button onclick="useHint()" id="hint-btn"
-            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold text-sm px-5 py-2.5 rounded-full border border-white/20 active:scale-95 transition-all">
-      <span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">lightbulb</span> Hint
-    </button>
-    <button onclick="clearInput()"
-            class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-label font-bold text-sm px-5 py-2.5 rounded-full border border-white/20 active:scale-95 transition-all">
-      <span class="material-symbols-outlined text-sm">backspace</span> Clear
-    </button>
-  </div>
+    <!-- Letter Boxes -->
+    <div id="letter-row" class="flex gap-1.5 sm:gap-2 flex-wrap justify-center my-5"></div>
 
-  <!-- On-screen keyboard -->
-  <div id="keyboard" class="w-full max-w-lg flex flex-col gap-2 items-center mt-2"></div>
+    <!-- Feedback -->
+    <div class="min-h-[3.2rem] flex flex-col items-center justify-center">
+      <div id="feedback" class="hidden font-black text-sm sm:text-base px-5 py-2.5 rounded-2xl text-center"></div>
+      <p id="example-reveal" class="hidden text-xs sm:text-sm text-slate-300 mt-2 text-center"></p>
+    </div>
+
+    <!-- On-Screen Keyboard -->
+    <div id="keyboard" class="w-full max-w-lg mx-auto flex flex-col gap-1.5 items-center mt-3"></div>
+  </section>
+
+  <!-- Summary Screen -->
+  <section id="summary-card" class="hidden glass-card rounded-[2rem] p-6 sm:p-8 text-center">
+    <div class="text-6xl sm:text-7xl">🐝</div>
+    <h2 class="text-3xl sm:text-4xl font-black mt-3">Torneio Concluído!</h2>
+    <p id="summary-subtitle" class="text-slate-300 text-sm sm:text-base mt-1"></p>
+
+    <div class="grid grid-cols-3 gap-3 max-w-lg mx-auto my-6">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">XP Ganho</p>
+        <p id="sum-xp" class="text-2xl sm:text-3xl font-black text-amber-300 mt-1">+0 XP</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Precisão</p>
+        <p id="sum-acc" class="text-2xl sm:text-3xl font-black text-emerald-300 mt-1">0%</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+        <p class="text-[11px] font-black uppercase text-slate-400">Maior Combo</p>
+        <p id="sum-streak" class="text-2xl sm:text-3xl font-black text-sky-300 mt-1">0x</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-7">
+      <button id="btn-play-again" type="button" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-6 py-3 rounded-full font-black transition-colors">
+        🔄 Jogar Novamente
+      </button>
+      <a href="5_Game_Pavilion_Forest_Edition.html" class="bg-white/10 hover:bg-white/15 border border-white/15 px-6 py-3 rounded-full font-black transition-colors">
+        🎮 Mais Jogos
+      </a>
+    </div>
+
+    <div class="text-left border-t border-white/10 pt-5">
+      <h3 class="text-sm font-black uppercase tracking-wider text-amber-300 mb-3">📚 Revisão das Palavras Soletradas</h3>
+      <div id="review-list" class="grid sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+  </section>
 
 </main>
+
+<div id="mobile-nav-placeholder"></div>
 
 <script src="capy-skins.js?v=skins1"></script>
 <script src="auth-secure.js?v=seg1"></script>
 <script src="store.js?v=xpfix"></script>
-<script src="streak-overlay.js?v=land1"></script>
-<script src="levelup-overlay.js?v=land1"></script>
-<script src="badge-toast.js?v=c52d7db"></script>
+<script src="components.js?v=seg1"></script>
 <script>
-// ── Word list ─────────────────────────────────────────────────────────────────
+Components.mount('top-nav-placeholder', Components.renderTopNav('games'));
+Components.mount('side-nav-placeholder', Components.renderSideNav('games'));
+Components.mount('mobile-nav-placeholder', Components.renderMobileNav('games'));
+
+const TRACK_META = {
+  starter:      { label: '🌱 Starter A1-A2' },
+  intermediate: { label: '🚀 Intermediate B1-B2' },
+  travel:       { label: '✈️ Viagem' },
+  work:         { label: '💼 Trabalho' },
+  agro:         { label: '🚜 Agro English' },
+  gpstronic:    { label: '🛰️ GPS Tronic' },
+  med:          { label: '🩺 Medical' },
+  advanced:     { label: '🔥 Avançado' }
+};
+
+// ── 144 Palavras Reais para Soletração (8 Trilhas x 18 Palavras) ─────────────
 const WORDS = [
-  { word:'CAT',       emoji:'🐱', hint:'A furry pet that says meow' },
-  { word:'DOG',       emoji:'🐶', hint:'A loyal pet that loves walks' },
-  { word:'SUN',       emoji:'☀️', hint:'The big bright star in the sky' },
-  { word:'TREE',      emoji:'🌳', hint:'A tall plant with branches' },
-  { word:'FISH',      emoji:'🐟', hint:'It swims in the water' },
-  { word:'BIRD',      emoji:'🐦', hint:'It has wings and can fly' },
-  { word:'CAKE',      emoji:'🎂', hint:'A sweet treat for birthdays' },
-  { word:'STAR',      emoji:'⭐', hint:'It shines in the night sky' },
-  { word:'RAIN',      emoji:'🌧️', hint:'Water that falls from clouds' },
-  { word:'FROG',      emoji:'🐸', hint:'A green animal that jumps' },
+  // 1. STARTER A1-A2 (18)
+  { track:'starter', word:'BREAKFAST', emoji:'🥞', pt:'Café da manhã', hint:'Primeira refeição do dia.', ex:'We always eat breakfast at seven thirty.' },
+  { track:'starter', word:'UMBRELLA', emoji:'☔', pt:'Guarda-chuva', hint:'Usado para se proteger da chuva.', ex:'Take an umbrella because it is raining.' },
+  { track:'starter', word:'HOSPITAL', emoji:'🏥', pt:'Hospital', hint:'Local onde médicos e enfermeiros cuidam de pacientes.', ex:'My mother works as a nurse at the hospital.' },
+  { track:'starter', word:'APARTMENT', emoji:'🏢', pt:'Apartamento', hint:'Moradia dentro de um edifício residencial.', ex:'They rented a two-bedroom apartment downtown.' },
+  { track:'starter', word:'SANDWICH', emoji:'🥪', pt:'Sanduíche', hint:'Lanche feito com duas fatias de pão.', ex:'He made a cheese sandwich for lunch.' },
+  { track:'starter', word:'THURSDAY', emoji:'📅', pt:'Quinta-feira', hint:'O dia da semana entre quarta e sexta-feira.', ex:'Our English class is on Tuesday and Thursday.' },
+  { track:'starter', word:'SATURDAY', emoji:'🧹', pt:'Sábado', hint:'Primeiro dia do fim de semana.', ex:'We clean the house on Saturday mornings.' },
+  { track:'starter', word:'BIRTHDAY', emoji:'🎂', pt:'Aniversário', hint:'Data em que comemoramos o dia em que nascemos.', ex:'We bought a birthday gift for our sister.' },
+  { track:'starter', word:'COMPUTER', emoji:'💻', pt:'Computador', hint:'Equipamento eletrônico de trabalho e estudo.', ex:'Turn off the computer before leaving the room.' },
+  { track:'starter', word:'PHARMACY', emoji:'💊', pt:'Farmácia', hint:'Loja onde compramos medicamentos.', ex:'There is a pharmacy across the street.' },
+  { track:'starter', word:'LANGUAGE', emoji:'🗣️', pt:'Idioma / Língua', hint:'Inglês, português, espanhol ou francês.', ex:'English is a very useful international language.' },
+  { track:'starter', word:'BACKPACK', emoji:'🎒', pt:'Mochila', hint:'Bolsa carregada nas costas.', ex:'Put your notebook inside your backpack.' },
+  { track:'starter', word:'QUESTION', emoji:'❓', pt:'Pergunta', hint:'O que você faz quando tem uma dúvida.', ex:'May I ask you a quick question?' },
+  { track:'starter', word:'TOMORROW', emoji:'🌅', pt:'Amanhã', hint:'O dia depois de hoje.', ex:'See you tomorrow morning at the office.' },
+  { track:'starter', word:'DAUGHTER', emoji:'👧', pt:'Filha', hint:'Atenção às letras silenciosas GH no meio.', ex:'Their daughter studies medicine in São Paulo.' },
+  { track:'starter', word:'EXERCISE', emoji:'🏃', pt:'Exercício físico', hint:'Atividade para manter o corpo saudável.', ex:'I like to exercise early in the morning.' },
+  { track:'starter', word:'MEDICINE', emoji:'🩺', pt:'Remédio / Medicina', hint:'Substância usada para tratar uma doença.', ex:'Take your medicine with a glass of water.' },
+  { track:'starter', word:'VACATION', emoji:'🏖️', pt:'Férias', hint:'Período de descanso e viagem.', ex:'Where are you going on your next vacation?' },
+
+  // 2. INTERMEDIATE B1-B2 (18)
+  { track:'intermediate', word:'SCHEDULE', emoji:'🗓️', pt:'Cronograma / Agenda', hint:'Começa com SCH; lista de horários planejados.', ex:'Everything is running according to schedule.' },
+  { track:'intermediate', word:'RECEIPT', emoji:'🧾', pt:'Recibo / Comprovante', hint:'Tem um P silencioso antes do T final.', ex:'Please keep the receipt in case you need a refund.' },
+  { track:'intermediate', word:'NEIGHBOR', emoji:'🏡', pt:'Vizinho(a)', hint:'Escreve-se com EIGH no meio.', ex:'Our next-door neighbor is very friendly.' },
+  { track:'intermediate', word:'DECISION', emoji:'⚖️', pt:'Decisão', hint:'Escolha tomada após analisar as opções.', ex:'We need to make a final decision today.' },
+  { track:'intermediate', word:'KILOMETER', emoji:'🛣️', pt:'Quilômetro', hint:'Unidade de distância equivalente a mil metros.', ex:'The beach is five kilometers from here.' },
+  { track:'intermediate', word:'KNOWLEDGE', emoji:'🧠', pt:'Conhecimento', hint:'Começa com K silencioso e termina com DGE.', ex:'She has deep knowledge of international law.' },
+  { track:'intermediate', word:'BEHAVIOR', emoji:'🤝', pt:'Comportamento', hint:'Maneira como alguém age ou se comporta.', ex:'The study analyzes consumer behavior online.' },
+  { track:'intermediate', word:'AUDIENCE', emoji:'👏', pt:'Público / Plateia', hint:'Pessoas que assistem a uma palestra ou apresentação.', ex:'The speaker captured the attention of the audience.' },
+  { track:'intermediate', word:'PRESSURE', emoji:'⚡', pt:'Pressão', hint:'Escreve-se com dois S no meio.', ex:'He works well even under pressure.' },
+  { track:'intermediate', word:'PATIENCE', emoji:'⏳', pt:'Paciência', hint:'Capacidade de esperar com calma (termina em -CE).', ex:'Learning a new skill requires practice and patience.' },
+  { track:'intermediate', word:'STRENGTH', emoji:'💪', pt:'Força / Ponto forte', hint:'Termina com NGTH.', ex:'Teamwork is our company’s greatest strength.' },
+  { track:'intermediate', word:'ACCIDENT', emoji:'🚗', pt:'Acidente', hint:'Escreve-se com dois C ("by accident").', ex:'I deleted the file by accident.' },
+  { track:'intermediate', word:'ARGUMENT', emoji:'💬', pt:'Discussão / Argumento', hint:'Perde o E de argue antes de -MENT.', ex:'They resolved the argument peacefully.' },
+  { track:'intermediate', word:'VALUABLE', emoji:'💎', pt:'Valioso(a)', hint:'Algo de grande valor ou utilidade.', ex:'Thank you for your valuable time and support.' },
+  { track:'intermediate', word:'CONFIDENT', emoji:'🌟', pt:'Confiante', hint:'Pessoa segura de si.', ex:'She feels confident about tomorrow’s presentation.' },
+  { track:'intermediate', word:'GENEROUS', emoji:'🎁', pt:'Generoso(a)', hint:'Pessoa que compartilha com boa vontade.', ex:'Thank you for your generous contribution.' },
+  { track:'intermediate', word:'RELIABLE', emoji:'🛡️', pt:'Confiável', hint:'Pessoa ou sistema em que se pode confiar.', ex:'We need a reliable supplier for this project.' },
+  { track:'intermediate', word:'AVAILABLE', emoji:'✅', pt:'Disponível', hint:'Livre para uso ou atendimento.', ex:'Is there a table for two available tonight?' },
+
+  // 3. TRAVEL / VIAGEM (18)
+  { track:'travel', word:'PASSPORT', emoji:'🛂', pt:'Passaporte', hint:'Documento essencial com dois S no meio.', ex:'Please show your passport and boarding pass.' },
+  { track:'travel', word:'LUGGAGE', emoji:'🧳', pt:'Bagagem', hint:'Escreve-se com dois G no meio.', ex:'Where is the baggage and luggage claim area?' },
+  { track:'travel', word:'SUITCASE', emoji:'🎒', pt:'Mala de viagem', hint:'Formada por SUIT + CASE.', ex:'My suitcase weighs twenty-two kilograms.' },
+  { track:'travel', word:'BOARDING', emoji:'🛫', pt:'Embarque', hint:'Escreve-se com OA ("boarding gate").', ex:'Boarding begins at gate twelve in ten minutes.' },
+  { track:'travel', word:'DEPARTURE', emoji:'✈️', pt:'Partida / Embarque', hint:'Oposto de chegada (arrival) nos aeroportos.', ex:'Check the departure board for your gate number.' },
+  { track:'travel', word:'TERMINAL', emoji:'🏢', pt:'Terminal (aeroporto)', hint:'Prédio de embarque e desembarque de passageiros.', ex:'Take the shuttle bus to Terminal Two.' },
+  { track:'travel', word:'CURRENCY', emoji:'💱', pt:'Moeda / Câmbio', hint:'Escreve-se com dois R ("currency exchange").', ex:'You can exchange currency near the exit.' },
+  { track:'travel', word:'DISTANCE', emoji:'🚶', pt:'Distância', hint:'Usado em "within walking distance".', ex:'The museum is within walking distance of the hotel.' },
+  { track:'travel', word:'INSURANCE', emoji:'🛡️', pt:'Seguro (de viagem)', hint:'Proteção médica e de bagagem ("travel insurance").', ex:'I always buy travel insurance before flying abroad.' },
+  { track:'travel', word:'SOUVENIR', emoji:'🎁', pt:'Lembrança de viagem', hint:'Escreve-se com OU logo no início.', ex:'She bought a small souvenir for her mother.' },
+  { track:'travel', word:'ELEVATOR', emoji:'🛗', pt:'Elevador', hint:'Leva os hóspedes até o andar do quarto.', ex:'Take the elevator to the sixth floor.' },
+  { track:'travel', word:'RECEPTION', emoji:'🛎️', pt:'Recepção', hint:'Balcão principal de atendimento do hotel.', ex:'Leave your room key at the reception desk.' },
+  { track:'travel', word:'SECURITY', emoji:'🛃', pt:'Segurança / Raio-X', hint:'Controle de embarque no aeroporto.', ex:'Remove your laptop from the bag at security.' },
+  { track:'travel', word:'PASSENGER', emoji:'💺', pt:'Passageiro(a)', hint:'Escreve-se com dois S no meio.', ex:'Each passenger is allowed one carry-on bag.' },
+  { track:'travel', word:'RESERVATION', emoji:'🏨', pt:'Reserva (hotel/restaurante)', hint:'Registro antecipado de quarto ou mesa.', ex:'I have a hotel reservation under the name Silva.' },
+  { track:'travel', word:'ITINERARY', emoji:'🗺️', pt:'Roteiro / Itinerário', hint:'Rota planejada com datas e destinos da viagem.', ex:'I sent our flight itinerary to your email.' },
+  { track:'travel', word:'DOWNTOWN', emoji:'🏙️', pt:'Centro da cidade', hint:'Formado por DOWN + TOWN.', ex:'Our hotel is located right downtown.' },
+  { track:'travel', word:'PLATFORM', emoji:'🚆', pt:'Plataforma (de trem)', hint:'Local onde você embarca no trem na estação.', ex:'The train to Paris leaves from platform four.' },
+
+  // 4. WORK / TRABALHO & ENTREVISTA (18)
+  { track:'work', word:'DEADLINE', emoji:'🎯', pt:'Prazo final', hint:'Data limite para entrega de uma tarefa.', ex:'Our team worked together to meet the deadline.' },
+  { track:'work', word:'COLLEAGUE', emoji:'🤝', pt:'Colega de trabalho', hint:'Escreve-se com dois L e termina em -GUE.', ex:'My colleague helped me review the presentation.' },
+  { track:'work', word:'RESCHEDULE', emoji:'📅', pt:'Reagendar / Remarcar', hint:'RE + SCHEDULE (transferir reunião para nova data).', ex:'Could we reschedule our call to tomorrow morning?' },
+  { track:'work', word:'INTERVIEW', emoji:'💼', pt:'Entrevista', hint:'Conversa seletiva para uma vaga ("job interview").', ex:'She prepared carefully for her job interview.' },
+  { track:'work', word:'PROPOSAL', emoji:'📄', pt:'Proposta comercial', hint:'Oferta formal apresentada a um cliente.', ex:'The board approved our project proposal.' },
+  { track:'work', word:'STRATEGY', emoji:'♟️', pt:'Estratégia', hint:'Plano de ação para atingir metas de longo prazo.', ex:'We discussed our marketing strategy for next year.' },
+  { track:'work', word:'FEEDBACK', emoji:'💬', pt:'Retorno / Avaliação', hint:'Formado por FEED + BACK.', ex:'I will contact the client to check their feedback.' },
+  { track:'work', word:'CUSTOMER', emoji:'🛍️', pt:'Cliente / Consumidor', hint:'Pessoa que compra produtos de uma empresa.', ex:'Customer satisfaction is our top priority.' },
+  { track:'work', word:'FINANCIAL', emoji:'📊', pt:'Financeiro(a)', hint:'Relacionado a finanças e orçamento.', ex:'She presented the quarterly financial report.' },
+  { track:'work', word:'DIRECTOR', emoji:'👔', pt:'Diretor(a)', hint:'Executivo responsável por uma diretoria.', ex:'The operations director signed the contract.' },
+  { track:'work', word:'EMPLOYEE', emoji:'🪪', pt:'Funcionário / Colaborador', hint:'Termina com dois E (EMPLOYEE).', ex:'Every employee received safety training.' },
+  { track:'work', word:'APPROVAL', emoji:'✅', pt:'Aprovação', hint:'Escreve-se com dois P ("budget approval").', ex:'We are waiting for final budget approval.' },
+  { track:'work', word:'RESOURCE', emoji:'⚙️', pt:'Recurso', hint:'Usado em "Human Resources" (Recursos Humanos).', ex:'We need more resources to complete the project.' },
+  { track:'work', word:'TRAINING', emoji:'🎓', pt:'Treinamento / Capacitação', hint:'Curso prático para desenvolver a equipe.', ex:'The new software training starts on Monday.' },
+  { track:'work', word:'PROMOTION', emoji:'🚀', pt:'Promoção de cargo', hint:'Avanço para um nível superior na carreira.', ex:'He received a well-deserved promotion this month.' },
+  { track:'work', word:'OVERTIME', emoji:'🕒', pt:'Hora extra', hint:'Trabalho realizado além do horário normal.', ex:'The team worked overtime to launch on schedule.' },
+  { track:'work', word:'WORKLOAD', emoji:'🗂️', pt:'Carga de trabalho', hint:'Volume total de tarefas sob responsabilidade.', ex:'Automation helped reduce our daily workload.' },
+  { track:'work', word:'SIGNATURE', emoji:'✒️', pt:'Assinatura', hint:'Rubrica ou firma em um documento ou contrato.', ex:'We just need your signature on the last page.' },
+
+  // 5. AGRO ENGLISH / CAMPO, SAFRA & MAQUINÁRIO (18)
+  { track:'agro', word:'MOISTURE', emoji:'🌱', pt:'Umidade', hint:'Teor de água no solo ou nos grãos colhidos.', ex:'Soil moisture is ideal for planting soybeans.' },
+  { track:'agro', word:'HARVESTER', emoji:'🚜', pt:'Colheitadeira', hint:'Máquina que colhe os grãos ("combine harvester").', ex:'The combine harvester is working in plot four.' },
+  { track:'agro', word:'HERBICIDE', emoji:'🌿', pt:'Herbicida', hint:'Defensivo aplicado para controle de plantas daninhas.', ex:'Apply the burndown herbicide before seeding.' },
+  { track:'agro', word:'FUNGICIDE', emoji:'🍄', pt:'Fungicida', hint:'Produto que protege a lavoura contra fungos.', ex:'Fungicide protects the soybean leaves against rust.' },
+  { track:'agro', word:'ROTATION', emoji:'🌻', pt:'Rotação (de culturas)', hint:'Alternância planejada de culturas no talhão.', ex:'Crop rotation keeps the soil fertile and healthy.' },
+  { track:'agro', word:'SCOUTING', emoji:'🐛', pt:'Monitoramento de pragas', hint:'Vistoria técnica presencial na lavoura.', ex:'Field scouting revealed stink bugs in the plot.' },
+  { track:'agro', word:'AERATION', emoji:'🌀', pt:'Aeração (de grãos)', hint:'Ventilação forçada dentro do silo de grãos.', ex:'Turn on the aeration fans inside the grain silo.' },
+  { track:'agro', word:'LIMESTONE', emoji:'🧪', pt:'Calcário', hint:'Usado para corrigir a acidez do solo.', ex:'We applied limestone to correct soil acidity.' },
+  { track:'agro', word:'PASTURE', emoji:'🐄', pt:'Pastagem', hint:'Área de forragem para alimentação do gado.', ex:'Rotational grazing improves pasture quality.' },
+  { track:'agro', word:'IRRIGATION', emoji:'💧', pt:'Irrigação', hint:'Escreve-se com dois R ("center pivot irrigation").', ex:'The irrigation system runs during the night.' },
+  { track:'agro', word:'SEEDLING', emoji:'🌱', pt:'Plântula / Muda jovem', hint:'Planta recém-germinada na linha de plantio.', ex:'Protect the young seedlings against early pests.' },
+  { track:'agro', word:'NITROGEN', emoji:'🧪', pt:'Nitrogênio', hint:'Macronutriente essencial para o desenvolvimento do milho.', ex:'Corn requires high nitrogen levels for good yield.' },
+  { track:'agro', word:'AGRONOMY', emoji:'🌾', pt:'Agronomia', hint:'Ciência que estuda o manejo de solos e lavouras.', ex:'She graduated in agronomy five years ago.' },
+  { track:'agro', word:'SPREADER', emoji:'🚜', pt:'Distribuidor / Espalhador', hint:'Implemento que distribui calcário ou adubo a lanço.', ex:'Calibrate the fertilizer spreader before starting.' },
+  { track:'agro', word:'HYDRAULIC', emoji:'⚙️', pt:'Hidráulico(a)', hint:'Começa com HYD e tem AU no meio.', ex:'Check the tractor hydraulic oil level daily.' },
+  { track:'agro', word:'RADIATOR', emoji:'🌡️', pt:'Radiador', hint:'Trocador de calor que resfria o motor do trator.', ex:'Clean the radiator screen when working in dust.' },
+  { track:'agro', word:'LIVESTOCK', emoji:'🐂', pt:'Pecuária / Rebanho', hint:'Gado e animais de criação na fazenda.', ex:'The farm produces both grains and livestock.' },
+  { track:'agro', word:'DRAINAGE', emoji:'🌧️', pt:'Drenagem', hint:'Escoamento do excesso de água do solo.', ex:'Good soil drainage prevents root diseases.' },
+
+  // 6. GPS TRONIC / AGRICULTURA DE PRECISÃO & ELETRÔNICA (18)
+  { track:'gpstronic', word:'FIRMWARE', emoji:'💾', pt:'Firmware (software embarcado)', hint:'FIRM + WARE; programa interno de módulos e monitores.', ex:'Keep the display powered on during the firmware update.' },
+  { track:'gpstronic', word:'HARNESS', emoji:'🔌', pt:'Chicote elétrico', hint:'Termina com dois S ("wiring harness").', ex:'Inspect the CAN bus wiring harness for damage.' },
+  { track:'gpstronic', word:'RESISTOR', emoji:'⚡', pt:'Resistor', hint:'Componente de 120 ohms nas pontas da rede CAN.', ex:'Measure sixty ohms across the terminating resistors.' },
+  { track:'gpstronic', word:'ACCURACY', emoji:'🛰️', pt:'Precisão', hint:'Escreve-se com dois C ("two-centimeter accuracy").', ex:'RTK provides two-centimeter positioning accuracy.' },
+  { track:'gpstronic', word:'CONNECTOR', emoji:'🛠️', pt:'Conector elétrico', hint:'Escreve-se com dois N e termina em -OR.', ex:'Check the pins inside the waterproof Deutsch connector.' },
+  { track:'gpstronic', word:'GUIDANCE', emoji:'🧭', pt:'Linha guia / Orientação', hint:'Começa com GUI ("AB guidance line").', ex:'Set point A and point B to create a guidance line.' },
+  { track:'gpstronic', word:'FLOWMETER', emoji:'💧', pt:'Fluxômetro', hint:'Medidor de vazão de calda do pulverizador.', ex:'Enter the flowmeter calibration number in the setup.' },
+  { track:'gpstronic', word:'SATELLITE', emoji:'🛰️', pt:'Satélite', hint:'Tem um T e dois L (SATELLITE).', ex:'The receiver locked onto eighteen satellites.' },
+  { track:'gpstronic', word:'RECEIVER', emoji:'📡', pt:'Receptor (GNSS)', hint:'Seguir a regra I depois do C: RECEIVER.', ex:'Mount the GNSS receiver on the center of the roof.' },
+  { track:'gpstronic', word:'BOUNDARY', emoji:'📐', pt:'Bordadura / Limite', hint:'Perímetro gravado ao redor do talhão.', ex:'Record the field boundary before starting the pass.' },
+  { track:'gpstronic', word:'STEERING', emoji:'🛞', pt:'Direção (piloto automático)', hint:'Escreve-se com dois E ("steering angle sensor").', ex:'Calibrate the hydraulic steering valve on the tractor.' },
+  { track:'gpstronic', word:'TERMINAL', emoji:'🖥️', pt:'Terminal virtual (monitor)', hint:'Monitor universal ISOBUS na cabine.', ex:'The planter interface loaded on the virtual terminal.' },
+  { track:'gpstronic', word:'BLOCKAGE', emoji:'🚨', pt:'Entupimento', hint:'Usado em "seed tube blockage alarm".', ex:'Clean the optical sensor to stop false blockage alarms.' },
+  { track:'gpstronic', word:'SOLENOID', emoji:'🧲', pt:'Solenoide (bobina elétrica)', hint:'Bobina que aciona válvulas hidráulicas ou de seção.', ex:'Test the solenoid coil resistance with a multimeter.' },
+  { track:'gpstronic', word:'HEADLAND', emoji:'🔄', pt:'Cabeceira de manobra', hint:'HEAD + LAND; área de giro no fim do talhão.', ex:'Section control prevents overlap at the headland.' },
+  { track:'gpstronic', word:'COVERAGE', emoji:'🗺️', pt:'Mapa de cobertura / Aplicação', hint:'Área pintada na tela mostrando onde já foi aplicado.', ex:'The coverage map shows a small skip between passes.' },
+  { track:'gpstronic', word:'TELEMETRY', emoji:'📶', pt:'Telemetria', hint:'Transmissão remota de dados da máquina para o escritório.', ex:'Telemetry sends machine alerts in real time.' },
+  { track:'gpstronic', word:'IMPLEMENT', emoji:'🚜', pt:'Implemento agrícola', hint:'Plantadeira, pulverizador ou grade acoplada ao trator.', ex:'Verify the implement width in the monitor setup.' },
+
+  // 7. MEDICAL ENGLISH / SAÚDE & CONSULTA (18)
+  { track:'med', word:'DISCHARGE', emoji:'🏥', pt:'Alta hospitalar', hint:'DIS + CHARGE; liberação médica do paciente.', ex:'The physician signed your hospital discharge today.' },
+  { track:'med', word:'SWELLING', emoji:'🦵', pt:'Inchaço / Edema', hint:'Escreve-se com dois L ("reduce the swelling").', ex:'Apply ice to your ankle to reduce the swelling.' },
+  { track:'med', word:'ALLERGIC', emoji:'📋', pt:'Alérgico(a)', hint:'Escreve-se com dois L ("allergic to penicillin").', ex:'Are you allergic to any medication?' },
+  { track:'med', word:'SYMPTOMS', emoji:'🩺', pt:'Sintomas', hint:'Escreve-se com Y logo após o S e tem P antes do T.', ex:'How long have you had these symptoms?' },
+  { track:'med', word:'STITCHES', emoji:'💉', pt:'Pontos cirúrgicos', hint:'Contém TCH no meio ("remove the stitches").', ex:'Come back in ten days to remove the stitches.' },
+  { track:'med', word:'OINTMENT', emoji:'🧴', pt:'Pomada medicinal', hint:'Creme tópico aplicado sobre a pele ou ferida.', ex:'Apply this antibiotic ointment twice a day.' },
+  { track:'med', word:'MIGRAINE', emoji:'🤕', pt:'Enxaqueca', hint:'Dor de cabeça intensa, muitas vezes com sensibilidade à luz.', ex:'She took medication to relieve her severe migraine.' },
+  { track:'med', word:'DIZZINESS', emoji:'🌀', pt:'Tontura / Vertigem', hint:'Dois Z e dois S (DIZZINESS).', ex:'Sit down immediately if you feel dizziness.' },
+  { track:'med', word:'BREATHING', emoji:'🫁', pt:'Respiração', hint:'Ato contínuo de inspirar e expirar.', ex:'His breathing returned to normal after the nebulizer.' },
+  { track:'med', word:'DIAGNOSIS', emoji:'🔬', pt:'Diagnóstico', hint:'Identificação clínica de uma doença ou condição.', ex:'The blood test confirmed the doctor’s diagnosis.' },
+  { track:'med', word:'INFECTION', emoji:'🦠', pt:'Infecção', hint:'Presença de bactérias ou vírus causando inflamação.', ex:'Take the full course of antibiotics to clear the infection.' },
+  { track:'med', word:'BANDAGE', emoji:'🩹', pt:'Faixa / Atadura / Curativo', hint:'Faixa usada para proteger uma lesão.', ex:'Wrap a clean elastic bandage around your wrist.' },
+  { track:'med', word:'TREATMENT', emoji:'💊', pt:'Tratamento', hint:'TREAT + MENT; cuidados para curar um paciente.', ex:'The patient responded very well to the treatment.' },
+  { track:'med', word:'SURGERY', emoji:'🏥', pt:'Cirurgia', hint:'Procedimento operatório realizado no centro cirúrgico.', ex:'She is recovering quickly after knee surgery.' },
+  { track:'med', word:'HEARTBEAT', emoji:'💓', pt:'Batimento cardíaco', hint:'HEART + BEAT; pulsação do coração.', ex:'The stethoscope lets me listen to your heartbeat.' },
+  { track:'med', word:'CAPSULE', emoji:'💊', pt:'Cápsula', hint:'Medicamento oral revestido, tomado com água.', ex:'Swallow one capsule every twelve hours.' },
+  { track:'med', word:'FRACTURE', emoji:'🦴', pt:'Fratura óssea', hint:'Quebra ou fissura em um osso vista no raio-X.', ex:'The X-ray showed no fracture in your ankle.' },
+  { track:'med', word:'RECOVERY', emoji:'🌟', pt:'Recuperação', hint:'Retorno gradual à saúde plena.', ex:'We wish you a speedy and full recovery.' },
+
+  // 8. ADVANCED / FLUÊNCIA AVANÇADA (18)
+  { track:'advanced', word:'THOROUGH', emoji:'🔍', pt:'Minucioso / Completo', hint:'Escreve-se TH-O-R-O-U-G-H (análise detalhada).', ex:'They conducted a thorough investigation of the issue.' },
+  { track:'advanced', word:'ACCURATE', emoji:'🎯', pt:'Exato / Preciso', hint:'Escreve-se com dois C (ACCURATE).', ex:'Your forecast turned out to be completely accurate.' },
+  { track:'advanced', word:'MILESTONE', emoji:'🏁', pt:'Marco importante', hint:'MILE + STONE; conquista decisiva em um projeto.', ex:'Launching version two was a huge milestone for us.' },
+  { track:'advanced', word:'DISGUISE', emoji:'🎭', pt:'Disfarce', hint:'Termina em -GUISE ("a blessing in disguise").', ex:'That setback was actually a blessing in disguise.' },
+  { track:'advanced', word:'SEAMLESS', emoji:'✨', pt:'Fluido / Sem falhas', hint:'SEAM + LESS; integração perfeita.', ex:'The new app offers a seamless user experience.' },
+  { track:'advanced', word:'LEVERAGE', emoji:'⚙️', pt:'Alavancar / Aproveitar estrategicamente', hint:'Usar um recurso com inteligência para multiplicar resultados.', ex:'We can leverage automation to save hours every week.' },
+  { track:'advanced', word:'THRESHOLD', emoji:'🚪', pt:'Limiar / Limite crítico', hint:'Nível a partir do qual algo passa a acontecer.', ex:'The sensor triggers an alert above the safety threshold.' },
+  { track:'advanced', word:'CONSENSUS', emoji:'🤝', pt:'Consenso', hint:'Acordo geral entre todos os membros de um grupo.', ex:'After a constructive debate, the committee reached a consensus.' },
+  { track:'advanced', word:'HINDSIGHT', emoji:'🕰️', pt:'Olhando em retrospecto', hint:'HIND + SIGHT; compreensão após o fato ter ocorrido.', ex:'In hindsight, we should have backed up the server earlier.' },
+  { track:'advanced', word:'BOTTLENECK', emoji:'⏳', pt:'Gargalo operacional', hint:'BOTTLE + NECK; ponto que trava a velocidade de um processo.', ex:'Upgrading the database removed our main performance bottleneck.' },
+  { track:'advanced', word:'OUTWEIGHT', emoji:'⚖️', pt:'Superar em importância', hint:'As vantagens superam as desvantagens.', ex:'The long-term benefits far outweigh the initial cost.' },
+  { track:'advanced', word:'BENCHMARK', emoji:'📈', pt:'Referência de desempenho', hint:'BENCH + MARK; padrão usado para medir qualidade.', ex:'This product sets a new benchmark for efficiency.' },
+  { track:'advanced', word:'RESILIENT', emoji:'🛡️', pt:'Resiliente / Resistente', hint:'Capaz de se recuperar rapidamente de dificuldades.', ex:'We built a resilient architecture that handles traffic spikes.' },
+  { track:'advanced', word:'AMBIGUOUS', emoji:'❓', pt:'Ambíguo / Duplo sentido', hint:'Termina em -UOUS; algo que não está claro.', ex:'Avoid ambiguous wording in legal contracts.' },
+  { track:'advanced', word:'PRAGMATIC', emoji:'🛠️', pt:'Pragmático / Prático', hint:'Focado em soluções reais e objetivas.', ex:'We need a pragmatic approach to solve this today.' },
+  { track:'advanced', word:'INCENTIVE', emoji:'🏆', pt:'Incentivo / Estímulo', hint:'Motivação adicional para alcançar um resultado.', ex:'The company offers a bonus as an incentive for innovation.' },
+  { track:'advanced', word:'SCALABLE', emoji:'🚀', pt:'Escalável', hint:'Capaz de crescer sem perder eficiência.', ex:'Our cloud platform is designed to be fully scalable.' },
+  { track:'advanced', word:'FEASIBLE', emoji:'✅', pt:'Viável / Exequível', hint:'Escreve-se com EA ("feasible project").', ex:'The engineers confirmed that the timeline is feasible.' }
 ];
 
 const KEYBOARD_ROWS = [
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
-  ['Z','X','C','V','B','N','M','⌫'],
+  ['Z','X','C','V','B','N','M','⌫']
 ];
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let currentIdx  = 0;
-let currentInput = [];
-let lives        = 3;
-let score        = 0;
-let hintsUsed    = 0;
-let answered     = false;
-const shuffled   = [...WORDS].sort(() => Math.random() - 0.5);
+// ── Persistência de Domínio ──────────────────────────────────────────────────
+const MASTERED_KEY = 'capySpellingBeeMastered_v1';
+function getMasteredSet() {
+  try {
+    const raw = localStorage.getItem(MASTERED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (_) {
+    return new Set();
+  }
+}
+function saveMasteredWord(w) {
+  try {
+    const set = getMasteredSet();
+    set.add(w);
+    localStorage.setItem(MASTERED_KEY, JSON.stringify([...set]));
+    updateMasteredBadge();
+  } catch (_) {}
+}
+function updateMasteredBadge() {
+  const el = document.getElementById('mastered-badge');
+  if (el) el.textContent = `${getMasteredSet().size}/${WORDS.length}`;
+}
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-buildKeyboard();
-renderWord();
+// ── Áudio Web Speech API ─────────────────────────────────────────────────────
+function speakText(text, rate = 0.88) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = rate;
+    window.speechSynthesis.speak(u);
+  } catch (_) {}
+}
+
+// ── Estado do Jogo ───────────────────────────────────────────────────────────
+let selectedTrack = 'all';
+let beeMode       = 'guided'; // 'guided' | 'bee'
+let sessionLength = 10;
+
+let shuffled      = [];
+let currentIdx    = 0;
+let currentInput  = [];
+let score         = 0;
+let streak        = 0;
+let bestStreak    = 0;
+let solvedCount   = 0;
+let hintsLeft     = 4;
+let answered      = false;
+let historyLog    = [];
+
+const shuffleArr = a => [...a].sort(() => Math.random() - 0.5);
+
+function getFilteredPool() {
+  return selectedTrack === 'all'
+    ? WORDS
+    : WORDS.filter(x => x.track === selectedTrack);
+}
+
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  KEYBOARD_ROWS.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'flex gap-1.5 justify-center';
+    row.forEach(key => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'key-btn';
+      btn.textContent = key;
+      btn.id = key === '⌫' ? 'key-del' : `key-${key}`;
+      btn.onclick = () => handleKey(key);
+      rowEl.appendChild(btn);
+    });
+    kb.appendChild(rowEl);
+  });
+}
+
+function startSession() {
+  const pool = getFilteredPool();
+  const countLabel = document.getElementById('track-count-label');
+  if (countLabel) countLabel.textContent = `${pool.length} palavras disponíveis`;
+
+  shuffled     = shuffleArr(pool).slice(0, Math.min(sessionLength, pool.length));
+  currentIdx   = 0;
+  score        = 0;
+  streak       = 0;
+  bestStreak   = 0;
+  solvedCount  = 0;
+  hintsLeft    = 4;
+  historyLog   = [];
+
+  document.getElementById('summary-card').classList.add('hidden');
+  document.getElementById('game-card').classList.remove('hidden');
+  updateMasteredBadge();
+  renderWord();
+}
 
 function renderWord() {
-  answered  = false;
-  hintsUsed = 0;
+  if (currentIdx >= shuffled.length) return showFinished();
+  answered = false;
   currentInput = [];
 
   const w = shuffled[currentIdx];
-  document.getElementById('round-lbl').textContent = `Word ${currentIdx+1} of ${shuffled.length}`;
-  document.getElementById('word-emoji').textContent = w.emoji;
-  document.getElementById('word-hint').textContent  = w.hint;
-  document.getElementById('prog-fill').style.width  = `${(currentIdx/shuffled.length)*100}%`;
-  document.getElementById('feedback').classList.add('hidden');
-  document.getElementById('hint-btn').disabled = false;
+  const meta = TRACK_META[w.track] || TRACK_META.starter;
 
-  // Reset keyboard colours
-  document.querySelectorAll('.key-btn').forEach(b => b.className = 'key-btn');
+  document.getElementById('round-lbl').textContent = `Palavra ${currentIdx + 1} de ${shuffled.length}`;
+  document.getElementById('track-pill').textContent = meta.label;
+  document.getElementById('score-disp').textContent = `${score} XP`;
+  document.getElementById('streak-badge').textContent = String(streak);
+  document.getElementById('prog-fill').style.width = `${((currentIdx + 1) / shuffled.length) * 100}%`;
+  document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+  document.getElementById('hint-btn').disabled = hintsLeft <= 0;
+
+  document.getElementById('word-emoji').textContent = w.emoji;
+  if (beeMode === 'guided') {
+    document.getElementById('word-pt').textContent = w.pt;
+    document.getElementById('word-hint').textContent = w.hint;
+  } else {
+    document.getElementById('word-pt').textContent = `🐝 Modo Oficial (${w.word.length} letras)`;
+    document.getElementById('word-hint').textContent = `Dica: ${w.hint}`;
+  }
+
+  document.getElementById('feedback').classList.add('hidden');
+  document.getElementById('example-reveal').classList.add('hidden');
+  document.querySelectorAll('.key-btn').forEach(b => (b.className = 'key-btn'));
 
   buildLetterBoxes(w.word.length);
-
-  // Animate top area
-  const ta = document.getElementById('top-area');
-  ta.classList.remove('pop-in'); void ta.offsetWidth; ta.classList.add('pop-in');
+  setTimeout(() => speakText(w.word.toLowerCase(), 0.86), 200);
 }
 
-// ── Letter boxes ──────────────────────────────────────────────────────────────
 function buildLetterBoxes(len) {
   const row = document.getElementById('letter-row');
   row.innerHTML = '';
   for (let i = 0; i < len; i++) {
     const box = document.createElement('div');
-    box.className   = `letter-box ${i===0?'active':''}`;
-    box.id          = `lb-${i}`;
+    box.className = `letter-box ${i === 0 ? 'active' : ''}`;
+    box.id = `lb-${i}`;
     row.appendChild(box);
   }
 }
@@ -239,36 +623,10 @@ function updateBoxes() {
     const box = document.getElementById(`lb-${i}`);
     if (!box) continue;
     box.textContent = currentInput[i] || '';
-    box.classList.remove('active','correct','wrong','hint');
+    box.classList.remove('active', 'correct', 'wrong');
     if (i === currentInput.length) box.classList.add('active');
   }
 }
-
-// ── On-screen keyboard ────────────────────────────────────────────────────────
-function buildKeyboard() {
-  const kb = document.getElementById('keyboard');
-  KEYBOARD_ROWS.forEach(row => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'flex gap-1.5 justify-center';
-    row.forEach(key => {
-      const btn = document.createElement('button');
-      btn.className   = 'key-btn';
-      btn.textContent = key;
-      btn.id          = key === '⌫' ? 'key-del' : `key-${key}`;
-      btn.onclick     = () => handleKey(key);
-      rowEl.appendChild(btn);
-    });
-    kb.appendChild(rowEl);
-  });
-}
-
-// Physical keyboard support
-document.addEventListener('keydown', e => {
-  const k = e.key.toUpperCase();
-  if (k === 'BACKSPACE') handleKey('⌫');
-  else if (k === 'ENTER') checkSpelling();
-  else if (/^[A-Z]$/.test(k)) handleKey(k);
-});
 
 function handleKey(key) {
   if (answered) return;
@@ -282,209 +640,216 @@ function handleKey(key) {
   currentInput.push(key);
   updateBoxes();
   if (currentInput.length === word.length) {
-    setTimeout(checkSpelling, 120);
+    setTimeout(checkSpelling, 140);
   }
 }
 
-// ── Hear the word ─────────────────────────────────────────────────────────────
-function hearWord() {
-  if (!window.speechSynthesis) return;
-  const word = shuffled[currentIdx].word;
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(word.toLowerCase());
-  utt.lang = 'en-US'; utt.rate = 0.75; utt.pitch = 1.0;
-  window.speechSynthesis.speak(utt);
-
-  // Also spell it out after 1s (for harder words)
-  // Disabled by default — only on hint
-}
-
-// ── Hint: reveal first unrevealed letter ─────────────────────────────────────
 function useHint() {
+  if (answered || hintsLeft <= 0) return;
   const word = shuffled[currentIdx].word;
-  if (hintsUsed >= word.length - 1) return;
-  // Fill the next blank with correct letter
+
+  // Corrige qualquer letra errada já digitada antes de inserir a próxima
+  const wrongPos = currentInput.findIndex((ch, i) => ch !== word[i]);
+  if (wrongPos !== -1) {
+    currentInput = currentInput.slice(0, wrongPos);
+  }
+
   if (currentInput.length < word.length) {
-    const correctLetter = word[currentInput.length];
-    currentInput.push(correctLetter);
-    hintsUsed++;
+    const nextLetter = word[currentInput.length];
+    currentInput.push(nextLetter);
+    hintsLeft--;
+    document.getElementById('hints-left').textContent = `(${hintsLeft})`;
+    document.getElementById('hint-btn').disabled = hintsLeft <= 0;
     updateBoxes();
-    // Mark the box as a hint
-    const box = document.getElementById(`lb-${currentInput.length-1}`);
-    if (box) box.classList.add('hint');
-    // Spell it aloud
-    const utt = new SpeechSynthesisUtterance(correctLetter);
-    utt.lang = 'en-US'; utt.rate = 0.7;
-    window.speechSynthesis?.speak(utt);
-    if (currentInput.length === word.length) setTimeout(checkSpelling, 200);
+    speakText(nextLetter.toLowerCase(), 0.8);
+    if (currentInput.length === word.length) {
+      setTimeout(checkSpelling, 180);
+    }
   }
 }
 
 function clearInput() {
-  // Only clear non-hinted letters
+  if (answered) return;
   currentInput = [];
   updateBoxes();
 }
 
-// ── Check spelling ────────────────────────────────────────────────────────────
 function checkSpelling() {
   if (answered) return;
+  const entry = shuffled[currentIdx];
+  const word  = entry.word;
+  if (currentInput.length < word.length) return;
+
   answered = true;
-  const word    = shuffled[currentIdx].word;
   const attempt = currentInput.join('');
   const isCorrect = attempt === word;
 
   const fb = document.getElementById('feedback');
-  fb.classList.remove('hidden','bg-emerald-500/20','text-emerald-300','border-emerald-500/40',
-                                'bg-red-500/20','text-red-300','border-red-500/40','border');
-  fb.classList.add('border');
+  const exEl = document.getElementById('example-reveal');
+  fb.classList.remove('hidden');
 
   if (isCorrect) {
-    const pts = Math.max(10 - hintsUsed * 2, 4);
-    score += pts;
-    document.getElementById('score-disp').textContent = score;
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    solvedCount++;
 
-    // Colour boxes green
+    const earned = (beeMode === 'bee' ? 15 : 11) + Math.min(8, (streak - 1) * 2);
+    score += earned;
+    saveMasteredWord(word);
+
+    document.getElementById('score-disp').textContent = `${score} XP`;
+    document.getElementById('streak-badge').textContent = String(streak);
+
     for (let i = 0; i < word.length; i++) {
       const box = document.getElementById(`lb-${i}`);
-      if (box) { box.classList.add('correct'); box.classList.remove('active','hint'); }
-      // Mark keyboard key
+      if (box) {
+        box.classList.remove('active');
+        box.classList.add('correct');
+      }
       const key = document.getElementById(`key-${word[i]}`);
       if (key) key.classList.add('used-correct');
     }
 
-    fb.textContent = `✅ Correct! "${word}" +${pts} pts 🎉`;
-    fb.classList.add('bg-emerald-500/20','text-emerald-300','border-emerald-500/40');
-    launchSparks();
-    setTimeout(nextWord, 1600);
-  } else {
-    lives--;
-    updateHearts();
+    fb.textContent = `🐝 Soletração perfeita! "${word}" (${entry.pt}) +${earned} XP`;
+    fb.className = 'font-black text-sm sm:text-base px-5 py-2.5 rounded-2xl text-center bg-emerald-500/20 text-emerald-300 border border-emerald-400/40';
+    exEl.textContent = `Exemplo: "${entry.ex}"`;
+    exEl.classList.remove('hidden');
 
-    // Colour boxes
+    historyLog.push({ item: entry, ok: true });
+    setTimeout(() => {
+      currentIdx++;
+      renderWord();
+    }, 1850);
+  } else {
+    streak = 0;
+    document.getElementById('streak-badge').textContent = '0';
+
     for (let i = 0; i < word.length; i++) {
       const box = document.getElementById(`lb-${i}`);
       if (!box) continue;
-      if (attempt[i] === word[i]) box.classList.add('correct');
-      else                        box.classList.add('wrong');
       box.classList.remove('active');
+      if (attempt[i] === word[i]) box.classList.add('correct');
+      else box.classList.add('wrong');
     }
 
-    // Mark wrong keys
-    for (let i = 0; i < attempt.length; i++) {
-      if (attempt[i] !== word[i]) {
-        const key = document.getElementById(`key-${attempt[i]}`);
-        if (key) key.classList.add('used-wrong');
-      }
-    }
+    fb.textContent = `Quase! A grafia correta é "${word}" (${entry.pt}).`;
+    fb.className = 'font-black text-sm sm:text-base px-5 py-2.5 rounded-2xl text-center bg-rose-500/20 text-rose-300 border border-rose-400/40';
+    exEl.textContent = `Exemplo: "${entry.ex}"`;
+    exEl.classList.remove('hidden');
 
-    fb.textContent = lives > 0
-      ? `❌ Not quite! The word is "${word}". Try again!`
-      : `💔 The word was "${word}". Let's keep going!`;
-    fb.classList.add('bg-red-500/20','text-red-300','border-red-500/40');
+    speakText(word.toLowerCase(), 0.78);
+    historyLog.push({ item: entry, ok: false });
 
-    // Shake the letter row
-    const row = document.getElementById('letter-row');
-    row.classList.add('do-shake');
-    setTimeout(() => row.classList.remove('do-shake'), 450);
-
-    if (lives <= 0) {
-      setTimeout(showFinished, 1800);
-    } else {
-      setTimeout(() => {
-        currentInput = [];
-        answered     = false;
-        buildLetterBoxes(word.length);
-        fb.classList.add('hidden');
-      }, 2200);
-    }
+    setTimeout(() => {
+      currentIdx++;
+      renderWord();
+    }, 2500);
   }
 }
 
-function updateHearts() {
-  document.querySelectorAll('[data-h]').forEach(h => {
-    if (parseInt(h.dataset.h) > lives) {
-      h.style.opacity = '0.2';
-      h.style.transform = 'scale(0.7)';
-    }
+function showFinished() {
+  if (window.Store) {
+    Store.addXP(score);
+    Store.completeActivity('games');
+    Store.completeActivity('spelling');
+    if (typeof Store.activateStreak === 'function') Store.activateStreak();
+  }
+
+  document.getElementById('game-card').classList.add('hidden');
+  document.getElementById('summary-card').classList.remove('hidden');
+
+  const acc = shuffled.length > 0 ? Math.round((solvedCount / shuffled.length) * 100) : 0;
+  document.getElementById('sum-xp').textContent = `+${score} XP`;
+  document.getElementById('sum-acc').textContent = `${acc}%`;
+  document.getElementById('sum-streak').textContent = `${bestStreak}x`;
+  document.getElementById('summary-subtitle').textContent =
+    `Você soletrou corretamente ${solvedCount} de ${shuffled.length} palavras!`;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = historyLog.map(({ item, ok }, idx) => `
+    <div class="bg-white/5 border ${ok ? 'border-emerald-400/25' : 'border-rose-400/35'} rounded-2xl p-3 flex items-start justify-between gap-2">
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span>${ok ? '✅' : '❌'}</span>
+          <span class="font-extrabold text-sm text-white">${item.word}</span>
+          <span class="text-xs text-amber-300 font-bold">→ ${item.pt}</span>
+        </div>
+        <p class="text-xs text-slate-300 mt-1">${item.ex}</p>
+      </div>
+      <button type="button" data-review-idx="${idx}" class="review-speak-btn shrink-0 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 p-2 rounded-xl" title="Ouvir palavra e frase">
+        <span class="material-symbols-outlined text-base">volume_up</span>
+      </button>
+    </div>
+  `).join('');
+
+  reviewEl.querySelectorAll('.review-speak-btn').forEach(btn => {
+    btn.onclick = () => {
+      const entry = historyLog[+btn.dataset.reviewIdx];
+      if (entry) speakText(`${entry.item.word.toLowerCase()}. ${entry.item.ex}`, 0.88);
+    };
   });
 }
 
-function nextWord() {
-  currentIdx++;
-  if (currentIdx >= shuffled.length) {
-    showFinished();
-  } else {
-    renderWord();
+// ── Controles & Atalhos ──────────────────────────────────────────────────────
+document.getElementById('hear-btn').onclick = () => {
+  const w = shuffled[currentIdx];
+  if (w) speakText(w.word.toLowerCase(), 0.88);
+};
+document.getElementById('hear-slow-btn').onclick = () => {
+  const w = shuffled[currentIdx];
+  if (w) speakText(w.word.toLowerCase(), 0.65);
+};
+document.getElementById('hear-sentence-btn').onclick = () => {
+  const w = shuffled[currentIdx];
+  if (w) speakText(`${w.word.toLowerCase()}. ${w.ex}`, 0.88);
+};
+document.getElementById('hint-btn').onclick = useHint;
+document.getElementById('clear-btn').onclick = clearInput;
+document.getElementById('btn-play-again').onclick = startSession;
+
+document.querySelectorAll('#track-chips button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#track-chips button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTrack = btn.dataset.track;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#mode-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#mode-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    beeMode = btn.dataset.mode;
+    startSession();
+  };
+});
+
+document.querySelectorAll('#len-buttons button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#len-buttons button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sessionLength = +btn.dataset.len;
+    startSession();
+  };
+});
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('game-card').classList.contains('hidden')) return;
+  const k = e.key.toUpperCase();
+  if (k === 'BACKSPACE') {
+    e.preventDefault();
+    handleKey('⌫');
+  } else if (k === 'ENTER') {
+    e.preventDefault();
+    checkSpelling();
+  } else if (/^[A-Z]$/.test(k)) {
+    handleKey(k);
   }
-}
+});
 
-// ── Sparks ─────────────────────────────────────────────────────────────────────
-function launchSparks() {
-  const colors = ['#f59e0b','#10b981','#ec4899','#a855f7','#3b82f6'];
-  for (let i = 0; i < 16; i++) {
-    const sp = document.createElement('div');
-    sp.className = 'spark';
-    const a = (i/16)*360, d = 55+Math.random()*70;
-    sp.style.setProperty('--tx',`${Math.cos(a*Math.PI/180)*d}px`);
-    sp.style.setProperty('--ty',`${Math.sin(a*Math.PI/180)*d}px`);
-    sp.style.background = colors[i%colors.length];
-    sp.style.left='50vw'; sp.style.top='40vh';
-    document.body.appendChild(sp);
-    setTimeout(()=>sp.remove(), 950);
-  }
-}
-
-// ── Finished overlay ───────────────────────────────────────────────────────────
-function showFinished() {
-  const total    = shuffled.length;
-  const maxScore = total * 10;
-  const pct      = score / maxScore;
-  const xp       = Math.round(pct * 50) + 10;
-  const stars    = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1;
-
-  if (window.Store) {
-    Store.addXP(xp);
-    Store.activateStreak();
-    Store.completeActivity('games');
-    Store.completeActivity('spelling');
-    if (stars === 3) Store.unlockBadge('fast_tracker');
-  }
-
-  const overlay = document.createElement('div');
-  overlay.className = 'fixed inset-0 z-[9000] flex items-center justify-center bg-black/60 backdrop-blur-sm';
-  overlay.innerHTML = `
-    <div id="fin" class="bg-gradient-to-br from-[#001f3f] to-slate-900 border-2 border-yellow-500/60
-         rounded-[3rem] px-10 py-10 flex flex-col items-center gap-5 shadow-2xl text-center max-w-sm mx-4
-         scale-0 opacity-0 transition-all duration-500">
-      <div class="text-7xl float">🐝</div>
-      <div>
-        <p class="font-label text-yellow-400 font-bold text-sm uppercase tracking-widest mb-1">Spelling Bee Complete!</p>
-        <h2 class="font-headline text-5xl font-black text-white mb-1">+${xp} XP</h2>
-        <p class="font-body text-slate-300">Score: ${score} points</p>
-      </div>
-      <div class="flex gap-1">
-        ${[1,2,3].map(i=>`<span class="material-symbols-outlined text-3xl ${i<=stars?'text-yellow-400':'text-white/20'}"
-             style="font-variation-settings:'FILL' 1;">star</span>`).join('')}
-      </div>
-      <p class="font-body text-slate-400 text-sm">
-        ${stars===3?'🏅 Perfect speller! Fast Tracker badge unlocked!':
-          stars===2?'Great spelling! Keep practising! 🌿':
-                    'Good effort! Tap "Hear it" to learn each word. 💪'}
-      </p>
-      <div class="flex gap-3 flex-wrap justify-center">
-        <button onclick="location.reload()" class="bg-white/10 hover:bg-white/20 text-white font-label font-bold px-7 py-3 rounded-full border border-white/20 active:scale-95 transition-all">Play Again 🔄</button>
-        <button onclick="window.location.href='5_Game_Pavilion_Forest_Edition.html'"
-                class="bg-yellow-500 hover:bg-yellow-400 text-white font-label font-bold px-7 py-3 rounded-full active:scale-95 transition-all shadow-lg shadow-yellow-500/30">Games 🌿</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const f=document.getElementById('fin');
-    f.style.transform='scale(1)'; f.style.opacity='1';
-  }));
-  launchSparks();
-}
+buildKeyboard();
+startSession();
 </script>
 <script src="celebration.js?v=cel3"></script>
 <script src="game-celebra.js?v=gc1"></script>
