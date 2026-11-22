@@ -323,7 +323,7 @@ const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta se
 async function carregarIndice() {
   if (LESSON_INDEX.length) return LESSON_INDEX;
   try {
-    const r = await fetch('data/lessons-index.json?v=esit1');
+    const r = await fetch('data/lessons-index.json?v=esit2');
     if (r.ok) LESSON_INDEX = await r.json();
   } catch (e) { /* offline: segue com o que der */ }
   return LESSON_INDEX;

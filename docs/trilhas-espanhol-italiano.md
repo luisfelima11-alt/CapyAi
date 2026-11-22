@@ -1,9 +1,9 @@
 # Trilhas diárias — espanhol e italiano
 
-Primeira etapa A1: oito unidades por idioma, quatro mini-lições por unidade.
+Etapa iniciante A1 expandida: 16 unidades por idioma, quatro mini-lições por unidade (64 por idioma; 128 no total). Não representa todo o currículo A1 concluído.
 
-- Espanhol: `learn.html?lang=es`, IDs 901–908, capítulos 100–101.
-- Italiano: `learn.html?lang=it`, IDs 1001–1008, capítulos 200–201.
+- Espanhol: `learn.html?lang=es`, IDs 901–916, capítulos 100–103.
+- Italiano: `learn.html?lang=it`, IDs 1001–1016, capítulos 200–203.
 - Cada unidade: 10 entradas de vocabulário com tradução, 3 expressões com exemplos, 6 frases, explicações e tabela de padrões, 5 perguntas de múltipla escolha e 4 frases de fala.
 - Mini 1: escuta e quiz; mini 2: jogo com o vocabulário da unidade; mini 3: montagem de frases e fala; mini 4: conversa com a Yara.
 
@@ -13,7 +13,15 @@ As conclusões usam as chaves do Store já existentes: `es:901_1`, `it:1001_1` e
 
 O teste de nível de inglês continua disponível para inglês; não é exigido para entrar nas outras trilhas. O resultado de inglês não é sobrescrito. As novas trilhas mostram seu próprio rótulo A1.
 
-O desafio de capítulo e os desvios de notícias/música/história que ainda são específicos de inglês não aparecem nestas duas primeiras trilhas. A revisão global que mistura idiomas também não é apresentada nestes mapas. As 32 mini-lições de cada idioma usam conteúdo próprio.
+O desafio de capítulo e os desvios de notícias/música/história que ainda são específicos de inglês não aparecem nestas duas primeiras trilhas. A revisão global que mistura idiomas também não é apresentada nestes mapas. As 64 mini-lições de cada idioma usam conteúdo próprio.
+
+## Segunda etapa de conteúdo
+
+As unidades 9–16 acrescentam: casa e família; supermercado; roupas e tamanhos; gostos e convites; restaurante e comunicação de alergias; passagens e horários; entrevista de emprego; primeiro dia no escritório. A entrevista e o escritório retomam a situação pedida pelo usuário: apresentação de Jadson, agência de marketing, capacidades profissionais e descrição de objetos à sua frente. São modelos para personalização, não dados de um perfil do aluno.
+
+Cada idioma tem explicações próprias, sem copiar regras do português ou do outro curso: possessivos e parentesco em italiano, `hay` / `estar` em espanhol, `gustar` / `piacere`, plurais irregulares, cores e registros formal/informal. As últimas duas unidades revisam estruturas já apresentadas em uma situação adulta de trabalho.
+
+As unidades 1–8 mantêm conteúdo e IDs. Quem já concluiu as 32 mini-lições antigas passa à unidade 9, sem reset nem migração de progresso. O mapa e o índice recebem a versão de catálogo `esit2` para tornar a expansão visível.
 
 ## Construção e expansão
 
@@ -34,4 +42,4 @@ Após editar:
 - `node tests/romance-trails.e2e.js` com Playwright e Chromium instalados.
 - Testes de regressão: francês, turco, microfone, streak, contextos das aulas e segurança.
 
-O teste de navegador usa somente perfil, transcrição e IA fictícios. Verifica os quatro tipos de mini-lição, os 16 conteúdos, navegação, idioma do áudio/microfone/chat, conclusão sem misturar idiomas e layout de 320 px.
+O teste de navegador usa somente perfil, transcrição e IA fictícios. Verifica os quatro tipos de mini-lição, os 32 conteúdos, navegação entre as duas etapas, idioma do áudio/microfone/chat, conclusão sem misturar idiomas, retomada na unidade 9 para alunos antigos, contagens dos cursos e layout de 320 px, inclusive nas mini-lições novas.
