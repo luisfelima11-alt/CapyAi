@@ -8,13 +8,16 @@ const index=json('data/lessons-index.json');
 const ctx={window:{},document:{currentScript:null,addEventListener(){}},console};
 vm.runInNewContext(read('components.js'),ctx);
 for(const [lang,start,course] of [['es',901,'spanish'],['it',1001,'italian']]){
- test(lang+': eight complete units with unique exercises and generated data',()=>{
+ test(lang+': sixteen complete units with unique exercises and generated data',()=>{
   const source={window:{}};
   vm.runInNewContext(read('lessons_'+lang+'_data.js'),source);
   const units=source.window['LESSONS_'+lang.toUpperCase()];
-  assert.equal(units.length,8);
-  assert.deepEqual(Array.from(units,u=>u.id),Array.from({length:8},(_,i)=>start+i));
-  assert.equal(index.filter(l=>l.lang===lang).length,8);
+  assert.equal(units.length,16);
+  assert.deepEqual(Array.from(units,u=>u.id),Array.from({length:16},(_,i)=>start+i));
+  assert.equal(index.filter(l=>l.lang===lang).length,16);
+  assert.equal(new Set(units.map(u=>u.title)).size,16);
+  assert.equal(new Set(units.map(u=>u.objective)).size,16);
+  assert.equal(new Set(units.flatMap(u=>u.quiz.map(q=>q.q+'|'+q.a))).size,80);
   for(const u of units){
    assert.equal(u.lang,lang);assert.equal(u.course,course);assert.equal(u.level,'A1');
    assert(u.objective && u.focus);
@@ -56,16 +59,34 @@ test('catalogue and course ranges stay disjoint from existing courses',()=>{
  const c={window:{}};vm.runInNewContext(read('trail-language-catalog.js'),c);
  const chapters=new Set();
  for(const course of c.window.CapyLanguageTrails) {
-  assert.equal(course.lessons.length,8);
+  assert.equal(course.lessons.length,16);
+  assert.equal(course.blocks.length,4);
+  assert.equal(new Set(course.lessons.map(l=>l.id)).size,16);
   for(const lesson of course.lessons) assert.equal(index.find(l=>l.id===lesson.id).lang,course.lang);
   for(let i=0;i<course.blocks.length;i++){
    assert(!chapters.has(course.chapterStart+i));chapters.add(course.chapterStart+i);
+   assert.equal(course.lessons.filter(l=>l.chapter===course.chapterStart+i).length,4);
   }
  }
  assert.equal(new Set(index.map(l=>l.id)).size,index.length);
  assert.equal(index.filter(l=>l.lang==='en').length,241);
  assert.equal(index.filter(l=>l.lang==='fr').length,42);
  assert.equal(index.filter(l=>l.lang==='tr').length,36);
+});
+
+test('new interview and office practice contains concrete language, not English templates',()=>{
+ for(const [lang,start,patterns] of [
+  ['es',915,[/Trabajo como gerente/,/Puedo trabajar en equipo/,/Hay dos computadoras/,/Mi escritorio está/]],
+  ['it',1015,[/Lavoro come responsabile/,/Posso lavorare in gruppo/,/Ci sono due computer/,/La mia scrivania è/]]
+ ]){
+  const interview=json('data/lessons/'+start+'.json'),office=json('data/lessons/'+(start+1)+'.json');
+  const text=[...interview.sentences,...office.sentences].join('\n');
+  for(const pattern of patterns) assert.match(text,pattern);
+  assert.equal(interview.lang,lang);assert.equal(office.lang,lang);
+  assert(!/there is|there are|I am working/i.test(text));
+  const context=json('api/aulas-contexto.json')['trilha_'+start];
+  assert.equal(context.lang,lang);
+ }
 });
 test('new completion keys cannot complete lessons in another language',()=>{
  const values=new Map();

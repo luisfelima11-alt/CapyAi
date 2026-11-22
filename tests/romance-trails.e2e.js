@@ -38,7 +38,7 @@ const {chromium}=require('playwright');
    await page.goto(origin+'/learn.html?lang='+lang);
    await page.locator('#continue-btn').waitFor();
    assert.equal(await page.locator('[data-lang='+lang+']').getAttribute('aria-pressed'),'true');
-   assert.equal(await page.evaluate(()=>MINI_TRAIL.filter(m=>CHAPTERS.find(c=>c.id===m.chapter)?.lang===currentTrailLang).length),32);
+   assert.equal(await page.evaluate(()=>MINI_TRAIL.filter(m=>CHAPTERS.find(c=>c.id===m.chapter)?.lang===currentTrailLang).length),64);
    assert.equal(await page.evaluate(()=>document.querySelectorAll('[onclick*="startBoss"],[onclick*="openBoss"]').length),0);
    assert.equal(await page.evaluate(()=>CapyYaraWidget.aula()),'trilha_'+start);
    await page.locator('#continue-btn').click();
@@ -95,13 +95,38 @@ const {chromium}=require('playwright');
    assert(!await page.evaluate(start=>Store.isMiniDone(start,4,'en'),start));
    assert.equal(await page.evaluate(()=>trilhaDoCurso(currentLesson.id)),'learn.html?lang='+lang);
    assert.equal(await page.evaluate(()=>_nextLessonInCurrentLanguage().id),start+1);
-   for(let id=start;id<start+8;id++){
+   for(let id=start;id<start+16;id++){
     await page.goto(origin+'/lessons.html?lesson='+id);
     await page.waitForFunction(id=>currentLesson?.id===id,id);
     assert.equal(await page.evaluate(()=>_lessonLanguage()),lang);
-    assert.equal(await page.evaluate(()=>posicaoNoCurso(currentLesson.id).total),8);
+    assert.equal(await page.evaluate(()=>posicaoNoCurso(currentLesson.id).total),16);
+    if(id===start+7) assert.equal(await page.evaluate(()=>_nextLessonInCurrentLanguage().id),start+8);
    }
    assert.equal(await page.evaluate(()=>_nextLessonInCurrentLanguage()),null);
+   // Expanded units use every guided tool with their own target-language material.
+   for(let mini=1;mini<=4;mini++){
+    await page.goto(lessonUrl(start+15,mini));
+    await page.waitForFunction(id=>currentLesson?.id===id,start+15);
+    const selector={1:'#listen-opts button',2:'#panel-'+await page.evaluate(()=>currentTool),3:'#build-tiles button',4:'#aichat-input'}[mini];
+    await page.locator(selector).first().waitFor();
+    assert.equal(await page.evaluate(()=>CUR_TTS_LANG),locale);
+    if(mini===2) assert(['speed','scramble','typing'].includes(await page.evaluate(()=>currentTool)));
+    await page.setViewportSize({width:320,height:760});
+    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'New mini '+mini+' fits at 320px');
+    await page.setViewportSize({width:1366,height:900});
+   }
+   await page.goto(origin+'/learn.html?lang='+lang);
+   await page.locator('#continue-btn').waitFor();
+   // A returning learner who finished the original release continues at unit 9.
+   await page.evaluate(({start,lang})=>{
+    for(let id=start;id<start+8;id++) for(let n=1;n<=4;n++) Store.completeMini(id,n,lang);
+    localStorage.setItem('capyLastMini_'+lang,JSON.stringify({lessonId:start+7,miniNum:4}));
+    buildContinueCard();
+   },{start,lang});
+   assert.deepEqual(await page.evaluate(lang=>{const m=computeNextMini(lang);return[m.lessonId,m.miniNum];},lang),[start+8,1]);
+   assert.equal(await page.evaluate(()=>CapyYaraWidget.aula()),'trilha_'+(start+8));
+   await page.locator('#continue-btn').click();
+   await page.waitForURL('**/lessons.html?lesson='+(start+8)+'&mini=1&guided=1');
    await page.goto(origin+'/learn.html?lang='+lang);
    await page.locator('#continue-btn').waitFor();
    await page.waitForTimeout(1200);
@@ -116,11 +141,15 @@ const {chromium}=require('playwright');
   await page.waitForFunction(()=>typeof CURSOS!=='undefined');
   assert.equal(await page.evaluate(()=>CURSOS.spanish),'learn.html?lang=es');
   assert.equal(await page.evaluate(()=>CURSOS.italian),'learn.html?lang=it');
+  assert.equal(await page.evaluate(()=>CURSO_POR_ID.spanish.aulas),16);
+  assert.equal(await page.evaluate(()=>CURSO_POR_ID.italian.aulas),16);
+  assert.equal(await page.evaluate(()=>progresso('spanish').feitas),8);
+  assert.equal(await page.evaluate(()=>progresso('italian').feitas),8);
   await page.evaluate(()=>localStorage.setItem('capyPlacementDone','1'));
   await page.goto(origin+'/learn.html?lang=en');
   await page.locator('#continue-btn').waitFor();
   assert.equal(await page.locator('[data-lang=en]').getAttribute('aria-pressed'),'true');
   assert.deepEqual(errors,[]);
-  console.log('OK: 16 units, 64 minis, five language buttons, game/build/quiz/speech/chat, progress separation, course links and 320px layout. No JavaScript errors.');
+  console.log('OK: 32 units, 128 minis, five language buttons, game/build/quiz/speech/chat, returning learners advance to unit 9, progress separation, course links and 320px layout. No JavaScript errors.');
  }finally{await browser?.close();server.closeAllConnections();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

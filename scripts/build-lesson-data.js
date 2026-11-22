@@ -159,8 +159,8 @@ console.log(`data/lessons-index.json: ${(indiceJson.length / 1024).toFixed(0)} K
 
 // Lightweight catalogue for the trail: no need to download both full curricula.
 const languageTrails = [
-  {lang:'es', name:'Español', chapterStart:100, icon:'🇪🇸', blocks:['Primeros pasos · Primeiros passos','Vida diaria · Cotidiano e trabalho']},
-  {lang:'it', name:'Italiano', chapterStart:200, icon:'🇮🇹', blocks:['Primi passi · Primeiros passos','Vita quotidiana · Cotidiano e trabalho']}
+  {lang:'es', name:'Español', chapterStart:100, icon:'🇪🇸', blocks:['Primeros pasos · Primeiros passos','Vida diaria · Cotidiano e trabalho','Casa, compras y ocio · Casa, compras e lazer','Viajes y profesión · Viagens e vida profissional']},
+  {lang:'it', name:'Italiano', chapterStart:200, icon:'🇮🇹', blocks:['Primi passi · Primeiros passos','Vita quotidiana · Cotidiano e trabalho','Casa, acquisti e tempo libero · Casa, compras e lazer','Viaggi e professione · Viagens e vida profissional']}
 ].map(config => ({
   ...config,
   lessons: fontes.find(source => source.lang === config.lang).lessons.map((lesson,i)=>({
