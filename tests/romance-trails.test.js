@@ -84,3 +84,19 @@ test('new completion keys cannot complete lessons in another language',()=>{
  assert(s.isLessonDone(901,'es') && !s.isLessonDone(901,'en'));
  assert.equal(s.state.completedMinis.length,2);
 });
+test('switching languages preserves an English level restored after page initialization',()=>{
+ const elements={};
+ const c={
+  currentTrailLang:'en',playerLevel:'starter',
+  localStorage:{getItem:key=>key==='capyPlayerLevel'?'elementary':null},
+  Components:{icon:()=>''},
+  document:{getElementById:id=>elements[id]||(elements[id]={})}
+ };
+ const source=read('learn.html').match(/function setLevelBadge\(nivel\) \{[\s\S]*?^\}/m)[0];
+ vm.runInNewContext(source+';setLevelBadge();',c);
+ assert.equal(elements['level-name'].textContent,'Elementary Level');
+ c.currentTrailLang='it';vm.runInNewContext('setLevelBadge();',c);
+ assert.match(elements['level-name'].textContent,/Italiano.*A1/);
+ c.currentTrailLang='en';vm.runInNewContext('setLevelBadge();',c);
+ assert.equal(elements['level-name'].textContent,'Elementary Level');
+});

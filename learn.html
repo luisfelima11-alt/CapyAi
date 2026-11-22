@@ -2547,7 +2547,7 @@ function setLevelBadge(nivel) {
     'pre-intermediate': { name:'Pre-Intermediate', emoji:'🌳', iconKey:'sapling' },
     'intermediate': { name:'Intermediate', emoji:'🌲', iconKey:'tree' },
   };
-  const l = map[nivel || playerLevel] || map['starter'];
+  const l = map[nivel || localStorage.getItem('capyPlayerLevel') || playerLevel] || map['starter'];
   document.getElementById('level-emoji').innerHTML = Components.icon(l.iconKey, 'w-5 h-5') || l.emoji;
   document.getElementById('level-name').textContent  = l.name + ' Level';
 }
