@@ -260,7 +260,9 @@
     <li><a href="classes_agro.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Agro English — do zero (turma fechada)</a></li>
     <li><a href="classes_med.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Medical English — inglês para médicos</a></li>
           <li><a href="classes_interview.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Entrevista de Emprego em Inglês</a></li>
-    <li><a href="learn.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Inglês</a></li>
+    <li><a href="learn.html?lang=en" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Inglês</a></li>
+    <li><a href="learn.html?lang=es" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Espanhol</a></li>
+    <li><a href="learn.html?lang=it" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Italiano</a></li>
     <li><a href="learn_fr.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária de Francês</a></li>
     <li><a href="learn_intermediate.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária Intermediate</a></li>
     <li><a href="learn_gpstronic.html" class="text-slate-500 hover:text-navy underline decoration-dotted">Trilha Diária GPS Tronic</a></li>
@@ -302,6 +304,8 @@ const CURSOS = {
   advanced:     'classes_advanced.html',
   francais:     'classes_fr.html',
   turkish:      'classes_tr.html',
+  spanish:      'learn.html?lang=es',
+  italian:      'learn.html?lang=it',
   gpstronic:    'classes_gpstronic.html',
   agro:         'classes_agro.html',
   med:          'classes_med.html',
@@ -328,7 +332,9 @@ const GRUPOS = [
     { id: 'med',          em: '🩺', nome: 'Medical English',       nivel: 'A0 → A2', aulas: 10 } ] },
   { nome: 'Outros idiomas', cor: '#be123c', cursos: [
     { id: 'francais',     em: '🇫🇷', nome: 'Français',             nivel: 'A1 → A2', aulas: 12 },
-    { id: 'turkish',      em: '🇹🇷', nome: 'Türkçe',               nivel: 'A1 → A2', aulas: 36 } ] },
+    { id: 'turkish',      em: '🇹🇷', nome: 'Türkçe',               nivel: 'A1 → A2', aulas: 36 },
+    { id: 'spanish',      em: '🇪🇸', nome: 'Español · Trilha diária', nivel: 'Primeiros passos · A1', aulas: 8 },
+    { id: 'italian',      em: '🇮🇹', nome: 'Italiano · Trilha diária', nivel: 'Primeiros passos · A1', aulas: 8 } ] },
 ];
 const CURSO_POR_ID = Object.fromEntries(GRUPOS.flatMap(g => g.cursos.map(c => [c.id, c])));
 
@@ -350,6 +356,8 @@ const VISUAL = {
   med:          { cor: '#dc2626', claro: '#fee2e2', busca: 'medico medicina saude hospital paciente', chave: 'capyMedCompleted', prefixo: 'med' },
   francais:     { cor: '#0369a1', claro: '#e0f2fe', busca: 'frances french franca outro idioma', chave: 'capyFrCompleted', prefixo: 'fr' },
   turkish:      { cor: '#be123c', claro: '#ffe4e6', busca: 'turco turquia turkce outro idioma' },
+  spanish:      { cor: '#b45309', claro: '#fef3c7', busca: 'espanhol spanish espana espanol trilha outro idioma', miniLang:'es', start:901 },
+  italian:      { cor: '#047857', claro: '#d1fae5', busca: 'italiano italian italia trilha outro idioma', miniLang:'it', start:1001 },
 };
 // O nome curto de cada grupo no filtro do topo.
 const CHIP = { 'Inglês geral': 'Inglês geral', 'Inglês para o trabalho': 'Trabalho', 'Inglês profissional': 'Profissional', 'Outros idiomas': 'Outros idiomas' };
@@ -452,6 +460,12 @@ function progresso(id) {
   if (id === 'starter') {
     return { feitas: totalFeitas, total: LESSONS.length,
       prox: totalFeitas >= LESSONS.length ? null : { n: alvoStarter.n, href: alvoStarter.href, titulo: alvoStarter.title } };
+  }
+  if (c && v.miniLang) {
+    const ids = Array.from({length:c.aulas},(_,i)=>v.start+i);
+    const done = ids.filter(n=>Store.isLessonDone(n,v.miniLang)).length;
+    const pending = ids.find(n=>!Store.isLessonDone(n,v.miniLang));
+    return {feitas:done,total:c.aulas,prox:pending ? {n:pending-v.start+1,href:CURSOS[id],titulo:c.nome} : null};
   }
   if (!c || !v.chave || !v.prefixo) return null;
   let lista = [];

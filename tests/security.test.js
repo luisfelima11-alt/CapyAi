@@ -565,7 +565,7 @@ test('npm audit gate: production gets no exception; a dev-only one holds only un
 
 test('the CI and npm run security:check run the audit gate; every exception has a package, a date and a reason', () => {
   const { EXCECOES } = require('../scripts/audit.js')._internos;
-  const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/security.yml'), 'utf8');
+  const workflow = fs.readFileSync(path.join(ROOT, '.github/workflows/security.yml'), 'utf8').replace(/\r\n/g, '\n');
   assert.match(workflow, /- run: node scripts\/audit\.js\n/);
   assert.doesNotMatch(workflow, /npm audit/);
   assert.match(require('../package.json').scripts['security:check'], /^node scripts\/audit\.js && /);

@@ -26,10 +26,11 @@
 <script src="auth-secure.js?v=seg1"></script>
   <script src="store.js?v=trail-progress"></script>
 <script src="streak-overlay.js?v=land1"></script>
-  <script src="badge-toast.js?v=c52d7db"></script>
+  <script src="badge-toast.js?v=c52d7db" defer></script>
   <script src="levelup-overlay.js?v=land1"></script>
-  <script src="components.js?v=seg1"></script>
+  <script src="components.js?v=esit1"></script>
   <script src="lessons_tr_data.js?v=tr2"></script>
+  <script src="trail-language-catalog.js?v=esit1"></script>
   <script>
     tailwind.config = {
       darkMode:'class',
@@ -87,7 +88,7 @@
         <span id="level-emoji" class="text-xl inline-flex items-center">🌱</span>
         <span id="level-name" class="font-black text-sm text-white">Starter Level</span>
       </div>
-      <a href="placement_test.html" class="text-slate-500 hover:text-slate-300 text-xs underline">Retake test →</a>
+      <a id="trail-placement-link" href="placement_test.html" class="text-slate-500 hover:text-slate-300 text-xs underline">Retake test →</a>
     </div>
 
     <!-- Continue CTA / Hero -->
@@ -171,10 +172,12 @@
     </div>
 
     <!-- Language toggle -->
-    <div id="trail-lang-toggle" class="inline-flex items-center gap-1 bg-white/5 border border-white/10 rounded-full p-1 mb-3">
+    <div id="trail-lang-toggle" aria-label="Idioma da trilha diária" class="inline-flex flex-wrap max-w-full items-center gap-1 bg-white/5 border border-white/10 rounded-2xl p-1 mb-3">
       <button data-lang="en" onclick="setTrailLang('en')" class="bg-pink-500 text-white font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇬🇧 English</button>
       <button data-lang="fr" onclick="setTrailLang('fr')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇫🇷 Français</button>
       <button data-lang="tr" onclick="setTrailLang('tr')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇹🇷 Türkçe</button>
+      <button data-lang="es" onclick="setTrailLang('es')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇪🇸 Español</button>
+      <button data-lang="it" onclick="setTrailLang('it')" class="bg-white/10 text-slate-300 font-bold text-xs px-4 py-1.5 rounded-full transition-all">🇮🇹 Italiano</button>
     </div>
     <!-- Free plan banner -->
     <div id="free-plan-banner" class="hidden flex items-center justify-between bg-pink-500/10 border border-pink-500/25 rounded-xl px-4 py-2.5 mb-3">
@@ -1949,6 +1952,17 @@ const CHAPTERS = [
   }
 ];
 
+// New languages have independent chapters and IDs; only their catalogue is loaded here.
+for (const course of window.CapyLanguageTrails || []) {
+  TRAIL.push(...course.lessons);
+  course.blocks.forEach((name,index) => CHAPTERS.push({
+    id:course.chapterStart+index, name:course.name+' A1 · '+name,
+    color:index === 0 ? 'from-rose-600 to-pink-500' : 'from-teal-600 to-cyan-500',
+    icon:course.icon, iconKey:'globe', lang:course.lang,
+    lessons:course.lessons.filter(l=>l.chapter===course.chapterStart+index).map(l=>l.id)
+  }));
+}
+
 // ── Discovery activities (News / History / Music) ─────────────────────────────
 // "Detour" nodes placed on the trail path after each chapter's boss. They don't
 // gate progress (every node is unlocked anyway) — they resurface the daily AI
@@ -2000,9 +2014,11 @@ const playerLevel      = localStorage.getItem('capyPlayerLevel') || 'starter';
 
 // ── Trail language (English default; French is chapter 6) ──────────────────────
 const requestedTrailLang = new URLSearchParams(location.search).get('lang');
-let currentTrailLang = ['en','fr','tr'].includes(requestedTrailLang)
+const TRAIL_LANGUAGES = ['en','fr','tr','es','it'];
+const savedTrailLang = localStorage.getItem('capyTrailLang');
+let currentTrailLang = TRAIL_LANGUAGES.includes(requestedTrailLang)
   ? requestedTrailLang
-  : (localStorage.getItem('capyTrailLang') || 'en');
+  : (TRAIL_LANGUAGES.includes(savedTrailLang) ? savedTrailLang : 'en');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function getStepProgress(lessonId) {
@@ -2223,7 +2239,7 @@ function renderTrail() {
 
     // ── Boss node: "Desafio da Yara" at the end of each EN chapter ──
     // (skip French chapter 6 and "My Lessons" chapter 5)
-    if (ch.id !== 6 && ch.id !== 5) {
+    if (ch.id !== 6 && ch.id !== 5 && !['es','it'].includes(currentTrailLang)) {
       html += renderBossNode(ch, chMinis);
       // Discovery detour after the boss — rotates News → History → Music
       html += renderDiscoveryNode(DISCOVERY_ACTIVITIES[ci % DISCOVERY_ACTIVITIES.length]);
@@ -2519,6 +2535,12 @@ function scrollToNextMini() {
 
 // ── Level badge ───────────────────────────────────────────────────────────────
 function setLevelBadge(nivel) {
+  if (currentTrailLang !== 'en') {
+    const name = {fr:'Français',tr:'Türkçe',es:'Español',it:'Italiano'}[currentTrailLang];
+    document.getElementById('level-emoji').textContent = {fr:'🇫🇷',tr:'🇹🇷',es:'🇪🇸',it:'🇮🇹'}[currentTrailLang];
+    document.getElementById('level-name').textContent = name + (['es','it'].includes(currentTrailLang) ? ' · Primeiros passos A1' : ' · Trilha diária');
+    return;
+  }
   const map = {
     'starter': { name:'Starter', emoji:'🌱', iconKey:'sprout' },
     'elementary': { name:'Elementary', emoji:'🌿', iconKey:'seedling' },
@@ -2537,6 +2559,10 @@ function setLevelBadge(nivel) {
 // teste e o nível dele vira o selo. Visitante sem o teste vai para lá na hora.
 const NIVEL_DA_TRILHA = { beginner: 'starter', elementary: 'elementary', intermediate: 'pre-intermediate', advanced: 'intermediate' };
 (async function conferirOnboardingETeste() {
+  if (currentTrailLang !== 'en') {
+    if (typeof Auth !== 'undefined') await Auth.checkOnboarding();
+    return;
+  }
   const testeFeito = localStorage.getItem('capyPlacementDone');
   const cache = typeof Auth !== 'undefined' ? Auth.getSession() : null;
   const ehVisitante = s => !s || s.id === 'guest' || s.role === 'guest';
@@ -2566,16 +2592,21 @@ function syncTrailLangButtons(lang) {
     b.classList.toggle('text-white', on);
     b.classList.toggle('text-slate-300', !on);
     b.classList.toggle('bg-white/10', !on);
+    b.setAttribute('aria-pressed',String(on));
   });
 }
 
 function setTrailLang(lang) {
+  if (!TRAIL_LANGUAGES.includes(lang)) return;
   currentTrailLang = lang;
   localStorage.setItem('capyTrailLang', lang);
   const url = new URL(location.href);
   url.searchParams.set('lang', lang);
   history.replaceState(history.state, '', url);
+  document.title = 'Trilha Diária · '+({en:'Inglês',fr:'Francês',tr:'Turco',es:'Espanhol',it:'Italiano'}[lang])+' | Capy English';
   syncTrailLangButtons(lang);
+  setLevelBadge();
+  document.getElementById('trail-placement-link').hidden = lang !== 'en';
   // French retains its legacy non-guided behavior; Turkish uses the shared guided runner.
   const continueCard = document.getElementById('continue-card');
   if (lang === 'fr') {
@@ -2585,6 +2616,7 @@ function setTrailLang(lang) {
   }
   renderTrail();
   updateTrailCounter();
+  renderReviewCard();
   if (lang !== 'fr') buildContinueCard();
 }
 
@@ -2626,6 +2658,7 @@ function renderReviewCard() {
   const card = document.getElementById('review-card');
   const countLabel = document.getElementById('review-card-count');
   if (!card) return;
+  if (['es','it'].includes(currentTrailLang)) { card.classList.add('hidden'); return; }
   const count = countWeakWords();
   if (count >= 4) {
     card.classList.remove('hidden');
@@ -2768,6 +2801,6 @@ setTrailLang(currentTrailLang);
 scrollToNextMini();
 </script>
 <script>window.YARA_WIDGET = { lang: currentTrailLang, lessonTitle: 'Trilha Diária', lessonNum: '' };</script>
-<script src="yara-widget.js?v=yw8"></script>
+<script src="yara-widget.js?v=esit1"></script>
 </body>
 </html>

@@ -38,6 +38,14 @@
 
   function idDaAula() {
     if (ARQUIVO_AULA) return ARQUIVO_AULA;
+    // On the new trail maps, use the next lesson's canonical server-side material.
+    // Read at click time: switching the language must not leave the widget in English.
+    if (/\/learn(?:\.html)?$/.test(location.pathname) &&
+        typeof currentTrailLang !== 'undefined' && ['es','it'].includes(currentTrailLang) &&
+        typeof computeNextMini === 'function') {
+      const next = computeNextMini(currentTrailLang);
+      return 'trilha_' + (next?.lessonId || (currentTrailLang === 'es' ? 908 : 1008));
+    }
     const l = NA_TRILHA && licaoDaTrilha();
     return l ? 'trilha_' + l.id : null;
   }
@@ -268,7 +276,8 @@
 
   function atualizarCabecalho() {
     const titulo = PAGINA_DE_AULA ? tituloDaAula() : '';
-    $('yw-sub').textContent = titulo || (IS_FR ? 'Francês com a Yara' : 'Inglês com a Yara');
+    const mapaNovo = /\/learn(?:\.html)?$/.test(location.pathname) && typeof currentTrailLang !== 'undefined' && ['es','it'].includes(currentTrailLang);
+    $('yw-sub').textContent = mapaNovo ? (currentTrailLang === 'es' ? 'Espanhol com a Yara' : 'Italiano com a Yara') : titulo || (IS_FR ? 'Francês com a Yara' : 'Inglês com a Yara');
     const barra = $('yw-aula-bar');
     barra.hidden = !(PAGINA_DE_AULA && titulo);
     $('yw-aula-nome').textContent = titulo ? '📘 Nesta aula: ' + titulo : '';
@@ -419,7 +428,7 @@
     isLoading = true;
     sendBtn.disabled = true;
     const typingEl = addMsg('yara typing', 'A Yara está pensando…');
-    const aula = PAGINA_DE_AULA ? idDaAula() : null;
+    const aula = idDaAula();
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',

@@ -303,9 +303,9 @@
 <script src="memory.js?v=mem1"></script>
 <script src="store.js?v=trail-progress"></script>
 <script src="streak-overlay.js?v=land1"></script>
-<script src="components.js?v=seg1"></script>
+<script src="components.js?v=esit1"></script>
 <script src="celebration.js?v=cel3"></script>
-<script src="yara-widget.js?v=yw8"></script>
+<script src="yara-widget.js?v=esit1"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
 // LESSON DATA — All 24 Jadson lessons + custom lessons merged at boot
@@ -323,7 +323,7 @@ const LICOES_CARREGADAS = new Map(); // cache das lições já baixadas nesta se
 async function carregarIndice() {
   if (LESSON_INDEX.length) return LESSON_INDEX;
   try {
-    const r = await fetch('data/lessons-index.json?v=gps24');
+    const r = await fetch('data/lessons-index.json?v=esit1');
     if (r.ok) LESSON_INDEX = await r.json();
   } catch (e) { /* offline: segue com o que der */ }
   return LESSON_INDEX;
@@ -359,7 +359,7 @@ async function garantirLicoes(ids) {
 // Curso novo TEM que entrar aqui. Sem o início da faixa, a lição é contada
 // dentro do curso anterior: a 701 do Agro aparecia como "Aula 13 de 24",
 // somada às 12 do Entrevista (601-612).
-const INICIOS_DE_CURSO = [1, 201, 301, 401, 501, 601, 701, 801];
+const INICIOS_DE_CURSO = [1, 201, 301, 401, 501, 601, 701, 801, 901, 1001];
 
 function faixaDoCurso(id) {
   const ini = INICIOS_DE_CURSO.filter(s => id >= s).pop() || INICIOS_DE_CURSO[0];
@@ -369,6 +369,8 @@ function faixaDoCurso(id) {
 
 function trilhaDoCurso(id) {
   const n = Number(id || (currentLesson && currentLesson.id) || (new URLSearchParams(location.search).get('lesson')) || 1);
+  if (n >= 1001) return 'learn.html?lang=it';
+  if (n >= 901) return 'learn.html?lang=es';
   if (n >= 801) return 'learn_med.html';
   if (n >= 701) return 'learn_agro.html';
   if (n >= 601) return 'learn_interview.html';
@@ -1016,7 +1018,11 @@ function renderAIChat() {
   document.getElementById('aichat-compose').classList.remove('hidden');
   document.getElementById('aichat-writing-option').hidden = true;
   document.getElementById('aichat-input').value = '';
-  document.getElementById('aichat-input').placeholder = _lessonLanguage() === 'tr'
+  document.getElementById('aichat-input').placeholder = _lessonLanguage() === 'es'
+    ? 'Escribe en español… (ou peça ajuda em português)'
+    : _lessonLanguage() === 'it'
+    ? 'Scrivi in italiano… (ou peça ajuda em português)'
+    : _lessonLanguage() === 'tr'
     ? 'Türkçe cevap yazın… (ou peça ajuda em português)'
     : _lessonLanguage() === 'fr'
       ? 'Écrivez votre réponse en français… (ou peça ajuda em português)'
@@ -1026,7 +1032,11 @@ function renderAIChat() {
     offerChatWritingPractice('Você usou as mensagens disponíveis hoje. Ainda dá para concluir o Dia 4.');
   }
   // Yara opens the conversation
-  const opener = _lessonLanguage() === 'tr'
+  const opener = _lessonLanguage() === 'es'
+    ? `¡Muy bien! Terminaste «${currentLesson.title}». 🌟 ¿Puedes usar una palabra de esta lección en una frase?`
+    : _lessonLanguage() === 'it'
+    ? `Ottimo! Hai finito «${currentLesson.title}». 🌟 Puoi usare una parola di questa lezione in una frase?`
+    : _lessonLanguage() === 'tr'
     ? `Harika! “${currentLesson.title}” dersini bitirdin. 🌟 Bugün öğrendiğin bir Türkçe kelime söyler misin?`
     : _lessonLanguage() === 'fr'
       ? `Bravo ! Tu as terminé la leçon « ${currentLesson.title} » ! 🌟 Peux-tu me dire un mot en français que tu as appris aujourd'hui ?`
@@ -1388,6 +1398,8 @@ let guidedStep  = 0;
 // v2 = 6-step flow (no vocab). If old v1 key exists, clear it.
 const GUIDED_VERSION = 'v2';
 function _lessonLanguage() { return (currentLesson && currentLesson.lang) || 'en'; }
+function _lessonLocale() { return ({en:'en-US',fr:'fr-FR',tr:'tr-TR',es:'es-ES',it:'it-IT'})[_lessonLanguage()] || 'en-US'; }
+function _lessonLanguageName() { return ({en:'inglês',fr:'francês',tr:'turco',es:'espanhol',it:'italiano'})[_lessonLanguage()] || 'inglês'; }
 function _nextLessonInCurrentLanguage() {
   const language = _lessonLanguage();
   const { ini, fim } = faixaDoCurso(currentLesson.id);
@@ -1396,7 +1408,7 @@ function _nextLessonInCurrentLanguage() {
   return currentIndex >= 0 ? (languageLessons[currentIndex + 1] || null) : null;
 }
 function _lessonLower(value) {
-  const locale = _lessonLanguage() === 'tr' ? 'tr-TR' : _lessonLanguage() === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = _lessonLocale();
   return String(value || '').toLocaleLowerCase(locale);
 }
 function _miniSuffix() { return '_' + _lessonLanguage() + (miniNum > 0 ? '_m' + miniNum : ''); }
@@ -1768,9 +1780,7 @@ function buildSidebar() {
 async function loadLesson(id) {
   currentLesson = await garantirLicao(id) || ALL_LESSONS[0];
   if (!currentLesson) return;
-  CUR_TTS_LANG = currentLesson && currentLesson.lang === 'fr' ? 'fr-FR'
-    : currentLesson && currentLesson.lang === 'tr' ? 'tr-TR'
-    : 'en-US';
+  CUR_TTS_LANG = _lessonLocale();
   // Sidebar highlight
   document.querySelectorAll('.lesson-item').forEach(b => b.classList.remove('active'));
   const active = document.getElementById(`lesson-btn-${id}`);
@@ -2370,7 +2380,7 @@ function renderSpeak() {
   document.getElementById('panel-speak').innerHTML = `
     <div class="space-y-5">
       <div class="text-center bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl border border-teal-100 p-6">
-        <p class="text-xs font-bold text-teal-500 uppercase tracking-wide mb-3">Diga em ${_lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês'} 🎤</p>
+        <p class="text-xs font-bold text-teal-500 uppercase tracking-wide mb-3">Diga em ${_lessonLanguageName()} 🎤</p>
         <p class="font-headline text-2xl font-extrabold text-navy mb-4">"${phrase}"</p>
         <button onclick="speakWord('${phrase.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-teal-200 text-teal-600 font-bold text-sm hover:bg-teal-50 transition-all mb-4">
           <span class="material-symbols-outlined text-base" style="font-variation-settings:'FILL' 1;">volume_up</span> Ouvir exemplo
@@ -2423,7 +2433,7 @@ async function toggleMic(phrase) {
       fb.className = 'bg-teal-50 border border-teal-200 rounded-3xl p-5 text-center shadow-sm';
       fb.innerHTML = '<div class="text-teal-600 font-bold text-sm">🎧 Processando sua fala...</div>';
     }
-    const lang = CUR_TTS_LANG === 'fr-FR' ? 'fr' : CUR_TTS_LANG === 'tr-TR' ? 'tr' : 'en';
+    const lang = _lessonLanguage();
     const { text, empty, error } = await CapyMic.stopAndTranscribe({ lang });
     if (empty)  { showSpeakFeedback(false, '(nada foi ouvido)', phrase); return; }
     // Falha TÉCNICA (limite diário, rede, etc.) — nunca compara isto com a
@@ -2581,7 +2591,7 @@ function renderListen() {
   const opts   = shuffle([card, ...others]);
   const isEnToPt = listenMode === 'en-to-pt';
   const langCode = _lessonLanguage().toUpperCase();
-  const langNamePt = _lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês';
+  const langNamePt = _lessonLanguageName();
   const streakHtml = listenStreak >= 2
     ? `<span class="text-xs font-black text-amber-500 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">🔥 ${listenStreak}x combo!</span>`
     : '';
@@ -2997,7 +3007,7 @@ function renderScramble() {
       </div>
 
       <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border border-purple-100 p-6 text-center">
-        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em ${_lessonLanguage() === 'fr' ? 'francês' : _lessonLanguage() === 'tr' ? 'turco' : 'inglês'}</p>
+        <p class="text-xs font-bold text-purple-500 uppercase tracking-wide mb-2">Monte a palavra em ${_lessonLanguageName()}</p>
         <p class="text-lg font-extrabold text-navy mb-1">${card.pt}</p>
         <button onclick="speakWord('${card.en.replace(/'/g,"\\'")}','${CUR_TTS_LANG}')"
                 class="text-xs text-purple-400 font-bold flex items-center gap-1 mx-auto hover:text-purple-600">
