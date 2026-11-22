@@ -44,7 +44,7 @@ const {
 
 const MAX_JSON_BODY = 256 * 1024;
 const MAX_AUDIO_BODY = 8 * 1024 * 1024;
-const TRANSCRIBE_LANGS = ['en', 'fr', 'tr', 'pt']; // idiomas que o /api/transcribe repassa ao Whisper
+const TRANSCRIBE_LANGS = ['en', 'fr', 'tr', 'es', 'it', 'pt']; // idiomas aceitos pelo Whisper
 const MAX_WEBHOOK_BODY = 1024 * 1024;
 const AI_ROUTE_KEYS = new Map([
     ['/api/chat', 'chat'], ['/api/quiz', 'quiz'], ['/api/translate', 'translate'],
@@ -1973,7 +1973,8 @@ function personaDe(id) {
 // a capivara francesa falava frances na ligacao e respondia em ingles por
 // escrito. Pego em producao, na primeira verificacao da Fase 5.
 function idiomaDe(lang) {
-    return lang === 'fr' ? 'French' : lang === 'tr' ? 'Turkish' : 'English';
+    const names = {fr:'French',tr:'Turkish',es:'Spanish',it:'Italian'};
+    return typeof lang === 'string' && Object.hasOwn(names,lang) ? names[lang] : 'English';
 }
 
 // O que o navegador pode ver. NUNCA os prompts — o menu so precisa do rotulo,
@@ -2312,6 +2313,8 @@ const AULA_FAMILIAS = {
     trilha_en: { persona: 'conversa' },
     trilha_fr: { persona: 'francais', nivel: 'iniciante', nivelFixo: true },
     trilha_tr: { persona: 'turkish', nivel: 'iniciante', nivelFixo: true },
+    trilha_es: { persona: 'conversa', nivel: 'iniciante', nivelFixo: true },
+    trilha_it: { persona: 'conversa', nivel: 'iniciante', nivelFixo: true },
 };
 
 const AULA_ID = /^(?:(?:[a-z]+_)?aula_\d{1,3}|trilha_\d{1,4})$/;
@@ -2335,7 +2338,7 @@ function aulaDe(id, catalogo) {
     return {
         id: chave,
         familia,
-        lang: ['en', 'fr', 'tr'].includes(a.lang) ? a.lang : 'en',
+        lang: ['en', 'fr', 'tr', 'es', 'it'].includes(a.lang) ? a.lang : 'en',
         titulo,
         resumo: falaParaPrompt(a.resumo, 160),
         situacao: falaParaPrompt(a.situacao, 160),
@@ -3347,7 +3350,7 @@ module.exports = async (req, res) => {
         const pedido = aula ? null : pedidoDeConversa(body.cenario, body.nivel, body.estilo);
         const persona = aula ? PERSONAS[aula.familia.persona] : pedido.persona;
         const requestedLang = String((aula && aula.lang) || persona.lang || body.lang || 'en').toLowerCase();
-        const lang = ['en', 'fr', 'tr'].includes(requestedLang) ? requestedLang : 'en';
+        const lang = ['en', 'fr', 'tr', 'es', 'it'].includes(requestedLang) ? requestedLang : 'en';
         const idioma = idiomaDe(lang);
         let idiomaDoAluno = Object.prototype.hasOwnProperty.call(persona, 'transcricao') ? persona.transcricao : lang;
         const tema = textoParaPrompt(body.lessonTopic, 120);
@@ -4314,8 +4317,8 @@ Respond ONLY with valid JSON, no markdown:
         const level = /^(A1|A2|B1|B2|C1|C2)$/i.test(String(corpoLq.level || '')) ? String(corpoLq.level).toUpperCase() : '';
         const grammar = textoLivreParaPrompt(corpoLq.grammar, 200);
         // Frances e turco alem do ingles (producao, 16/out), de lista fechada.
-        const lang = ['en', 'fr', 'tr'].includes(corpoLq.lang) ? corpoLq.lang : 'en';
-        const targetLanguage = lang === 'tr' ? 'Turkish' : lang === 'fr' ? 'French' : 'English';
+        const lang = ['en', 'fr', 'tr', 'es', 'it'].includes(corpoLq.lang) ? corpoLq.lang : 'en';
+        const targetLanguage = idiomaDe(lang);
         // O prompt antigo dizia "for children" e travava o nivel em 'beginner'.
         // Os alunos sao ADULTOS (tecnicos de GPS agricola, candidato a vaga,
         // profissionais). E o exemplo de JSON usava opts ["A","B","C","D"]:
@@ -4351,7 +4354,9 @@ Respond ONLY with valid JSON, no markdown:
             req._securityIdentity && req._securityIdentity.appAccount);
         const ctx = {
             idioma: idiomaDe(lang),
-            faixa: perfil.faixa, perfil,
+            // These first Spanish/Italian trail units are A1. An advanced English
+            // profile must not turn a beginner's first Spanish lesson into B2.
+            faixa: ['es','it'].includes(lang) ? 'iniciante' : perfil.faixa, perfil,
             fracas: [], tema: temaLimpo, vocab, cargo: '', abertura: [],
         };
         const system = [
@@ -6507,15 +6512,20 @@ Rules:
 
         const isFr = lang === 'fr';
         const isTr = lang === 'tr';
+        const isEs = lang === 'es';
+        const isIt = lang === 'it';
 
         function doOpenAiTts() {
-            const ttsModel = (isFr || isTr) ? 'gpt-4o-mini-tts' : 'tts-1';
+            const ttsModel = (isFr || isTr || isEs || isIt) ? 'gpt-4o-mini-tts' : 'tts-1';
             const bodyObj = { model: ttsModel, input: text, voice, response_format: 'mp3' };
             if (isFr) {
                 bodyObj.instructions = 'You are a native French speaker. Pronounce every word with a perfect, authentic French accent — no English influence. Speak clearly and naturally like a French teacher.';
             }
             if (isTr) {
                 bodyObj.instructions = 'You are a native Turkish speaker from Istanbul. Pronounce Turkish letters, vowels and suffixes clearly and naturally for a Brazilian beginner. Do not use an English accent.';
+            }
+            if (isEs || isIt) {
+                bodyObj.instructions = 'Speak in native '+idiomaDe(lang)+'. Read only the supplied text, clearly and naturally for a Brazilian beginner. Do not translate it or use an English accent.';
             }
             const body = JSON.stringify(bodyObj);
             const ttsReq = https.request({

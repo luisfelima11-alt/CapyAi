@@ -252,7 +252,7 @@ function aulaDoHtml(arquivo, html) {
 
 // A trilha diaria: JSON estruturado, nao precisa adivinhar forma nenhuma.
 function aulaDaTrilha(j) {
-    const lang = ['en', 'fr', 'tr'].includes(j.lang) ? j.lang : 'en';
+    const lang = ['en', 'fr', 'tr', 'es', 'it'].includes(j.lang) ? j.lang : 'en';
     return ['trilha_' + j.id, montar({
         titulo: j.title, resumo: j.objective || '', situacao: '', lang, familia: 'trilha_' + lang,
         palavras: (j.vocab || []).map(v => v && v.en),

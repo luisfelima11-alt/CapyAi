@@ -240,7 +240,7 @@ function transcribeHarness(body) {
 
 test('/api/transcribe só repassa idioma da lista; o resto não entra no corpo multipart', async () => {
   const audioBase64 = Buffer.alloc(400, 1).toString('base64');
-  for (const lang of ['en', 'fr', 'tr', 'pt']) {
+  for (const lang of ['en', 'fr', 'tr', 'es', 'it', 'pt']) {
     const h = transcribeHarness({ audioBase64, mimeType: 'audio/webm', lang });
     await h.run();
     assert.equal(h.res.statusCode, 200);
