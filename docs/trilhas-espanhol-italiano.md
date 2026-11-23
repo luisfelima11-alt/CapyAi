@@ -1,0 +1,72 @@
+# Trilhas diárias — espanhol e italiano
+
+Etapa iniciante A1 expandida: 16 unidades por idioma, quatro mini-lições por unidade (64 por idioma; 128 no total). Não representa todo o currículo A1 concluído.
+
+- Espanhol: `learn.html?lang=es`, IDs 901–916, capítulos 100–103.
+- Italiano: `learn.html?lang=it`, IDs 1001–1016, capítulos 200–203.
+- Cada unidade: 10 entradas de vocabulário com tradução, 3 expressões com exemplos, 6 frases, explicações e tabela de padrões, 5 perguntas de múltipla escolha e 4 frases de fala.
+- Mini 1: escuta e quiz; mini 2: jogo com o vocabulário da unidade; mini 3: montagem de frases e fala; mini 4: conversa com a Yara.
+
+## Separação e limites
+
+As conclusões usam as chaves do Store já existentes: `es:901_1`, `it:1001_1` etc. Retomada, passos e conclusão da unidade também usam o idioma. XP e streak continuam sendo os totais da conta. Nenhuma migração de banco, alteração de login ou mudança de cota/plano foi feita.
+
+O teste de nível de inglês continua disponível para inglês; não é exigido para entrar nas outras trilhas. O resultado de inglês não é sobrescrito. As novas trilhas mostram seu próprio rótulo A1.
+
+O desafio de capítulo e os desvios de notícias/música/história que ainda são específicos de inglês não aparecem nestas duas primeiras trilhas. A revisão global que mistura idiomas também não é apresentada nestes mapas. As 64 mini-lições de cada idioma usam conteúdo próprio.
+
+## Segunda etapa de conteúdo
+
+As unidades 9–16 acrescentam: casa e família; supermercado; roupas e tamanhos; gostos e convites; restaurante e comunicação de alergias; passagens e horários; entrevista de emprego; primeiro dia no escritório. A entrevista e o escritório retomam a situação pedida pelo usuário: apresentação de Jadson, agência de marketing, capacidades profissionais e descrição de objetos à sua frente. São modelos para personalização, não dados de um perfil do aluno.
+
+Cada idioma tem explicações próprias, sem copiar regras do português ou do outro curso: possessivos e parentesco em italiano, `hay` / `estar` em espanhol, `gustar` / `piacere`, plurais irregulares, cores e registros formal/informal. As últimas duas unidades revisam estruturas já apresentadas em uma situação adulta de trabalho.
+
+As unidades 1–8 mantêm conteúdo e IDs. Quem já concluiu as 32 mini-lições antigas passa à unidade 9, sem reset nem migração de progresso. O mapa e o índice recebem a versão de catálogo `esit2` para tornar a expansão visível.
+
+## Construção e expansão
+
+Fontes: `lessons_es_data.js` e `lessons_it_data.js`.
+
+Após editar:
+
+1. Rodar `node scripts/build-lesson-data.js`. Gera os JSON individuais, o índice e o catálogo leve `trail-language-catalog.js`. Não apaga as unidades anteriores.
+2. Rodar `node scripts/gera-contexto-aulas.js`. Gera os materiais canônicos que a Yara recebe no servidor, inclusive `trilha_es` e `trilha_it`.
+3. Atualizar os nomes de blocos no gerador ao acrescentar unidades. As faixas de capítulos foram afastadas para permitir expansão sem misturar idiomas.
+4. A primeira etapa de ES/IT está fixada em iniciante no chat da mini-lição; ao lançar etapas B1/B2, revisar essa seleção de nível.
+
+Áudio: mapas es-ES e it-IT, com pedidos de leitura nativa no serviço de voz e fallback do navegador no mesmo idioma. Números escritos e transcritos como dígitos são normalizados na prática de fala. Referência: [documentação de voz da OpenAI](https://developers.openai.com/api/docs/guides/text-to-speech).
+
+## Verificação
+
+- `node --test tests/romance-trails.test.js tests/romance-api.test.js`
+- `node tests/romance-trails.e2e.js` com Playwright e Chromium instalados.
+- Testes de regressão: francês, turco, microfone, streak, contextos das aulas e segurança.
+
+O teste de navegador usa somente perfil, transcrição e IA fictícios. Verifica os quatro tipos de mini-lição, os 32 conteúdos, navegação entre as duas etapas, idioma do áudio/microfone/chat, conclusão sem misturar idiomas, retomada na unidade 9 para alunos antigos, contagens dos cursos e layout de 320 px, inclusive nas mini-lições novas.
+
+## Cursos completos — 8 aulas por idioma
+
+Além das trilhas, há agora hubs `classes_es.html` e `classes_it.html` e páginas `es_aula_01..08.html` / `it_aula_01..08.html`. O catálogo principal abre os cursos completos; cada hub e cada aula mantêm o atalho da trilha diária (16 unidades, 64 minis). Uma aula completa reúne os temas de duas unidades da trilha, mas tem diálogo próprio e não conclui as minis automaticamente.
+
+Sequência: apresentações; números e café; trajeto e rotina; reunião e hotel; casa e supermercado; roupas e lazer; restaurante e transporte; entrevista e escritório. Há dez etapas por aula: palavras com exemplos, expressões em slides, Patterns por exemplos, diálogo traduzido, tradução escrita, quiz e montagem de frases, texto com lacunas, ditado, fala e lição de casa. Cada diálogo tem dez falas com tradução para português.
+
+- Fonte autoral: `scripts/romance-course-content.js`; usa vocabulário, expressões e quizzes dos pares da trilha sem modificar as fontes antigas.
+- Gerador: `node scripts/build-romance-courses.js`; gera 16 aulas, dois hubs e as entradas no sitemap. Não altera as contas nem o login.
+- Interface: `romance-course.css` e `romance-course.js`; navy/rosa e Plus Jakarta Sans, navegação por teclado, tela de 320 px e redução de movimento.
+- Áudio e microfone: `CapyTTS`, `CapyAudio` e `CapyMic` existentes, com `es-ES` / `it-IT` e transcrição `es` / `it`. A comparação de palavras não é uma nota de sotaque. É possível praticar em voz alta sem gravar, com indicação explícita de que a conclusão é autodeclarada.
+- Progresso: `Store.completeLesson('es_aula_01')` / `it_aula_01`, distintos dos IDs da trilha. A conclusão da aula entra no estado sincronizado; etapas, última aba e rascunhos ficam no aparelho, com chave por conta e aula. O prêmio de 75 XP é concedido uma vez na conclusão das dez etapas.
+- Homework: três traduções e um texto com ao menos 15 palavras, lido em voz alta. Só é aceito depois das outras etapas. O gancho existente de `components.js` cuida de sessão, CSRF, envio único ao professor, orientação a visitantes e repetição em caso de falha. O motor não chama `/api/homework` diretamente.
+- Yara: as famílias canônicas `es_aula` / `it_aula` entram no catálogo do servidor com nível iniciante fixo, independentemente do nível de inglês do perfil.
+
+Depois de mudar o conteúdo, gerar HTML, contextos e folhas:
+
+1. `node scripts/build-romance-courses.js`
+2. `node scripts/gera-contexto-aulas.js`
+3. `node scripts/gera-folha-aula.mjs --curso es_aula`
+4. `node scripts/gera-folha-aula.mjs --curso it_aula`
+
+As 16 folhas são A4 de uma página: vocabulário com exemplos, quatro padrões, seis expressões, três linhas para frases próprias e notas. Os PDFs ficam em `assets/pdf/`, já incluída na lista de publicação. Não editar HTML ou PDF gerado à mão.
+
+Verificar com `npm run test:romance-courses`, `npm run test:e2e:romance-courses`, `npm run test:romance`, `npm run test:e2e:romance`, `npm run test:security` e `node --test tests/aula-contexto.test.js`. O e2e usa somente serviços fictícios e confere o percurso inteiro em ambos os idiomas, reprovação de entrega incompleta, envio único, retomada, XP sem repetição, separação da trilha, os 16 PDFs e largura de 320 px.
+
+Entrega pelo fluxo de revisão do projeto: ramo baseado na `sync/estado-producao`, com as trilhas já publicadas como dependência, e PR para revisão da sessão mestre. Sem publicação direta ou SQL nesta etapa.

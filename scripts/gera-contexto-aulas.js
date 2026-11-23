@@ -228,7 +228,7 @@ function montar({ titulo, resumo, situacao, lang, familia, palavras, falas, fras
 function aulaDoHtml(arquivo, html) {
     const id = arquivo.replace(/\.html$/, '');
     const familia = prefixoDe(id);
-    const lang = familia === 'fr_aula' ? 'fr' : 'en';
+    const lang = ({fr_aula:'fr',es_aula:'es',it_aula:'it'})[familia] || 'en';
     const baldes = { palavras: [], falas: [], frases: [], pratica: [], perguntas: [] };
     for (const arr of arraysDaPagina(html)) {
         const r = classificar(arr, lang);
@@ -252,7 +252,7 @@ function aulaDoHtml(arquivo, html) {
 
 // A trilha diaria: JSON estruturado, nao precisa adivinhar forma nenhuma.
 function aulaDaTrilha(j) {
-    const lang = ['en', 'fr', 'tr'].includes(j.lang) ? j.lang : 'en';
+    const lang = ['en', 'fr', 'tr', 'es', 'it'].includes(j.lang) ? j.lang : 'en';
     return ['trilha_' + j.id, montar({
         titulo: j.title, resumo: j.objective || '', situacao: '', lang, familia: 'trilha_' + lang,
         palavras: (j.vocab || []).map(v => v && v.en),

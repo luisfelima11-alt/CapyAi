@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
 const vm = require('node:vm');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -71,9 +72,9 @@ test('a trilha de francês (lessons_fr_data.js e data/lessons/201..242.json) nã
 });
 
 test('os geradores trazem a limpeza: rodar de novo não faz a pronúncia voltar', async () => {
-  const { semPronuncia, confere } = await import(path.join(ROOT, 'scripts', 'fr-sem-pronuncia.mjs'));
-  const { FR_LESSONS_1_6 } = await import(path.join(ROOT, 'scripts', 'fr-lessons-part1.mjs'));
-  const { FR_LESSONS_7_12 } = await import(path.join(ROOT, 'scripts', 'fr-lessons-part2.mjs'));
+  const { semPronuncia, confere } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'fr-sem-pronuncia.mjs')).href);
+  const { FR_LESSONS_1_6 } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'fr-lessons-part1.mjs')).href);
+  const { FR_LESSONS_7_12 } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'fr-lessons-part2.mjs')).href);
   const limpas = semPronuncia([...FR_LESSONS_1_6, ...FR_LESSONS_7_12]);
   assert.deepEqual(confere(limpas), []);
 });

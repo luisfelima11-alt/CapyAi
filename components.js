@@ -1674,6 +1674,8 @@ window.CapyTTS = {
         const l = String(lang || 'en-US').toLowerCase();
         if (l.startsWith('fr')) return { bcp47: 'fr-FR', apiLang: 'fr' };
         if (l.startsWith('tr')) return { bcp47: 'tr-TR', apiLang: 'tr' };
+        if (l.startsWith('es')) return { bcp47: 'es-ES', apiLang: 'es' };
+        if (l.startsWith('it')) return { bcp47: 'it-IT', apiLang: 'it' };
         if (l.startsWith('pt')) return { bcp47: 'pt-BR', apiLang: 'pt' };
         return { bcp47: 'en-US', apiLang: 'en' };
     },
@@ -1961,9 +1963,34 @@ window.CapyFala = (function () {
             dokuz: 9, on: 10, yirmi: 20, otuz: 30, kirk: 40, elli: 50, altmis: 60,
             yetmis: 70, seksen: 80, doksan: 90, yuz: 100, bin: 1000,
         },
+        es: {
+            cero:0, uno:1, un:1, una:1, dos:2, tres:3, cuatro:4, cinco:5, seis:6,
+            siete:7, ocho:8, nueve:9, diez:10, once:11, doce:12, trece:13,
+            catorce:14, quince:15, dieciseis:16, diecisiete:17, dieciocho:18,
+            diecinueve:19, veinte:20, veintiuno:21, veintiun:21, veintiuna:21,
+            veintidos:22, veintitres:23, veinticuatro:24, veinticinco:25,
+            veintiseis:26, veintisiete:27, veintiocho:28, veintinueve:29,
+            treinta:30, cuarenta:40, cincuenta:50, sesenta:60, setenta:70, ochenta:80,
+            noventa:90, cien:100, ciento:100, mil:1000
+        },
+        it: {
+            zero:0, uno:1, un:1, una:1, due:2, tre:3, quattro:4, cinque:5,
+            sei:6, sette:7, otto:8, nove:9, dieci:10, undici:11, dodici:12,
+            tredici:13, quattordici:14, quindici:15, sedici:16, diciassette:17,
+            diciotto:18, diciannove:19, venti:20, trenta:30, quaranta:40,
+            cinquanta:50, sessanta:60, settanta:70, ottanta:80, novanta:90,
+            cent:100, cento:100, mille:1000, mila:1000,
+            vent:20, trent:30, quarant:40, cinquant:50, sessant:60, settant:70, ottant:80, novant:90
+        },
     };
+    // Italian writes compound numbers as one word, dropping the final vowel before uno/otto.
+    for (const [tens, value] of [['venti',20],['trenta',30],['quaranta',40],['cinquanta',50],['sessanta',60],['settanta',70],['ottanta',80],['novanta',90]]) {
+        ['uno','due','tre','quattro','cinque','sei','sette','otto','nove'].forEach((unit,i)=>{
+            BASE.it[((i===0 || i===7) ? tens.slice(0,-1) : tens)+unit] = value+i+1;
+        });
+    }
     // Palavras que ligam número sem valor próprio: "vingt ET un", "one hundred AND five"
-    const LIGACAO = { et: 1, and: 1, e: 1 };
+    const LIGACAO = { et: 1, and: 1, e: 1, y: 1 };
     // O Whisper alterna entre "I'm" e "I am" na mesma frase; para uma atividade
     // de fala as duas formas são a mesma coisa dita. Expandimos antes de tirar
     // o apóstrofo, senão "im" e "i am" viram palavras diferentes na contagem.
@@ -1993,6 +2020,8 @@ window.CapyFala = (function () {
         const l = semAcento(String(lang || 'en')).toLowerCase();
         if (l.startsWith('fr')) return 'fr';
         if (l.startsWith('tr')) return 'tr';
+        if (l.startsWith('es')) return 'es';
+        if (l.startsWith('it')) return 'it';
         return 'en';
     }
 
