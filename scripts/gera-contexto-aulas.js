@@ -228,7 +228,7 @@ function montar({ titulo, resumo, situacao, lang, familia, palavras, falas, fras
 function aulaDoHtml(arquivo, html) {
     const id = arquivo.replace(/\.html$/, '');
     const familia = prefixoDe(id);
-    const lang = familia === 'fr_aula' ? 'fr' : 'en';
+    const lang = ({fr_aula:'fr',es_aula:'es',it_aula:'it'})[familia] || 'en';
     const baldes = { palavras: [], falas: [], frases: [], pratica: [], perguntas: [] };
     for (const arr of arraysDaPagina(html)) {
         const r = classificar(arr, lang);

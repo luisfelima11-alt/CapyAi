@@ -139,12 +139,13 @@ const {chromium}=require('playwright');
   }
   await page.goto(origin+'/classes.html');
   await page.waitForFunction(()=>typeof CURSOS!=='undefined');
-  assert.equal(await page.evaluate(()=>CURSOS.spanish),'learn.html?lang=es');
-  assert.equal(await page.evaluate(()=>CURSOS.italian),'learn.html?lang=it');
-  assert.equal(await page.evaluate(()=>CURSO_POR_ID.spanish.aulas),16);
-  assert.equal(await page.evaluate(()=>CURSO_POR_ID.italian.aulas),16);
-  assert.equal(await page.evaluate(()=>progresso('spanish').feitas),8);
-  assert.equal(await page.evaluate(()=>progresso('italian').feitas),8);
+  assert.equal(await page.evaluate(()=>CURSOS.spanish),'classes_es.html');
+  assert.equal(await page.evaluate(()=>CURSOS.italian),'classes_it.html');
+  assert.equal(await page.evaluate(()=>CURSO_POR_ID.spanish.aulas),8);
+  assert.equal(await page.evaluate(()=>CURSO_POR_ID.italian.aulas),8);
+  // Finishing daily minis does not finish a complete course class.
+  assert.equal(await page.evaluate(()=>progresso('spanish').feitas),0);
+  assert.equal(await page.evaluate(()=>progresso('italian').feitas),0);
   await page.evaluate(()=>localStorage.setItem('capyPlacementDone','1'));
   await page.goto(origin+'/learn.html?lang=en');
   await page.locator('#continue-btn').waitFor();

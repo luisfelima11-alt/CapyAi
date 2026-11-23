@@ -583,7 +583,13 @@ test('homework: every lesson with a Homework tab reaches the teacher through the
   const paginas = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
   let comLicao = 0;
   for (const pagina of paginas) {
-    const source = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, pagina), 'utf8');
+    // ES/IT use a shared local runner rather than duplicating its validation
+    // into 16 inline scripts. Inspect the actual handler and enforce the same
+    // no-direct-request/disable-on-success contract; the browser test also
+    // verifies one POST after validation and no repeated XP on reload.
+    const source = html + (/<script[^>]+src="romance-course\.js(?:\?|"|\s)/.test(html)
+      ? '\n' + fs.readFileSync(path.join(ROOT, 'romance-course.js'), 'utf8') : '');
     assert.doesNotMatch(source, /saveHomework\(|fetch\(\s*['"`]\/api\/homework/, `${pagina} sends homework on its own`);
     const inicio = source.indexOf('id="tab-homework"');
     if (inicio < 0) continue;

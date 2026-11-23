@@ -12,7 +12,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
+import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)('playwright');
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SAIDA = path.join(RAIZ, 'assets', 'pdf');
@@ -27,6 +28,8 @@ const CURSOS = {
     advanced_aula: { nome: 'Advanced', cor: '#9f1239' },
     interview_aula: { nome: 'Entrevista em inglês', cor: '#334155' },
     fr_aula: { nome: 'Français', cor: '#1e3a8a' },
+    es_aula: { nome: 'Español', cor: '#001f3f' },
+    it_aula: { nome: 'Italiano', cor: '#047857' },
     aula: { nome: 'Starter', cor: '#001f3f' },
 };
 
@@ -77,6 +80,13 @@ function LER_PADROES() {
     c.querySelectorAll('s').forEach(s => s.replaceWith('~~' + s.textContent + '~~'));
     return c.textContent.replace(/\s+/g, ' ').trim();
   };
+  // Cursos ES/IT: os mesmos exemplos visíveis e ouvíveis da seção Patterns.
+  const curso = [...document.querySelectorAll('.rc-pattern')];
+  if (curso.length) return curso.map(b => ({
+    titulo: limpa(b.querySelector('span')),
+    certo: [limpa(b.querySelector('div')).replace(/^✅\s*/, '')],
+    errado: [],
+  }));
   // Slides de exemplos (gramatica-slides.mjs, desde 05/out/2026): um padrão por slide, sem
   // a abertura (lista dos padrões) e sem a revisão (frases misturadas).
   const slides = [...document.querySelectorAll('.gs-slide')];
