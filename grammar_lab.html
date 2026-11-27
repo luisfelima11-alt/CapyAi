@@ -287,6 +287,9 @@ function showQuestion() {
   const q  = l.questions[quizIdx];
   const area = document.getElementById('lesson-area');
   const opts = [...q.opts].sort(() => Math.random() - 0.5);
+  // A alternativa vai por índice, não como texto dentro do onclick: as
+  // explicações têm aspas ("an") e cortavam o atributo, e o clique não fazia nada.
+  currentOpts = opts;
 
   area.innerHTML = `
     <!-- Progress -->
@@ -299,7 +302,7 @@ function showQuestion() {
       <p class="font-label text-xs text-yellow-400 uppercase tracking-widest font-bold mb-3">Pergunta ${quizIdx+1} de ${l.questions.length}</p>
       <p class="font-headline font-bold text-white text-xl leading-snug mb-6">${q.q}</p>
       <div class="flex flex-col gap-3" id="q-opts">
-        ${opts.map(opt => `<button class="q-opt" onclick="answerQ(this,'${opt.replace(/'/g,"\\'")}','${q.correct.replace(/'/g,"\\'")}','${q.exp.replace(/'/g,"\\'")}')"> ${opt} </button>`).join('')}
+        ${opts.map((opt, j) => `<button class="q-opt" onclick="answerQ(this, ${j})"> ${opt} </button>`).join('')}
       </div>
     </div>
 
@@ -315,7 +318,10 @@ function showQuestion() {
   `;
 }
 
-function answerQ(btn, chosen, correct, exp) {
+var currentOpts = [];
+function answerQ(btn, j) {
+  const q = LESSONS[currentLesson].questions[quizIdx];
+  const chosen = currentOpts[j], correct = q.correct, exp = q.exp;
   document.querySelectorAll('.q-opt').forEach(b => b.disabled = true);
   const ok = chosen.trim() === correct.trim();
   btn.classList.add(ok ? 'correct' : 'wrong');
