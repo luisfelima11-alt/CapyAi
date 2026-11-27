@@ -80,7 +80,7 @@
     <div class="flex whitespace-nowrap px-4 max-w-5xl mx-auto">
       <button class="tab-btn active px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="vocab">📖 Vocab</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="expressions">💡 Expressions</button>
-      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">📐 Grammar</button>
+      <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="grammar">🧩 Patterns</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="dialogue">🎭 Dialogue</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="practice">🎯 Practice</button>
       <button class="tab-btn px-5 py-4 text-sm text-slate-500 whitespace-nowrap" data-tab="speak">🗣️ Speak</button>
@@ -102,7 +102,7 @@
     </div>
 
     <div id="tab-grammar" class="fade-in hidden">
-      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">📐 Grammar</h2><p class="text-slate-500 text-sm">Ordering food — frases para pedir no restaurante.</p></div>
+      <div class="mb-6"><h2 class="text-2xl font-black text-navy mb-1">🧩 Patterns</h2><p class="text-slate-500 text-sm">Ordering food — frases para pedir no restaurante.</p></div>
       <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 mb-4 text-white">
         <p class="text-xs font-black uppercase tracking-widest mb-2 text-emerald-100">Ordering at a Restaurant</p>
         <div class="space-y-2 text-sm font-black">
@@ -113,7 +113,7 @@
         </div>
       </div>
       <div class="space-y-3 mb-6" id="grammar-acc"></div>
-      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Grammar understood! +20 XP</button>
+      <button onclick="markSection('grammar')" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-sm">✓ Entendi o padrão! +20 XP</button>
     </div>
 
     <div id="tab-dialogue" class="fade-in hidden">
@@ -288,7 +288,7 @@ const sections=['vocab','expressions','grammar','dialogue','practice','speak','h
 const done={};let quizAnswers={};
 let mp17State={selLeft:null,selRight:null,matched:new Set()};
 
-function renderDots(){const c=document.getElementById('hero-dots');c.innerHTML=sections.map(s=>`<div class="prog-dot${done[s]?' done':''}" title="${s}"></div>`).join('');document.getElementById('hero-label').textContent=`${Object.keys(done).length} / 7 sections done`;}
+function renderDots(){const c=document.getElementById('hero-dots');c.innerHTML=sections.map(s=>`<div class="prog-dot${done[s]?' done':''}" title="${s==='grammar'?'patterns':s}"></div>`).join('');document.getElementById('hero-label').textContent=`${Object.keys(done).length} / 7 sections done`;}
 function xpPop(xp){const el=document.createElement('div');el.className='xp-pop';el.textContent=`+${xp} XP!`;el.style.cssText=`top:${window.innerHeight/2}px;left:${window.innerWidth/2-30}px`;document.body.appendChild(el);setTimeout(()=>el.remove(),1300);}
 function markSection(s){if(done[s])return;done[s]=true;Store.addXP(20);xpPop(20);renderDots();}
 

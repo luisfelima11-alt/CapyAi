@@ -1431,7 +1431,15 @@ window.CapyJuice = {
           @keyframes capyConfettiFall{0%{transform:translateY(-10vh) rotate(0deg)}100%{transform:translateY(110vh) rotate(var(--rz,720deg))}}
           .capy-confetti{position:fixed;top:0;width:10px;height:14px;border-radius:2px;pointer-events:none;animation:capyConfettiFall var(--dur,2.2s) ease-in var(--delay,0s) forwards;z-index:94}
         `;
-        document.head.appendChild(st);
+        // Folha construída pelo CSSOM: a CSP estrita de account/login bloqueia um
+        // <style> novo (erro no console e "+XP" sem estilo), mas não o CSSOM.
+        try {
+            const folha = new CSSStyleSheet();
+            folha.replaceSync(st.textContent);
+            document.adoptedStyleSheets = [...document.adoptedStyleSheets, folha];
+        } catch (e) {
+            document.head.appendChild(st);
+        }
 
         // XP pop: envolve Store.addXP mantendo o comportamento original
         if (typeof Store !== 'undefined' && typeof Store.addXP === 'function' && !Store.__capyJuiced) {

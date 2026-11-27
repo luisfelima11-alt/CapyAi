@@ -126,6 +126,76 @@ um caractere (o `'`) esquece o outro (o `"`). Passe um índice e leia o dado no 
 
 ---
 
+## 2026-11-20 — "Foco gramatical" na revisão final do GPS Tronic (lessons.html)
+
+**Sintoma:** na lição "GPS Tronic Master Review" (id 524) do `lessons.html`, a tabela da seção de padrões tinha a coluna "Foco gramatical".
+
+**Causa raiz:** o texto vem do `lessons_gps_data.js` (cabeçalho da tabela) e nenhum teste olhava os arquivos de dados das lições.
+
+**Correção:** a coluna se chama "Padrão".
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` também lê os `lessons_*data.js` (tirando as chaves internas `grammar:`).
+
+**Por que aconteceu:** a troca de 12/out procurou nas páginas HTML, não nos dados que o JS transforma em tela.
+
+---
+
+## 2026-11-20 — Erro de CSP no console da página Minha conta
+
+**Sintoma:** na produção, abrir `account.html` mostrava no console "Applying inline style violates the following Content Security Policy directive 'style-src-elem …'", e o "+XP"/confete dessa página ficava sem estilo.
+
+**Causa raiz:** `account.html` tem CSP estrita no `vercel.json` (sem `'unsafe-inline'` em `style-src-elem`). O `CapyJuice.init()` (`components.js`) roda em toda página e criava um `<style>` com as animações; a CSP bloqueava. O dev-server não manda CSP, por isso só aparecia no ar.
+
+**Correção:** as regras entram por uma folha construída pelo CSSOM (`new CSSStyleSheet()` + `document.adoptedStyleSheets`), que a CSP não bloqueia; navegador sem isso cai no `<style>` antigo. Etiqueta do `components.js` mantida (`seg1`).
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre `account.html` com a CSP tirada do `vercel.json` e falha em qualquer erro de CSP no console. Código novo que injeta `<style>` precisa passar por esse teste.
+
+**Por que aconteceu:** a CSP estrita de account/login é posterior ao CapyJuice, e a varredura local não reproduz cabeçalhos da Vercel.
+
+---
+
+## 2026-11-20 — Aba "📐 Grammar" em ~100 aulas feitas à mão
+
+**Sintoma:** nas aulas 01–44, Advanced, Business, Travel e Intermediate 01–18 o aluno via a aba "📐 Grammar", o botão "✓ Grammar understood!", títulos "Grammar: …", "Corrija o erro gramatical", a dica "grammar" ao passar o mouse na bolinha de progresso e até frases de diálogo e um cartão de vocabulário com a palavra.
+
+**Causa raiz:** a troca para "🧩 Patterns" (regra de 12/out) entrou nos geradores (Agro, GPS, Intermediate 19+, francês) e no `aplicar-slides.mjs`, mas as aulas antigas feitas à mão nunca passaram por ela. Nenhum teste olhava essas páginas.
+
+**Correção:** troca só do texto visível ("🧩 Patterns", "Entendi o padrão!", "Patterns: …", "Corrija a frase"; frases de diálogo reescritas sem a palavra). Os ids internos (`tab-grammar`, `'grammar'` nas listas de seções) ficaram. A bolinha de progresso mostra "patterns" na dica.
+
+**Como pegar isso de novo:** `tests/aulas-sem-gramatica.test.js` (no `npm run test:security`) lê todas as aulas feitas à mão, tira os nomes internos e procura "gramática/gramatical/grammar/grammatical".
+
+**Por que aconteceu:** a troca foi feita curso a curso, junto com o molde novo; as aulas que não mudaram de molde ficaram para trás. Ainda faltam `med_aula_*` e `interview_aula_*`: o gerador deles escreve "Entendi a gramática!" e não passa na própria validação de slides, então regerar hoje mudaria muito mais que o texto.
+
+---
+
+## 2026-11-20 — "Gramática"/"grammar" ainda na tela em páginas do site
+
+**Sintoma:** fora das aulas, o aluno ainda via a palavra proibida: selo "Grammar Star" (pavilhões de jogos, progresso e aviso de selo), "grammar adventure" no Dialogue Expedition, "Domine a gramática avançada" e etiquetas "Grammar" no curso Advanced, "Expedição de gramática" no Verb Voyage e "Grammar Notes" no criador de aulas.
+
+**Causa raiz:** a troca de 12/out (regra do Luis) foi feita página por página e os testes só olhavam a descrição SEO, o Laboratório de Padrões e as aulas no molde novo; textos montados em JS (selos, cartões) e páginas menos visitadas ficaram de fora.
+
+**Correção:** "Grammar Star" vira "Pattern Star" (o id `grammar_star` fica), "dialogue adventure", "estruturas avançadas", etiqueta "Patterns", "Expedição dos verbos" e "🧩 Patterns" no criador.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` abre cada página e procura a palavra no texto visível (inclusive o que o JS montou), no título e em title/placeholder/alt/aria-label.
+
+**Por que aconteceu:** a busca da troca original olhou o HTML, não o texto que o JS escreve na tela.
+
+---
+
+## 2026-11-20 — Setas do menu lateral sem efeito no YouTube Lab
+
+**Sintoma:** no computador, no `youtube_lab.html`, as setas ▲ ▼ do menu lateral não faziam nada; o console mostrava `ReferenceError: sideNavScroll is not defined`.
+
+**Causa raiz:** a página montava o menu com `innerHTML = Components.renderSideNav(...)` em vez de `Components.mount('side-nav-placeholder', ...)`. Só o `mount` chama o `initSideNavScroll()`, que cria a função `sideNavScroll` usada pelos botões.
+
+**Correção:** a página usa `Components.mount` com os ids padrão (`top-nav-placeholder`, `side-nav-placeholder`), como as outras.
+
+**Como pegar isso de novo:** `tests/site-desktop.spec.js` (as setas existem e clicar não dá erro). Varredura: procurar `innerHTML = Components.render` nas páginas.
+
+**Por que aconteceu:** a página é mais antiga que o `initSideNavScroll` e nunca foi migrada para o `mount`.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.
