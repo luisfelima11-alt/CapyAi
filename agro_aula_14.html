@@ -184,7 +184,7 @@
 <!-- EXPRESSIONS -->
 <div id="tab-expressions" class="tab-content fade-in hidden">
   <h2 class="text-2xl font-black text-navy mb-2">Key Expressions</h2>
-  <p class="text-slate-500 text-sm mb-6">Frases prontas de quem atende no telefone. Clique para ver o uso.</p>
+  <p class="text-slate-500 text-sm mb-6">Frases prontas para usar na conversa. Uma por slide.</p>
   <div class="grid gap-4" id="expr-grid"></div>
   <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
@@ -752,26 +752,26 @@ setTimeout(adotarListening,3200);
 // ── DIÁLOGO ────────────────────────────────────────────────────────────────
 // Fonte única: scripts/aula09-dialogo.json. O mesmo arquivo gerou os mp3.
 const DIALOGO=/*DIALOGO_JSON*/[
-  {"who":"yara","en":"Jack, come to the corral, please! It's urgent.","pt":"Jack, venha ao curral, por favor! É urgente.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"What's wrong, Luan?","pt":"O que houve, Luan?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"One cow is sick. She isn't eating.","pt":"Uma vaca está doente. Ela não está comendo.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Which cow? The old one?","pt":"Qual vaca? A velha?","extra":true,"voz":"echo"},
-  {"who":"yara","en":"No, the young one. Number twelve.","pt":"Não, a nova. A número doze.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"Is she lying down?","pt":"Ela está deitada?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"Yes. She looks very weak and tired.","pt":"Sim. Ela parece muito fraca e cansada.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Does she have a fever?","pt":"Ela está com febre?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"Yes, she's very hot. And she's breathing fast.","pt":"Sim, ela está muito quente. E está respirando rápido.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Is she drinking water?","pt":"Ela está bebendo água?","extra":true,"voz":"echo"},
-  {"who":"yara","en":"Only a little. Her nose is dry.","pt":"Só um pouco. O focinho dela está seco.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"OK. Call the vet right now.","pt":"Ok. Ligue para o veterinário agora mesmo.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"What's her number? I don't have it.","pt":"Qual é o número dela? Eu não tenho.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"It's on the board in the office.","pt":"Está no quadro do escritório.","extra":true,"voz":"echo"},
-  {"who":"yara","en":"Got it. What should I do now?","pt":"Entendi. O que eu devo fazer agora?","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Keep her away from the other cows.","pt":"Mantenha ela longe das outras vacas.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"Should I give her medicine?","pt":"Devo dar remédio para ela?","extra":false,"voz":"onyx"},
-  {"who":"client","en":"No, you shouldn't. Wait for the vet.","pt":"Não, não deve. Espere o veterinário.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"OK. I'm giving her fresh water and shade.","pt":"Ok. Estou dando água fresca e sombra para ela.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"Good job, Luan. She's going to be OK.","pt":"Bom trabalho, Luan. Ela vai ficar bem.","extra":true,"voz":"echo"}
+  {"who":"yara","en":"Jack, come to the corral, please! It's urgent.","pt":"Jack, venha ao curral, por favor! É urgente.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s01.mp3"},
+  {"who":"client","en":"What's wrong, Luan?","pt":"O que houve, Luan?","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s02.mp3"},
+  {"who":"yara","en":"One cow is sick. She isn't eating.","pt":"Uma vaca está doente. Ela não está comendo.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s03.mp3"},
+  {"who":"client","en":"Which cow? The old one?","pt":"Qual vaca? A velha?","extra":true,"voz":"echo","mp3":"/assets/audio/agro14/s04.mp3"},
+  {"who":"yara","en":"No, the young one. Number twelve.","pt":"Não, a nova. A número doze.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro14/s05.mp3"},
+  {"who":"client","en":"Is she lying down?","pt":"Ela está deitada?","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s06.mp3"},
+  {"who":"yara","en":"Yes. She looks very weak and tired.","pt":"Sim. Ela parece muito fraca e cansada.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s07.mp3"},
+  {"who":"client","en":"Does she have a fever?","pt":"Ela está com febre?","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s08.mp3"},
+  {"who":"yara","en":"Yes, she's very hot. And she's breathing fast.","pt":"Sim, ela está muito quente. E está respirando rápido.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s09.mp3"},
+  {"who":"client","en":"Is she drinking water?","pt":"Ela está bebendo água?","extra":true,"voz":"echo","mp3":"/assets/audio/agro14/s10.mp3"},
+  {"who":"yara","en":"Only a little. Her nose is dry.","pt":"Só um pouco. O focinho dela está seco.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro14/s11.mp3"},
+  {"who":"client","en":"OK. Call the vet right now.","pt":"Ok. Ligue para o veterinário agora mesmo.","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s12.mp3"},
+  {"who":"yara","en":"What's her number? I don't have it.","pt":"Qual é o número dela? Eu não tenho.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro14/s13.mp3"},
+  {"who":"client","en":"It's on the board in the office.","pt":"Está no quadro do escritório.","extra":true,"voz":"echo","mp3":"/assets/audio/agro14/s14.mp3"},
+  {"who":"yara","en":"Got it. What should I do now?","pt":"Entendi. O que eu devo fazer agora?","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s15.mp3"},
+  {"who":"client","en":"Keep her away from the other cows.","pt":"Mantenha ela longe das outras vacas.","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s16.mp3"},
+  {"who":"yara","en":"Should I give her medicine?","pt":"Devo dar remédio para ela?","extra":false,"voz":"onyx","mp3":"/assets/audio/agro14/s17.mp3"},
+  {"who":"client","en":"No, you shouldn't. Wait for the vet.","pt":"Não, não deve. Espere o veterinário.","extra":false,"voz":"echo","mp3":"/assets/audio/agro14/s18.mp3"},
+  {"who":"yara","en":"OK. I'm giving her fresh water and shade.","pt":"Ok. Estou dando água fresca e sombra para ela.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro14/s19.mp3"},
+  {"who":"client","en":"Good job, Luan. She's going to be OK.","pt":"Bom trabalho, Luan. Ela vai ficar bem.","extra":true,"voz":"echo","mp3":"/assets/audio/agro14/s20.mp3"}
 ]/*FIM_DIALOGO*/;
 let dlgLongo=false, dlgComPt=false, dlgAudio=null, dlgTocando=false, dlgTurno=0;
 
@@ -1074,7 +1074,7 @@ function submitHomeworkAgro14(){if(hwEntregue)return;if(window.HomeworkPlus&&!Ho
 <script src="listening-lab.js?v=som2"></script>
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
-<script src="aula-molde.js?v=am1"></script>
+<script src="aula-molde.js?v=am3"></script>
 <script>window.HW_PLUS={"aula":14,"titulo":"Call the Vet!","curso":"Agro English","cor":"#15803d","completar":[{"f":"She isn't ___.","r":["eating"],"dica":"eat (comer)"},{"f":"She ___ very weak.","r":["looks"],"dica":"parece"},{"f":"___ the vet right now.","r":["call"],"dica":"ligar"},{"f":"No, you ___ give her medicine.","r":["shouldn't","should not"],"dica":"não deveria"}],"compreensao":[{"q":"Qual vaca está doente?","opts":["The young one, number twelve.","The old one.","Number twenty."],"a":"The young one, number twelve."},{"q":"O que o Luan deve fazer com a vaca?","opts":["Keep her away from the other cows.","Give her medicine.","Take her to the field."],"a":"Keep her away from the other cows."}],"voz":["One cow is sick. She isn't eating.","Should I give her medicine?"],"livre":{"pedido":"Escreva 2 conselhos com should / shouldn't para alguém que está doente.","exemplo":"You should drink water. You shouldn't work today."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro14-fb');return{ordem:WO_AGRO14_DATA.map((x,i)=>wo_agro14[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro14_Done.size,MP_AGRO14.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_14-folha.pdf"></script>

@@ -29,9 +29,16 @@ sessão passa pela revisão dela antes de ir ao ar, para não quebrar o site.
   - 🟡 **mestre: esperando** (o aluno vê a mudança, falta SQL, ou depende de outro PR): só vai ao ar depois
     do ok do Luis no Preview ou da condição cumprida;
   - 🔴 **mestre: corrigir**: volta para a sessão que fez, com o que corrigir no comentário;
-- **publica mesclando na `sync/estado-producao`**: a Production Branch do Vercel publica e promove sozinha,
-  e os crons vão junto;
-- confere o site no ar depois de publicar.
+- **publica em dois passos: mescla na `sync/estado-producao` e promove o deploy do merge.**
+  - **O merge sozinho NÃO publica** (visto em 12/nov/2026). A Vercel constrói esse ramo como
+    **preview**, e o domínio fica no deploy anterior.
+  - Depois do merge, pegue a URL do deploy do commit de merge, que está no status "Vercel" do commit
+    ou no `npx vercel ls`, e rode `vercel promote` (veja "Deployment and branches").
+  - O promote leva junto os domínios e os crons.
+  - Se um dia a Production Branch da Vercel passar a ser a `sync/estado-producao` (Settings → Git, quem
+    muda é o Luis), o promote deixa de ser necessário. Atualize este arquivo quando isso acontecer;
+- confere o site no ar depois de publicar: `curl` com `?cb=` numa página nova tem que dar 200 nos dois
+  domínios, e `npx vercel crons ls` tem que mostrar os 2 crons.
 
 Se der errado, a mestre volta pelo Vercel → Deployments → Instant Rollback, e depois abre um PR de revert.
 
@@ -323,8 +330,9 @@ get no exception and an advisory only the dev tools reach (Tailwind, Playwright)
 ## Deployment and branches
 
 Vercel project `capy-yara-adventures`, production https://capyenglish.com.br. **Only the master
-session publishes** (see "Sessão mestre"): `sync/estado-producao` is the production branch, so merging
-into it is publishing. Every other session works on a branch and opens a PR.
+session publishes** (see "Sessão mestre"). Publishing is merging into `sync/estado-producao` **and then
+promoting** that merge's deployment. As of 12/nov/2026, Vercel builds `sync/estado-producao` as a
+*preview*, so a merge alone does not reach the domain. Every other session works on a branch and opens a PR.
 
 - `vercel.json` sends `/api/*` to `api/index.js` and `/` to `landing.html`, and sets the security
   headers and two CSPs: strict for the hardened pages (login, set-password, account, admin,
@@ -340,8 +348,21 @@ into it is publishing. Every other session works on a branch and opens a PR.
   Release steps and owner actions live in `SECURITY-ROLLOUT.md`.
 - `scripts/`, `tests/`, `supabase/` and `*.md` never ship (`.vercelignore`).
 
-Só a sessão mestre publica, mesclando na `sync/estado-producao` (veja "Sessão mestre"). Os comandos abaixo
-ficam para emergência, com o Luis, se a publicação pelo merge falhar:
+Só a sessão mestre publica (veja "Sessão mestre").
+
+**Depois de todo merge na `sync/estado-producao`:**
+```bash
+npx vercel ls capy-yara-adventures              # o deploy mais novo é o do commit de merge (target: preview)
+printf 'y\n' | npx vercel promote <deployment-url>
+npx vercel crons ls                             # os 2 crons registrados
+```
+- O promote de um preview pergunta "A new deployment will be built using your production environment…
+  (y/N)". Responda pelo **Bash** com `printf 'y\n'`, sem `--yes` e depois de conferir que o
+  `.vercel/project.json` é o `capy-yara-adventures`.
+- No PowerShell 5.1, `"y" | npx …` manda um BOM junto, e a Vercel entende "no".
+- O deploy novo leva de 1 a 2 minutos para chegar ao domínio. Confira com `curl` e `?cb=`.
+
+Os comandos abaixo ficam para emergência, com o Luis, se o caminho do merge falhar:
 ```bash
 npx vercel --prod --force                 # always use --force to bypass cache
 npx vercel promote <deployment-url>       # OBRIGATORIO: sem isto o deploy nao vira producao oficial

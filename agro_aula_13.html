@@ -184,7 +184,7 @@
 <!-- EXPRESSIONS -->
 <div id="tab-expressions" class="tab-content fade-in hidden">
   <h2 class="text-2xl font-black text-navy mb-2">Key Expressions</h2>
-  <p class="text-slate-500 text-sm mb-6">Frases prontas de quem atende no telefone. Clique para ver o uso.</p>
+  <p class="text-slate-500 text-sm mb-6">Frases prontas para usar na conversa. Uma por slide.</p>
   <div class="grid gap-4" id="expr-grid"></div>
   <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>
 </div>
@@ -752,26 +752,26 @@ setTimeout(adotarListening,3200);
 // ── DIÁLOGO ────────────────────────────────────────────────────────────────
 // Fonte única: scripts/aula09-dialogo.json. O mesmo arquivo gerou os mp3.
 const DIALOGO=/*DIALOGO_JSON*/[
-  {"who":"client","en":"OK, Luan. Which tractor do you like?","pt":"Ok, Luan. De qual trator você gosta?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"I like the green one. It's bigger.","pt":"Gosto do verde. Ele é maior.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Yes, it's bigger than the red one.","pt":"Sim, ele é maior que o vermelho.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"And it's stronger. It has more power.","pt":"E é mais forte. Tem mais potência.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"Is it faster too?","pt":"Ele é mais rápido também?","extra":true,"voz":"echo"},
-  {"who":"yara","en":"A little. But speed isn't important for us.","pt":"Um pouco. Mas velocidade não é importante pra gente.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"But the green one is more expensive.","pt":"Mas o verde é mais caro.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"How much more expensive is it?","pt":"Quanto mais caro ele é?","extra":false,"voz":"onyx"},
-  {"who":"client","en":"About twenty percent. The red one is cheaper.","pt":"Uns vinte por cento. O vermelho é mais barato.","extra":false,"voz":"echo"},
-  {"who":"yara","en":"What about fuel? Which one uses less?","pt":"E o combustível? Qual gasta menos?","extra":false,"voz":"onyx"},
-  {"who":"client","en":"The green one. Its engine is more modern.","pt":"O verde. O motor dele é mais moderno.","extra":true,"voz":"echo"},
-  {"who":"yara","en":"So it's more economical in the long run.","pt":"Então ele é mais econômico no longo prazo.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"Is the cab more comfortable?","pt":"A cabine é mais confortável?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"Yes! It's the most comfortable cab here.","pt":"Sim! É a cabine mais confortável daqui.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"And the GPS? Is it better?","pt":"E o GPS? É melhor?","extra":true,"voz":"echo"},
-  {"who":"yara","en":"Much better. It's the newest model.","pt":"Muito melhor. É o modelo mais novo.","extra":true,"voz":"onyx"},
-  {"who":"client","en":"So which one is the best for us?","pt":"Então qual é o melhor pra gente?","extra":false,"voz":"echo"},
-  {"who":"yara","en":"The green one. It's the best for big fields.","pt":"O verde. É o melhor para talhões grandes.","extra":false,"voz":"onyx"},
-  {"who":"client","en":"OK. Let's talk about the price, then.","pt":"Ok. Então vamos falar do preço.","extra":true,"voz":"echo"},
-  {"who":"yara","en":"Good idea. Maybe we get a better price!","pt":"Boa ideia. Talvez a gente consiga um preço melhor!","extra":true,"voz":"onyx"}
+  {"who":"client","en":"OK, Luan. Which tractor do you like?","pt":"Ok, Luan. De qual trator você gosta?","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s01.mp3"},
+  {"who":"yara","en":"I like the green one. It's bigger.","pt":"Gosto do verde. Ele é maior.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s02.mp3"},
+  {"who":"client","en":"Yes, it's bigger than the red one.","pt":"Sim, ele é maior que o vermelho.","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s03.mp3"},
+  {"who":"yara","en":"And it's stronger. It has more power.","pt":"E é mais forte. Tem mais potência.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s04.mp3"},
+  {"who":"client","en":"Is it faster too?","pt":"Ele é mais rápido também?","extra":true,"voz":"echo","mp3":"/assets/audio/agro13/s05.mp3"},
+  {"who":"yara","en":"A little. But speed isn't important for us.","pt":"Um pouco. Mas velocidade não é importante pra gente.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro13/s06.mp3"},
+  {"who":"client","en":"But the green one is more expensive.","pt":"Mas o verde é mais caro.","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s07.mp3"},
+  {"who":"yara","en":"How much more expensive is it?","pt":"Quanto mais caro ele é?","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s08.mp3"},
+  {"who":"client","en":"About twenty percent. The red one is cheaper.","pt":"Uns vinte por cento. O vermelho é mais barato.","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s09.mp3"},
+  {"who":"yara","en":"What about fuel? Which one uses less?","pt":"E o combustível? Qual gasta menos?","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s10.mp3"},
+  {"who":"client","en":"The green one. Its engine is more modern.","pt":"O verde. O motor dele é mais moderno.","extra":true,"voz":"echo","mp3":"/assets/audio/agro13/s11.mp3"},
+  {"who":"yara","en":"So it's more economical in the long run.","pt":"Então ele é mais econômico no longo prazo.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro13/s12.mp3"},
+  {"who":"client","en":"Is the cab more comfortable?","pt":"A cabine é mais confortável?","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s13.mp3"},
+  {"who":"yara","en":"Yes! It's the most comfortable cab here.","pt":"Sim! É a cabine mais confortável daqui.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s14.mp3"},
+  {"who":"client","en":"And the GPS? Is it better?","pt":"E o GPS? É melhor?","extra":true,"voz":"echo","mp3":"/assets/audio/agro13/s15.mp3"},
+  {"who":"yara","en":"Much better. It's the newest model.","pt":"Muito melhor. É o modelo mais novo.","extra":true,"voz":"onyx","mp3":"/assets/audio/agro13/s16.mp3"},
+  {"who":"client","en":"So which one is the best for us?","pt":"Então qual é o melhor pra gente?","extra":false,"voz":"echo","mp3":"/assets/audio/agro13/s17.mp3"},
+  {"who":"yara","en":"The green one. It's the best for big fields.","pt":"O verde. É o melhor para talhões grandes.","extra":false,"voz":"onyx","mp3":"/assets/audio/agro13/s18.mp3"},
+  {"who":"client","en":"OK. Let's talk about the price, then.","pt":"Ok. Então vamos falar do preço.","extra":true,"voz":"echo","mp3":"/assets/audio/agro13/s19.mp3"},
+  {"who":"yara","en":"Good idea. Maybe we get a better price!","pt":"Boa ideia. Talvez a gente consiga um preço melhor!","extra":true,"voz":"onyx","mp3":"/assets/audio/agro13/s20.mp3"}
 ]/*FIM_DIALOGO*/;
 let dlgLongo=false, dlgComPt=false, dlgAudio=null, dlgTocando=false, dlgTurno=0;
 
@@ -1074,7 +1074,7 @@ function submitHomeworkAgro13(){if(hwEntregue)return;if(window.HomeworkPlus&&!Ho
 <script src="listening-lab.js?v=som2"></script>
 <script src="self-study.js?v=ss4"></script>
 <script src="tela-cheia.js?v=tc1"></script>
-<script src="aula-molde.js?v=am1"></script>
+<script src="aula-molde.js?v=am3"></script>
 <script>window.HW_PLUS={"aula":13,"titulo":"This Tractor Is Bigger","curso":"Agro English","cor":"#15803d","completar":[{"f":"The green tractor is ___ than the red one.","r":["bigger"],"dica":"big (grande)"},{"f":"The red tractor is ___ than the green one.","r":["cheaper"],"dica":"cheap (barato)"},{"f":"The green tractor is ___ expensive.","r":["more"],"dica":"mais"},{"f":"It's the ___ tractor for big fields.","r":["best"],"dica":"good → o melhor"}],"compreensao":[{"q":"Quanto o trator verde é mais caro?","opts":["About twenty percent.","About ten percent.","About fifty percent."],"a":"About twenty percent."},{"q":"Qual trator gasta menos combustível?","opts":["The green one.","The red one.","They use the same."],"a":"The green one."}],"voz":["The green tractor is bigger than the red one.","It's the most comfortable cab here."],"livre":{"pedido":"Compare duas coisas da sua vida (dois carros, duas cidades, dois celulares) em 2 frases.","exemplo":"My car is older than my father's car. São Paulo is bigger than my city."}};window.HW_ESTADO=function(){const er=document.getElementById('err-agro13-fb');return{ordem:WO_AGRO13_DATA.map((x,i)=>wo_agro13[i].ans.join(' ').toLowerCase()===x.s.toLowerCase()),pares:[mp_agro13_Done.size,MP_AGRO13.length],erro:!!(er&&/✅/.test(er.textContent))};};</script>
 <script src="homework-plus.js?v=hw1"></script>
 <script src="folha-da-aula.js?v=fa1" data-pdf="assets/pdf/agro_aula_13-folha.pdf"></script>
