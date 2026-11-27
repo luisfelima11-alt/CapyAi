@@ -54,6 +54,39 @@ function trocarArray(t, nome, corpoNovo) {
 }
 
 const j = o => JSON.stringify(o);
+// Dado dentro de <script>: "</script>" num texto fecharia a tag antes da hora.
+const jsonNoScript = o => JSON.stringify(o).replace(/</g, '\\u003c');
+
+const CONTINUAR = `  <div class="mt-6 pt-6 border-t border-slate-100"><button type="button" onclick="proximoPasso()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy text-white font-black px-7 py-3.5 rounded-2xl hover:opacity-90 transition-opacity">Continuar <span class="material-symbols-outlined text-lg">arrow_forward</span></button></div>`;
+
+// Padrão de 12/nov/2026: "How do you say it in English?" e texto com lacunas, montados
+// pelo aula-molde.js. Só entram quando o conteudo.json traz `traducao` e `lacunas`
+// (Agro 16 em diante); as aulas 1–15 continuam iguais se forem reconstruídas.
+const SECAO_TRADUCAO = `<!-- HOW DO YOU SAY IT IN ENGLISH? (padrão de 12/nov/2026, montado pelo aula-molde.js) -->
+<div id="tab-traducao" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🇧🇷 How do you say it in English?</h2>
+  <p class="text-slate-500 text-sm mb-5">Leia a frase em português e escreva em inglês, com as palavras e os padrões da aula. Depois de conferir, a resposta certa aparece escrita.</p>
+  <div id="trad-area"></div>
+${CONTINUAR}
+</div>
+
+`;
+const SECAO_LACUNAS = `<!-- COMPLETE THE TEXT (padrão de 12/nov/2026, montado pelo aula-molde.js) -->
+<div id="tab-lacunas" class="tab-content fade-in hidden">
+  <h2 class="text-2xl font-black text-navy mb-2">🔤 Complete the text</h2>
+  <p class="text-slate-500 text-sm mb-5">Um texto com partes faltando. Os pedaços estão na caixa: escolha cada um e encaixe no lugar certo.</p>
+  <div id="lacunas-area"></div>
+${CONTINUAR}
+</div>
+
+`;
+const temPadraoNovo = c => Array.isArray(c.traducao) && !!c.lacunas;
+const palavras = s => String(s).replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length;
+
+function trocar(t, de, para, oQue) {
+    if (!t.includes(de)) throw new Error(`não achei ${oQue} no molde`);
+    return t.split(de).join(para);
+}
 
 function blocoHero(c) {
     const f = c.hero.flutuantes;
@@ -153,7 +186,8 @@ function construir(n) {
     const nn = String(n).padStart(2, '0');
     const d = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/agro${nn}-dialogo.json`), 'utf8'));
     const c = JSON.parse(fs.readFileSync(path.join(RAIZ, `scripts/agro${nn}-conteudo.json`), 'utf8'));
-    let t = fs.readFileSync(MOLDE, 'utf8');
+    // No Windows o checkout pode vir com CRLF, e as âncoras (aqui e nas libs) são com \n.
+    let t = fs.readFileSync(MOLDE, 'utf8').replace(/\r\n/g, '\n');
     // O molde (GPS 09) já traz o cartão da folha apontando para o PDF dele. Sai aqui; o
     // gera-folha-aula.mjs põe o cartão certo desta aula.
     t = t.replace(/<script src="folha-da-aula\.js[^>]*><\/script>\n?/, '');
@@ -180,6 +214,17 @@ function construir(n) {
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
     t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
         c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio, raiz: RAIZ }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
+    // O subtítulo das Key Expressions do molde é do GPS ("quem atende no telefone").
+    t = trocar(t, 'Frases prontas de quem atende no telefone. Clique para ver o uso.',
+        c.expressoesSub || 'Frases prontas para usar na conversa. Uma por slide.', 'o subtítulo das Expressions');
+    if (temPadraoNovo(c)) {
+        t = trocar(t, '<!-- CONVERSATION', SECAO_TRADUCAO + '<!-- CONVERSATION', 'a âncora da Conversation');
+        t = trocar(t, '<!-- SPEAK', SECAO_LACUNAS + '<!-- SPEAK', 'a âncora do Speak');
+        t = trocar(t, "  {id:'grammar',     rotulo:'🧩 Patterns'},\n", "  {id:'grammar',     rotulo:'🧩 Patterns'},\n  {id:'traducao',    rotulo:'🇧🇷 How do you say it?'},\n", 'o Patterns na ROTA');
+        t = trocar(t, "  {id:'practice',    rotulo:'✏️ Practice'},\n", "  {id:'practice',    rotulo:'✏️ Practice'},\n  {id:'lacunas',     rotulo:'🔤 Complete the text'},\n", 'o Practice na ROTA');
+        t = trocar(t, '<script src="aula-molde.js',
+            `<script>const TRAD_DATA=${jsonNoScript(c.traducao)};const LACUNAS_DATA=${jsonNoScript(c.lacunas)};</script>\n<script src="aula-molde.js`, 'a tag do aula-molde.js');
+    }
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
@@ -268,7 +313,22 @@ function validar({ t, d, c, n, nn }) {
     ok(t.includes('capyAgroCompleted'), 'grava capyAgroCompleted');
     ok(t.includes(`arr.push(${n})`), `push(${n}) na chave do curso`);
     ok(!/Ã[©¡ªµ§]|â€/.test(t), 'zero mojibake');
-    ok((t.match(/id="tab-/g) || []).length === 9, '9 seções tab-* (com o 🎯 Prepare)');
+    const novo = temPadraoNovo(c);
+    ok((t.match(/id="tab-/g) || []).length === (novo ? 11 : 9), novo ? '11 seções tab-* (Prepare + 8 do molde + tradução + lacunas)' : '9 seções tab-* (com o 🎯 Prepare)');
+    ok(!t.includes('quem atende no telefone'), 'subtítulo das Expressions do Agro, não o do GPS');
+    if (novo) {
+        // Padrão de 12/nov/2026: tradução e texto com lacunas.
+        ok(/\{id:'traducao'/.test(t) && /\{id:'lacunas'/.test(t), 'tradução e lacunas na ROTA');
+        ok(c.expressoes.length === 6 && c.expressoes.every(e => e.expr && e.pt && e.usage && e.example), '6 expressões completas (slides)');
+        const tr = c.traducao;
+        ok(tr.length === 6 && tr.every(x => x.pt && x.en && !/</.test(x.pt + x.en)), '6 frases de "How do you say it in English?" (pt + en, sem HTML)');
+        ok(tr.every(x => palavras(x.en) <= (c.tetoPalavras || 10) + 1), 'frases de tradução curtas (nível A1)');
+        const pecas = [...String(c.lacunas.texto || '').matchAll(/\[\[([^\]]+)\]\]/g)].map(m => m[1]);
+        ok(pecas.length >= 6 && pecas.length <= 8, `texto com 6 a 8 lacunas (${pecas.length})`);
+        ok(Array.isArray(c.lacunas.extras) && c.lacunas.extras.length === 2 && c.lacunas.extras.every(x => !pecas.includes(x)), '2 pedaços de distração que não são respostas');
+        ok(palavras(String(c.lacunas.texto).replace(/\[\[|\]\]/g, '')) >= 60, 'texto com 60 palavras ou mais');
+        ok(t.includes('id="trad-area"') && t.includes('id="lacunas-area"') && (t.match(/aula-molde\.js\?v=/g) || []).length === 1, 'seções novas ligadas ao aula-molde.js');
+    }
     // Com arquivo gravado, a aula aponta para ele; sem arquivo, cada fala leva a voz do personagem
     // (a voz da IA) e nenhum caminho de mp3 que daria 404.
     if (temAudio(`agro${nn}`, 19)) ok(t.includes(`/assets/audio/agro${nn}/s20.mp3`), 'áudio da 20ª fala apontado');

@@ -14,10 +14,13 @@ const LESSONS_TR = [
   {
     id: 302, title: 'Türk Alfabesi', emoji: '🔤', lang: 'tr', course: 'turkish',
     verbs: ['okumak', 'yazmak', 'dinlemek', 'söylemek'],
-    vocab: [{en:'ç',pt:'som de tch'},{en:'ş',pt:'som de ch'},{en:'c',pt:'som de dj'},{en:'ğ',pt:'prolonga a vogal anterior'},{en:'ı',pt:'vogal sem ponto, som fechado'},{en:'ö / ü',pt:'vogais arredondadas'}],
+    // Uma palavra por letra especial, e não a letra solta: com "ç" ou "ö / ü" no vocab o
+    // Listen lia o nome da letra, o Typing aceitava qualquer tecla e o Scramble ficava vazio
+    // (relato do Luis, 21/nov/2026). O som de cada letra está no grammar e no quiz.
+    vocab: [{en:'çay',pt:'chá'},{en:'şeker',pt:'açúcar'},{en:'cam',pt:'vidro'},{en:'dağ',pt:'montanha'},{en:'ışık',pt:'luz'},{en:'göz',pt:'olho'},{en:'üzüm',pt:'uva'},{en:'iş',pt:'trabalho'}],
     expressions: [{expr:'Nasıl yazılır?',meaning:'Como se escreve?',example:'İstanbul nasıl yazılır?'},{expr:'Tekrar eder misiniz?',meaning:'Pode repetir?',example:'Lütfen, tekrar eder misiniz?'},{expr:'Yavaş konuşun.',meaning:'Fale devagar.',example:'Lütfen, yavaş konuşun.'}],
     sentences: ['Türkçede yirmi dokuz harf var.','Çay kelimesi ç ile başlar.','Şeker kelimesinde ş var.','İstanbul büyük İ ile başlar.','Işık kelimesi noktasız ı ile yazılır.','G harfi ve ğ harfi farklıdır.'],
-    grammar: {title:'As letras especiais do turco',rules:['O alfabeto turco tem 29 letras e não usa q, w ou x.','<b>i/İ</b> têm ponto; <b>ı/I</b> não têm ponto e formam outro par.','<b>ğ</b> geralmente alonga ou conecta vogais; não tem o som do g português.'],table:{headers:['Letra','Som aproximado','Exemplo'],rows:[['ç','tch','çay'],['ş','ch','şeker'],['c','dj','cam'],['ğ','alongamento','dağ']]}},
+    grammar: {title:'As letras especiais do turco',rules:['O alfabeto turco tem 29 letras e não usa q, w ou x.','<b>i/İ</b> têm ponto; <b>ı/I</b> não têm ponto e formam outro par.','<b>ğ</b> geralmente alonga ou conecta vogais; não tem o som do g português.'],table:{headers:['Letra','Som aproximado','Exemplo'],rows:[['ç','tch','çay (chá)'],['ş','ch','şeker (açúcar)'],['c','dj','cam (vidro)'],['ğ','alonga a vogal','dağ (montanha)'],['ı','i fechado, sem ponto','ışık (luz)'],['ö','ê com boca de ô','göz (olho)'],['ü','i com boca de u','üzüm (uva)']]}},
     quiz: [{q:'Qual letra tem som de “tch”?',a:'ç',opts:['c','ç','ş','ğ']},{q:'Qual letra tem som de “ch”?',a:'ş',opts:['s','c','ş','j']},{q:'Qual palavra usa o i sem ponto?',a:'ışık',opts:['işik','ışık','isik','işık']},{q:'Quantas letras há no alfabeto turco?',a:'29',opts:['26','27','29','31']}],
     speak: ['çay','şeker','İstanbul','dağ','ışık']
   },

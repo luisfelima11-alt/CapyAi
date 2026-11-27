@@ -43,6 +43,23 @@ for (const comFala of [true, false]) {
     });
 }
 
+for (const comFala of [true, false]) {
+    test(`tradução: contração digitada sem apóstrofo vale (${comFala ? 'com' : 'sem'} CapyFala)`, () => {
+        const p = carregarPuras({ comFala });
+        // No celular é comum digitar "didnt" e "im": antes isso levava "Faltou: did, not".
+        assert.equal(p.conferirTraducao('I didnt have the part', ["I didn't have the part."]).ok, true);
+        assert.equal(p.conferirTraducao('im going to plant soy', ["I'm going to plant soy."]).ok, true);
+        assert.equal(p.conferirTraducao('it doesnt work', ["It doesn't work."]).ok, true);
+        assert.equal(p.conferirTraducao('you cant miss it', ["You can't miss it!"]).ok, true);
+        // "id" antes de like/love/rather/prefer é "I'd" (Agro 19: "I'd like a pair of gloves").
+        assert.equal(p.conferirTraducao('id like a pair of gloves', ["I'd like a pair of gloves."]).ok, true);
+        assert.equal(p.normalizarResposta('my id card'), 'my id card', 'id sozinho continua id');
+        // "its", "well" e "were" são palavras de verdade e não viram contração.
+        assert.equal(p.normalizarResposta('we were well'), 'we were well');
+        assert.ok(!/\bit is\b/.test(p.normalizarResposta('its color')), 'its continua its');
+    });
+}
+
 test('tradução: número em algarismo vale o mesmo que por extenso (com CapyFala)', () => {
     const p = carregarPuras({ comFala: true });
     assert.equal(p.conferirTraducao("I'm meeting my boss at 3. It's all arranged.", ["I'm meeting my boss at three. It's all arranged."]).ok, true);
@@ -87,10 +104,21 @@ test('toda aula do molde carrega o aula-molde.js uma vez, antes do cartão da fo
     assert.ok(aulasDoMolde.length >= 50, `aulas do molde: ${aulasDoMolde.length}`);
     for (const arq of aulasDoMolde) {
         const html = ler(arq);
-        const tags = html.match(/<script src="aula-molde\.js\?v=am1"><\/script>/g) || [];
+        const tags = html.match(/<script src="aula-molde\.js\?v=am3"><\/script>/g) || [];
         assert.equal(tags.length, 1, arq);
         const folha = html.indexOf('folha-da-aula.js');
         if (folha >= 0) assert.ok(html.indexOf('aula-molde.js') < folha, arq + ': aula-molde antes da folha');
+    }
+});
+
+test('o subtítulo das Key Expressions da GPS 09 ("quem atende no telefone") não vaza para outras aulas', () => {
+    // O molde é a GPS 09, uma aula de suporte por telefone. Os construtores copiavam o
+    // subtítulo dela para Agro, GPS 10+, Entrevista e Medical (corrigido em 21/nov/2026).
+    for (const arq of aulasDoMolde.filter(n => n !== 'gpstronic_aula_09.html')) {
+        assert.ok(!ler(arq).includes('quem atende no telefone'), arq);
+    }
+    for (const b of ['build-gpstronic-aula', 'build-interview-aula', 'build-med-aula', 'build-agro-aula', 'build-intermediate-aula']) {
+        assert.ok(ler(`scripts/${b}.mjs`).includes('Frases prontas de quem atende no telefone'), `${b} troca o subtítulo do molde`);
     }
 });
 
