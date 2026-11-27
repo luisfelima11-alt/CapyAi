@@ -196,6 +196,76 @@ um caractere (o `'`) esquece o outro (o `"`). Passe um índice e leia o dado no 
 
 ---
 
+## 2026-11-20 — Aulas 43 e 44: o 🔊 ficava mudo no iPhone
+
+**Sintoma:** nas aulas 43 ("Let's Make Plans!") e 44 ("Tell Me About Yourself"), os 🔊 do diálogo, das frases-chave e dos exemplos de resposta não faziam som no iPhone com a chave de silencioso ligada (e tinham a voz robótica nos outros aparelhos).
+
+**Causa raiz:** `speakLine43/44`, `speakChunk43/44` e `speakEx44` chamavam `speechSynthesis` direto. As outras aulas passam pelo `tts-en.js`, que toca a voz da IA no elemento de áudio liberado pelo primeiro toque (`CapyAudio`, entrada de 18/out); estas cinco funções foram escritas à mão no modelo comunicativo e nunca foram ligadas a ele.
+
+**Correção:** as cinco funções chamam `falar43/falar44`, que usa `window.speakEn` (tts-en.js, já carregado nas duas páginas) e só cai na voz do navegador se o tts-en.js não existir.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` toca em cada 🔊 no iPhone 13 e exige o pedido a `/api/tts`, sem fala do navegador antes. Para achar outras: procure `new SpeechSynthesisUtterance` fora de `speak()` em página que carrega `tts-en.js`.
+
+**Por que aconteceu:** o `tts-en.js` só substitui `speak`/`speakRaw`; função com outro nome passa por fora sem ninguém notar no computador.
+
+---
+
+## 2026-11-20 — No celular, o Pavilhão de Jogos não abria o "Mais"
+
+**Sintoma:** no Pavilhão de Jogos, no celular, tocar em "Mais" no menu de baixo subia a página até o topo em vez de abrir o menu.
+
+**Causa raiz:** o botão rosa "voltar ao topo" é fixo em `bottom-8 right-8` (64 px). No celular ele ficava bem em cima do "Mais" do menu de baixo (82 px de altura), e por estar na frente recebia o toque.
+
+**Correção:** no celular o botão fica acima do menu (`bottom-24 right-4`, 56 px); no computador continua onde estava.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` toca no meio do "Mais" no iPhone 13 e espera a folha subir.
+
+**Por que aconteceu:** o botão foi posto antes do menu de baixo existir e nunca foi revisto no celular.
+
+---
+
+## 2026-11-20 — No celular, a página "Minha conta" não tinha caminho
+
+**Sintoma:** no celular não havia como chegar a "Minha conta" (plano atual, "Atualizar status da assinatura", o que a Yara sabe do aluno). O link só existia no menu do avatar.
+
+**Causa raiz:** o menu do avatar abre com `group-hover` (passar o mouse). No toque, o avatar é um link e leva direto para os Ajustes; o menu "Mais" do celular só tinha Progresso e Ajustes, e os Ajustes não apontam para a conta.
+
+**Correção:** "Minha conta" entrou nos links de baixo do menu "Mais" (`components.js`, etiqueta `?v=` mantida). A fileira quebra linha em 320 px.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` abre o "Mais" no iPhone 13 e toca em "Minha conta".
+
+**Por que aconteceu:** menu que depende de hover não existe no celular; ninguém conferiu se cada item dele tinha outro caminho no toque.
+
+---
+
+## 2026-11-20 — No celular, o Índice das aulas do molde escondia o "Homework"
+
+**Sintoma:** nas aulas do molde novo (Agro, GPS 09+, Intermediate 19+, Entrevista, Medical), tocar em "Índice" no celular abria a lista dos 10 passos, mas o fim dela ficava embaixo do menu de baixo. Não dava para rolar até lá: o "Homework" (e às vezes o "Listening") não podia ser tocado.
+
+**Causa raiz:** o Índice fica dentro da barra grudada no topo (`sticky top-0`). Uma área grudada não rola com a página, e a lista (~536 px) somada ao cabeçalho, à barra e ao menu de baixo passa dos 664 px do iPhone 13.
+
+**Correção:** `aula-molde.js` (que todas essas aulas carregam) limita o `#rota-indice` à altura da tela menos 15rem e deixa a lista rolar por dentro. Corrige as 63 páginas sem gerar de novo.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` abre o Índice com a barra grudada e confere, passo a passo, que o dedo alcança cada item (`elementFromPoint`).
+
+**Por que aconteceu:** o Índice foi desenhado no computador, onde a tela é alta e não há menu de baixo.
+
+---
+
+## 2026-11-20 — No celular, a Yara cobria o "Verificar" das lições
+
+**Sintoma:** no celular, em `lessons.html` (Build, Quiz, Scramble, Speed), o último botão de cada ferramenta ficava metade embaixo dos botões flutuantes da Yara e da lousa, mesmo com a página rolada até o fim. O toque no "✓ Verificar" abria a Yara.
+
+**Causa raiz:** é a única página com o widget da Yara que não tem o menu de baixo. Sem o menu, os botões flutuantes ficam a 16 px do fundo (~74 px de altura), e o `<main>` só tinha `py-8` (32 px) de folga embaixo.
+
+**Correção:** `pb-28 md:pb-8` no `<main>` de `lessons.html`: no celular sobra espaço para rolar o último botão para cima dos flutuantes.
+
+**Como pegar isso de novo:** `tests/celular.spec.js` (iPhone 13) mede, com a página rolada até o fim, quanto do botão fica embaixo de `#yw-fab`/`#yw-board`.
+
+**Por que aconteceu:** as outras páginas com a Yara têm o menu de baixo e `pb-32`; a folga foi pensada para o menu, não para os flutuantes.
+
+---
+
 ## 2026-11-16 — "Ouvir o diálogo" quebrado no Agro 11 a 15 e no GPS 15 a 27
 
 **Sintoma:** nas aulas mais novas do Agro English e do GPS Tronic, o botão de ouvir o diálogo falava frases repetidas, uma por cima da outra, ou cortava no meio, tudo com a mesma voz.

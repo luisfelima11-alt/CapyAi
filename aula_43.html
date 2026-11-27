@@ -373,12 +373,20 @@ function buildDialogue() {
   }).join('');
 }
 
-function speakLine43(i) {
+// Voz das falas: a do tts-en.js (voz da IA no elemento de áudio que o primeiro
+// toque liberou), que soa no iPhone mesmo com a chave de silencioso. A voz do
+// navegador fica só de reserva, para quando o tts-en.js não carregou.
+function falar43(texto, rate) {
+  if (typeof window.speakEn === 'function') { window.speakEn(texto); return; }
   if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(DIALOGUE43[i].plain);
-  u.lang = 'en-US'; u.rate = 0.88;
+  const u = new SpeechSynthesisUtterance(texto);
+  u.lang = 'en-US'; u.rate = rate;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
+}
+
+function speakLine43(i) {
+  falar43(DIALOGUE43[i].plain, 0.88);
 }
 
 // ─── CHUNKS ───────────────────────────────────────────────────────────────────
@@ -413,11 +421,7 @@ function buildChunks43() {
 }
 
 function speakChunk43(i) {
-  if (!window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(CHUNKS43[i].expr.replace(/\?|\./g, ''));
-  u.lang = 'en-US'; u.rate = 0.85;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+  falar43(CHUNKS43[i].expr.replace(/\?|\./g, ''), 0.85);
   _chunks43Spoken.add(i);
   if (_chunks43Spoken.size >= 4) {
     const markEl = document.getElementById('chunks43-mark');

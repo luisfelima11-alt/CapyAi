@@ -477,7 +477,20 @@
     function marcar(secao) {
         if (typeof raiz.markSection === 'function') raiz.markSection(secao);
     }
+    // O Índice abre dentro da barra grudada no topo. Com 10 passos ele passava
+    // da tela do celular e o fim ficava embaixo do menu de baixo, sem como rolar
+    // (a barra gruda): o "Homework" não podia ser tocado. Agora ele cabe na tela
+    // (descontados o cabeçalho, a barra e o menu de baixo) e rola por dentro.
+    function indiceCabeNaTela() {
+        if (!document.getElementById('rota-indice') || document.getElementById('capy-rota-indice-css')) return;
+        const s = document.createElement('style');
+        s.id = 'capy-rota-indice-css';
+        s.textContent = '#rota-indice{max-height:calc(100vh - 15rem);max-height:calc(100dvh - 15rem);'
+            + 'overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}';
+        (document.head || document.documentElement).appendChild(s);
+    }
     function ligar() {
+        indiceCabeNaTela();
         const molde = document.getElementById('rota-indice-lista');
         const grade = document.getElementById('expr-grid');
         const expr = dado('EXPR_DATA');
