@@ -193,6 +193,9 @@ function construir(n) {
     t = entre(t, '<div id="tab-dialogue" class="tab-content fade-in">', '<!-- VOCAB', blocoDialogo(c, d));
     t = entre(t, '<div id="tab-grammar" class="tab-content fade-in hidden">', '<!-- CONVERSATION',
         c.gramatica.slides ? blocoGramaticaSlides(c, { slug: pastaAudio, raiz: RAIZ }) : blocoGramatica(c));   // slides: padrão desde 05/10/2026
+    // O subtítulo das Key Expressions do molde é da aula 09 (suporte por telefone). O
+    // aula-molde.js troca na tela, mas o HTML (o que o Google lê) ficava com o texto errado.
+    t = t.split("Frases prontas de quem atende no telefone. Clique para ver o uso.").join(c.expressoesSub || "Uma expressão por slide. Ouça, veja quando usar e passe com as setas. Toque no slide para ver em tela cheia.");
 
     // 4. Homework
     t = t.split('Lesson 09 — Walk Me Through It').join(`Lesson ${nn} — ${d.titulo}`);
